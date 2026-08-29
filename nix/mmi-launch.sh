@@ -1,4 +1,4 @@
-# Runs inside the mmi-cad FHS namespace (bubblewrap). Host launcher: nix_run.sh
+# Runs inside the mmi-cad FHS namespace (bubblewrap). Host launcher: run.sh
 set -euo pipefail
 
 info()  { printf '%s\n' "[mmi-cad] $*"; }

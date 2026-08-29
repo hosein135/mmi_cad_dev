@@ -969,7 +969,7 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
 
   set sh [mag_magic2gds_script]
   if {$sh == ""} {
-    mag_import_fail "mag2gds.sh not found. Re-run ./nix_run.sh, or use the Tcl paint-dump converter."
+    mag_import_fail "mag2gds.sh not found. Re-run ./run.sh, or use the Tcl paint-dump converter."
     return
   }
 
@@ -981,7 +981,7 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
     set magicbin /opt/magic/bin/magic
   }
   if {$magicbin == ""} {
-    mag_import_fail "Magic VLSI is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./nix_run.sh so magic is on PATH."
+    mag_import_fail "Magic VLSI is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./run.sh so magic is on PATH."
     return
   }
 

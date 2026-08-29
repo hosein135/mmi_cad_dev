@@ -26,15 +26,14 @@ The vendor tools are **32-bit Linux ELF** (i486). Nix supplies a filesystem layo
 ## Quick start
 
 ```bash
-chmod +x nix_run.sh run.sh
-./nix_run.sh              # first time: install Nix if needed, then open a CAD shell
-./nix_run.sh max          # start MAX
-./run.sh max              # same (wrapper)
+chmod +x run.sh
+./run.sh              # first time: install Nix if needed, then open a CAD shell
+./run.sh max          # start MAX
 ```
 
 Place `mmi_pd_040526.tar.gz` in this directory before the first CAD launch.
 
-The first `./nix_run.sh` downloads nixpkgs and realises the FHS environment. That can take a while; later runs reuse the Nix store.
+The first `./run.sh` downloads nixpkgs and realises the FHS environment. That can take a while; later runs reuse the Nix store.
 
 ## Import a PDK into MAX
 
@@ -63,7 +62,7 @@ MAX cannot read `.mag` natively (`db_magic` was removed). Use **File → Import 
 
 ### Shared PDK folder (Magic + MAX)
 
-`nix_run.sh` bind-mounts host **`./pdks`** → **`/opt/pdks`** (`PDK_ROOT`) inside the FHS env. One tree, not two copies:
+`run.sh` bind-mounts host **`./pdks`** → **`/opt/pdks`** (`PDK_ROOT`) inside the FHS env. One tree, not two copies:
 
 | Path in `/opt/pdks` | Used by |
 |---------------------|---------|
@@ -99,22 +98,20 @@ Then MAX `gds_read` turns that GDS into `.max` (same for both).
 3. Pick the destination MAX technology
 4. Output: `<design>/max_import/` (`*.gds`, `*.max`)
 
-## `nix_run.sh` options
+## `run.sh` options
 
 | Command | Description |
 |--------|-------------|
-| `./nix_run.sh` | Prepare Nix (if needed) and start an interactive CAD shell |
-| `./nix_run.sh <tool>` | Prepare (if needed) and launch a CAD tool |
-| `./nix_run.sh --prep-only` | Install/lock Nix and realise the FHS env; do not start CAD |
-| `./nix_run.sh --force-setup` | Re-run curl/Nix/flake prep even if `.mmi-nix-ready` exists |
-| `./nix_run.sh --force-install` | Re-extract `mmi_pd_040526.tar.gz` into `.mmi-prefix` |
-| `./nix_run.sh --force-fonts` | Re-copy Motif XLFD fonts into `.mmi-xfonts` |
-| `./nix_run.sh --clean` | Remove local prefix, fonts, bootstrap, and ready marker |
-| `./nix_run.sh --help` | Show help |
+| `./run.sh` | Prepare Nix (if needed) and start an interactive CAD shell |
+| `./run.sh <tool>` | Prepare (if needed) and launch a CAD tool |
+| `./run.sh --prep-only` | Install/lock Nix and realise the FHS env; do not start CAD |
+| `./run.sh --force-setup` | Re-run curl/Nix/flake prep even if `.mmi-nix-ready` exists |
+| `./run.sh --force-install` | Re-extract `mmi_pd_040526.tar.gz` into `.mmi-prefix` |
+| `./run.sh --force-fonts` | Re-copy Motif XLFD fonts into `.mmi-xfonts` |
+| `./run.sh --clean` | Remove local prefix, fonts, bootstrap, and ready marker |
+| `./run.sh --help` | Show help |
 
-`./run.sh` is a thin wrapper around `nix_run.sh`.
-
-You can also enter the env with Nix directly (after the first `./nix_run.sh --prep-only`):
+You can also enter the env with Nix directly (after the first `./run.sh --prep-only`):
 
 ```bash
 export MMI_CAD_ROOT="$PWD"
@@ -137,8 +134,7 @@ nix develop
 | Path | Role |
 |------|------|
 | `flake.nix` | Nix FHS env, fonts, Magic VLSI, PDK scripts |
-| `nix_run.sh` | Host bootstrap + launch |
-| `run.sh` | Calls `nix_run.sh` |
+| `run.sh` | Host bootstrap + launch |
 | `nix/mmi-launch.sh` | Entrypoint inside the FHS env |
 | `mmi_pd_040526.tar.gz` | Upstream Micro Magic package (required to run CAD) |
 | `max_pdk/` | MAX menus: Import PDK; Import Magic; Caravel sample |
