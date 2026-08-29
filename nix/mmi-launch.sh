@@ -225,7 +225,7 @@ if [ -n "${DISPLAY:-}" ]; then
       "-misc-fixed-medium-r-normal--14-140-75-75-c-70-iso8859-1" \
       "fixed" "9x15"
   do
-    if xlsfonts 2>/dev/null | grep -qF "${font}"; then
+    if xlsfonts 2>/dev/null | grep -qF -e "${font}"; then
       echo "  [OK] ${font}"
     else
       echo "  [MISSING] ${font}"

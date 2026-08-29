@@ -95,6 +95,7 @@
       mmiCad = pkgs.buildFHSEnv {
         pname = "mmi-cad";
         version = "1.0.0";
+        multiArch = true; # 32-bit i486 CAD binaries need /lib/ld-linux.so.2 + lib32
 
         # Mount points inside the FHS root (not host /home — bwrap cannot mkdir there).
         extraBuildCommands = ''
