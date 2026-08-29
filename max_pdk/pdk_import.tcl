@@ -257,8 +257,8 @@ proc pdk_which {names} {
 }
 
 # Shared PDK folder used by Magic (native open_pdks tree) and MAX
-# (compiled .source / make_tech output under max/tech/). Default /opt/pdks,
-# bind-mounted from host ./pdks so the files are not duplicated in the image.
+# (compiled .source / make_tech output under max/tech/). Default /opt/pdks
+# (host ./pdks inside the Nix FHS env).
 proc pdk_root {} {
   global env
   if {[info exists env(PDK_ROOT)] && $env(PDK_ROOT) != ""} {
@@ -501,7 +501,7 @@ proc pdk_import_download_next {} {
       return
     }
   } else {
-    pdk_import_fail "Neither curl nor wget is installed in the container."
+    pdk_import_fail "Neither curl nor wget is installed in this environment."
     return
   }
 
@@ -579,10 +579,14 @@ proc pdk_import_unpack {} {
   set src $PDK_IMPORT(src)
   set tar [pdk_which {tar /bin/tar /usr/bin/tar}]
   set unzip [pdk_which {unzip /usr/bin/unzip}]
+  set filebin [pdk_which {file /usr/bin/file}]
 
   set cmd ""
-  if {[catch {set magic [exec /usr/bin/file -b $dest]}]} {
-    set magic ""
+  set magic ""
+  if {$filebin != ""} {
+    if {[catch {set magic [exec $filebin -b $dest]}]} {
+      set magic ""
+    }
   }
   pdk_log "Archive type: $magic"
 

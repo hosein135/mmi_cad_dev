@@ -181,8 +181,13 @@ proc mag_pdk_magicrc_ok {} {
   }
   return 0
 }
+
+proc mag_sample_dir {} {
   global env MMI_TOOLS
   set cands {}
+  if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
+    lappend cands [file join $env(MMI_PDK_DIR) samples caravel_analog_por]
+  }
   if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
     lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk/samples/caravel_analog_por]
   }
@@ -802,7 +807,7 @@ proc mag_import_dialog {} -desc {
           "Magic mag2gds — tapeout-quality (needs Magic + shared PDK)" \
           "Tcl paint dump — fast, no Magic (NOT tapeout-quality)"] \
       -values {mag2gds tcl} \
-      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules (contacts, derived layers, correct units). Requires \$PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc (shared folder /opt/pdks). Tcl dump: MAX Tcl copies paint rectangles to GDS layers; no Magic binary; missing stdcells become empty boxes.}]
+      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules (contacts, derived layers, correct units). Requires \$PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc (shared folder ./pdks → /opt/pdks). Tcl dump: MAX Tcl copies paint rectangles to GDS layers; no Magic binary; missing stdcells become empty boxes.}]
 
   lappend prop_list [list "Destination MAX PDK / technology:" MAG_IMPORT(tech) \
       -radio $labels -values $values \
@@ -942,6 +947,9 @@ proc mag_import_run {dir top tech {method mag2gds}} {
 proc mag_magic2gds_script {} {
   global MMI_TOOLS env
   set cands {}
+  if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
+    lappend cands [file join $env(MMI_PDK_DIR) mag2gds.sh]
+  }
   lappend cands /opt/mmi-pdk/mag2gds.sh
   if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
     lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk/mag2gds.sh]
@@ -961,7 +969,7 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
 
   set sh [mag_magic2gds_script]
   if {$sh == ""} {
-    mag_import_fail "mag2gds.sh not found. Rebuild the image, or use the Tcl paint-dump converter."
+    mag_import_fail "mag2gds.sh not found. Re-run ./nix_run.sh, or use the Tcl paint-dump converter."
     return
   }
 
@@ -973,7 +981,7 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
     set magicbin /opt/magic/bin/magic
   }
   if {$magicbin == ""} {
-    mag_import_fail "Magic VLSI is not installed in this image.\nUse the Tcl paint-dump converter, or rebuild so /opt/magic/bin/magic exists."
+    mag_import_fail "Magic VLSI is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./nix_run.sh so magic is on PATH."
     return
   }
 

@@ -19,7 +19,7 @@ if [ -z "$magic_bin" ] && [ -x /opt/magic/bin/magic ]; then
   magic_bin=/opt/magic/bin/magic
 fi
 if [ -z "$magic_bin" ]; then
-  echo "ERROR: magic is not installed (expected /opt/magic/bin/magic)." >&2
+  echo "ERROR: magic is not installed (expected on PATH or /opt/magic/bin/magic)." >&2
   exit 2
 fi
 

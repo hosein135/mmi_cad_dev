@@ -2,6 +2,9 @@
 proc _mmi_pdk_source {name} {
   global env
   set cands {}
+  if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
+    lappend cands [file join $env(MMI_PDK_DIR) $name]
+  }
   if {[info exists env(MMI_TOOLS)]} {
     lappend cands [file normalize $env(MMI_TOOLS)/../mmi_local/max/pdk/$name]
   }

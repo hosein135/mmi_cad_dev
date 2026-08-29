@@ -1,31 +1,44 @@
-# Micro Magic CAD (Docker)
+# Micro Magic CAD (Nix)
 
-Run Micro Magic CAD tools (`max`, `sue`, `nst`, and others) inside a Docker image based on Ubuntu 20.04, with X11 GUI forwarding to the host.
+Run Micro Magic CAD tools (`max`, `sue`, `nst`, and others) in a **Nix FHS environment** on x86_64 Linux. There is no Docker image.
 
-This directory is the **build & development** tree: `Dockerfile` + `run.sh`.
+The vendor tools are **32-bit Linux ELF** (i486). Nix supplies a filesystem layout (`/lib`, `/usr`, 32-bit Motif/X11/glibc) so those binaries run on a modern host. **Magic VLSI** comes from nixpkgs (`magic-vlsi`) instead of being compiled in a container.
 
-For **offline / end-user launchers** (load a pre-built image tar, no Dockerfile needed), see the sibling project [`mmi_cad`](../mmi_cad/).
+## What is possible
+
+| Host | Works? |
+|------|--------|
+| **x86_64 Linux** | Yes — native Nix FHS |
+| **WSL2** (x86_64) | Yes — same, with VcXsrv/Xming on Windows |
+| **macOS** | **No.** These are Linux ELF binaries. Docker used to be a Linux VM; Nix cannot execute them on Darwin. Use a Linux machine or WSL2. |
+| **ARM Linux** | **No**, not without an x86_64 VM. |
+| **WSL1** | **No** — bubblewrap / user namespaces need WSL2. |
 
 ## Requirements
 
-- [Docker](https://docs.docker.com/get-docker/) Engine (daemon running)
+- x86_64 Linux or WSL2
 - An X11 display:
   - **Linux:** graphical session (`DISPLAY` set)
   - **WSL2:** VcXsrv/Xming (or similar) with access control disabled
-  - **macOS:** [XQuartz](https://www.xquartz.org/) with network clients allowed
-- Vendor tarball used by the image build: `mmi_pd_040526.tar.gz` (must sit next to the `Dockerfile`)
+- Vendor tarball **`mmi_pd_040526.tar.gz`** next to `flake.nix` (same archive the old Docker build copied in)
+- First run installs **curl** (static binary if missing) and **Nix** via the official installer. No apt/dnf/pacman/brew.
 
 ## Quick start
 
 ```bash
-chmod +x run.sh
-./run.sh              # build image (first time), then open a shell in the container
-./run.sh max          # build (if needed), then start a specific tool
+chmod +x nix_run.sh run.sh
+./nix_run.sh              # first time: install Nix if needed, then open a CAD shell
+./nix_run.sh max          # start MAX
+./run.sh max              # same (wrapper)
 ```
+
+Place `mmi_pd_040526.tar.gz` in this directory before the first CAD launch.
+
+The first `./nix_run.sh` downloads nixpkgs and realises the FHS environment. That can take a while; later runs reuse the Nix store.
 
 ## Import a PDK into MAX
 
-After rebuilding the image, MAX has **File → Import PDK from URL...** and **Local → Import PDK from URL...** (Tcl-only; no Python).
+MAX has **File → Import PDK from URL...** and **Local → Import PDK from URL...** (Tcl-only; no Python).
 
 The dialog has **ready-to-download** choices:
 
@@ -50,7 +63,7 @@ MAX cannot read `.mag` natively (`db_magic` was removed). Use **File → Import 
 
 ### Shared PDK folder (Magic + MAX)
 
-`run.sh` bind-mounts host **`./pdks`** → container **`/opt/pdks`** (`PDK_ROOT`). One tree, not two copies:
+`nix_run.sh` bind-mounts host **`./pdks`** → **`/opt/pdks`** (`PDK_ROOT`) inside the FHS env. One tree, not two copies:
 
 | Path in `/opt/pdks` | Used by |
 |---------------------|---------|
@@ -73,7 +86,7 @@ The dialog asks which converter to use:
 
 | | **Magic mag2gds** (default) | **Tcl paint dump** |
 |--|-----------------------------|---------------------|
-| Who writes GDS | **Magic VLSI** (`/opt/magic/bin/magic`) | Tcl inside MAX (`mag_import.tcl`) |
+| Who writes GDS | **Magic VLSI** (`magic` from nixpkgs, also `/opt/magic/bin/magic`) | Tcl inside MAX (`mag_import.tcl`) |
 | Layer rules | PDK **cifoutput** (contacts, implants, derived layers, units) | Fixed name → GDS layer table |
 | Stdcells | Loaded from `$PDK_ROOT/.../libs.ref/*/mag` | Missing `.mag` → empty box |
 | Needs | Magic 8.3 + `.magicrc` under `PDK_ROOT` | Nothing extra |
@@ -86,70 +99,72 @@ Then MAX `gds_read` turns that GDS into `.max` (same for both).
 3. Pick the destination MAX technology
 4. Output: `<design>/max_import/` (`*.gds`, `*.max`)
 
-Rebuild once:
-
-```bash
-./run.sh --build-only
-./run.sh max
-```
-
-## `run.sh` options
+## `nix_run.sh` options
 
 | Command | Description |
 |--------|-------------|
-| `./run.sh` | Build (if needed) and start an interactive shell |
-| `./run.sh <tool>` | Build (if needed) and launch a CAD tool |
-| `./run.sh --build-only` | Build `mmi-cad:latest` only |
-| `./run.sh --save-tar` | Build (quietly) and write `mmi-cad-offline.tar` next to `run.sh` — does not start MAX |
-| `./run.sh --no-build` | Skip build; run an existing image |
-| `./run.sh --clean` | Remove image/containers/build cache, then rebuild |
-| `./run.sh --help` | Show help |
+| `./nix_run.sh` | Prepare Nix (if needed) and start an interactive CAD shell |
+| `./nix_run.sh <tool>` | Prepare (if needed) and launch a CAD tool |
+| `./nix_run.sh --prep-only` | Install/lock Nix and realise the FHS env; do not start CAD |
+| `./nix_run.sh --force-setup` | Re-run curl/Nix/flake prep even if `.mmi-nix-ready` exists |
+| `./nix_run.sh --force-install` | Re-extract `mmi_pd_040526.tar.gz` into `.mmi-prefix` |
+| `./nix_run.sh --force-fonts` | Re-copy Motif XLFD fonts into `.mmi-xfonts` |
+| `./nix_run.sh --clean` | Remove local prefix, fonts, bootstrap, and ready marker |
+| `./nix_run.sh --help` | Show help |
 
-Image name: **`mmi-cad:latest`**  
-Container name: **`mmi-cad-session`**
+`./run.sh` is a thin wrapper around `nix_run.sh`.
+
+You can also enter the env with Nix directly (after the first `./nix_run.sh --prep-only`):
+
+```bash
+export MMI_CAD_ROOT="$PWD"
+nix run .#mmi-cad
+nix run .#mmi-cad -- max
+nix develop
+```
 
 ## What the launcher does
 
-1. Builds the Docker image from `Dockerfile` (unless skipped)
-2. Configures X11 (`DISPLAY`, optional Xauthority, socket mounts)
-3. Extracts Motif/X11 fonts from the image to `.mmi-xfonts` on the host and bind-mounts them (required for Motif GUI apps)
-4. Starts the container with `--ipc=host` and display env vars
-
-## Export an offline image archive
-
-After a successful build you can produce a tar for machines that should **not** rebuild from the Dockerfile. This writes `mmi-cad-offline.tar` in this directory and does **not** start MAX:
-
-```bash
-./run.sh --save-tar
-```
-
-Same thing by hand:
-
-```bash
-docker save -o mmi-cad-offline.tar mmi-cad:latest
-```
-
-Copy that file into the [`mmi_cad`](../mmi_cad/) project (or let the offline launchers download the published archive).
+1. Ensures **curl** and **Nix** (official installer; flakes enabled)
+2. Creates `flake.lock` on first run
+3. Sets `DISPLAY` (native X11 or WSL2 → Windows host)
+4. `nix run .#mmi-cad` — FHS namespace with 32-bit X11/Motif libs
+5. Extracts the vendor tarball into `.mmi-prefix` (once)
+6. Points the X server at Motif bitmap fonts in `.mmi-xfonts`
 
 ## Layout
 
 | Path | Role |
 |------|------|
-| `Dockerfile` | Image definition (Ubuntu 20.04 + MMI install) |
-| `run.sh` | Build + run with X11 forwarding |
-| `mmi_pd_040526.tar.gz` | Upstream Micro Magic package (required to build) |
-| `.dockerignore` | Build context filter |
-| `max_pdk/` | MAX menus: Import PDK; Import Magic (mag2gds + Tcl dump); Caravel sample |
-| `pdks/` | Host shared `PDK_ROOT` (created by `run.sh`; not in the image) |
+| `flake.nix` | Nix FHS env, fonts, Magic VLSI, PDK scripts |
+| `nix_run.sh` | Host bootstrap + launch |
+| `run.sh` | Calls `nix_run.sh` |
+| `nix/mmi-launch.sh` | Entrypoint inside the FHS env |
+| `mmi_pd_040526.tar.gz` | Upstream Micro Magic package (required to run CAD) |
+| `max_pdk/` | MAX menus: Import PDK; Import Magic; Caravel sample |
+| `pdks/` | Host shared `PDK_ROOT` (created by the launcher) |
 | `workspace/` | Host design folder → `/home/caduser/work` |
-| `readme.txt` | Legacy host-install notes (older non-Docker flow) |
+| `.mmi-prefix/` | Extracted CAD tree (not committed) |
+
+## Libraries that changed vs the old Ubuntu 20.04 image
+
+These substitutions are intentional so the stack is Nix-only:
+
+- **glibc / libstdc++** — current nixpkgs (still ABI-compatible for the old binaries; `libstdc++.so.5` is included when nixpkgs provides it)
+- **OpenSSL 3** instead of 1.1, with OpenSSL 1.1 added only if nixpkgs still has it
+- **OpenMotif** (`motif`) for Motif widgets instead of whatever Ubuntu pulled in
+- **Magic VLSI** from nixpkgs (`magic-vlsi`) instead of a git build in Docker
+- **XLFD fonts** from nixpkgs `xorg.fontadobe75dpi` / `fontmiscmisc` / … instead of `apt xfonts-*`
+- **curl/wget/file/tar** from Nix instead of Ubuntu
+
+If a 32-bit binary still misses a `.so`, run `mmi-cad` then `ldd $(command -v max)` and we can add that library to `multiPkgs` in `flake.nix`.
 
 ## Notes
 
-- Motif tools need XLFD fonts on a path the **host** X server can read; `run.sh` handles this via `.mmi-xfonts`.
-- Re-login (or `newgrp docker`) may be required after adding your user to the `docker` group on Linux.
-- Do not commit large vendor archives or exported image tars unless you intend to; prefer release artifacts / external hosting.
+- Motif tools need XLFD fonts on a path the **host** X server can read; the launcher copies them to `.mmi-xfonts` (on WSL, a Windows path is passed to VcXsrv).
+- Do not commit the vendor tarball or `.mmi-prefix` unless you intend to.
+- User namespaces must be available (needed by bubblewrap). On Debian/Ubuntu that is the default; some hardened kernels disable them.
 
 ## License / proprietary content
 
-Micro Magic CAD binaries and the vendor tarball are subject to their own licenses. This repository’s scripts package and run that software in Docker; redistribute only what you are allowed to share.
+Micro Magic CAD binaries and the vendor tarball are subject to their own licenses. This repository’s Nix files only wrap that software; redistribute only what you are allowed to share.
