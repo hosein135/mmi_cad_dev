@@ -7,7 +7,7 @@ DIR="${1:?design directory}"
 TOP="${2:?top cell}"
 OUT="${3:?output .gds}"
 FAMILY="${4:-sky130A}"
-PDK_ROOT="${PDK_ROOT:-/opt/pdks}"
+PDK_ROOT="${PDK_ROOT:-/mmi-pdks}"
 
 DIR="$(cd "$DIR" && pwd)"
 OUTDIR="$(dirname "$OUT")"
@@ -51,7 +51,7 @@ if [ -z "$RC" ]; then
   echo "ERROR: No Magic .magicrc under PDK_ROOT=$PDK_ROOT" >&2
   echo "Tapeout mag2gds needs an open_pdks-style PDK, for example:" >&2
   echo "  \$PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc" >&2
-  echo "Put that tree in the shared folder (host ./pdks → /opt/pdks)," >&2
+  echo "Put that tree in the shared folder (host ./pdks → /mmi-pdks)," >&2
   echo "or use the Tcl paint-dump converter instead." >&2
   exit 3
 fi

@@ -257,14 +257,14 @@ proc pdk_which {names} {
 }
 
 # Shared PDK folder used by Magic (native open_pdks tree) and MAX
-# (compiled .source / make_tech output under max/tech/). Default /opt/pdks
+# (compiled .source / make_tech output under max/tech/). Default /mmi-pdks
 # (host ./pdks inside the Nix FHS env).
 proc pdk_root {} {
   global env
   if {[info exists env(PDK_ROOT)] && $env(PDK_ROOT) != ""} {
     return $env(PDK_ROOT)
   }
-  return /opt/pdks
+  return /mmi-pdks
 }
 
 proc pdk_shared_max_techdir {tech} {
@@ -277,7 +277,7 @@ proc pdk_link_max_private {tech shared} {
   global env
   set home ""
   if {[info exists env(HOME)]} { set home $env(HOME) }
-  if {$home == ""} { set home /home/caduser }
+  if {$home == ""} { set home /mmi-home }
   set priv [file join $home mmi_private max tech]
   catch {file mkdir $priv}
   set link [file join $priv $tech]
@@ -709,7 +709,7 @@ proc pdk_import_convert {} {
 
   set home ""
   if {[info exists env(HOME)]} { set home $env(HOME) }
-  if {$home == ""} { set home /home/caduser }
+  if {$home == ""} { set home /mmi-home }
   set techdir [pdk_shared_max_techdir $tech]
   if {![file isdirectory $techdir]} {
     set techdir [file join $home mmi_private max tech $tech]

@@ -11,14 +11,7 @@
 
       pkgs = import nixpkgs {
         inherit system;
-        config = {
-          allowUnfree = true;
-          permittedInsecurePackages = [
-            "openssl-1.1.1w"
-            "openssl-1.1.1v"
-            "openssl-1.1.1u"
-          ];
-        };
+        config.allowUnfree = true;
       };
 
       inherit (pkgs) lib;
@@ -27,27 +20,26 @@
       # so the host X server (including VcXsrv on WSL) can open the files.
       mmiFonts = pkgs.runCommand "mmi-xfonts" {
         nativeBuildInputs = [
-          pkgs.xorg.mkfontdir
-          pkgs.xorg.mkfontscale
+          pkgs.mkfontscale
           pkgs.findutils
           pkgs.coreutils
         ];
         fontPkgs = [
-          pkgs.xorg.fontadobe75dpi
-          pkgs.xorg.fontadobe100dpi
-          pkgs.xorg.fontmiscmisc
-          pkgs.xorg.fontcursormisc
-          pkgs.xorg.fontbitstream75dpi
-          pkgs.xorg.fontbitstream100dpi
-          pkgs.xorg.fontalias
-          pkgs.xorg.fontmisccyrillic
-          pkgs.xorg.fontcronyxcyrillic
-          pkgs.xorg.fontbh75dpi
-          pkgs.xorg.fontbh100dpi
-          pkgs.xorg.fontbhtype1
-          pkgs.xorg.fontbitstreamtype1
-          pkgs.xorg.fontibmtype1
-          pkgs.xorg.encodings
+          pkgs.font-adobe-75dpi
+          pkgs.font-adobe-100dpi
+          pkgs.font-misc-misc
+          pkgs.font-cursor-misc
+          pkgs.font-bitstream-75dpi
+          pkgs.font-bitstream-100dpi
+          pkgs.font-alias
+          pkgs.font-misc-cyrillic
+          pkgs.font-cronyx-cyrillic
+          pkgs.font-bh-75dpi
+          pkgs.font-bh-100dpi
+          pkgs.font-bh-type1
+          pkgs.font-bitstream-type1
+          pkgs.font-ibm-type1
+          pkgs.font-encodings
         ];
       } ''
         mkdir -p $out
@@ -58,31 +50,41 @@
             \) 2>/dev/null | while read -r d; do
             base="$(basename "$d")"
             mkdir -p "$out/$base"
-            cp -a "$d"/. "$out/$base"/ || true
+            find "$d" -maxdepth 1 -type f \
+              ! -name fonts.dir ! -name fonts.scale ! -name fonts.alias \
+              -exec cp -f {} "$out/$base"/ \;
           done
         done
-        mkdir -p $out/misc $out/75dpi $out/100dpi
-        cp ${./nix/fonts.alias} $out/misc/fonts.alias
-        cp ${./nix/fonts.alias} $out/75dpi/fonts.alias
-        cp ${./nix/fonts.alias} $out/100dpi/fonts.alias
+        chmod -R u+w "$out"
+        install -Dm644 ${./nix/fonts.alias} $out/misc/fonts.alias
+        install -Dm644 ${./nix/fonts.alias} $out/75dpi/fonts.alias
+        install -Dm644 ${./nix/fonts.alias} $out/100dpi/fonts.alias
         for dir in $out/misc $out/75dpi $out/100dpi $out/Type1 $out/cyrillic; do
           if [ -d "$dir" ]; then
+            rm -f "$dir/fonts.dir" "$dir/fonts.scale"
             (cd "$dir" && mkfontdir . && mkfontscale . 2>/dev/null || true)
           fi
         done
+        chmod -R u+w "$out"
       '';
 
-      mmiPdk = pkgs.runCommand "mmi-pdk" { } ''
-        mkdir -p $out/app-defaults $out/samples
-        cp ${./max_pdk/pdk_import.tcl} $out/
-        cp ${./max_pdk/mag_import.tcl} $out/
-        cp ${./max_pdk/mag2gds.sh} $out/
-        cp ${./max_pdk/maxrc} $out/
-        chmod +x $out/mag2gds.sh
-        cp ${./nix/Xresources} $out/Xresources
-        cp ${./nix/app-defaults-Mmi} $out/app-defaults/Mmi
-        cp -a ${./max_pdk/samples}/. $out/samples/
-      '';
+      mmiPdk = pkgs.runCommand "mmi-pdk"
+        {
+          src = ./max_pdk;
+          xresources = ./nix/Xresources;
+          appDefaults = ./nix/app-defaults-Mmi;
+        }
+        ''
+          mkdir -p $out/app-defaults
+          install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
+          install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
+          install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
+          install -Dm644 "$src/maxrc" $out/maxrc
+          cp -r "$src/samples" $out/
+          chmod -R u+w "$out"
+          install -Dm644 "$xresources" $out/Xresources
+          install -Dm644 "$appDefaults" $out/app-defaults/Mmi
+        '';
 
       cshCompat = pkgs.runCommand "csh-compat" { } ''
         mkdir -p $out/bin
@@ -93,6 +95,12 @@
       mmiCad = pkgs.buildFHSEnv {
         pname = "mmi-cad";
         version = "1.0.0";
+
+        # Mount points inside the FHS root (not host /home — bwrap cannot mkdir there).
+        extraBuildCommands = ''
+          mkdir -p $out/mmi-home/work
+          mkdir -p $out/mmi-pdks
+        '';
 
         targetPkgs =
           p:
@@ -132,20 +140,18 @@
             xdg-utils
             strace
             magic-vlsi
-            xorg.xset
-            xorg.xlsfonts
-            xorg.xrdb
-            xorg.xauth
-            xorg.xhost
-            xorg.mkfontdir
-            xorg.mkfontscale
+            xset
+            xlsfonts
+            xrdb
+            xauth
+            xhost
+            mkfontscale
             fontconfig
           ])
           ++ lib.optionals (p ? urw-base35-fonts) [ p.urw-base35-fonts ];
 
         # Installed for both i686 and x86_64 so the 2004 i486 binaries can resolve
-        # libX11/Motif/glibc. OpenSSL 3 replaces Ubuntu 20.04's 1.1; 1.1 is added
-        # when nixpkgs still provides it. libstdc++.so.5 is for pre-GCC4 binaries.
+        # libX11/Motif/glibc. OpenSSL 3 only (1.1 is EOL and removed from nixpkgs).
         multiPkgs =
           p:
           with p;
@@ -154,25 +160,25 @@
             libxcrypt
             libGL
             libGLU
-            xorg.libX11
-            xorg.libXext
-            xorg.libXt
-            xorg.libXmu
-            xorg.libXpm
-            xorg.libXaw
-            xorg.libICE
-            xorg.libSM
-            xorg.libXrender
-            xorg.libXcursor
-            xorg.libXi
-            xorg.libXrandr
-            xorg.libXinerama
-            xorg.libXfixes
-            xorg.libXft
-            xorg.libXxf86vm
-            xorg.libxcb
-            xorg.libXau
-            xorg.libXdmcp
+            libx11
+            libxext
+            libxt
+            libxmu
+            libxpm
+            libxaw
+            libice
+            libsm
+            libxrender
+            libxcursor
+            libxi
+            libxrandr
+            libxinerama
+            libxfixes
+            libxft
+            libxxf86vm
+            libxcb
+            libxau
+            libxdmcp
             freetype
             fontconfig
             expat
@@ -194,9 +200,7 @@
           ]
           ++ lib.optionals (p ? ncurses5) [ p.ncurses5 ]
           ++ lib.optionals (p ? libstdcxx5) [ p.libstdcxx5 ]
-          ++ lib.optionals (p ? openssl_1_1) [ p.openssl_1_1 ]
           ++ lib.optionals (p ? libnsl) [ p.libnsl ]
-          ++ lib.optionals (p.xorg ? libXp) [ p.xorg.libXp ]
           ++ lib.optionals (p ? libxp) [ p.libxp ];
 
         extraPreBwrapCmds = ''
@@ -210,9 +214,9 @@
         '';
 
         extraBwrapArgs = [
-          "--bind-try \"$MMI_CAD_ROOT/.mmi-prefix/home\" /home/caduser"
-          "--bind-try \"$MMI_CAD_ROOT/workspace\" /home/caduser/work"
-          "--bind-try \"$MMI_CAD_ROOT/pdks\" /opt/pdks"
+          "--bind \"$MMI_CAD_ROOT/.mmi-prefix/home\" /mmi-home"
+          "--bind \"$MMI_CAD_ROOT/workspace\" /mmi-home/work"
+          "--bind \"$MMI_CAD_ROOT/pdks\" /mmi-pdks"
           "--ro-bind-try ${mmiPdk} /opt/mmi-pdk"
           "--ro-bind-try ${pkgs.magic-vlsi} /opt/magic"
         ];
@@ -220,7 +224,7 @@
         profile = ''
           export MMI_FONTS_SRC=${mmiFonts}
           export MMI_PDK_DIR=/opt/mmi-pdk
-          export PDK_ROOT="''${PDK_ROOT:-/opt/pdks}"
+          export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
           export QT_X11_NO_MITSHM=1
           export LC_ALL=C

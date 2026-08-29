@@ -62,14 +62,14 @@ MAX cannot read `.mag` natively (`db_magic` was removed). Use **File → Import 
 
 ### Shared PDK folder (Magic + MAX)
 
-`run.sh` bind-mounts host **`./pdks`** → **`/opt/pdks`** (`PDK_ROOT`) inside the FHS env. One tree, not two copies:
+`run.sh` bind-mounts host **`./pdks`** → **`/mmi-pdks`** (`PDK_ROOT`) inside the FHS env. One tree, not two copies:
 
-| Path in `/opt/pdks` | Used by |
-|---------------------|---------|
-| `sky130A/` `gf180mcuD/` `ihp-sg13g2/` (open_pdks layout) | **Magic** mag2gds (`libs.tech/magic/*.magicrc`) |
-| `max/tech/<name>/` (`.source` + `make_tech` output) | **MAX** (`max -tech <name>`) |
+| Path in container | Used by |
+|-------------------|---------|
+| `/mmi-pdks/sky130A/` … (open_pdks layout) | **Magic** mag2gds |
+| `/mmi-pdks/max/tech/<name>/` | **MAX** (`max -tech <name>`) |
 
-Put designs in **`./workspace`** (mounted at `/home/caduser/work`).
+Put designs in **`./workspace`** (mounted at `/mmi-home/work`).
 
 Tapeout mag2gds needs a real open_pdks/volare install, for example:
 
@@ -139,7 +139,7 @@ nix develop
 | `mmi_pd_040526.tar.gz` | Upstream Micro Magic package (required to run CAD) |
 | `max_pdk/` | MAX menus: Import PDK; Import Magic; Caravel sample |
 | `pdks/` | Host shared `PDK_ROOT` (created by the launcher) |
-| `workspace/` | Host design folder → `/home/caduser/work` |
+| `workspace/` | Host design folder → `/mmi-home/work` |
 | `.mmi-prefix/` | Extracted CAD tree (not committed) |
 
 ## Libraries that changed vs the old Ubuntu 20.04 image
@@ -147,10 +147,10 @@ nix develop
 These substitutions are intentional so the stack is Nix-only:
 
 - **glibc / libstdc++** — current nixpkgs (still ABI-compatible for the old binaries; `libstdc++.so.5` is included when nixpkgs provides it)
-- **OpenSSL 3** instead of 1.1, with OpenSSL 1.1 added only if nixpkgs still has it
+- **OpenSSL 3** (OpenSSL 1.1 was removed from nixpkgs as EOL)
 - **OpenMotif** (`motif`) for Motif widgets instead of whatever Ubuntu pulled in
 - **Magic VLSI** from nixpkgs (`magic-vlsi`) instead of a git build in Docker
-- **XLFD fonts** from nixpkgs `xorg.fontadobe75dpi` / `fontmiscmisc` / … instead of `apt xfonts-*`
+- **XLFD fonts** from nixpkgs `font-adobe-75dpi` / `font-misc-misc` / … instead of `apt xfonts-*`
 - **curl/wget/file/tar** from Nix instead of Ubuntu
 
 If a 32-bit binary still misses a `.so`, run `mmi-cad` then `ldd $(command -v max)` and we can add that library to `multiPkgs` in `flake.nix`.

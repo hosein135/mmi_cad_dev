@@ -170,7 +170,7 @@ proc mag_cancelled {} {
 }
 
 proc mag_pdk_magicrc_ok {} {
-  set root /opt/pdks
+  set root /mmi-pdks
   if {[info commands pdk_root] != ""} { set root [pdk_root] }
   foreach rel {
     sky130A/libs.tech/magic/sky130A.magicrc
@@ -807,7 +807,7 @@ proc mag_import_dialog {} -desc {
           "Magic mag2gds — tapeout-quality (needs Magic + shared PDK)" \
           "Tcl paint dump — fast, no Magic (NOT tapeout-quality)"] \
       -values {mag2gds tcl} \
-      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules (contacts, derived layers, correct units). Requires \$PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc (shared folder ./pdks → /opt/pdks). Tcl dump: MAX Tcl copies paint rectangles to GDS layers; no Magic binary; missing stdcells become empty boxes.}]
+      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules (contacts, derived layers, correct units). Requires \$PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc (shared folder ./pdks → /mmi-pdks). Tcl dump: MAX Tcl copies paint rectangles to GDS layers; no Magic binary; missing stdcells become empty boxes.}]
 
   lappend prop_list [list "Destination MAX PDK / technology:" MAG_IMPORT(tech) \
       -radio $labels -values $values \
@@ -1026,7 +1026,7 @@ proc mag_import_poll_magic {} {
 
   set gds $MAG_IMPORT(gds)
   if {![file exists $gds] || [file size $gds] < 64} {
-    mag_import_fail "Magic mag2gds failed (no GDS).\nNeed \$PDK_ROOT/<pdk>/libs.tech/magic/<pdk>.magicrc\nin the shared folder (host ./pdks → /opt/pdks).\nLog: $MAG_IMPORT(log)"
+    mag_import_fail "Magic mag2gds failed (no GDS).\nNeed \$PDK_ROOT/<pdk>/libs.tech/magic/<pdk>.magicrc\nin the shared folder (host ./pdks → /mmi-pdks).\nLog: $MAG_IMPORT(log)"
     return
   }
   mag_log "Wrote $gds ([file size $gds] bytes) via Magic mag2gds"

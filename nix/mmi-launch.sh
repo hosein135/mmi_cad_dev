@@ -8,10 +8,10 @@ error() { printf '%s\n' "[mmi-cad] ERROR: $*" >&2; }
 MMI_CAD_ROOT="${MMI_CAD_ROOT:-${PWD:-.}}"
 MMI_TARBALL_NAME="${MMI_TARBALL_NAME:-mmi_pd_040526.tar.gz}"
 MMI_DIR_NAME="${MMI_DIR_NAME:-mmi_pd_040526}"
-CAD_HOME="/home/caduser"
+CAD_HOME="/mmi-home"
 CAD="${CAD_HOME}/cad"
 
-mkdir -p "${CAD_HOME}" "${CAD}" /opt/pdks 2>/dev/null || true
+mkdir -p "${CAD_HOME}" "${CAD}" /mmi-pdks 2>/dev/null || true
 
 # Keep a copy of the real login home for Xauthority, then use the CAD prefix as HOME
 # so MAX picks up .maxrc without writing into the user's actual homedir.
@@ -121,7 +121,7 @@ export MMI_TOOLS="${CAD}/mmi_pd"
 export MMI_LOCAL="${CAD}/mmi_local"
 export MMI_PDK_DIR="/opt/mmi-pdk"
 export MMI_BROWSER="${MMI_BROWSER:-xdg-open}"
-export PDK_ROOT="${PDK_ROOT:-/opt/pdks}"
+export PDK_ROOT="${PDK_ROOT:-/mmi-pdks}"
 export PDK="${PDK:-sky130A}"
 export PATH="/opt/magic/bin:${MMI_TOOLS}/bin:${PATH}"
 export QT_X11_NO_MITSHM=1
