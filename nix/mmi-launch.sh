@@ -72,6 +72,7 @@ install_vendor() {
   fi
   if [ -d "${CAD}/mmi_pd/mmi_local.sample" ]; then
     cp -a "${CAD}/mmi_pd/mmi_local.sample" "${CAD}/mmi_local"
+    chmod -R u+w "${CAD}/mmi_local"
   else
     mkdir -p "${CAD}/mmi_local"
   fi
@@ -84,6 +85,7 @@ fi
 
 # Overlay MAX PDK menus from the Nix-provided tree (always refresh).
 mkdir -p "${CAD}/mmi_local/max/pdk/samples" "${CAD}/mmi_pd/app-defaults"
+chmod -R u+w "${CAD}/mmi_local" 2>/dev/null || true
 if [ -d /mmi-bundle ]; then
   cp -f /mmi-bundle/pdk_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
   cp -f /mmi-bundle/mag_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
@@ -109,7 +111,11 @@ MARKER="# mmi-pdk-nix"
 ensure_maxrc() {
   local f="$1"
   mkdir -p "$(dirname "${f}")"
+  if [ -e "${f}" ] && [ ! -w "${f}" ]; then
+    chmod u+w "${f}" 2>/dev/null || rm -f "${f}"
+  fi
   touch "${f}"
+  chmod u+w "${f}" 2>/dev/null || true
   if ! grep -q "${MARKER}" "${f}" 2>/dev/null; then
     printf '\n%s\nsource /mmi-bundle/maxrc\n' "${MARKER}" >> "${f}"
   fi
