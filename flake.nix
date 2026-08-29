@@ -100,6 +100,8 @@
         extraBuildCommands = ''
           mkdir -p $out/mmi-home/work
           mkdir -p $out/mmi-pdks
+          mkdir -p $out/mmi-bundle
+          mkdir -p $out/mmi-magic
         '';
 
         targetPkgs =
@@ -217,13 +219,13 @@
           "--bind \"$MMI_CAD_ROOT/.mmi-prefix/home\" /mmi-home"
           "--bind \"$MMI_CAD_ROOT/workspace\" /mmi-home/work"
           "--bind \"$MMI_CAD_ROOT/pdks\" /mmi-pdks"
-          "--ro-bind-try ${mmiPdk} /opt/mmi-pdk"
-          "--ro-bind-try ${pkgs.magic-vlsi} /opt/magic"
+          "--ro-bind-try ${mmiPdk} /mmi-bundle"
+          "--ro-bind-try ${pkgs.magic-vlsi} /mmi-magic"
         ];
 
         profile = ''
           export MMI_FONTS_SRC=${mmiFonts}
-          export MMI_PDK_DIR=/opt/mmi-pdk
+          export MMI_PDK_DIR=/mmi-bundle
           export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
           export QT_X11_NO_MITSHM=1

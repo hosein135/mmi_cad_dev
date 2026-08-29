@@ -194,7 +194,7 @@ proc mag_sample_dir {} {
   if {[info exists env(HOME)]} {
     lappend cands [file join $env(HOME) cad mmi_local max pdk samples caravel_analog_por]
   }
-  lappend cands /opt/mmi-pdk/samples/caravel_analog_por
+  lappend cands /mmi-bundle/samples/caravel_analog_por
   foreach d $cands {
     set d [file normalize $d]
     if {[file isdirectory $d] && [file exists [file join $d example_por.mag]]} {
@@ -950,7 +950,7 @@ proc mag_magic2gds_script {} {
   if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
     lappend cands [file join $env(MMI_PDK_DIR) mag2gds.sh]
   }
-  lappend cands /opt/mmi-pdk/mag2gds.sh
+  lappend cands /mmi-bundle/mag2gds.sh
   if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
     lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk/mag2gds.sh]
   }
@@ -975,10 +975,10 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
 
   set magicbin ""
   if {[info commands pdk_which] != ""} {
-    set magicbin [pdk_which {magic /opt/magic/bin/magic}]
+    set magicbin [pdk_which {magic /mmi-magic/bin/magic}]
   }
-  if {$magicbin == "" && [file executable /opt/magic/bin/magic]} {
-    set magicbin /opt/magic/bin/magic
+  if {$magicbin == "" && [file executable /mmi-magic/bin/magic]} {
+    set magicbin /mmi-magic/bin/magic
   }
   if {$magicbin == ""} {
     mag_import_fail "Magic VLSI is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./run.sh so magic is on PATH."

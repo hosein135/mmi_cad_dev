@@ -15,11 +15,11 @@ mkdir -p "$OUTDIR"
 OUT="$(cd "$OUTDIR" && pwd)/$(basename "$OUT")"
 
 magic_bin="$(command -v magic || true)"
-if [ -z "$magic_bin" ] && [ -x /opt/magic/bin/magic ]; then
-  magic_bin=/opt/magic/bin/magic
+if [ -z "$magic_bin" ] && [ -x /mmi-magic/bin/magic ]; then
+  magic_bin=/mmi-magic/bin/magic
 fi
 if [ -z "$magic_bin" ]; then
-  echo "ERROR: magic is not installed (expected on PATH or /opt/magic/bin/magic)." >&2
+  echo "ERROR: magic is not installed (expected on PATH or /mmi-magic/bin/magic)." >&2
   exit 2
 fi
 

@@ -84,19 +84,19 @@ fi
 
 # Overlay MAX PDK menus from the Nix-provided tree (always refresh).
 mkdir -p "${CAD}/mmi_local/max/pdk/samples" "${CAD}/mmi_pd/app-defaults"
-if [ -d /opt/mmi-pdk ]; then
-  cp -f /opt/mmi-pdk/pdk_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
-  cp -f /opt/mmi-pdk/mag_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
-  cp -f /opt/mmi-pdk/mag2gds.sh "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+if [ -d /mmi-bundle ]; then
+  cp -f /mmi-bundle/pdk_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+  cp -f /mmi-bundle/mag_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+  cp -f /mmi-bundle/mag2gds.sh "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
   chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
-  if [ -d /opt/mmi-pdk/samples ]; then
-    cp -a /opt/mmi-pdk/samples/. "${CAD}/mmi_local/max/pdk/samples/"
+  if [ -d /mmi-bundle/samples ]; then
+    cp -a /mmi-bundle/samples/. "${CAD}/mmi_local/max/pdk/samples/"
   fi
-  if [ -f /opt/mmi-pdk/app-defaults/Mmi ]; then
-    cp -f /opt/mmi-pdk/app-defaults/Mmi "${CAD}/mmi_pd/app-defaults/Mmi"
+  if [ -f /mmi-bundle/app-defaults/Mmi ]; then
+    cp -f /mmi-bundle/app-defaults/Mmi "${CAD}/mmi_pd/app-defaults/Mmi"
   fi
-  if [ -f /opt/mmi-pdk/Xresources ]; then
-    cp -f /opt/mmi-pdk/Xresources "${CAD_HOME}/.Xresources"
+  if [ -f /mmi-bundle/Xresources ]; then
+    cp -f /mmi-bundle/Xresources "${CAD_HOME}/.Xresources"
   fi
 fi
 if [ -f "${CAD}/mmi_pd/app-defaults/Mmi" ]; then
@@ -111,7 +111,7 @@ ensure_maxrc() {
   mkdir -p "$(dirname "${f}")"
   touch "${f}"
   if ! grep -q "${MARKER}" "${f}" 2>/dev/null; then
-    printf '\n%s\nsource /opt/mmi-pdk/maxrc\n' "${MARKER}" >> "${f}"
+    printf '\n%s\nsource /mmi-bundle/maxrc\n' "${MARKER}" >> "${f}"
   fi
 }
 ensure_maxrc "${CAD_HOME}/.maxrc"
@@ -119,11 +119,11 @@ ensure_maxrc "${CAD}/mmi_local/max/.maxrc"
 
 export MMI_TOOLS="${CAD}/mmi_pd"
 export MMI_LOCAL="${CAD}/mmi_local"
-export MMI_PDK_DIR="/opt/mmi-pdk"
+export MMI_PDK_DIR="/mmi-bundle"
 export MMI_BROWSER="${MMI_BROWSER:-xdg-open}"
 export PDK_ROOT="${PDK_ROOT:-/mmi-pdks}"
 export PDK="${PDK:-sky130A}"
-export PATH="/opt/magic/bin:${MMI_TOOLS}/bin:${PATH}"
+export PATH="/mmi-magic/bin:${MMI_TOOLS}/bin:${PATH}"
 export QT_X11_NO_MITSHM=1
 export LC_ALL=C
 export LANG=C

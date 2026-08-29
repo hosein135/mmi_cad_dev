@@ -8,7 +8,7 @@ proc _mmi_pdk_source {name} {
   if {[info exists env(MMI_TOOLS)]} {
     lappend cands [file normalize $env(MMI_TOOLS)/../mmi_local/max/pdk/$name]
   }
-  lappend cands /opt/mmi-pdk/$name
+  lappend cands /mmi-bundle/$name
   foreach f $cands {
     if {[file readable $f]} {
       source $f

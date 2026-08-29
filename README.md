@@ -85,7 +85,7 @@ The dialog asks which converter to use:
 
 | | **Magic mag2gds** (default) | **Tcl paint dump** |
 |--|-----------------------------|---------------------|
-| Who writes GDS | **Magic VLSI** (`magic` from nixpkgs, also `/opt/magic/bin/magic`) | Tcl inside MAX (`mag_import.tcl`) |
+| Who writes GDS | **Magic VLSI** (`magic` from nixpkgs, also `/mmi-magic/bin/magic`) | Tcl inside MAX (`mag_import.tcl`) |
 | Layer rules | PDK **cifoutput** (contacts, implants, derived layers, units) | Fixed name → GDS layer table |
 | Stdcells | Loaded from `$PDK_ROOT/.../libs.ref/*/mag` | Missing `.mag` → empty box |
 | Needs | Magic 8.3 + `.magicrc` under `PDK_ROOT` | Nothing extra |
