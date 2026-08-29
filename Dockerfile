@@ -42,6 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     csh zsh zsh-common xterm \
     sudo less iproute2 procps \
+    wget curl unzip ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Step 3: Enable bitmap fonts in fontconfig ────────────────────────────────
@@ -107,6 +108,31 @@ RUN mkdir -p /home/caduser/cad \
     && cp -r mmi_local.sample ../mmi_local \
     && chown -R caduser:caduser /home/caduser
 
+# ── Step 6b: PDK importer + Magic→MAX importer (menus + sample) ──────────────
+COPY max_pdk/pdk_import.tcl /opt/mmi-pdk/
+COPY max_pdk/mag_import.tcl /opt/mmi-pdk/
+COPY max_pdk/mag2gds.sh /opt/mmi-pdk/
+COPY max_pdk/samples /opt/mmi-pdk/samples
+COPY max_pdk/maxrc /tmp/mmi-pdk.maxrc
+RUN mkdir -p /home/caduser/cad/mmi_local/max/pdk/samples /opt/pdks \
+    && cp /opt/mmi-pdk/pdk_import.tcl /home/caduser/cad/mmi_local/max/pdk/ \
+    && cp /opt/mmi-pdk/mag_import.tcl /home/caduser/cad/mmi_local/max/pdk/ \
+    && cp /opt/mmi-pdk/mag2gds.sh /home/caduser/cad/mmi_local/max/pdk/ \
+    && chmod 755 /opt/mmi-pdk/mag2gds.sh /home/caduser/cad/mmi_local/max/pdk/mag2gds.sh \
+    && cp -a /opt/mmi-pdk/samples/. /home/caduser/cad/mmi_local/max/pdk/samples/ \
+    && chmod 644 /opt/mmi-pdk/pdk_import.tcl /opt/mmi-pdk/mag_import.tcl \
+    && (if [ -f /home/caduser/cad/mmi_local/max/.maxrc ]; then \
+          cat /tmp/mmi-pdk.maxrc >> /home/caduser/cad/mmi_local/max/.maxrc; \
+        else \
+          cp /tmp/mmi-pdk.maxrc /home/caduser/cad/mmi_local/max/.maxrc; \
+        fi) \
+    && (if [ -f /home/caduser/.maxrc ]; then \
+          cat /tmp/mmi-pdk.maxrc >> /home/caduser/.maxrc; \
+        else \
+          cp /tmp/mmi-pdk.maxrc /home/caduser/.maxrc; \
+        fi) \
+    && chown -R caduser:caduser /home/caduser/cad/mmi_local /home/caduser/.maxrc /opt/mmi-pdk /opt/pdks
+
 # ── Step 7: Motif X resources (max / nst) ─────────────────────────────────────
 # Separate RUN steps: Docker parse treats anything after a heredoc as a new
 # instruction, so we cannot chain && after <<EOF in the same RUN.
@@ -149,10 +175,25 @@ XREOF
 
 RUN chown -R caduser:caduser /home/caduser
 
+# ── Step 7b: Magic VLSI (tapeout mag2gds; not used by the Tcl paint dumper) ──
+# Sky130 needs Magic ≥ 8.3; Ubuntu 20.04's apt package is too old.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential git m4 tcl-dev tk-dev \
+        libx11-dev libcairo2-dev mesa-common-dev libglu1-mesa-dev zlib1g-dev \
+    && git clone --depth 1 https://github.com/RTimothyEdwards/magic.git /tmp/magic \
+    && cd /tmp/magic \
+    && ./configure --prefix=/opt/magic \
+    && make -j"$(nproc)" \
+    && make install \
+    && rm -rf /tmp/magic \
+    && rm -rf /var/lib/apt/lists/*
+
 # ── Step 8: Environment ──────────────────────────────────────────────────────
 ENV MMI_TOOLS=/home/caduser/cad/mmi_pd \
     MMI_BROWSER=firefox \
-    PATH="/home/caduser/cad/mmi_pd/bin:$PATH" \
+    PDK_ROOT=/opt/pdks \
+    PDK=sky130A \
+    PATH="/opt/magic/bin:/home/caduser/cad/mmi_pd/bin:$PATH" \
     QT_X11_NO_MITSHM=1 \
     XKEYSYMDB=/usr/share/X11/XKeysymDB \
     LC_ALL=C \
@@ -168,7 +209,9 @@ RUN cat > /entrypoint.sh << 'EOF'
 set -e
 
 export MMI_TOOLS=/home/caduser/cad/mmi_pd
-export PATH="$MMI_TOOLS/bin:$PATH"
+export PDK_ROOT="${PDK_ROOT:-/opt/pdks}"
+export PDK="${PDK:-sky130A}"
+export PATH="/opt/magic/bin:$MMI_TOOLS/bin:$PATH"
 export _XNO_XFT=1
 export XAPPLRESDIR=/home/caduser/cad/mmi_pd/app-defaults
 export LC_ALL=C
@@ -195,6 +238,8 @@ echo "  Micro Magic CAD - Motif font setup"
 echo "=============================================="
 echo "  DISPLAY=${DISPLAY}"
 echo "  XAUTHORITY=${XAUTHORITY:-<unset>}"
+echo "  PDK_ROOT=${PDK_ROOT}"
+echo "  Magic: $(command -v magic 2>/dev/null || echo missing)"
 
 # Prefer host-visible font root from run.sh; fall back to image paths
 FONT_ROOT="${MMI_XFONT_ROOT:-/usr/share/fonts/X11}"

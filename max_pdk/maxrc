@@ -1,0 +1,17 @@
+# Site-wide MAX startup: PDK import + Magic design import
+proc _mmi_pdk_source {name} {
+  global env
+  set cands {}
+  if {[info exists env(MMI_TOOLS)]} {
+    lappend cands [file normalize $env(MMI_TOOLS)/../mmi_local/max/pdk/$name]
+  }
+  lappend cands /opt/mmi-pdk/$name
+  foreach f $cands {
+    if {[file readable $f]} {
+      source $f
+      return
+    }
+  }
+}
+_mmi_pdk_source pdk_import.tcl
+_mmi_pdk_source mag_import.tcl

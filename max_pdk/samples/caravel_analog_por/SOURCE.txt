@@ -1,0 +1,26 @@
+Caravel analog user-project sample (Magic → MAX)
+
+This folder is a trimmed copy of the analog example from:
+
+  https://github.com/efabless/caravel_user_project_analog
+  path: mag/
+  license: Apache-2.0 (upstream)
+
+It is the power-on-reset (example_por) used as the analog user-space
+example on Efabless/ChipFoundry Caravel (sky130A), plus the leaf
+sky130_fd_pr device cells that example_por instantiates.
+
+Top cell for conversion:  example_por
+Also present:             user_analog_proj_example  (two POR instances)
+
+Not included (need the full Caravel padframe / PDK stdcell mag views):
+  user_analog_project_wrapper.mag
+  sky130_fd_sc_hvl__*  (schmittbuf / buf_8 / inv_8 / fill_4)
+
+Those HVL standard-cell instances become empty placeholders in GDS
+unless you point the importer at a folder that also contains their .mag
+files from open_pdks.
+
+Upstream docs:
+  https://github.com/efabless/caravel_user_project_analog
+  https://github.com/chipfoundry/caravel

@@ -6,6 +6,7 @@
 #   ./run.sh              # build then launch interactive shell
 #   ./run.sh mmiwolf      # build then launch a specific CAD tool
 #   ./run.sh --build-only # build image only, do not start container
+#   ./run.sh --save-tar   # build quietly, write mmi-cad-offline.tar here, exit
 #   ./run.sh --no-build   # skip build, run existing image directly
 #   ./run.sh --clean      # remove image/containers/build cache, then rebuild
 #   ./run.sh --help       # show this help
@@ -21,6 +22,8 @@ IMAGE_NAME="mmi-cad"
 IMAGE_TAG="latest"
 CONTAINER_NAME="mmi-cad-session"
 BASE_IMAGE="ubuntu:20.04"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+OFFLINE_TAR="${SCRIPT_DIR}/mmi-cad-offline.tar"
 
 # ── Colour helpers ────────────────────────────────────────────────────────────
 RED='\033[0;31m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; CYAN='\033[0;36m'; NC='\033[0m'
@@ -33,14 +36,16 @@ step()  { echo -e "${CYAN}[STEP]${NC}  $*"; }
 BUILD_ONLY=false
 SKIP_BUILD=false
 CLEAN=false
+SAVE_TAR=false
 CMD_ARGS=()
 
 for arg in "$@"; do
     case "$arg" in
         --help|-h)
-            sed -n '3,14p' "$0" | sed 's/^# //'
+            sed -n '3,16p' "$0" | sed 's/^# //'
             exit 0 ;;
         --build-only) BUILD_ONLY=true ;;
+        --save-tar)   SAVE_TAR=true; BUILD_ONLY=true ;;
         --no-build)   SKIP_BUILD=true ;;
         --clean)      CLEAN=true ;;
         *)            CMD_ARGS+=("$arg") ;;
@@ -50,17 +55,44 @@ done
 [ ${#CMD_ARGS[@]} -eq 0 ] && CMD_ARGS=("/bin/bash")
 
 # ── Sanity checks ─────────────────────────────────────────────────────────────
+# WSL1 cannot run dockerd. Use the Windows Docker engine (docker.exe or
+# DOCKER_HOST=tcp://localhost:2375 after exposing the daemon on 2375).
+DOCKER_IS_EXE=0
 if ! command -v docker &>/dev/null; then
-    error "Docker is not installed or not in PATH."
-    exit 1
+    if command -v docker.exe &>/dev/null; then
+        docker() { docker.exe "$@"; }
+        DOCKER_IS_EXE=1
+        info "Using docker.exe (Windows Docker engine)."
+    else
+        error "Docker is not installed or not in PATH."
+        error "On WSL1: install Docker Desktop on Windows, enable"
+        error "  Settings → General → Expose daemon on tcp://localhost:2375"
+        error "then in WSL:  sudo apt-get install -y docker.io"
+        error "              echo 'export DOCKER_HOST=tcp://localhost:2375' >> ~/.bashrc"
+        exit 1
+    fi
 fi
 if [ ! -f "Dockerfile" ] && [ "$SKIP_BUILD" = false ]; then
     error "Dockerfile not found. Run this script from the directory containing it."
     exit 1
 fi
+# CRLF check (common when the tree was cloned on Windows)
+if grep -q $'\r' "$0" 2>/dev/null; then
+    error "$0 has Windows CRLF line endings. In WSL run:"
+    error "  sed -i 's/\\r\$//' run.sh && chmod +x run.sh"
+    exit 1
+fi
+if ! docker info >/dev/null 2>&1; then
+    error "Cannot talk to the Docker daemon (docker info failed)."
+    error "WSL1 cannot run dockerd. On Windows: start Docker Desktop and enable"
+    error "  Settings → General → Expose daemon on tcp://localhost:2375 without TLS"
+    error "In WSL:  export DOCKER_HOST=tcp://localhost:2375"
+    exit 1
+fi
 
 # ── OS / X11 detection ────────────────────────────────────────────────────────
 OS="$(uname -s)"
+WSL_VER=""
 DISPLAY_VAR=""
 XAUTH_MOUNT=""
 XSOCK_MOUNT=""
@@ -71,12 +103,20 @@ MMI_XFONT_ROOT=""
 
 detect_display_linux() {
     if grep -qi microsoft /proc/version 2>/dev/null; then
-        # WSL2: X server (VcXsrv/Xming) is on the Windows host
-        HOST_IP=$(grep nameserver /etc/resolv.conf | awk '{print $2}' | head -1)
-        [ -z "$HOST_IP" ] && { error "Cannot determine Windows host IP from /etc/resolv.conf."; exit 1; }
-        DISPLAY_VAR="${HOST_IP}:0.0"
-        warn "WSL2 detected. X server target: ${DISPLAY_VAR}"
-        warn "VcXsrv/Xming must be running with 'Disable access control' checked."
+        # WSL1 shares the Windows network stack (localhost works).
+        # WSL2 is a VM; DISPLAY must be the Windows host IP (resolv.conf nameserver).
+        if uname -r | grep -qiE 'microsoft-standard|WSL2'; then
+            WSL_VER=2
+            HOST_IP=$(grep nameserver /etc/resolv.conf | awk '{print $2}' | head -1)
+            [ -z "$HOST_IP" ] && { error "Cannot determine Windows host IP from /etc/resolv.conf."; exit 1; }
+            DISPLAY_VAR="${HOST_IP}:0.0"
+        else
+            WSL_VER=1
+            # WSL1 shares Windows networking; VcXsrv on :0 is localhost.
+            DISPLAY_VAR="${DISPLAY:-localhost:0.0}"
+        fi
+        warn "WSL${WSL_VER} detected. X server target: ${DISPLAY_VAR}"
+        warn "Start VcXsrv/Xming on Windows with 'Disable access control' checked."
     else
         # Native Linux
         [ -z "${DISPLAY:-}" ] && { error "DISPLAY not set. Start an X session first."; exit 1; }
@@ -135,13 +175,18 @@ detect_display_macos() {
     xhost +localhost 2>/dev/null || true
 }
 
-case "$OS" in
-    Linux)  detect_display_linux ;;
-    Darwin) detect_display_macos ;;
-    *)
-        error "Unsupported OS: $OS. Set DISPLAY manually and adapt this script."
-        exit 1 ;;
-esac
+# Image-only modes do not need X11 (and must work headless).
+if [ "$BUILD_ONLY" = true ] || [ "$SAVE_TAR" = true ]; then
+    :
+else
+    case "$OS" in
+        Linux)  detect_display_linux ;;
+        Darwin) detect_display_macos ;;
+        *)
+            error "Unsupported OS: $OS. Set DISPLAY manually and adapt this script."
+            exit 1 ;;
+    esac
+fi
 
 # ── Clean previous build ──────────────────────────────────────────────────────
 clean_previous() {
@@ -196,18 +241,31 @@ fi
 # ── Build ─────────────────────────────────────────────────────────────────────
 if [ "$SKIP_BUILD" = false ]; then
     step "Building image ${IMAGE_NAME}:${IMAGE_TAG} ..."
-    docker build \
-        --tag "${IMAGE_NAME}:${IMAGE_TAG}" \
-        --file Dockerfile \
-        . \
-        && info "Build complete." \
-        || { error "Docker build failed."; exit 1; }
+    BUILD_ARGS=(--tag "${IMAGE_NAME}:${IMAGE_TAG}" --file Dockerfile .)
+    if [ "$SAVE_TAR" = true ]; then
+        docker build -q "${BUILD_ARGS[@]}" >/dev/null \
+            && info "Build complete." \
+            || { error "Docker build failed."; exit 1; }
+    else
+        docker build "${BUILD_ARGS[@]}" \
+            && info "Build complete." \
+            || { error "Docker build failed."; exit 1; }
+    fi
 else
     info "Skipping build (--no-build). Using existing image ${IMAGE_NAME}:${IMAGE_TAG}."
     if ! docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" &>/dev/null; then
         error "Image ${IMAGE_NAME}:${IMAGE_TAG} not found. Run without --no-build first."
         exit 1
     fi
+fi
+
+if [ "$SAVE_TAR" = true ]; then
+    step "Writing ${OFFLINE_TAR}"
+    docker save -o "${OFFLINE_TAR}" "${IMAGE_NAME}:${IMAGE_TAG}" \
+        || { error "docker save failed."; exit 1; }
+    info "Wrote ${OFFLINE_TAR}"
+    ls -lh "${OFFLINE_TAR}"
+    exit 0
 fi
 
 $BUILD_ONLY && { info "Build-only mode — done."; exit 0; }
@@ -231,7 +289,11 @@ ensure_host_fonts() {
         mkdir -p "${FONT_CACHE}"
         TMP_CTR="mmi-font-extract-$$"
         docker create --name "${TMP_CTR}" "${IMAGE_NAME}:${IMAGE_TAG}" >/dev/null
-        docker cp "${TMP_CTR}:/usr/share/fonts/X11/." "${FONT_CACHE}/"
+        CP_DEST="${FONT_CACHE}"
+        if [ "${DOCKER_IS_EXE}" = 1 ] && command -v wslpath >/dev/null 2>&1; then
+            CP_DEST="$(wslpath -w "${FONT_CACHE}")"
+        fi
+        docker cp "${TMP_CTR}:/usr/share/fonts/X11/." "${CP_DEST}/"
         docker rm -f "${TMP_CTR}" >/dev/null
         info "Fonts extracted."
     else
@@ -240,9 +302,40 @@ ensure_host_fonts() {
 
     MMI_XFONT_ROOT="${FONT_CACHE}"
     FONT_MOUNT="-v ${FONT_CACHE}:${FONT_CACHE}:ro"
+
+    # Windows Docker daemon cannot bind-mount a WSL path like /home/... or
+    # /mnt/c/.... Convert the host side to a Windows path and put the fonts
+    # at a stable Linux path inside the container. VcXsrv still needs the
+    # Windows path (xset talks to the X server on Windows).
+    if [ -n "${WSL_VER:-}" ] && command -v wslpath >/dev/null 2>&1; then
+        WIN_FONT="$(wslpath -w "${FONT_CACHE}")"
+        FONT_MOUNT="-v ${WIN_FONT}:/opt/mmi-xfonts:ro"
+        MMI_XFONT_ROOT="${WIN_FONT}"
+        info "WSL${WSL_VER}: font mount ${WIN_FONT} → /opt/mmi-xfonts"
+        info "VcXsrv font path: ${WIN_FONT}"
+    fi
 }
 
 ensure_host_fonts
+
+# Shared PDK + design workspace (host folders, bind-mounted — Magic and MAX
+# both use PDK_ROOT=/opt/pdks so the PDK is not duplicated in the image).
+PDK_HOST="${SCRIPT_DIR}/pdks"
+WORK_HOST="${SCRIPT_DIR}/workspace"
+mkdir -p "${PDK_HOST}" "${WORK_HOST}"
+PDK_MOUNT="-v ${PDK_HOST}:/opt/pdks"
+WORK_MOUNT="-v ${WORK_HOST}:/home/caduser/work"
+if command -v wslpath >/dev/null 2>&1; then
+    WIN_PDK="$(wslpath -w "${PDK_HOST}")"
+    WIN_WORK="$(wslpath -w "${WORK_HOST}")"
+    PDK_MOUNT="-v ${WIN_PDK}:/opt/pdks"
+    WORK_MOUNT="-v ${WIN_WORK}:/home/caduser/work"
+    info "Shared PDK_ROOT: ${WIN_PDK} → /opt/pdks"
+    info "Workspace:       ${WIN_WORK} → /home/caduser/work"
+else
+    info "Shared PDK_ROOT: ${PDK_HOST} → /opt/pdks"
+    info "Workspace:       ${WORK_HOST} → /home/caduser/work"
+fi
 
 # ── Run ───────────────────────────────────────────────────────────────────────
 step "Starting '${CONTAINER_NAME}' ..."
@@ -252,19 +345,29 @@ info "  X fonts   → ${MMI_XFONT_ROOT}"
 info "  Command   → ${CMD_ARGS[*]}"
 echo ""
 
+IPC_FLAG="--ipc=host"
+# Windows Docker (WSL1 → docker.exe / tcp:2375) often rejects --ipc=host.
+if [ -n "${WSL_VER:-}" ]; then
+    IPC_FLAG=""
+fi
+
 docker run \
     --rm \
     --interactive \
     --tty \
     --name "${CONTAINER_NAME}" \
-    --ipc=host \
+    ${IPC_FLAG} \
     --env DISPLAY="${DISPLAY_VAR}" \
     --env QT_X11_NO_MITSHM=1 \
     --env MMI_XFONT_ROOT="${MMI_XFONT_ROOT}" \
+    --env PDK_ROOT=/opt/pdks \
+    --env PDK=sky130A \
     ${XAUTH_ENV:+--env XAUTHORITY=${XAUTH_ENV}} \
     ${XSOCK_MOUNT} \
     ${XAUTH_MOUNT} \
     ${FONT_MOUNT} \
+    ${PDK_MOUNT} \
+    ${WORK_MOUNT} \
     ${NETWORK_MODE} \
     "${IMAGE_NAME}:${IMAGE_TAG}" \
     "${CMD_ARGS[@]}"
