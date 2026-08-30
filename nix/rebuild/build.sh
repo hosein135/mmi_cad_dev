@@ -14,21 +14,20 @@ export PATH="${PATH}"
 export CC CXX
 : "${SOURCE_DATE_EPOCH:=315532800}"
 export SOURCE_DATE_EPOCH
+# Do not add -D__DATE__ / -D__TIME__. The date string contains spaces
+# ("Jan  1 1980"); Nix's cc-wrapper word-splits NIX_CFLAGS_COMPILE and
+# GCC 14 then reports: error: duplicate 'unsigned'. GCC already stamps
+# those builtins from SOURCE_DATE_EPOCH.
 export CFLAGS="${CFLAGS:--std=gnu89 -fcommon -fno-strict-aliasing -O2 -frandom-seed=mmi-cad-040526 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0} -Wno-error -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-return-type -Wno-unused -Wno-old-style-definition -Wno-declaration-after-statement -include float.h -DCLK_TCK=100"
 
 export LC_ALL=C
 export LANG=C
 export TZ=UTC
-DATE_STR="$(date -u -d "@${SOURCE_DATE_EPOCH}" "+%b %e %Y" 2>/dev/null || date -u -r "${SOURCE_DATE_EPOCH}" "+%b %e %Y")"
-TIME_STR="$(date -u -d "@${SOURCE_DATE_EPOCH}" "+%H:%M:%S" 2>/dev/null || date -u -r "${SOURCE_DATE_EPOCH}" "+%H:%M:%S")"
-CFLAGS="${CFLAGS} -Wno-builtin-macro-redefined -D__DATE__=\"${DATE_STR}\" -D__TIME__=\"${TIME_STR}\""
 
 # Deterministic GNU ar (zero uid/gid/mtime in archive members).
 mmi_ar_rcs() { ar -D rcs "$@"; }
 export AR="ar -D rc"
 export RANLIB="${RANLIB:-ranlib}"
-
-export NIX_CFLAGS_COMPILE="${NIX_CFLAGS_COMPILE:-} ${CFLAGS}"
 HOST_TCLSH="$(command -v tclsh)"
 
 LIBDIR="${UTILS}/lib.x86_64-linux"

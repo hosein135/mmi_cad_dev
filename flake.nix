@@ -23,7 +23,8 @@
       };
       inherit (pkgs) lib;
 
-      # Fixed epoch so __DATE__/__TIME__ and archive members do not follow git mtime.
+      # GCC stamps __DATE__/__TIME__ from this epoch (do not pass -D__DATE__;
+      # the space-padded day breaks the cc-wrapper). Also used for ar/tar.
       sourceDateEpoch = "315532800";
 
       vendorSrc =
