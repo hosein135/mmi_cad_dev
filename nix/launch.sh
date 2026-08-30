@@ -238,9 +238,10 @@ if local_fonts="$(mmi_resolve_local_max_font_dir 2>/dev/null)"; then
   esac
 fi
 if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
-  for sub in encodings 75dpi misc 100dpi Type1 cyrillic; do
+  # encodings/ is charset data, not an XLFD font dir (no fonts.dir) — do not xset it.
+  for sub in 75dpi misc 100dpi Type1 cyrillic; do
     d="${MMI_FONTS_SRC}/${sub}"
-    if [ -d "${d}" ] && { [ -f "${d}/fonts.dir" ] || [ -f "${d}/encodings.dir" ]; }; then
+    if mmi_font_dir_ok "${d}"; then
       if [ -z "${FP_LIST}" ]; then
         FP_LIST="${d}"
       else
@@ -252,27 +253,32 @@ if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
 fi
 
 if [ -n "${FP_LIST}" ] && [ -n "${DISPLAY:-}" ]; then
-  old_fp="$(xset q 2>/dev/null | awk 'BEGIN{p=0} /Font Path:/{p=1; next} p{gsub(/^[ \t]+/,""); print; exit}')"
-  merged="${FP_LIST}"
-  if [ -n "${old_fp}" ]; then
-    merged="${FP_LIST},${old_fp}"
-  fi
-  if xset fp= "${merged}" 2>/tmp/xset-fp.err; then
-    echo "  Font path set (MMI dirs first, then server path)"
-  else
-    echo "  WARN: xset fp= failed:"
-    cat /tmp/xset-fp.err 2>/dev/null || true
-    old_ifs="${IFS}"
-    IFS=','
-    for d in ${FP_LIST}; do
-      xset fp- "${d}" 2>/dev/null || true
-    done
-    for d in ${FP_LIST}; do
-      xset +fp "${d}" 2>/dev/null || true
-    done
-    IFS="${old_ifs}"
-  fi
+  # Prepend each dir (xset +fp). Reverse so the first FP_LIST entry is searched first.
+  # Do not xset fp= (that drops the server path and fails on any bad element).
+  rev=""
+  old_ifs="${IFS}"
+  IFS=','
+  for d in ${FP_LIST}; do
+    if [ -z "${rev}" ]; then
+      rev="${d}"
+    else
+      rev="${d},${rev}"
+    fi
+  done
+  fp_ok=1
+  for d in ${rev}; do
+    xset fp- "${d}" 2>/dev/null || true
+    if ! xset +fp "${d}" 2>/tmp/xset-fp.err; then
+      fp_ok=0
+      echo "  WARN: skip font dir ${d}"
+      cat /tmp/xset-fp.err 2>/dev/null || true
+    fi
+  done
+  IFS="${old_ifs}"
   xset fp rehash 2>/dev/null || true
+  if [ "${fp_ok}" = "1" ]; then
+    echo "  Font path prepended (server path kept)"
+  fi
 elif [ -n "${DISPLAY:-}" ]; then
   echo "  WARN: No bitmap font dirs found in ${MMI_FONTS_SRC:-<unset>}"
 fi
