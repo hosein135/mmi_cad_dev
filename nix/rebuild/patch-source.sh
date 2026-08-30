@@ -231,14 +231,13 @@ PY
 # abort on X_SetFontPath failure (BadValue when the path is sandbox-only).
 python3 - << 'PY'
 from pathlib import Path
-import re
 
 p = Path("src/max4.3.16/m/graphics/graphics1.c")
 t = p.read_text(encoding="latin-1")
 
-# Hoist error handler if we patch grAugmentFontPath and it is not present yet.
-if "grFontPathXErr" not in t:
-    anchor = "static void grAugmentFontPath()"
+if 'getenv("MMI_MAX_FONTS_DIR")' in t and "grFontPathXErr" in t:
+    print("graphics1.c: grAugmentFontPath already patched")
+else:
     helper = """static int grFontPathQuiet = 0;
 static XErrorHandler grFontPathPrevHandler = NULL;
 
@@ -251,11 +250,32 @@ grFontPathXErr(Display *dpy, XErrorEvent *err)
 }
 
 """
-    if anchor not in t:
+    sig = "static void grAugmentFontPath()"
+    start = t.find(sig)
+    if start < 0:
         raise SystemExit("graphics1.c: grAugmentFontPath anchor missing")
-    t = t.replace(anchor, helper + anchor, 1)
+    if "grFontPathXErr" not in t:
+        t = t[:start] + helper + t[start:]
+        start += len(helper)
 
-new_fn = """static void grAugmentFontPath()
+    brace = t.find("{", start)
+    if brace < 0:
+        raise SystemExit("graphics1.c: grAugmentFontPath body missing")
+    depth = 0
+    end = None
+    for i in range(brace, len(t)):
+        c = t[i]
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    if end is None:
+        raise SystemExit("graphics1.c: grAugmentFontPath end not found")
+
+    new_fn = """static void grAugmentFontPath()
 {
   char fontDirBuf[BUFSIZ];
   char **dirs;
@@ -332,19 +352,11 @@ new_fn = """static void grAugmentFontPath()
   }
 
   if (dirs) XFreeFontPath(dirs);
-}
-"""
-pat = re.compile(
-    r"static void grAugmentFontPath\(\)\s*\{.*?\n\} \n\n/\*-\{5,\}\n \* grLoadFonts",
-    re.S,
-)
-if not pat.search(t):
-    raise SystemExit("graphics1.c: grAugmentFontPath not found")
-t = pat.sub(new_fn + "\n\n/*---------------------------------------------------------\n * grLoadFonts", t)
-p.write_text(t, encoding="latin-1")
-print("graphics1.c: general grAugmentFontPath (MMI_MAX_FONTS_DIR, safe XSetFontPath)")
+}"""
+    t = t[:start] + new_fn + t[end:]
+    p.write_text(t, encoding="latin-1")
+    print("graphics1.c: general grAugmentFontPath (MMI_MAX_FONTS_DIR, safe XSetFontPath)")
 
-p = Path("src/max4.3.16/m/graphics/graphics1.c")
 t = p.read_text(encoding="latin-1")
 if "#include <unistd.h>" not in t and "access(fontDir" in t:
     t = t.replace("#include <stdio.h>", "#include <stdio.h>\n#include <unistd.h>", 1)
