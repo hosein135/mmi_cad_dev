@@ -134,19 +134,31 @@ EOF
 build_tclmods() {
   log "tclmods"
   cd "${UTILS}/tclmods"
-  mkdir -p "o/x86_64-linux"
-  make -e -j1 MMI_UTILS="${UTILS}" || make -e -j1 -k MMI_UTILS="${UTILS}" || true
-  find . -name 'libtclmods8.0.a' -exec cp -f {} "${LIBDIR}/" \;
-  if [ ! -f "${LIBDIR}/libtclmods8.0.a" ]; then
-    objs=$(find o -name '*.o' | tr '\n' ' ')
+  rm -f "${LIBDIR}/libtclmods8.0.a"
+  mkdir -p o/x86_64-linux
+  # Do not use find(1) — vendor tree ships 32-bit libtclmods8.0.a under o/i486-linux*.
+  make -j1 MMI_UTILS="${UTILS}" TARGET=x86_64-linux \
+    CC="${CC:-gcc}" CFLAGS="${CFLAGS}" AR="ar rc" RANLIB=ranlib
+  local built="o/x86_64-linux/libtclmods8.0.a"
+  if [ ! -f "$built" ]; then
+    objs=$(find o/x86_64-linux -maxdepth 1 -name '*.o' | tr '\n' ' ')
     if [ -n "${objs}" ]; then
-      ar rcs "${LIBDIR}/libtclmods8.0.a" ${objs}
+      ar rcs "$built" ${objs}
+      ranlib "$built"
     fi
   fi
-  if [ ! -f "${LIBDIR}/libtclmods8.0.a" ]; then
-    log "ERROR: libtclmods8.0.a not built"
+  if [ ! -f "$built" ]; then
+    log "ERROR: libtclmods8.0.a not built in o/x86_64-linux"
     exit 1
   fi
+  sample=$(find o/x86_64-linux -maxdepth 1 -name '*.o' | head -1)
+  if [ -n "$sample" ] && ! file "$sample" | grep -q 'ELF 64-bit'; then
+    log "ERROR: tclmods objects are not ELF 64-bit ($sample)"
+    file "$sample" >&2 || true
+    exit 1
+  fi
+  cp -f "$built" "${LIBDIR}/libtclmods8.0.a"
+  file "${LIBDIR}/libtclmods8.0.a" || true
   cd "${ROOT}"
 }
 
