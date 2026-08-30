@@ -22,14 +22,15 @@ for arg in "$@"; do
       cat <<'EOF'
 Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
 
-  ./run.sh              CAD shell (Nix Xvnc + browser noVNC)
+  ./run.sh              CAD shell (host X if DISPLAY is set, else Nix Xvnc)
   ./run.sh max          start MAX
   ./run.sh --prep-only  build vendor + wrapper into the Nix store
   ./run.sh --clean      remove data/home (CAD overlay)
 
 Needs x86_64 Linux: bare metal, a VM, or WSL2 (not WSL1, not Windows-native).
-GUI uses the Nix TigerVNC X server. Open the printed http://127.0.0.1:6080 URL.
-Host X instead: MMI_USE_HOST_X=1 DISPLAY=:0 ./run.sh max
+On a graphical VM, windows open on your desktop. Headless: open the printed
+http://127.0.0.1:6080 URL. Force VNC: MMI_USE_XVNC=1 ./run.sh max
+Force host X: MMI_USE_HOST_X=1 DISPLAY=:0 ./run.sh max
 EOF
       exit 0
       ;;

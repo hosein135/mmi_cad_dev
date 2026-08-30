@@ -38,10 +38,10 @@ Windows-native is not a run target. Clone and run on x86_64 Linux (bare metal, V
 ```bash
 chmod +x run.sh
 ./run.sh --prep-only     # optional: warm the Nix store
-./run.sh max             # starts Nix Xvnc + noVNC, then MAX
+./run.sh max             # MAX on your desktop if DISPLAY is set, else noVNC
 ```
 
-Open the printed URL (default `http://127.0.0.1:6080/vnc.html?autoconnect=1`).
+On a graphical VM the MAX/SUE/NST windows appear on the desktop. If you have no `DISPLAY`, open the printed URL (`http://127.0.0.1:6080/vnc.html?autoconnect=1`). Force the browser desktop with `MMI_USE_XVNC=1`.
 
 ## Commands
 
@@ -56,8 +56,9 @@ Open the printed URL (default `http://127.0.0.1:6080/vnc.html?autoconnect=1`).
 
 | Environment | Action |
 |-------------|--------|
-| `MMI_NO_X=1` | Do not start Xvnc |
-| `MMI_USE_HOST_X=1` | Use host `DISPLAY` instead of Nix X |
+| `MMI_NO_X=1` | Do not start X |
+| `MMI_USE_HOST_X=1` | Require host `DISPLAY` (error if unset) |
+| `MMI_USE_XVNC=1` | Always use TigerVNC + noVNC (ignore host DISPLAY) |
 | `MMI_OPEN_BROWSER=0` | Do not auto-open noVNC |
 | `MMI_CAD_ROOT=` | Writable overlay root (default: repo dir, or `~/.local/state/mmi-cad` for `nix run`) |
 

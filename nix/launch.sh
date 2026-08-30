@@ -186,26 +186,43 @@ fi
 
 cmd="${1:-/bin/bash}"
 
-# Default: Nix TigerVNC X server. MMI_NO_X=1 skips GUI. MMI_USE_HOST_X=1 uses host DISPLAY.
+# Prefer the VM/desktop X server when DISPLAY already points at a local socket.
+# MMI_USE_XVNC=1 forces TigerVNC + browser. MMI_USE_HOST_X=1 requires host DISPLAY.
+export MMI_HOST_DISPLAY="${DISPLAY:-}"
 if [ "${MMI_NO_X:-0}" = "1" ]; then
-  info "MMI_NO_X=1 — not starting Xvnc"
+  info "MMI_NO_X=1 — not starting X"
+elif [ "${MMI_USE_XVNC:-0}" = "1" ]; then
+  mmi_start_nix_x
 elif [ "${MMI_USE_HOST_X:-0}" = "1" ]; then
   if [ -z "${DISPLAY:-}" ]; then
     error "MMI_USE_HOST_X=1 but DISPLAY is not set."
     exit 1
   fi
   info "Using host X server DISPLAY=${DISPLAY}"
+elif mmi_host_x_ok; then
+  info "Using desktop DISPLAY=${DISPLAY}  (MMI_USE_XVNC=1 for browser/noVNC)"
 else
   mmi_start_nix_x
 fi
 
+if [ -n "${DISPLAY:-}" ] && [ "${MMI_NO_X:-0}" != "1" ]; then
+  if command -v xset >/dev/null 2>&1 && ! xset q >/dev/null 2>&1; then
+    warn "Cannot connect to X DISPLAY=${DISPLAY} — GUI windows will not appear."
+    warn "From a graphical session try:  echo \$DISPLAY"
+    warn "Or force the browser desktop: MMI_USE_XVNC=1 ./run.sh $*"
+  fi
+fi
+
 echo "=============================================="
-echo "  Micro Magic CAD (x86_64, Nix X)"
+echo "  Micro Magic CAD (x86_64)"
 echo "=============================================="
 echo "  DISPLAY=${DISPLAY:-<unset>}   MMI_TOOLS=${MMI_TOOLS}"
 echo "  PDK_ROOT=${PDK_ROOT}   Magic: $(command -v magic 2>/dev/null || echo missing)"
 if [ -n "${MMI_NOVNC_URL:-}" ]; then
-  echo "  GUI: ${MMI_NOVNC_URL}"
+  echo "  GUI is in the browser, not this terminal:"
+  echo "  ${MMI_NOVNC_URL}"
+elif [ -n "${DISPLAY:-}" ]; then
+  echo "  GUI windows open on DISPLAY=${DISPLAY} (your desktop)"
 fi
 if [ -n "${MMI_MAX_FONTS_DIR:-}" ]; then
   echo "  MAX fonts: ${MMI_MAX_FONTS_DIR}"

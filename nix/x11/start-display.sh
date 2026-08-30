@@ -1,5 +1,4 @@
-# Nix-provided X server (TigerVNC Xvnc) + noVNC.
-# CAD tools always talk to this X server, never to VcXsrv / host X.
+# X display for CAD: host desktop when available, else TigerVNC + noVNC.
 # Prepended onto launch.sh by flake.nix (helpers info/warn/error come from launch.sh).
 
 mmi_x_cleanup() {
@@ -11,28 +10,41 @@ mmi_x_cleanup() {
   fi
 }
 
+# True if DISPLAY names a local Unix X socket visible in this namespace.
+mmi_host_x_ok() {
+  local disp n
+  disp="${1:-${DISPLAY:-}}"
+  [ -n "$disp" ] || return 1
+  case "$disp" in
+    :[0-9]*|unix:[0-9]*) ;;
+    *) return 1 ;;
+  esac
+  n="${disp#unix:}"
+  n="${n#:}"
+  n="${n%%.*}"
+  [ -S "/tmp/.X11-unix/X${n}" ]
+}
+
 mmi_open_url() {
   local url="$1"
-  # Native Linux / VM first; WSL helpers only as fallback.
+  local saved="${DISPLAY:-}"
+  # Browser must use the VM/desktop display, not the CAD Xvnc screen.
+  if [ -n "${MMI_HOST_DISPLAY:-}" ]; then
+    export DISPLAY="${MMI_HOST_DISPLAY}"
+  fi
   if command -v xdg-open >/dev/null 2>&1; then
     xdg-open "$url" >/dev/null 2>&1 || true
-    return 0
-  fi
-  if command -v gio >/dev/null 2>&1; then
+  elif command -v gio >/dev/null 2>&1; then
     gio open "$url" >/dev/null 2>&1 || true
-    return 0
-  fi
-  if command -v sensible-browser >/dev/null 2>&1; then
+  elif command -v sensible-browser >/dev/null 2>&1; then
     sensible-browser "$url" >/dev/null 2>&1 || true
-    return 0
-  fi
-  if command -v wslview >/dev/null 2>&1; then
+  elif command -v wslview >/dev/null 2>&1; then
     wslview "$url" >/dev/null 2>&1 || true
-    return 0
-  fi
-  if command -v explorer.exe >/dev/null 2>&1; then
+  elif command -v explorer.exe >/dev/null 2>&1; then
     explorer.exe "$url" >/dev/null 2>&1 || true
-    return 0
+  fi
+  if [ -n "$saved" ]; then
+    export DISPLAY="$saved"
   fi
 }
 
@@ -74,7 +86,7 @@ mmi_start_nix_x() {
   mkdir -p "${CAD_HOME:-/mmi-home}" /tmp/.X11-unix
   chmod 1777 /tmp/.X11-unix 2>/dev/null || true
 
-  export XAUTHORITY="${XAUTHORITY:-${CAD_HOME:-/mmi-home}/.Xauthority}"
+  export XAUTHORITY="${CAD_HOME:-/mmi-home}/.Xauthority"
   : > "${XAUTHORITY}"
   chmod 600 "${XAUTHORITY}" 2>/dev/null || true
 
@@ -97,6 +109,7 @@ mmi_start_nix_x() {
     -localhost
     -SecurityTypes None
     -AlwaysShared
+    -ac
     -auth "${XAUTHORITY}"
     -pn
   )
@@ -131,6 +144,10 @@ mmi_start_nix_x() {
   export DISPLAY=":${MMI_X_NUM}"
   export MMI_NIX_X=1
 
+  if command -v xauth >/dev/null 2>&1; then
+    xauth -f "${XAUTHORITY}" generate ":${MMI_X_NUM}" . trusted 2>/dev/null || true
+  fi
+
   if command -v xsetroot >/dev/null 2>&1; then
     xsetroot -solid '#2a2a2a' 2>/dev/null || true
   fi
@@ -146,7 +163,8 @@ mmi_start_nix_x() {
       --vnc "127.0.0.1:${MMI_VNC_PORT}" >"${CAD_HOME:-/mmi-home}/.mmi-novnc.log" 2>&1 &
     MMI_NOVNC_PID=$!
     MMI_NOVNC_URL="http://127.0.0.1:${MMI_NOVNC_PORT}/vnc.html?autoconnect=1&resize=remote"
-    info "noVNC: ${MMI_NOVNC_URL}"
+    info "CAD windows are NOT in this terminal. Open:"
+    info "  ${MMI_NOVNC_URL}"
     if [ "${MMI_OPEN_BROWSER:-1}" != "0" ]; then
       mmi_open_url "${MMI_NOVNC_URL}"
     fi
@@ -156,3 +174,4 @@ mmi_start_nix_x() {
 
   trap mmi_x_cleanup EXIT INT TERM
 }
+

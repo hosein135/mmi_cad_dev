@@ -341,6 +341,8 @@
           "--bind \"$MMI_CAD_ROOT/data/home\" /mmi-home"
           "--bind \"$MMI_CAD_ROOT/data/workspace\" /mmi-home/work"
           "--bind \"$MMI_CAD_ROOT/data/pdks\" /mmi-pdks"
+          "--bind-try /tmp/.X11-unix /tmp/.X11-unix"
+          "--ro-bind-try \"$HOME/.Xauthority\" \"$HOME/.Xauthority\""
           "--ro-bind-try ${mmiVendor} /mmi-vendor"
           "--ro-bind-try ${mmiPdk} /mmi-bundle"
           "--ro-bind-try ${pkgs.magic-vlsi} /mmi-magic"
