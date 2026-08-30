@@ -68,8 +68,7 @@ Open the printed URL (default `http://127.0.0.1:6080/vnc.html?autoconnect=1`).
 | `/mmi-vendor/mmi` | Rebuilt 64-bit CAD + scripts/tech |
 | `/mmi-bundle` | From `pdk/` |
 | `/mmi-magic` | Magic VLSI (nixpkgs 25.05) |
-| `/mmi-pdks-nix` | Flake-locked PDK sources + Magic tech |
-| `/mmi-pdks` | Writable overlay (`data/pdks`; seeded from Nix) |
+| `/mmi-pdks` | Writable PDK overlay (`data/pdks`; empty until you import in MAX) |
 | `/mmi-xfonts` | Bitmap fonts for Nix Xvnc |
 | `/mmi-home` | `data/home` |
 

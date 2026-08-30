@@ -27,24 +27,25 @@ if {[info commands _mmi_file_normalize] == ""} {
   }
 }
 
-# ── Preset paths (flake-locked trees at /mmi-pdks, no network) ───────────────
-set PDK_PRESET(sky130A,label)  "SKY130A — SkyWater 130nm (Nix-locked)"
-set PDK_PRESET(sky130A,url)    "/mmi-pdks/src/skywater-pdk"
-set PDK_PRESET(sky130A,repo)   "/mmi-pdks/src/skywater-pdk"
+# ── Presets: download only when the user runs Import PDK in MAX ───────────────
+# Prefer a copy already under /mmi-pdks; otherwise fetch the GitHub archive.
+set PDK_PRESET(sky130A,label)  "SKY130A — SkyWater 130nm"
+set PDK_PRESET(sky130A,local)  "/mmi-pdks/src/skywater-pdk"
+set PDK_PRESET(sky130A,url)    "https://github.com/google/skywater-pdk/archive/7198cf647113f56041e02abf3eb623692820c5e1.tar.gz"
 set PDK_PRESET(sky130A,tech)   "sky130A"
 
-set PDK_PRESET(gf180mcu,label) "GF180MCU — GlobalFoundries 180nm (Nix-locked)"
-set PDK_PRESET(gf180mcu,url)   "/mmi-pdks/src/gf180mcu-pdk"
-set PDK_PRESET(gf180mcu,repo)  "/mmi-pdks/src/gf180mcu-pdk"
+set PDK_PRESET(gf180mcu,label) "GF180MCU — GlobalFoundries 180nm"
+set PDK_PRESET(gf180mcu,local) "/mmi-pdks/src/gf180mcu-pdk"
+set PDK_PRESET(gf180mcu,url)   "https://github.com/google/gf180mcu-pdk/archive/de3240d7529a6970437ac3344820aaae7839f215.tar.gz"
 set PDK_PRESET(gf180mcu,tech)  "gf180mcu"
 
-set PDK_PRESET(sg13g2,label)   "IHP SG13G2 — IHP 130nm SiGe (Nix-locked)"
-set PDK_PRESET(sg13g2,url)     "/mmi-pdks/ihp-sg13g2"
-set PDK_PRESET(sg13g2,repo)    "/mmi-pdks/ihp-sg13g2"
+set PDK_PRESET(sg13g2,label)   "IHP SG13G2 — IHP 130nm SiGe"
+set PDK_PRESET(sg13g2,local)   "/mmi-pdks/ihp-sg13g2"
+set PDK_PRESET(sg13g2,url)     "https://github.com/IHP-GmbH/IHP-Open-PDK/archive/refs/heads/main.tar.gz"
 set PDK_PRESET(sg13g2,tech)    "sg13g2"
 
 set PDK_IMPORT(pdk)  "sky130A"
-set PDK_IMPORT(url)  $PDK_PRESET(sky130A,repo)
+set PDK_IMPORT(url)  $PDK_PRESET(sky130A,url)
 set PDK_IMPORT(tech) "auto"
 set PDK_IMPORT(after) ""
 set PDK_IMPORT(pid) ""
@@ -393,7 +394,7 @@ proc pdk_import_dialog {} -desc {
           "Custom URL..."] \
       -values {sky130A gf180mcu sg13g2 custom} \
       -reload \
-      -help {Nix-locked PDK trees under /mmi-pdks/src (no network).}]
+      -help {Downloads a PDK when you click OK. Already-imported trees under /mmi-pdks are reused.}]
 
   lappend prop_list [list "Custom URL:" PDK_IMPORT(url) -entry -width 56 \
       -when {$PDK_IMPORT(pdk) == "custom"} \
@@ -413,24 +414,25 @@ proc pdk_import_dialog {} -desc {
     set tech $PDK_IMPORT(tech)
     set urls [list $url]
   } else {
-    set url $PDK_PRESET($choice,url)
     set family $choice
     set tech $PDK_PRESET($choice,tech)
     if {$PDK_IMPORT(tech) != "auto" && $PDK_IMPORT(tech) != ""} {
       set tech $PDK_IMPORT(tech)
     }
-    set urls [list $PDK_PRESET($choice,url)]
+    set local $PDK_PRESET($choice,local)
+    if {[file isdirectory $local]} {
+      set url $local
+    } else {
+      set url $PDK_PRESET($choice,url)
+    }
+    set urls [list $url]
   }
 
   if {$url == ""} {
     max_error "PDK URL is empty."
     return
   }
-    if {$choice != "custom" && ![file isdirectory $url] && ![file isfile $url]} {
-      max_error "Nix PDK tree is not mounted:\n$url\nExpected flake output mmi-pdks at /mmi-pdks-nix."
-      return
-    }
-    pdk_import_start $urls $tech $family
+  pdk_import_start $urls $tech $family
 }
 
 # ── Engine ───────────────────────────────────────────────────────────────────
@@ -942,14 +944,14 @@ proc pdk_import_cancel {} {
 
 proc _pdk_import_install_menus {} {
   catch {
-    menu_local_cmd "Import PDK (Nix-locked)..." pdk_import_dialog \
-        "Install SKY130A, GF180MCU, or IHP SG13G2 from the flake-locked trees"
+    menu_local_cmd "Import PDK..." pdk_import_dialog \
+        "Download a PDK (SKY130A, GF180MCU, IHP, or custom URL) into PDK_ROOT"
   }
   if {![catch {_menu_get_widget File}]} {
     catch {
-      menu_add_cmd [_menu_get_widget File] "Import PDK (Nix-locked)..." \
+      menu_add_cmd [_menu_get_widget File] "Import PDK..." \
           pdk_import_dialog \
-          -desc "Install a PDK from /mmi-pdks (flake-locked; custom URL is opt-in)"
+          -desc "Download a PDK into /mmi-pdks when you choose to"
     }
   }
 }

@@ -8,27 +8,12 @@
   inputs = {
     # NixOS 25.05 (Warbler). flake.lock records rev + narHash (durable GitHub commit).
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    open-pdks = {
-      url = "github:fossi-foundation/open-pdks/1689ac3f2dc763876eaf967227c7dfe831b031ae";
-      flake = false;
-    };
-    skywater-pdk = {
-      url = "github:google/skywater-pdk/7198cf647113f56041e02abf3eb623692820c5e1";
-      flake = false;
-    };
-    gf180mcu-pdk = {
-      url = "github:google/gf180mcu-pdk/de3240d7529a6970437ac3344820aaae7839f215";
-      flake = false;
-    };
   };
 
   outputs =
     {
       self,
       nixpkgs,
-      open-pdks,
-      skywater-pdk,
-      gf180mcu-pdk,
     }:
     let
       system = "x86_64-linux";
@@ -159,36 +144,6 @@
           install -Dm644 "$appDefaults" $out/app-defaults/Mmi
         '';
 
-      mmiPdks = pkgs.stdenvNoCC.mkDerivation {
-        pname = "mmi-pdks";
-        version = "locked";
-        SOURCE_DATE_EPOCH = sourceDateEpoch;
-        TZ = "UTC";
-        LC_ALL = "C";
-        dontUnpack = true;
-        nativeBuildInputs = [
-          pkgs.python3
-          pkgs.coreutils
-          pkgs.gnused
-          pkgs.findutils
-        ];
-        buildPhase = "true";
-        installPhase = ''
-          export OPEN_PDKS="${open-pdks}"
-          export SKYWATER_PDK="${skywater-pdk}"
-          export GF180MCU_PDK="${gf180mcu-pdk}"
-          export MAGICRC_SKY="${./pdk/magic/sky130A.magicrc}"
-          export MAGICRC_GF="${./pdk/magic/gf180mcuD.magicrc}"
-          export MAGICRC_IHP="${./pdk/magic/ihp-sg13g2.magicrc}"
-          export out="$out"
-          bash ${./nix/pdk/install.sh}
-        '';
-        meta = {
-          description = "Flake-locked open PDKs (sky130 / gf180 / IHP) plus Magic tech files";
-          platforms = [ "x86_64-linux" ];
-        };
-      };
-
       mmiVendor = pkgs.stdenv.mkDerivation {
         pname = "mmi-vendor";
         version = "040526-x86_64";
@@ -277,7 +232,6 @@
           mkdir -p $out/mmi-bundle
           mkdir -p $out/mmi-magic
           mkdir -p $out/mmi-vendor
-          mkdir -p $out/mmi-pdks-nix
           mkdir -p $out/mmi-xfonts
         '';
 
@@ -389,7 +343,6 @@
           "--ro-bind-try ${mmiVendor} /mmi-vendor"
           "--ro-bind-try ${mmiPdk} /mmi-bundle"
           "--ro-bind-try ${pkgs.magic-vlsi} /mmi-magic"
-          "--ro-bind-try ${mmiPdks} /mmi-pdks-nix"
           "--ro-bind-try ${mmiFonts} /mmi-xfonts"
         ];
 
@@ -442,8 +395,6 @@
             exit 1
           }
         done
-        test -f ${mmiPdks}/sky130A/libs.tech/magic/sky130A.magicrc
-        test -d ${mmiPdks}/src/skywater-pdk
         touch $out
       '';
     in
@@ -454,7 +405,6 @@
         mmi-vendor = mmiVendor;
         mmi-xfonts = mmiFonts;
         mmi-pdk = mmiPdk;
-        mmi-pdks = mmiPdks;
       };
 
       apps.${system}.default = {

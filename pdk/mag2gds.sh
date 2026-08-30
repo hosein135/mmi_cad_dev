@@ -49,9 +49,9 @@ done
 
 if [ -z "$RC" ]; then
   echo "ERROR: No Magic .magicrc under PDK_ROOT=$PDK_ROOT" >&2
-  echo "Tapeout mag2gds needs an open_pdks-style PDK from the Nix store:" >&2
+  echo "Tapeout mag2gds needs an open_pdks-style Magic rc:" >&2
   echo "  \$PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc" >&2
-  echo "(seeded from /mmi-pdks-nix). Rebuild: nix build .#mmi-pdks" >&2
+  echo "Import a PDK from MAX first (File → Import PDK), or copy a .magicrc there." >&2
   exit 3
 fi
 

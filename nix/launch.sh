@@ -81,14 +81,7 @@ mmi_resolve_local_max_font_dir() {
 
 mkdir -p "${CAD_HOME}" "${CAD}" /mmi-pdks 2>/dev/null || true
 
-# Writable PDK_ROOT with store-backed trees (symlinks; MAX tech writes go to /mmi-pdks/max).
-if [ -d /mmi-pdks-nix ]; then
-  for name in sky130A gf180mcuD ihp-sg13g2 src; do
-    if [ -e "/mmi-pdks-nix/${name}" ] && [ ! -e "/mmi-pdks/${name}" ]; then
-      ln -s "/mmi-pdks-nix/${name}" "/mmi-pdks/${name}"
-    fi
-  done
-fi
+# PDKs are not fetched at launch. Import later from MAX (File menu).
 
 if [ ! -e "${MMI_TOOLS}/bin/max" ] && [ ! -e "${MMI_TOOLS}/bin/sue.exe" ] && [ ! -e "${MMI_TOOLS}/bin/nst" ]; then
   error "x86_64 CAD tools not found at ${MMI_TOOLS}."

@@ -3,7 +3,7 @@ Shared PDK_ROOT
 
 Magic and MAX do not use the same on-disk format:
 
-  Magic  →  $PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc  (open_pdks)
+  Magic  →  $PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc
   MAX    →  $PDK_ROOT/max/tech/<name>/                 (make_tech)
 
 Both live under one directory so you do not keep two full foundry trees.
@@ -12,7 +12,8 @@ Both live under one directory so you do not keep two full foundry trees.
   Inside Nix FHS:  /mmi-pdks   (PDK_ROOT)
   Designs:    data/workspace → /mmi-home/work
 
-Tapeout mag2gds needs $PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc
-from the flake-locked mmi-pdks output (seeded into data/pdks on launch).
+Foundry PDKs are not fetched by ./run.sh. Import them from MAX when you want
+(File / Local → Import PDK). They land in data/pdks.
 
-Tcl paint dump does not need that file; it is not tapeout-quality.
+Tapeout mag2gds needs $PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc after
+you have imported a sky130 tree (or copied a Magic rc into that path).
