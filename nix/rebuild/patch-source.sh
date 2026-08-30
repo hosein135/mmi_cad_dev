@@ -760,6 +760,224 @@ if gds.is_file():
         print("gdsWrite cd_client intptr")
 PY
 
+# GCC 14 removed <varargs.h> (va_dcl / va_start(ap)). Convert maxaux
+# K&R varargs to stdarg.h before compiling ext2spice / irsim / etc.
+python3 - << 'PY'
+from pathlib import Path
+
+def subst(path, old, new, label):
+    p = Path(path)
+    if not p.is_file():
+        return
+    t = p.read_text(encoding="latin-1")
+    if old not in t:
+        if "va_dcl" not in t:
+            print("skip", label, path)
+            return
+        raise SystemExit(f"{label}: pattern not found in {path}")
+    p.write_text(t.replace(old, new, 1), encoding="latin-1")
+    print(label, path)
+
+for maxv in ("max4.3.16", "max4.2.11"):
+    root = Path(f"src/{maxv}/maxaux")
+    if not root.is_dir():
+        continue
+    for p in root.rglob("*.c"):
+        if "RCS" in p.parts:
+            continue
+        t = p.read_text(encoding="latin-1")
+        t2 = t.replace("#include <varargs.h>", "#include <stdarg.h>")
+        if t2 != t:
+            p.write_text(t2, encoding="latin-1")
+            print("stdarg include", p)
+
+    subst(
+        f"src/{maxv}/maxaux/ext/utils/LIBtextio.c",
+        """    /*VARARGS*/
+TxError(fmt, va_alist)
+    char *fmt;
+    va_dcl
+{
+    va_list ap;
+ 
+    (void) fflush(stdout);
+    (void) fflush(stderr);
+    va_start(ap);
+""",
+        """    /*VARARGS*/
+void
+TxError(char *fmt, ...)
+{
+    va_list ap;
+ 
+    (void) fflush(stdout);
+    (void) fflush(stderr);
+    va_start(ap, fmt);
+""",
+        "TxError stdarg",
+    )
+    subst(
+        f"src/{maxv}/maxaux/ext/utils/LIBtextio.c",
+        """    /*VARARGS*/
+TxPrintf(fmt, va_alist)
+    char *fmt;
+    va_dcl
+{
+    va_list ap;
+ 
+    (void) fflush(stderr);
+    (void) fflush(stdout);
+    va_start(ap);
+""",
+        """    /*VARARGS*/
+void
+TxPrintf(char *fmt, ...)
+{
+    va_list ap;
+ 
+    (void) fflush(stderr);
+    (void) fflush(stdout);
+    va_start(ap, fmt);
+""",
+        "TxPrintf stdarg",
+    )
+    subst(
+        f"src/{maxv}/maxaux/ext/extflat/EFread.c",
+        """    /*VARARGS1*/
+efReadError(fmt, va_alist)
+    char *fmt;
+    va_dcl
+{
+    va_list args;
+
+    (void) printf("%s, line %d: ", efReadFileName, efReadLineNum);
+    va_start(args);
+""",
+        """    /*VARARGS1*/
+void
+efReadError(char *fmt, ...)
+{
+    va_list args;
+
+    (void) printf("%s, line %d: ", efReadFileName, efReadLineNum);
+    va_start(args, fmt);
+""",
+        "efReadError stdarg",
+    )
+    subst(
+        f"src/{maxv}/maxaux/irsim/src/ana11/textwind.c",
+        """public void PRINTF( va_alist )
+  va_dcl
+  {
+    va_list  args;
+    char     *format;
+    char     *s;
+    int      len;
+
+    va_start( args );
+    format = va_arg( args, char * );
+""",
+        """public void PRINTF( char *format, ... )
+  {
+    va_list  args;
+    char     *s;
+    int      len;
+
+    va_start( args, format );
+""",
+        "PRINTF stdarg",
+    )
+    subst(
+        f"src/{maxv}/maxaux/irsim/src/irsim/prints.c",
+        """public void lprintf( va_alist )
+  va_dcl
+  {
+    va_list  args;
+    char     *fmt;
+    FILE     *fp;
+    char     buff[ 300 ];
+
+    va_start( args );
+    fp = va_arg( args, FILE * );
+    fmt = va_arg( args, char * );
+""",
+        """public void lprintf( FILE *fp, char *fmt, ... )
+  {
+    va_list  args;
+    char     buff[ 300 ];
+
+    va_start( args, fmt );
+""",
+        "lprintf stdarg",
+    )
+    subst(
+        f"src/{maxv}/maxaux/irsim/src/irsim/prints.c",
+        """public void error( va_alist )
+  va_dcl
+  {
+    va_list  args;
+    char     *filename;
+    int      lineno;
+    char     *fmt;
+    char     buf1[ 100 ], buf2[ 200 ];
+
+    va_start( args );
+    filename = va_arg( args, char * );
+    lineno = va_arg( args, int );
+    fmt = va_arg( args, char * );
+""",
+        """public void error( char *filename, int lineno, char *fmt, ... )
+  {
+    va_list  args;
+    char     buf1[ 100 ], buf2[ 200 ];
+
+    va_start( args, fmt );
+""",
+        "error stdarg",
+    )
+    subst(
+        f"src/{maxv}/maxaux/irsim/src/irsim/netupdate.c",
+        """private void nu_error( va_alist )
+  va_dcl
+  {
+    va_list  args;
+    char     *fmt, *errstr = "| error";
+    FILE     *fp;
+
+    if( nu_logf != NULL )	fp = nu_logf;
+    else if( logfile != NULL )	fp = logfile;
+    else			fp = stderr, errstr ++;
+
+    va_start( args );
+    fmt = va_arg( args, char * );
+""",
+        """private void nu_error( char *fmt, ... )
+  {
+    va_list  args;
+    char     *errstr = "| error";
+    FILE     *fp;
+
+    if( nu_logf != NULL )	fp = nu_logf;
+    else if( logfile != NULL )	fp = logfile;
+    else			fp = stderr, errstr ++;
+
+    va_start( args, fmt );
+""",
+        "nu_error stdarg",
+    )
+
+left = []
+for p in Path("src").glob("max*/maxaux/**/*.c"):
+    if "RCS" in p.parts:
+        continue
+    t = p.read_text(encoding="latin-1", errors="replace")
+    if "va_dcl" in t or "#include <varargs.h>" in t:
+        left.append(str(p).replace("\\", "/"))
+if left:
+    raise SystemExit("still using varargs.h / va_dcl:\n  " + "\n  ".join(left))
+print("maxaux: K&R varargs converted to stdarg.h")
+PY
+
 # Rewrite mkcsue / mknst as bash (csh not required at build time).
 cat > src/sue4.4/build/mkcsue << 'EOF'
 #!/usr/bin/env bash
