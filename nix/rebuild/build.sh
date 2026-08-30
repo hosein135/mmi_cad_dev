@@ -89,7 +89,15 @@ build_blt() {
   rm -f src/libBLT.a src/libBLT.so
   find src -maxdepth 1 -name '*.a' -delete 2>/dev/null || true
   printf '%s\n' '#!/bin/sh' 'echo x86_64-unknown-linux-gnu' > cf/config.guess
-  chmod +x cf/config.guess configure 2>/dev/null || true
+  cat > cf/config.sub << 'EOF'
+#!/bin/sh
+case "$1" in
+"") echo x86_64-unknown-linux-gnu ;;
+sun4) echo sparc-sun-sunos4.1.3 ;;
+*) echo x86_64-unknown-linux-gnu ;;
+esac
+EOF
+  chmod +x cf/config.guess cf/config.sub configure cf/install-sh 2>/dev/null || true
   rm -f config.cache config.status
   local inc="-I${UTILS}/tcltk/tk8.0.4/generic -I${UTILS}/tcltk/tk8.0.4/unix -I${UTILS}/tcltk/tcl8.0.4/generic -I${UTILS}/tcltk/tcl8.0.4/unix"
   [ -d "${UTILS}/tcltk/tk8.0/generic" ] && inc="${inc} -I${UTILS}/tcltk/tk8.0/generic -I${UTILS}/tcltk/tcl8.0/generic"

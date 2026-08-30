@@ -157,8 +157,8 @@ PY
 
 ln -sfn blt2.4g.i486-linux2.2 src/utils/blt2.4g.x86_64-linux
 if [ -f src/utils/blt2.4g.i486-linux2.2/configure ]; then
-  chmod +x src/utils/blt2.4g.i486-linux2.2/configure \
-    src/utils/blt2.4g.i486-linux2.2/cf/config.guess 2>/dev/null || true
+  blt=src/utils/blt2.4g.i486-linux2.2
+  chmod +x "$blt/configure" "$blt/cf/config.guess" "$blt/cf/config.sub" "$blt/cf/install-sh" 2>/dev/null || true
 fi
 
 # Pre-generated DEF parser is in the tarball; do not require 32-bit PCCTS/antlr.
