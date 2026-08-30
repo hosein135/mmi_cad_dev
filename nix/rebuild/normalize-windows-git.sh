@@ -39,6 +39,16 @@ fix_reserved_names() {
       mv "$p" "$dir/$new"
       echo "normalize: renamed $(basename "$p") -> $new"
     done
+  # CON.* is reserved on Windows (e.g. m/def/con.c).
+  find . -type f -iname 'con.*' -print0 2>/dev/null |
+    while IFS= read -r -d '' p; do
+      base=$(basename "$p")
+      dir=$(dirname "$p")
+      new="def_${base}"
+      [ -e "$dir/$new" ] && new="_${new}"
+      mv "$p" "$dir/$new"
+      echo "normalize: renamed $base -> $(basename "$new")"
+    done
 }
 
 expand_symlinks() {
@@ -80,8 +90,20 @@ fix_bin() {
   fi
 }
 
+break_hardlinks() {
+  local n=0 f tmp
+  while IFS= read -r -d '' f; do
+    tmp="${f}.norm.$$"
+    cp -f -- "$f" "$tmp"
+    mv -f -- "$tmp" "$f"
+    n=$((n + 1))
+  done < <(find . -type f -links +1 -print0)
+  echo "normalize: broke $n hard links"
+}
+
 fix_reserved_names
 expand_symlinks
+break_hardlinks
 fix_bin
 
 echo "normalize: done under $ROOT"

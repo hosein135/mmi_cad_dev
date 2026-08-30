@@ -46,11 +46,11 @@ include $(MAKE_DIR)/config
 include max/max_version
 
 #aux programs (relative to o/$(CONFIG)/)
-EXT2SPICE := aux/ext/ext2spice/ext2spice
-EXT2SIM := aux/ext/ext2sim/ext2sim
+EXT2SPICE := maxaux/ext/ext2spice/ext2spice
+EXT2SIM := maxaux/ext/ext2sim/ext2sim
 GEMINI := aux/gemini/gemini
-IRSIM := aux/irsim/irsim/irsim
-ANXHELPER := aux/irsim/anXhelper/anXhelper
+IRSIM := maxaux/irsim/irsim/irsim
+ANXHELPER := maxaux/irsim/anXhelper/anXhelper
 
 #binary extensions
 BIN_SOLARIS := bin.sparc-solaris2
@@ -78,12 +78,12 @@ MRD = $(MAX_ROOT_DIR)
 
 # update max and auxilary programs
 .PHONY: all
-all: max aux
+all: max maxaux
 
 # update auxilary programs
-.PHONY: aux
-aux:
-	cd aux; make
+.PHONY: maxaux
+maxaux:
+	cd maxaux; make
 
 # update all modules, then remake max
 .PHONY: max
