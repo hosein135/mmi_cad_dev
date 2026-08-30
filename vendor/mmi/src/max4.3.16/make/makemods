@@ -1,16 +1,6 @@
-#!/bin/csh -f
-#
-# :makemods modules
-#
-# rcsid $$
-#
-
-foreach mod ( $argv[1-] )
-	echo ' '
-	echo ------- Doing $mod -------
-	echo -n "pushd "
-	pushd m/$mod
-	make -k 
-	echo -n "popd "
-	popd
-end
+#!/usr/bin/env bash
+set -euo pipefail
+for mod in "$@"; do
+  echo "------- Doing $mod -------"
+  make -e -C "m/$mod" -k
+done

@@ -175,7 +175,7 @@ build_max() {
     mkdir -p "o/linux/$name"
     touch "o/linux/$name/depend"
   done
-  chmod +x make/:makemods
+  chmod +x make/makemods
   make -s -e -j1 max
   if [ -x o/linux/max ]; then
     file o/linux/max

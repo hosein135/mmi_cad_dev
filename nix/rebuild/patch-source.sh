@@ -53,8 +53,10 @@ sed -i 's/\${OBJDIR}\/max/\${OBJ_DIR}\/max/' src/max4.3.16/max/Makefile
 sed -i 's|GEMINI := aux/gemini/gemini|GEMINI := maxaux/gemini/gemini|' \
   src/max4.3.16/make/Makefile.main
 
-# :makemods is csh — replace with bash.
-cat > src/max4.3.16/make/:makemods << 'EOF'
+# makemods (was :makemods csh script) — bash, colon-free name for NTFS/git.
+for max_mk in src/max4.3.16/make src/max4.2.11/make; do
+  [ -d "$max_mk" ] || continue
+  cat > "$max_mk/makemods" << 'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 for mod in "$@"; do
@@ -62,7 +64,12 @@ for mod in "$@"; do
   make -e -C "m/$mod" -k
 done
 EOF
-chmod +x src/max4.3.16/make/:makemods
+  chmod +x "$max_mk/makemods"
+  rm -f "$max_mk/:makemods"
+  if [ -f "$max_mk/Makefile.main" ]; then
+    sed -i 's|make/:makemods|./make/makemods|g' "$max_mk/Makefile.main"
+  fi
+done
 
 # Drop hardcoded Juniper paths so MMI_CAD / MMI_UTILS come from the environment.
 sed -i \
