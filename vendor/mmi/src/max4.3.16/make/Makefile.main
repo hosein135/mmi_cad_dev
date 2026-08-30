@@ -90,7 +90,10 @@ maxaux:
 max:	
 	cd maxtcl; make
 	cd mc; make
-	./make/makemods ${MODULES}
+	@for mod in $(MODULES); do \
+	  echo "------- Doing $$mod -------"; \
+	  $(MAKE) -e -C m/$$mod -k || exit 1; \
+	done
 	cd max; make
 
 # remake from scratch

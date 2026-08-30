@@ -53,7 +53,7 @@ sed -i 's/\${OBJDIR}\/max/\${OBJ_DIR}\/max/' src/max4.3.16/max/Makefile
 sed -i 's|GEMINI := aux/gemini/gemini|GEMINI := maxaux/gemini/gemini|' \
   src/max4.3.16/make/Makefile.main
 
-# makemods (was :makemods csh script) — bash, colon-free name for NTFS/git.
+# makemods (was :makemods csh script) — inline in Makefile.main; also write helper script.
 for max_mk in src/max4.3.16/make src/max4.2.11/make; do
   [ -d "$max_mk" ] || continue
   cat > "$max_mk/makemods" << 'EOF'
@@ -67,7 +67,25 @@ EOF
   chmod +x "$max_mk/makemods"
   rm -f "$max_mk/:makemods"
   if [ -f "$max_mk/Makefile.main" ]; then
-    sed -i 's|make/:makemods|./make/makemods|g' "$max_mk/Makefile.main"
+    python3 - << PY
+from pathlib import Path
+p = Path("$max_mk/Makefile.main")
+t = p.read_text(encoding="latin-1")
+old = "\t./make/makemods \${MODULES}\n"
+if old not in t:
+    old = "\tmake/:makemods \${MODULES}\n"
+new = """\t@for mod in \$(MODULES); do \\\\
+\t  echo "------- Doing \$\$mod -------"; \\\\
+\t  \$(MAKE) -e -C m/\$\$mod -k || exit 1; \\\\
+\tdone
+"""
+if old in t:
+    t = t.replace(old, new)
+    p.write_text(t, encoding="latin-1")
+    print("patch:", p, "makemods inlined")
+else:
+    print("warn: makemods recipe not found in", p)
+PY
   fi
 done
 
