@@ -356,10 +356,7 @@ old_int = """#ifdef	ALPHA
 #define	LOGBYPERWD	2				    /* LOG2(BYPERWD) */
 #endif"""
 
-new_int = """#ifndef USE_SYSTEM_MALLOC
-#define USE_SYSTEM_MALLOC 1
-#endif
-#define	INT		intptr_t
+new_int = """#define	INT		intptr_t
 #define ALIGN		intptr_t
 #define	BYPERWD		(sizeof (INT))
 #if defined(__LP64__) || defined(_LP64) || defined(ALPHA)
@@ -368,16 +365,30 @@ new_int = """#ifndef USE_SYSTEM_MALLOC
 #define	LOGBYPERWD	2				    /* LOG2(BYPERWD) */
 #endif"""
 
+# NOMACROS (which makes FREE() skip mallocFreePage) is decided BEFORE the
+# INT macros. Define USE_SYSTEM_MALLOC at the top of the header.
+sys_off = """/* The USE_SYSTEM_MALLOC flag disables Magic's allocator, allowing
+ * the system malloc to be used instead.
+ */
+"""
+sys_on = """/* The USE_SYSTEM_MALLOC flag disables Magic's allocator, allowing
+ * the system malloc to be used instead.
+ */
+#ifndef USE_SYSTEM_MALLOC
+#define USE_SYSTEM_MALLOC 1
+#endif
+"""
+
 for p in Path("src").glob("max*/maxaux/ext/include/malloc.h"):
     t = p.read_text(encoding="latin-1")
-    if "USE_SYSTEM_MALLOC 1" in t and "intptr_t" in t:
-        print("malloc.h already patched", p)
-        continue
-    if old_int not in t:
+    if old_int not in t and "intptr_t" not in t:
         raise SystemExit(f"malloc.h INT macros not found in {p}")
+    if old_int in t:
+        t = t.replace(old_int, new_int, 1)
+    if sys_off in t and "#define USE_SYSTEM_MALLOC 1" not in t:
+        t = t.replace(sys_off, sys_on, 1)
     if "#include <stdint.h>" not in t:
         t = "#include <stdint.h>\n" + t
-    t = t.replace(old_int, new_int, 1)
     p.write_text(t, encoding="latin-1")
     print("malloc.h LP64 + USE_SYSTEM_MALLOC", p)
 

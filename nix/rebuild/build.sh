@@ -18,7 +18,7 @@ export SOURCE_DATE_EPOCH
 # ("Jan  1 1980"); Nix's cc-wrapper word-splits NIX_CFLAGS_COMPILE and
 # GCC 14 then reports: error: duplicate 'unsigned'. GCC already stamps
 # those builtins from SOURCE_DATE_EPOCH.
-export CFLAGS="${CFLAGS:--std=gnu89 -fcommon -fno-strict-aliasing -O2 -frandom-seed=mmi-cad-040526 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0} -Wno-error -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-return-type -Wno-unused -Wno-old-style-definition -Wno-declaration-after-statement -include float.h -DCLK_TCK=100"
+export CFLAGS="${CFLAGS:--std=gnu89 -fcommon -fno-strict-aliasing -O2 -frandom-seed=mmi-cad-040526 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0} -Wno-error -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-return-type -Wno-unused -Wno-old-style-definition -Wno-declaration-after-statement -include float.h -DCLK_TCK=100 -DUSE_SYSTEM_MALLOC"
 
 export LC_ALL=C
 export LANG=C
