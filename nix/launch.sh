@@ -9,6 +9,74 @@ MMI_CAD_ROOT="${MMI_CAD_ROOT:-${PWD:-.}}"
 CAD_HOME="/mmi-home"
 CAD="${CAD_HOME}/cad"
 MMI_TOOLS="${MMI_TOOLS:-/mmi-vendor/mmi}"
+MMI_LOCAL="${MMI_LOCAL:-${CAD}/mmi_local}"
+
+# Return 0 if $1 is a plausible X font directory path for this machine.
+mmi_font_dir_ok() {
+  local d="$1"
+  [ -n "${d}" ] && [ -d "${d}" ] && [ -f "${d}/fonts.dir" ]
+}
+
+# Paths under these prefixes are visible to the client but often not to the X server.
+mmi_path_needs_font_mirror() {
+  case "$1" in
+    /mmi-vendor/*|/mmi-home/*|/mmi-bundle/*|/mmi-magic/*|/mmi-pdks/*) return 0 ;;
+  esac
+  return 1
+}
+
+# Directory the X server should use for MAX Helvetica-Bold PCF fonts.
+# Override anytime with MMI_MAX_FONTS_DIR (must contain fonts.dir).
+mmi_resolve_max_font_dir() {
+  local src cache
+
+  if mmi_font_dir_ok "${MMI_MAX_FONTS_DIR:-}"; then
+    printf '%s' "${MMI_MAX_FONTS_DIR}"
+    return 0
+  fi
+
+  src="${MMI_TOOLS}/max/fonts"
+  if mmi_font_dir_ok "${src}" && ! mmi_path_needs_font_mirror "${src}"; then
+    printf '%s' "${src}"
+    return 0
+  fi
+
+  if mmi_font_dir_ok "${MMI_LOCAL:-}/max/fonts" && ! mmi_path_needs_font_mirror "${MMI_LOCAL}/max/fonts"; then
+    printf '%s' "${MMI_LOCAL}/max/fonts"
+    return 0
+  fi
+
+  if mmi_font_dir_ok "${src}"; then
+    cache="${MMI_FONT_CACHE:-${MMI_CAD_ROOT}/data/fonts/max}"
+    mkdir -p "${cache}"
+    if [ ! -f "${cache}/fonts.dir" ] || [ "${src}/fonts.dir" -nt "${cache}/fonts.dir" ]; then
+      cp -a "${src}/." "${cache}/"
+      command -v mkfontdir >/dev/null 2>&1 && (cd "${cache}" && mkfontdir . 2>/dev/null || true)
+    fi
+    if mmi_font_dir_ok "${cache}"; then
+      printf '%s' "${cache}"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+# Optional writable mirror of mmi_local max fonts (host path when CAD_HOME is a bind mount).
+mmi_resolve_local_max_font_dir() {
+  local d
+
+  if [ -n "${MMI_CAD_ROOT:-}" ] && mmi_font_dir_ok "${MMI_CAD_ROOT}/data/home/cad/mmi_local/max/fonts"; then
+    printf '%s' "${MMI_CAD_ROOT}/data/home/cad/mmi_local/max/fonts"
+    return 0
+  fi
+  d="${MMI_LOCAL:-}/max/fonts"
+  if mmi_font_dir_ok "${d}" && ! mmi_path_needs_font_mirror "${d}"; then
+    printf '%s' "${d}"
+    return 0
+  fi
+  return 1
+}
 
 mkdir -p "${CAD_HOME}" "${CAD}" /mmi-pdks 2>/dev/null || true
 
@@ -94,13 +162,16 @@ ensure_maxrc() {
 ensure_maxrc "${CAD_HOME}/.maxrc"
 ensure_maxrc "${CAD}/mmi_local/max/.maxrc"
 
-export MMI_LOCAL="${CAD}/mmi_local"
+export MMI_LOCAL
 export MMI_PDK_DIR="/mmi-bundle"
 export MMI_BROWSER="${MMI_BROWSER:-xdg-open}"
 export PDK_ROOT="${PDK_ROOT:-/mmi-pdks}"
 export PDK="${PDK:-sky130A}"
 export MN_BIN_DIR="${MN_BIN_DIR:-bin.linux}"
 export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-1}"
+if resolved="$(mmi_resolve_max_font_dir 2>/dev/null)"; then
+  export MMI_MAX_FONTS_DIR="${resolved}"
+fi
 export PATH="/mmi-magic/bin:${MMI_TOOLS}/bin:${PATH}"
 export QT_X11_NO_MITSHM=1
 export LC_ALL=C
@@ -138,6 +209,7 @@ echo "  DISPLAY=${DISPLAY:-<unset>}"
 echo "  XAUTHORITY=${XAUTHORITY:-<unset>}"
 echo "  PDK_ROOT=${PDK_ROOT}"
 echo "  MMI_TOOLS=${MMI_TOOLS}"
+echo "  MMI_MAX_FONTS_DIR=${MMI_MAX_FONTS_DIR:-<unset>}"
 echo "  Magic: $(command -v magic 2>/dev/null || echo missing)"
 echo "  Font root: ${FONT_ROOT:-<unset>}"
 
@@ -149,17 +221,22 @@ if [ -f "${MMI_TOOLS}/app-defaults/Mmi" ]; then
 fi
 
 FP_LIST=""
-if [ -d "${MMI_TOOLS}/max/fonts" ] && [ -f "${MMI_TOOLS}/max/fonts/fonts.dir" ]; then
-  FP_LIST="${MMI_TOOLS}/max/fonts"
-  echo "  + ${MMI_TOOLS}/max/fonts (MAX PCF)"
+if mmi_font_dir_ok "${MMI_MAX_FONTS_DIR:-}"; then
+  FP_LIST="${MMI_MAX_FONTS_DIR}"
+  echo "  + ${MMI_MAX_FONTS_DIR} (MAX PCF)"
 fi
-if [ -d "${CAD}/mmi_local/max/fonts" ] && [ -f "${CAD}/mmi_local/max/fonts/fonts.dir" ]; then
-  if [ -z "${FP_LIST}" ]; then
-    FP_LIST="${CAD}/mmi_local/max/fonts"
-  else
-    FP_LIST="${FP_LIST},${CAD}/mmi_local/max/fonts"
-  fi
-  echo "  + ${CAD}/mmi_local/max/fonts (local MAX PCF)"
+if local_fonts="$(mmi_resolve_local_max_font_dir 2>/dev/null)"; then
+  case ",${FP_LIST}," in
+    *,"${local_fonts}",*) ;;
+    *)
+      if [ -z "${FP_LIST}" ]; then
+        FP_LIST="${local_fonts}"
+      else
+        FP_LIST="${FP_LIST},${local_fonts}"
+      fi
+      echo "  + ${local_fonts} (mmi_local MAX PCF)"
+      ;;
+  esac
 fi
 if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
   for sub in 75dpi misc 100dpi Type1 cyrillic; do

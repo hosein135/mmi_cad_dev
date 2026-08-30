@@ -227,49 +227,130 @@ for pth in Path("src").rglob("*"):
         print("gds lvalue", pth)
 PY
 
-# MAX: PaOpen("fonts") cannot fopen(2) a directory on Linux; use fonts/fonts.dir.
+# MAX: font path must be readable by the X server (not only the client).  Never
+# abort on X_SetFontPath failure (BadValue when the path is sandbox-only).
 python3 - << 'PY'
 from pathlib import Path
+import re
+
 p = Path("src/max4.3.16/m/graphics/graphics1.c")
 t = p.read_text(encoding="latin-1")
-old = """  /* find max fonts directory */
-  {
-    FILE *fp = PaOpen("fonts","r", NULL, MnPathSysLib, &maxFontDir);
-    if(!fp)
-    {
-      fprintf(stderr,"WARNING:  Could not find Max fonts directory!\\n");
-      return;
+
+# Hoist error handler if we patch grAugmentFontPath and it is not present yet.
+if "grFontPathXErr" not in t:
+    anchor = "static void grAugmentFontPath()"
+    helper = """static int grFontPathQuiet = 0;
+static XErrorHandler grFontPathPrevHandler = NULL;
+
+static int
+grFontPathXErr(Display *dpy, XErrorEvent *err)
+{
+  if (grFontPathQuiet) return 0;
+  if (grFontPathPrevHandler) return grFontPathPrevHandler(dpy, err);
+  return 0;
+}
+
+"""
+    if anchor not in t:
+        raise SystemExit("graphics1.c: grAugmentFontPath anchor missing")
+    t = t.replace(anchor, helper + anchor, 1)
+
+new_fn = """static void grAugmentFontPath()
+{
+  char fontDirBuf[BUFSIZ];
+  char **dirs;
+  int nDirs, i;
+  char *fontDir = NULL;
+  char *envDir;
+  FILE *fp;
+  char *opened;
+
+  /* Prefer an explicit host-visible directory (set by launcher / site config). */
+  envDir = getenv("MMI_MAX_FONTS_DIR");
+  if (envDir && envDir[0]) {
+    strncpy(fontDirBuf, envDir, sizeof fontDirBuf - 1);
+    fontDirBuf[sizeof fontDirBuf - 1] = '\\0';
+    fontDir = fontDirBuf;
+  } else {
+    /* Locate $MMI_LOCAL|$MMI_TOOLS/max/.../fonts via fonts.dir (Linux). */
+    fp = PaOpen("fonts/fonts.dir", "r", NULL, MnPathSysLib, &opened);
+    if (!fp) {
+      fp = PaOpen("fonts", "r", NULL, MnPathSysLib, &opened);
     }
-    
-    fclose(fp); 
-  }"""
-new = """  /* find max fonts directory (fonts/fonts.dir under max lib path) */
-  {
-    static char fontDirBuf[BUFSIZ];
-    FILE *fp = PaOpen("fonts/fonts.dir","r", NULL, MnPathSysLib, &maxFontDir);
-    if(!fp)
-    {
-      fprintf(stderr,"WARNING:  Could not find Max fonts directory!\\n");
+    if (!fp) {
+      fprintf(stderr, "WARNING:  Could not find Max fonts directory!\\n");
       return;
     }
     fclose(fp);
-    strncpy(fontDirBuf, maxFontDir, sizeof fontDirBuf - 1);
+    strncpy(fontDirBuf, opened, sizeof fontDirBuf - 1);
     fontDirBuf[sizeof fontDirBuf - 1] = '\\0';
-    {
+    if (strstr(fontDirBuf, "fonts.dir")) {
       char *slash = strrchr(fontDirBuf, '/');
       if (slash) *slash = '\\0';
     }
-    maxFontDir = fontDirBuf;
-  }"""
-if old in t:
-    p.write_text(t.replace(old, new), encoding="latin-1")
-    print("graphics1.c: fonts/fonts.dir for grAugmentFontPath")
-elif "fonts/fonts.dir" in t:
-    print("graphics1.c: fonts/fonts.dir already patched")
-else:
-    raise SystemExit("graphics1.c: grAugmentFontPath patch failed")
+    fontDir = fontDirBuf;
+  }
+
+  if (access(fontDir, R_OK) != 0) {
+    fprintf(stderr,
+            "WARNING:  Max fonts not readable by client (%s).\\n",
+            fontDir);
+    return;
+  }
+
+  dirs = XGetFontPath(grXdpy, &nDirs);
+  if (dirs) {
+    for (i = 0; i < nDirs; i++) {
+      if (dirs[i] && strcmp(fontDir, dirs[i]) == 0) {
+        XFreeFontPath(dirs);
+        return;
+      }
+    }
+  } else if (nDirs != 0) {
+    return;
+  }
+
+  {
+    char **newDirs;
+
+    MALLOC_TAG(char **,
+               newDirs,
+               (nDirs + 1) * sizeof(char *),
+               "grFontDirs");
+    newDirs[0] = fontDir;
+    for (i = 0; i < nDirs; i++) newDirs[i + 1] = dirs[i];
+
+    grFontPathQuiet = 1;
+    grFontPathPrevHandler = XSetErrorHandler(grFontPathXErr);
+    XSetFontPath(grXdpy, newDirs, nDirs + 1);
+    XSync(grXdpy, False);
+    XSetErrorHandler(grFontPathPrevHandler);
+    grFontPathPrevHandler = NULL;
+    grFontPathQuiet = 0;
+
+    FREE_TAG(newDirs, "grFontDirs");
+  }
+
+  if (dirs) XFreeFontPath(dirs);
+}
+"""
+pat = re.compile(
+    r"static void grAugmentFontPath\(\)\s*\{.*?\n\} \n\n/\*-\{5,\}\n \* grLoadFonts",
+    re.S,
+)
+if not pat.search(t):
+    raise SystemExit("graphics1.c: grAugmentFontPath not found")
+t = pat.sub(new_fn + "\n\n/*---------------------------------------------------------\n * grLoadFonts", t)
+p.write_text(t, encoding="latin-1")
+print("graphics1.c: general grAugmentFontPath (MMI_MAX_FONTS_DIR, safe XSetFontPath)")
 
 p = Path("src/max4.3.16/m/graphics/graphics1.c")
+t = p.read_text(encoding="latin-1")
+if "#include <unistd.h>" not in t and "access(fontDir" in t:
+    t = t.replace("#include <stdio.h>", "#include <stdio.h>\n#include <unistd.h>", 1)
+    p.write_text(t, encoding="latin-1")
+    print("graphics1.c: include unistd.h for access()")
+
 t = p.read_text(encoding="latin-1")
 old = """    for(i=GrMaxFontSize; i>=0; i--)
     {
@@ -287,6 +368,8 @@ new = """    for(i=GrMaxFontSize; i>=0; i--)
 if old in t:
     p.write_text(t.replace(old, new), encoding="latin-1")
     print("graphics1.c: skip null fonts in grInitText")
+elif "if (!xfs) continue" in t:
+    print("graphics1.c: grInitText null guard already patched")
 PY
 
 ln -sfn blt2.4g.i486-linux2.2 src/utils/blt2.4g.x86_64-linux

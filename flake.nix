@@ -300,7 +300,8 @@
           mkdir -p \
             "$MMI_CAD_ROOT/data/pdks" \
             "$MMI_CAD_ROOT/data/workspace" \
-            "$MMI_CAD_ROOT/data/home"
+            "$MMI_CAD_ROOT/data/home" \
+            "$MMI_CAD_ROOT/data/fonts/max"
         '';
 
         extraBwrapArgs = [
@@ -317,6 +318,8 @@
           export MMI_PDK_DIR=/mmi-bundle
           export MMI_TOOLS=/mmi-vendor/mmi
           export MMI_LOCAL=/mmi-home/cad/mmi_local
+          # Default font mirror dir; override with MMI_MAX_FONTS_DIR or MMI_FONT_CACHE.
+          export MMI_FONT_CACHE="''${MMI_FONT_CACHE:-''${MMI_CAD_ROOT}/data/fonts/max}"
           export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
           export QT_X11_NO_MITSHM=1
