@@ -168,7 +168,6 @@ export MMI_BROWSER="${MMI_BROWSER:-xdg-open}"
 export PDK_ROOT="${PDK_ROOT:-/mmi-pdks}"
 export PDK="${PDK:-sky130A}"
 export MN_BIN_DIR="${MN_BIN_DIR:-bin.linux}"
-export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-1}"
 if resolved="$(mmi_resolve_max_font_dir 2>/dev/null)"; then
   export MMI_MAX_FONTS_DIR="${resolved}"
 fi

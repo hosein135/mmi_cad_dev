@@ -235,28 +235,13 @@ from pathlib import Path
 p = Path("src/max4.3.16/m/graphics/graphics1.c")
 t = p.read_text(encoding="latin-1")
 
-if 'getenv("MMI_MAX_FONTS_DIR")' in t and "grFontPathXErr" in t:
+if 'getenv("MMI_MAX_FONTS_DIR")' in t and "Max fonts not on X server font path" in t:
     print("graphics1.c: grAugmentFontPath already patched")
 else:
-    helper = """static int grFontPathQuiet = 0;
-static XErrorHandler grFontPathPrevHandler = NULL;
-
-static int
-grFontPathXErr(Display *dpy, XErrorEvent *err)
-{
-  if (grFontPathQuiet) return 0;
-  if (grFontPathPrevHandler) return grFontPathPrevHandler(dpy, err);
-  return 0;
-}
-
-"""
     sig = "static void grAugmentFontPath()"
     start = t.find(sig)
     if start < 0:
         raise SystemExit("graphics1.c: grAugmentFontPath anchor missing")
-    if "grFontPathXErr" not in t:
-        t = t[:start] + helper + t[start:]
-        start += len(helper)
 
     brace = t.find("{", start)
     if brace < 0:
@@ -285,14 +270,15 @@ grFontPathXErr(Display *dpy, XErrorEvent *err)
   FILE *fp;
   char *opened;
 
-  /* Prefer an explicit host-visible directory (set by launcher / site config). */
+  /* The X server must read font dirs from its own filesystem.  launch.sh
+   * registers MMI_MAX_FONTS_DIR via xset; do not call XSetFontPath here.
+   */
   envDir = getenv("MMI_MAX_FONTS_DIR");
   if (envDir && envDir[0]) {
     strncpy(fontDirBuf, envDir, sizeof fontDirBuf - 1);
     fontDirBuf[sizeof fontDirBuf - 1] = '\\0';
     fontDir = fontDirBuf;
   } else {
-    /* Locate $MMI_LOCAL|$MMI_TOOLS/max/.../fonts via fonts.dir (Linux). */
     fp = PaOpen("fonts/fonts.dir", "r", NULL, MnPathSysLib, &opened);
     if (!fp) {
       fp = PaOpen("fonts", "r", NULL, MnPathSysLib, &opened);
@@ -311,13 +297,6 @@ grFontPathXErr(Display *dpy, XErrorEvent *err)
     fontDir = fontDirBuf;
   }
 
-  if (access(fontDir, R_OK) != 0) {
-    fprintf(stderr,
-            "WARNING:  Max fonts not readable by client (%s).\\n",
-            fontDir);
-    return;
-  }
-
   dirs = XGetFontPath(grXdpy, &nDirs);
   if (dirs) {
     for (i = 0; i < nDirs; i++) {
@@ -326,36 +305,17 @@ grFontPathXErr(Display *dpy, XErrorEvent *err)
         return;
       }
     }
-  } else if (nDirs != 0) {
-    return;
+    XFreeFontPath(dirs);
   }
 
-  {
-    char **newDirs;
-
-    MALLOC_TAG(char **,
-               newDirs,
-               (nDirs + 1) * sizeof(char *),
-               "grFontDirs");
-    newDirs[0] = fontDir;
-    for (i = 0; i < nDirs; i++) newDirs[i + 1] = dirs[i];
-
-    grFontPathQuiet = 1;
-    grFontPathPrevHandler = XSetErrorHandler(grFontPathXErr);
-    XSetFontPath(grXdpy, newDirs, nDirs + 1);
-    XSync(grXdpy, False);
-    XSetErrorHandler(grFontPathPrevHandler);
-    grFontPathPrevHandler = NULL;
-    grFontPathQuiet = 0;
-
-    FREE_TAG(newDirs, "grFontDirs");
-  }
-
-  if (dirs) XFreeFontPath(dirs);
+  fprintf(stderr,
+          "WARNING:  Max fonts not on X server font path (%s).\\n"
+          "          Set MMI_MAX_FONTS_DIR and run: xset +fp <dir>\\n",
+          fontDir);
 }"""
     t = t[:start] + new_fn + t[end:]
     p.write_text(t, encoding="latin-1")
-    print("graphics1.c: general grAugmentFontPath (MMI_MAX_FONTS_DIR, safe XSetFontPath)")
+    print("graphics1.c: grAugmentFontPath (xset only, no XSetFontPath)")
 
 t = p.read_text(encoding="latin-1")
 if "#include <unistd.h>" not in t and "access(fontDir" in t:
@@ -435,28 +395,77 @@ python3 - << 'PY'
 from pathlib import Path
 import re
 
-new = """#define DBisSetTileFlag(tp,f)      (((intptr_t) (tp)->ti_body) & (f))
-#define DBsetTileFlag(tp,f)\t((tp)->ti_body = (ClientData)(((intptr_t)(tp)->ti_body) | (intptr_t)(f)))
-#define DBresetTileFlag(tp,f)   ((tp)->ti_body = (ClientData)(((intptr_t)(tp)->ti_body) & ~(intptr_t)(f)))"""
-rx = re.compile(
-    r"#define DBisSetTileFlag\(tp,f\)\s+\(\(\(int\) \(tp\)->ti_body\) & \(f\)\)\s*\n"
-    r"#define DBsetTileFlag\(tp,f\)\s+\(\(\(int\) \(tp\)->ti_body\) \|= \(f\)\)\s*\n"
-    r"#define DBresetTileFlag\(tp,f\)\s+\(\(\(int\) \(tp\)->ti_body\) &= ~\(f\)\)",
-)
-rx2 = re.compile(
-    r"#define\s+DBgetTileType\(tp\)\s+\(\(\(TileType\) \(tp\)->ti_body\) & 0xff\)"
-)
-for p in Path("src").rglob("database.h"):
-    t = p.read_text(encoding="latin-1")
-    t2 = rx.sub(new, t)
-    t2 = rx2.sub("#define\tDBgetTileType(tp)       (((intptr_t) (tp)->ti_body) & 0xff)", t2)
-    t2 = t2.replace(
-        "(ClientData) (((TileType) (tp)->ti_body) & ~0xff | ((TileType) (b)))",
-        "(ClientData) ((((intptr_t) (tp)->ti_body) & ~0xff) | ((intptr_t) (b)))",
+def ensure_stdint(text: str) -> str:
+    if "#include <stdint.h>" in text:
+        return text
+    m = re.search(r"(^/\*.*?\*/\s*\n)", text, re.S)
+    if m:
+        return text[: m.end()] + "#include <stdint.h>\n\n" + text[m.end() :]
+    return "#include <stdint.h>\n\n" + text
+
+def patch_database_h(path: Path) -> None:
+    t = path.read_text(encoding="latin-1")
+    orig = t
+    t = ensure_stdint(t)
+    t = re.sub(
+        r"#define\s+DBgetTileType\(tp\)\s+\(\(\(TileType\)\s+\(tp\)->ti_body\)\s+&\s+0xff\)\s*",
+        "#define\tDBgetTileType(tp)       (((intptr_t) (tp)->ti_body) & 0xff)  ",
+        t,
     )
+    t = re.sub(
+        r"\(ClientData\)\s+\(\(\(TileType\)\s+\(tp\)->ti_body\)\s+&\s+~0xff\s+\|\s+\(\(TileType\)\s+\(b\)\)\)",
+        "(ClientData) ((((intptr_t) (tp)->ti_body) & ~0xff) | ((intptr_t) (b)))",
+        t,
+    )
+    t = re.sub(
+        r"#define\s+DBisSetTileFlag\(tp,f\)\s+\(\(\(int\)\s+\(tp\)->ti_body\)\s+&\s+\(f\)\)\s*",
+        "#define DBisSetTileFlag(tp,f)      (((intptr_t) (tp)->ti_body) & (f))  ",
+        t,
+    )
+    t = re.sub(
+        r"#define\s+DBsetTileFlag\(tp,f\)\s+\(\(\(int\)\s+\(tp\)->ti_body\)\s+\|=\s+\(f\)\)",
+        "#define DBsetTileFlag(tp,f)\t((tp)->ti_body = (ClientData)(((intptr_t)(tp)->ti_body) | (intptr_t)(f)))",
+        t,
+    )
+    t = re.sub(
+        r"#define\s+DBresetTileFlag\(tp,f\)\s+\(\(\(int\)\s+\(tp\)->ti_body\)\s+&=\s+~\(f\)\)",
+        "#define DBresetTileFlag(tp,f)   ((tp)->ti_body = (ClientData)(((intptr_t)(tp)->ti_body) & ~(intptr_t)(f)))",
+        t,
+    )
+    if "(((int) (tp)->ti_body)" in t:
+        raise SystemExit(f"database.h: failed LP64 tile macros in {path}")
+    if t != orig:
+        path.write_text(t, encoding="latin-1")
+        print("macros", path)
+
+for p in Path("src").rglob("database.h"):
+    patch_database_h(p)
+
+for p in [
+    Path("src/max4.3.16/maxaux/ext/include/rtrDcmpose.h"),
+    Path("src/max4.3.16/maxaux/ext/include/plowInt.h"),
+]:
+    if not p.is_file():
+        continue
+    t = p.read_text(encoding="latin-1")
+    t2 = t.replace("((int) (t)->ti_client)", "((intptr_t) (t)->ti_client)")
+    t2 = t2.replace("((int) (tp)->ti_client)", "((intptr_t) (tp)->ti_client)")
+    if "intptr_t" in t2 and "#include <stdint.h>" not in t2:
+        t2 = ensure_stdint(t2)
     if t2 != t:
         p.write_text(t2, encoding="latin-1")
-        print("macros", p)
+        print("ti_client macros", p)
+
+gds = Path("src/max4.3.16/m/gds/gdsWrite.c")
+if gds.is_file():
+    t = gds.read_text(encoding="latin-1")
+    t2 = t.replace(
+        "def->cd_client = (ClientData) (- (int) def->cd_client);",
+        "def->cd_client = (ClientData) (- (intptr_t) def->cd_client);",
+    )
+    if t2 != t:
+        gds.write_text(t2, encoding="latin-1")
+        print("gdsWrite cd_client intptr")
 PY
 
 # Rewrite mkcsue / mknst as bash (csh not required at build time).

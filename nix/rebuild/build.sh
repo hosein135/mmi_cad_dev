@@ -165,6 +165,10 @@ build_tclmods() {
 build_max() {
   log "MAX 4.3.16"
   local max="${SRC}/max4.3.16"
+  if ! grep -q 'intptr_t.*ti_body' "${max}/m/database/database.h"; then
+    log "ERROR: database.h LP64 tile macros were not patched (see patch-source.sh)"
+    exit 1
+  fi
   cd "$max"
   mkdir -p i
   (cd i && rm -f ./*.h && ln -sf ../m/*/*.h .)

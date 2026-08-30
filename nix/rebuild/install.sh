@@ -57,7 +57,6 @@ if [ -x "$bindir/max.bin" ]; then
   cat > "$bindir/max" << 'EOF'
 #!/bin/sh
 export MN_BIN_DIR="${MN_BIN_DIR:-bin.linux}"
-export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-1}"
 exec "$(dirname "$0")/max.bin" "$@"
 EOF
   chmod +x "$bindir/max"
