@@ -169,6 +169,10 @@ build_max() {
     log "ERROR: database.h LP64 tile macros were not patched (see patch-source.sh)"
     exit 1
   fi
+  if ! grep -q 'MEM_LP64_PATCH' "${max}/m/memory/mem.c"; then
+    log "ERROR: mem.c LP64 allocator was not patched (see patch-source.sh)"
+    exit 1
+  fi
   cd "$max"
   mkdir -p i
   (cd i && rm -f ./*.h && ln -sf ../m/*/*.h .)

@@ -6,6 +6,298 @@ cd "$ROOT"
 
 python3 "${PATCH_INTPTR:?}" "$ROOT/src"
 
+# MAX pool allocator (mem.c) is ILP32: free-list pointer math uses
+# "(mem_free_item)storage + i" which is 8-byte strides on LP64 while
+# slots are sized in 4-byte ints, and the header size uses
+# sizeof(struct)-sizeof(int) which is wrong once pointers are 8 bytes.
+python3 - << 'PY'
+from pathlib import Path
+
+p = Path("src/max4.3.16/m/memory/mem.c")
+t = p.read_text(encoding="latin-1")
+if "MEM_LP64_PATCH" in t:
+    print("mem.c: LP64 allocator already patched")
+else:
+    t = t.replace(
+        '#include "port.h"\n#include "mem.h"\n',
+        '#include "port.h"\n#include "mem.h"\n'
+        "#include <stddef.h>\n#include <stdint.h>\n"
+        "extern int posix_memalign(void **memptr, size_t alignment, size_t size);\n",
+        1,
+    )
+    old_macros = """#define MEM_MALLOC_OVERHEAD    8
+#define MEM_MAX_ALLOC        512
+#define MEM_BLOCK_BITS        11
+#define MEM_BLOCK_ALIGN        ( 1 << MEM_BLOCK_BITS)
+#define MEM_BLOCK_MASK         (-1 << MEM_BLOCK_BITS)
+#define MEM_BLOCK_HEADER_SIZE  (sizeof (struct mem_block) - sizeof (int))
+#define MEM_BLOCK_ALLOC        (MEM_BLOCK_ALIGN - MEM_MALLOC_OVERHEAD)
+#define MEM_BLOCK_STORAGE_SIZE (MEM_BLOCK_ALLOC - MEM_BLOCK_HEADER_SIZE)"""
+    new_macros = """#define MEM_LP64_PATCH 1
+#define MEM_MALLOC_OVERHEAD    8
+#define MEM_MAX_ALLOC        512
+#define MEM_BLOCK_BITS        11
+#define MEM_BLOCK_ALIGN        ( 1 << MEM_BLOCK_BITS)
+#define MEM_BLOCK_MASK         (~((uintptr_t) MEM_BLOCK_ALIGN - 1))
+#define MEM_BLOCK_HEADER_SIZE  (offsetof (struct mem_block, storage))
+#define MEM_BLOCK_ALLOC        MEM_BLOCK_ALIGN
+#define MEM_BLOCK_STORAGE_SIZE (MEM_BLOCK_ALLOC - MEM_BLOCK_HEADER_SIZE)"""
+    if old_macros not in t:
+        raise SystemExit("mem.c: MEM_* macros not found")
+    t = t.replace(old_macros, new_macros, 1)
+
+    old_reg = """static
+void
+mem_register_block (mem_block block, int flag)
+{
+  unsigned int block_index = ((ptrdiff_t) block >> MEM_BLOCK_BITS);
+  unsigned int offset = block_index >> 5;
+  unsigned int bit = block_index & 0x1f;
+  unsigned int mask = 1 << bit;
+
+  if ( offset >= mem_block_table_size ) {
+    unsigned int i;
+    unsigned int old_table_size = mem_block_table_size;
+
+    mem_block_table_size = power_2_roundup (offset);
+    mem_block_table = realloc (mem_block_table,
+			       mem_block_table_size * sizeof (int));
+
+    for ( i = old_table_size; i < mem_block_table_size; i++ ) {
+      mem_block_table[i] = 0;
+    }
+  }
+
+  if ( flag )
+    mem_block_table[offset] |= mask;
+  else
+    mem_block_table[offset] &= ~mask;
+}"""
+    new_reg = """static mem_block *mem_reg_tab = NULL;
+static unsigned int mem_reg_cap = 0;
+static unsigned int mem_reg_used = 0;
+#define MEM_REG_EMPTY ((mem_block) 0)
+#define MEM_REG_TOMB  ((mem_block) (uintptr_t) 1)
+
+static unsigned int
+mem_reg_hash (mem_block block)
+{
+  uintptr_t x = (uintptr_t) block >> MEM_BLOCK_BITS;
+  x ^= x >> 33;
+  x *= (uintptr_t) 0xff51afd7ed558ccdULL;
+  return (unsigned int) x;
+}
+
+static void
+mem_reg_grow (void)
+{
+  unsigned int ncap = mem_reg_cap ? mem_reg_cap * 2 : 64;
+  mem_block *ntab = calloc (ncap, sizeof (mem_block));
+  unsigned int i;
+
+  for ( i = 0; i < mem_reg_cap; i++ ) {
+    mem_block b = mem_reg_tab[i];
+    if ( b != MEM_REG_EMPTY && b != MEM_REG_TOMB ) {
+      unsigned int j = mem_reg_hash (b) & (ncap - 1);
+      while ( ntab[j] != MEM_REG_EMPTY )
+	j = (j + 1) & (ncap - 1);
+      ntab[j] = b;
+    }
+  }
+  free (mem_reg_tab);
+  mem_reg_tab = ntab;
+  mem_reg_cap = ncap;
+}
+
+static int
+mem_block_is_regular (mem_block block)
+{
+  unsigned int j;
+  if ( ! mem_reg_tab || ! block )
+    return 0;
+  j = mem_reg_hash (block) & (mem_reg_cap - 1);
+  for ( ;; ) {
+    mem_block b = mem_reg_tab[j];
+    if ( b == MEM_REG_EMPTY )
+      return 0;
+    if ( b == block )
+      return 1;
+    j = (j + 1) & (mem_reg_cap - 1);
+  }
+}
+
+static
+void
+mem_register_block (mem_block block, int flag)
+{
+  unsigned int j;
+
+  if ( flag ) {
+    if ( mem_reg_used * 2 >= mem_reg_cap )
+      mem_reg_grow ();
+    j = mem_reg_hash (block) & (mem_reg_cap - 1);
+    for ( ;; ) {
+      mem_block b = mem_reg_tab[j];
+      if ( b == MEM_REG_EMPTY || b == MEM_REG_TOMB || b == block ) {
+	if ( b != block )
+	  mem_reg_used++;
+	mem_reg_tab[j] = block;
+	return;
+      }
+      j = (j + 1) & (mem_reg_cap - 1);
+    }
+  }
+
+  if ( ! mem_reg_tab )
+    return;
+  j = mem_reg_hash (block) & (mem_reg_cap - 1);
+  for ( ;; ) {
+    mem_block b = mem_reg_tab[j];
+    if ( b == MEM_REG_EMPTY )
+      return;
+    if ( b == block ) {
+      mem_reg_tab[j] = MEM_REG_TOMB;
+      return;
+    }
+    j = (j + 1) & (mem_reg_cap - 1);
+  }
+}"""
+    if old_reg not in t:
+        raise SystemExit("mem.c: mem_register_block not found")
+    t = t.replace(old_reg, new_reg, 1)
+
+    old_of = """static
+mem_block
+mem_block_of_pointer (void *ptr)
+{
+  unsigned int block_index = ((ptrdiff_t) ptr) >> MEM_BLOCK_BITS;
+  unsigned int offset = block_index >> 5;
+  unsigned int bit = block_index & 0x1f;
+  unsigned int mask = 1 << bit;
+  mem_block block;
+
+  if ( offset >= mem_block_table_size ||
+       ! (mem_block_table[offset] & mask) ) {
+    block = (mem_block) (((ptrdiff_t) ptr) - MEM_BLOCK_HEADER_SIZE);
+  }
+  else {
+    block = (mem_block) (((ptrdiff_t) ptr) & MEM_BLOCK_MASK);
+  }
+
+  return block;
+}"""
+    new_of = """static
+mem_block
+mem_block_of_pointer (void *ptr)
+{
+  mem_block aligned = (mem_block) (((uintptr_t) ptr) & MEM_BLOCK_MASK);
+
+  if ( mem_block_is_regular (aligned) ) {
+    unsigned char *p = (unsigned char *) ptr;
+    unsigned char *b = (unsigned char *) aligned;
+    if ( p >= b + MEM_BLOCK_HEADER_SIZE && p < b + MEM_BLOCK_ALLOC )
+      return aligned;
+  }
+  return (mem_block) ((unsigned char *) ptr - MEM_BLOCK_HEADER_SIZE);
+}"""
+    if old_of not in t:
+        raise SystemExit("mem.c: mem_block_of_pointer not found")
+    t = t.replace(old_of, new_of, 1)
+
+    old_alloc = """  mem_block block = memalign (MEM_BLOCK_ALIGN, MEM_BLOCK_ALLOC);
+
+  group->regular_blocks++;
+  group->allocated += MEM_BLOCK_ALLOC + MEM_MALLOC_OVERHEAD;
+
+  block->group = group;
+  block->num_words = num_words;
+
+  mem_dll_insert (group, block);
+
+  mem_register_block (block, 1);
+
+  {
+    int i;
+    int *storage = block->storage;
+    int storage_size = MEM_BLOCK_STORAGE_SIZE / sizeof (int); 
+
+    for ( i = 0; i + num_words < storage_size; i += num_words ) {
+      mem_free_item item = (mem_free_item) storage + i;
+      mem_free_item next = (mem_free_item) storage + i + num_words;
+
+      group->free += num_words * sizeof (int);
+
+      if ( i + 2*num_words < storage_size ) {
+	item->next = next;
+      }
+      else {
+	item->next = NULL;
+      }
+    }
+
+    return (mem_free_item) storage;
+  }"""
+    new_alloc = """  mem_block block;
+  {
+    void *p = NULL;
+    if ( posix_memalign (&p, MEM_BLOCK_ALIGN, MEM_BLOCK_ALLOC) != 0 )
+      p = NULL;
+    block = (mem_block) p;
+  }
+
+  if ( block == NULL ) {
+    group->out_of_memory_fun ();
+  }
+
+  group->regular_blocks++;
+  group->allocated += MEM_BLOCK_ALLOC + MEM_MALLOC_OVERHEAD;
+
+  block->group = group;
+  block->num_words = num_words;
+
+  mem_dll_insert (group, block);
+
+  mem_register_block (block, 1);
+
+  {
+    int i;
+    int *storage = block->storage;
+    int storage_size = MEM_BLOCK_STORAGE_SIZE / sizeof (int); 
+
+    /* Slot index is in ints; do not use mem_free_item* arithmetic (8 bytes
+     * on LP64 vs 4-byte slots). */
+    for ( i = 0; i + num_words < storage_size; i += num_words ) {
+      mem_free_item item = (mem_free_item) (storage + i);
+      mem_free_item next = (mem_free_item) (storage + i + num_words);
+
+      group->free += num_words * sizeof (int);
+
+      if ( i + 2*num_words < storage_size ) {
+	item->next = next;
+      }
+      else {
+	item->next = NULL;
+      }
+    }
+
+    return (mem_free_item) storage;
+  }"""
+    if old_alloc not in t:
+        raise SystemExit("mem.c: mem_alloc_items body not found")
+    t = t.replace(old_alloc, new_alloc, 1)
+
+    old_align = """  int alignment = (align + 3) & 0xfffffffc;"""
+    new_align = """  int alignment = (align + 3) & 0xfffffffc;
+  if ( alignment < (int) sizeof (void *) )
+    alignment = (int) sizeof (void *);"""
+    if old_align not in t:
+        raise SystemExit("mem.c: mem_group_create alignment not found")
+    t = t.replace(old_align, new_align, 1)
+
+    p.write_text(t, encoding="latin-1")
+    print("mem.c: LP64 pool allocator (free-list strides, header offsetof, posix_memalign)")
+PY
+
 mkdir -p src/utils/pccts/h
 cp -a "${PATCH_PCCTS_H:?}/." src/utils/pccts/h/
 
