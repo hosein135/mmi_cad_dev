@@ -30,6 +30,7 @@ sed -i 's/BIN_LINUX := bin.i486-linux/BIN_LINUX := bin.linux/' \
 for d in src/utils/tcltk/tcl8.0.4/unix src/utils/tcltk/tk8.0.4/unix; do
   rm -f "$d/config.cache" "$d/config.status" "$d/config.log"
   if [ -f "$d/configure" ]; then
+    chmod +x "$d/configure" "$d/config.guess" "$d/config.sub" 2>/dev/null || true
     sed -i \
       -e 's/system=`uname -s`-`uname -r`/system=Linux-4.19/' \
       -e 's|test -r /etc/.relid|test -r /etc/.relid-disabled|' \
@@ -136,6 +137,10 @@ for pth in Path("src").rglob("*"):
 PY
 
 ln -sfn blt2.4g.i486-linux2.2 src/utils/blt2.4g.x86_64-linux
+if [ -f src/utils/blt2.4g.i486-linux2.2/configure ]; then
+  chmod +x src/utils/blt2.4g.i486-linux2.2/configure \
+    src/utils/blt2.4g.i486-linux2.2/cf/config.guess 2>/dev/null || true
+fi
 
 # Pre-generated DEF parser is in the tarball; do not require 32-bit PCCTS/antlr.
 python3 - << 'PY'

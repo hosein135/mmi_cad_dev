@@ -25,9 +25,9 @@ build_tcl() {
   local d="${UTILS}/tcltk/tcl8.0.4/unix"
   cd "$d"
   printf '%s\n' '#!/bin/sh' 'echo x86_64-unknown-linux-gnu' > config.guess
-  chmod +x config.guess
+  chmod +x config.guess configure 2>/dev/null || true
   rm -f config.cache config.status
-  ./configure --disable-shared --disable-load --enable-gcc \
+  bash ./configure --disable-shared --disable-load --enable-gcc \
     --cache-file=/dev/null --prefix="${UTILS}/tcltk/install-x64"
   make -e -j1 CFLAGS="${CFLAGS}" || make -e -j1
   cp -f libtcl8.0.a "${LIBDIR}/" || cp -f *.a "${LIBDIR}/libtcl8.0.a"
@@ -43,9 +43,9 @@ build_tk() {
   local d="${UTILS}/tcltk/tk8.0.4/unix"
   cd "$d"
   printf '%s\n' '#!/bin/sh' 'echo x86_64-unknown-linux-gnu' > config.guess
-  chmod +x config.guess
+  chmod +x config.guess configure 2>/dev/null || true
   rm -f config.cache config.status
-  ./configure --disable-shared --disable-load --enable-gcc \
+  bash ./configure --disable-shared --disable-load --enable-gcc \
     --cache-file=/dev/null \
     --with-tcl="${UTILS}/tcltk/tcl8.0.4/unix" \
     --prefix="${UTILS}/tcltk/install-x64"
@@ -89,11 +89,11 @@ build_blt() {
   rm -f src/libBLT.a src/libBLT.so
   find src -maxdepth 1 -name '*.a' -delete 2>/dev/null || true
   printf '%s\n' '#!/bin/sh' 'echo x86_64-unknown-linux-gnu' > cf/config.guess
-  chmod +x cf/config.guess
+  chmod +x cf/config.guess configure 2>/dev/null || true
   rm -f config.cache config.status
   local inc="-I${UTILS}/tcltk/tk8.0.4/generic -I${UTILS}/tcltk/tk8.0.4/unix -I${UTILS}/tcltk/tcl8.0.4/generic -I${UTILS}/tcltk/tcl8.0.4/unix"
   [ -d "${UTILS}/tcltk/tk8.0/generic" ] && inc="${inc} -I${UTILS}/tcltk/tk8.0/generic -I${UTILS}/tcltk/tcl8.0/generic"
-  CFLAGS="${CFLAGS} ${inc}" ./configure --disable-shared --enable-gcc --cache-file=/dev/null \
+  CFLAGS="${CFLAGS} ${inc}" bash ./configure --disable-shared --enable-gcc --cache-file=/dev/null \
     --with-tcl="${UTILS}/tcltk/tcl8.0.4/unix" \
     --with-tk="${UTILS}/tcltk/tk8.0.4/unix" \
     --prefix="${UTILS}/tcltk/install-x64" || true
