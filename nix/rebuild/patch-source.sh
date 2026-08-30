@@ -412,7 +412,7 @@ new_ext = """/* These were defined to be error strings in malloc.h */
 #include <unistd.h>
 
 /* Imports */
-extern void TxError();
+extern void TxError(char *fmt, ...);
 extern char *TxGetLine();
 """
 for p in Path("src").glob("max*/maxaux/ext/utils/malloc.c"):
@@ -1086,6 +1086,24 @@ efReadError(char *fmt, ...)
             "extern void TxError();",
             "extern void TxError(char *fmt, ...);",
             "TxError prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/irsim/src/irsim/netupdate.c",
+            "private	void	nu_error();",
+            "private	void	nu_error(char *fmt, ...);",
+            "nu_error prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/irsim/src/anaNO/ana.c",
+            "extern void lprintf();",
+            "extern void lprintf(FILE *fp, char *fmt, ...);",
+            "anaNO lprintf prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/ext/utils/malloc.c",
+            "extern void TxError();",
+            "extern void TxError(char *fmt, ...);",
+            "malloc.c TxError prototype",
         ),
     ):
         subst(hdr, old, new, label)
