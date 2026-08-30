@@ -3,7 +3,6 @@
 
   nixConfig = {
     extra-experimental-features = "nix-command flakes";
-    download-buffer-size = 268435456;
   };
 
   inputs = {
@@ -73,6 +72,8 @@
           pkgs.gawk
           pkgs.gzip
         ];
+        # Bitmap fonts only. BH Lucida and IBM Type1 are unfreeRedistributable
+        # in nixpkgs 25.05; keep allowUnfree = false.
         fontPkgs = [
           pkgs.xorg.fontadobe75dpi
           pkgs.xorg.fontadobe100dpi
@@ -83,11 +84,6 @@
           pkgs.xorg.fontalias
           pkgs.xorg.fontmisccyrillic
           pkgs.xorg.fontcronyxcyrillic
-          pkgs.xorg.fontbh75dpi
-          pkgs.xorg.fontbh100dpi
-          pkgs.xorg.fontbhtype1
-          pkgs.xorg.fontbitstreamtype1
-          pkgs.xorg.fontibmtype1
           pkgs.xorg.encodings
         ];
       } ''
