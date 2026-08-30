@@ -70,6 +70,16 @@ if [ -d "$maxtcl_src" ]; then
   echo "install: maxtcl -> $OUT/mmi/max/maxtcl"
 fi
 
+fonts_src="$ROOT/src/utils/mmi_local/max/fonts"
+if [ -d "$fonts_src" ]; then
+  mkdir -p "$OUT/mmi/max/fonts"
+  cp -a "$fonts_src"/. "$OUT/mmi/max/fonts/"
+  if command -v mkfontdir >/dev/null 2>&1; then
+    (cd "$OUT/mmi/max/fonts" && mkfontdir . 2>/dev/null || true)
+  fi
+  echo "install: max fonts -> $OUT/mmi/max/fonts"
+fi
+
 for aux in ext2spice ext2sim gemini irsim anXhelper make_tech; do
   found=$(find "$ROOT/src/max4.3.16/o" -type f -name "$aux" 2>/dev/null | head -1 || true)
   [ -n "$found" ] && install_bin "$found" "$bindir/$aux"

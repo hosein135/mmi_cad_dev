@@ -131,17 +131,39 @@ print("sueAppInit: optional nlsh")
 # Flat install: binaries live in $MMI_TOOLS/bin; SUE assets in $MMI_TOOLS/sue.
 sue_init = Path("src/sue4.4/build/sueInit.tcl")
 t = sue_init.read_text(encoding="latin-1")
-if "file join $env(MMI_TOOLS) sue" not in t:
+# Remove broken Tcl-8.0-incompatible patch from an earlier attempt.
+t = t.replace(
+    'if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) ne ""} {\n'
+    '  set SUE_DIR [file join $env(MMI_TOOLS) sue]\n'
+    '}\n',
+    "",
+)
+old_sue_dir = """set SUE_DIR [file nativename [file dirname [file dirname $argv0]]]
+
+if {$SUE_DIR == "."} {
+  set SUE_DIR [pwd]
+}
+"""
+new_sue_dir = """if [info exists env(MMI_TOOLS)] {
+  set SUE_DIR [file join $env(MMI_TOOLS) sue]
+} else {
+  set SUE_DIR [file nativename [file dirname [file dirname $argv0]]]
+  if {$SUE_DIR == "."} {
+    set SUE_DIR [pwd]
+  }
+}
+"""
+if old_sue_dir in t:
+    t = t.replace(old_sue_dir, new_sue_dir)
+elif "file join $env(MMI_TOOLS) sue" not in t:
     t = t.replace(
-        'if {$SUE_DIR == "."} {\n  set SUE_DIR [pwd]\n}\n',
-        'if {$SUE_DIR == "."} {\n  set SUE_DIR [pwd]\n}\n'
-        'if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) ne ""} {\n'
-        '  set SUE_DIR [file join $env(MMI_TOOLS) sue]\n'
-        '}\n',
+        'set SUE_DIR [file nativename [file dirname [file dirname $argv0]]]',
+        new_sue_dir.strip() + "\n\n# (SUE_DIR set above)",
+        1,
     )
-    t = t.replace("set SUE_BIN bin.i486-linux", "set SUE_BIN bin.linux")
-    sue_init.write_text(t, encoding="latin-1")
-    print("sueInit.tcl: MMI_TOOLS/sue, bin.linux")
+t = t.replace("set SUE_BIN bin.i486-linux", "set SUE_BIN bin.linux")
+sue_init.write_text(t, encoding="latin-1")
+print("sueInit.tcl: MMI_TOOLS/sue, bin.linux")
 
 max0 = Path("src/max4.3.16/maxtcl/max0.tcl")
 t = max0.read_text(encoding="latin-1")
@@ -203,6 +225,68 @@ for pth in Path("src").rglob("*"):
     if t != orig:
         pth.write_text(t, encoding="latin-1")
         print("gds lvalue", pth)
+PY
+
+# MAX: PaOpen("fonts") cannot fopen(2) a directory on Linux; use fonts/fonts.dir.
+python3 - << 'PY'
+from pathlib import Path
+p = Path("src/max4.3.16/m/graphics/graphics1.c")
+t = p.read_text(encoding="latin-1")
+old = """  /* find max fonts directory */
+  {
+    FILE *fp = PaOpen("fonts","r", NULL, MnPathSysLib, &maxFontDir);
+    if(!fp)
+    {
+      fprintf(stderr,"WARNING:  Could not find Max fonts directory!\\n");
+      return;
+    }
+    
+    fclose(fp); 
+  }"""
+new = """  /* find max fonts directory (fonts/fonts.dir under max lib path) */
+  {
+    static char fontDirBuf[BUFSIZ];
+    FILE *fp = PaOpen("fonts/fonts.dir","r", NULL, MnPathSysLib, &maxFontDir);
+    if(!fp)
+    {
+      fprintf(stderr,"WARNING:  Could not find Max fonts directory!\\n");
+      return;
+    }
+    fclose(fp);
+    strncpy(fontDirBuf, maxFontDir, sizeof fontDirBuf - 1);
+    fontDirBuf[sizeof fontDirBuf - 1] = '\\0';
+    {
+      char *slash = strrchr(fontDirBuf, '/');
+      if (slash) *slash = '\\0';
+    }
+    maxFontDir = fontDirBuf;
+  }"""
+if old in t:
+    p.write_text(t.replace(old, new), encoding="latin-1")
+    print("graphics1.c: fonts/fonts.dir for grAugmentFontPath")
+elif "fonts/fonts.dir" in t:
+    print("graphics1.c: fonts/fonts.dir already patched")
+else:
+    raise SystemExit("graphics1.c: grAugmentFontPath patch failed")
+
+p = Path("src/max4.3.16/m/graphics/graphics1.c")
+t = p.read_text(encoding="latin-1")
+old = """    for(i=GrMaxFontSize; i>=0; i--)
+    {
+      XFontStruct *xfs = grXFonts[i];
+      int wi = xfs->max_bounds.rbearing - xfs->min_bounds.lbearing;
+      int hi = xfs->max_bounds.ascent + xfs->max_bounds.descent;"""
+new = """    for(i=GrMaxFontSize; i>=0; i--)
+    {
+      XFontStruct *xfs = grXFonts[i];
+      int wi, hi;
+
+      if (!xfs) continue;
+      wi = xfs->max_bounds.rbearing - xfs->min_bounds.lbearing;
+      hi = xfs->max_bounds.ascent + xfs->max_bounds.descent;"""
+if old in t:
+    p.write_text(t.replace(old, new), encoding="latin-1")
+    print("graphics1.c: skip null fonts in grInitText")
 PY
 
 ln -sfn blt2.4g.i486-linux2.2 src/utils/blt2.4g.x86_64-linux

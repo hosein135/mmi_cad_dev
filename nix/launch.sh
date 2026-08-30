@@ -47,6 +47,11 @@ if [ ! -d "${CAD}/mmi_local/max" ] && [ -d "${MMI_TOOLS}/mmi_local.sample" ]; th
   cp -a "${MMI_TOOLS}/mmi_local.sample" "${CAD}/mmi_local"
   chmod -R u+w "${CAD}/mmi_local"
 fi
+if [ -d "${MMI_TOOLS}/max/fonts" ] && [ ! -d "${CAD}/mmi_local/max/fonts" ]; then
+  mkdir -p "${CAD}/mmi_local/max"
+  cp -a "${MMI_TOOLS}/max/fonts" "${CAD}/mmi_local/max/"
+  chmod -R u+w "${CAD}/mmi_local/max/fonts" 2>/dev/null || true
+fi
 chmod -R u+w "${CAD}/mmi_local" 2>/dev/null || true
 
 if [ -d /mmi-bundle ]; then
@@ -144,6 +149,18 @@ if [ -f "${MMI_TOOLS}/app-defaults/Mmi" ]; then
 fi
 
 FP_LIST=""
+if [ -d "${MMI_TOOLS}/max/fonts" ] && [ -f "${MMI_TOOLS}/max/fonts/fonts.dir" ]; then
+  FP_LIST="${MMI_TOOLS}/max/fonts"
+  echo "  + ${MMI_TOOLS}/max/fonts (MAX PCF)"
+fi
+if [ -d "${CAD}/mmi_local/max/fonts" ] && [ -f "${CAD}/mmi_local/max/fonts/fonts.dir" ]; then
+  if [ -z "${FP_LIST}" ]; then
+    FP_LIST="${CAD}/mmi_local/max/fonts"
+  else
+    FP_LIST="${FP_LIST},${CAD}/mmi_local/max/fonts"
+  fi
+  echo "  + ${CAD}/mmi_local/max/fonts (local MAX PCF)"
+fi
 if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
   for sub in 75dpi misc 100dpi Type1 cyrillic; do
     d="${MMI_FONTS_SRC}/${sub}"
