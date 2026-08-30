@@ -202,15 +202,13 @@ if [ -z "${DISPLAY:-}" ]; then
 fi
 
 echo "=============================================="
-echo "  Micro Magic CAD (Nix FHS, x86_64)"
+echo "  Micro Magic CAD (x86_64)"
 echo "=============================================="
-echo "  DISPLAY=${DISPLAY:-<unset>}"
-echo "  XAUTHORITY=${XAUTHORITY:-<unset>}"
-echo "  PDK_ROOT=${PDK_ROOT}"
-echo "  MMI_TOOLS=${MMI_TOOLS}"
-echo "  MMI_MAX_FONTS_DIR=${MMI_MAX_FONTS_DIR:-<unset>}"
-echo "  Magic: $(command -v magic 2>/dev/null || echo missing)"
-echo "  Font root: ${FONT_ROOT:-<unset>}"
+echo "  DISPLAY=${DISPLAY:-<unset>}   MMI_TOOLS=${MMI_TOOLS}"
+echo "  PDK_ROOT=${PDK_ROOT}   Magic: $(command -v magic 2>/dev/null || echo missing)"
+if [ -n "${MMI_MAX_FONTS_DIR:-}" ]; then
+  echo "  MAX fonts: ${MMI_MAX_FONTS_DIR}"
+fi
 
 if [ -f "${CAD_HOME}/.Xresources" ]; then
   xrdb -merge "${CAD_HOME}/.Xresources" 2>/dev/null || true
@@ -220,75 +218,56 @@ if [ -f "${MMI_TOOLS}/app-defaults/Mmi" ]; then
 fi
 
 FP_LIST=""
-if mmi_font_dir_ok "${MMI_MAX_FONTS_DIR:-}"; then
-  FP_LIST="${MMI_MAX_FONTS_DIR}"
-  echo "  + ${MMI_MAX_FONTS_DIR} (MAX PCF)"
-fi
-if local_fonts="$(mmi_resolve_local_max_font_dir 2>/dev/null)"; then
+mmi_fp_append() {
+  local d="$1"
+  mmi_font_dir_ok "${d}" || return 0
   case ",${FP_LIST}," in
-    *,"${local_fonts}",*) ;;
-    *)
-      if [ -z "${FP_LIST}" ]; then
-        FP_LIST="${local_fonts}"
-      else
-        FP_LIST="${FP_LIST},${local_fonts}"
-      fi
-      echo "  + ${local_fonts} (mmi_local MAX PCF)"
-      ;;
+    *,"${d}",*) return 0 ;;
   esac
+  if [ -z "${FP_LIST}" ]; then
+    FP_LIST="${d}"
+  else
+    FP_LIST="${FP_LIST},${d}"
+  fi
+}
+
+# Classic MMI look: MAX Helvetica-Bold PCF, then 75dpi Adobe, then misc-fixed.
+# Skip 100dpi / Type1 / server leftovers (they change size and weight).
+mmi_fp_append "${MMI_MAX_FONTS_DIR:-}"
+if local_fonts="$(mmi_resolve_local_max_font_dir 2>/dev/null)"; then
+  mmi_fp_append "${local_fonts}"
 fi
 if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
-  # encodings/ is charset data, not an XLFD font dir (no fonts.dir) — do not xset it.
-  for sub in 75dpi misc 100dpi Type1 cyrillic; do
-    d="${MMI_FONTS_SRC}/${sub}"
-    if mmi_font_dir_ok "${d}"; then
-      if [ -z "${FP_LIST}" ]; then
-        FP_LIST="${d}"
-      else
-        FP_LIST="${FP_LIST},${d}"
-      fi
-      echo "  + ${d}"
-    fi
-  done
+  mmi_fp_append "${MMI_FONTS_SRC}/75dpi"
+  mmi_fp_append "${MMI_FONTS_SRC}/misc"
 fi
 
 if [ -n "${FP_LIST}" ] && [ -n "${DISPLAY:-}" ]; then
-  # Prepend each dir (xset +fp). Reverse so the first FP_LIST entry is searched first.
-  # Do not xset fp= (that drops the server path and fails on any bad element).
-  rev=""
-  old_ifs="${IFS}"
-  IFS=','
-  for d in ${FP_LIST}; do
-    if [ -z "${rev}" ]; then
-      rev="${d}"
-    else
-      rev="${d},${rev}"
-    fi
-  done
-  fp_ok=1
-  for d in ${rev}; do
-    xset fp- "${d}" 2>/dev/null || true
-    if ! xset +fp "${d}" 2>/tmp/xset-fp.err; then
-      fp_ok=0
-      echo "  WARN: skip font dir ${d}"
-      cat /tmp/xset-fp.err 2>/dev/null || true
-    fi
-  done
-  IFS="${old_ifs}"
-  xset fp rehash 2>/dev/null || true
-  if [ "${fp_ok}" = "1" ]; then
-    echo "  Font path prepended (server path kept)"
+  if xset fp= "${FP_LIST}" 2>/tmp/xset-fp.err; then
+    echo "  Fonts: MAX PCF + 75dpi Helvetica + misc-fixed"
+  else
+    warn "xset fp= failed; trying one directory at a time"
+    cat /tmp/xset-fp.err 2>/dev/null || true
+    old_ifs="${IFS}"
+    IFS=','
+    built=""
+    for d in ${FP_LIST}; do
+      trial="${d}"
+      [ -n "${built}" ] && trial="${built},${d}"
+      if xset fp= "${trial}" 2>/dev/null; then
+        built="${trial}"
+      else
+        warn "skip font dir ${d}"
+      fi
+    done
+    IFS="${old_ifs}"
   fi
+  xset fp rehash 2>/dev/null || true
 elif [ -n "${DISPLAY:-}" ]; then
-  echo "  WARN: No bitmap font dirs found in ${MMI_FONTS_SRC:-<unset>}"
+  warn "No bitmap font dirs found"
 fi
 
 if [ -n "${DISPLAY:-}" ]; then
-  echo ""
-  echo "--- Font Path ---"
-  xset q 2>/dev/null | grep -A 20 "Font Path" | head -n 25 || true
-  echo ""
-  echo "--- XLFD fonts ---"
   MISSING=0
   for font in \
       "-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1" \
@@ -296,16 +275,13 @@ if [ -n "${DISPLAY:-}" ]; then
       "-misc-fixed-medium-r-normal--14-140-75-75-c-70-iso8859-1" \
       "fixed" "9x15"
   do
-    if xlsfonts -fn "${font}" 2>/dev/null | grep -q .; then
-      echo "  [OK] ${font}"
-    else
-      echo "  [MISSING] ${font}"
+    if ! xlsfonts -fn "${font}" 2>/dev/null | grep -q .; then
       MISSING=1
+      warn "XLFD not found: ${font}"
     fi
   done
-  if [ "${MISSING}" = "1" ]; then
-    echo ""
-    echo "  WARN: Some XLFD fonts missing. max/nst may still look wrong."
+  if [ "${MISSING}" = "0" ]; then
+    echo "  XLFD: helvetica 12/14, misc-fixed 14, fixed, 9x15  OK"
   fi
 fi
 
