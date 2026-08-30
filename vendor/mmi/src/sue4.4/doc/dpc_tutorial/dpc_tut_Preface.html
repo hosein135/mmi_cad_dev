@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_Tutorial">
+<meta name="LASTUPDATED" content="12/04/01 15:02:11">
+<title>About This Document</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler Tutorial </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_tut_Pt1Overview.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_tut_Ch2Basics.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h1>
+  <a name="1012838"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">About This Document</font>
+</h1><hr>
+
+<dl><dl>
+<p>
+  <dt> <a name="1013536"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This chapter provides an overview of the <b><strong class="Strong">Micro Magic Tools DPC DataPath Compiler Tutorial</strong></b>:</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013537"> </a>Objectives on this page.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013538"> </a> <a href="dpc_tut_Preface.html#1013586">  "Getting Set Up"</a>.</li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h3>
+  <a name="1013539"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Objectives</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1015239"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This tutorial is a intended to be a step-by-step introductory training in the use of the Micro Magic Tools (TM) DPC DataPath Compiler. By following the steps in this tutorial, you will learn how to run DPC, and how to use DPC to optimize your designs. Once you are familiar with DPC, refer to the Micro Magic Tools DPC User Guide for more detailed information about the tool and its options.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1013942"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Audience - DPC</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1013943"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This document is designed for chip designers and architects. It assumes that you have a strong foundation in IC design and development, and schematic design. This document also assumes that you are familiar with the following programming languages and operating systems:Tcl/Tk, and UNIX or Linux.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1013543"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Organization</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1013544"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This tutorial is divided into parts. Each part leads you through a different aspect of the Micro Magic Tools DPC DataPath Compiler. </font>
+<p>
+<p>
+  <dt> <a name="1013545"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This document contains the following parts: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014119"> </a>Preface, "About This Document" (this chapter), provides a brief description of the content and organization of this document.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013547"> </a>Part 1, "Running DPC", gives an overview of what you can accomplish using DPC, and the requirements necessary for running the program. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1015362"> </a>Part 2, "The DPC Placement Algorithm and Bit-Slice Design", provides instructions on how DPC does placement, using Bit slice vs. packed gates. It then details more advanced placement techniques, including Bit Pitch, spaces, and hierarchical placement.</li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h3>
+  <a name="1014693"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter Organization</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1013561"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Each part contains descriptions of the commands and methodology necessary to create datapaths using DPC, with step-by-step, illustrative examples describing the usage of commands and procedures.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1013562"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Documentation Conventions</font>
+</h3>
+
+
+<h4>
+  <a name="1013563"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>General Conventions</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1013564"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This guide uses the following text conventions:</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013565"> </a>Statements, commands, command output, filenames, directory names, and configurations are shown in a boldface, fixed-width font. The following example shows a full path name:</li>
+ </font>
+
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><code class="CodeStrong">~/mmi_private/sue/.sue
+</code></b></font><a name="1014237"> </a>
+</p></pre>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013566"> </a>In examples, text that you type literally is shown in bold. In the following example, you type the word <b><strong class="Strong">max</strong></b>:</li>
+ </font>
+
+
+<pre>
+<font face="ITC Franklin Gothic Book">To launch sue, type <b><code class="CodeStrong">sue
+</code></b></font><a name="1013567"> </a>
+</p></pre>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013569"> </a>Menus, menu options, and pop-up menus are generally shown in a boldface, sans serif font. For example:</li>
+ </font>
+
+
+<pre>
+<font face="ITC Franklin Gothic Book">Select <b><code class="CodeStrong">Save As</code></b> from the <b><code class="CodeStrong">File</code></b> Menu.</font><a name="1013570"> </a>
+</p></pre>
+</ul></dl></dl>
+
+<h4>
+  <a name="1013572"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Conventions for Software Commands and Statements</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1013573"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When describing the Micro Magic Tools (TM) software, this guide uses the following type and presentation conventions:</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013574"> </a>Statement or command names that you type literally are shown nonitalicized. In the following example, the statement name is <i><strong class="StrongItalic">set MC(default_generator)</strong></i>:</li>
+ </font>
+
+
+<pre>
+<font face="ITC Franklin Gothic Book">set MC(default_generator) sram
+</font><a name="1013575"> </a>
+</p></pre>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1013884"> </a>Variables for which you substitute appropriate values, are shown in itallics. Optional commands within a string of code are often enclosed within square brackets ([ ]). Variables are enclosed within angle brackets (&lt;&gt;). When you type the <b><code class="CodeStrong">setMACRO</code></b> statement, you substitute a value for <i><strong class="StrongItalic">name</strong></i>, <i><strong class="StrongItalic">row1</strong></i> and <i><strong class="StrongItalic">row2</strong></i>. <i><strong class="StrongItalic">CELL</strong></i> is an optional command. </li>
+ </font>
+
+
+<pre>
+<font face="ITC Franklin Gothic Book">set MACRO(&lt;<b><code class="CodeEmphasis">name</code></b>&gt;){[<b><code class="CodeEmphasis">CELL</code></b>]&lt;<b><code class="CodeEmphasis">row1</code></b>&gt;&lt;<b><code class="CodeEmphasis">row2</code></b>&gt;...}</font><a name="1014285"> </a>
+</p></pre>
+</ul></dl></dl>
+
+<h4>
+  <a name="1014798"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Conventions for Mousing</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014799"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Throughout this document, we assume you are using a 3-button mouse. When we refer to using the mouse, the following settings apply:</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014800"> </a>Mouse-Button-1, or Button-1, refers to the left-most button (index finger) when you are using a right-handed mouse. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014801"> </a>Mouse-Button-2, or Button-2, refers to the middle, or center button (middle finger).</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014802"> </a>Mouse-Button-3, or Button-3, refers to the right-most button (ring finger) when using a right-handed mouse. </li>
+ </font>
+
+
+</ul>  <dl>
+<p> <dt> <a name="1014803"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Reverse these settings if you are using a left-handed mouse, using your mouse control program, so that you click Button-1 with your index finger, Button-2 with your middle finger, and Button-3 with your ring finger.</font>
+<p>  </dl>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014804"> </a>"Click" means to depress the designated mouse button once.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014805"> </a>"Double-click" means to depress the designated mouse button twice, quickly.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014806"> </a>"Drag" means to depress and hold down the designated mouse button while moving the mouse.</li>
+ </font>
+
+
+</ul></dl></dl>
+ 
+
+ 
+
+<h3>
+  <a name="1013586"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Getting Set Up</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014791"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to run DPC, you must also have  SUE.</font>
+<p>
+<p>
+  <dt> <a name="1015405"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">First, ensure that the Micro Magic software has been installed, and that you have DPC and SUE installed.</font>
+<p>
+<p>
+  <dt> <a name="1014668"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_tut_Pt1Overview.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_tut_Ch2Basics.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

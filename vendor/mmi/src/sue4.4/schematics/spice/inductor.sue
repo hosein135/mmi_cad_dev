@@ -1,0 +1,23 @@
+# SUE version MMI_SUE2.6
+
+proc ICON_inductor args {
+  icon_setup $args {{origin {0 0}} {orient R0} {inductance 1n} {M {}}}
+  icon_term -type inout -origin {0 40} -name t1
+  icon_term -type inout -origin {0 -40} -name t2
+  icon_property -origin {-140 100} -type user -name inductance -default 1n
+  icon_property -origin {10 0} -label {$inductance}
+  icon_property -origin {-140 170} -type fixed -name spice -text {[unique_name L] $t1 $t2 $inductance}
+  icon_arc -10 -20 10 0 -start 272 -extent 171
+  icon_arc -10 -10 10 0 -start 78 -extent 193
+  icon_arc -10 -10 10 10 -start 272 -extent 171
+  icon_arc -10 0 10 10 -start 78 -extent 193
+  icon_arc -10 0 10 20 -start 272 -extent 171
+  icon_arc -10 10 10 20 -start 78 -extent 193
+  icon_arc -10 10 10 30 -start 272 -extent 171
+  icon_line 0 40 0 30
+  icon_line 0 -40 0 -30
+  icon_arc -10 -30 10 -10 -start 272 -extent 175
+  icon_arc -10 -20 10 -10 -start 78 -extent 193
+  icon_property -origin {-140 130} -type user -name M
+}
+

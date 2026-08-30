@@ -1,0 +1,520 @@
+#header <<
+#include "charptr.h"
+#include "assert.h"
+#define assert ASSERT
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "skip-list.h"
+#include "nl.h"
+#include "pnl.h"
+#include "def2pnl.h"
+#include "def2pnl_int.h"
+
+#define USER_ZZSYN
+
+#if 0
+#  define AST_FIELDS   int token; char *text;
+#  define zzcr_ast(tr, attr, tok, txt) { cr_ast (tr, attr, tok, txt); }
+#  define zzmk_ast(tr, tok, txt)	     (AST *) mk_ast (tr, tok, txt)
+#endif
+
+#define zzcr_attr(attr, tok, text)	(*(attr) = (text))
+#undef zzd_attr
+>>
+
+#parser "def"
+
+<<
+#define ID_MODE	 zzmode (IDENTIFIER)
+#include <strings.h>
+
+static
+char *
+get_history_string (char *text)
+{
+  char *s = text;
+  char *result;
+  int len;
+
+  while ( *s && (*s == ';' || *s == ' ' || *s == '\t' || *s == '\n' ) ) {
+    s++;
+  }
+
+  result = STRDUP (s);
+  len = strlen (s) - 2;
+
+  while (len >= 0 &&
+         (result[len] == ' ' || result[len] == '\t' || result[len] == '\n')) {
+    len--;
+  }
+
+  result[len+1] = 0;
+  return result;
+}
+>>
+
+
+#token			"[\ \t]+"	<< zzskip (); >>
+#token			"\n"		<< zzline++; zzskip (); >>
+
+#token DEF_BUSBITCHARS		"BUSBITCHARS"
+#token DEF_BY			"BY"
+#token DEF_COMPONENT		"COMPONENT"
+#token DEF_COMPONENTS		"COMPONENTS"
+#token DEF_COVER		"COVER"
+#token DEF_DEFAULT		"DEFAULT"
+#token DEF_DESIGN		"DESIGN"
+#token DEF_DIEAREA		"DIEAREA"
+#token DEF_DIRECTION		"DIRECTION"
+#token DEF_DIST			"DIST"
+#token DEF_DISTANCE		"DISTANCE"
+#token DEF_DIVIDERCHAR		"DIVIDERCHAR"
+#token DEF_DO			"DO"
+#token DEF_END			"END"
+#token DEF_FIXED		"FIXED"
+#token DEF_GCELLGRID		"GCELLGRID"
+#token DEF_GROUND		"GROUND"
+#token DEF_HISTORY		"HISTORY"
+#token DEF_HORIZONTAL		"HORIZONTAL"
+#token DEF_IN			"IN"
+#token DEF_INOUT		"INOUT"
+#token DEF_INPUT		"INPUT"
+#token DEF_LAYER		"LAYER"
+#token DEF_MICRONS		"MICRONS"
+#token DEF_NAMESCASESENSITIVE	"NAMESCASESENSITIVE"
+#token DEF_NET			"NET"
+#token DEF_NETS			"NETS"
+#token DEF_NEW			"NEW"
+#token DEF_OFF			"OFF"
+#token DEF_ON			"ON"
+#token DEF_OUT			"OUT"
+#token DEF_OUTPUT		"OUTPUT"
+#token DEF_PIN			"PIN"
+#token DEF_PINS			"PINS"
+#token DEF_PLACED		"PLACED"
+#token DEF_POWER		"POWER"
+#token DEF_PROPERTYDEFINITIONS	"PROPERTYDEFINITIONS"
+#token DEF_RECT			"RECT"
+#token DEF_REGIONS		"REGIONS"
+#token DEF_ROUTED		"ROUTED"
+#token DEF_ROW			"ROW"
+#token DEF_ROWS			"ROWS"
+#token DEF_SIGNAL		"SIGNAL"
+#token DEF_SITE			"SITE"
+#token DEF_SOURCE		"SOURCE"
+#token DEF_SPECIAL		"SPECIAL"
+#token DEF_SPECIALNET		"SPECIALNET"
+#token DEF_SPECIALNETS		"SPECIALNETS"
+#token DEF_START		"START"
+#token DEF_STEP			"STEP"
+#token DEF_STOP			"STOP"
+#token DEF_STRING		"STRING"
+#token DEF_TECHNOLOGY		"TECHNOLOGY"
+#token DEF_TRACKS		"TRACKS"
+#token DEF_UNITS		"UNITS"
+#token DEF_UNPLACED		"UNPLACED"
+#token DEF_USE			"USE"
+#token DEF_VERILOGDESIGNNAME	"VERILOGDESIGNNAME"
+#token DEF_VERSION		"VERSION"
+#token DEF_VERTICAL		"VERTICAL"
+#token DEF_VIAS			"VIAS"
+#token DEF_X			"X"
+#token DEF_Y			"Y"
+#token DEF_N			"N"
+#token DEF_S			"S"
+#token DEF_FN			"FN"
+#token DEF_FS			"FS"
+
+#token DEF_PLUS		"\+"
+#token DEF_SEMI		";"
+#token DEF_NUMBER	"(\-|[])[0-9]+"
+#token			"\""		<< zzmode (STRING); zzmore (); >>
+#token			"[A-Za-z0-9_]+"
+
+
+#lexclass IDENTIFIER
+
+#token			"[\ \t]+"	<< zzskip (); >>
+#token			"\n"		<< zzline++; zzskip (); >>
+#token DEF_SEMI		";"		<< zzmode (START); >>
+#token DEF_IDENT	"~[\ \t\n]+"	<< zzmode (START); >>
+
+
+#lexclass IDENT_NEW_OR_PLUS
+
+#token			"[\ \t]+"	<< zzskip (); >>
+#token			"\n"		<< zzline++; zzskip (); >>
+#token DEF_SEMI		";"		<< zzmode (START); >>
+#token DEF_PLUS         "\+"		<< zzmode (START); >>
+#token DEF_NEW		"NEW"		<< zzmode (START); >>
+#token DEF_ID_OPEN	"\("		<< zzmode (START); >>
+#token DEF_IDENT	"~[\ \t\n]+"	<< zzmode (START); >>
+
+
+#lexclass STRING
+
+#token			"~[\\\"]+"	<< zzmore (); >>
+#token			"\\~[]"		<< zzmore (); >>
+#token DEF_QUOTED	"\""		<< zzmode (START); >>
+
+
+#lexclass LEX_HISTORY
+
+#token			"[\ \t]+"	<< zzmore (); >>
+#token			"\n"		<< zzline++; zzmore (); >>
+#token			"~[\\\";]+"	<< zzmore (); >>
+#token			"\\~[]"		<< zzmore (); >>
+#token			"\""            << zzmode (LEX_HISTORY_STRING); 
+					   zzmore ();
+					>>
+#token DEF_HISTORY_LIST	";"		<< zzmode (START); >>
+
+
+#lexclass LEX_HISTORY_STRING
+
+#token			"~[\\\"]+"	<< zzmore (); >>
+#token			"\\~[]"		<< zzmore (); >>
+#token 			"\""		<< zzmode (LEX_HISTORY); zzmore (); >>
+
+
+
+#lexclass START
+
+
+def_file	: ( header )*
+		  def_design
+		;
+
+header		: version
+		| namescasesensitive
+		| dividerchar
+		| busbitchars
+		;
+
+version		: DEF_VERSION^ << ID_MODE; >> DEF_IDENT DEF_SEMI!
+		;
+
+namescasesensitive
+		: DEF_NAMESCASESENSITIVE^ ( DEF_ON | DEF_OFF ) DEF_SEMI!
+		;
+
+dividerchar	: DEF_DIVIDERCHAR^ str:DEF_QUOTED
+			<< def2pnl_divider_char (STRDUP ($str)); >>
+		  DEF_SEMI!
+		;
+
+busbitchars	: DEF_BUSBITCHARS^ DEF_QUOTED DEF_SEMI!
+		;
+
+def_design	: DEF_DESIGN^ << ID_MODE; >> name:DEF_IDENT
+			<< def2pnl_design ($name); >>
+		  DEF_SEMI!
+		    ( declaration )*
+		    ( constituent )*
+		  DEF_END! DEF_DESIGN!
+		;
+
+declaration	: units_decl
+		| diearea_decl
+		| tracks_decl
+		| history_decl 
+		| row_decl
+		| propertydefinitions_decl
+		| gcellgrid_decl
+		;
+
+units_decl	: << char *name;
+		     int num;
+		  >>
+		  DEF_UNITS^ DEF_DISTANCE << ID_MODE; >>
+		  id:DEF_IDENT 		<< name = STRDUPA ($id); >>
+		  number > [num]
+		  DEF_SEMI!		<< def2pnl_distance_units (name, num); >>
+		;
+
+diearea_decl	: << int x0, y0;
+		     int x1, y1;
+		  >>
+		  DEF_DIEAREA^ coordinate > [x0, y0] coordinate > [x1, y1] DEF_SEMI! 
+		  << def2pnl_die_area (x0, y0, x1, y1); >>
+		;
+
+tracks_decl	: << int is_x = 0;
+	             int start;
+		     int count;
+		     int step;
+		     char *layer;
+		     ar layers = ar_alloc (16, sizeof (char *));
+		  >>
+	          DEF_TRACKS^
+		  ( DEF_X << is_x = 1; >> | DEF_Y )
+		  number > [start]
+		  DEF_DO number > [count]
+		  DEF_STEP number > [step]
+		  DEF_LAYER	<< ID_MODE; >>
+		  ( id:DEF_IDENT	<< layer = STRDUPA ($id);
+					   ar_add (layers, &layer);
+					   ID_MODE;
+					>>
+		  )+ 
+		  DEF_SEMI!	<< def2pnl_tracks (is_x, start, count, step,
+						    layers);
+				   ar_free (layers);
+				>>
+		;
+
+history_decl	: DEF_HISTORY^ << zzmode (LEX_HISTORY); >> history_list
+		;
+
+history_list	: hist:DEF_HISTORY_LIST
+//		    << { char *str = get_history_string ($hist);
+//			 $0 = str;
+//			 free (str);
+//		       }
+//		    >>
+		;
+
+row_decl	: << char *name;
+		     char *core_name;
+		     int x0, y0;
+		     pnl_orientation orient;
+		     int count;
+		     int one;
+		     int width;
+		     int height;
+		  >>
+		  DEF_ROW^		<< ID_MODE; >>
+		  name_id:DEF_IDENT	<< name = STRDUPA ($name_id);
+					   ID_MODE;
+					>>
+		  core_id:DEF_IDENT	<< core_name = STRDUPA ($core_id); >>
+		  number > [x0] number > [y0] orientation > [orient]
+		  DEF_DO number > [count] DEF_BY number > [one]
+		  DEF_STEP number > [width] number > [height]
+		  DEF_SEMI!		<< if ( one != 1 ) {
+					     def2pnl_error ("currently don't "
+							     "handle BY != 1 in "
+							     "row site (got %d).",
+							     one);
+					   }
+					   def2pnl_row_site (name, core_name, x0,
+							      y0, orient, count,
+							      width, height);
+					>>
+		;
+
+gcellgrid_decl	: DEF_GCELLGRID^ ( DEF_X | DEF_Y ) number
+		  DEF_DO number DEF_STEP number DEF_SEMI!
+		;
+
+propertydefinitions_decl
+		: DEF_PROPERTYDEFINITIONS^
+		    ( propertydefinition )*
+		  DEF_END! DEF_PROPERTYDEFINITIONS!
+		;
+
+propertydefinition
+		: DEF_DESIGN DEF_VERILOGDESIGNNAME^
+		  DEF_STRING DEF_QUOTED DEF_SEMI!
+		;
+
+constituent	: vias
+		| components
+		| specialnets
+		| nets
+		| pins
+		;
+
+vias		: DEF_VIAS^ number DEF_SEMI!
+		    ( via )*
+		  DEF_END! DEF_VIAS!
+		;
+
+via		: "\-"! << ID_MODE; >> DEF_IDENT^ ( via_plus )* DEF_SEMI!
+		;
+
+via_plus	: DEF_PLUS! ( rect_clause )
+		;
+
+components	: DEF_COMPONENTS^ number DEF_SEMI!
+		    ( component )*
+		  DEF_END! DEF_COMPONENTS!
+		;
+
+component	: << char *inst_name;
+		     char *mod_name;
+		  >>
+		  "\-"! << ID_MODE; >> i:DEF_IDENT^
+			<< inst_name = STRDUPA ($i);
+			   ID_MODE;
+			>>
+			m:DEF_IDENT
+			<< mod_name = STRDUPA ($m); >>
+		    ( component_plus [inst_name, mod_name] )* DEF_SEMI!
+		;
+
+pins		: DEF_PINS^ number DEF_SEMI!
+		    ( pin )*
+		  DEF_END! DEF_PINS!
+		;
+
+pin		: << char *pin_name; >>
+		  "\-"! << ID_MODE; >> n:DEF_IDENT^
+			<< pin_name = STRDUPA ($n); >>
+		    ( pin_plus [pin_name] )* DEF_SEMI!
+		;
+
+nets		: DEF_NETS^ number DEF_SEMI!
+		    ( net )*
+		  DEF_END! DEF_NETS!
+		;
+
+specialnets	: DEF_SPECIALNETS^ number DEF_SEMI!
+		    ( net )*
+		  DEF_END! DEF_SPECIALNETS!
+		;
+
+net		: << pnl_net pnet; >>
+		  "\-" << ID_MODE; >> id:DEF_IDENT
+			<< pnet = def2pnl_net ($id); >>
+		    ( net_connection )* ( net_plus [pnet] )* DEF_SEMI!
+		;
+
+net_connection	: "\("! << ID_MODE; >> cell:DEF_IDENT^
+		  << ID_MODE; >> DEF_IDENT "\)"!
+//		    << /* This has to be a special case. */
+//		      if ( strcmp (#cell->text, "PIN") == 0 ) {
+//			#cell->token = DEF_PIN;
+//		      }
+//		    >>
+		;
+
+component_plus [char *inst_name, char *mod_name]
+		: << pnl_loctype loctype;
+		     int x, y;
+		     pnl_orientation orient;
+		  >>
+		  DEF_PLUS! ( placed_clause > [loctype, x, y, orient]
+				<< def2pnl_component (inst_name, mod_name,
+						       loctype, x, y, orient);
+				>>
+			)
+		;
+
+pin_plus [char *pin_name]
+		: << pnl_loctype loctype;
+		     int x, y;
+		     pnl_orientation orient;
+		  >>
+		  DEF_PLUS! ( placed_clause > [loctype, x, y, orient]
+				<< def2pnl_pin (pin_name, loctype, x, y, orient); >>
+			| net_clause
+			| dir_clause
+			| use_clause
+			| layer_clause
+			)
+		;
+
+net_plus [pnl_net pnet]
+		: << pnl_route route; >>
+		  DEF_PLUS! ( use_clause
+			| route_clause > [route]
+				<< pnl_net_add_route (pnet, route); >>
+			)
+		;
+
+placed_clause > [pnl_loctype loctype, int x, int y, pnl_orientation orient]
+		: ( DEF_PLACED^		<< $loctype = pnl_loctype_PLACED; >> 
+		  | DEF_FIXED^		<< $loctype = pnl_loctype_FIXED; >> 
+		  | DEF_COVER^		<< $loctype = pnl_loctype_COVER; >> 
+		  )
+			coordinate > [$x, $y] orientation > [$orient]
+			
+		| DEF_UNPLACED^		<< $loctype = pnl_loctype_UNPLACED;
+					   $x = -1;
+					   $y = -1;
+					   $orient = pnl_orientation_none;
+					>>
+		;
+
+net_clause	: DEF_NET^ << ID_MODE; >> DEF_IDENT
+		;
+
+dir_clause	: DEF_DIRECTION^ ( DEF_INPUT | DEF_OUTPUT | DEF_INOUT )
+		;
+
+use_clause	: DEF_USE^ ( DEF_SIGNAL | DEF_POWER | DEF_GROUND )
+		;
+
+route_clause > [pnl_route route]
+		: << pnl_routekind routekind;
+		     pnl_branch branch;
+		  >>
+		  ( DEF_ROUTED^	<< routekind = pnl_routekind_ROUTED; ID_MODE; >>
+		  | DEF_FIXED^	<< routekind = pnl_routekind_FIXED; ID_MODE; >>
+		  | DEF_COVER^	<< routekind = pnl_routekind_COVER; ID_MODE; >>
+		  )
+			<< $route = pnl_route_create (routekind); >>
+		  route_branch > [branch]
+			<< pnl_route_add_branch ($route, branch); >>
+ 		  ( DEF_NEW
+			<< ID_MODE; >>
+		    route_branch > [branch]
+			<< pnl_route_add_branch ($route, branch); >>
+		  )*
+		;
+
+route_branch > [pnl_branch branch]
+		: << int x0;
+		     int y0;
+		     pnl_segment segment;
+		     char *layer;
+		  >>
+		  id:DEF_IDENT
+				<< layer = STRDUPA ($id); >>
+		  "\(" number > [x0] number > [y0] "\)"
+				<< $branch = pnl_branch_create (layer, x0, y0);
+			           zzmode (IDENT_NEW_OR_PLUS);
+				>>
+		  ( route_segment > [segment]
+				<< pnl_branch_add_segment ($branch, segment); >>
+		  )+
+		;
+
+route_segment > [pnl_segment segment]
+		: << int x, y; >> 
+		  ( DEF_ID_OPEN	( number > [x] "\*"
+					<< $segment = pnl_segment_create_x_segment (x); >>
+				| "\*" number > [y]
+					<< $segment = pnl_segment_create_y_segment (y); >>
+				) "\)"
+					<< zzmode (IDENT_NEW_OR_PLUS); >>
+		  | via_name:DEF_IDENT
+			<< $segment = pnl_segment_create_via ($via_name);
+			   zzmode (IDENT_NEW_OR_PLUS);
+			>>
+		  )
+		;
+
+layer_clause	: DEF_LAYER^ << ID_MODE; >> DEF_IDENT coordinate coordinate
+		;
+
+rect_clause	: DEF_RECT^ << ID_MODE; >> DEF_IDENT coordinate coordinate 
+		;
+
+coordinate > [int x, int y]
+		: "\("! number > [$x] number > [$y]"\)"!
+		;
+
+orientation > [pnl_orientation orient]
+		: DEF_N		<< $orient = pnl_orientation_N; >>
+		| DEF_S		<< $orient = pnl_orientation_S; >>
+		| DEF_FN	<< $orient = pnl_orientation_FN; >>
+		| DEF_FS	<< $orient = pnl_orientation_FS; >>
+		;
+
+number > [int result]
+		: n:DEF_NUMBER	<< $result = atoi ($n); >>
+		;

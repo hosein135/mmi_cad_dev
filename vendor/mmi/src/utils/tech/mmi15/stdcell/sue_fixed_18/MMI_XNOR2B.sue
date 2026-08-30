@@ -1,0 +1,70 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_XNOR2B {} {
+  make MMI_XNOR2B -origin {750 100}
+  make output -name out -origin {710 440}
+  make input -name in1 -origin {200 380}
+  make input -name in0 -origin {200 340}
+  make MMI_NAND2A -origin {350 360}
+  make MMI_OAI21B -origin {580 440}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 12/06/99 -origin {330 740}
+  make_wire 680 440 710 440
+  make_wire 410 360 480 360
+  make_wire 480 360 480 410
+  make_wire 260 380 260 440
+  make_wire 260 440 480 440
+  make_wire 260 380 200 380
+  make_wire 260 380 290 380
+  make_wire 230 340 230 480
+  make_wire 230 480 480 480
+  make_wire 230 340 200 340
+  make_wire 230 340 290 340
+  make_text -origin {-10 110} -text {Exclusive NOR}
+  make_text -origin {-10 130} -text {B Size}
+  make_text -origin {-10 90} -text MMI_XNOR2B -size large
+}
+
+proc ICON_MMI_XNOR2B args {
+  set size B
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_XNOR2 icon body
+  icon_arc -60 -30 50 110 -start 35 -extent 50
+  icon_arc -48 -30 -28 30 -start 270 -extent 180
+  icon_line -38 -30 0 -30
+  icon_line -38 30 0 30
+  icon_arc -60 -110 50 30 -start 275 -extent 50
+  icon_arc -58 -30 -38 30 -start 270 -extent 180
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  icon_property -origin {-27 -20} -size small -label F
+  if {$DeMorgan} {
+    icon_line 40 0 60 0
+    icon_line -60 20 -40 20
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+    icon_line -60 20 -40 20
+    icon_line -60 -20 -40 -20
+  }
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 20} -name in1
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_XNOR2B
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

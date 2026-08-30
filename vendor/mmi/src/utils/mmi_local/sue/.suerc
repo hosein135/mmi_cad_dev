@@ -1,0 +1,271 @@
+# Special setting for Micro Magic
+
+set VERILOG_PROBE_CMD(interactive) {verilog -s +libext+.vb+.v -y . -y lib.v}
+set VERILOG_CMD {verilog +libext+.vb+.v -y . -y lib.v}
+
+# make sure this is defined
+set default_mmi_local "env(MMI_TOOLS)/../mmi_local"
+set env(MMI_LOCAL) [use_first env(MMI_LOCAL) default_mmi_local]
+
+# filename of default header (.h) file for spice and verilog
+set DEFAULT_SPICE_HEADER \
+	$env(MMI_LOCAL)/sue/default_spice_header.h
+set DEFAULT_VERILOG_HEADER \
+	$env(MMI_LOCAL)/sue/default_verilog_header.h
+
+# List of possible spice hosts so we can kill a spice job if desired.
+#set SPICEHOSTS "mmifs3"
+set SPICEHOSTS [exec hostname]
+
+# Use our own local copy of devices and mspice.  Put new one here.
+
+#set SCHEM_DIR(devices) $SUE_DIR/schematics/devices
+set SCHEM_DIR(devices) $env(MMI_LOCAL)/sue/schematics/devices
+# spice directory is for spice models that have been scaled so don't require
+# the user to explicitly put in um's.  For example W=2.0
+#set SCHEM_DIR(spice) $SUE_DIR/schematics/spice
+# mspice directory is for spice models that require um's.  For example W=2.0u
+#set SCHEM_DIR(spice) $SUE_DIR/schematics/mspice
+set SCHEM_DIR(spice) $env(MMI_LOCAL)/sue/schematics/mspice
+
+
+# add the amazing, new diff feature
+source $env(MMI_LOCAL)/sue/diff.tcl
+
+# add a function to local menu
+source $env(MMI_LOCAL)/sue/what_instances.tcl
+menu_add -menu local -label "What Instances" -command what_instances \
+	-help "Popup a list of instances in the current schematic.  Click on an instance to select."
+
+menu_add -menu local -label "Import DEF" -command make_cell_from_def \
+	-help "Prompt for a DEF file and then make a schematic that will create that DEF file when DPC'd."
+
+source $env(MMI_LOCAL)/sue/add_net_name.tcl
+
+switch [exec uname] {
+  Linux {
+    set arch i486-linux
+  }
+  HP-UX {
+    set arch hppa
+  }
+  SunOS {
+    set arch sparc-solaris2
+  }
+  default {
+    # If I were a good programmer I would have something here
+    barf
+  }
+}
+
+# if solaris and development version, nl dynamically linked
+if {[info commands nl_find_cells] == ""} {
+  # nl not loaded, load it
+#  set NL_PATH [use_first env(NL_PATH) '/volume/mmi/build/nl/bin.$arch]
+  set NL_PATH [use_first env(NL_PATH) '/volume/mmi/src/nl/bin-opt.$arch]
+
+  puts "Loading nl shared object from $NL_PATH ... (override with unix environment variable NL_PATH)"
+  if {[catch {load $NL_PATH/nl_shell.so} msg]} {
+    puts $msg
+  }
+}
+
+# auto-placement stuff
+
+if {[string range $VERSION 0 10] == "MMI_SUE4.3."} {
+
+   menu_add -menu local -label separator
+
+   menu_add -menu local -label "Export DEF" \
+	-command "_write_def_from_placement" \
+	-help "Write the current placement to a def file."
+
+   menu_add -menu local -label "View DEF" \
+	-command "make_placement_from_def" \
+        -help "View a DEF file in a placement view."
+
+   menu_add -menu local -label "Create DEF of" \
+	-command "_build_bbox_ports" \
+	-help "Create Placement bbox/Ports of selected instance."
+
+   menu_add -menu local -label "Write Ports File" \
+	-command "_write_port_file_from_placement" \
+	-help "Write the current placement bbox to ports file."
+
+   menu_add -menu local -label separator
+}
+ 
+
+
+set PROJ_TECH /volume/mmi_proj/proj/tech
+
+set PROJECT [use_first SUE_PROJECT PROJECT env(PROJECT) env(MMI_PROJECT)]
+
+if {$PROJECT != ""} {
+  # If max is started automatically (for cross-probing)
+  # this will make it use the same project.
+  set env(MMI_PROJECT) $PROJECT
+}
+
+switch $PROJECT {
+  tsmc25 {
+    source $PROJ_TECH/tsmc25/library/dpc/.suerc
+    puts "Setting up for DPC with tsmc25 library ..."
+  }
+
+  mmi25 {
+    set tech $PROJ_TECH/mmi25
+    source $tech/library/dpc/sue.rc
+    puts "Setting up for DPC with mmi25 library ..."
+  }
+
+  mmi18 {
+    set tech $PROJ_TECH/mmi18
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up for DPC with mmi18 library ..."
+  }
+
+  mmi15 {
+    set tech $PROJ_TECH/mmi15
+    puts "Setting up for DPC with mmi15 library ..."
+    puts "Note: setting NO_HIER_DEMORGAN=1 to get rid of demorgans; remove .cache files"
+    global NO_HIER_DEMORGAN
+    set NO_HIER_DEMORGAN 1
+    source $tech/library/dpc/dpc.suerc
+  }
+
+  ibmsa27 {
+    set tech /volume/cad/proj/ibmsa27
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up for DPC with IBM SA-27 library ..."
+  }
+
+  ibmcu11 {
+    set tech /volume/cad/proj/ibmcu11
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up for DPC with IBM Cu-11 library ..."
+  }
+
+  ibm9s {
+    set tech /volume/cad/proj/ibm9s
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up with ibm9s SOI library ..."
+  }
+
+  ibm9sf {
+    # set tech /volume/cad/proj/ibm9sf
+    # set to our protected area for now
+    set tech $PROJ_TECH/ibm9sf
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up with ibm9sf (0.10 um) library ..."
+  }
+
+  mmi13 {
+    set tech $PROJ_TECH/mmi13
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up for DPC with mmi13 library ..."
+  }
+
+  artisan {
+    set tech /home/tavrow/dev/mapper/artisan
+    source $tech/library/dpc/dpc.suerc
+    puts "Setting up for DPC with artisan library ..."
+  }
+
+  "" {
+    # No project specified
+  }
+
+  default {
+    puts "Warning: unrecognized PROJECT specified: $PROJECT"
+  }
+
+}
+
+
+# floorplanning stuff
+#source ~tavrow/archive/fp/sfp.tcl
+
+
+# for our 11x17 printer
+set PRINT(B,SIZE) "11in 17in"
+#set PRINT(B,COMMAND) "lpr -Php5000n-b -r %s"
+set PRINT(B,COMMAND) "lpr -Ppinecone -r %s"
+
+set PRINT(E,SIZE) "36in 24in"
+set PRINT(E,COMMAND) "lpr -Pribbon -r %s"
+
+set PRINT(F,SIZE) "36in 60in"
+set PRINT(F,COMMAND) "lpr -Pribbon -r %s"
+
+
+set PRINT(PAGE_SIZES) "A B E F"
+
+menu_add -menu file -label "Write EDIF" -command edif_write -position 10 \
+	-help "Writes the EDIF for the given schematic and descendents."
+
+menu_add -menu local -label "Show Utilization" -command display_utilization \
+	-help "Draws solid boxes over all placed instances in DPC placement so you can easily see holes."
+
+source $env(MMI_LOCAL)/sue/display_nets.tcl
+source $env(MMI_LOCAL)/sue/display_named_connections.tcl
+source $env(MMI_LOCAL)/sue/icon_creator.tcl
+
+
+####### Floorplanner Stuff, added by pat:
+menu_add -menu local -label "Dump to Chipper" -command fplan_sue_dump \
+	-help "Dump contents of sue schematic for use by floor planner."
+
+menu_add -menu local -label "Chipper Cross Probe Init" \
+	-command max_cross_probe_init_verilog \
+	-help "Initialize cross probing for Chip Planner"
+source $env(MMI_LOCAL)/sue/sue_fplan.tcl
+#######
+
+####### wire RC calculator , added by ritesh saraf
+source $env(MMI_LOCAL)/sue/quickRC.tcl
+##########
+
+
+# until next release when system .suerc is fixed
+set GEOMETRY(signalscan4) 1000x800+50+100
+set VERILOG_PROBE_CMD(signalscan4) {signalscan -stdio -auto $PROBE_DISPLAY}
+
+
+
+# MUST GO AT END SINCE CAN BOMB even with catch statements and cause
+# remainder of this file not to be executed.
+
+# add speedy stuff -- note, only used if "set DPC_TIMING(simulator) speedy"
+# timing simulator is always "pearl" at this point, too bad
+# always load speedy until switch gets to working right
+
+# if {$DPC_TIMING(simulator) == "speedy"} {
+
+# don't try to load for now with sue (ok for sued, suex)
+# if {[string first build [info nameofexecutable]] != -1} {
+  set SPEEDY_PATH [use_first env(SPEEDY_PATH) '/volume/mmi/build/speedy/bin.$arch]
+  if {[info commands speedy_cmd] == ""} {
+    # speedy not loaded, load it
+    puts "Loading speedy shared object from $SPEEDY_PATH ... (override with unix environment variable SPEEDY_PATH)"
+    if {[catch {load $SPEEDY_PATH/speedy_package.so} msg]} {
+      puts $msg
+      return
+    }
+  }
+
+  # load speedy_procs.... first look in the place for release versions....
+  set SPEEDY_TCL_PATH "$SPEEDY_PATH/../src"
+  if {[catch "source $SPEEDY_TCL_PATH/speedy_procs.tcl" rv] != 0} {
+    puts "source speedy_procs 1st try... $rv"
+    
+    # ... if not found, look in the place for source versions...
+    set SPEEDY_TCL_PATH "$SPEEDY_PATH/src"
+    if {[catch "source $SPEEDY_TCL_PATH/speedy_procs.tcl" rv] != 0} {
+      puts "source speedy_procs 2nd try... $rv"
+      # if not found, speedy won't run
+      puts "ERROR: speedy_procs.tcl not found"
+      return
+    }
+  }
+#}

@@ -1,0 +1,1 @@
+../ctl/MMI_OR2B.ctl

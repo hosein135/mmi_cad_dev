@@ -1,0 +1,1550 @@
+Max change log (2001)  (INST BRANCH!)
+=====================
+
+VERSION HISTORY
+---------------
+
+4/30/01 max4.1.20 
+	bplane insts.  3 pointers, hash + doubly linked list.
+	no bins.
+
+
+DATE    FILES
+----    -----
+         CHANGES
+         -------
+
+1/10/01 max/max_version
+	4.0.3
+
+1/10/01 INSTALL
+
+1/11/01 layPixel.c 
+	Fixed bug in layPixelPaintGroup() that obliterated kid values
+	when nothing found.  (Was introduced when adding true colormode.)
+
+1/10/01	maxtcl/ mc/
+	make update
+	(second stab at problem where paint was left in 'select' group)
+
+1/11/01	max/max_version
+	4.0.4
+
+1/11/01 INSTALL
+
+1/12/01 max/max_version
+	4.1.0 BETA
+
+1/12/01 DBtcl.c
+	added cell_read_only command.
+
+1/12/01 DBaccess.c database.h message.c
+	new file: DBaccess.c
+	coded DBAccessModify() and DBAccessMsgsClear()
+	added DBAccessMsgsClear() to MsgCmdEnd()
+
+1/12/01 DBpaint2.c
+	added DBAccessModify() check to DBPaint().
+
+	TODO: don't change Read Only flag on write (leave up to tcl?).
+	Add access checks to other db modifications.
+	drc?
+
+1/16/01	mnMain.c	
+	added Juniper Copyright notice.
+
+1/16/01 mnMain.c
+	added "sema_file" cmd defn.  
+
+1/16/01 DBwrite.c
+	Modified DBCellWrite() to not toggle CDREADONLY based on file
+	permissions.
+
+	Modified DBCellWrite() to not write read-only buffers.
+		
+1/16/01 DBRead.c
+	temporarily clear CDREADONLY during read-in!
+
+1/16/01 DBPaint.c
+	added access checks to DBErase() and DBEraseG().
+
+1/16/01 DBlabel.c
+	added access checks to label operations.
+
+1/16/01 DBarray.c
+	added access checks to DBMakeArray().
+
+1/16/01 DBcell.c
+	DBCellDeleteDef() fixed to clear CDREADONLY so it doesn't
+	trip on its self!
+
+1/17/01 mgcLQ.c
+	Changed cmdLabelProc() to only mark cell modified if 
+	database change was successful.
+
+1/17/01 DBpaint.c DBlabel.c DBarray.c DBcell.c
+	rmed DBAccessModify() checks mving to tcl interface procedures
+	(e.g. in DBtcl.c)
+
+1/17/01 DBcell.c DBRead.c
+	rmed temporary clear of CDREADONLY
+
+1/17/01 database.h
+	modified DBAccessModify() to print first 10 messages.
+
+1/17/01 mgc/*.c
+	modified cmds to check for read-only.
+
+1/17/01 DBtcl.c selTcl.c
+	modified cmds to check for read-only
+
+1/17/01 gdsReadCell.c
+	skipping read-only cells.
+
+1/17/01 CHECKPOINT
+	make tar
+	xfer to mmi
+
+1/17/01 maxtcl/ mc/
+	make update
+
+1/18/01 maxtcl/ mc/
+	make update
+	(cell_load_hook added)
+
+1/18/01 INSTALL
+	installed as maxx max4.1.0 BETA
+
+1/22/01 mnMain.c	
+	Changed version message to match NST and SUE.
+	Max -> Micro Magic MAX
+
+1/22/01 selTcl.c
+	for DBAccessModify,  return -> CMD_RETURN(interp);
+
+1/22/01 database.h
+	DBAccessModify(), fixed error message.
+
+1/22/01 selTcl.c
+	added access check on sel_group_transfer
+	
+1/23/01 mgcRS.c
+	fixed read-only check in CmdSave() (:save).
+
+1/23/01 CHECKPOINT
+	make tar
+	xfer to kiwi
+
+1/23/01 utlsStat.c utlsTcl.c utils.h
+	implemented process stat commands.
+
+1/23/01 mnMain.c
+	rmed mmTclInit() add UtlsTclInit()
+
+	Todo remove runstats (redundant).
+
+1/24/01 mnMain.c
+	Add call to UtlsStatInit() to stash base for elapsed times.
+
+1/24/01 mgcWind.c mgcWindNR.c mgcWindAM.c
+	rm :*runstats command (obsolete).
+
+1/24/01	mgcWizard.c
+	rewrote :*psearch to user utlsStat.c instead of runstats.c 
+
+1/24/01 utils/runStats.c utils/runStats.h
+	rmed (obsolete).
+
+1/24/01 dbStats.c dbTcl.c
+	coded/tested DBstatPaintPlane.
+	testing with db_mha
+
+	TODO code tcl command(s).
+	cell plane.
+
+1/25/01 dbTcl.c
+	coded db_stat_paint
+
+1/25/01 layTcl.c layCoarse.c layint.h
+	coded lay_stat_coarse
+
+1/25/01 DBstat.c DBtcl.c database.h
+	coded DBStatCellPlane() and db_stat_instances
+
+1/26/01	DBprop.c
+	fixed double FREE in DBPropSet()
+
+1/29/01 CHECKPOINT
+	make tar
+	xfer to MMI
+
+1/29/01 databse.h DBsearch.c
+	Began implementing DBSearchLabels2(), which includes a "text"
+	argument.
+ 
+1/30/01 DBtcl.c
+	db_cells, added -user switch
+	(suppresses internal cells, and change args.)
+	Should help eliminate unnecessary listbox updates.
+
+1/30/01 layDisplay.c
+	layFrameUpdate() modified to multiply by layLabelSizeFactor
+	before converting to pixels (to avoid round-off to zero).
+
+1/30/01 CHECKPOINT
+	make tar
+	xfer to MMI
+	
+1/31/01 DBcell.c DBlabel.c databaseInt.h
+	converted cd_LabelHash to use text as key.
+	removed dbLabelKeyEq() and dbLabelKeyHash()
+	changed IHashLookUp() in DBLabelLink accordingly.
+
+1/31/01 selEnum.c
+	modified SelEnumLabels() to use DBSearchLabels2, text!
+	TODO: make DBSearchLabels2 text work for subcells.
+	TODO: remove redundant comparison of text. 
+
+2/1/01	database.h DBlabel.c selTcl.c
+	adding lab_prev (to allow labels found by hashing to be
+	efficiently removed from the list!)
+	
+	added lab_prev handling to DBLabelLink()
+	recoded DBLabelErase()
+	eliminating DBLabelEraseNext()
+
+2/1/01 CHECKPOINT
+	make tar
+
+2/1/01 selOps.c
+	changed selDelLabelsFunc() to call dbLabelErase() directly.
+	(Fixes performance bug!)
+
+2/1/01 DBSearch.c database.h selEnum.c
+	DBSearchLabels() now handling 'text' arg for children too.
+	DBSearchLabels() added DBSL_NON_RECURSIVE flag.
+
+2/1/01 selEnum.c	
+	converted SelEnumLabelsAll to DBSearchLabels2()
+	rmed redundant strcmp() from selEnumLFunc() and selEnumLFuncAll()
+
+2/1/01 utils/match.c utils.h
+	added MatchPlainTextQ() to attempt to convert glob patterns to
+	plain-text. (returns NULL on failure).
+
+2/1/01 DBlabel2.c
+	rewrote DBSearchLabel() to optimize plain text case.
+	TODO: renames, mv stuff that doesn't belong in this file out!
+
+2/5/01	CHECKPOINT
+	make tar
+	xfer to mmi
+
+2/6/01	DBsearch.c DBlabels2.c database.h DBtcl.c
+	renamed DBSearchLabel() DBSearchLabelsGlob(), and moved to DBsearch.c
+
+2/6/01  DBlabel2.c
+	converted DBSrLabelLoc() to use label hash.
+	(used by flylines).
+
+2/6/01  DBlabel2.c database.h
+	rmed DBNearestLabel()  (not used.)
+
+2/6/01  DBlabel2.c database.h etc.
+	DBSrLabelLoc() renamed DBLabelFindByPathName()
+	DBSrLabelLocDef() renamed DBLabelFindByPathNameDef()
+
+2/6/01  database.h DBsearch.c DBtcl.c 
+	added flags to DBSearchLabelsGlob()
+	added -non_hier option to 'db_search labels'
+
+2/7/01  selTcl.c 
+	added '-limit' options to sel_what.
+
+	Fixed bug where sel_what result was lost for '-edit var'
+	if var not predefined.
+
+2/7/01  CHECKPOINT
+	make tar
+
+2/9/01  max/max_version
+	4.1.1
+
+2/9/01  CHECKPOINT
+	make tar
+	xfering to mmi.
+
+2/13/01 selTcl.c
+	implemented sel_transform
+
+2/13/01  max/max_version
+	4.1.2
+
+2/13/01  CHECKPOINT
+	make tar
+	xfering to mmi.
+
+2/13/01 DBtcl.c
+	added orientation info to db_instance documentation
+
+2/14/01	database.h
+	added fl_width and fl_text fields to flylines.
+TODO: refer sel_move, :upsidedown etc. to sel_transform.
+
+2/14/01 database.h databaseInt.h DBflyline.c DBtcl.c DBundo.c
+	adding width and text to flylines.
+	flyline struc, undo, db_flyline
+
+2/15/01 layout/*
+	added width, tic mark and text to flyline redisplay
+
+2/16/01	layout/layDisplayHL.c
+	fixed text alignment for flyline text.
+
+2/16/01	layout/*
+	using lay_labelExtent for correct redisplay of flyline text.
+
+2/16/01 max/max_version
+	4.1.3
+
+2/16/01 CHECKPOINT
+	make tar
+
+	xfering to MMI.
+
+2/16/01 DBundo.c
+	strnlen() -> strlen()
+
+2/20/01 DBtcl.c
+	added -erase flag to db_paint
+
+2/20/01 DBtcl.c mgcCmd.c
+	added to db_paint and :paint doc:
+	Note:  clears selection
+
+2/20/01	utils.h
+	coded inline func UtlsStatMallocMem()
+
+2/20/01 ihash.h ihash.c
+	coded IhashStats2()
+
+2/20/01 DBstat.c
+	converted to use UtlsStatMallocMem()
+
+2/20/01	DBtcl.c
+	completed db_stat_instances
+	coded db_stat_labels
+
+2/20/01 max/max_version
+	4.1.4
+	
+2/20/01 CHECKPOINT
+	make tar
+	xfering to MMI
+
+
+2/21/01 database/* layout/* utils/*
+	improved stat funcs.
+
+2/22/01	database/* layout/* utils/*
+	improved stat funcs.
+
+2/22/01	max/maxVersion
+	4.1.5
+
+2/22/01 CHECKPOINT
+	make tar
+	xfering to MMI	
+
+2/28/01 CHECKPOINT
+	make tar
+	xfering to MMI
+
+3/1/01	layCoarse.c layMain.c layint.h
+	added LAY_COARSE_DATA_FACTOR and LAY_COARSE_MAX_OVERHEAD
+
+3/1/01  tile1.h tile.h DBplane.c
+	added pl_numTiles field to planes.
+	changed TiNewPlane() to take tile body rather than tile arg.
+	added plane arg to TiAlloc() and TiFree() and changed
+	so they keep pl_numTiles current. 
+	added plane are to TiSplit*() funcs so they can pass it to
+	TiAlloc().
+
+3/1/01  DBplane.c
+	added plane arg to TiFree() calls.
+
+3/1/01	DBinstancePlace.c
+	adding plane args to TiSplit*() calls.
+
+3/1/01	resis/* max/Makefile
+	rmed module.
+
+3/1/01  mgcE.c mgcint.h mgcCmd.c
+	rmed CmdExtResis()
+
+3/1/01  CHECKPOINT
+	make tar
+
+3/1/01	mnMain.c mgcCmd.c mgcFI.c mgcRS.c make/Makefile.module
+	rmed NO_SIM (conditional code).
+
+3/1/01  max/max_version
+	4.1.6 BETA
+	
+3/2/01  maxd.old maxo.old
+	saved executables, so we can compare later.
+
+3/2/01	layint.h
+	added c_prev and c_flags to Coarse struct.
+
+3/2/01  layCoarse.c layTcl.c
+	implemented LAY_COARSE_DATA_FACTOR
+ 
+3/5/01	CHECKPOINT
+	make tar
+	xfer to MMI
+	
+3/5/01  Makefile
+	modified to not assume /mmi-cad/
+	(Now requires MMI_CAD environment variable!)
+
+3/5/01	maxtcl/Makefile
+	/mmi-cad -> $(MMI_CAD)
+
+3/5/01  make/config.*
+	/mmi-cad -> $(MMI_CAD)
+
+3/6/01	DBtcl.c
+	fixed db_cell_signature
+
+3/6/01  DBgcell.c
+	Modified DBGCellProcessInstances() to not post
+	Saved gcell missing error, when hash func changed.
+
+3/7/01  DBtcl.c
+	added db_instances command.
+
+3/8/01  DBplane.c
+	changed DBPlaneEmptyQ to requre space tile.
+
+3/9/01 layCoarse.c layout/*
+	made LAY_COARSE_DATA_FACTOR and LAY_COARSE_MAX_OVERHEAD work
+	properly.  
+
+3/10/01 CHECKPOINT
+	make tar
+
+3/10/01 tile.h tile1.c DBtcl.c layCoarse.c
+	pl_numTiles -> pl_numAllocs, pl_numFrees
+	int -> double
+
+3/11/01	layint.h layCoarse.c layMain.c
+	added cdb_opsOrig, cdb_opsLast
+	added LAY_COARSE_FLUSH
+
+3/12/01 CHECKPOINT
+	make tar
+	xfering to MMI/jnpr
+
+3/13/01 layCoarse.c
+	special case active plane
+	rmed debugs.
+
+3/13/00 max/max_version
+	max 4.1.7
+ 
+3/13/01  CHECKPOINT
+	make tar
+	xfering to MMI for testing/tuning.
+
+3/13/01	layCoarse.c
+	fixed data compression computation.
+
+3/13/01 utlsTcl.c
+	fixed utls_stat_memory to work correctly for
+	large numbers (using 'u' in sprintf).
+
+3/14/01 layCoarse.c
+	changed data compression to remove new plane rather than prev!
+
+3/14/01 layCoarse.c
+	changed data compression to remove first coarse plane, if indicated!
+
+3/14/01 utils/tlist.c,tlist.h
+	created tcl list convenience routines.
+
+3/14/01 DBtcl.c
+	completed implementation of db_instances
+
+3/14/01 DBconnect.c  selCreate.c Extlength.c
+	added 'limit' to DBTreeCopyConnect()
+
+3/15/01 selTcl.c selCreate.c
+	added -limit option to sel_net
+ 
+3/15/01 max/max_version
+	max 4.1.8
+
+3/15/01 INSTALL
+	make tar
+	xfer to mmi for testing/tuning
+	xfer to jnpr to install as maxx.
+
+3/19/01	bplane/*
+	bringing back to life!
+
+3/20/01 utils
+	rmed abin.c abin.h
+
+3/20/01 bplane/*
+	hacking away.
+
+3/21/01 max/max_version
+	max 4.1.9
+
+3/21/01 CHECKPOINT
+	make tar
+	xfer to mmi/jnpr 
+
+3/22/01 utils/mm.c
+	fixed abort message.
+
+3/22/01 layCoarse.c
+	fixed bug in layCoarseMakePlaneRedundant()
+
+3/23/01 utils/mm.c
+	fixed double word alignment bug. 
+
+3/27/01 bplane/*
+	working on complete functionality trivial implementation.
+
+3/27/01 graphics1.c
+	changed to chain previous X error handler when installing ours
+	since tk wants to ignore errors related to requests on deleted
+	windows.
+
+3/28/01	CHECKPOINT
+	make tar
+	xfer to mmi/jnpr
+
+3/29/01	DBlabel.c
+	disabled dup check in DBLabelLink() 
+	TODO: fix this!
+
+3/29/01 selEnum.c
+	fixed enum for overlapping identical cells to
+	prefer edit cell uses.
+
+3/29/01 database.h DBcell.c DBtcl.c DBlabel.c DBlabel2.c
+	adding location based hash.
+
+TODO:  write IHashWord4...
+	optimize SelEnumLabels().	
+
+4/2/01 utils.c utils.h
+	added IHash4Word* hash funcs.
+
+4/2/01 bplane/* selEnum.c
+	made compile
+
+4/2/01 database.h DBsearch.c selEnum.c
+	added loc arg to DBSearchLabels2 and modified to use loc hash
+	to make fixed loc searches efficient.
+
+	modified selEnumLabels to take advantage of loc based searches.
+
+4/2/01 layCoarse.c
+	upped LAY_COARSE_DATA_FACTOR from 2.0 to 4.0 
+
+4/2/01 max/max_version	
+	4.1.10
+
+4/2/01 CHECKPOINT
+	make tar
+	xfering to jnpr, to install as maxx. 
+
+4/3/01	DBtcl.c
+	added -kind option to 'db_search labels'
+
+4/3/01 make/config.hp,Makefile.config
+	adding hp
+
+4/3/01	max/Makefile maxtcl/Makefile mc/Makefile
+	adding hp
+	
+4/3/01 gdsTcl.c
+        fix gds_plot_key to compile on hp platform.
+
+4/3/01 make/config make/Makefile.module
+       consolidating code to include proper config dir in one place.
+
+4/3/01 Makefile max/Makefile maxtcl/Makefile mc/Makefile
+	include config
+
+4/4/01 CHECKPOINT
+	make tar
+	xfer to jnpr.
+
+4/4/01 maxtcl/ mc/
+	imported newest
+
+4/4/01 layCoarse.c
+	removed DEBUG.
+
+4/4/01 make/Makefile.module
+	rmed obsolete config rule. 
+
+4/5/01 selTcl.c
+	fixed 'sel_what labels' usage message.
+
+4/5/01 DBsearch.c
+	DBSearchLabelsFunc()
+	use inverse trans to get label loc in current def!
+
+4/5/01 ExtTech.c
+	commented out "Fet substrate node %s is not a global name" 'error'.
+
+4/5/01 max/max_version
+	4.1.11 BETA
+
+4/5/01 CHECKPOINT
+	make tar
+	xfering to jnpr
+
+4/6/01 aux/
+	added auxilary program srcs (gemini,irsim,ext2sim,ext2spice)
+	and modified Makefile to use max config and multi-platform
+	support.
+	
+4/6/01 Makefile
+	modified to make/install aux programs
+	also added hp install.
+
+4/6/01 max/max_version
+	4.1.12 BETA
+	
+4/6/01 CHECKPOINT
+	make tar
+	xfering to jnpr
+
+4/6/01 make/config.*
+	added -DSYS_V when -DSYSV (needed by irsim)
+
+4/9/01 aux/irsim/src/ana11/event.c
+	made tail of InitHandler() conditional on NEED_HELPER
+
+4/9/01 aux/irsim/src/irsim/fio.c
+	commented out extern decl of clearerr() (it's a macro).~
+
+4/9/01 aux/gemini/prototypes.h
+	removed strcpy declaration
+	added include <string.h>
+	(needed to compile under linux 7)
+
+4/9/01 CHECKPOINT
+	make tar		
+	xfer back to mharnold.com	
+
+4/11/01 DBtcl.c
+	include nil path in db_instances output, so it matches
+	'sel_what cells' and 'db_search cells'
+
+4/11/01 DBcell.c
+	DBCellDeleteDef() fixed to clear cd_file, cd_showName, and
+	cd_instName - even if cell still referenced.
+	
+4/12/01 database.h
+	added CU_NTL_CHECKED2
+	(integrating Myron's new code).
+
+4/12/01 ntl/*
+	Myron's latest.
+
+4/13/01 CHECKPOINT
+	make tar
+	xfer back to mharnold.com
+
+4/17/01	DBtcl.c
+	fixed bug in db_instances 
+	changed name to db_instances_l
+
+4/20/01 bplane.h bpEnum.c bpMain.c bpTcl.c
+	Changed BPEnumInit() to return first element in enumeration.
+
+4/20/01 bpTcl.c
+	added bp_delete to exercise/test bplane delete function
+
+4/23/01 bplane.h
+	refined rules for add/delete ops during enumerations.
+
+4/23/01 bplane/bpOpaque.h bpEnum.c bpMain.c bpDump.c
+	added concurrent enum book-keeping
+
+4/23/01 bplane.h bpEnum.c
+	generalized bpEnumInit() match arg to flags arg (for future
+	expansion).
+
+4/24/01	CHECKPOINT
+	BASE VERSION BEFORE CONVERTING INSTANCES TO BPLANES!
+	make tar
+
+4/24/01 database.h DBcell.c
+	added cd_cellPlane  (BPlane for instance locations)	 
+	initialed cd_cellPlane in dbCellDefAlloc()
+
+4/24/01 DBpaintTech.c
+	fixed undef of tblsize to remove warning.
+
+4/24/01 DBinstancePlace.c DBinstance.c
+	Converted DBInstancePlace() and DBInstanceUnplace()
+	to use cd_cellPlane (bplane).  
+
+	merged (now much simpler) DBinstancePlace.c into DBinstance.c
+
+4/24/01 DBInstance.c
+	modified dbInstanceFindDup to use new cell bplane.
+
+4/24/01 DBenum.c
+	recoded DBEnumChildren() to use cd_kids instead of cell tile plane.
+	TODO: replace calls to DBEnumChildren with more efficient
+
+4/24/01 DBstat.c
+	recoded DBstatCellPlane() to call BPStatMemory()
+	TODO: code BPStatMemory() !
+
+4/24/01 DRCSubcell.c	
+	recoded DRCFindInteractions() to not use DBPlaneEnumAreaInstances()
+	recoded DRCFlatCheck() to not use DBPlaneEnumAreaInstances()
+
+4/24/01 ExtMain.c
+	recoded extContainsGeometry() to not use DBPlaneEnumAreaInstances()
+
+4/24/01 ExtInter.c
+	replaced extCellSrArea() with DBSrChildrenNested()
+
+4/24/01 DBSearch.c
+	recoded DBSrChildrenNested()
+	TODO: rename to DBSrChildren()
+
+4/24/01 DBplane.c
+	rmed DBPlaneEnumAreaInstances()
+
+4/24/01 BPlane.h bpMain.c
+	added BPStatMemory()
+
+4/24/01 database.h
+	added cu_bpLink to beginning of CellUse and moved
+	cu_bbox to second element, to conform to bplane element form.
+	
+4/25/01 selTcl.c
+        fixed 'sel_labels -kind hidden -less' to not hang!
+
+4/26/01 DBread.c
+	fixed dbReadOpen() to properly handle cellnames with a '.' in them.
+
+4/26/01 Makefile
+        changed hp bin to bin.hppa
+
+4/26/01 databaseInt.h DBcellUse.c DBarray.c DBupdate.c
+	changed DBCellUseSetBBox(CellUse *use) 
+	to dbCellUseComputeBBox(CellUse *use, Rect *result);
+	modified DBUpdate1() to change cellUse bbox only after unplacing.
+
+4/26/01 geometry.h geometry.c
+	inlined GeoInclude() and GeoIncludeAll()
+
+4/26/01 DBbbox.c
+	fixed dbBBoxCellCompute to include cell bplane.
+
+4/26/01 Fixed DBCellClearContents() to work with new cell bplane.
+
+4/26/01 database.h DBcell.c DBlayers.c  DBsearch.c layDisplayGen.c
+	rmed remaining references to PL_CELL.
+
+4/27/01 CHECKPOINT
+	make tar
+
+	simple bplane (linked list implementation) for instances
+	complete.  Seems to be working!
+
+4/27/01 max/max_version
+	max 4.1.20 BPLANE
+	(skip ahead to allow room for more non-bplane versions)
+
+4/27/01 bpOpaque.h bplane.h bpTest.c database.h
+	converted bplanes to allow for multiple links 
+	added BP_NUM_LINKS.
+
+4/30/01	bplane/*
+	converted to 3-ptr (hash,link,back_link)
+	allows fast EQUAL and fast delete ops.
+
+4/30/01 CHECKPOINT
+	make tar
+
+	xfering to juniper for safe keeping.
+
+4/30/01 DBread.c
+	Modified cell_load_hook call in DBCellRead() to quote args
+	so that special chars such as '$' don't cause trouble.
+
+5/1/01  bplane/*
+	Renamed BinNode BinArray.
+
+5/1/01  bpOpaque.h bpBin.c
+	started work on bin arrays!
+
+5/3/01 DBread.c
+	disabled cell_load_hook call (trashing sel_what labels result,
+	during auto-load)
+
+
+5/03/01 mgcFI.c mgcint.h
+	added cmdGetcellParseArgs() to decouple arg processing for
+	:getcell and :dump
+
+5/03/01 mgcAD.c 
+	added -label_prefix and -instance_prefix options to :dump
+
+
+5/03/01 select.h selOps.c
+	adding instPrefix and labPrefix args to SelectDump()
+
+5/03/01 selOps.c selCreate.c DBcopy.c database.h
+	adding prefix arg to DBCellCopyAllLabels(G)
+
+5/03/01 selOps.c selCreate.c DBcopy.c database.h
+	adding prefix arg to DBCellCopyAllCells()
+
+5/03/01 mgcCmd.c
+	document -label_prefix and -instance_prefix options to :dump
+
+5/07/01 bplane/*
+	combined bp_inboxCount, bp_binCount to bp_count
+	(fast delete precludes separate counts)
+
+5/07/01 bpDump.c
+	converted dump code to use internal units consistently.
+
+5/07/01 bpBin.c
+	rmed this file - ancient code.
+	see bpBins.c instead!
+
+5/07/01 bpOpaque.h
+	setup stack fields.
+
+5/07/01 magic.h layCoarse.c
+	moved roundUp() roundDown and roundNearest() macros from
+	layCoarse.c to magic.h
+
+5/08/01 bplane/*
+	got simple bins working.
+	passes snow test.
+	fast!
+
+5/08/01 max/max_version
+	4.1.21 BPLANE
+
+5/08/01 CHECKPOINT
+	make tar
+
+5/08/01 bpBins.c bpTest.c bpEnum.c bpTcl.c bpTest.c
+	rmed BPE_X
+	Changed bpBinsUpdate() to create bins to span current bbox 
+	with big enough mesh to contain all elements.  (Bins now in
+	place for insts)
+
+5/09/01 max/max_version
+	4.1.22 BPLANE
+
+5/10/01 database.h
+        added CD_ALLFEEDTHRUS and CD_NOFEEDTHRUS (used by netlist/)
+
+5/10/01 netlist/*
+        latest from Myron
+
+5/10/01 **** INTERPOLATED ALL CHANGES UP TO max4.1.15 5/10 ****  
+
+5/10/01 bpStat.c
+	began coding stat routines.
+
+5/11/01 DBPolygon3.c
+	fixed bug in DBPolygonIntersectPolygonQ1()
+
+5/11/01 bplane/* dbTcl.c
+	added bplane stats.
+	added BP_BIN_POP_TARGET
+
+5/11/01 CHECKPOINT
+	make tar
+	xfering to Juniper for backup.
+ 
+5/12/01 bpDump.c
+	added ability to dump sub-bins.
+
+5/15/01 bplane/*
+	complete implementation of multi-binning.
+
+5/15/01 DBtcl.c
+	updated db_instance -bplane
+
+5/15/01 max/max_version
+	max4.1.24 DUAL-GRID
+
+5/16/01 CHECKPOINT
+	make tar
+	xfer to jnpr for safe keeping.
+
+5/18/01 bplane/	
+	subbining completely implemented.
+
+5/18/01 CHECKPOINT
+	subbining working.
+ 
+5/20/01 bpStat.c bplane.h bpTcl.c DBtcl.c
+	added 'binArrays' to BPStat().
+
+5/20/01 bpTcl.c
+	added -cell and -silent options to bp_search
+
+5/20/01 CHECKPOINT
+	make tar
+
+5/20/01 bpBins.c
+	Changed bpBinsBuild algor. to choose bin dimension to fit largest
+	element.  Works pretty well but too many empty bins.  Also max eff
+	pop for phillips1 is still pretty large.  I suspect aspect ratio
+	problem.
+
+5/21/01 CHECKPOINT
+	make tar
+	(also saved bplane/ to bplane/save2)
+
+5/21/01 bpBins.c bpTcl.c bplaneInt.h
+	implemented new bpBinArrayBuild():
+	two parameters:  BP_MIN_BA_POP BP_MIN_AVG_BIN_POP
+	variable aspect ratio bins.
+
+ 
+5/23/01 bplane/*
+	got variable aspect ratio bin-sizing debugged and functional.
+
+5/23/01 CHECKPOINT	
+	make tar
+	(also xfer to juniper for safe keeping)
+
+5/24/01 bpBins.c
+	bpMinBAPop=10, bpMinAvgBinPop=1.0
+
+5/24/01 max/max_version
+	max 4.1.26 ALPHA-BPLANE
+
+5/24/01 CHECKPOINT
+	make tar
+	xfering to Juniper to install as maxy!
+
+5/30/01 DBconnect.c
+	DBTreeCopyConnect() changed 'break' to goto done: (after
+	interrupt) to avoid loop (since whiles nested).
+
+5/30/01 DBconnect.c
+	dbcVisit() simplified check for previous visit 
+	(by using DBSpaceBits instead of computing unconnected 
+	mask).  Fixes Intel net selection infinite loop.  Should
+	also speed up net selection.
+
+5/30/01 main/message.c
+	Fixed parsing error in msg_catch that sometimes screwed
+	up "msg -warn"
+
+5/30/01 DBlabel.c
+	DBLabelLink() fixed dup detection in DBLabelLink().
+
+5/30/01 DBtcl.c
+	Modified db_cell_new to make unavailable cells available,
+	instead of complaining! 
+
+5/31/01 DBinstance.c
+	Fixed dup instance detection.
+
+5/31/01 max/max_version
+	max 4.1.27 ALPHA-BPLANE
+
+5/31/01 CHECKPOINT
+	make tar
+	xfer to Juniper (to install as maxy)
+
+6/1/01	bpEnum.h
+	fixed bug in BPEnumNext() that caused multiple elements
+	hashing to same value to be missed in EQUAL enum.
+
+	(INSTALLED as maxy @ Juniper)
+
+6/4/01	CHECKPOINT
+	make tar
+	cp -p o/linux/max ~/tools/bin/max.4.1.27
+
+(plan:  rewrite enum code for efficiency and maintainability.)
+
+6/4/01 	bpOpaque.h added bps_state 
+
+6/5/01  DBRead.c
+	fixed update bug due to interaction between flylines and gcells. 
+
+6/5/01  DBinstance.c 
+	rmed DEBUG
+
+6/10/01 bplane/*
+	state machine based enum working.
+	only about 10% faster for enumerating large areas. :-(
+
+6/10/01 max/max_version
+	4.1.28 ALPHA-BPLANE
+
+6/10/01 CHECKPOINT
+	make tar
+
+6/11/01	bplane/*
+	 Dynamic rebinning working.
+
+6/11/01 gdsReadCell.c
+	upped gdsReadMessageInterval from 25000 to 100000
+
+6/11/01 CHECKPOINT
+	make tar
+
+	mving to Juniper for install as maxy.
+
+6/14/01 mm.c
+	MMChunkSize upped from 2 to 32 Megabytes.
+	error message corrected: "request to big" -> "request too big"
+
+6/15/01 layDisplayHL.c
+	modified layDisplayHLFlylinesFunc to fix edit_pop/edit_push
+	performance bug.
+
+6/15/01 bpEnum.h
+	bpEnumPush()
+	fixed to return TRUE on normal completion.
+
+6/15/01 make/config.linux config.linuxd
+	adding -Wreturn-type -Werror
+
+6/15/01 geometry.h database.h
+	made implicit return types void.
+
+6/15/01 bpBins.c bplaneInt.h
+	made bpBinAdd return void.
+
+6/15/01 magic.h
+changed Void from 'int' to 'void'
+
+6/15/01 undo.h cifRead.h
+	fixed implicit return type
+
+6/15/01 cifRead.h
+	added function declaration.
+
+6/15/01 DBCell.c
+	fixed genuine return bug in DBCellDeleteDef().
+
+6/15/01 DBread.c
+	fixed genuine return bug in dbReadPaint(). 
+	fixed genuine return bug in dbReadRects(). 
+
+6/15/01 DBwirepath.c
+	DBWPathNew():
+	changed flaky return to ASSERT(def,...)
+
+6/15/01 DRCcontin.c
+	fixed genuine return bug in DRCContinouous().
+
+6/16/01 gdsRead.c
+	fixed genuine return bug in gdsReadFile().
+
+6/16/01 layDisplayGen.c
+	fixed genuine return bug in layDisplayLabelsFunc()
+	fixed genuine return bug in layDisplayUnexpandedSubcellsFunc()
+
+6/16/01 layDisplayHL.c
+	fixed genuine return bug in layDisplayLabelsHLFlylinesFunc()
+
+6/16/01 selCreate.c
+	fixed genuine return bug in SelectNet()
+
+6/16/01 selTcl.c
+	fixed genuine return bug in sel_duplicate
+
+6/16/01 undo1.c
+	fixed genuine return bug in undo_flush_redo
+
+6/16/01 config.linuxd
+	added check for uninitialized.
+
+6/16/01 DBread.c
+	fixed more genuine uninitialized varaible 
+	(could have coredumped on bad .max file)
+
+6/17/01 make/makefile.permissive config.linuxd	
+	coded permissive compile version of Makefile
+
+6/17/01 gds/Makefile
+	ln -s to make/Makefile.permissive
+
+TODO:  warnings in gds, select, geometry.h ...
+
+6/17/01 gdsInt.h
+	added CALMA_EOF, changed READRH to set rtype to CALMA_EOF
+	on eof.  (may have been genuine uninitialized variable?)
+
+6/17/01 gdsReadCell.c
+	in calmaElementSref()
+	initialize xlo,ylo,xhi,yhi,xsep,ysep.
+	semi-genuine uninitialized variable issue?
+
+6/17/01 geometry.h
+	fixed geoClipLine() to avoid uninitialized warning.
+	(Actually resulted in slightly more efficient code.)
+
+6/17/01 selUnselect.c
+	selUnselFunc() added call to DBgetTileType()
+	fixes scary genuine uninitialized variable bug!
+ 
+6/17/01 bpEnum.h
+	fixed jdj/chorus coredump!
+
+6/18/01 make/config.*
+	fixed up all config files to set extra warnings and
+	to define CONFIG_DEFINES_PERMISSIVE
+
+6/18/01 aux/*
+	convert Makefiles from CONFIG_DEFINES to CONFIG_DEFINES_PERMISSIVE 
+
+6/18/01 ntlOutput.c ntlTrans.c
+	latest from Myron.
+
+6/18/01 max/max_version
+	4.1.30 BETA (BPLANE)
+
+6/18/01 CHECKPOINT
+	make tar
+	xfer to Juniper to install as maxy
+
+6/20/01 selTcl.c selTclWhatOld.c selTclWhat.c
+	moved sel_what stuff to selTclWhatOld.c
+	began implementation of sel_what_*_l in selTclWhat.c
+
+6/20/01 mnUnits.c units.h	
+	coded UnitsI2D() and UnitsF2D().
+
+6/25/01 selTcl.c
+	added -dup_ok to sel_transform
+
+6/26/01 selTcl.c
+	sel_what_*_l complete.
+
+6/26/01 DBtcl.c DBtclSearchOld.c DBtclSearch.c
+	moved db_search code to DBtclSearchOld.c
+	began implementation of db_search_*_l in DBtclSearch.c
+
+6/29/01 DBsearch.c
+	fixed db_search_l documentation.
+
+6/29/01	selTcl.c
+	fixed sel_chunk to check for TT_SPACE layer.
+
+7/12/01	bpBins.c
+	fixed computation of oversized counts in bpBinArraySizeIt(),
+	which was causing infinite recursion with eventual coredump!
+
+7/13/01 selTcl.c
+	fixed sel_region and sel_net to check for TT_SPACE layer.
+
+7/13/01 selTclWhat.c dbTclSearch.c
+	removed _l's from names (for better or worse).
+
+7/13/01 DBsearch.c
+	modified DBSearchLabel2 to properly process hier label names.
+
+7/13/01 max/max_version
+	max 4.1.31 BETA (BPLANE)
+
+7/13/01 CHECKPOINT
+	make tar
+	xfering to Juniper to install as maxy.
+
+7/23/01 mnScripts.c
+	fixed filename in script error message.
+
+7/23/01 selArea.c
+	sel_area: documented that -no_tiles etc doesn't work with -less
+	add code to error out if sel_area called with -less -no_tiles 
+
+7/24/01 DBtclSearch.c
+	db_search_* complete.
+
+TODO:  change sel_what and db_search to use new code.
+	ASSERT nil result fields on callbacks.
+
+7/25/01 CHECKPOINT
+	make tar
+	xfering to Juniper.
+
+7/27/01 DBcellUse.c databaseInt.h DBarray.c DBupdate.c
+	added update arg to dbCellUseComputeBBox
+	changed dbInitUse() to not update bbox.
+
+	Fixes 'race' condition caused by flyline update during
+	DBInstanceAdd()
+
+7/31/01 database/* select/*
+	converted db_search, sel_what to new commands.
+	tested/debugged.
+
+7/31/01	mnTcl.c mnMain.c main.h
+	added CMD_INSIDEQ, mnTclEvalBg() 
+	(Checks that Result is not being clobbered.)
+
+7/31/01 DBread.c
+	reenabled load_cell_hook
+	using mnTclEvalBg()
+
+7/31/01 DBtcl.c
+	db_prop:  now modified flag set on property set/reset.
+
+8/01/01 CHECKPOINT
+	make tar
+	transfering to JNPR.
+
+8/01/01 make update
+	latest maxtcl/ mcc/
+
+8/01/01 max_version
+	4.1.32 BETA
+
+8/01/01 maxtcl/
+	backing out to previous version because
+	of 'call_keyword' problem
+
+8/01/01 INSTALL
+	installing as maxz
+
+8/02/01	ntlPort.c
+	latest fix from Myron	
+
+8/02/01 INSTALL
+	installing as maxz
+
+8/02/01	bpBins.c
+	bpBinArraySizeIt() made numBins double, to avoid overflow
+	on tentative calc.
+	
+8/03/01 maxtcl/ mcc/
+	make update
+
+8/03/01 INSTALL
+	installing as maxz
+
+8/03/01 CHECKPOINT
+	make tar
+	xfering back to cafe
+
+8/03/01 DBproperties.c DBundo.c databaseInt.h
+	implemented undo for properties.
+
+8/03/01 selTclWhat.c DBTclSearch.c
+	error out on incomplete 'sub' command.
+
+8/03/01	CHECKPOINT
+	make tar
+	xfering back to jnpr
+
+8/06/01 DBtcl.c
+	added db_instance_delete
+
+8/06/01 DBtcl.c databaseInt.h DBflyine.c DBread.c DBwrite.c
+	implemented DB_FLYLINES_SAVE
+	(if reset flylines treated as annotations only.)
+
+8/06/01 CHECKPOINT
+	make tar
+	xfering back to jnpr
+
+8/06/01 DBlabel2.c
+	DBLabelFindByPathName():
+	implemented special 'labels': 
+	{*center*}, {*left*}, {*right*}, {*top*}, {*bottom*}.
+	for flyline terminations.
+
+
+8/07/01	layint.h layDraw.c layMain.c 
+	added LAY_ROTATED_TEXT global variable.
+
+8/07/01 graphics.h graphics1.c layDraw.c layDisplay.c
+        added rotation arg to GrTextBBox()
+
+8/07/01 graphics.h graphics1.c layDraw.c
+        added rotation to GrDrawText()
+        NOTE: TODO implement rotation in GrDrawText!
+
+8/07/01 grRotText.c
+        created grRotTextDraw() stub.
+
+8/07/01 CHECKPOINT
+        make tar
+        xfering back to jnpr
+
+8/08/01 mnMain.c
+        rmed -technology processing.
+        tcl linked MN_TECH, MN_TECH_VAR
+        commented out technology set code, mving set
+        to max0.tcl so that -project can be handled correctly.
+        NOTE: MUST COORDINATE WITH max0.tcl!!!
+
+8/08/01 database.h layMain.c
+        (UNNAMED) -> UNNAMED
+        NOTE: MUST COORDINATE WITH max0.tcl!!!
+
+8/08/01 maxtcl/ mc/
+        latest maxtcl (including MN_TECH / UNNAMED changes)
+
+8/08/01 INSTALL
+        installing as maxz at Juniper.
+
+8/09/01 DBtclSearchOld.c DBtcl.c
+        resurrected old db_search as db_search_old for debug
+
+8/09/01 selTclWhatOld.c selTcl.c
+        resurrected old sel_what as sel_what_old for debug
+
+8/09/01 maxtcl/ mc
+        make update
+
+8/09/01 INSTALL
+        installed as maxz at Juniper.
+
+8/13/01 gdsWrite.c gdsTcl.c gdsInt.h
+	added tcl linked var GDS_MAP_SLASH_HACK.
+
+8/13/01	gdsReadPaint.c
+	changed calmaElementText() to map '/' to '|',
+	if gdsMapSlashHack set.
+
+	Also warns if input contains '|'!
+
+	TODO: implement real escaping for names.
+
+8/13/01 gdsWrite.c
+	calmaWriteText() modified to map '|' back to '/'
+	(if gdsMapSlashHack set.)
+
+8/14/01	database/ layout/ main/debug.c
+	debugs to track down db_search_labels problem.
+	problem is with DBCellNewUse() in DBcellUse.c
+	(use bbox version should stay invalid.)
+
+8/14/01	main/mnMain.c
+	setting MN_FILE_TECH for max0.tcl
+
+8/15/01 CHECKPOINT
+	make tar
+	xfering to jnpr.
+
+8/15/01 maxtcl/ mc/
+	make update
+
+8/15/01	mnMain.c	
+	fixed MN_FILE_TECH set.
+
+8/15/01 DBcellUse.c
+	changed dbInitUse() to leave the use bbox invalid.
+
+8/15/01 DBtclSearch.c layLoad.c DBread.c mnMain.c
+	removed debugs.
+
+8/15/01 max0.tcl
+	slight fix to tech processing.
+	Needs to be checked in.
+
+8/15/01	INSTALL
+	installing as maxz
+
+8/16/01 CHECKPOINT
+	make tar
+	xfering back to cafe
+
+8/16/01 databaseInt.h DBcellUse.c DBupdate.c DBarray.c 
+	rmed 3rd arg (update) form dbCellUseComputeBBox()
+
+8/16/01 geometry.c geometry.h
+	added GrCanonicalRectF()
+
+8/16/01	layDraw.c gerRotText.c  
+	finished rotating text implementation.
+
+8/16/01	CHECKPOINT
+	make tar
+	xfering back to jnpr. 
+
+8/16/01 maxtcl/ mc/
+	make update
+
+8/16/01 INSTALL
+	installing as maxz
+
+8/20/01	graphics1.c
+	modified grSetClipRect() to clip against drawable size.
+	(avoid int overflow bug, and is more efficient.)
+
+8/20/01	maxtcl/ mc/
+	make update
+
+8/20/01	INSTALL
+	installing as maxz
+
+8/22/01	max/max_version
+	4.2.0
+
+	verified on jdj's Music scripts.
+	verified on mha's regressions 
+
+8/22/01 maxtcl/ mc/
+	make update
+
+8/22/01 INSTALL
+	building release.
+ 	
+8/23/01 DBtcl.c
+	made db_instances synonymous with db_instances_l
+
+8/23/01	max_version
+	4.2.1
+
+8/23/01	maxtcl/ mcc/
+	make update
+
+8/24/01	maxtcl mcc/
+	make update
+
+8/24/01 max_version
+	4.2.2
+
+8/28/01	DBcopy.c
+	enhanced DBCellCopyDefNotify() to copy properties.
+	(so db_cell_copy copies properties.)
+
+8/28/01	maxtcl mcc/
+	make update
+
+8/28/01 max/max_version
+	4.2.3
+
+8/28/01	INSTALL
+	installed as maxz	
+
+9/05/01	maxtcl mcc/
+	make update
+
+9/13/01 aux/irsim (irsim/mem.c ana11/event.c)
+	fixed irsim.
+
+9/13/01	maxtcl/ mcc/
+	make update
+
+9/13/01 max/max_version
+	4.2.4
+
+9/13/01 INSTALL
+	make install
+
+9/24/01	 maxtcl/ mcc/
+	make update
+
+9/24/01 max/max_version
+	4.2.5
+
+9/24/01 INSTALL
+	make install
+
+10/02/01 maxtcl/ mcc
+	make update
+	(fixes flatten/extract_it bug)
+
+10/02/01 max/max_version
+	4.2.6
+
+10/02/01 INSTALL
+	make install
+
+11/30/01 maxtcl/
+	cped Pat's latest from /volume/mmi/src/max/maxtcl/4.2.6
+
+11/30/01 max/max_version
+	4.2.7
+
+11/30/01 INSTALL
+	make install
+
+12/14/01 maxtcl/
+	cped Pat's latest from /volume/mmi/src/max/maxtcl/4.2
+
+12/14/01 max/max_version
+	4.2.8
+
+12/14/01 INSTALL
+	make install
+
+12/20/01 DBlabel.c
+	fixed DBLabelLink() to allow otherwise identical labels
+	on different layers!
+
+12/20/01 max/max_version
+	4.2.9
+		
+12/22/01 maxtcl/
+	cped Pat's latest from /volume/mmi/src/max/maxtcl/4.2
+
+12/20/01 max/max_version
+	4.2.10
+
+12/22/01 INSTALL
+	make install
+
+02/27/02 maxtcl/print.tcl
+	rmed print menu item (gds plot is proprietary code)
+
+02/27/02 maxtcl/i_cmd.tcl
+	rmed LUCKY_VARIABLE reference.
+
+02/27/02 maxtcl/stdcell.c
+	rmed license_check refs.
+
+02/27/02 gds/gdsTcl.c
+	rmed gds_plot_key
+
+02/27/02 main/mnMain.c
+	rmed license checking.
+	rmed LUCKY_VARIABLE, LuckyVariable.
+	updated Copyright messages.
+
+02/27/02 mnTcl.c
+	rmed license checking.
+	rmed encryption/decryption of internal version of file. 
+
+02/27/02 max/max_version
+	4.2.11,pd
+
+3/21/02 doc/
+	mved CHANGE_LOGs to toplevel dir.
+	mved aside other doc (contains proprietary refs)
+
+3/21/02 COPYRIGHT README
+	updated from max4.3.16
+
+3/21/02 doc/ proto/	
+	cped from max4.3.16
+
+
+
+

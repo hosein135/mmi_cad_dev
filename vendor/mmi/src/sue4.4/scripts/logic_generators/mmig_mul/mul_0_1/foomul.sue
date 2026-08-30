@@ -1,0 +1,32 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_foomul {} {
+  make output -orient R270 -name ACout_H -origin {470 270}
+  make output -name {RES_H[7:0]} -origin {580 420}
+  generate testCounter testCounter4 -NBITS 4
+  make testCounter4 -orient R90X -origin {50 380}
+  make name_net -name {A_H[3:0]} -origin {290 360}
+  make name_net -name {B_H[3:0]} -origin {290 400}
+  generate mul mul4_Y_N_N_Y_Y -NBITS 4 -UseMulCin Y
+  make mul4_Y_N_N_Y_Y -origin {440 400}
+  make global -name vdd -origin {410 540}
+  make flag -value 0 -origin {190 360}
+  make flag -value 2 -origin {190 400}
+  make flag -value x -origin {560 420}
+  make flag -value x -origin {500 310}
+  make global -name gnd -origin {470 540}
+  make_wire 470 480 470 540
+  make_wire 290 360 380 360
+  make_wire 290 400 380 400
+  make_wire 410 460 410 540
+  make_wire 190 360 290 360
+  make_wire 190 360 100 360
+  make_wire 190 400 290 400
+  make_wire 190 400 100 400
+  make_wire 560 420 500 420
+  make_wire 560 420 580 420
+  make_wire 500 310 470 310
+  make_wire 470 310 470 340
+  make_wire 470 310 470 270
+}
+

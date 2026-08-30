@@ -1,0 +1,128 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_MUXI3B {} {
+  make MMI_MUXI3B -origin {1780 -420}
+  make output -name out -origin {1830 -110}
+  make input -name in2 -origin {1130 140}
+  make input -name sel1 -origin {1270 330}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel1_L -origin {1560 330}
+  make name_net -name in2_L -origin {1450 140}
+  make name_net -name N1 -origin {1440 -190}
+  make name_net -name N2 -origin {1660 -190}
+  make xgate -orient RY -WP 1.54 -WN 0.77 -origin {1560 -190}
+  make xgate -orient RY -WP 1.54 -WN 0.77 -origin {1560 140}
+  make inverter -WP 1.54 -WN 0.77 -origin {1350 140}
+  make inverter -WP 0.77 -WN 0.385 -origin {1430 330}
+  make xgate -WP 1.54 -WN 0.77 -origin {1160 -290}
+  make inverter -WP 1.54 -WN 0.77 -origin {1010 -290}
+  make xgate -WP 1.54 -WN 0.77 -origin {1160 -80}
+  make inverter -WP 1.54 -WN 0.77 -origin {1010 -80}
+  make inverter -WP 0.77 -WN 0.385 -origin {910 40}
+  make input -name in0 -origin {790 -290}
+  make input -name sel0 -origin {800 -180}
+  make input -name in1 -origin {790 -80}
+  make inverter -WP 1.54 -WN 0.77 -origin {1750 -110}
+  make inverter -WP 1.54 -WN 0.77 -origin {1350 -190}
+  make inverter -WP 0.77 -WN 0.385 -origin {1230 140}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/09/99 -origin {1150 460}
+  make_wire 1800 -110 1830 -110
+  make_wire 1560 -260 1560 -230
+  make_wire 1670 -110 1720 -110
+  make_wire 1590 140 1670 140
+  make_wire 1560 200 1560 170
+  make_wire 1500 200 1560 200
+  make_wire 1380 200 1500 200
+  make_wire 1380 200 1380 330
+  make_wire 1560 330 1480 330
+  make_wire 1560 330 1620 330
+  make_wire 1450 140 1400 140
+  make_wire 1450 140 1530 140
+  make_wire 1660 -190 1590 -190
+  make_wire 1660 -190 1670 -190
+  make_wire 1560 -160 1560 -50
+  make_wire 1560 -50 1560 100
+  make_wire 1670 -190 1670 -110
+  make_wire 1670 -110 1670 140
+  make_wire 1500 -260 1500 200
+  make_wire 1500 -260 1560 -260
+  make_wire 1620 -50 1620 330
+  make_wire 1560 -50 1620 -50
+  make_wire 1060 -290 1130 -290
+  make_wire 1190 -290 1270 -290
+  make_wire 980 -290 790 -290
+  make_wire 1060 -80 1130 -80
+  make_wire 1190 -80 1270 -80
+  make_wire 980 -80 790 -80
+  make_wire 1160 -180 1160 -250
+  make_wire 1160 -180 1160 -110
+  make_wire 840 -180 840 40
+  make_wire 840 40 880 40
+  make_wire 840 -180 800 -180
+  make_wire 840 -180 1160 -180
+  make_wire 1160 40 1160 -40
+  make_wire 1100 -340 1160 -340
+  make_wire 1100 40 960 40
+  make_wire 1100 40 1160 40
+  make_wire 1100 -340 1100 40
+  make_wire 1160 -340 1160 -320
+  make_wire 1530 -190 1440 -190
+  make_wire 1270 330 1380 330
+  make_wire 1380 330 1400 330
+  make_wire 1400 -190 1440 -190
+  make_wire 1320 -190 1270 -190
+  make_wire 1270 -190 1270 -80
+  make_wire 1270 -190 1270 -290
+  make_wire 1130 140 1200 140
+  make_wire 1280 140 1320 140
+  make_text -origin {740 -480} -text {Inverting 3:1 Mux }
+  make_text -origin {740 -460} -text {B Size}
+  make_text -origin {740 -500} -text MMI_MUXI3B -size large
+}
+
+proc ICON_MMI_MUXI3B args {
+  set size B
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_MUXI3 icon body
+  icon_line -40 -100 -40 100 40 60 40 -60 -40 -100
+  if {$DeMorgan} {
+    icon_arc -60 -50 -40 -70 -start 0 -extent 359
+    icon_arc -60 -10 -40 10 -start 0 -extent 359
+    icon_arc -60 50 -40 70 -start 0 -extent 359
+    icon_line 60 0 40 0
+  } else {
+    icon_line -60 -60 -40 -60
+    icon_line -60 0 -40 0
+    icon_line -60 60 -40 60
+    icon_arc 60 -10 40 10 -start 0 -extent 359
+  }
+  # properties
+  icon_property -origin {-37 -60} -size small -label 0
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  icon_property -origin {-20 82} -size small -label 0 -anchor center
+  # inputs
+  icon_term -type input -origin {-60 -60} -name in0
+  icon_term -type input -origin {-60 0} -name in1
+  icon_term -type input -origin {-60 60} -name in2
+  icon_term -type input -origin {-20 90} -orient R270 -name sel0
+  icon_term -type input -origin {20 70} -orient R270 -name sel1
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_MUXI3B
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .in2(\$\{in2\}), .sel0(\$\{sel0\}), .sel1(\$\{sel1\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

@@ -1,0 +1,25 @@
+#!/bin/ksh
+
+#
+#       Generator Program for DPC Tutorial.
+#
+
+
+function error {
+    echo ERROR: shell script did not complete
+    exit 2
+}
+
+alias -x tar=tar
+set -x				;# print commands before executing them.
+
+( cd dev
+  rm *.cache core
+  trap error ERR ; set -xe
+  export PROJECT; PROJECT=""
+  export SUE_IGNORE_SUERC; SUE_IGNORE_SUERC=site,user,private
+  suex -set DEMO=0 -cmd "source ../commands.tcl" alu8 -cmd "exit -error_code" -set BATCH=1
+  tar cvf tutorial.tar *
+  mv tutorial.tar ..
+)
+

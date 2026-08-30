@@ -1,0 +1,84 @@
+NOTE:
+
+directory sue_fixed contains the schematics with fixed size fets.
+
+directory sue_param contains the schematics with parameterizable
+fet sizes - THIS IS THE DIRECTORY that has been modified by
+pat so the cells can be routed.
+
+
+The cell library includes:
+
+	gds for each cell
+	lef for each cell
+	timing library in .lib format
+	verilog behavioral model for each cell
+	spice netlist of each cell
+
+Micro Magic cell library characteristics:
+
+	P:N ratio 2:1
+
+	Five different size cells: A,B,C,D,E
+		Strength corresponds to output drive strength, thus a
+		INVC, AND2C, MUX2C all have the same drive strength but
+		have different input capacitances and intrinsic delays.
+
+		E = 2xD, D = 2xC, C = 2xB, B = 2xA
+
+	Larger cells would break electromigration limits for min. wires.
+	(really maximum current, not electromigration).
+
+	Not all sizes for all cells.  Typically, the more inputs,
+	the fewer sizes.
+
+Cells from Micro Magic 0.25 um Library
+
+MMI_AND2B,C
+MMI_AND3B,C
+MMI_AND4B,C
+MMI_AO21B,C
+MMI_AO22B,C
+MMI_AO31B,C
+MMI_AOI21A,B,C
+MMI_AOI22A,B
+MMI_AOI31A,B
+MMI_BUFB,C,D,E
+MMI_FFCB		flipflop with scan and async. clear
+MMI_FFSB		flipflop with scan and async. set
+MMI_INAND2A,B,C
+MMI_INOR2A,B,C
+MMI_INVA,B,C,D,E
+MMI_MUX2A,B,C,D
+MMI_MUX3B,C
+MMI_MUX4B,C
+MMI_MUXI2A,B,C
+MMI_MUXI3B,C
+MMI_MUXI4B,C
+MMI_NAND2A,B,C,D
+MMI_NAND3A,B,C
+MMI_NAND4A,B,C
+MMI_NOR2A,B,C,D
+MMI_NOR3A,B
+MMI_OA21B,C
+MMI_OA22B,C
+MMI_OA31B,C
+MMI_OAI21A,B,C
+MMI_OAI22A,B
+MMI_OAI31A,B
+MMI_OR2B,C
+MMI_OR3B,C
+MMI_XNOR2A,B,C
+MMI_XOR2A,B,C
+filler cells
+clock buffers
+
+Additional cells needed by equator:
+
+tristate buffers
+latches
+other flipflops 
+fully decoded muxes
+full adder/ half adder (maybe)
+???
+

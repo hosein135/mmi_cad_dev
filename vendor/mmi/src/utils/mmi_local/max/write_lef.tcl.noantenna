@@ -1,0 +1,286 @@
+# Creates a LEF file for the current max cell.
+
+# The next two lines go into the .maxrc to load this command and
+# place into the tool menu.
+#source $MMI_LOCAL/max/write_lef.tcl
+#menu_tool_cmd "write lef" write_lef
+
+# NOTE: only handles paint, NOT wirepaths or polygons, at present.
+
+# Only adds layers from the first metal layer up
+
+# Should not be used with Megacells.  Will create too much data for
+# a router to use.
+
+#====================================================================#
+
+# Technology dependent setup
+
+# If you want to write out layers in LEF that are different from the
+# MAX layer names, set up the WRITE_LEF array.  If a layer isn't defined
+# in this array, it is not translated.
+
+set WRITE_LEF(xlate,m1) M1
+set WRITE_LEF(xlate,m2) M2
+set WRITE_LEF(xlate,m3) M3
+set WRITE_LEF(xlate,m4) M4
+set WRITE_LEF(xlate,m5) M5
+set WRITE_LEF(xlate,m6) M6
+set WRITE_LEF(xlate,v12) VIA1
+set WRITE_LEF(xlate,v23) VIA2
+set WRITE_LEF(xlate,v34) VIA3
+set WRITE_LEF(xlate,v45) VIA4
+set WRITE_LEF(xlate,v56) VIA5
+
+# you can also translate pin
+
+set WRITE_LEF(xlate,vdd) VDD
+set WRITE_LEF(xlate,gnd) GND
+
+# Use this layer to set the bounding box of the cell
+set WRITE_LEF(boundary) prb
+
+# Site name for this lef
+set WRITE_LEF(site) CORE1
+
+# Mapping from global signal names to power/ground type.
+set WRITE_LEF(POWER) "VDD AVDD"
+set WRITE_LEF(GROUND) "GND VSS AGND AVSS"
+
+# for clocks
+set WRITE_LEF(CLOCK) "clk"
+
+#====================================================================#
+
+proc write_lef {} -desc {
+  write LEF for current cell to cell's directory.
+} {
+
+  global WRITE_LEF
+
+  # only metal layers are valid label layers
+  set metals [techinfo layers metal]
+  # metals and vias, but not contacts
+  set lef_layers [concat [lrange [techinfo layers via] 1 end] $metals]
+
+  # save so we can restore later
+  set save_box [lay_box]
+
+  # current cell name
+  set cell [lay_rootcell]
+
+  # find the directory
+  set dir [file dirname [lindex [cell_info $cell] 1]]
+  if {$dir == "."} {
+    set dir [pwd]
+  }
+
+  set filename $dir/$cell.lef
+  puts "Writing LEF for cell $cell to $filename ..."
+
+  set x1 0
+  set x2 0
+
+  # first look for the prboundary layer
+  if {[use_first WRITE_LEF(boundary)] != ""} {
+    if {![catch "sel_area -layers $WRITE_LEF(boundary) [lay_bbox]"]} {
+      # layer is a valid max layer
+      setl {x1 y1 x2 y2} [db_bbox -cell __SELECT__]
+    }
+  }
+
+  if {$x2 > [expr $x1 + 2 * [res]]} {
+    # got a valid bbox from the prboundary layer
+
+  } else {
+    # use the bbox of the cell.
+    setl {x1 y1 x2 y2} [db_bbox]
+    
+    if {$x2 < [expr $x1 + 2 * [res]]} {
+      warning "Aborting, the cell is empty.  Can't write LEF."
+      return
+    }
+  }
+
+  # clear any feedback or other annotations
+  clear_annotations
+
+  # need to expand all instances
+  eval lay_box [lay_bbox]
+  lay_internals -area
+  
+  # find all I/O and global labels
+  sel_labels -kind input
+  sel_labels -more -kind output
+  sel_labels -more -kind inout
+  sel_labels -more -kind global
+
+  set iog_labels [split [sel_what labels] \n]
+  if {$iog_labels == ""} {
+    warning "Aborting, cell has no I/O or global labels in it."
+    return
+  }
+
+  # open lef file for writing
+  if {[catch "open $filename w" FILE_ID]} {
+    # can't write file, abort
+    warning "Aborting, $FILE_ID"
+    return
+  }
+
+  # boiler plate
+  puts $FILE_ID "MACRO $cell"
+
+  puts $FILE_ID "\tCLASS CORE ;"
+  puts $FILE_ID "\tFOREIGN $cell $x1 $y1 ;"
+  puts $FILE_ID "\tSIZE [expr $x2 - $x1] BY [expr $y2 - $y1] ;"
+  puts $FILE_ID "\tSYMMETRY X Y ;"
+  puts $FILE_ID "\tSITE $WRITE_LEF(site) ;"
+
+  # look for unconnected/shorted
+  foreach label $iog_labels {
+    setl {layer lx1 ly1 lx2 ly2 pos text path} $label
+
+    if {$path != ""} {
+      # ignore labels in subcells
+      continue
+    }
+
+    if {[info exists save($label)]} {
+      # already processed this
+      continue
+    }
+
+    if {[info exists labels($text)]} {
+      # duplicate unconnected label
+      puts "WARNING, multiple unconnected nets of the same name ($text) in cell \"[lay_rootcell]\"."
+    }
+
+    # select all labels on this net
+    eval sel_net -point [center_coords $lx1 $ly1 $lx2 $ly2] $layer
+    foreach _label [split [sel_what labels] \n] {
+      
+      if {[lindex $_label 7] != ""} {
+	# ignore labels in subcells
+	continue
+      }
+
+#      if {[lindex $_label 9] == "hidden"} {
+#	# ignore hidden labels (???)
+#	continue
+#      }
+
+      set _text [lindex $_label 6]
+      if {$_text != $text} {
+	# different name, bad
+	puts "WARNING, duplicate labels on the same net: $text and $_text.  Ignoring $_text."
+      }
+
+      # remember we were here
+      set save($_label) 1
+    }
+
+    lappend labels($text) $label
+  }
+    
+  # Now add the pin layers for all of the labels
+  foreach label_list [array names labels] {
+
+    setl {layer lx1 ly1 lx2 ly2 pos text path group_unused kind} \
+	[lindex $labels($label_list) 0]
+
+    # translate pin name if needed
+    set text [use_first WRITE_LEF(xlate,$text) text]
+
+    puts $FILE_ID "\tPIN $text"
+
+    if {$kind == "global"} {
+      # special case for globals
+      puts $FILE_ID "\t\tDIRECTION inout ;"
+
+      if {[lsearch $WRITE_LEF(POWER) $text] != -1} {
+	puts $FILE_ID "\t\tUSE POWER ;"
+      } elseif {[lsearch $WRITE_LEF(GROUND) $text] != -1} {
+	puts $FILE_ID "\t\tUSE GROUND ;"
+      } else {
+	puts "WARNING, global pin $text is neither in POWER or GROUND list."
+      }
+
+    } else {
+      # signal
+      puts $FILE_ID "\t\tDIRECTION $kind ;"
+
+      if {[lsearch $WRITE_LEF(CLOCK) $text] != -1} {
+	puts $FILE_ID "\t\tUSE CLOCK ;"
+      } else {
+	puts $FILE_ID "\t\tUSE SIGNAL ;"
+      }
+    }
+
+    puts $FILE_ID "\t\tPORT"
+
+    foreach label $labels($label_list) {
+      setl {layer lx1 ly1 lx2 ly2 pos _text path group_unused kind} $label
+
+      if {[lsearch $metals $layer] == -1} {
+	puts "WARNING, label $_text on layer $layer instead of [join $metals ,]."
+      }
+
+      eval sel_net -point [center_coords $lx1 $ly1 $lx2 $ly2] $layer
+ 
+      foreach paint [split [sel_what paint] \n] {
+	# remember that we already encountered this paint
+	set save_paint($paint) 1
+
+	set player [lindex $paint 0]
+	if {[lsearch $lef_layers $player] != -1} {
+	  # legal layer, write it out
+	  puts $FILE_ID \
+	      "\t\t\tLAYER [use_first WRITE_LEF(xlate,$player) player] ;"
+	  puts $FILE_ID "\t\t\tRECT [lrange $paint 1 4] ;"
+	}
+      }
+    }
+
+    puts $FILE_ID "\t\tEND"
+    puts $FILE_ID "\tEND $text"
+  }
+
+  if {[db_search polygons -any_cell [join $lef_layers ,]] != "" || \
+	  [db_search wirepaths -any_cell [join $lef_layers ,]] != ""} {
+    puts "WARNING, polygons/wirepaths ignored."
+  }
+
+  # Now add the obstruction layers
+  puts $FILE_ID "\tOBS"
+
+  # block layers that are not connected to I/O's or globals and are in 
+  # the first metal and above
+
+  eval sel_area -any_cell -layers [join $lef_layers ,] [lay_bbox]
+
+  foreach paint [split [sel_what paint] \n] {
+
+    if {[info exists save_paint($paint)]} {
+      # already got this
+      continue
+    }
+
+    set player [lindex $paint 0]
+    puts $FILE_ID "\t\tLAYER [use_first WRITE_LEF(xlate,$player) player] ;"
+    puts $FILE_ID "\t\tRECT [lrange $paint 1 4] ;"
+  }
+
+  puts $FILE_ID "\tEND"
+ 
+  puts $FILE_ID "END $cell"
+ 
+  # close the file
+  close $FILE_ID
+ 
+  # clear selection and restore box
+  sel_clear
+  eval lay_box $save_box
+ 
+  puts "Done."
+}

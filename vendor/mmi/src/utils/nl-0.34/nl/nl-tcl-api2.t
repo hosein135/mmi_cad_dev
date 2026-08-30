@@ -1,0 +1,270 @@
+nl_ast_child_addr
+nl_ast_copy
+nl_ast_copy_tree
+nl_ast_create
+nl_ast_dump
+nl_ast_dump_fl
+nl_ast_dump_l
+nl_ast_dump_w
+nl_ast_dup
+nl_ast_free
+nl_ast_free_tree
+nl_ast_get_args
+nl_ast_inherit_file_line
+nl_ast_is_expr
+nl_ast_link
+nl_ast_make
+nl_ast_prewalk
+nl_ast_set_child
+nl_ast_set_file_line
+nl_ast_set_sibling
+nl_ast_set_token
+nl_ast_set_width
+nl_ast_sibling_addr
+nl_ast_walk
+nl_attr_create				nl_create_attribute
+nl_attr_get				nl_attr_initialize
+nl_attr_set				nl_bus_add_cell
+nl_bus_add_libpin
+nl_bus_add_net
+nl_bus_add_port
+nl_bus_add_refpin
+nl_bus_attr_create
+nl_bus_attr_get
+nl_bus_attr_set
+nl_bus_create				nl_create_libpin_bus
+					nl_create_net_bus
+					nl_create_port_bus
+nl_bus_get_member			lindex [get_bus_members]
+nl_bus_set_type				
+nl_bus_width				llength [get_bus_members]
+nl_cell_attr_create			nl_create_cell_attribute
+nl_cell_attr_get			nl_get_cell_attribute
+nl_cell_attr_get_by_name		nl_get_cell_attribute
+nl_cell_attr_set			nl_set_cell_attribute
+nl_cell_attr_set_by_name		nl_set_cell_attribute
+nl_cell_create				nl_create_cell
+nl_cell_disconnect			
+nl_cell_get_pin_by_name			nl_get_cell_pin
+nl_cell_get_pin_by_refpin		
+nl_cell_rename				nl_rename_cell
+nl_cell_set_file_line			
+nl_cell_set_reference			
+nl_context_advance_inet_timestamp	
+nl_context_create			n.a.
+nl_context_free				n.a.
+nl_context_get_design_by_name		nl_find_designs
+nl_context_get_library_by_name		
+nl_context_remove_design		nl_remove_design
+nl_context_remove_library		nl_remove_library
+nl_context_set_current_design		set nl_current_design
+nl_design_add_supply0			nl_create_net
+nl_design_add_supply1			nl_create_net
+nl_design_add_symbol			
+nl_design_attr_create			nl_create_design_attribute
+nl_design_attr_get			nl_get_design_attribute
+nl_design_attr_get_by_name		nl_get_design_attribute
+nl_design_attr_set			nl_set_design_attribute
+nl_design_attr_set_by_name		nl_set_design_attribute
+nl_design_create			nl_create_design
+nl_design_first_idesign			
+nl_design_get_attr_by_name		nl_find_attributes
+nl_design_get_cell_by_name		nl_find_cells
+nl_design_get_net_by_name		nl_find_nets
+nl_design_get_net_or_bus_by_name	
+nl_design_get_object_by_name		
+nl_design_get_port_by_name		nl_find_ports
+nl_design_get_reference_by_name		nl_find_references
+nl_design_get_subprogram_by_name	
+nl_design_get_symbol_by_name		
+nl_design_get_type_by_name		nl_find_types
+nl_design_num_attrs			llength [nl_list_attributes]
+nl_design_num_cell_buses		
+nl_design_num_cells			llength [nl_list_cells]
+nl_design_num_idesigns
+nl_design_num_net_buses	
+nl_design_num_nets			llength [nl_list_nets]
+nl_design_num_port_buses		
+nl_design_num_ports			llength [nl_list_ports]
+nl_design_num_references		llength [nl_list_references]
+nl_design_num_types			llength [nl_list_types]
+nl_design_remove_attr			nl_remove_attribute
+nl_design_remove_cell			nl_remove_cell
+nl_design_remove_cell_bus
+nl_design_remove_net			nl_remove_net
+nl_design_remove_net_bus
+nl_design_remove_port			nl_remove_port
+nl_design_remove_port_bus
+nl_design_remove_reference		
+nl_design_remove_subprogram
+nl_design_rename
+nl_design_set_bus_naming_style		set nl_bus_naming_style
+nl_design_set_libcell			nl_set_libcell
+nl_dll_gen_first
+nl_dll_gen_next
+nl_icell_attr_create
+nl_icell_attr_get
+nl_icell_attr_get_by_name
+nl_icell_attr_set
+nl_icell_attr_set_by_name
+nl_icell_get_ipin_by_refpin
+nl_icell_name				nl_get_cell_name
+nl_icell_reference			nl_get_cell_reference
+nl_icell_root_idesign
+nl_id_ast_create
+nl_id_ast_set_name
+nl_idesign_alloc_attr
+nl_idesign_attr_create
+nl_idesign_attr_get
+nl_idesign_attr_get_by_name
+nl_idesign_attr_set
+nl_idesign_create
+nl_idesign_get_attr_by_name
+nl_idesign_get_icell
+nl_idesign_get_icell_by_name
+nl_idesign_get_inet
+nl_idesign_get_inet_by_name
+nl_idesign_get_iobject
+nl_idesign_get_ipin
+nl_idesign_get_iport
+nl_idesign_get_iport_by_name
+nl_idesign_get_or_create
+nl_idesign_name
+nl_idesign_remove_attr
+nl_in_ast_create
+nl_in_ast_set_index
+nl_inet_attr_create
+nl_inet_attr_get
+nl_inet_attr_get_by_name
+nl_inet_attr_set
+nl_inet_attr_set_by_name
+nl_inet_name				nl_get_net_name
+nl_inet_set_timestamp
+nl_ipin_attr_create
+nl_ipin_attr_get
+nl_ipin_attr_set
+nl_ipin_direction
+nl_ipin_down_iport
+nl_ipin_inet
+nl_ipin_name				nl_get_pin_name
+nl_ipin_owner				nl_get_pin_owner
+nl_iport_attr_create
+nl_iport_attr_get
+nl_iport_attr_get_by_name
+nl_iport_attr_set
+nl_iport_create
+nl_iport_direction
+nl_iport_ipin
+nl_iport_name
+nl_libcell_attr_create			
+nl_libcell_attr_get
+nl_libcell_attr_set
+nl_libcell_create			nl_create_libcell
+nl_libcell_get_libpin_by_name
+nl_libpin_attr_create
+nl_libpin_attr_get
+nl_libpin_attr_set
+nl_libpin_create			nl_create_libpin
+nl_libpin_set_bus_and_offset
+nl_libpin_set_direction
+nl_libpin_set_use
+nl_library_attr_create
+nl_library_attr_get
+nl_library_attr_get_by_name
+nl_library_attr_set
+nl_library_create			nl_create_library
+nl_library_get_attr_by_name
+nl_library_get_libcell_by_name
+nl_library_get_type_by_name
+nl_library_remove_attr
+nl_net_all_hierarchy_pins
+nl_net_attr_create
+nl_net_attr_get
+nl_net_attr_get_by_name
+nl_net_attr_set
+nl_net_attr_set_by_name
+nl_net_create
+nl_net_num_pins
+nl_net_rename
+nl_net_set_class
+nl_number_ast_create
+nl_number_ast_set_value
+nl_out_ast_create
+nl_out_ast_set_index
+nl_pin_attr_create
+nl_pin_attr_get
+nl_pin_attr_get_by_name
+nl_pin_attr_set
+nl_pin_attr_set_by_name
+nl_pin_connect_net
+nl_pin_create
+nl_pin_direction
+nl_pin_disconnect
+nl_pin_name
+nl_port_attr_create
+nl_port_attr_get
+nl_port_attr_get_by_name
+nl_port_attr_set
+nl_port_attr_set_by_name
+nl_port_connect_net
+nl_port_create
+nl_port_rename
+nl_ref_ast_create
+nl_ref_ast_set_object
+nl_reference_add_bus
+nl_reference_add_parameter
+nl_reference_attr_create
+nl_reference_attr_get
+nl_reference_attr_get_by_name
+nl_reference_attr_set
+nl_reference_attr_set_by_name
+nl_reference_create
+nl_reference_get_refpin_by_name
+nl_reference_inout_width
+nl_reference_input_width
+nl_reference_link
+nl_reference_num_instances
+nl_reference_output_width
+nl_reference_set_tree
+nl_reference_unlink
+nl_refpin_attr_create
+nl_refpin_attr_get
+nl_refpin_attr_get_by_name
+nl_refpin_attr_set
+nl_refpin_attr_set_by_name
+nl_refpin_create
+nl_refpin_create_bus
+nl_refpin_rename
+nl_refpin_set_direction
+nl_subprogram_add_formal
+nl_subprogram_add_local
+nl_subprogram_add_symbol
+nl_subprogram_create
+nl_subprogram_get_symbol_by_name
+nl_subprogram_num_formals
+nl_subprogram_set_body
+nl_subprogram_set_pragmas
+nl_symbol_add_constituent
+nl_symbol_attr_create
+nl_symbol_attr_get
+nl_symbol_attr_set
+nl_symbol_create
+nl_symbol_get_constituent
+nl_symbol_set_binding
+nl_type_array_depth
+nl_type_copy
+nl_type_get_array
+nl_type_get_index_for_offset
+nl_type_get_integer
+nl_type_get_offset_for_index
+nl_type_get_scalar
+nl_type_width
+nl_vnum_ast_create
+nl_vnum_ast_set_bits
+nl_walk_cells
+nl_walk_connected_nets
+nl_walk_connected_nets_and_pins
+nl_walk_connected_pins
+nl_walk_hierarchy
+nl_walk_idesigns
+nl_walk_nets

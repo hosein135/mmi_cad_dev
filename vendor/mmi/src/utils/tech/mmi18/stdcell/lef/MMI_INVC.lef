@@ -1,0 +1,53 @@
+MACRO MMI_INVC
+	CLASS CORE ;
+	FOREIGN MMI_INVC 0 0 ;
+	SIZE 2.22 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.9 1.11 1.24 5.95 ;
+		END
+		AntennaDiffArea 1.8768 ;
+	END out
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 1.62 0.5 1.96 2.87 ;
+			LAYER M1 ;
+			RECT 0 -0.5 2.22 0.5 ;
+		END
+	END GND
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 2.22 7.9 ;
+			LAYER M1 ;
+			RECT 0.18 4.19 0.52 6.9 ;
+			LAYER M1 ;
+			RECT 1.62 4.19 1.96 6.9 ;
+		END
+	END VDD
+	PIN in
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.625 3.5 2.075 3.555 ;
+			LAYER M1 ;
+			RECT 1.56 3.16 2.075 3.5 ;
+			LAYER M1 ;
+			RECT 1.625 3.105 2.075 3.16 ;
+		END
+		AntennaGateArea 0.9936 ;
+	END in
+	OBS
+	END
+END MMI_INVC

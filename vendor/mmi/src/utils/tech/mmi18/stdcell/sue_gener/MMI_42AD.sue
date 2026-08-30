@@ -1,0 +1,362 @@
+# Created using mapper from:
+#"MMI_42AD {D {MMI_42ADD {In1_H In1_H} {In2_H In2_H} {In3_H In3_H} {In4_H In4_H} {Cin_L Cin_L} {Sum_H Sum_H} {Carry_H Carry_H} {Cout_L Cout_L}}} "
+
+proc SCHEMATIC_MMI_42AD args {
+  call_use_keyword $args {{Size "D"}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    D {
+
+  make input -orient R90 -name In1_H -origin {520 -150}
+  make input -orient R90 -name In2_H -origin {670 -160}
+  make input -orient R90 -name In3_H -origin {1210 -150}
+  make input -orient R90 -name In4_H -origin {1360 -150}
+  make output -orient R90 -name Carry_H -origin {1200 1280}
+  make output -orient R90 -name Sum_H -origin {1550 1280}
+  generate name_net_s name_net -cell name_net
+  make name_net -name In1_XNOR_In2 -origin {530 370}
+  make name_net -name In1_XOR_In2 -origin {870 370}
+  make name_net -name In3_XNOR_In4 -origin {1220 370}
+  make name_net -name In3_XOR_In4 -origin {1560 370}
+  make name_net -name even_inputs -origin {1030 660}
+  make name_net -name odd_inputs -origin {1370 660}
+  make output -orient RXY -name Cout_L -origin {-120 610}
+  make input -orient RXY -name Cin_L -origin {1770 610}
+  make nmos -orient RXY -W 0.8 -origin {1640 960}
+  make nmos -orient RXY -W 0.8 -origin {1480 960}
+  make nmos -orient RXY -W 0.8 -origin {1300 960}
+  make nmos -orient RXY -W 0.8 -origin {1140 960}
+  make pmos -W 1.6 -origin {930 570}
+  make pmos -W 1.6 -origin {1090 570}
+  make pmos -W 1.6 -origin {1270 570}
+  make pmos -W 1.6 -origin {1430 570}
+  make pmos -W 3.2 -origin {1120 280}
+  make nmos -orient RXY -W 1.6 -origin {1160 280}
+  make nmos -orient RXY -W 1.6 -origin {1320 280}
+  make nmos -orient RXY -W 1.6 -origin {1500 280}
+  make nmos -orient RXY -W 1.6 -origin {1660 280}
+  make pmos -W 3.2 -origin {1280 280}
+  make pmos -W 3.2 -origin {1460 280}
+  make pmos -W 3.2 -origin {1620 280}
+  generate aoi aoi22 -inputs {2 2}
+  make aoi22 -orient R90X -WP 4.56 -WN 2.76 -origin {-20 230}
+  make inverter -orient R90 -WP 2.4 -WN 1.2 -origin {1210 60}
+  make inverter -orient R90 -WP 1.6 -WN 0.8 -origin {520 60}
+  make pmos -W 1.6 -origin {430 280}
+  make nmos -orient RXY -W 0.8 -origin {470 280}
+  make nmos -orient RXY -W 0.8 -origin {630 280}
+  make nmos -orient RXY -W 0.8 -origin {810 280}
+  make nmos -orient RXY -W 0.8 -origin {970 280}
+  make pmos -W 1.6 -origin {590 280}
+  make pmos -W 1.6 -origin {770 280}
+  make pmos -W 1.6 -origin {930 280}
+  make inverter -orient R90 -WP 4.4 -WN 2.2 -origin {1360 50}
+  make nmos -orient RXY -W 0.8 -origin {970 570}
+  make nmos -orient RXY -W 0.8 -origin {1130 570}
+  make nmos -orient RXY -W 0.8 -origin {1310 570}
+  make nmos -orient RXY -W 0.8 -origin {1470 570}
+  make inverter -orient R90 -WP 1.86 -WN 1.24 -origin {1550 1090}
+  make pmos -W 1.6 -origin {1100 960}
+  make pmos -W 1.6 -origin {1260 960}
+  make pmos -W 1.6 -origin {1440 960}
+  make pmos -W 1.6 -origin {1600 960}
+  make inverter -orient R90 -WP 2.48 -WN 1.24 -origin {1200 1090}
+  make inverter -orient R90 -WP 1.6 -WN 0.8 -origin {670 50}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -orient R90X -WP 4.4 -WN 2.2 -origin {230 760}
+  make inverter1 -orient R90X -WP 3.2 -WN 3.2 -origin {1550 760}
+  generate oai oai2_2 -inputs {2 2}
+  make oai2_2 -orient R90 -WP 3.68 -WN 1.84 -origin {300 230}
+  make inverter1 -orient R90 -WP 7.36 -WN 3.68 -origin {1200 1200}
+  make inverter1 -orient R90 -WP 7.36 -WN 3.68 -origin {1550 1200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 05/23/00 -origin {110 1370}
+  make_wire 430 320 470 320
+  make_wire 590 320 630 320
+  make_wire 770 320 810 320
+  make_wire 930 320 970 320
+  make_wire 1030 280 1030 220
+  make_wire 700 280 690 280
+  make_wire 700 280 710 280
+  make_wire 700 220 1030 220
+  make_wire 700 220 700 280
+  make_wire 700 220 370 220
+  make_wire 450 240 470 240
+  make_wire 450 240 430 240
+  make_wire 950 240 970 240
+  make_wire 950 240 930 240
+  make_wire 670 160 450 160
+  make_wire 670 160 950 160
+  make_wire 610 -20 670 -20
+  make_wire 610 240 630 240
+  make_wire 610 240 590 240
+  make_wire 610 200 790 200
+  make_wire 790 200 790 240
+  make_wire 790 240 810 240
+  make_wire 790 240 770 240
+  make_wire 1100 1000 1140 1000
+  make_wire 1440 1000 1480 1000
+  make_wire 1600 1000 1640 1000
+  make_wire 1700 960 1700 900
+  make_wire 1370 960 1360 960
+  make_wire 1370 960 1380 960
+  make_wire 1370 900 1040 900
+  make_wire 1460 920 1480 920
+  make_wire 1460 920 1440 920
+  make_wire 1620 920 1640 920
+  make_wire 1620 920 1600 920
+  make_wire 1540 860 1540 960
+  make_wire 1460 920 1460 830
+  make_wire 1040 900 1040 960
+  make_wire 1300 1000 1260 1000
+  make_wire 610 -20 610 200
+  make_wire 610 200 610 240
+  make_wire 870 180 870 280
+  make_wire 950 160 950 240
+  make_wire 670 100 670 160
+  make_wire 450 160 450 240
+  make_wire 1200 1000 1260 1000
+  make_wire 1200 1000 1140 1000
+  make_wire 1550 1000 1600 1000
+  make_wire 1550 1000 1480 1000
+  make_wire 520 110 520 180
+  make_wire 520 180 530 180
+  make_wire 530 180 870 180
+  make_wire 530 180 530 280
+  make_wire 530 320 590 320
+  make_wire 530 320 470 320
+  make_wire 870 320 810 320
+  make_wire 870 320 930 320
+  make_wire 370 220 370 280
+  make_wire 1120 320 1160 320
+  make_wire 1280 320 1320 320
+  make_wire 1460 320 1500 320
+  make_wire 1620 320 1660 320
+  make_wire 1720 280 1720 220
+  make_wire 1390 280 1380 280
+  make_wire 1390 280 1400 280
+  make_wire 1390 220 1720 220
+  make_wire 1390 220 1390 280
+  make_wire 1390 220 1060 220
+  make_wire 1140 240 1160 240
+  make_wire 1140 240 1120 240
+  make_wire 1640 240 1660 240
+  make_wire 1640 240 1620 240
+  make_wire 1360 160 1140 160
+  make_wire 1360 160 1640 160
+  make_wire 1300 -20 1360 -20
+  make_wire 1300 240 1320 240
+  make_wire 1300 240 1280 240
+  make_wire 1300 200 1480 200
+  make_wire 1480 200 1480 240
+  make_wire 1480 240 1500 240
+  make_wire 1480 240 1460 240
+  make_wire 1060 -20 1210 -20
+  make_wire 1060 -20 1060 220
+  make_wire 1300 -20 1300 200
+  make_wire 1300 200 1300 240
+  make_wire 1560 180 1560 280
+  make_wire 1640 160 1640 240
+  make_wire 1360 100 1360 160
+  make_wire 1140 160 1140 240
+  make_wire 1210 110 1210 180
+  make_wire 1210 180 1220 180
+  make_wire 1220 180 1560 180
+  make_wire 1220 180 1220 280
+  make_wire 1220 320 1280 320
+  make_wire 1220 320 1160 320
+  make_wire 1560 320 1500 320
+  make_wire 1560 320 1620 320
+  make_wire 1060 220 1060 280
+  make_wire 1360 -150 1360 -160
+  make_wire 930 610 970 610
+  make_wire 1090 610 1130 610
+  make_wire 1270 610 1310 610
+  make_wire 1430 610 1470 610
+  make_wire 1530 570 1530 510
+  make_wire 1200 570 1190 570
+  make_wire 1200 570 1210 570
+  make_wire 1200 510 1530 510
+  make_wire 1200 510 1200 570
+  make_wire 1200 510 870 510
+  make_wire 950 530 970 530
+  make_wire 950 530 930 530
+  make_wire 1450 530 1470 530
+  make_wire 1450 530 1430 530
+  make_wire 1110 530 1130 530
+  make_wire 1110 530 1090 530
+  make_wire 1110 490 1290 490
+  make_wire 1290 530 1310 530
+  make_wire 1290 530 1270 530
+  make_wire 1110 490 1110 530
+  make_wire 1370 470 1370 570
+  make_wire 950 450 950 530
+  make_wire 1030 470 1370 470
+  make_wire 1030 610 1090 610
+  make_wire 1030 610 970 610
+  make_wire 1370 610 1310 610
+  make_wire 1370 610 1430 610
+  make_wire 530 470 1030 470
+  make_wire 1290 490 1290 530
+  make_wire 870 510 870 570
+  make_wire 1030 470 1030 570
+  make_wire 1450 450 1450 530
+  make_wire 870 320 870 370
+  make_wire 1700 900 1370 900
+  make_wire 1290 490 1560 490
+  make_wire 1360 -20 1360 20
+  make_wire 520 -150 520 -20
+  make_wire 520 -20 520 30
+  make_wire 1210 -20 1210 30
+  make_wire 670 -20 670 20
+  make_wire 120 -20 120 230
+  make_wire 80 -50 80 230
+  make_wire 30 -80 30 230
+  make_wire -10 -110 -10 230
+  make_wire 370 -20 520 -20
+  make_wire 290 -20 290 230
+  make_wire 250 -50 250 230
+  make_wire 200 -80 200 230
+  make_wire 160 -110 160 230
+  make_wire 1120 920 1140 920
+  make_wire 1120 920 1100 920
+  make_wire 1280 830 1280 920
+  make_wire 1280 920 1260 920
+  make_wire 1280 920 1300 920
+  make_wire 1560 320 1560 370
+  make_wire 1560 370 1560 490
+  make_wire 530 320 530 370
+  make_wire 530 370 530 470
+  make_wire 1030 860 1200 860
+  make_wire 1200 860 1540 860
+  make_wire 870 510 870 370
+  make_wire 1220 320 1220 370
+  make_wire 1220 370 1220 450
+  make_wire 1220 450 950 450
+  make_wire 1220 450 1450 450
+  make_wire 1200 860 1200 960
+  make_wire -120 610 50 610
+  make_wire 1370 960 1370 900
+  make_wire 1620 920 1620 930
+  make_wire 1280 830 1460 830
+  make_wire 1460 830 1550 830
+  make_wire 50 400 50 610
+  make_wire 1030 610 1030 660
+  make_wire 1030 660 1030 860
+  make_wire 1370 610 1370 660
+  make_wire 1370 660 1370 900
+  make_wire 1550 610 1620 610
+  make_wire 1620 610 1770 610
+  make_wire 1120 830 1120 920
+  make_wire 1360 -150 1360 -110
+  make_wire 1360 -110 1360 -20
+  make_wire 670 -160 670 -50
+  make_wire 670 -50 670 -20
+  make_wire 370 -20 370 220
+  make_wire 1210 -150 1210 -80
+  make_wire 1210 -80 1210 -20
+  make_wire 1200 1170 1200 1140
+  make_wire 1550 1170 1550 1140
+  make_wire 1550 1000 1550 1060
+  make_wire 1200 1000 1200 1060
+  make_wire 1550 1250 1550 1280
+  make_wire 1200 1250 1200 1280
+  make_wire 1550 730 1550 610
+  make_wire 1550 810 1550 830
+  make_wire 1620 610 1620 920
+  make_wire 230 810 230 830
+  make_wire 230 830 1120 830
+  make_wire 230 400 230 730
+  make_wire -10 -110 160 -110
+  make_wire 160 -110 1360 -110
+  make_wire 30 -80 200 -80
+  make_wire 200 -80 1210 -80
+  make_wire 250 -50 80 -50
+  make_wire 250 -50 670 -50
+  make_wire 290 -20 120 -20
+  make_wire 290 -20 370 -20
+  make_text -origin {-240 -340} -text {4:2 Adder for use in multipliers}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_42AD MMI_42ADD -Size D -DeMorgan 0
+        make MMI_42ADD -origin "$urx $ury"
+    }
+
+  }
+}
+
+
+proc NAME_MMI_42AD args {
+  call_use_keyword $args {{Size "D"}}
+
+  set nom MMI_42AD[string toupper $Size]
+
+  return $nom
+}
+
+
+proc ICON_MMI_42AD args {
+  icon_generator $args {{Size "D" {radio D}} }
+
+  set size [string toupper $Size]
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "D")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_42AD icon body
+  icon_line -60 -120 -60 120 60 120 60 -120 -60 -120
+
+  # properties
+  icon_property -origin {0 -60} -size large -anchor center -label {Custom}
+  icon_property -origin {0 0} -size large -anchor center -label {4:2 Adder}
+  icon_property -origin {-50 -90} -size small -label In1_H
+  icon_property -origin {-50 -30} -size small -label In2_H
+  icon_property -origin {-50 30} -size small -label In3_H
+  icon_property -origin {-50 90} -size small -label In4_H
+  icon_property -origin {0 110} -size small -anchor center -label Cin_L
+  icon_property -origin {50 30} -size small -anchor e -label S_H
+  icon_property -origin {50 -30} -size small -anchor e -label C_H
+  icon_property -origin {0 -110} -size small -anchor center -label Cout_L
+
+  # inputs
+  icon_term -type input -origin {-60 -90} -name In1_H
+  icon_term -type input -origin {-60 -30} -name In2_H
+  icon_term -type input -origin {-60 30} -name In3_H
+  icon_term -type input -origin {-60 90} -name In4_H
+  icon_term -type input -origin {0 120} -orient R270 -name Cin_L
+
+  # outputs
+  icon_term -type output -origin {60 30} -name Sum_H
+  icon_term -type output -origin {60 -30} -name Carry_H  
+  icon_term -type output -origin {0 -120} -orient R270 -name Cout_L
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_42AD -Size $Size]
+  set nname [NAME_MMI_42AD -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    D {
+    set pnames ".In1_H(\$In1_H), .In2_H(\$In2_H), .In3_H(\$In3_H), .In4_H(\$In4_H), .Cin_L(\$Cin_L), .Sum_H(\$Sum_H), .Carry_H(\$Carry_H), .Cout_L(\$Cout_L)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

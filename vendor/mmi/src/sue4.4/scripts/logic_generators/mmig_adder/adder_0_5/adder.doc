@@ -1,0 +1,90 @@
+Documentation for adder
+-----------------------
+rev 0.2, 2/5/99:   Added support for HalfHeight layout
+rev 0.3, 2/19/99:  Changed from TSMC25 icons to MMI generic icons
+rev 0.4, 3/9/99:   Updated to final MMI generic icons;
+                   Partitioned adder now outputs the sub-chain carry out's
+rev 0.5, 3/26/99:  UsePrevCout property added, to allow the carry-in to the
+                   msb of a chain to be visible outside the adder.
+
+The adder generator is used to derive adders of the following types:
+  - ripple carry
+  - carry select
+
+These are the input arguments:
+
+  NBITS:  
+    Definition:  
+      The number of bits in the adder.
+    Legal Values:  
+      The ripple carry adder allows 1 <= NBITS <= 128.
+      The carry select adder allows 4 <= NBITS <= 128, since a ripple adder 
+      is more efficient than a carry select adder for just a few bits.
+    Default:  
+      32
+
+  Type:
+    Definition:
+      The adder algorithm used.
+    Legal Values:
+      Carry Select ("CS") or Ripple ("Ripple")
+    Default:
+      Carry Select
+
+  Partition:
+    Definition:
+      Either type of adder can be partitioned into smaller adders.  When
+      you designate a bit as a partition bit, a mux is added to the carry in
+      to that bit.  If the "Inject" signal corresponding to that bit position
+      is asserted, the value of C_H is used as the carry in to that bit;
+      otherwise, the carry out of the previous bit is used.  The carry out
+      of each partition is an output of the adder.
+    Legal Values:
+      No partitioning ("N"), or a list of bit positions separated by spaces, 
+      i.e. "1 5 27".  The legal values for the bit positions are 1 to
+      (NBITS - 1), inclusive.
+    Default:
+      N
+
+  UsePrevCout:
+    Definition:
+      This argument allows the carry-in's to the msb of any chain (meaning
+      the msb of any partition, and the msb of the entire adder) to be 
+      visible outside the adder.  Useful for overflow/underflow detection.
+    Legal Values:
+      The allowed values of this argument are "Y" (make carry-in's visible)
+      and "N" (don't).
+    Default:
+      N
+      
+  OutputSize:
+    Definition:
+      This argument selects the final drive size of the adder.  
+    Legal Values:
+      The supported strengths are A, B, and C.
+    Default:
+      C
+
+  HalfHeight:
+    Definition:
+      This argument allows the user to specify that the layout be done in
+      (NBITS_A + NBITS_B)/2 bit positions, instead of (NBITS_A + NBITS_B) 
+      bit positions.  Note that if (NBITS_A + NBITS_B)/2 is an odd number of
+      bit positions, the layout will actually fit in 
+      ((NBITS_A + NBITS_B)/2 + 1) bit positions.
+      This configuration results in a slightly slower and less area 
+      efficient design.
+    Legal Values:
+      The allowed values of this argument are "Y" (half height layout)
+      and "N" (full height layout).
+    Default:
+      N
+
+  bitslice:
+    Definition:
+      This argument directs DPC to enforce bitslice layout, or not.  
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+

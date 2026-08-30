@@ -1,0 +1,682 @@
+VERSION  5.3 ;
+NAMESCASESENSITIVE ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS  "[]" ;
+DESIGN mux32 ;
+UNITS DISTANCE MICRONS 1000 ;
+
+HISTORY CREATETIME 19 March 2001 11:24:33 ;
+HISTORY SAVETIME 19 March 2001 11:24:34 ;
+HISTORY DB CREATE by jka ;
+HISTORY Name: LBRARY, dir: '' ;
+HISTORY SE version: 5.3.60 MASTER, DB code version: 5.1, DB created under: 5.1 ;
+HISTORY Max mem: 25165824, mainsail: $TNT_INST_DIR/tools/dsm/lib/sys1620r.olb:
+        16.20 ;
+HISTORY System no. 19 --> SPARC UNIX, CPU id = 'Sun_Microsystems: 2163244025' ;
+HISTORY Design saved as LBRARY in directory  ;
+HISTORY DB LOAD by jka ;
+HISTORY Name: LBRARY, dir: '' ;
+HISTORY SE version: 5.3.60 MASTER, DB code version: 5.1, DB created under: 5.1 ;
+HISTORY Max mem: 25165824, mainsail: $TNT_INST_DIR/tools/dsm/lib/sys1620r.olb:
+        16.20 ;
+HISTORY System no. 19 --> SPARC UNIX, CPU id = 'Sun_Microsystems: 2163244025' ;
+HISTORY INPUT VERILOG FILENAME "../se/mmi25.v mux32.v" LIB "lib" DESIGN
+        "lib.mux32:hdl" ;
+HISTORY INPUT DEF FILENAME "mux32.plan.def" ;
+HISTORY QPLACE FILENAME "mux32.qpconfig" ;
+
+
+PROPERTYDEFINITIONS
+DESIGN  VERILOGDESIGNNAME  STRING  "lib.mux32:hdl"  ;
+
+END PROPERTYDEFINITIONS
+DIEAREA ( 0 0 ) ( 192000 30000 ) ;
+
+ROW ROW_01 CORE1 0 0 N DO 192 BY 1 STEP 1000 10000 ;
+ROW ROW_02 CORE1 0 10000 S DO 192 BY 1 STEP 1000 10000 ;
+ROW ROW_03 CORE1 0 20000 N DO 192 BY 1 STEP 1000 10000 ;
+TRACKS Y 500 DO 30 STEP 1000 LAYER M1 M2 M3 M4 M5 ;
+TRACKS X 500 DO 192 STEP 1000 LAYER M1 M2 M3 M4 M5 ;
+GCELLGRID Y 500 DO 4 STEP 13500 ;
+GCELLGRID X 500 DO 14 STEP 14700 ;
+
+VIAS 4 ;
+- VIA12 + RECT M2 ( -280 -280 ) ( 280 280 ) + RECT VIA1 ( -180 -180 )
+  ( 180 180 ) + RECT M1 ( -280 -280 ) ( 280 280 ) ;
+- VIA23 + RECT M3 ( -280 -280 ) ( 280 280 ) + RECT VIA2 ( -180 -180 )
+  ( 180 180 ) + RECT M2 ( -280 -280 ) ( 280 280 ) ;
+- VIA34 + RECT M4 ( -280 -280 ) ( 280 280 ) + RECT VIA3 ( -180 -180 )
+  ( 180 180 ) + RECT M3 ( -280 -280 ) ( 280 280 ) ;
+- VIA45 + RECT M5 ( -270 -270 ) ( 270 270 ) + RECT VIA4 ( -180 -180 )
+  ( 180 180 ) + RECT M4 ( -270 -270 ) ( 270 270 ) ;
+END VIAS
+
+COMPONENTS 128 ;
+- u1$31$ MMI_INVB + PLACED ( 0 0 ) FN ;
+- u1$30$ MMI_INVB + PLACED ( 6000 0 ) FN ;
+- u1$29$ MMI_INVB + PLACED ( 13000 0 ) FN ;
+- u1$28$ MMI_INVB + PLACED ( 19000 0 ) FN ;
+- u1$27$ MMI_INVB + PLACED ( 25000 0 ) FN ;
+- u1$26$ MMI_INVB + PLACED ( 26000 10000 ) FS ;
+- u1$25$ MMI_INVB + PLACED ( 37000 0 ) FN ;
+- u1$24$ MMI_INVB + PLACED ( 42000 0 ) N ;
+- u1$23$ MMI_INVB + PLACED ( 48000 0 ) FN ;
+- u1$22$ MMI_INVB + PLACED ( 53000 20000 ) N ;
+- u1$21$ MMI_INVB + PLACED ( 59000 0 ) FN ;
+- u1$20$ MMI_INVB + PLACED ( 66000 0 ) FN ;
+- u1$19$ MMI_INVB + PLACED ( 73000 0 ) FN ;
+- u1$18$ MMI_INVB + PLACED ( 79000 0 ) FN ;
+- u1$17$ MMI_INVB + PLACED ( 83000 20000 ) FN ;
+- u1$16$ MMI_INVB + PLACED ( 91000 0 ) FN ;
+- u1$15$ MMI_INVB + PLACED ( 97000 0 ) FN ;
+- u1$14$ MMI_INVB + PLACED ( 99000 10000 ) S ;
+- u1$13$ MMI_INVB + PLACED ( 109000 0 ) FN ;
+- u1$12$ MMI_INVB + PLACED ( 115000 0 ) FN ;
+- u1$11$ MMI_INVB + PLACED ( 121000 0 ) N ;
+- u1$10$ MMI_INVB + PLACED ( 129000 10000 ) FS ;
+- u1$9$ MMI_INVB + PLACED ( 133000 0 ) FN ;
+- u1$8$ MMI_INVB + PLACED ( 139000 0 ) FN ;
+- u1$7$ MMI_INVB + PLACED ( 145000 0 ) FN ;
+- u1$6$ MMI_INVB + PLACED ( 151000 0 ) FN ;
+- u1$5$ MMI_INVB + PLACED ( 157000 0 ) FN ;
+- u1$4$ MMI_INVB + PLACED ( 163000 0 ) FN ;
+- u1$3$ MMI_INVB + PLACED ( 169000 0 ) FN ;
+- u1$2$ MMI_INVB + PLACED ( 175000 0 ) FN ;
+- u1$1$ MMI_INVB + PLACED ( 187000 10000 ) S ;
+- u1$0$ MMI_INVB + PLACED ( 181000 0 ) N ;
+- u2$31$ MMI_INVB + PLACED ( 3000 0 ) N ;
+- u2$30$ MMI_INVB + PLACED ( 9000 0 ) FN ;
+- u2$29$ MMI_INVB + PLACED ( 16000 0 ) FN ;
+- u2$28$ MMI_INVB + PLACED ( 22000 0 ) FN ;
+- u2$27$ MMI_INVB + PLACED ( 34000 0 ) FN ;
+- u2$26$ MMI_INVB + PLACED ( 34000 20000 ) FN ;
+- u2$25$ MMI_INVB + PLACED ( 39000 0 ) FN ;
+- u2$24$ MMI_INVB + PLACED ( 45000 0 ) FN ;
+- u2$23$ MMI_INVB + PLACED ( 56000 0 ) FN ;
+- u2$22$ MMI_INVB + PLACED ( 59000 20000 ) FN ;
+- u2$21$ MMI_INVB + PLACED ( 62000 0 ) FN ;
+- u2$20$ MMI_INVB + PLACED ( 69000 0 ) FN ;
+- u2$19$ MMI_INVB + PLACED ( 76000 0 ) FN ;
+- u2$18$ MMI_INVB + PLACED ( 82000 0 ) FN ;
+- u2$17$ MMI_INVB + PLACED ( 88000 20000 ) FN ;
+- u2$16$ MMI_INVB + PLACED ( 94000 0 ) FN ;
+- u2$15$ MMI_INVB + PLACED ( 100000 0 ) FN ;
+- u2$14$ MMI_INVB + PLACED ( 106000 20000 ) N ;
+- u2$13$ MMI_INVB + PLACED ( 112000 0 ) FN ;
+- u2$12$ MMI_INVB + PLACED ( 117000 0 ) N ;
+- u2$11$ MMI_INVB + PLACED ( 125000 0 ) FN ;
+- u2$10$ MMI_INVB + PLACED ( 130000 20000 ) FN ;
+- u2$9$ MMI_INVB + PLACED ( 136000 0 ) FN ;
+- u2$8$ MMI_INVB + PLACED ( 142000 0 ) FN ;
+- u2$7$ MMI_INVB + PLACED ( 148000 0 ) FN ;
+- u2$6$ MMI_INVB + PLACED ( 154000 0 ) FN ;
+- u2$5$ MMI_INVB + PLACED ( 160000 0 ) FN ;
+- u2$4$ MMI_INVB + PLACED ( 166000 0 ) FN ;
+- u2$3$ MMI_INVB + PLACED ( 172000 0 ) FN ;
+- u2$2$ MMI_INVB + PLACED ( 178000 0 ) N ;
+- u2$1$ MMI_INVB + PLACED ( 189000 10000 ) S ;
+- u2$0$ MMI_INVB + PLACED ( 183000 0 ) N ;
+- u3$31$ MMI_INVB + PLACED ( 0 20000 ) FN ;
+- u3$30$ MMI_INVB + PLACED ( 8000 20000 ) N ;
+- u3$29$ MMI_INVB + PLACED ( 14000 20000 ) FN ;
+- u3$28$ MMI_INVB + PLACED ( 20000 20000 ) FN ;
+- u3$27$ MMI_INVB + PLACED ( 30000 10000 ) S ;
+- u3$26$ MMI_INVB + PLACED ( 31000 20000 ) FN ;
+- u3$25$ MMI_INVB + PLACED ( 38000 20000 ) FN ;
+- u3$24$ MMI_INVB + PLACED ( 44000 20000 ) FN ;
+- u3$23$ MMI_INVB + PLACED ( 52000 10000 ) S ;
+- u3$22$ MMI_INVB + PLACED ( 56000 20000 ) FN ;
+- u3$21$ MMI_INVB + PLACED ( 62000 20000 ) FN ;
+- u3$20$ MMI_INVB + PLACED ( 68000 20000 ) FN ;
+- u3$19$ MMI_INVB + PLACED ( 74000 20000 ) FN ;
+- u3$18$ MMI_INVB + PLACED ( 80000 20000 ) FN ;
+- u3$17$ MMI_INVB + PLACED ( 86000 20000 ) FN ;
+- u3$16$ MMI_INVB + PLACED ( 90000 10000 ) FS ;
+- u3$15$ MMI_INVB + PLACED ( 103000 20000 ) N ;
+- u3$14$ MMI_INVB + PLACED ( 109000 20000 ) N ;
+- u3$13$ MMI_INVB + PLACED ( 112000 20000 ) FN ;
+- u3$12$ MMI_INVB + PLACED ( 116000 20000 ) FN ;
+- u3$11$ MMI_INVB + PLACED ( 121000 10000 ) FS ;
+- u3$10$ MMI_INVB + PLACED ( 127000 20000 ) FN ;
+- u3$9$ MMI_INVB + PLACED ( 134000 20000 ) FN ;
+- u3$8$ MMI_INVB + PLACED ( 140000 20000 ) FN ;
+- u3$7$ MMI_INVB + PLACED ( 146000 20000 ) FN ;
+- u3$6$ MMI_INVB + PLACED ( 152000 20000 ) FN ;
+- u3$5$ MMI_INVB + PLACED ( 158000 20000 ) FN ;
+- u3$4$ MMI_INVB + PLACED ( 164000 20000 ) FN ;
+- u3$3$ MMI_INVB + PLACED ( 170000 20000 ) FN ;
+- u3$2$ MMI_INVB + PLACED ( 176000 20000 ) FN ;
+- u3$1$ MMI_INVB + PLACED ( 181000 20000 ) N ;
+- u3$0$ MMI_INVB + PLACED ( 190000 20000 ) FN ;
+- mux$31$\/MMI_AO22B MMI_AO22B + PLACED ( 0 10000 ) S ;
+- mux$30$\/MMI_AO22B MMI_AO22B + PLACED ( 6000 10000 ) S ;
+- mux$29$\/MMI_AO22B MMI_AO22B + PLACED ( 12000 10000 ) S ;
+- mux$28$\/MMI_AO22B MMI_AO22B + PLACED ( 19000 10000 ) S ;
+- mux$27$\/MMI_AO22B MMI_AO22B + PLACED ( 28000 0 ) FN ;
+- mux$26$\/MMI_AO22B MMI_AO22B + PLACED ( 24000 20000 ) FN ;
+- mux$25$\/MMI_AO22B MMI_AO22B + PLACED ( 35000 10000 ) FS ;
+- mux$24$\/MMI_AO22B MMI_AO22B + PLACED ( 42000 10000 ) FS ;
+- mux$23$\/MMI_AO22B MMI_AO22B + PLACED ( 50000 0 ) FN ;
+- mux$22$\/MMI_AO22B MMI_AO22B + PLACED ( 47000 20000 ) N ;
+- mux$21$\/MMI_AO22B MMI_AO22B + PLACED ( 59000 10000 ) FS ;
+- mux$20$\/MMI_AO22B MMI_AO22B + PLACED ( 66000 10000 ) FS ;
+- mux$19$\/MMI_AO22B MMI_AO22B + PLACED ( 72000 10000 ) FS ;
+- mux$18$\/MMI_AO22B MMI_AO22B + PLACED ( 78000 10000 ) FS ;
+- mux$17$\/MMI_AO22B MMI_AO22B + PLACED ( 90000 20000 ) FN ;
+- mux$16$\/MMI_AO22B MMI_AO22B + PLACED ( 85000 0 ) N ;
+- mux$15$\/MMI_AO22B MMI_AO22B + PLACED ( 102000 0 ) N ;
+- mux$14$\/MMI_AO22B MMI_AO22B + PLACED ( 97000 20000 ) N ;
+- mux$13$\/MMI_AO22B MMI_AO22B + PLACED ( 108000 10000 ) FS ;
+- mux$12$\/MMI_AO22B MMI_AO22B + PLACED ( 114000 10000 ) FS ;
+- mux$11$\/MMI_AO22B MMI_AO22B + PLACED ( 123000 10000 ) FS ;
+- mux$10$\/MMI_AO22B MMI_AO22B + PLACED ( 120000 20000 ) N ;
+- mux$9$\/MMI_AO22B MMI_AO22B + PLACED ( 132000 10000 ) FS ;
+- mux$8$\/MMI_AO22B MMI_AO22B + PLACED ( 138000 10000 ) FS ;
+- mux$7$\/MMI_AO22B MMI_AO22B + PLACED ( 144000 10000 ) FS ;
+- mux$6$\/MMI_AO22B MMI_AO22B + PLACED ( 150000 10000 ) FS ;
+- mux$5$\/MMI_AO22B MMI_AO22B + PLACED ( 156000 10000 ) FS ;
+- mux$4$\/MMI_AO22B MMI_AO22B + PLACED ( 162000 10000 ) FS ;
+- mux$3$\/MMI_AO22B MMI_AO22B + PLACED ( 168000 10000 ) S ;
+- mux$2$\/MMI_AO22B MMI_AO22B + PLACED ( 174000 10000 ) FS ;
+- mux$1$\/MMI_AO22B MMI_AO22B + PLACED ( 180000 10000 ) FS ;
+- mux$0$\/MMI_AO22B MMI_AO22B + PLACED ( 185000 0 ) N ;
+END COMPONENTS
+
+PINS 100 ;
+- gnd! + NET gnd! + DIRECTION INPUT + USE GROUND ;
+- vdd! + NET vdd! + DIRECTION INPUT + USE POWER ;
+- Z[31] + NET Z[31] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 3000 30000 ) N ;
+- Z[30] + NET Z[30] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 9000 30000 ) N ;
+- Z[29] + NET Z[29] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 15000 30000 ) N ;
+- Z[28] + NET Z[28] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 21000 30000 ) N ;
+- Z[27] + NET Z[27] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 27000 30000 ) N ;
+- Z[26] + NET Z[26] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 33000 30000 ) N ;
+- Z[25] + NET Z[25] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 39000 30000 ) N ;
+- Z[24] + NET Z[24] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 45000 30000 ) N ;
+- Z[23] + NET Z[23] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 51000 30000 ) N ;
+- Z[22] + NET Z[22] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 57000 30000 ) N ;
+- Z[21] + NET Z[21] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 63000 30000 ) N ;
+- Z[20] + NET Z[20] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 69000 30000 ) N ;
+- Z[19] + NET Z[19] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 75000 30000 ) N ;
+- Z[18] + NET Z[18] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 81000 30000 ) N ;
+- Z[17] + NET Z[17] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 87000 30000 ) N ;
+- Z[16] + NET Z[16] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 93000 30000 ) N ;
+- Z[15] + NET Z[15] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 99000 30000 ) N ;
+- Z[14] + NET Z[14] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 105000 30000 ) N ;
+- Z[13] + NET Z[13] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 111000 30000 ) N ;
+- Z[12] + NET Z[12] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 117000 30000 ) N ;
+- Z[11] + NET Z[11] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 123000 30000 ) N ;
+- Z[10] + NET Z[10] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 129000 30000 ) N ;
+- Z[9] + NET Z[9] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 135000 30000 ) N ;
+- Z[8] + NET Z[8] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 141000 30000 ) N ;
+- Z[7] + NET Z[7] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 147000 30000 ) N ;
+- Z[6] + NET Z[6] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 153000 30000 ) N ;
+- Z[5] + NET Z[5] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 159000 30000 ) N ;
+- Z[4] + NET Z[4] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 165000 30000 ) N ;
+- Z[3] + NET Z[3] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 171000 30000 ) N ;
+- Z[2] + NET Z[2] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 177000 30000 ) N ;
+- Z[1] + NET Z[1] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 183000 30000 ) N ;
+- Z[0] + NET Z[0] + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 189000 30000 ) N ;
+- S[1] + NET S[1] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 192000 13000 ) N ;
+- S[0] + NET S[0] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 192000 17000 ) N ;
+- B[31] + NET B[31] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 4500 0 ) N ;
+- B[30] + NET B[30] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 10500 0 ) N ;
+- B[29] + NET B[29] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 16500 0 ) N ;
+- B[28] + NET B[28] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 22500 0 ) N ;
+- B[27] + NET B[27] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 28500 0 ) N ;
+- B[26] + NET B[26] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 34500 0 ) N ;
+- B[25] + NET B[25] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 40500 0 ) N ;
+- B[24] + NET B[24] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 46500 0 ) N ;
+- B[23] + NET B[23] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 52500 0 ) N ;
+- B[22] + NET B[22] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 58500 0 ) N ;
+- B[21] + NET B[21] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 64500 0 ) N ;
+- B[20] + NET B[20] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 70500 0 ) N ;
+- B[19] + NET B[19] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 76500 0 ) N ;
+- B[18] + NET B[18] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 82500 0 ) N ;
+- B[17] + NET B[17] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 88500 0 ) N ;
+- B[16] + NET B[16] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 94500 0 ) N ;
+- B[15] + NET B[15] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 100500 0 ) N ;
+- B[14] + NET B[14] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 106500 0 ) N ;
+- B[13] + NET B[13] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 112500 0 ) N ;
+- B[12] + NET B[12] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 118500 0 ) N ;
+- B[11] + NET B[11] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 124500 0 ) N ;
+- B[10] + NET B[10] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 130500 0 ) N ;
+- B[9] + NET B[9] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 136500 0 ) N ;
+- B[8] + NET B[8] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 142500 0 ) N ;
+- B[7] + NET B[7] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 148500 0 ) N ;
+- B[6] + NET B[6] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 154500 0 ) N ;
+- B[5] + NET B[5] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 160500 0 ) N ;
+- B[4] + NET B[4] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 166500 0 ) N ;
+- B[3] + NET B[3] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 172500 0 ) N ;
+- B[2] + NET B[2] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 178500 0 ) N ;
+- B[1] + NET B[1] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 184500 0 ) N ;
+- B[0] + NET B[0] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 190500 0 ) N ;
+- A[31] + NET A[31] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 1500 0 ) N ;
+- A[30] + NET A[30] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 7500 0 ) N ;
+- A[29] + NET A[29] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 13500 0 ) N ;
+- A[28] + NET A[28] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 19500 0 ) N ;
+- A[27] + NET A[27] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 25500 0 ) N ;
+- A[26] + NET A[26] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 31500 0 ) N ;
+- A[25] + NET A[25] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 37500 0 ) N ;
+- A[24] + NET A[24] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 43500 0 ) N ;
+- A[23] + NET A[23] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 49500 0 ) N ;
+- A[22] + NET A[22] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 55500 0 ) N ;
+- A[21] + NET A[21] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 61500 0 ) N ;
+- A[20] + NET A[20] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 67500 0 ) N ;
+- A[19] + NET A[19] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 73500 0 ) N ;
+- A[18] + NET A[18] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 79500 0 ) N ;
+- A[17] + NET A[17] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 85500 0 ) N ;
+- A[16] + NET A[16] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 91500 0 ) N ;
+- A[15] + NET A[15] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 97500 0 ) N ;
+- A[14] + NET A[14] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 103500 0 ) N ;
+- A[13] + NET A[13] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 109500 0 ) N ;
+- A[12] + NET A[12] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 115500 0 ) N ;
+- A[11] + NET A[11] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 121500 0 ) N ;
+- A[10] + NET A[10] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300
+  600 ) + PLACED ( 127500 0 ) N ;
+- A[9] + NET A[9] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 133500 0 ) N ;
+- A[8] + NET A[8] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 139500 0 ) N ;
+- A[7] + NET A[7] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 145500 0 ) N ;
+- A[6] + NET A[6] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 151500 0 ) N ;
+- A[5] + NET A[5] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 157500 0 ) N ;
+- A[4] + NET A[4] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 163500 0 ) N ;
+- A[3] + NET A[3] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 169500 0 ) N ;
+- A[2] + NET A[2] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 175500 0 ) N ;
+- A[1] + NET A[1] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 181500 0 ) N ;
+- A[0] + NET A[0] + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600
+  ) + PLACED ( 187500 0 ) N ;
+END PINS
+
+SPECIALNETS 2 ;
+- gnd! ( mux$0$\/MMI_AO22B GND ) ( mux$1$\/MMI_AO22B GND )
+  ( mux$2$\/MMI_AO22B GND ) ( mux$3$\/MMI_AO22B GND ) ( mux$4$\/MMI_AO22B GND )
+  ( mux$5$\/MMI_AO22B GND ) ( mux$6$\/MMI_AO22B GND ) ( mux$7$\/MMI_AO22B GND )
+  ( mux$8$\/MMI_AO22B GND ) ( mux$9$\/MMI_AO22B GND ) ( mux$10$\/MMI_AO22B GND )
+  ( mux$11$\/MMI_AO22B GND ) ( mux$12$\/MMI_AO22B GND )
+  ( mux$13$\/MMI_AO22B GND ) ( mux$14$\/MMI_AO22B GND )
+  ( mux$15$\/MMI_AO22B GND ) ( mux$16$\/MMI_AO22B GND )
+  ( mux$17$\/MMI_AO22B GND ) ( mux$18$\/MMI_AO22B GND )
+  ( mux$19$\/MMI_AO22B GND ) ( mux$20$\/MMI_AO22B GND )
+  ( mux$21$\/MMI_AO22B GND ) ( mux$22$\/MMI_AO22B GND )
+  ( mux$23$\/MMI_AO22B GND ) ( mux$24$\/MMI_AO22B GND )
+  ( mux$25$\/MMI_AO22B GND ) ( mux$26$\/MMI_AO22B GND )
+  ( mux$27$\/MMI_AO22B GND ) ( mux$28$\/MMI_AO22B GND )
+  ( mux$29$\/MMI_AO22B GND ) ( mux$30$\/MMI_AO22B GND )
+  ( mux$31$\/MMI_AO22B GND ) ( u3$0$ GND ) ( u3$1$ GND ) ( u3$2$ GND )
+  ( u3$3$ GND ) ( u3$4$ GND ) ( u3$5$ GND ) ( u3$6$ GND ) ( u3$7$ GND )
+  ( u3$8$ GND ) ( u3$9$ GND ) ( u3$10$ GND ) ( u3$11$ GND ) ( u3$12$ GND )
+  ( u3$13$ GND ) ( u3$14$ GND ) ( u3$15$ GND ) ( u3$16$ GND ) ( u3$17$ GND )
+  ( u3$18$ GND ) ( u3$19$ GND ) ( u3$20$ GND ) ( u3$21$ GND ) ( u3$22$ GND )
+  ( u3$23$ GND ) ( u3$24$ GND ) ( u3$25$ GND ) ( u3$26$ GND ) ( u3$27$ GND )
+  ( u3$28$ GND ) ( u3$29$ GND ) ( u3$30$ GND ) ( u3$31$ GND ) ( u2$0$ GND )
+  ( u2$1$ GND ) ( u2$2$ GND ) ( u2$3$ GND ) ( u2$4$ GND ) ( u2$5$ GND )
+  ( u2$6$ GND ) ( u2$7$ GND ) ( u2$8$ GND ) ( u2$9$ GND ) ( u2$10$ GND )
+  ( u2$11$ GND ) ( u2$12$ GND ) ( u2$13$ GND ) ( u2$14$ GND ) ( u2$15$ GND )
+  ( u2$16$ GND ) ( u2$17$ GND ) ( u2$18$ GND ) ( u2$19$ GND ) ( u2$20$ GND )
+  ( u2$21$ GND ) ( u2$22$ GND ) ( u2$23$ GND ) ( u2$24$ GND ) ( u2$25$ GND )
+  ( u2$26$ GND ) ( u2$27$ GND ) ( u2$28$ GND ) ( u2$29$ GND ) ( u2$30$ GND )
+  ( u2$31$ GND ) ( u1$0$ GND ) ( u1$1$ GND ) ( u1$2$ GND ) ( u1$3$ GND )
+  ( u1$4$ GND ) ( u1$5$ GND ) ( u1$6$ GND ) ( u1$7$ GND ) ( u1$8$ GND )
+  ( u1$9$ GND ) ( u1$10$ GND ) ( u1$11$ GND ) ( u1$12$ GND ) ( u1$13$ GND )
+  ( u1$14$ GND ) ( u1$15$ GND ) ( u1$16$ GND ) ( u1$17$ GND ) ( u1$18$ GND )
+  ( u1$19$ GND ) ( u1$20$ GND ) ( u1$21$ GND ) ( u1$22$ GND ) ( u1$23$ GND )
+  ( u1$24$ GND ) ( u1$25$ GND ) ( u1$26$ GND ) ( u1$27$ GND ) ( u1$28$ GND )
+  ( u1$29$ GND ) ( u1$30$ GND ) ( u1$31$ GND ) + USE GROUND ;
+- vdd! ( mux$0$\/MMI_AO22B VDD ) ( mux$1$\/MMI_AO22B VDD )
+  ( mux$2$\/MMI_AO22B VDD ) ( mux$3$\/MMI_AO22B VDD ) ( mux$4$\/MMI_AO22B VDD )
+  ( mux$5$\/MMI_AO22B VDD ) ( mux$6$\/MMI_AO22B VDD ) ( mux$7$\/MMI_AO22B VDD )
+  ( mux$8$\/MMI_AO22B VDD ) ( mux$9$\/MMI_AO22B VDD ) ( mux$10$\/MMI_AO22B VDD )
+  ( mux$11$\/MMI_AO22B VDD ) ( mux$12$\/MMI_AO22B VDD )
+  ( mux$13$\/MMI_AO22B VDD ) ( mux$14$\/MMI_AO22B VDD )
+  ( mux$15$\/MMI_AO22B VDD ) ( mux$16$\/MMI_AO22B VDD )
+  ( mux$17$\/MMI_AO22B VDD ) ( mux$18$\/MMI_AO22B VDD )
+  ( mux$19$\/MMI_AO22B VDD ) ( mux$20$\/MMI_AO22B VDD )
+  ( mux$21$\/MMI_AO22B VDD ) ( mux$22$\/MMI_AO22B VDD )
+  ( mux$23$\/MMI_AO22B VDD ) ( mux$24$\/MMI_AO22B VDD )
+  ( mux$25$\/MMI_AO22B VDD ) ( mux$26$\/MMI_AO22B VDD )
+  ( mux$27$\/MMI_AO22B VDD ) ( mux$28$\/MMI_AO22B VDD )
+  ( mux$29$\/MMI_AO22B VDD ) ( mux$30$\/MMI_AO22B VDD )
+  ( mux$31$\/MMI_AO22B VDD ) ( u3$0$ VDD ) ( u3$1$ VDD ) ( u3$2$ VDD )
+  ( u3$3$ VDD ) ( u3$4$ VDD ) ( u3$5$ VDD ) ( u3$6$ VDD ) ( u3$7$ VDD )
+  ( u3$8$ VDD ) ( u3$9$ VDD ) ( u3$10$ VDD ) ( u3$11$ VDD ) ( u3$12$ VDD )
+  ( u3$13$ VDD ) ( u3$14$ VDD ) ( u3$15$ VDD ) ( u3$16$ VDD ) ( u3$17$ VDD )
+  ( u3$18$ VDD ) ( u3$19$ VDD ) ( u3$20$ VDD ) ( u3$21$ VDD ) ( u3$22$ VDD )
+  ( u3$23$ VDD ) ( u3$24$ VDD ) ( u3$25$ VDD ) ( u3$26$ VDD ) ( u3$27$ VDD )
+  ( u3$28$ VDD ) ( u3$29$ VDD ) ( u3$30$ VDD ) ( u3$31$ VDD ) ( u2$0$ VDD )
+  ( u2$1$ VDD ) ( u2$2$ VDD ) ( u2$3$ VDD ) ( u2$4$ VDD ) ( u2$5$ VDD )
+  ( u2$6$ VDD ) ( u2$7$ VDD ) ( u2$8$ VDD ) ( u2$9$ VDD ) ( u2$10$ VDD )
+  ( u2$11$ VDD ) ( u2$12$ VDD ) ( u2$13$ VDD ) ( u2$14$ VDD ) ( u2$15$ VDD )
+  ( u2$16$ VDD ) ( u2$17$ VDD ) ( u2$18$ VDD ) ( u2$19$ VDD ) ( u2$20$ VDD )
+  ( u2$21$ VDD ) ( u2$22$ VDD ) ( u2$23$ VDD ) ( u2$24$ VDD ) ( u2$25$ VDD )
+  ( u2$26$ VDD ) ( u2$27$ VDD ) ( u2$28$ VDD ) ( u2$29$ VDD ) ( u2$30$ VDD )
+  ( u2$31$ VDD ) ( u1$0$ VDD ) ( u1$1$ VDD ) ( u1$2$ VDD ) ( u1$3$ VDD )
+  ( u1$4$ VDD ) ( u1$5$ VDD ) ( u1$6$ VDD ) ( u1$7$ VDD ) ( u1$8$ VDD )
+  ( u1$9$ VDD ) ( u1$10$ VDD ) ( u1$11$ VDD ) ( u1$12$ VDD ) ( u1$13$ VDD )
+  ( u1$14$ VDD ) ( u1$15$ VDD ) ( u1$16$ VDD ) ( u1$17$ VDD ) ( u1$18$ VDD )
+  ( u1$19$ VDD ) ( u1$20$ VDD ) ( u1$21$ VDD ) ( u1$22$ VDD ) ( u1$23$ VDD )
+  ( u1$24$ VDD ) ( u1$25$ VDD ) ( u1$26$ VDD ) ( u1$27$ VDD ) ( u1$28$ VDD )
+  ( u1$29$ VDD ) ( u1$30$ VDD ) ( u1$31$ VDD ) + USE POWER ;
+END SPECIALNETS
+
+NETS 194 ;
+- S[1] ( PIN S[1] ) ( mux$0$\/MMI_AO22B in3 ) ( mux$1$\/MMI_AO22B in3 )
+  ( mux$2$\/MMI_AO22B in3 ) ( mux$3$\/MMI_AO22B in3 ) ( mux$4$\/MMI_AO22B in3 )
+  ( mux$5$\/MMI_AO22B in3 ) ( mux$6$\/MMI_AO22B in3 ) ( mux$7$\/MMI_AO22B in3 )
+  ( mux$8$\/MMI_AO22B in3 ) ( mux$9$\/MMI_AO22B in3 ) ( mux$10$\/MMI_AO22B in3 )
+  ( mux$11$\/MMI_AO22B in3 ) ( mux$12$\/MMI_AO22B in3 )
+  ( mux$13$\/MMI_AO22B in3 ) ( mux$14$\/MMI_AO22B in3 )
+  ( mux$15$\/MMI_AO22B in3 ) ( mux$16$\/MMI_AO22B in3 )
+  ( mux$17$\/MMI_AO22B in3 ) ( mux$18$\/MMI_AO22B in3 )
+  ( mux$19$\/MMI_AO22B in3 ) ( mux$20$\/MMI_AO22B in3 )
+  ( mux$21$\/MMI_AO22B in3 ) ( mux$22$\/MMI_AO22B in3 )
+  ( mux$23$\/MMI_AO22B in3 ) ( mux$24$\/MMI_AO22B in3 )
+  ( mux$25$\/MMI_AO22B in3 ) ( mux$26$\/MMI_AO22B in3 )
+  ( mux$27$\/MMI_AO22B in3 ) ( mux$28$\/MMI_AO22B in3 )
+  ( mux$29$\/MMI_AO22B in3 ) ( mux$30$\/MMI_AO22B in3 )
+  ( mux$31$\/MMI_AO22B in3 ) ;
+- S[0] ( PIN S[0] ) ( mux$0$\/MMI_AO22B in1 ) ( mux$1$\/MMI_AO22B in1 )
+  ( mux$2$\/MMI_AO22B in1 ) ( mux$3$\/MMI_AO22B in1 ) ( mux$4$\/MMI_AO22B in1 )
+  ( mux$5$\/MMI_AO22B in1 ) ( mux$6$\/MMI_AO22B in1 ) ( mux$7$\/MMI_AO22B in1 )
+  ( mux$8$\/MMI_AO22B in1 ) ( mux$9$\/MMI_AO22B in1 ) ( mux$10$\/MMI_AO22B in1 )
+  ( mux$11$\/MMI_AO22B in1 ) ( mux$12$\/MMI_AO22B in1 )
+  ( mux$13$\/MMI_AO22B in1 ) ( mux$14$\/MMI_AO22B in1 )
+  ( mux$15$\/MMI_AO22B in1 ) ( mux$16$\/MMI_AO22B in1 )
+  ( mux$17$\/MMI_AO22B in1 ) ( mux$18$\/MMI_AO22B in1 )
+  ( mux$19$\/MMI_AO22B in1 ) ( mux$20$\/MMI_AO22B in1 )
+  ( mux$21$\/MMI_AO22B in1 ) ( mux$22$\/MMI_AO22B in1 )
+  ( mux$23$\/MMI_AO22B in1 ) ( mux$24$\/MMI_AO22B in1 )
+  ( mux$25$\/MMI_AO22B in1 ) ( mux$26$\/MMI_AO22B in1 )
+  ( mux$27$\/MMI_AO22B in1 ) ( mux$28$\/MMI_AO22B in1 )
+  ( mux$29$\/MMI_AO22B in1 ) ( mux$30$\/MMI_AO22B in1 )
+  ( mux$31$\/MMI_AO22B in1 ) ;
+- Z[0] ( PIN Z[0] ) ( u3$0$ out ) ;
+- net_1[0] ( mux$0$\/MMI_AO22B out ) ( u3$0$ in ) ;
+- Z[1] ( PIN Z[1] ) ( u3$1$ out ) ;
+- net_1[1] ( mux$1$\/MMI_AO22B out ) ( u3$1$ in ) ;
+- Z[2] ( PIN Z[2] ) ( u3$2$ out ) ;
+- net_1[2] ( mux$2$\/MMI_AO22B out ) ( u3$2$ in ) ;
+- Z[3] ( PIN Z[3] ) ( u3$3$ out ) ;
+- net_1[3] ( mux$3$\/MMI_AO22B out ) ( u3$3$ in ) ;
+- Z[4] ( PIN Z[4] ) ( u3$4$ out ) ;
+- net_1[4] ( mux$4$\/MMI_AO22B out ) ( u3$4$ in ) ;
+- Z[5] ( PIN Z[5] ) ( u3$5$ out ) ;
+- net_1[5] ( mux$5$\/MMI_AO22B out ) ( u3$5$ in ) ;
+- Z[6] ( PIN Z[6] ) ( u3$6$ out ) ;
+- net_1[6] ( mux$6$\/MMI_AO22B out ) ( u3$6$ in ) ;
+- Z[7] ( PIN Z[7] ) ( u3$7$ out ) ;
+- net_1[7] ( mux$7$\/MMI_AO22B out ) ( u3$7$ in ) ;
+- Z[8] ( PIN Z[8] ) ( u3$8$ out ) ;
+- net_1[8] ( mux$8$\/MMI_AO22B out ) ( u3$8$ in ) ;
+- Z[9] ( PIN Z[9] ) ( u3$9$ out ) ;
+- net_1[9] ( mux$9$\/MMI_AO22B out ) ( u3$9$ in ) ;
+- Z[10] ( PIN Z[10] ) ( u3$10$ out ) ;
+- net_1[10] ( mux$10$\/MMI_AO22B out ) ( u3$10$ in ) ;
+- Z[11] ( PIN Z[11] ) ( u3$11$ out ) ;
+- net_1[11] ( mux$11$\/MMI_AO22B out ) ( u3$11$ in ) ;
+- Z[12] ( PIN Z[12] ) ( u3$12$ out ) ;
+- net_1[12] ( mux$12$\/MMI_AO22B out ) ( u3$12$ in ) ;
+- Z[13] ( PIN Z[13] ) ( u3$13$ out ) ;
+- net_1[13] ( mux$13$\/MMI_AO22B out ) ( u3$13$ in ) ;
+- Z[14] ( PIN Z[14] ) ( u3$14$ out ) ;
+- net_1[14] ( mux$14$\/MMI_AO22B out ) ( u3$14$ in ) ;
+- Z[15] ( PIN Z[15] ) ( u3$15$ out ) ;
+- net_1[15] ( mux$15$\/MMI_AO22B out ) ( u3$15$ in ) ;
+- Z[16] ( PIN Z[16] ) ( u3$16$ out ) ;
+- net_1[16] ( mux$16$\/MMI_AO22B out ) ( u3$16$ in ) ;
+- Z[17] ( PIN Z[17] ) ( u3$17$ out ) ;
+- net_1[17] ( mux$17$\/MMI_AO22B out ) ( u3$17$ in ) ;
+- Z[18] ( PIN Z[18] ) ( u3$18$ out ) ;
+- net_1[18] ( mux$18$\/MMI_AO22B out ) ( u3$18$ in ) ;
+- Z[19] ( PIN Z[19] ) ( u3$19$ out ) ;
+- net_1[19] ( mux$19$\/MMI_AO22B out ) ( u3$19$ in ) ;
+- Z[20] ( PIN Z[20] ) ( u3$20$ out ) ;
+- net_1[20] ( mux$20$\/MMI_AO22B out ) ( u3$20$ in ) ;
+- Z[21] ( PIN Z[21] ) ( u3$21$ out ) ;
+- net_1[21] ( mux$21$\/MMI_AO22B out ) ( u3$21$ in ) ;
+- Z[22] ( PIN Z[22] ) ( u3$22$ out ) ;
+- net_1[22] ( mux$22$\/MMI_AO22B out ) ( u3$22$ in ) ;
+- Z[23] ( PIN Z[23] ) ( u3$23$ out ) ;
+- net_1[23] ( mux$23$\/MMI_AO22B out ) ( u3$23$ in ) ;
+- Z[24] ( PIN Z[24] ) ( u3$24$ out ) ;
+- net_1[24] ( mux$24$\/MMI_AO22B out ) ( u3$24$ in ) ;
+- Z[25] ( PIN Z[25] ) ( u3$25$ out ) ;
+- net_1[25] ( mux$25$\/MMI_AO22B out ) ( u3$25$ in ) ;
+- Z[26] ( PIN Z[26] ) ( u3$26$ out ) ;
+- net_1[26] ( mux$26$\/MMI_AO22B out ) ( u3$26$ in ) ;
+- Z[27] ( PIN Z[27] ) ( u3$27$ out ) ;
+- net_1[27] ( mux$27$\/MMI_AO22B out ) ( u3$27$ in ) ;
+- Z[28] ( PIN Z[28] ) ( u3$28$ out ) ;
+- net_1[28] ( mux$28$\/MMI_AO22B out ) ( u3$28$ in ) ;
+- Z[29] ( PIN Z[29] ) ( u3$29$ out ) ;
+- net_1[29] ( mux$29$\/MMI_AO22B out ) ( u3$29$ in ) ;
+- Z[30] ( PIN Z[30] ) ( u3$30$ out ) ;
+- net_1[30] ( mux$30$\/MMI_AO22B out ) ( u3$30$ in ) ;
+- Z[31] ( PIN Z[31] ) ( u3$31$ out ) ;
+- net_1[31] ( mux$31$\/MMI_AO22B out ) ( u3$31$ in ) ;
+- net_3[0] ( mux$0$\/MMI_AO22B in2 ) ( u2$0$ out ) ;
+- B[0] ( PIN B[0] ) ( u2$0$ in ) ;
+- net_3[1] ( mux$1$\/MMI_AO22B in2 ) ( u2$1$ out ) ;
+- B[1] ( PIN B[1] ) ( u2$1$ in ) ;
+- net_3[2] ( mux$2$\/MMI_AO22B in2 ) ( u2$2$ out ) ;
+- B[2] ( PIN B[2] ) ( u2$2$ in ) ;
+- net_3[3] ( mux$3$\/MMI_AO22B in2 ) ( u2$3$ out ) ;
+- B[3] ( PIN B[3] ) ( u2$3$ in ) ;
+- net_3[4] ( mux$4$\/MMI_AO22B in2 ) ( u2$4$ out ) ;
+- B[4] ( PIN B[4] ) ( u2$4$ in ) ;
+- net_3[5] ( mux$5$\/MMI_AO22B in2 ) ( u2$5$ out ) ;
+- B[5] ( PIN B[5] ) ( u2$5$ in ) ;
+- net_3[6] ( mux$6$\/MMI_AO22B in2 ) ( u2$6$ out ) ;
+- B[6] ( PIN B[6] ) ( u2$6$ in ) ;
+- net_3[7] ( mux$7$\/MMI_AO22B in2 ) ( u2$7$ out ) ;
+- B[7] ( PIN B[7] ) ( u2$7$ in ) ;
+- net_3[8] ( mux$8$\/MMI_AO22B in2 ) ( u2$8$ out ) ;
+- B[8] ( PIN B[8] ) ( u2$8$ in ) ;
+- net_3[9] ( mux$9$\/MMI_AO22B in2 ) ( u2$9$ out ) ;
+- B[9] ( PIN B[9] ) ( u2$9$ in ) ;
+- net_3[10] ( mux$10$\/MMI_AO22B in2 ) ( u2$10$ out ) ;
+- B[10] ( PIN B[10] ) ( u2$10$ in ) ;
+- net_3[11] ( mux$11$\/MMI_AO22B in2 ) ( u2$11$ out ) ;
+- B[11] ( PIN B[11] ) ( u2$11$ in ) ;
+- net_3[12] ( mux$12$\/MMI_AO22B in2 ) ( u2$12$ out ) ;
+- B[12] ( PIN B[12] ) ( u2$12$ in ) ;
+- net_3[13] ( mux$13$\/MMI_AO22B in2 ) ( u2$13$ out ) ;
+- B[13] ( PIN B[13] ) ( u2$13$ in ) ;
+- net_3[14] ( mux$14$\/MMI_AO22B in2 ) ( u2$14$ out ) ;
+- B[14] ( PIN B[14] ) ( u2$14$ in ) ;
+- net_3[15] ( mux$15$\/MMI_AO22B in2 ) ( u2$15$ out ) ;
+- B[15] ( PIN B[15] ) ( u2$15$ in ) ;
+- net_3[16] ( mux$16$\/MMI_AO22B in2 ) ( u2$16$ out ) ;
+- B[16] ( PIN B[16] ) ( u2$16$ in ) ;
+- net_3[17] ( mux$17$\/MMI_AO22B in2 ) ( u2$17$ out ) ;
+- B[17] ( PIN B[17] ) ( u2$17$ in ) ;
+- net_3[18] ( mux$18$\/MMI_AO22B in2 ) ( u2$18$ out ) ;
+- B[18] ( PIN B[18] ) ( u2$18$ in ) ;
+- net_3[19] ( mux$19$\/MMI_AO22B in2 ) ( u2$19$ out ) ;
+- B[19] ( PIN B[19] ) ( u2$19$ in ) ;
+- net_3[20] ( mux$20$\/MMI_AO22B in2 ) ( u2$20$ out ) ;
+- B[20] ( PIN B[20] ) ( u2$20$ in ) ;
+- net_3[21] ( mux$21$\/MMI_AO22B in2 ) ( u2$21$ out ) ;
+- B[21] ( PIN B[21] ) ( u2$21$ in ) ;
+- net_3[22] ( mux$22$\/MMI_AO22B in2 ) ( u2$22$ out ) ;
+- B[22] ( PIN B[22] ) ( u2$22$ in ) ;
+- net_3[23] ( mux$23$\/MMI_AO22B in2 ) ( u2$23$ out ) ;
+- B[23] ( PIN B[23] ) ( u2$23$ in ) ;
+- net_3[24] ( mux$24$\/MMI_AO22B in2 ) ( u2$24$ out ) ;
+- B[24] ( PIN B[24] ) ( u2$24$ in ) ;
+- net_3[25] ( mux$25$\/MMI_AO22B in2 ) ( u2$25$ out ) ;
+- B[25] ( PIN B[25] ) ( u2$25$ in ) ;
+- net_3[26] ( mux$26$\/MMI_AO22B in2 ) ( u2$26$ out ) ;
+- B[26] ( PIN B[26] ) ( u2$26$ in ) ;
+- net_3[27] ( mux$27$\/MMI_AO22B in2 ) ( u2$27$ out ) ;
+- B[27] ( PIN B[27] ) ( u2$27$ in ) ;
+- net_3[28] ( mux$28$\/MMI_AO22B in2 ) ( u2$28$ out ) ;
+- B[28] ( PIN B[28] ) ( u2$28$ in ) ;
+- net_3[29] ( mux$29$\/MMI_AO22B in2 ) ( u2$29$ out ) ;
+- B[29] ( PIN B[29] ) ( u2$29$ in ) ;
+- net_3[30] ( mux$30$\/MMI_AO22B in2 ) ( u2$30$ out ) ;
+- B[30] ( PIN B[30] ) ( u2$30$ in ) ;
+- net_3[31] ( mux$31$\/MMI_AO22B in2 ) ( u2$31$ out ) ;
+- B[31] ( PIN B[31] ) ( u2$31$ in ) ;
+- net_2[0] ( mux$0$\/MMI_AO22B in0 ) ( u1$0$ out ) ;
+- A[0] ( PIN A[0] ) ( u1$0$ in ) ;
+- net_2[1] ( mux$1$\/MMI_AO22B in0 ) ( u1$1$ out ) ;
+- A[1] ( PIN A[1] ) ( u1$1$ in ) ;
+- net_2[2] ( mux$2$\/MMI_AO22B in0 ) ( u1$2$ out ) ;
+- A[2] ( PIN A[2] ) ( u1$2$ in ) ;
+- net_2[3] ( mux$3$\/MMI_AO22B in0 ) ( u1$3$ out ) ;
+- A[3] ( PIN A[3] ) ( u1$3$ in ) ;
+- net_2[4] ( mux$4$\/MMI_AO22B in0 ) ( u1$4$ out ) ;
+- A[4] ( PIN A[4] ) ( u1$4$ in ) ;
+- net_2[5] ( mux$5$\/MMI_AO22B in0 ) ( u1$5$ out ) ;
+- A[5] ( PIN A[5] ) ( u1$5$ in ) ;
+- net_2[6] ( mux$6$\/MMI_AO22B in0 ) ( u1$6$ out ) ;
+- A[6] ( PIN A[6] ) ( u1$6$ in ) ;
+- net_2[7] ( mux$7$\/MMI_AO22B in0 ) ( u1$7$ out ) ;
+- A[7] ( PIN A[7] ) ( u1$7$ in ) ;
+- net_2[8] ( mux$8$\/MMI_AO22B in0 ) ( u1$8$ out ) ;
+- A[8] ( PIN A[8] ) ( u1$8$ in ) ;
+- net_2[9] ( mux$9$\/MMI_AO22B in0 ) ( u1$9$ out ) ;
+- A[9] ( PIN A[9] ) ( u1$9$ in ) ;
+- net_2[10] ( mux$10$\/MMI_AO22B in0 ) ( u1$10$ out ) ;
+- A[10] ( PIN A[10] ) ( u1$10$ in ) ;
+- net_2[11] ( mux$11$\/MMI_AO22B in0 ) ( u1$11$ out ) ;
+- A[11] ( PIN A[11] ) ( u1$11$ in ) ;
+- net_2[12] ( mux$12$\/MMI_AO22B in0 ) ( u1$12$ out ) ;
+- A[12] ( PIN A[12] ) ( u1$12$ in ) ;
+- net_2[13] ( mux$13$\/MMI_AO22B in0 ) ( u1$13$ out ) ;
+- A[13] ( PIN A[13] ) ( u1$13$ in ) ;
+- net_2[14] ( mux$14$\/MMI_AO22B in0 ) ( u1$14$ out ) ;
+- A[14] ( PIN A[14] ) ( u1$14$ in ) ;
+- net_2[15] ( mux$15$\/MMI_AO22B in0 ) ( u1$15$ out ) ;
+- A[15] ( PIN A[15] ) ( u1$15$ in ) ;
+- net_2[16] ( mux$16$\/MMI_AO22B in0 ) ( u1$16$ out ) ;
+- A[16] ( PIN A[16] ) ( u1$16$ in ) ;
+- net_2[17] ( mux$17$\/MMI_AO22B in0 ) ( u1$17$ out ) ;
+- A[17] ( PIN A[17] ) ( u1$17$ in ) ;
+- net_2[18] ( mux$18$\/MMI_AO22B in0 ) ( u1$18$ out ) ;
+- A[18] ( PIN A[18] ) ( u1$18$ in ) ;
+- net_2[19] ( mux$19$\/MMI_AO22B in0 ) ( u1$19$ out ) ;
+- A[19] ( PIN A[19] ) ( u1$19$ in ) ;
+- net_2[20] ( mux$20$\/MMI_AO22B in0 ) ( u1$20$ out ) ;
+- A[20] ( PIN A[20] ) ( u1$20$ in ) ;
+- net_2[21] ( mux$21$\/MMI_AO22B in0 ) ( u1$21$ out ) ;
+- A[21] ( PIN A[21] ) ( u1$21$ in ) ;
+- net_2[22] ( mux$22$\/MMI_AO22B in0 ) ( u1$22$ out ) ;
+- A[22] ( PIN A[22] ) ( u1$22$ in ) ;
+- net_2[23] ( mux$23$\/MMI_AO22B in0 ) ( u1$23$ out ) ;
+- A[23] ( PIN A[23] ) ( u1$23$ in ) ;
+- net_2[24] ( mux$24$\/MMI_AO22B in0 ) ( u1$24$ out ) ;
+- A[24] ( PIN A[24] ) ( u1$24$ in ) ;
+- net_2[25] ( mux$25$\/MMI_AO22B in0 ) ( u1$25$ out ) ;
+- A[25] ( PIN A[25] ) ( u1$25$ in ) ;
+- net_2[26] ( mux$26$\/MMI_AO22B in0 ) ( u1$26$ out ) ;
+- A[26] ( PIN A[26] ) ( u1$26$ in ) ;
+- net_2[27] ( mux$27$\/MMI_AO22B in0 ) ( u1$27$ out ) ;
+- A[27] ( PIN A[27] ) ( u1$27$ in ) ;
+- net_2[28] ( mux$28$\/MMI_AO22B in0 ) ( u1$28$ out ) ;
+- A[28] ( PIN A[28] ) ( u1$28$ in ) ;
+- net_2[29] ( mux$29$\/MMI_AO22B in0 ) ( u1$29$ out ) ;
+- A[29] ( PIN A[29] ) ( u1$29$ in ) ;
+- net_2[30] ( mux$30$\/MMI_AO22B in0 ) ( u1$30$ out ) ;
+- A[30] ( PIN A[30] ) ( u1$30$ in ) ;
+- net_2[31] ( mux$31$\/MMI_AO22B in0 ) ( u1$31$ out ) ;
+- A[31] ( PIN A[31] ) ( u1$31$ in ) ;
+END NETS
+
+END DESIGN

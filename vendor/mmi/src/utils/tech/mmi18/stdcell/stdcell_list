@@ -1,0 +1,69 @@
+
+ 0.18um Standard Cell Library                                                               rev.  5/02/00 
+
+                       Input                      Output
+  Cell Name  Sizes     Names                      Names       Function
+  ---------  -----     ---------------------      ------     --------------------------------------------
+  MMI_AND2   B,C       in0,in1                    out    
+  MMI_AND3   B,C       in0,in1,in2                out
+  MMI_AND4   B,C       in0,in1,in2,in3            out
+  MMI_AO21   B,C       in0,in1,in2                out
+  MMI_AO22   B,C       in0,in1,in2,in3            out
+  MMI_AO31   B,C       in0,in1,in2,in3            out
+  MMI_AOI21  A,B,C     in0,in1,in2                out
+  MMI_AOI22  A,B       in0,in1,in2,in3            out
+  MMI_AOI31  A,B       in0,in1,in2,in3            out
+  MMI_BUF    B,C,D,E   in                         out        Non-inverting buffer
+  MMI_FILL_  1,2,4,8                                         Filler cells
+  MMI_FF     B	       d,clk                      q          FF 
+  MMI_FFC    B	       d,clk,clrb                 q          FF with async. clear
+  MMI_FFNC   B	       d,clk,clrb                 q          neg edge FF with async. clear
+  MMI_FFH    B	       d,clk,hold                 q          FF with hold (input mux)
+  MMI_FFM    B	       d0,d1,clk,sel              q          FF with 2:1 input mux
+  MMI_FFS    B	       d,clk,setb                 q          FF with async. set
+  MMI_INAND2 A,B,C     in0,in1                    out        Nand2 with inverter on one input
+  MMI_INOR2  A,B,C     in0,in1                    out        Nor2 with inverter on one input
+  MMI_INV    A,B,C,D,E in                         out
+  MMI_KEEP   W (weak)  in                         -          Keeper for tristate bus 
+  MMI_LLAC   B         d,clk,clrb                 q          Latch with async clear (for mmi25 compatability)
+  MMI_LLC    B         d,clk,clrb                 q          Latch with async clear (for mmi25 compatability)
+  MMI_LTCHN  B         d,clk                      q          Transparent Latch, Negative enable (no scan)
+  MMI_LTCHP  B         d,clk                      q          Transparent Latch, Positive enable (no scan)
+  MMI_MUX2   A,B,C,D   in0,in1,sel                out
+  MMI_MUX3   B,C       in0,in1,in2,sel0,sel1      out
+  MMI_MUX4   B,C       in0,in1,in2,in3,sel0,sel1  out
+  MMI_MUXI2  A,B,C     in0,in1,sel                out
+  MMI_MUXI3  B,C       in0,in1,in2,sel0,sel1      out
+  MMI_MUXI4  B,C       in0,in1,in2,in3,sel0,sel1  out
+  MMI_NAND2  A,B,C,D   in0,in1                    out
+  MMI_NAND3  A,B,C     in0,in1,in2                out
+  MMI_NAND4  A,B,C     in0,in1,in2,in3            out
+  MMI_NOR2   A,B,C,D   in0,in1                    out
+  MMI_NOR3   A,B       in0,in1,in2                out
+  MMI_OA21   B,C       in0,in1,in2                out
+  MMI_OA22   B,C       in0,in1,in2,in3            out
+  MMI_OA31   B,C       in0,in1,in2,in3            out
+  MMI_OAI21  A,B,C     in0,in1,in2                out
+  MMI_OAI22  A,B       in0,in1,in2,in3            out
+  MMI_OAI31  A,B       in0,in1,in2,in3            out
+  MMI_OR2    B,C       in0,in1                    out
+  MMI_OR3    B,C       in0,in1,in2                out
+  MMI_RPTR   F         in                         out        Large inverter for driving wide wires
+  MMI_SFF    B	       d,clk,s_in,s_en            q,s_out    FF with scan 
+  MMI_SFFC   B	       d,clk,clrb,s_in,s_en       q,s_out    FF with scan and async. clear
+  MMI_SFFH   B	       d,clk,hold,s_in,s_en       q,s_out    FF with scan and hold (input mux)
+  MMI_SFFM   B	       d0,d1,clk,sel,s_in,s_en    q,s_out    FF with scan and 2:1 input mux
+  MMI_SFFP   B	       d,clk,setb,s_in,s_en       q          FF with scan and async. set (was MMI_FFSB in mmi25)
+  MMI_SFFR   B	       d,clk,clrb,s_in,s_en       q          FF with scan and async. clear (was MMI_FFCB in mmi25)
+  MMI_SFFS   B	       d,clk,setb,s_in,s_en       q,s_out    FF with scan and async. set
+  MMI_TSBUF  C,E       in,en,enb                  out        Tristate buffer
+  MMI_XNOR2  A,B,C     in0,in1                    out 
+  MMI_XOR2   A,B,C     in0,in1                    out 
+
+Total = 113 cells
+
+
+Notes: Full cell name is the cell name above with the size appended on the end, i.e. MMI_XOR2B
+       Pins with names that end with a "b" are active low
+
+

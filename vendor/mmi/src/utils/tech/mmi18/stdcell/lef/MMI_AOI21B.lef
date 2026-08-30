@@ -1,0 +1,109 @@
+MACRO MMI_AOI21B
+	CLASS CORE ;
+	FOREIGN MMI_AOI21B 0 0 ;
+	SIZE 5.18 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.9 4.545 1.24 5.825 ;
+			LAYER M1 ;
+			RECT 0.9 2.85 1.13 4.545 ;
+			LAYER M1 ;
+			RECT 2.63 2.85 2.97 3.13 ;
+			LAYER M1 ;
+			RECT 0.9 2.815 2.97 2.85 ;
+			LAYER M1 ;
+			RECT 0.885 2.62 2.97 2.815 ;
+			LAYER M1 ;
+			RECT 0.885 2.365 1.335 2.62 ;
+			LAYER M1 ;
+			RECT 2.63 1.37 2.97 2.62 ;
+		END
+		AntennaDiffArea 1.978 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 2.365 4.19 2.815 4.295 ;
+			LAYER M1 ;
+			RECT 2.365 4.135 3.21 4.19 ;
+			LAYER M1 ;
+			RECT 2.365 3.905 3.275 4.135 ;
+			LAYER M1 ;
+			RECT 2.365 3.85 3.21 3.905 ;
+			LAYER M1 ;
+			RECT 2.365 3.845 2.815 3.85 ;
+		END
+		AntennaGateArea 0.9936 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 1.86 0.5 2.2 2.385 ;
+			LAYER M1 ;
+			RECT 3.78 0.5 4.12 3.13 ;
+			LAYER M1 ;
+			RECT 0 -0.5 5.18 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.845 4.19 4.295 4.295 ;
+			LAYER M1 ;
+			RECT 3.54 3.85 4.295 4.19 ;
+			LAYER M1 ;
+			RECT 3.845 3.845 4.295 3.85 ;
+		END
+		AntennaGateArea 0.9936 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 5.18 7.9 ;
+			LAYER M1 ;
+			RECT 2.34 5.025 2.68 6.9 ;
+			LAYER M1 ;
+			RECT 3.78 5.025 4.12 6.9 ;
+		END
+	END VDD
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.625 3.5 2.075 3.555 ;
+			LAYER M1 ;
+			RECT 1.36 3.16 2.075 3.5 ;
+			LAYER M1 ;
+			RECT 1.625 3.105 2.075 3.16 ;
+		END
+		AntennaGateArea 0.828 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 0.18 6.075 1.96 6.305 ;
+		LAYER M1 ;
+		RECT 0.18 4.545 0.52 6.075 ;
+		LAYER M1 ;
+		RECT 1.62 4.775 1.96 6.075 ;
+		LAYER M1 ;
+		RECT 3.06 4.775 3.4 6.305 ;
+		LAYER M1 ;
+		RECT 4.5 4.775 4.84 6.305 ;
+		LAYER M1 ;
+		RECT 1.62 4.545 4.84 4.775 ;
+	END
+END MMI_AOI21B

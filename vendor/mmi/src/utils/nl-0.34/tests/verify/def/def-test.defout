@@ -1,0 +1,94 @@
+VERSION  5.3 ;
+NAMESCASESENSITIVE ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS  "[]" ;
+DESIGN AB ;
+UNITS DISTANCE MICRONS 1000 ;
+
+HISTORY CREATETIME 4 May 2001 11:59:52 ;
+HISTORY SAVETIME 4 May 2001 11:59:53 ;
+HISTORY DB CREATE by jka ;
+HISTORY Name: LBRARY, dir: '' ;
+HISTORY SE version: 5.3.60 MASTER, DB code version: 5.1, DB created under: 5.1 ;
+HISTORY Max mem: 25165824, mainsail: $TNT_INST_DIR/tools/dsm/lib/sys1620r.olb:
+        16.20 ;
+HISTORY System no. 19 --> SPARC UNIX, CPU id = 'Sun_Microsystems: 2157853406' ;
+HISTORY Design saved as LBRARY in directory  ;
+HISTORY DB LOAD by jka ;
+HISTORY Name: LBRARY, dir: '' ;
+HISTORY SE version: 5.3.60 MASTER, DB code version: 5.1, DB created under: 5.1 ;
+HISTORY Max mem: 25165824, mainsail: $TNT_INST_DIR/tools/dsm/lib/sys1620r.olb:
+        16.20 ;
+HISTORY System no. 19 --> SPARC UNIX, CPU id = 'Sun_Microsystems: 2157853406' ;
+HISTORY INPUT VERILOG FILENAME "/homes/jka/psyn/se/mmi25.v def-test.v" LIB "lib"
+        DESIGN "lib.AB:hdl" ;
+
+
+PROPERTYDEFINITIONS
+DESIGN  VERILOGDESIGNNAME  STRING  "lib.AB:hdl"  ;
+
+END PROPERTYDEFINITIONS
+DIEAREA ( 0 0 ) ( 0 0 ) ;
+
+
+VIAS 4 ;
+- VIA12 + RECT M2 ( -280 -280 ) ( 280 280 ) + RECT VIA1 ( -180 -180 )
+  ( 180 180 ) + RECT M1 ( -280 -280 ) ( 280 280 ) ;
+- VIA23 + RECT M3 ( -280 -280 ) ( 280 280 ) + RECT VIA2 ( -180 -180 )
+  ( 180 180 ) + RECT M2 ( -280 -280 ) ( 280 280 ) ;
+- VIA34 + RECT M4 ( -280 -280 ) ( 280 280 ) + RECT VIA3 ( -180 -180 )
+  ( 180 180 ) + RECT M3 ( -280 -280 ) ( 280 280 ) ;
+- VIA45 + RECT M5 ( -270 -270 ) ( 270 270 ) + RECT VIA4 ( -180 -180 )
+  ( 180 180 ) + RECT M4 ( -270 -270 ) ( 270 270 ) ;
+END VIAS
+
+COMPONENTS 5 ;
+- a1/inva MMI_INVA ;
+- a2/inva MMI_INVA ;
+- b1/invb MMI_INVB ;
+- b2/invb MMI_INVB ;
+- and2 MMI_AND2B ;
+END COMPONENTS
+
+PINS 13 ;
+- gnd! + NET gnd! + DIRECTION INPUT + USE GROUND ;
+- vdd! + NET vdd! + DIRECTION INPUT + USE POWER ;
+- v + NET v + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- u + NET vdd! + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 )
+  ;
+- t + NET t + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- s + NET s + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- r + NET gnd! + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 )
+  ;
+- q + NET q + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- p + NET gnd! + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 )
+  ;
+- o + NET o + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- f + NET o + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- e + NET e + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- d + NET d + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+END PINS
+
+SPECIALNETS 2 ;
+- gnd! ( and2 GND ) ( b2/invb GND ) ( b1/invb GND ) ( a2/inva GND )
+  ( a1/inva GND ) + USE GROUND ;
+- vdd! ( and2 VDD ) ( b2/invb VDD ) ( b1/invb VDD ) ( a2/inva VDD )
+  ( a1/inva VDD ) + USE POWER ;
+END SPECIALNETS
+
+NETS 12 ;
+- o ( PIN o ) ( PIN f ) ;
+- d ( PIN d ) ;
+- v ( PIN v ) ( and2 out ) ;
+- h ( and2 in0 ) ( b2/invb out ) ;
+- t ( PIN t ) ( b1/invb out ) ;
+- e ( PIN e ) ( b1/invb in ) ;
+- s ( PIN s ) ( a2/inva out ) ;
+- a2/x ( a2/inva in ) ;
+- q ( PIN q ) ( a1/inva out ) ;
+- a1/x ( a1/inva in ) ;
+- gnd! ( PIN gnd! ) ( PIN r ) ( PIN p ) ( b2/invb in ) + USE GROUND ;
+- vdd! ( PIN vdd! ) ( PIN u ) ( and2 in1 ) + USE POWER ;
+END NETS
+
+END DESIGN

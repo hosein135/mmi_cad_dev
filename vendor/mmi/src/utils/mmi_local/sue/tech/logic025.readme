@@ -1,0 +1,269 @@
+
+  **********************************************
+  *             TSMC SPICE MODEL               *
+  **********************************************
+
+    PROCESS :  0.25um LOGIC SALICIDE (1P5M, 2.5V, 2.5V/3.3V)
+
+    DOC. NO.:  TA-1099-6001
+
+    VERSION :  1.3
+
+    DATE    :  JAN. 12, 1998
+
+
+1) MOS MODEL :
+ 
+ A) HSPICE LEVEL 49 :
+
+    ## library files:
+
+    All models are included in file 'logic025.l' :
+
+      1. 2.5V MOS DEVICE MODELS
+
+         .lib TT : Typical model
+              SS : Slow NMOS Slow PMOS model
+              FF : Fast NMOS Fast PMOS model
+              SF : Slow NMOS Fast PMOS model
+              FS : Fast NMOS Slow PMOS model
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch.1         1.21   20.0         10     100.       um
+            nch.2         0.51   1.21         10     100.       um
+            nch.3         0.24   0.51         10     100.       um
+            nch.4         1.21   20.0         1.2     10.       um
+            nch.5         0.51   1.21         1.2     10.       um
+            nch.6         0.24   0.51         1.2     10.       um
+            nch.7         1.21   20.0         0.6     1.2       um
+            nch.8         0.51   1.21         0.6     1.2       um
+            nch.9         0.24   0.51         0.6     1.2       um
+            nch.10        1.21   20.0         0.3     0.6       um
+            nch.11        0.51   1.21         0.3     0.6       um
+            nch.12        0.24   0.51         0.3     0.6       um
+          ----------------------------------------------------------
+            pch.1         1.2     20.         10     100.       um
+            pch.2         0.5     1.2         10     100.       um
+            pch.3         0.24    0.5         10     100.       um
+            pch.4         1.2     20.         1.2     10        um
+            pch.5         0.5     1.2         1.2     10        um
+            pch.6         0.24    0.5         1.2     10        um
+            pch.7         1.2     20.         0.6     1.2       um
+            pch.8         0.5     1.2         0.6     1.2       um
+            pch.9         0.24    0.5         0.6     1.2       um
+            pch.10        1.2     20.         0.3     0.6       um
+            pch.11        0.5     1.2         0.3     0.6       um
+            pch.12        0.24    0.5         0.3     0.6       um
+          ----------------------------------------------------------
+
+         The parameter HDIF listed in model card is based on the layout of
+         testkey PCM51, users must change this value according to their
+         layout.
+   
+         (ps: for more information about ACM = 12, please reference the HSPICE
+              release note. Also please note that AS/AD and PS/PD need to be
+              specified to avoid zero junction capacitance and to result in
+              correct junction leakage current.)
+
+      2. 3.3V MOS DEVICE MODELS
+
+
+         .lib TT_3V : Typical model ( Typical NMOS with ESD implant )
+              SS_3V : Slow NMOS Slow PMOS model ( Slow NMOS with ESD implant )
+              FF_3V : Fast NMOS Fast PMOS model ( Fast NMOS with ESD implant )
+              SF_3V : Slow NMOS Fast PMOS model ( Slow NMOS with ESD implant )
+              FS_3V : Fast NMOS Slow PMOS model ( Fast NMOS with ESD implant )
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch3.1        1.21   20.0         10.02  101.       um
+            nch3.2        0.61   1.21         10.02  101.       um
+            nch3.3        0.35   0.61         10.02  101.       um
+            nch3.4        1.21   20.0          1.22  10.02      um
+            nch3.5        0.61   1.21          1.22  10.02      um
+            nch3.6        0.35   0.61          1.22  10.02      um
+            nch3.7        1.21   20.0          0.62   1.22      um
+            nch3.8        0.61   1.21          0.62   1.22      um
+            nch3.9        0.35   0.61          0.62   1.22      um
+            nch3.10       1.21   20.0          0.3    0.62      um
+            nch3.11       0.61   1.21          0.3    0.62      um
+            nch3.12       0.35   0.61          0.3    0.62      um
+          ----------------------------------------------------------
+            pch3.1        1.21   20.0         10.02  101.       um
+            pch3.2        0.61   1.21         10.02  101.       um
+            pch3.3        0.30   0.61         10.02  101.       um
+            pch3.4        1.21   20.0         1.22   10.02      um
+            pch3.5        0.61   1.21         1.22   10.02      um
+            pch3.6        0.30   0.61         1.22   10.02      um
+            pch3.7        1.21   20.0         0.62    1.22      um
+            pch3.8        0.61   1.21         0.62    1.22      um
+            pch3.9        0.30   0.61         0.62    1.22      um
+            pch3.10       1.21   20.0         0.3     0.62      um
+            pch3.11       0.61   1.21         0.3     0.62      um
+            pch3.12       0.30   0.61         0.3     0.62      um
+          ----------------------------------------------------------
+            ech3          0.50   20.0         15.0   200.0      um
+          ----------------------------------------------------------
+         The parameter HDIF listed in model card is based on the layout of
+         testkey PCM51, users must change this value according to their
+         layout.
+
+         (ps: for more information about ACM = 12, please reference the HSPICE
+              release note. Also please note that AS/AD and PS/PD need to be
+              specified to avoid zero junction capacitance and to result in
+              correct junction leakage current.)
+
+ B) Spectre model :
+
+  1. 2.5V BSIM3v3 models are included in 5 files and 1 Spectre supporting file:
+
+
+      typical.pm3 : Typical model
+         slow.pm3 : Slow NMOS Slow PMOS model
+         fast.pm3 : Fast NMOS Fast PMOS model
+         fnsp.pm3 : Fast NMOS Slow PMOS model
+         snfp.pm3 : Slow NMOS Fast PMOS model
+
+     log025b3.mod : Auto model selector
+
+           Model name        length range         width range  unit
+                             low     high         low    high    
+          ----------------------------------------------------------
+            nch_1         1.21   20.0         10     100.       um
+            nch_2         0.51   1.21         10     100.       um
+            nch_3         0.24   0.51         10     100.       um
+            nch_4         1.21   20.0         1.2     10.       um
+            nch_5         0.51   1.21         1.2     10.       um
+            nch_6         0.24   0.51         1.2     10.       um
+            nch_7         1.21   20.0         0.6     1.2       um
+            nch_8         0.51   1.21         0.6     1.2       um
+            nch_9         0.24   0.51         0.6     1.2       um
+            nch_10        1.21   20.0         0.3     0.6       um
+            nch_11        0.51   1.21         0.3     0.6       um
+            nch_12        0.24   0.51         0.3     0.6       um
+          ----------------------------------------------------------
+            pch_1         1.2     20.         10     100.       um
+            pch_2         0.5     1.2         10     100.       um
+            pch_3         0.24    0.5         10     100.       um
+            pch_4         1.2     20.         1.2     10        um
+            pch_5         0.5     1.2         1.2     10        um
+            pch_6         0.24    0.5         1.2     10        um
+            pch_7         1.2     20.         0.6     1.2       um
+            pch_8         0.5     1.2         0.6     1.2       um
+            pch_9         0.24    0.5         0.6     1.2       um
+            pch_10        1.2     20.         0.3     0.6       um
+            pch_11        0.5     1.2         0.3     0.6       um
+            pch_12        0.24    0.5         0.3     0.6       um
+          ----------------------------------------------------------
+
+  2. 3.3V BSIM3v3 models are included in 5 files and 1 Spectre supporting file:
+
+
+       3vtyp.pm3  : Typical model ( Typical NMOS with ESD implant )
+       3vslow.pm3 : Slow NMOS Slow PMOS model ( Slow NMOS with ESD implant )
+       3vfast.pm3 : Fast NMOS Fast PMOS model ( Fast NMOS with ESD implant )
+       3vfnsp.pm3 : Fast NMOS Slow PMOS model ( Slow NMOS with ESD implant )
+       3vsnfp.pm3 : Slow NMOS Fast PMOS model ( Fast NMOS with ESD implant )
+
+     log033b3.mod : Auto model selector
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch3_1        1.21   20.0         10.02  101.       um
+            nch3_2        0.61   1.21         10.02  101.       um
+            nch3_3        0.35   0.61         10.02  101.       um
+            nch3_4        1.21   20.0          1.22  10.02      um
+            nch3_5        0.61   1.21          1.22  10.02      um
+            nch3_6        0.35   0.61          1.22  10.02      um
+            nch3_7        1.21   20.0          0.62   1.22      um
+            nch3_8        0.61   1.21          0.62   1.22      um
+            nch3_9        0.35   0.61          0.62   1.22      um
+            nch3_10       1.21   20.0          0.3    0.62      um
+            nch3_11       0.61   1.21          0.3    0.62      um
+            nch3_12       0.35   0.61          0.3    0.62      um
+          ----------------------------------------------------------
+            pch3_1        1.21   20.0         10.02  101.       um
+            pch3_2        0.61   1.21         10.02  101.       um
+            pch3.3        0.30   0.61         10.02  101.       um
+            pch3_4        1.21   20.0         1.22   10.02      um
+            pch3_5        0.61   1.21         1.22   10.02      um
+            pch3_6        0.30   0.61         1.22   10.02      um
+            pch3_7        1.21   20.0         0.62    1.22      um
+            pch3_8        0.61   1.21         0.62    1.22      um
+            pch3_9        0.30   0.61         0.62    1.22      um
+            pch3_10       1.21   20.0         0.3     0.62      um
+            pch3_11       0.61   1.21         0.3     0.62      um
+            pch3_12       0.30   0.61         0.3     0.62      um
+          ----------------------------------------------------------
+            ech3          0.50   20.0         15.0   200.0      um
+          ----------------------------------------------------------
+
+
+2) VERTICAL P+/NW/PSUB BIPOLAR
+
+      .lib BIP
+
+            Model name      emitter area      base area         unit
+          ------------------------------------------------------------
+              pnp10             100              256            um^2
+          ------------------------------------------------------------
+            ( P+/NW/PUB vertical PNP bipolar )
+
+
+3) N+/PW, P+/NW & NW/PSUB junction diode
+
+      .lib DIO
+
+        Scalable junction diode model ( level 3 ) was used for modeling.
+        User can change the AREA, PJ (perimeter) according their layout
+        to simulate their circuit.
+
+
+4) INTERCONNECTION MODEL TABLE
+
+       1. typ_strA : typical case, structure A interconnection table
+
+       2. typ_strB : typical case, structure B interconnection table
+
+       3. wor_strA : worst   case, structure A interconnection table
+
+       4. wor_strB : worst   case, structure B interconnection table
+
+
+5) RAW DATA :
+
+      ## raw data files:
+
+        1.  readme.txt : explain how to read the raw data format 
+
+        2.  nmos.log   : for NMOS DEVICES GROUP (without ESD implant)
+
+        3.  pmos.log   : for PMOS DEVICES GROUP (without ESD implant)
+
+        4.  nmos3.log  : for 3V NMOS DEVICES GROUP (without ESD implant)
+
+        5.  pmos3.log  : for 3V PMOS DEVICES GROUP (without ESD implant)
+
+
+6) UPDATE HISTORY :
+
+
+      V1.3 : Adding interconnect capaciatnce models.
+             Addind NW/Psub diode model.
+             Adding N+ diff. w/o silicide w/i ESD & NW diffusion (under OD)
+             resistance's temperature & delta_W coefficients.
+             Revised sheet resistance values for Metal 1 ~ Metal 5.
+
+      V1.2 : Change V0.3 3.3V MOS model to V1.1 3.3V MOS model.
+             Added V1.1 3.3V NMOS model with ESD implant.
+             Revised resistor model in metal resistance.
+
+      V1.1 : Create 2.5V MOS model & added V0.3 3.3V MOS model, P+/NW/Psub
+             vertical bipolar model, diode model, and resistor model.

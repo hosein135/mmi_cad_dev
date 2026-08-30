@@ -1,0 +1,385 @@
+;; -*-Emacs-Lisp-*-
+
+(define-schema nl
+
+  (primitive int)
+  (primitive float)
+  (primitive char*)
+  (primitive void*)
+
+
+  (type uint "unsigned int %s")
+  (type init_fun "void (*%s)(void *, void *)")
+  (type free_fun "void (*%s)(void *)")
+
+
+  (require mem_group "mem.h")
+  (require ar "ar.h")
+  (require hashtab "hashtab.h")
+  (require ht_attr "hashtab.h")
+
+
+  (enum direction (null in out inout unknown))
+
+  (enum kind (null context library design libcell port cell pin libpin net
+		   reference refpin type bus attr subprogram ast symbol
+		   dll_head idesign icell inet ipin iport free_port
+		   free_cell free_net free_pin free_icell free_inet
+		   free_ipin free_iport))
+
+  (enum token (null id in out bin hex dec oct number vnum always begin
+		    posedge negedge sens_or if case casex casez
+		    default for while function task shr shl cond
+		    bitnot lognot and_reduce nand_reduce or_reduce
+		    nor_reduce xor_reduce xnor_reduce and or xor nand nor xnor
+		    andand oror add sub mul div mod gt geq lt leq eq2
+		    eq3 neq neq2 concat repeat_concat ref bit varbit
+		    slice list case_item pos neg block_assign
+		    nonblock_assign delay instance pin params funcall
+		    call varshl varshr parallel_case full_case
+		    infer_mux wire reg input output inout integer lref
+		    range unbind map_to_module return_port_name))
+
+  (enum typeclass (null scalar array integer))
+
+  (enum wireclass (null input output inout wire tri wand wor reg trireg
+			supply0 supply1))
+
+  (enum density (null sparse dense))
+
+  (enum use (null signal clock analog ground power))
+
+
+
+  (class object
+ 
+	 ((kind kind public readable)
+	  (id uint public readable))
+
+ 	 (struct context
+		 ((designs dll_head public readable)
+		  (designs_by_name (hashtab char* design))
+		  (designs_attr ht_attr)
+
+		  (libraries dll_head public readable)
+		  (libraries_by_name (hashtab char* library))
+		  (libraries_attr ht_attr)
+
+		  (current_design design public readable)
+
+		  (inet_timestamp int public readable)
+
+		  (next_dll_id int)
+		  (next_design_id int)
+		  (next_library_id int)))
+	 
+	 (struct free_object
+		 ((next free_object)))
+
+	 (class dll
+		((next dll)
+		 (prev dll))
+
+		(struct dll_head
+			((element_kind kind readable)
+			 (num_elements int public readable)))
+
+		(struct pin
+			((refpin refpin public readable writable)
+			 (owner cell_or_port public readable)
+			 (net net public readable)))
+
+		(class named_object
+		       ((name char* public readable))
+
+		       (struct design
+			       ((context context public readable)
+
+				(ports dll_head public readable)
+				(port_buses dll_head public readable)
+
+				(ports_attr ht_attr)
+				(ports_by_name (hashtab char* design_port))
+				(attrs_attr ht_attr)
+				(attrs_by_name (hashtab char* attr))
+
+				(bus_naming_style char* public readable)
+				       
+				(libcell int public readable)
+
+				(cells dll_head public readable)
+				(cell_buses dll_head public readable)
+				(nets dll_head public readable)
+				(net_buses dll_head public readable)
+				(references dll_head public readable)
+				(types dll_head public readable)
+				(attrs dll_head public readable)
+				(subprograms dll_head public readable)
+				(symbols dll_head public readable)
+				(idesigns dll_head public readable)
+
+				(objects_attr ht_attr)
+				(objects_by_name (hashtab char* design_object))
+				(references_attr ht_attr)
+				(references_by_name (hashtab char*))
+				(types_attr ht_attr)
+				(types_by_name (hashtab char* type))
+				(subprograms_attr ht_attr)
+				(subprograms_by_name (hashtab char* subprogram))
+				(symbols_attr ht_attr)
+				(symbols_by_name (hashtab char* symbol))
+
+				(supply0s (ar nl_object) public readable)
+				(supply1s (ar nl_object) public readable)
+
+				;; The following are free lists for all the
+				;; objects for which we need to support dense
+				;; attributes.
+				(free_ports free_object)
+				(free_cells free_object)
+				(free_nets free_object)
+				(free_pins free_object)
+				(mem_group mem_group readable public)
+
+				(next_port_id int)
+				(next_cell_id int)
+				(next_net_id int)
+				(next_pin_id int)
+				(next_reference_id int)
+				(next_refpin_id int)
+				(next_bus_id int)
+				(next_type_id int)
+				(next_attr_id int)
+				(next_subprogram_id int)
+				(next_symbol_id int)
+				(next_idesign_id int)))
+			      
+		       (struct libcell
+			       ((library library public readable)
+				(libpins_attr ht_attr)
+				(libpins_by_name (hashtab char* libpin))
+				(libpins dll_head public readable)
+				(buses dll_head public readable)))
+	       
+		       (struct libpin
+			       ((libcell libcell public readable)
+				(direction direction public readable)
+				(bus bus public readable)
+				(bus_offset int public readable)
+				(use use public readable)
+				(capacitance float public readable)))
+		
+		       (struct refpin
+			       ((reference reference public readable)
+				(down_port object public readable writable)
+				(direction direction public readable)
+				(position int readable writable)
+				(bus bus public readable)
+				(bus_offset int public readable writable)))
+		
+		       (struct bus
+			       ((owner object public readable)
+				(member_kind kind public readable)
+				(members (ar object) public readable)
+				(type type public readable)))
+
+		       (class attr
+			      ((owner object public readable)
+			       (attr_of kind public readable)
+			       (density density public readable))
+
+			      (struct dense_attr
+				      ((array (ar void*))
+				       (init_fun init_fun)
+				       (free_fun free_fun)))
+
+			      (struct sparse_attr
+				      ((table (hashtab object))
+				       (attr ht_attr)))
+
+			      (struct design_attr)
+			      (struct net_attr)
+			      (struct cell_attr)
+			      (struct reference_attr)
+			      (struct refpin_attr)
+			      (struct pin_attr)
+			      (struct port_attr)
+			      (struct bus_attr)
+			      (struct symbol_attr)
+			      (struct idesign_attr)
+			      (struct icell_attr)
+			      (struct inet_attr)
+			      (struct ipin_attr)
+			      (struct iport_attr)
+			      (struct library_attr)
+			      (struct libcell_attr)
+			      (struct libpin_attr))
+
+		       (struct symbol
+			       ((owner subprogram public readable)
+				(type type public readable)
+				(constituents ar public readable)
+				(class wireclass public readable)
+				(binding void* public readable)))
+
+		       (struct type
+			       ((owner object public readable)
+				(class typeclass public readable)
+				(left int public readable)
+				(right int public readable)
+				(base_type type public readable)))
+
+		       (class design_object
+			      ((design design public readable))
+
+			      (class cell_or_port
+				     ()
+			      
+				     (struct port
+					     ((direction direction public
+							 readable writable)
+					      (pin pin public readable)
+					      (bus bus public readable)
+					      (bus_offset int public readable)))
+
+				     (struct cell
+					     ((reference reference public
+							 readable)
+					      (file char* public readable)
+					      (line int public readable)
+					      (inputs (ar pin) public readable)
+					      (outputs (ar pin) public
+						       readable)
+					      (inouts (ar pin) public readable)
+					      (bus bus public readable)
+					      (bus_offset int public readable))))
+
+			      (struct net
+				      ((fanins dll_head public readable)
+				       (fanouts dll_head public readable)
+				       (fanios dll_head public readable)
+				       (bus bus public readable)
+				       (bus_offset int public readable)
+				       (class wireclass public readable)))
+
+			      (struct reference
+				      ((down_design object public readable)
+				       (buses dll_head public readable)
+				       (refpins dll_head public readable)
+				       (refpins_attr ht_attr)
+				       (refpins_by_name (hashtab char* int))
+				       (inputs (ar refpin) public readable)
+				       (outputs (ar refpin) public readable)
+				       (inouts (ar refpin) public readable)
+				       (instances (ar cell) public readable)
+				       (tree ast public readable)
+				       (parameters ar public readable)
+				       ))
+
+			      (struct subprogram
+				      ((type type public readable)
+				       (symbols_by_name (hashtab char* symbol))
+				       (symbols_attr ht_attr)
+				       (pragmas ast public readable)
+				       (formals dll_head readable public)
+				       (locals dll_head readable public)
+				       (body ast public readable)))
+			      )
+
+		       (struct library
+			       ((context context public readable)
+
+				(attrs dll_head)
+				(attrs_by_name (hashtab char* attr))
+				(attrs_attr ht_attr)
+
+				(types dll_head)
+				(types_attr ht_attr)
+				(types_by_name (hashtab char* type))
+
+				(libcells dll_head public readable)
+				(libcells_by_name (hashtab char* libcell))
+				(libcells_attr ht_attr)
+
+				(next_attr_id int)
+				(next_libcell_id int)
+				(next_libpin_id int)
+				(next_type_id int)
+				(next_bus_id int)
+				
+				(mem_group mem_group public readable))))
+			       
+
+		(struct idesign
+			((design design public readable)
+			 (icell icell public readable)
+
+			 (attrs dll_head)
+			 (attrs_by_name (hashtab char* attr))
+			 (attrs_attr ht_attr)
+
+			 (cell_attr cell_attr) 
+			 (net_attr net_attr)
+			 (pin_attr pin_attr)
+			 (port_attr port_attr)
+
+			 (next_icell_id int)
+			 (next_inet_id int)
+			 (next_ipin_id int)
+			 (next_iport_id int)
+			 (next_attr_id int)
+
+			 (free_icells free_object)			 
+			 (free_inets free_object)
+			 (free_ipins free_object)		 
+			 (free_iports free_object)))
+
+		(class idesign_object
+		       ((idesign idesign public readable))
+		
+		       (struct icell
+			       ((cell cell public readable)
+				(down_design idesign public readable)))
+
+		       (struct inet
+			       ((net net public readable)
+				(timestamp int public readable)))
+
+		       (struct ipin
+			       ((pin pin public readable)))
+		
+		       (struct iport
+			       ((port port public readable)
+				(up_pin ipin public readable)))))
+
+	 (class ast
+		((token token public readable)
+		 (line int public readable)
+		 (file char* public readable)
+		 (width int public readable)
+		 (child ast public readable)
+		 (sibling ast public readable))
+	  
+		(struct number_ast
+			((value int public readable)))
+
+		(struct in_ast
+			((index int public readable)))
+
+		(struct out_ast
+			((index int public readable)))
+
+		(struct id_ast
+			((name char* public readable)))
+
+		(struct vnum_ast
+			((bits char* public readable)))
+		
+		(struct ref_ast
+			((object object public readable)))))
+  
+  (enum walk_status (null continue skip stop))
+
+  (type walk_fun "nl_walk_status (*%s) (nl_object, void *)")
+  (type ast_walk_fun "nl_walk_status (*%s) (nl_ast *, void *)")
+  (type ast_prewalk_fun "void (*%s) (nl_ast)"))

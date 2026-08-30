@@ -1,0 +1,193 @@
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# wish script to run powermill on this machine and optionally call back
+# when powermill is finished.
+
+###########################################################################
+
+# READ AND MODIFY THIS AREA FOR INSTALLATION
+
+# This is the string used to run powermill.  Note that the
+# <cell> will be automatically replaced at runtime
+
+set run_string "powrmill -n <cell>.sp -o <cell>"
+
+# execute any setup commands, such as sourcing powermill setup or
+# set the flexlm license variable.  Separate commands with a semicolon (;)
+
+set setup "source /utility/packages/epic/CSHRC"
+
+# run powermill on the following host.  If node locked to a particular
+# host, set the hostname here.  Otherwise set to $env(HOST).
+
+set host $env(HOST)
+
+###########################################################################
+
+
+# First define some useful procedures.
+
+proc call_with_keyword {_ARG_LIST _DEFAULT_LIST} {
+  
+  set _RETURN ""
+
+  upvar default_value default_value
+  upvar defaulted defaulted
+  foreach _DEFAULT $_DEFAULT_LIST {
+    set _ARG_NAME [lindex $_DEFAULT 0] 
+    upvar $_ARG_NAME $_ARG_NAME
+    set $_ARG_NAME [lindex $_DEFAULT 1]
+    set default_value($_ARG_NAME) [set $_ARG_NAME]
+    set defaulted($_ARG_NAME) 1
+  }
+
+  for {set _INDEX 0} {$_INDEX < [llength $_ARG_LIST]} {} {
+    if {[string index [lindex $_ARG_LIST $_INDEX] 0] == "-"} {
+      # is a keyword pair
+      set _ARG_NAME [string range [lindex $_ARG_LIST $_INDEX] 1 end]
+      set _ARG_VALUE [lindex $_ARG_LIST [expr $_INDEX+1]]
+    
+      if {[info exists $_ARG_NAME] == 0} {
+	puts "\"$_ARG_NAME\" is not a valid argument to call_with_keyword."
+	return
+      }
+      set $_ARG_NAME $_ARG_VALUE
+      set defaulted($_ARG_NAME) 0
+      incr _INDEX 2
+
+    } else {
+      # not a keyword pair
+      lappend _RETURN [lindex $_ARG_LIST $_INDEX]
+
+      incr _INDEX
+    }
+  }
+  return $_RETURN
+}
+
+
+# returns the value of the first variable name in the list that is defined
+# and not equal to "".  If the first character of the name is ' then
+# it is a literal.
+
+proc use_first args {
+  
+  foreach var $args {
+    if {[string index $var 0] == "'"} {
+      return [string range $var 1 end]
+    }
+    upvar $var name
+    if {[info exists name] && $name != ""} {
+	return $name
+    }
+  }
+}
+
+
+# send a message back to the caller using the CALLBACK variable.  CALLBACK
+# should be of the form "send <interp> <proc>"  where <interp> can be 
+# found from [winfo name .]
+
+proc call_back code {
+
+  global CALLBACK
+
+  if {$CALLBACK == ""} {
+    exit $code
+  }
+
+  # hide wish window just in case this takes a while
+  wm withdraw .
+
+  # more choking
+  regsub " \#" $CALLBACK {\ \#} CALLBACK 
+
+  # send the code to the callback
+  set error [catch "$CALLBACK $code" error_msg]
+
+  # error usually have to do with xauth.  Must do an "xhost -" and have
+  # no host shown during xhost.
+  if {$error != 0} {
+    puts $error_msg
+  }
+
+  exit $code
+}
+
+
+###########################################################################
+
+# Now execute
+
+# read in the arguments
+
+# Special case of csh choking on quotes.  If CALLBACK option then group
+# together all next arguments.  Requires CALLBACK to be last argument
+set index [lsearch $argv -CALLBACK]
+if {$index != -1 && [expr $index + 2] != [llength $argv]} {
+  set argv "[lrange $argv 0 $index] \"[lrange $argv [expr $index + 1] end]\""
+}
+
+set filename [call_with_keyword $argv {{CALLBACK ""} {QUIET ""}}]
+
+set cell [file rootname $filename]
+set dir [file dirname $filename]
+if {$dir == "."} {
+  set dir [pwd]
+}
+set errfile $cell.err
+
+# get rid of any bogus prefixes from the automounter
+#set bogus [lindex [split $dir /] 1]
+#if {$bogus == "tmp_mnt" || $bogus == "export" || $bogus == "a"} {
+#  set dir /[join [lrange [split $dir /] 2 end] /]
+#}
+
+# replace <cell> with the actual cell name
+regsub -all <cell> $run_string $cell run_string
+
+# need to quote semicolons
+regsub -all \; $setup \\\; setup
+
+# run powermill
+puts "Starting powermill on $host at [exec date]"
+
+# unfortunately, powermill doesn't just return an exit status, it
+# causes as error that we have to catch.
+# Need to use rsh so that sourcing works (exec bug).
+if {$QUIET == "" && $host == $env(HOST)} {
+  # show all output to screen
+  catch "exec rsh -n $host cd $dir \\; $setup \\; $run_string >& [exec tty]" error_output
+
+  # alert the user that powermill finished
+  bell
+
+} else {
+  # send output to a file
+  catch "exec rsh -n $host cd $dir \\; $setup \\; $run_string >& $cell.run" error_output
+}
+
+###############################################################################
+#	Check for errors 
+###############################################################################
+
+cd $dir
+
+# if this string in the error file, we won
+if {[catch "exec grep {errors in this file: 0} $errfile" result] == 0 && \
+      $result != ""} {
+  # powermill completed successfully
+  call_back 1
+
+} else {
+  # error
+  puts "Powermill exited with an error."
+  call_back 0
+} 
+
+# Note: call_back includes an exit statement
+
+

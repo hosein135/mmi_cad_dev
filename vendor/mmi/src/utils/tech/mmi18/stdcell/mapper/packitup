@@ -1,0 +1,17 @@
+mkdir send
+cp README send
+cp doit send
+cp mapper.tcl send
+cp map_mmi25 send
+cd send
+mkdir mmi_body
+cd mmi_body
+cp ../../mmi_body/*.body .
+cd ..
+tar cvf - . > send.tar
+gzip send.tar
+cd ..
+cp send/send.tar.gz .
+rm -r send
+
+

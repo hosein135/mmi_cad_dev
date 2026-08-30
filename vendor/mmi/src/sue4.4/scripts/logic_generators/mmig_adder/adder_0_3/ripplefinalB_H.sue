@@ -1,0 +1,101 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_ripplefinalB_H {} {
+  make input -orient RY -name A_H -origin {-20 450}
+  make input -orient RY -name B_H -origin {-20 490}
+  make input -orient R90Y -name Cin_H -origin {670 860}
+  make output -name Sum_H -origin {1160 610}
+  generate name_net_s name_net -cell name_net
+  make name_net -name K_H -origin {340 610}
+  make name_net -name G_H -origin {340 470}
+  make name_net -name P_H -origin {960 590}
+  make name_net -name K_L -origin {340 550}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {250 1070}
+  make row_spanner300 -origin {900 1070}
+  make name_net -name Cout_L -origin {550 240}
+  make output -orient R90Y -name Cout_H -origin {460 70}
+  make name_net -name Cin_L -origin {960 630}
+  make ripplefinalB_H -origin {30 210}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -orient RY -origin {90 470}
+  generate MMI_NOR2 MMI_NOR2B_1 -Size B -DeMorgan 1
+  make MMI_NOR2B_1 -orient RY -origin {90 550}
+  make MMI_NOR2B_1 -origin {470 590}
+  generate MMI_INV MMI_INVB -Size B
+  make MMI_INVB -origin {470 690}
+  generate MMI_INV MMI_INVB_1 -Size B -DeMorgan 1
+  make MMI_INVB_1 -orient R270 -origin {460 160}
+  generate MMI_INV MMI_INVC -Size C
+  make MMI_INVC -origin {230 550}
+  generate MMI_INV MMI_INVC_1 -Size C -DeMorgan 1
+  make MMI_INVC_1 -origin {230 470}
+  generate MMI_AOI21 MMI_AOI21C -Size C
+  make MMI_AOI21C -orient R270 -origin {670 360}
+  generate MMI_XNOR2 MMI_XNOR2B_1 -Size B -DeMorgan 1
+  make MMI_XNOR2B_1 -orient RY -origin {1060 610}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.3 -date 02/19/99 -origin {520 1180}
+  make_wire -20 490 10 490
+  make_wire 380 470 380 570
+  make_wire 170 610 340 610
+  make_wire 170 550 170 610
+  make_wire 550 240 670 240
+  make_wire 550 240 460 240
+  make_wire 30 530 40 530
+  make_wire 30 450 30 530
+  make_wire 10 490 10 570
+  make_wire 960 630 960 690
+  make_wire 670 740 380 740
+  make_wire -20 450 30 450
+  make_wire 30 450 40 450
+  make_wire 10 490 40 490
+  make_wire 180 470 150 470
+  make_wire 280 470 340 470
+  make_wire 40 570 10 570
+  make_wire 150 550 170 550
+  make_wire 170 550 180 550
+  make_wire 420 570 380 570
+  make_wire 420 610 340 610
+  make_wire 380 690 420 690
+  make_wire 380 690 380 740
+  make_wire 520 690 960 690
+  make_wire 460 210 460 240
+  make_wire 460 70 460 110
+  make_wire 710 450 710 550
+  make_wire 280 550 340 550
+  make_wire 340 550 710 550
+  make_wire 640 450 640 470
+  make_wire 340 470 380 470
+  make_wire 380 470 640 470
+  make_wire 670 240 670 260
+  make_wire 670 450 670 740
+  make_wire 670 740 670 860
+  make_wire 530 590 960 590
+  make_wire 990 590 960 590
+  make_wire 990 630 960 630
+  make_wire 1120 610 1160 610
+  make_text -origin {-30 890} -text {This is the same cell as rippleB_H, with an inverter added
+to create Cout_H from Cout_L.}
+}
+
+proc ICON_ripplefinalB_H args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin_H
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout_H
+  icon_property -origin {-60 220} -type user -name name
+  icon_property -origin {-60 240} -type user -name M
+  icon_property -origin {-60 260} -type user -name dpc
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin_H
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label ripplefinalB_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+}
+

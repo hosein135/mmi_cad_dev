@@ -1,0 +1,14 @@
+proc ICON_inverter args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {delay 100} {drive strong}}
+  icon_term -type output -origin {50 0} -name out
+  icon_term -type input -origin {-30 0} -name in
+  icon_property -origin {-70 50} -type user -name name
+  icon_property -origin {-70 70} -type user -name delay -default 100
+  icon_line -30 -30 -30 30 30 0 -30 -30
+  icon_arc 30 -10 50 10 -start 0 -extent 359
+  icon_property -origin {-20 0} -text {[if {$delay != "0"} {set delay}]}
+  icon_property -origin {-70 90} -type user -name drive -default strong
+  icon_property -origin {-70 130} -type fixed -name verilog \
+	-text {not \#$delay [unique_name "" $name inv]\($out, $in\)\;}
+}
+

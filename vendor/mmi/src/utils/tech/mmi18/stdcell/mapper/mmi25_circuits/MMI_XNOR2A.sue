@@ -1,0 +1,61 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_XNOR2A {} {
+  make global -name gnd -origin {660 560}
+  make global -orient RY -name vdd -origin {370 160}
+  make nmos -W 1.2 -origin {660 420}
+  make nmos -W 1.2 -origin {660 520}
+  make pmos -W 2.4 -origin {370 300}
+  make pmos -W 2.4 -origin {370 200}
+  make pmos -W 2.4 -origin {660 200}
+  make global -name gnd -origin {370 560}
+  make nmos -W 1.2 -origin {370 520}
+  make pmos -W 2.4 -origin {660 300}
+  make nmos -W 1.2 -origin {370 420}
+  make inverter -WP 1.2 -WN 0.6 -origin {110 420}
+  make output -name out -origin {760 360}
+  make input -name in1 -origin {40 520}
+  make inverter -WP 1.2 -WN 0.6 -origin {470 520}
+  make global -orient RY -name vdd -origin {660 160}
+  make input -name in0 -origin {40 420}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in0_L -origin {210 420}
+  make name_net -name in1_L -origin {550 520}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {380 760}
+  make_wire 370 380 370 360
+  make_wire 370 340 370 360
+  make_wire 370 240 370 260
+  make_wire 660 480 660 460
+  make_wire 660 240 660 260
+  make_wire 660 360 660 380
+  make_wire 370 480 370 460
+  make_wire 660 340 660 360
+  make_wire 560 420 600 420
+  make_wire 600 200 580 200
+  make_wire 580 200 580 520
+  make_wire 580 520 600 520
+  make_wire 310 300 430 300
+  make_wire 310 200 260 200
+  make_wire 260 200 260 520
+  make_wire 40 420 80 420
+  make_wire 40 300 40 420
+  make_wire 440 520 310 520
+  make_wire 430 300 560 420
+  make_wire 560 300 430 420
+  make_wire 560 300 600 300
+  make_wire 40 300 310 300
+  make_wire 310 420 430 420
+  make_wire 210 420 160 420
+  make_wire 210 420 310 420
+  make_wire 370 360 660 360
+  make_wire 660 360 760 360
+  make_wire 550 520 520 520
+  make_wire 550 520 580 520
+  make_wire 40 520 260 520
+  make_wire 260 520 310 520
+  make_text -origin {20 120} -text {Exclusive NOR}
+  make_text -origin {20 140} -text {A Size}
+  make_text -origin {20 100} -text MMI_XNOR2A -size large
+}
+

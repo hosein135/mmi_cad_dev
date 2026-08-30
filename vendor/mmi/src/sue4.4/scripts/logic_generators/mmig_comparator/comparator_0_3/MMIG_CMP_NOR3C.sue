@@ -1,0 +1,52 @@
+# SUE version MMI_SUE4.0p4
+
+proc SCHEMATIC_MMIG_CMP_NOR3C {} {
+  generate MMI_NOR3 MMI_NOR3B_ -Size B -DeMorgan 1
+  make MMI_NOR3B_ -origin {440 360}
+  make MMI_NOR3B_ -origin {440 460}
+  make output -name out -origin {600 410}
+  make input -name in0 -origin {220 340}
+  make input -name in1 -origin {220 360}
+  make input -name in2 -origin {220 380}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.3 -date 06/14/99 -origin {370 660}
+  make_wire 530 460 500 460
+  make_wire 530 410 600 410
+  make_wire 500 360 530 360
+  make_wire 530 360 530 410
+  make_wire 530 410 530 460
+  make_wire 380 440 290 440
+  make_wire 290 440 290 340
+  make_wire 290 340 380 340
+  make_wire 290 340 220 340
+  make_wire 380 460 270 460
+  make_wire 270 460 270 360
+  make_wire 270 360 380 360
+  make_wire 270 360 220 360
+  make_wire 380 480 250 480
+  make_wire 250 480 250 380
+  make_wire 250 380 380 380
+  make_wire 250 380 220 380
+  make_text -origin {70 200} -text MMIG_CMP_NOR3C -size large
+  make_text -origin {70 230} -text {There is no MMI_NOR3C available, so create one by putting two MMI_NOR3B's in parallel.}
+}
+
+proc ICON_MMIG_CMP_NOR3C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 0} -name in1
+  icon_term -type input -origin {-60 20} -name in2
+  icon_term -type output -origin {60 0} -name out
+  icon_property -origin {-50 70} -type user -name name
+  icon_property -origin {-50 90} -type user -name M
+  icon_property -origin {-50 110} -type user -name dpc
+  icon_arc -30 -30 40 30 -start 277 -extent 166
+  icon_line 10 -30 -40 -30 -40 30 10 30
+  icon_line 40 0 60 0
+  icon_arc -60 10 -40 30 -start 0 -extent 359
+  icon_arc -60 -10 -40 10 -start 0 -extent 359
+  icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  icon_property -origin {0 0} -size large -anchor center -label C
+  icon_property -origin {-37 -22} -size small -label F
+}
+

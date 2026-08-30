@@ -1,0 +1,344 @@
+ToolGetBox --
+-------------
+
+Returns the box CellDef and location in CellDef coords.
+
+Results:
+TRUE if the box exists.
+
+Side effects:
+The rootArea parameter is modified to contain the area
+of the box.  If rootArea is NULL, it is ignored.
+Same with rootDef.
+
+ToolGetBoxWindow --
+-------------------
+
+Returns information about the current box location.  Used by
+command processing routines.
+
+Results:
+The return value is a pointer to a window containing the
+box, or NULL if the box doesn't exist in any window.  Note:
+the box may actually be in more than one window, so this
+isn't necessarily the only window containing the box.
+
+Side effects:
+The rootArea parameter is modified to contain the area
+of the box.  If rootArea is NULL, it is ignored.  The
+integer pointed to by pMask is modified to contain a
+mask of all windows containing the box (there may be more
+than one).  If pMask is NULL, it is ignored.
+
+ToolGetEditBox --
+-----------------
+
+Fill in the location of the box in edit cell coordinates.
+
+Results:
+TRUE if the box can indeed be put into edit cell coordinates.
+FALSE and an error message otherwise.
+
+Side effects:
+Sets *rect to be the coordinates of the box tool in edit cell
+coordinates, if TRUE was returned.
+
+Prints an error message if the box is not found or the box
+is not in the edit cell coordinate system.
+
+LaySetBox --
+------------
+
+Change the location and/or size of the box.
+
+Results:
+None.
+
+Side effects:
+Information is recorded so that the box will be redrawn.
+
+LayChangedWindow --
+-------------------
+
+Mark part of layout window for future redisplay, and schedule
+redisplay.
+
+The area is noted as having changed in window w.  
+If area is NULL, the entire window is marked for redisplay.
+If w is NULL, all layout windows are marked for redisplay.
+
+LayChangedDisplay --
+--------------------
+
+Called when something effecting redisplay is changed, 
+e.g. the layers visible on the screen or the styles for
+displaying layers are changned.
+
+LayChangedHighlight --
+----------------------
+
+Schedule highlight redisplay of given area in given rootdef.
+
+Highlights are "white".  They include, box,selection,feedback areas 
+and flylines.  The important thing about highlights is that, they
+use their own color-map plane, and hence can be changed without
+having to redraw "underlying" paint etc. 
+
+Results:
+None.
+
+LayChangedSelection --
+----------------------
+
+TODO:  call LayChangedHighlight directly!
+Mark areas for redisplay.
+
+Results:
+None.
+
+LayChangedDef --
+----------------
+
+Schedule redisplay of specified area in windows containing the specifed
+cellDef as root.
+
+If any labels may have been deleted in the area, layers should be NULL. 
+If layers = NULL, the area is automatically expanded enough to encompass
+any text that may have stuck out from labels in this area (so it is properly
+erased.
+
+NOTE:  only effects windows with cellDef as root.
+
+Results:
+None.
+
+LayChangedScheduleDef --
+------------------------
+
+Schedule redisplay for windows having rootDef as their root
+def.
+
+NOTE:  This call does not specify which areas to redisplay.  The redisplay
+code does a DBUpdate() to generate calls to LayChangedDef()
+for areas that need redisplay.
+
+Results:
+None.
+
+LayCoarseDelete --
+------------------
+
+Delete coarse db for given def
+
+LayCoarseChange --
+------------------
+
+Mark changed area for recomputation of coarse db.
+NULL area means recompute entire bbox.
+
+LayCoarseFlush --
+-----------------
+
+Delete coarse planes for all defs.
+
+LayCurWindow --
+---------------
+
+Get current layout window.  Used by Mgc/ module.
+
+Result:
+Current Layout window.
+
+Side Effects:      
+None
+
+LayDisplayInit --
+-----------------
+
+Called at startup time, 
+after technology file read in and graphics initialization.
+
+LayDisplayHLBox --
+------------------
+
+This procedure is called by LayDisplay() to
+to redraw the box in a given window.
+
+ALSO called by layChangedBox() to mark box areas for later highlight
+redisplay.
+
+modes: 
+----
+LDB_DISPLAY - redisplay box.
+LDB_CHANGED - mark old box loc for redisplay.
+
+NOTE: box redrawn in its entirity on every HIGHLIGHT redisplay, 
+so new box loc need not be explicitly marked for redisplay.
+
+Results:
+None.
+
+LayFeedbackClear --
+-------------------
+
+This procedure clears all existing feedback information.
+
+Results:
+None.
+
+Side effects:
+Any existing feedback information is cleared from the screen
+and from our database.
+
+LayFeedbackAdd --
+-----------------
+
+Adds a new piece of feedback information to the list we have
+already.
+
+Results:
+None.
+
+Side effects:
+CellDef's ancestors are searched until its first root definition
+is found, and the coordinates of area are transformed into the
+root.  Then the feedback area is added to our current list, using
+the style and scalefactor given.  This stuff will be displayed on
+the screen at the end of the current command.
+
+LayFeedbackNth --
+-----------------
+
+Provides the area and text associated with a particular
+feedback area.
+
+Results:
+None.
+
+Side effects:
+The parameter "area" is filled with the area of the nth
+feedback, and the text of that feedback is returned. *pRootDef
+is filled in with rootDef for window of feedback area.  *pStyle
+is filled in with the display style for the feedback area.  If
+the particular area doesn't exist (nth >= LayFeedbackCount),
+area and *pRootDef  and *pStyle are untouched and NULL is
+returned.  NULL	may also be returned if there simply wasn't
+any text associated with the selected feedback.
+
+LayFrame --
+-----------
+
+Make the given database area visible in the layout widget.
+(Sets up the db/pixel transform accordingly)
+
+PROPERTIES OF THIS ROUTINE:
+
+lowerleft corner of window corresponds to db point.
+(right and upper edges generally not on exact db grid).
+
+iterated LayFrame call on lay_dbArea does not change the transform.
+
+LayloadWindow --
+----------------
+
+Replace the root cell of a window by the specified cell.
+
+A cell name of NULL causes the cell with name "(UNNAMED)" to be
+created if it does not already exist, or used if it does.
+
+Results:
+None.
+
+Side effects:
+Makes new cell the edit cell.
+Clears the selection.  (to make sure no refs to old rootUse)
+
+WindSearch --
+-------------
+
+Search for all of the Layout windows that contain a particular
+surface area, whether exposed or not.
+
+Results:
+if func ever returns non-zero, WindSearch() terminates search and
+returns with the same result.  Otherwise WindSearch() returns 0.
+
+Side effects:
+Calls the function 'func' for each window that matches. 'func' should
+be of the form
+
+int func(window, clientData)
+Layout *window;		
+ClientData clientData;
+{
+}
+
+Window is the window that matched the search, and clientData is the
+clientData parameter supplied to this procedure.
+If the function returns a non-zero value the search is aborted, and
+that value is returned.  Otherwise the search continues and 0 is
+returned.
+
+LayoutTclInit --
+----------------
+
+Initialize tcl commands for this module.  
+
+LayoutInit --
+-------------
+
+Technology independent module initialization.  
+
+LayPointGet --
+--------------
+
+rootPoint set to nearst DB point.
+rootArea  set to one-by-one rect containing point.
+
+returns pointer to Layout window containing point. 
+
+LayTechAddStyle --
+------------------
+
+Add a new entry to the style tables.
+
+Results:
+TRUE if successful, FALSE on error.
+
+Side effects:
+Updates the display module's technology variables.
+
+LayUndoOldEdit --
+-----------------
+LayUndoNewEdit --
+
+Record the old and new edit cells when the edit cell changes.
+
+Results:
+None.
+
+Side effects:
+Each creates a single undo list entry.
+
+LayUndoBox --
+-------------
+
+Remember a box change for later undo-ing.
+
+Results:
+None.
+
+Side effects:
+An entry is added to the undo list.
+
+LayUndoLoad --
+--------------
+
+Remember a window rootcell change for later undo-ing.
+
+Results:
+None.
+
+Side effects:
+An entry is added to the undo list.
+

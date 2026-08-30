@@ -1,0 +1,235 @@
+# This is a generator for a bitslice of nand-inverts.
+
+proc NAME_mmig_nandbuf args {
+  call_use_keyword $args {{NBITS 8} {IconHeight 8} {ReduceInputLoad "N"}}
+
+  # NBITS
+  set nom [format "mmig_nandbuf_%d" $NBITS]
+
+  # ReduceInputLoad
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # IconHeight
+  set nom [format "%s%d" $nom $IconHeight]
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_nandbuf args {
+  call_use_keyword $args {{NBITS 8} {IconHeight 8} {ReduceInputLoad "N"}}
+
+  global DPC
+
+  # drawing origin
+  set base_x -350
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  # select & generate the cells
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set nand2size "A"
+    set invsize "B"
+  } else {
+    set nand2size "B"
+    set invsize "C"
+  }
+  set nand2demorgan 0
+  set nand2base "MMI_NAND2"
+  set nand2name [NAME_$nand2base -Size $nand2size -DeMorgan $nand2demorgan]
+  generate $nand2base $nand2name -Size $nand2size -DeMorgan $nand2demorgan
+  set invdemorgan 1
+  set invbase "MMI_INV"
+  set invname [NAME_$invbase -Size $invsize -DeMorgan $invdemorgan]
+  generate $invbase $invname -Size $invsize -DeMorgan $invdemorgan
+
+  # icon info
+  # MMI_NAND2
+  setl {nand2count nand2inpins nand2outpins nand2inoutpins} [generators_get_pin_info $nand2base]
+  # in
+  set npins [get_assoc ninputs $nand2count]
+  for {set i 0} {$i < $npins} {incr i} {
+    set data [lindex $nand2inpins $i]
+    set nand_in_x($i) [lindex $data 1]
+    set nand_in_y($i) [lindex $data 2]
+  }
+  # out
+  set data [lindex $nand2outpins 0]
+  set nand_out_x [lindex $data 1]
+  set nand_out_y [lindex $data 2]
+  # dimensions
+  setl {nand_x nand_y junk1 junk2 junk3 junk4} [generators_get_icon_size $nand2base]
+
+  # MMI_INV
+  setl {invcount invinpins invoutpins invinoutpins} [generators_get_pin_info "MMI_INV"]
+  # in
+  set data [lindex $invinpins 0]
+  set inv_in_x [lindex $data 1]
+  set inv_in_y [lindex $data 2]
+  # out
+  set data [lindex $invoutpins 0]
+  set inv_out_x [lindex $data 1]
+  set inv_out_y [lindex $data 2]
+  # dimensions
+  setl {inv_x inv_y junk1 junk2 junk3 junk4} [generators_get_icon_size "MMI_INV"]
+
+
+  # spacings between nand-invert icon groups
+  set yfudge $nand_y
+
+  # set inflag, wire track, row spanner locations
+  set inflag_x $base_x
+  set wire0_x [expr $inflag_x + $ws1]
+  set wire1_x [expr $wire0_x + $ws1]
+  set rs_y [expr $base_y + 150]
+
+  # init the cell placement variables
+  # limit = bitpitch 
+  set limit_h $DPC(PITCH)
+  set curr_h 0
+  set rswidth 0
+  set rs_x 0
+  set last_origin_x 0
+  set row_start [expr $base_x + 350]
+  set y $base_y
+
+  # row_count parameter for generators_place_cell, not used in this generator
+  set rc_dummy 0
+
+  for {set i 0} {$i < $NBITS} {incr i} {
+
+    # place nand
+    set nand_origin_x [expr $row_start + int($nand_x / 2)]
+    set ok [generators_place_cell $nand2base $nand2size $nand2demorgan nand_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $nand_x last_origin_x row_start rc_dummy]
+     
+    # place inv
+    set inv_origin_x [expr ($nand_origin_x + $nand_out_x) + $ws1 + ($inv_x + $inv_in_x)]
+    set ok [generators_place_cell $invbase $invsize $invdemorgan inv_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $nand_x last_origin_x row_start rc_dummy]
+
+    # hook up inputs
+    set pin_x [expr $nand_origin_x + $nand_in_x(0)]
+    set pin_y [expr $y + $nand_in_y(0)]
+    make_wire $pin_x $pin_y $wire0_x $pin_y
+    if {$i == 0} {
+      make_wire $wire0_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name "In0_H"
+    } else {
+      make_wire $wire0_x $pin_y $wire0_x [expr $pin_y + $yfudge]
+    }
+    set pin_x [expr $nand_origin_x + $nand_in_x(1)]
+    set pin_y [expr $y + $nand_in_y(1)]
+    make_wire $pin_x $pin_y $wire1_x $pin_y
+    if {$i == 0} {
+      make_wire $wire1_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name "In1_H"
+    } else {
+      make_wire $wire1_x $pin_y $wire1_x [expr $pin_y + $yfudge]
+    }
+
+    # hook up between nand & invert
+    make_wire [expr $nand_origin_x + $nand_out_x] $y [expr $inv_origin_x + $inv_in_x] $y
+      
+    # mark output
+    set pin_x [expr $inv_origin_x + $inv_out_x]
+    set pin_y [expr $y + $inv_out_y]
+    set outpins($i) "$pin_x $pin_y"
+
+    # increment y
+    set y [expr $y - $yfudge]
+  }
+
+  # hook up the outputs
+  set outflag_x [expr $last_origin_x + 200]
+  for {set j 0} {$j < $NBITS} {incr j} {
+    set pin_x [lindex $outpins($j) 0]
+    set pin_y [lindex $outpins($j) 1]
+    set pin_name [format "Out%d_H" $j]
+    make_wire $pin_x $pin_y $outflag_x $pin_y
+    make output -origin "$outflag_x $pin_y" -name $pin_name
+  }
+
+  # drop the final row spanner
+  set rsname [format "row_spanner%d" [expr int($rswidth/2)]]
+  generate row_spanner $rsname -width [expr int($rswidth/2)]
+  make $rsname -origin "$rs_x $rs_y"
+
+  # title bar
+  make sccs_title_bar -origin "[expr $inflag_x + int(($outflag_x - $inflag_x)/2)] [expr $base_y + 300]" -owner emc -version 0.9 -date 05/31/00
+}
+
+
+proc ICON_mmig_nandbuf args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 8} {IconHeight 8} {ReduceInputLoad "N"}}
+  
+  # don't let the user get too crazy
+  if {$NBITS > 64} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  
+  # check for acceptable response on ReduceInputLoad query
+  if {([string toupper $ReduceInputLoad] != "Y") && ([string toupper $ReduceInputLoad] != "N")} {
+    error "ERROR: ReduceInputLoad property ($ReduceInputLoad) must be Y or N"
+  }
+  
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  
+  # figure out icon size
+  set cs_spacer 70
+  set pin_spacer 20
+  
+  # how many pins?
+  set pincount [expr 2 * $IconHeight]
+  
+  # icon body
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+  
+  # inputs
+  icon_term -type input -origin "$icon_left 0" -name "In0_H"
+  icon_property -origin "$icon_left_label 0" -size small -label In0_H
+  icon_term -type input -origin "$icon_left 40" -name "In1_H"
+  icon_property -origin "$icon_left_label 40" -size small -label In1_H 
+
+  # outputs
+  set pin_pos [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set wname [format "Out%d_H" $i]
+    icon_term -type output -origin "$icon_right $pin_pos" -name $wname
+    icon_property -origin "$icon_right_label $pin_pos" -size small -label $wname -anchor e
+    set pin_pos [expr $pin_pos - 2 * $pin_spacer]
+  }
+
+  # text
+  set wname [format "%dbit" $NBITS]
+  icon_property -origin "0 -60" -size large -label $wname -anchor center
+  icon_property -origin "0 -20" -size large -label "Nand Buffer" -anchor center
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    icon_property -origin "0 20" -size large -label "R" -anchor center
+  }  
+  icon_property -origin "0 60" -size large -label {$name} -anchor center
+  
+  # junk
+  set prop_y $icon_y
+  icon_property -origin "-70 $prop_y" -type user -name name
+  icon_property -origin "-70 [expr $prop_y + 20]" -type user -name M
+  icon_property -origin "-70 [expr $prop_y + 40]" -type user -name dpc
+  
+  icon_special -type sccs_title_bar -origin "-70 [expr $prop_y + 140]" -owner emc -version 0.9 -date 05/31/00
+}
+
+
+ 

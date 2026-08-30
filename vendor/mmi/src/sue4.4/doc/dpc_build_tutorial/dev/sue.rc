@@ -1,0 +1,20 @@
+# if env(SUE_DEMO) is set, its put SUE into a special demo mode in which
+# SUE skips running the static timing analyser.  Useful if you
+# don't have either Pearl, Primetime, or Pathmill (i.e. the 3 P's).
+
+if {[use_first DEMO] == 0} {
+  # demo mode off
+  # sue -SET DEMO=0
+  catch "unset env(SUE_DEMO)"	
+} else {
+  # demo mode on (default)
+  puts "DEMO MODE ON"
+  set env(SUE_DEMO) 1
+}
+
+
+# set up the library and data path compiler
+set tech [pwd]/mmi25
+source $tech/library/dpc/dpc.suerc
+
+set GRID_SPACING "10 22"

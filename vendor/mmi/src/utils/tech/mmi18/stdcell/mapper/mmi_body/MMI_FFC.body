@@ -1,0 +1,26 @@
+  # MMI_FFC icon body
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 100 -20 80 -start 0 -extent 359
+
+  # properties
+  icon_property -origin {0 -50} -size large -anchor center -label FFC
+  icon_property -origin {0 -30} -size large -anchor center -label $size
+  icon_property -origin {-50 0} -label D
+  icon_property -origin {50 0} -anchor e -label Q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label clearn
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+  icon_property -origin {10 70} -anchor e -rotate 1 -label scan_en
+  icon_property -origin {30 70} -anchor e -rotate 1 -label scan_in
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name D
+  icon_term -type input -origin {-30 100} -orient R270 -name clearn
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {10 80} -orient R270 -name scan_en
+  icon_term -type input -origin {30 80} -orient R270 -name scan_in
+
+  # outputs
+  icon_term -type output -origin {60 0} -name Q
+
+
+

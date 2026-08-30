@@ -5,12 +5,16 @@ data/pdks/*
 !data/pdks/.gitkeep
 data/workspace/*
 !data/workspace/.gitkeep
-vendor/*
-!vendor/README.md
 /result
 /result-*
 .tmp-*
 
-# Vendor archive (keep local; rebuild uses src/ inside it)
+# Nix store symlink from `nix build -o vendor/result`
+vendor/result
+vendor/result-*
+
+# Do not commit the original archive if it is dropped here again
+vendor/*.tar.gz
+vendor/*.tar
 mmi_pd_*.tar.gz
 mmi_pd_*.tar

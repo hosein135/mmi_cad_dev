@@ -1,0 +1,76 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_BUFE {} {
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make global -name gnd -origin {850 400}
+  make global -orient RY -name vdd -origin {850 160}
+  make output -name out -origin {870 280}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {660 280}
+  make MMI_BUFE -origin {1120 60}
+  make pmos -W 14.72 -origin {850 200}
+  make nmos -W 7.36 -origin {850 360}
+  make nmos -W 2.48 -origin {550 360}
+  make pmos -W 4.96 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {620 550}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_wire 770 200 790 200
+  make_wire 770 360 790 360
+  make_wire 770 280 770 360
+  make_wire 770 280 770 200
+  make_wire 850 280 870 280
+  make_wire 850 280 850 240
+  make_wire 850 280 850 320
+  make_wire 660 280 550 280
+  make_wire 660 280 770 280
+  make_text -origin {360 90} -text Buffer
+  make_text -origin {360 110} -text {E Size}
+  make_text -origin {360 70} -text MMI_BUFE -size large
+}
+
+proc ICON_MMI_BUFE args {
+  set size E
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "E")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_BUF icon body
+    icon_line -30 -30 -30 30 30 0 -30 -30
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+  } else {
+    icon_line 30 0 60 0
+    icon_line -30 0 -60 0
+  }
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_BUFE
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in(\$\{in\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

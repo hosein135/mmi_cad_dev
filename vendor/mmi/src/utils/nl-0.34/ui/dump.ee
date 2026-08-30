@@ -1,0 +1,13 @@
+#(defcommand dump
+  "Dump nl_shell."
+  (exec_file string "dump to this file")
+  (symb_file string "dump to this file"))
+{
+  extern char *my_edata;
+
+  unexec (exec_file, symb_file, 0, (unsigned) my_edata, 0);
+
+  return TCL_OK;
+}
+
+

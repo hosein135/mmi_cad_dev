@@ -1,0 +1,165 @@
+# ------------------------------------------------------------------------
+#       Makefile for demonstation shell of BLT library
+# ------------------------------------------------------------------------
+v1=81
+v2=8.1a2
+
+v1=80
+v2=8.0.3
+
+TARGET=i386-mingw32-		# for cross-compilations.
+TARGET=				# default is native build.
+
+# ------------------------------------------------------------------------
+#       C Compiler options 
+# ------------------------------------------------------------------------
+
+TOOLS32	     	= "c:/Cygnus/egcs-1.1"
+rc32	     	= $(TARGET)windres
+
+#
+# if you don't have jpeg, remove the HAVE_JPEGLIB_H.
+#
+DEFINES      	= -D_X86_=1 -D__WIN32__ -DCONSOLE -D_MT -D_DLL \
+		  -DHAVE_JPEGLIB_H=1
+CFLAGS       	= -O2
+EXTRA_CFLAGS 	= 
+CC 	     	= $(TARGET)gcc -v
+
+# ------------------------------------------------------------------------
+#       Source and target installation directories
+# ------------------------------------------------------------------------
+
+prefix	     = @prefix@
+exec_prefix  = @exec_prefix@
+srcdir	     = .
+bindir       = @bindir@
+includedir   = @includedir@
+libdir	     = @libdir@
+
+instdirs  = $(prefix) $(exec_prefix) $(bindir) $(libdir) $(includedir)
+
+# ------------------------------------------------------------------------
+#       Include directives for Tcl, Tk, and X include files 
+# ------------------------------------------------------------------------
+
+JPEGDIR		= $(srcdir)/../jpeg-6b
+#TCLDIR     	= $(srcdir)/../tcl$(v2)
+#TKDIR     	= $(srcdir)/../tk$(v2)
+TCLDIR     	= c:/src/tcl$(v2)
+TKDIR     	= c:/src/tk$(v2)
+INCLUDES	= -I. -I$(srcdir) -I$(srcdir)/src \
+		-I$(TOOLS32)/include \
+		-I$(TCLDIR)/win \
+		-I$(TCLDIR)/generic \
+		-I$(TKDIR)/win \
+		-I$(TKDIR)/generic \
+		-I$(TKDIR)/xlib \
+		-I$(JPEGDIR)
+
+# ------------------------------------------------------------------------
+#       Libraries directives for Tcl, Tk, X11, and BLT
+# ------------------------------------------------------------------------
+
+LIBRARIES    = ./src/libBLT24.a \
+		$(TKDIR)/win/libtk80.a  \
+		$(TCLDIR)/win/libtcl80.a  \
+		$(JPEGDIR)/libjpeg.a
+
+# ------------------------------------------------------------------------
+#       Don't edit anything beyond this point
+# ------------------------------------------------------------------------
+
+demo 	     = bltwish.exe
+headers	     = blt.h
+
+CC_SWITCHES  = $(CFLAGS) $(EXTRA_CFLAGS) $(DEFINES) $(INCLUDES)
+LDFLAGS      =  -mwindows
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+RANLIB 	     = $(TARGET)ranlib
+SHELL 	     = bash
+RM 	     = rm -f
+LN_S	     = ln -s
+
+subdirs	     = src src/shared demos library man 
+
+OBJS	     = bltWinMain.o tkConsole.o
+# GNU Make-specific macro
+SRCS	     = $(patsubst %.o,$(srcdir)/%.c,$(OBJS)) 
+
+all:  $(demo) 
+
+$(demo): static $(OBJS)
+	@echo "making BLT demo \"$(demo)\"..."
+	$(RM) $(demo)
+	$(CC) -o $@ $(LDFLAGS) $(OBJS) $(LIBRARIES)
+
+shared:
+	(cd src/shared; \
+	$(MAKE) -f Makefile.mingw32 TARGET=$(TARGET) CFLAGS="$(CFLAGS)" all)
+static: 
+	(cd src; \
+	$(MAKE) -f Makefile.mingw32 TARGET=$(TARGET) CFLAGS="$(CFLAGS)" all)
+
+install: $(demo) mkdirs install-headers install-libs 
+	$(INSTALL) -m 0755 $(demo) $(bindir)/$(demo)
+
+mkdirs:
+	@for i in $(instdirs) ; do \
+	    if test ! -d $$i ; then \
+		echo " mkdir $$i" ; \
+		mkdir $$i ; \
+	    fi ; \
+        done
+
+install-headers:
+	@for i in $(headers) ; do \
+	    echo "installing $(includedir)/$$i..." ; \
+	    $(INSTALL_DATA) -m 0444 $(srcdir)/$$i $(includedir) ; \
+	done
+
+install-libs:
+	@for i in $(subdirs) ; do \
+	    (cd $$i; $(MAKE) install) ; \
+	done
+
+clean:
+	$(RM) $(demo) $(OBJS)
+	$(RM) *.bak *\~ "#"* *pure* .pure* *.obj bltwish.*
+	@for i in $(subdirs) ; do \
+	    echo "cleaning $$i..." ; \
+	    (cd $$i; $(MAKE) -f Makefile.mingw32 clean) ; \
+	done
+
+.c.o:
+	$(CC) -c $(CC_SWITCHES) -o $*.o $<
+
+GENERATED_FILES = \
+	config.status config.cache config.log \
+	config.BLT src/bltConfig.h \
+	Makefile \
+	src/Makefile \
+	src/TAGS \
+	src/shared/Makefile \
+	man/Makefile \
+	library/Makefile \
+	demos/*.ps
+
+distclean: 
+	@for i in $(subdirs) ; do \
+	    echo "cleaning $$i..." ; \
+	    (cd $$i; $(MAKE) distclean) ; \
+	done
+	$(RM) $(demo) *.bak *\~ "#"* *pure* .pure* *.obj
+	$(RM) $(GENERATED_FILES)
+
+PUREFLAGS=
+pure: static
+	$(PURIFYHOME)/purify $(PUREFLAGS) $(CC) $(CC_SWITCHES) \
+		$(srcdir)/tkAppInit.c -o $(demo) ./src/libBLT.a $(LIBRARIES)
+
+QUANTIFYFLAGS=
+quant: static
+	$(QUANTIFYHOME)/quantify $(QUANTIFYFLAGS) $(CC) $(CC_SWITCHES) \
+		$(srcdir)/tkAppInit.c -o $(demo) ./src/libBLT.a $(LIBRARIES)

@@ -1,0 +1,26 @@
+  # MMI_42AD icon body
+  icon_line -60 -120 -60 120 60 120 60 -120 -60 -120
+
+  # properties
+  icon_property -origin {0 -60} -size large -anchor center -label {Custom}
+  icon_property -origin {0 0} -size large -anchor center -label {4:2 Adder}
+  icon_property -origin {-50 -90} -size small -label In1_H
+  icon_property -origin {-50 -30} -size small -label In2_H
+  icon_property -origin {-50 30} -size small -label In3_H
+  icon_property -origin {-50 90} -size small -label In4_H
+  icon_property -origin {0 110} -size small -anchor center -label Cin_L
+  icon_property -origin {50 30} -size small -anchor e -label S_H
+  icon_property -origin {50 -30} -size small -anchor e -label C_H
+  icon_property -origin {0 -110} -size small -anchor center -label Cout_L
+
+  # inputs
+  icon_term -type input -origin {-60 -90} -name In1_H
+  icon_term -type input -origin {-60 -30} -name In2_H
+  icon_term -type input -origin {-60 30} -name In3_H
+  icon_term -type input -origin {-60 90} -name In4_H
+  icon_term -type input -origin {0 120} -orient R270 -name Cin_L
+
+  # outputs
+  icon_term -type output -origin {60 30} -name Sum_H
+  icon_term -type output -origin {60 -30} -name Carry_H  
+  icon_term -type output -origin {0 -120} -orient R270 -name Cout_L

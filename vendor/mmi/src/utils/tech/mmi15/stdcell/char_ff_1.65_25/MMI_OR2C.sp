@@ -1,0 +1,1 @@
+../extract/MMI_OR2C.sp

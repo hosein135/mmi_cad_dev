@@ -1,0 +1,13 @@
+#!/bin/csh -f
+
+rm ~/max/make/procs.s
+
+cd ~/max/m
+foreach m ( * )
+pushd $m
+procs -s *.c >> ~/max/make/procs.s
+procs -sg *.c >> ~/max/make/procs.sg
+procs -g *.c >> ~/max/make/procs.g
+procs *.c >> ~/max/make/procs.all
+popd
+end

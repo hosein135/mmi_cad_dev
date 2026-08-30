@@ -1,0 +1,348 @@
+# This is a generator for a binary decoder.
+
+
+proc NAME_mmig_decode args {
+  call_use_keyword $args {{NBITS 4} {OutputSize "B"} {SpecialModes "None"} {BitSlice "N"}}
+
+  set nom "mmig_decode"
+
+  # NBITS
+  set nom [format "%s%dto%d" $nom $NBITS [expr int(pow(2,$NBITS))]]
+
+  # SpecialModes
+  if {[string toupper $SpecialModes] == "ENABLED"} {
+    set nom [format "%sEn" $nom]
+  }
+  if {[string toupper $SpecialModes] == "FORCEZERO"} {
+    set nom [format "%sFz" $nom]
+  }
+
+  # BitSlice
+  if {[string toupper $BitSlice] == "Y"} {
+    set nom [format "%sB" $nom]
+  }
+
+  # OutputSize
+  set size [string toupper $OutputSize]
+  set nom [format "%s_%s" $nom $size]
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_decode args {
+  call_use_keyword $args {{NBITS 4} {OutputSize "B"} {SpecialModes "None"} {BitSlice "N"}}
+
+  set debug 0
+  
+  # make the arguments more digestible
+  # NBITS
+  set maxidx [expr $NBITS - 1]
+  set max_bitrange [format "\[%d:0\]" $maxidx]
+  set vmax_bitrange $max_bitrange
+  set NBITSOUT [expr int(pow(2,$NBITS))]
+  set maxoutidx [expr $NBITSOUT - 1]
+  set maxout_bitrange [format "\[%d:0\]" $maxoutidx]
+  set vmaxout_bitrange $maxout_bitrange
+
+
+  set xfudge 100
+  set yfudge 150
+
+  # set up to draw the input wires
+  set end_y [expr 0 - $yfudge * ($NBITSOUT + 2)]
+
+  # figure out inverter info
+  # first calculate the size.  rough estimate, for a fanout of 4:
+  #   INVB can drive up to 2 output gates
+  #   INVC can drive up to 5 output gates
+  #   INVD can drive up to 10 output gates
+  #   INVE drives > 10 output gates
+  set noutgates [expr $NBITSOUT / 2]
+  if {$noutgates <= 2} {
+    set invsize "B"
+    set fzsize "C"
+  } elseif {$noutgates <= 5} {
+    set invsize "C"
+    set fzsize "D"
+  } elseif {$noutgates <= 10} {
+    set invsize "D"
+    set fzsize "E"
+  } else {
+    set invsize "E"
+    set fzsize "E"
+  }
+  set iname [NAME_MMI_INV -Size $invsize]
+  generate MMI_INV $iname -Size $invsize
+  set fzname [NAME_MMI_INV -Size $fzsize]
+  generate MMI_INV $fzname -Size $fzsize
+  set terms [api_terminal_data $iname]
+  set data [get_assoc {in} $terms]
+  set origin [get_assoc origin $data]
+  set inv_in_x [lindex $origin 0]
+  set inv_in_y [lindex $origin 1]
+  set data [get_assoc {out} $terms]
+  set origin [get_assoc origin $data]
+  set out_x [lindex $origin 0]
+  set out_y [lindex $origin 1]
+
+  # draw the input wires
+  set x 0
+  set y 0
+  for {set i [expr $NBITS - 1]} {$i >= 0} {set i [expr $i - 1]} {
+    # input
+    make_wire $x $y $x $end_y
+    set lname [format "enc\[%d\]" $i]
+    make input -origin "$x $y" -orient R270 -name $lname
+    set enc_H($i) $x
+
+    # inverted input
+    set inv_origin_x [expr $x + 30]
+    make_wire $x [expr $y - 20] $inv_origin_x [expr $y - 20]
+    make_wire $inv_origin_x [expr $y - 20] $inv_origin_x [expr $y - 40]
+    set inv_origin_y [expr $y - 40 + $inv_in_x]
+    if {[string toupper $BitSlice] == "Y"} {
+      make $iname -origin "$inv_origin_x $inv_origin_y" -orient R270 -name {[0]}
+    } else {
+      make $iname -origin "$inv_origin_x $inv_origin_y" -orient R270
+    }
+    make_wire $inv_origin_x [expr $inv_origin_y - $out_x] $inv_origin_x $end_y
+    set lname [format "enc_L\[%d\]" $i]
+    make name_net_s -origin "$inv_origin_x [expr $inv_origin_y - $out_x - 30]" -orient R90Y -name $lname
+    set enc_L($i) $inv_origin_x
+
+    set x [expr $x + $xfudge]
+  }
+
+  # add the enable or forcezero wire
+  if {([string toupper $SpecialModes] == "ENABLED")} {
+    make_wire $x $y $x $end_y
+    make input -origin "$x $y" -orient R270 -name enable
+    set enable_x $x
+    set x [expr $x + $xfudge]
+  }
+
+  if {([string toupper $SpecialModes] == "FORCEZERO")} {
+    # input
+    make_wire $x $y $x $end_y
+    make input -origin "$x $y" -orient R270 -name {forcezero}
+    set fz_x $x
+
+    # inverted input
+    set inv_origin_x [expr $x + 30]
+    make_wire $x [expr $y - 20] $inv_origin_x [expr $y - 20]
+    make_wire $inv_origin_x [expr $y - 20] $inv_origin_x [expr $y - 40]
+    set inv_origin_y [expr $y - 40 + $inv_in_x]
+    if {[string toupper $BitSlice] == "Y"} {
+      make $fzname -origin "$inv_origin_x $inv_origin_y" -orient R270 -name {[0]}
+    } else {
+      make $fzname -origin "$inv_origin_x $inv_origin_y" -orient R270
+    }
+    make_wire $inv_origin_x [expr $inv_origin_y - $out_x] $inv_origin_x $end_y
+    make name_net_s -origin "$inv_origin_x [expr $inv_origin_y - $out_x - 30]" -orient R90Y -name {fz_L}
+    set enable_x $inv_origin_x
+
+    set x [expr $x + $xfudge]
+
+  }
+
+  # figure out the number of inputs per gate
+  set ninputs $NBITS
+  if {([string toupper $SpecialModes] == "ENABLED") || ([string toupper $SpecialModes] == "FORCEZERO")} {
+    incr ninputs
+  }
+
+  # generate the AND gate
+  set gANDname [NAME_mmig_AND -NINPUTS $ninputs -OutputAssertion H -OutputSize $OutputSize -BitSlice N -ReduceInputLoad N]
+  generate mmig_AND $gANDname -NINPUTS $ninputs -OutputAssertion H -OutputSize $OutputSize -BitSlice N -ReduceInputLoad N
+
+  # generate the AO1 gate
+  set gAO1name [NAME_mmig_AOn1 -NAndInputs $NBITS -OutputAssertion H -OutputSize $OutputSize -BitSlice N -ReduceInputLoad N]
+  generate mmig_AOn1 $gAO1name -NAndInputs $NBITS -OutputAssertion H -OutputSize $OutputSize -BitSlice N -ReduceInputLoad N
+
+
+  # place the gates
+  set x [expr $x + $xfudge]
+  set outflag_x [expr $x + $xfudge]
+  set y [expr $y - $yfudge]
+  for {set j 0} {$j < $NBITSOUT} {incr j} {
+    set y [expr $y - $yfudge]
+
+    if {([string toupper $SpecialModes] == "FORCEZERO") && ($j == 0)} {
+      set gname $gAO1name
+    } else {
+      set gname $gANDname
+    }
+
+    # get the gate pin info
+    set terms [api_terminal_data $gname]
+
+    puts [format "cell=%s, terms=%s" $gname $terms]
+
+    set data [get_assoc {out} $terms]
+    set origin [get_assoc origin $data]
+    set out_x [lindex $origin 0]
+    set out_y [lindex $origin 1]
+    for {set i 0} {$i < $ninputs} {incr i} {
+      set pname [format "in%d" $i]
+      set data [get_assoc $pname $terms]
+      set origin [get_assoc origin $data]
+      set in_x($i) [lindex $origin 0]
+      set in_y($i) [lindex $origin 1]
+    }
+
+    if {[string toupper $BitSlice] == "Y"} {
+      make $gname -origin "$x $y" -name {[0]}
+    } else {
+      make $gname -origin "$x $y"
+    }
+
+    # wire up the enable or forcezero
+    if {([string toupper $SpecialModes] == "ENABLED") || ([string toupper $SpecialModes] == "FORCEZERO")} {
+      if {([string toupper $SpecialModes] == "FORCEZERO") && ($j == 0)} {
+	make_wire [expr $x + $in_x(0)] [expr $y + $in_y(0)] $fz_x [expr $y + $in_y(0)] 
+      } else {
+	make_wire [expr $x + $in_x(0)] [expr $y + $in_y(0)] $enable_x [expr $y + $in_y(0)] 
+      }
+      set startbit 1
+    } else {
+      set startbit 0
+    }
+
+    # wire up the encoded inputs
+    set k $j
+    for {set i 0} {$i < $NBITS} {incr i} {
+      # what value does this bit have?
+      set bitval [expr $k % 2]
+      set k [expr $k / 2]
+      # wire up to the encoded input
+      set thisbit [expr $startbit + $i]
+      puts [format "thisbit=%d, in_x(thisbit)=%d, in_y(thisbit)=%d" $thisbit $in_x($thisbit) $in_y($thisbit)]
+
+      if {$bitval == 0} {
+	make_wire [expr $x + $in_x($thisbit)] [expr $y + $in_y($thisbit)] $enc_L($i) [expr $y + $in_y($thisbit)] 
+      } else {
+	make_wire [expr $x + $in_x($thisbit)] [expr $y + $in_y($thisbit)] $enc_H($i) [expr $y + $in_y($thisbit)] 
+      }
+    }
+
+    # wire up the output
+    make_wire [expr $x + $out_x] [expr $y + $out_y] $outflag_x [expr $y + $out_y] 
+    set outname [format "dec\[%d\]" $j]
+    make output -origin "$outflag_x [expr $y + $out_y]" -name $outname
+  }
+
+
+
+  # place the row_spanner 
+  set rswidth [expr int($outflag_x/2)]
+  set rsname [format "row_spanner%d" $rswidth]
+  generate row_spanner $rsname -width $rswidth
+  make $rsname -origin "[expr $rswidth - 50] 400"
+  
+  # place the dpc control block
+  if {[string toupper $BitSlice] == "Y"} {
+    make dpc_control -mode bit_slice -origin "$outflag_x 430"
+  }
+
+  # place the title bar
+  make sccs_title_bar -origin "[expr $rswidth - 100] 500" -owner emc -version 0.2 -date 05/11/00
+
+  show_connects "" clean
+}
+
+
+proc ICON_mmig_decode args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 4} {OutputSize "B" {B C D E}} {SpecialModes "None" {None Enabled ForceZero}} {BitSlice "N" {Y N}}}
+
+  # check for acceptable response on NBITS
+  if {$NBITS < 2} {
+    error "ERROR: NBITS ($NBITS) must be greater than 1"
+  }
+  # don't let the user get too crazy
+  if {$NBITS > 128} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+
+  # bitranges
+  set maxidx [expr $NBITS - 1]
+  set max_bitrange [format "\[%d:0\]" $maxidx]
+  set vmax_bitrange $max_bitrange
+  set NBITSOUT [expr int(pow(2,$NBITS))]
+  set maxoutidx [expr $NBITSOUT - 1]
+  set maxout_bitrange [format "\[%d:0\]" $maxoutidx]
+  set vmaxout_bitrange $maxout_bitrange
+
+  # check for acceptable response on OutputSize
+  if {([string toupper $OutputSize] != "B") &&
+      ([string toupper $OutputSize] != "C") &&
+      ([string toupper $OutputSize] != "D") &&
+      ([string toupper $OutputSize] != "E")} {
+    error "ERROR: OutputSize ($OutputSize) must be B, C, D, or E"
+  }
+    
+  # check for acceptable response on SpecialModes
+  if {([string toupper $SpecialModes] != "NONE") &&
+      ([string toupper $SpecialModes] != "ENABLED") &&
+      ([string toupper $SpecialModes] != "FORCEZERO")} {
+    error "ERROR: SpecialModes ($SpecialModes) must be None or Enabled or ForceZero"
+  }
+  # check for acceptable response on BitSlice
+  if {([string toupper $BitSlice] != "Y") &&
+      ([string toupper $BitSlice] != "N")} {
+    error "ERROR: BitSlice ($BitSlice) must be Y or N"
+  }
+  
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  icon_line -60 -80 -60 80 60 80 60 -80 -60 -80
+
+  # output
+  icon_property -origin {50 20} -anchor e -label dec
+  icon_term -type output -origin {60 20} -name dec$vmaxout_bitrange  
+
+  # input
+  icon_property -origin {-50 20} -label enc
+  icon_term -type input -origin {-60 20} -name enc$vmax_bitrange  
+
+  # special modes
+  if {[string toupper $SpecialModes] == "ENABLED"} {
+    icon_property -origin {-50 60} -label en
+    icon_term -type input -origin {-60 60} -name enable
+  }
+  if {[string toupper $SpecialModes] == "FORCEZERO"} {
+    icon_property -origin {-50 60} -label fz
+    icon_term -type input -origin {-60 60} -name forcezero
+  }
+
+  # properties
+  icon_property -origin {0 -60} -anchor center -label Decode
+  icon_property -origin {0 -40} -anchor center -label "$NBITS to $NBITSOUT"
+  icon_property -origin {0 -20} -anchor center -label $OutputSize
+
+  # junk
+  icon_property -origin {-70 300} -type user -name name
+  icon_property -origin {-70 320} -type user -name M
+  icon_property -origin {-70 340} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 460} -owner emc -version 0.2 -date 05/11/00
+  # this property makes a generator pop up in "Schematic" mode rather than "Verilog" mode
+  icon_property -origin {-70 360} -type fixed -name netlist_level -text 2000
+
+  # generate verilog property
+  set fname [NAME_mmig_decode -NBITS $NBITS -OutputSize $OutputSize -SpecialModes $SpecialModes -BitSlice $BitSlice]
+
+  set pnames [format ".enc(\$\{enc%s\}), .dec(\$\{dec%s\})" $vmax_bitrange $vmaxout_bitrange]
+  if {[string toupper $SpecialModes] == "ENABLED"} {
+    set pnames [format "%s, .enable(\$enable)" $pnames]
+  }
+  if {[string toupper $SpecialModes] == "FORCEZERO"} {
+    set pnames [format "%s, .forcezero(\$forcezero)" $pnames]
+  }
+
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin {-70 380} -type fixed -name verilog -text $vprop  
+
+}

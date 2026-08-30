@@ -1,0 +1,29 @@
+#ASSUMES CALLER HAS SET MAKE_DIR to dir containing config files.
+
+#include appropriate config file.
+#contains environment dependent configuration info 
+#e.g. location of libraries and include files, and flags for gcc.
+#
+#note MAX_CONFIG_OPTIONS normally set as environment variable, or on make command line.
+# '' = production (optimize)
+# 'd' = debug (compile for gdb)
+# 'p' = enable profiling
+#
+
+UNAME = $(shell uname)
+ifeq "$(UNAME)" "Linux"
+  include $(MAKE_DIR)/config.linux$(MAX_CONFIG_OPTIONS)
+  GCP = cp	
+else
+ifeq "$(UNAME)" "HP-UX"
+  include $(MAKE_DIR)/config.hp$(MAX_CONFIG_OPTIONS)
+  GCP = gcp	
+else
+ifeq "$(UNAME)" "SunOS"
+  include $(MAKE_DIR)/config.solaris$(MAX_CONFIG_OPTIONS)
+  GCP = gcp	
+else
+    ERROR unrecognized return value from uname system call
+endif
+endif
+endif

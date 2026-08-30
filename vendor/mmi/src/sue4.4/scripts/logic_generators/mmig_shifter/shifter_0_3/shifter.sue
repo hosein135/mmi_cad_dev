@@ -1,0 +1,1065 @@
+# This is a generator for a left, right, or bidirectional shifter or rotator
+
+proc SCHEMATIC_shifter args {
+  call_use_keyword $args {{NBITS 32} {Operation "Shift"} {Direction "Left"} {SignExtendRsh "Y"} {NStages 5} {BidirOptimization "None"} {CustomAlgorithm ""} }
+
+  # make the arguments more digestible
+  # NBITS
+  set maxidx [expr $NBITS - 1]
+  # bitranges
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  # Operation
+  if {[string toupper $Operation] == "SHIFT"} {
+    set operation "shift"
+  }
+  if {[string toupper $Operation] == "ROTATE"} {
+    set operation "rotate"
+  }
+
+  # Direction & Shift Amount
+  if {[string toupper $Direction] == "LEFT"} {
+    # assumes encoded controls, 1 bit per stage
+    set nshfbits $NStages
+    for {set n 0} {$n < $NStages} {incr n} {
+      set direction($n) "left"
+      set shiftamt($n) [expr int(pow(2,$n))]
+    }
+  }
+  if {[string toupper $Direction] == "RIGHT"} {
+    # assumes encoded controls, 1 bit per stage
+    set nshfbits $NStages
+    for {set n 0} {$n < $NStages} {incr n} {
+      set direction($n) "right"
+      set shiftamt($n) [expr int(pow(2,$n))]
+    }
+  }
+  if {[string toupper $Direction] == "BOTH"} {
+    set nshfbits 0
+    for {set n 0} {$n < $NStages} {incr n} {
+      if {($n == [expr $NStages - 1]) && ([string toupper $BidirOptimization] == "SIMPLE")} {
+	# note:  if we assume a two's complement encoded shift amount for a bidirectional shifter,
+	# with positive values encoding a left shift, the last stage cannot perform a left shift
+	# since the most positive number is 0111...111.  since the msb must be zero, there cannot
+	# be a left shift in the final stage.
+	# NOTE THAT THE CUSTOM ALGORITHM IS NOT OVERRIDDEN
+	set direction($n) "right"
+	set nshfbits [expr $nshfbits + 1]
+      } else {
+	if {($n == 0) && ([string toupper $BidirOptimization] == "MODIFYFIRSTSTAGE")} {
+	  set direction($n) "both"
+	  # assumes decoded controls, 4 bits per stage
+	  set nshfbits [expr $nshfbits + 4]
+	} else {
+	  set direction($n) "both"
+	  # assumes decoded controls, 3 bits per stage
+	  set nshfbits [expr $nshfbits + 3]
+	}
+      }
+      set shiftamt($n) [expr int(pow(2,$n))]
+    }
+  }
+
+  if {[string toupper $Direction] == "CUSTOM"} {
+    set nshfbits 0
+    for {set n 0} {$n < $NStages} {incr n} {
+      set stage [lindex $CustomAlgorithm $n]
+      scan $stage "%d%s" shiftamt($n) dir
+      if {[string toupper $dir] == "L"} {
+	set direction($n) "left"
+	# assumes encoded controls, 1 bit per stage
+	incr nshfbits
+      }
+      if {[string toupper $dir] == "R"} {
+	set direction($n) "right"
+	# assumes encoded controls, 1 bit per stage
+	incr nshfbits
+      }
+      if {([string toupper $dir] == "B")} {
+	set direction($n) "both"
+	# assumes decoded controls, 3 bits per stage
+	set nshfbits [expr $nshfbits + 3]
+      }
+    }
+  }
+  set maxsidx [expr $nshfbits - 1]
+  if {$maxsidx == 0} {
+    set shf_bitrange [format "\[0\]"]
+    set vshf_bitrange ""
+  } else {
+    set shf_bitrange [format "\[%d:0\]" $maxsidx]
+    set vshf_bitrange $shf_bitrange
+  }
+
+  # select the mux cell
+  set mux2B "SHFMUX2B"
+  set mux2C "SHFMUX2C"
+  set mux3C "SHFMUX3C"
+  set mux4C "SHFMUX4C"
+  # cell selection algorithm:
+  # - C size required for even single-direction rotator (wire loading too high for b size)
+  # - mux2 used for single-direction shifter; mux3 used for bidirectional
+  # - except that C size required for any stage which drives a bidirectional stage
+  # - mux4 used for first stage if BidirOptimization = ModifyFirstStage
+
+  # used to end algorithm:
+  set direction($NStages) "left"
+  for {set n 0} {$n < $NStages} {incr n} {
+    if {$operation == "rotate"} {
+      if {$direction($n) == "both"} {
+	set muxcell($n) $mux3C
+	set muxtype($n) 3
+      } else {
+	set muxcell($n) $mux2C
+	set muxtype($n) 2
+      }
+    } else {
+      # shifter, not rotator
+      if {($direction($n) == "both")} {
+	set muxcell($n) $mux3C
+	set muxtype($n) 3
+      } else {
+	# this stage is unidirectional; what's the next stage?
+	if {($direction([expr $n + 1]) == "both")} {
+	  set muxcell($n) $mux2C
+	  set muxtype($n) 2
+	} else {
+	  set muxcell($n) $mux2B
+	  set muxtype($n) 2
+	}
+      }
+    }
+  }
+  if {($direction(0) == "both") && ([string toupper $BidirOptimization] == "MODIFYFIRSTSTAGE")} {
+    set muxcell(0) $mux4C
+    set muxtype(0) 4
+  }
+
+  # default (maximum size) mux icon properties
+  set icon_mux_x 120
+  set icon_mux_y 260
+  set icon_mux_left [expr -($icon_mux_x / 2)]
+  set icon_mux_right [expr ($icon_mux_x / 2)]
+  set icon_mux_top [expr -($icon_mux_y / 2)]
+  set icon_mux_bot [expr ($icon_mux_y / 2)]
+
+  # inverter icon properties
+  set icon_inv_x 120
+  set port_inv_in_x -60
+  set port_inv_in_y 0
+  set port_inv_out_x 60
+  set port_inv_out_y 0
+
+  # bus combine icon properties
+  set icon_bc_x 30
+  set icon_bc_y 20
+  set port_bc_out_x 20
+  set port_bc_out_y 0
+  set port_bc_in0_x -10
+  set port_bc_in0_y -10
+  set port_bc_in1_x -10
+  set port_bc_in1_y 10
+
+  # wire stub lengths
+  set ws_nnet 30
+  set ws1 50
+  set ws2 2*$ws1
+  
+  # distances
+  set xfudge [expr 3 * $ws2]
+  set delta_x [expr $icon_mux_x + $xfudge]
+  set yfudge [expr 4 * $ws1]
+  set delta_y [expr $icon_mux_y + $yfudge]
+
+  # init drawing location
+  set x 0
+  set y 0
+
+  # wire tracks
+  set inflag_x [expr $x - (6 * $ws1)]
+  set outflag_x [expr $x + $icon_mux_right + ($NStages - 1) * $delta_x + (2 * $ws1)]
+  set shiftamt_y [expr $y + $icon_mux_bot + 3*$ws1]
+
+  # init the shift amount bit counter
+  set cshiftamt 0
+
+  # draw the shifter
+  for {set i 0} {$i < $NStages} {incr i} {
+    # select mux cell
+    switch $muxtype($i) {
+      2 { # mux2 icon properties
+	set icon_mux_x 120
+	set icon_mux_y 140
+	set port_in0_x -60
+	set port_in0_y -30
+	set port_in1_x -60
+	set port_in1_y 30
+	set port_out_x 60
+	set port_out_y 0
+	set port_sel_x 0
+	set port_sel_y 50
+      }
+      3 { # mux3 icon properties
+	set icon_mux_x 120
+	set icon_mux_y 200
+	set port_in0_x -60
+	set port_in0_y -60
+	set port_in1_x -60
+	set port_in1_y 0
+	set port_in2_x -60
+	set port_in2_y 60
+	set port_out_x 60
+	set port_out_y 0
+	set port_sel_x 0
+	set port_sel_y 80
+      }
+      4 { # mux4 icon properties
+	set icon_mux_x 120
+	set icon_mux_y 260
+	set port_in0_x -60
+	set port_in0_y -90
+	set port_in1_x -60
+	set port_in1_y -30
+	set port_in2_x -60
+	set port_in2_y 30
+	set port_in3_x -60
+	set port_in3_y 90
+	set port_out_x 60
+	set port_out_y 0
+	set port_sel_x 0
+	set port_sel_y 110
+      }
+    }
+    set icon_mux_left [expr -($icon_mux_x / 2)]
+    set icon_mux_right [expr ($icon_mux_x / 2)]
+    set icon_mux_top [expr -($icon_mux_y / 2)]
+    set icon_mux_bot [expr ($icon_mux_y / 2)]
+    
+    # place mux cell
+    make $muxcell($i) -origin "$x $y" -name "$max_bitrange"
+
+    # wire up the inputs
+    # in0:  the unshifted vector
+    set pin_x [expr $x + $port_in0_x]
+    set pin_y [expr $y + $port_in0_y]
+    set stub_x [expr $pin_x - $ws1]
+    set stub2_x [expr $stub_x - $ws1]
+    make_wire $pin_x $pin_y $stub_x $pin_y
+    make name_net_s -origin "$stub_x $pin_y" -name $vmax_bitrange
+    make_wire $stub_x $pin_y $stub2_x $pin_y
+    make_wire $stub2_x $pin_y $stub2_x $y
+    # connect to input wire
+    make_wire $stub2_x $y $stub2_x $pin_y
+
+    if {($direction($i) == "left") || ($direction($i) == "both")} {
+      set pin_x [expr $x + $port_in1_x]
+      set pin_y [expr $y + $port_in1_y]
+      if {(($operation == "shift") && ($shiftamt($i) >= $NBITS)) ||
+	(($operation == "rotate") && (($shiftamt($i) % $NBITS) == 0))} {
+	# no bus combine needed
+	set nubitrange [format "\[%d:0\]" $maxidx]
+	make_wire $pin_x $pin_y $stub_x $pin_y
+	make name_net_s -origin "$stub_x $pin_y" -name $nubitrange
+	if {$operation == "shift"} {
+	  set stub3_x [expr $stub_x - 40]
+	  make_wire $stub_x $pin_y $stub3_x $pin_y
+	  set stub3_y [expr $y + $icon_mux_bot + $ws1]
+	  make_wire $stub3_x $pin_y $stub3_x $stub3_y
+	  make sign_extend -origin "$stub3_x [expr $stub3_y + 10]" -orient R270
+	  make_wire $stub3_x [expr $stub3_y + 20] $stub3_x [expr $stub3_y + 40]
+	  make global -origin "$stub3_x [expr $stub3_y + 40]" -name "gnd"
+	} else {
+	  # rotate
+	  make_wire $stub_x $pin_y $stub2_x $pin_y
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+      } else {
+	# place bus_combine
+	generate bus_combine bus_combine -ninputs 2
+	set bc_origin_x [expr $pin_x - $port_bc_out_x]
+	set bc_origin_y $pin_y
+	make bus_combine -origin "$bc_origin_x $bc_origin_y"
+	# connect in0 to the left shifted input
+	if {($operation == "rotate") && ($shiftamt($i) >= $NBITS)} {
+	  set samt [expr $shiftamt($i) % $NBITS]
+	  set numaxidx [expr $maxidx - $samt]
+	} else {
+	  set numaxidx [expr $maxidx - $shiftamt($i)]
+	}
+	set nubitrange [format "\[%d:0\]" $numaxidx]
+	set pin_x [expr $bc_origin_x + $port_bc_in0_x]
+	set pin_y [expr $bc_origin_y + $port_bc_in0_y]
+	make_wire $stub2_x $pin_y $stub_x $pin_y
+	make name_net_s -origin "$stub_x $pin_y" -name $nubitrange
+	make_wire $stub_x $pin_y $pin_x $pin_y
+	# if in0 is the bottom connection to the input wire, hook it up
+	if {$operation == "shift"} {
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+	# connect in1 to the zero or rotate bits
+	set pin_x [expr $bc_origin_x + $port_bc_in1_x]
+	set pin_y [expr $bc_origin_y + $port_bc_in1_y]
+	make_wire $pin_x $pin_y $stub_x $pin_y
+	if {$operation == "shift"} {
+	  if {$shiftamt($i) == 1} {
+	    set lname [format "\[0\]"]
+	  } else {
+	    set lname [format "\[%d:0\]" [expr $shiftamt($i) - 1]]
+	  }
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname -orient RY
+	  set stub3_x [expr $stub_x - 40]
+	  make_wire $stub_x $pin_y $stub3_x $pin_y
+	  set stub3_y [expr $y + $icon_mux_bot + $ws1]
+	  make_wire $stub3_x $pin_y $stub3_x $stub3_y
+	  make sign_extend -origin "$stub3_x [expr $stub3_y + 10]" -orient R270
+	  make_wire $stub3_x [expr $stub3_y + 20] $stub3_x [expr $stub3_y + 40]
+	  make global -origin "$stub3_x [expr $stub3_y + 40]" -name "gnd"
+	} else {
+	  # rotate, not shift
+	  # rotate amount is modulo the size of the shifter
+	  if {$shiftamt($i) >= $NBITS} {
+	    set samt [expr $shiftamt($i) % $NBITS]
+	  } else {
+	    set samt $shiftamt($i)
+	  }
+	  if {$samt == 1} {
+	    set lname [format "\[%d\]" $maxidx]
+	  } else {
+	    set lname [format "\[%d:%d\]" $maxidx [expr $maxidx - $samt + 1]]
+	  }
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname -orient RY
+	  make_wire $stub_x $pin_y $stub2_x $pin_y
+	  # this is the bottom connection to the input wire, hook it up
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+      }
+    }
+
+    if {($direction($i) == "right") || ($direction($i) == "both")} {
+      # for mux2, connect right shift input to in1; for mux3 or mux4, connect to in2
+      if {$muxtype($i) == 2} {
+	set pin_x [expr $x + $port_in1_x]
+	set pin_y [expr $y + $port_in1_y]
+      } else {
+	set pin_x [expr $x + $port_in2_x]
+	set pin_y [expr $y + $port_in2_y]
+      }
+      if {(($operation == "shift") && ($shiftamt($i) >= $NBITS)) ||
+	(($operation == "rotate") && (($shiftamt($i) % $NBITS) == 0))} {
+	# no bus combine needed
+	set nubitrange [format "\[%d:0\]" $maxidx]
+	make_wire $pin_x $pin_y $stub_x $pin_y
+	make name_net_s -origin "$stub_x $pin_y" -name $nubitrange
+	if {$operation == "shift"} {
+	  set stub3_x [expr $stub2_x - 30]
+	  make_wire $stub_x $pin_y $stub3_x $pin_y
+	  make sign_extend -origin "[expr $stub3_x - 10] $pin_y"
+	  make_wire [expr $stub3_x - 20] $pin_y [expr $stub3_x - 40] $pin_y
+	  if {[string toupper $SignExtendRsh] == "Y"} {
+	    set gname [format "\[%d\]" $maxidx]
+	    make name_net_s -origin "[expr $stub3_x - 40] $pin_y" -name $gname
+	    make_wire [expr $stub3_x - 40] $pin_y [expr $stub3_x - 40] $y
+	  } else {
+	    make global -origin "[expr $stub3_x - 40] $pin_y" -name "gnd"
+	  }
+	} else {
+	  # rotate
+	  make_wire $stub_x $pin_y $stub2_x $pin_y
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+      } else {
+	# place bus_combine
+	generate bus_combine bus_combine -ninputs 2
+	set bc_origin_x [expr $pin_x - $port_bc_out_x]
+	set bc_origin_y $pin_y
+	make bus_combine -origin "$bc_origin_x $bc_origin_y" -orient RY
+	# connect in0 to the right shifted input
+	if {($operation == "rotate") && ($shiftamt($i) >= $NBITS)} {
+	  set samt [expr $shiftamt($i) % $NBITS]
+	  set nubitrange [format "\[%d:%d\]" $maxidx $samt]
+	} else {
+	  set nubitrange [format "\[%d:%d\]" $maxidx $shiftamt($i)]
+	}
+	set pin_x [expr $bc_origin_x + $port_bc_in0_x]
+	set pin_y [expr $bc_origin_y + $port_bc_in0_y]
+	make_wire $stub2_x $pin_y $stub_x $pin_y
+	make name_net_s -origin "$stub_x $pin_y" -name $nubitrange
+	make_wire $stub_x $pin_y $pin_x $pin_y
+	# if in0 is the bottom connection to the input wire, hook it up
+	if {$operation == "shift"} {
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+	# connect in1 to the sign/zero/rotated bits
+	set pin_x [expr $bc_origin_x + $port_bc_in1_x]
+	set pin_y [expr $bc_origin_y + $port_bc_in1_y]
+	make_wire $pin_x $pin_y $stub_x $pin_y
+	if {$operation == "shift"} {
+	  if {$shiftamt($i) == 1} {
+	    set lname [format "\[0\]"]
+	  } else {
+	    set lname [format "\[%d:0\]" [expr $shiftamt($i) - 1]]
+	  }
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname -orient RY
+	  set stub3_x [expr $stub2_x - 30]
+	  make_wire $stub_x $pin_y $stub3_x $pin_y
+	  make sign_extend -origin "[expr $stub3_x - 10] $pin_y"
+	  make_wire [expr $stub3_x - 20] $pin_y [expr $stub3_x - 40] $pin_y
+	  if {[string toupper $SignExtendRsh] == "Y"} {
+	    set gname [format "\[%d\]" $maxidx]
+	    make name_net_s -origin "[expr $stub3_x - 40] $pin_y" -name $gname
+	    make_wire [expr $stub3_x - 40] $pin_y [expr $stub3_x - 40] $y
+	  } else {
+	    make global -origin "[expr $stub3_x - 40] $pin_y" -name "gnd"
+	  }
+	} else {
+	  # rotate amount is modulo the size of the shifter
+	  if {$shiftamt($i) >= $NBITS} {
+	    set samt [expr $shiftamt($i) % $NBITS]
+	  } else {
+	    set samt $shiftamt($i)
+	  }
+	  if {$samt == 1} {
+	    set lname [format "\[0\]"]
+	  } else {
+	    set lname [format "\[%d:0\]" [expr $samt - 1]]
+	  }
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname -orient RY
+	  make_wire $stub_x $pin_y $stub2_x $pin_y
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+      }
+    }
+
+    # wire up in3 on a mux4:  can only exist in the first stage of a bidirectional shifter
+    # shift right by 2
+    if {$muxtype($i) == 4} {
+      set shiftamt($i) 2
+      set pin_x [expr $x + $port_in3_x]
+      set pin_y [expr $y + $port_in3_y]
+      if {(($operation == "shift") && ($shiftamt($i) >= $NBITS)) ||
+	(($operation == "rotate") && (($shiftamt($i) % $NBITS) == 0))} {
+	# no bus combine needed
+	set nubitrange [format "\[%d:0\]" $maxidx]
+	make_wire $pin_x $pin_y $stub_x $pin_y
+	make name_net_s -origin "$stub_x $pin_y" -name $nubitrange
+	if {$operation == "shift"} {
+	  set stub3_x [expr $stub2_x - 30]
+	  make_wire $stub_x $pin_y $stub3_x $pin_y
+	  make sign_extend -origin "[expr $stub3_x - 10] $pin_y"
+	  make_wire [expr $stub3_x - 20] $pin_y [expr $stub3_x - 40] $pin_y
+	  if {[string toupper $SignExtendRsh] == "Y"} {
+	    set gname [format "\[%d\]" $maxidx]
+	    make name_net_s -origin "[expr $stub3_x - 40] $pin_y" -name $gname
+	    make_wire [expr $stub3_x - 40] $pin_y [expr $stub3_x - 40] $y
+	  } else {
+	    make global -origin "[expr $stub3_x - 40] $pin_y" -name "gnd"
+	  }
+	} else {
+	  # rotate
+	  make_wire $stub_x $pin_y $stub2_x $pin_y
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+      } else {
+	# place bus_combine
+	generate bus_combine bus_combine -ninputs 2
+	set bc_origin_x [expr $pin_x - $port_bc_out_x]
+	set bc_origin_y $pin_y
+	make bus_combine -origin "$bc_origin_x $bc_origin_y" -orient RY
+	# connect in0 to the right shifted input
+	if {($operation == "rotate") && ($shiftamt($i) >= $NBITS)} {
+	  set samt [expr $shiftamt($i) % $NBITS]
+	  set nubitrange [format "\[%d:%d\]" $maxidx $samt]
+	} else {
+	  set nubitrange [format "\[%d:%d\]" $maxidx $shiftamt($i)]
+	}
+	set pin_x [expr $bc_origin_x + $port_bc_in0_x]
+	set pin_y [expr $bc_origin_y + $port_bc_in0_y]
+	make_wire $stub2_x $pin_y $stub_x $pin_y
+	make name_net_s -origin "$stub_x $pin_y" -name $nubitrange
+	make_wire $stub_x $pin_y $pin_x $pin_y
+	# if in0 is the bottom connection to the input wire, hook it up
+	if {$operation == "shift"} {
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+	# connect in1 to the sign/zero/rotated bits
+	set pin_x [expr $bc_origin_x + $port_bc_in1_x]
+	set pin_y [expr $bc_origin_y + $port_bc_in1_y]
+	make_wire $pin_x $pin_y $stub_x $pin_y
+	if {$operation == "shift"} {
+	  if {$shiftamt($i) == 1} {
+	    set lname [format "\[0\]"]
+	  } else {
+	    set lname [format "\[%d:0\]" [expr $shiftamt($i) - 1]]
+	  }
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname -orient RY
+	  set stub3_x [expr $stub2_x - 30]
+	  make_wire $stub_x $pin_y $stub3_x $pin_y
+	  make sign_extend -origin "[expr $stub3_x - 10] $pin_y"
+	  make_wire [expr $stub3_x - 20] $pin_y [expr $stub3_x - 40] $pin_y
+	  if {[string toupper $SignExtendRsh] == "Y"} {
+	    set gname [format "\[%d\]" $maxidx]
+	    make name_net_s -origin "[expr $stub3_x - 40] $pin_y" -name $gname
+	    make_wire [expr $stub3_x - 40] $pin_y [expr $stub3_x - 40] $y
+	  } else {
+	    make global -origin "[expr $stub3_x - 40] $pin_y" -name "gnd"
+	  }
+	} else {
+	  # rotate amount is modulo the size of the shifter
+	  if {$shiftamt($i) >= $NBITS} {
+	    set samt [expr $shiftamt($i) % $NBITS]
+	  } else {
+	    set samt $shiftamt($i)
+	  }
+	  if {$samt == 1} {
+	    set lname [format "\[0\]"]
+	  } else {
+	    set lname [format "\[%d:0\]" [expr $samt - 1]]
+	  }
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname -orient RY
+	  make_wire $stub_x $pin_y $stub2_x $pin_y
+	  make_wire $stub2_x $pin_y $stub2_x $y
+	}
+      }
+    }
+
+
+    # wire up the input pin if this is the first mux
+    if {$i == 0} {
+      set stub_x [expr $x + $icon_mux_left - 2*$ws1]
+      set stub_y $y
+      make_wire $stub_x $stub_y $inflag_x $stub_y
+      make input -origin "$inflag_x $stub_y" -name "In_H$vmax_bitrange"
+    }
+
+    # wire up the output
+    set pin_x [expr $x + $port_out_x]
+    set pin_y [expr $y + $port_out_y]
+    set stub_x [expr $pin_x + $ws2]
+    if {$i == [expr $NStages - 1]} {
+      # last mux
+      make_wire $pin_x $pin_y $outflag_x $pin_y
+      make output -origin "$outflag_x $pin_y" -name "Out_H$vmax_bitrange"
+    } else {
+      # not the last mux
+      make_wire $pin_x $pin_y $stub_x $pin_y
+      set lname [format "L%d_H%s" $i $vmax_bitrange]
+      make name_net_s -origin "$stub_x $pin_y" -name $lname
+      make_wire $stub_x $pin_y [expr $stub_x + $ws2] $pin_y
+    }
+
+    # add spacers for wire routing between stages
+    if {$i != [expr $NStages - 1]} {
+      set wirecount [expr int(pow(2, [expr $i + 1]))]
+      if {$direction($i) == "both"} {
+	set wirecount [expr 2 * $wirecount]
+      }
+      if {$wirecount > 8} {
+	set nrows [expr ($wirecount / 8) - 1]
+	set rname [format "%dr" $nrows]
+	make spacer -origin "$stub_x [expr $y - $delta_y + 100]" -rows $rname
+      }
+    }
+
+    # add comments describing the stage's function
+    if {($direction($i) == "right") && 
+	([string toupper $Operation] == "SHIFT") &&
+	([string toupper $SignExtendRsh] == "Y")} {
+      make_text -origin "$x [expr $y - $delta_y - 40]" -text {Sign Extended} -anchor center
+    }
+    switch $direction($i) {
+      left {set ctext "Left"}
+      right {set ctext "Right"}
+      both {set ctext "Bidirectional"}
+    }
+    if {[string toupper $Operation] == "SHIFT"} {
+      set ctext [format "%s Shift" $ctext]
+    } else {
+      set ctext [format "%s Rotate" $ctext]
+    }
+    make_text -origin "$x [expr $y - $delta_y - 20]" -text $ctext -anchor center
+    if {($i == 0) && ($direction($i) == "both") && ([string toupper $BidirOptimization] == "MODIFYFIRSTSTAGE")} {
+      set ctext [format "Left by 1"]
+      make_text -origin "$x [expr $y - $delta_y]" -text $ctext -anchor center
+      set ctext [format "Right by 1 or 2"]
+      make_text -origin "$x [expr $y - $delta_y + 20]" -text $ctext -anchor center
+    } else {
+      set ctext [format "by %d" $shiftamt($i)]
+      make_text -origin "$x [expr $y - $delta_y]" -text $ctext -anchor center
+    }
+
+    # wire up the shift amount
+    set pin_x [expr $x + $port_sel_x]
+    set pin_y [expr $y + $port_sel_y]
+    set stub_y [expr $pin_y + $ws1]
+    switch $muxtype($i) {
+      2 { # mux2
+	if {$nshfbits > 1} {
+	  set lname [format "\[%d\]" $cshiftamt]
+	  incr cshiftamt
+	} else {
+	  set lname ""
+	}
+      }
+      3 { # mux3
+	set lname [format "\[%d:%d\]" [expr $cshiftamt + 2] $cshiftamt]
+	set cshiftamt [expr $cshiftamt + 3]
+      }
+      4 { # mux 4
+	set lname [format "\[%d:%d\]" [expr $cshiftamt + 3] $cshiftamt]
+	set cshiftamt [expr $cshiftamt + 4]
+      }
+    }
+    make_wire $pin_x $pin_y $pin_x $stub_y
+    make name_net_s -name "$lname" -origin "$pin_x $stub_y" -orient R90
+    make_wire $pin_x $stub_y $pin_x $shiftamt_y
+    # shift amount hookup between stages
+    if {$i == 0} {
+      make_wire $pin_x $shiftamt_y $inflag_x $shiftamt_y
+      make input -origin "$inflag_x $shiftamt_y" -name "ShiftAmt_H$vshf_bitrange"      
+    } else {
+      make_wire $pin_x $shiftamt_y [expr $pin_x - $delta_x] $shiftamt_y
+    }
+
+    set x [expr $x + $delta_x]
+  }
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr 0 + $delta_y]" -owner emc -version 0.3 -date 04/22/99
+
+  show_connects "" clean
+
+}
+
+
+proc ICON_shifter args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 32} {Operation "Shift" {radio Shift Rotate}} {Direction "Left" {radio Left Right Both Custom}} {SignExtendRsh "Y"} {NStages 5} {BidirOptimization "None" {radio None Simple ModifyFirstStage}} {CustomAlgorithm ""} }
+
+  # check for acceptable response on NBITS
+  if {$NBITS < 1} {
+    error "ERROR: NBITS ($NBITS) must be greater than 0"
+  }
+  # don't let the user get too crazy
+  if {$NBITS > 128} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  set maxidx [expr $NBITS - 1]
+  # bitranges
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  # check for acceptable response on Operation
+  if {([string toupper $Operation] != "SHIFT") && 
+      ([string toupper $Operation] != "ROTATE")} {
+    error "ERROR: Operation ($Operation) must be Shift or Rotate"
+  }
+
+  # check for acceptable response on Direction
+  if {([string toupper $Direction] != "LEFT") &&
+      ([string toupper $Direction] != "RIGHT") &&
+      ([string toupper $Direction] != "BOTH") &&
+      ([string toupper $Direction] != "CUSTOM")} {
+    error "ERROR: Direction ($Direction) must be Left, Right, Both, or Custom"
+  }
+
+  # check for acceptable response on SignExtendRsh
+  if {([string toupper $SignExtendRsh] != "N") &&
+      ([string toupper $SignExtendRsh] != "Y")} {
+    error "ERROR: SignExtendRsh ($SignExtendRsh) must be Y or N"
+  }
+
+  # check for acceptable response on NStages
+  if {$NStages < 1} {
+    error "ERROR: NStages ($NStages) must be greater than 0"
+  }
+
+  # check for acceptable response on CustomAlgorithm
+  if {([string toupper $Direction] == "CUSTOM") &&
+      ($NStages != [llength $CustomAlgorithm])} {
+    error "ERROR: CustomAlgorithm ($CustomAlgorithm) must have NStages ($NStages) elements"
+  }
+
+  # check for acceptable response on BidirOptimization
+  if {([string toupper $BidirOptimization] != "NONE") &&
+      ([string toupper $BidirOptimization] != "SIMPLE") &&
+      ([string toupper $BidirOptimization] != "MODIFYFIRSTSTAGE")} {
+    error "ERROR: BidirOptimization ($BidirOptimization) must be None, Simple, or ModifyFirstStage"
+  }
+
+  # Direction & Shift Amount
+  if {[string toupper $Direction] == "LEFT"} {
+    # assumes encoded controls, 1 bit per stage
+    set nshfbits $NStages
+    for {set n 0} {$n < $NStages} {incr n} {
+      set direction($n) "left"
+      set shiftamt($n) [expr int(pow(2,$n))]
+    }
+  }
+  if {[string toupper $Direction] == "RIGHT"} {
+    # assumes encoded controls, 1 bit per stage
+    set nshfbits $NStages
+    for {set n 0} {$n < $NStages} {incr n} {
+      set direction($n) "right"
+      set shiftamt($n) [expr int(pow(2,$n))]
+    }
+  }
+  if {[string toupper $Direction] == "BOTH"} {
+    set nshfbits 0
+    for {set n 0} {$n < $NStages} {incr n} {
+      if {($n == [expr $NStages - 1]) && ([string toupper $BidirOptimization] == "SIMPLE")} {
+	# note:  if we assume a two's complement encoded shift amount for a bidirectional shifter,
+	# with positive values encoding a left shift, the last stage cannot perform a left shift
+	# since the most positive number is 0111...111.  since the msb must be zero, there cannot
+	# be a left shift in the final stage.
+	# NOTE THAT THE CUSTOM ALGORITHM IS NOT OVERRIDDEN
+	set direction($n) "right"
+	set nshfbits [expr $nshfbits + 1]
+      } else {
+	if {($n == 0) && ([string toupper $BidirOptimization] == "MODIFYFIRSTSTAGE")} {
+	  set direction($n) "both"
+	  # assumes decoded controls, 4 bits per stage
+	  set nshfbits [expr $nshfbits + 4]
+	} else {
+	  set direction($n) "both"
+	  # assumes decoded controls, 3 bits per stage
+	  set nshfbits [expr $nshfbits + 3]
+	}
+      }
+      set shiftamt($n) [expr int(pow(2,$n))]
+    }
+  }
+  if {[string toupper $Direction] == "CUSTOM"} {
+    set nshfbits 0
+    for {set n 0} {$n < $NStages} {incr n} {
+      set stage [lindex $CustomAlgorithm $n]
+      scan $stage "%d%s" shiftamt($n) dir
+      # check shiftamt
+      if {($shiftamt($n) < 1) } {
+	error "ERROR: CustomAlgorithm element ($stage) shift amount must be greater than 0"
+      }
+      # check direction
+      switch [string toupper $dir] {
+	B {
+	  set direction($n) "both"
+	  # assumes decoded controls, 3 bits per stage
+	  set nshfbits [expr $nshfbits + 3]
+	}
+	R {
+	  set direction($n) "right"
+	  # assumes encoded controls, 1 bit per stage
+	  incr nshfbits
+	}
+	L {
+	  set direction($n) "left"
+	  # assumes encoded controls, 1 bit per stage
+	  incr nshfbits
+	}
+	default {error "ERROR: CustomAlgorithm element ($stage) direction must be B, L, or R"}
+      }
+    }
+  }
+  set maxsidx [expr $nshfbits - 1]
+  if {$maxsidx == 0} {
+    set shf_bitrange [format "\[0\]"]
+    set vshf_bitrange ""
+  } else {
+    set shf_bitrange [format "\[%d:0\]" $maxsidx]
+    set vshf_bitrange $shf_bitrange
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  icon_line -50 80 -50 -80 50 -80 50 80 -50 80 
+
+  # inputs
+  icon_term -type input -origin {-50 0} -name "In_H$vmax_bitrange"
+  icon_property -origin {-40 0} -size small -label In_H
+  icon_term -type input -origin {0 80} -orient R270 -name "ShiftAmt_H$vshf_bitrange"
+  icon_property -origin {0 70} -size small -anchor center -label ShiftAmt
+
+  # outputs
+  icon_term -type output -origin {50 0} -name "Out_H$vmax_bitrange"
+  icon_property -origin {40 0} -size small -anchor e -label Out_H
+
+  # text
+  if {[string toupper $Direction] == "LEFT"} {
+    set dirtxt "Left"
+    set dirname "Left"
+  }
+  if {[string toupper $Direction] == "RIGHT"} {
+    set dirtxt "Right"
+    set dirname "Right"
+  }
+  if {[string toupper $Direction] == "BOTH"} {
+    set dirtxt "Bidir"
+    set dirname "Both"
+  }
+  if {[string toupper $Direction] == "CUSTOM"} {
+    set dirtxt "Custom"
+    set dirname "Custom"
+  }
+  icon_property -origin {0 -40} -anchor center -label "$dirtxt"
+  if {[string toupper $Operation] == "SHIFT"} {
+    set optxt "Shifter"
+    set opname "Shift"
+  } else {
+    set optxt "Rotator"
+    set opname "Rotate"
+  }
+  icon_property -origin {0 -20} -anchor center -label "$optxt"
+  icon_property -origin {0 20} -anchor center -label "$max_bitrange"
+
+  # junk
+  icon_property -origin {-70 300} -type user -name name
+  icon_property -origin {-70 320} -type user -name M
+  icon_property -origin {-70 340} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 440} -owner emc -version 0.3 -date 04/22/99
+
+
+  # generate verilog property
+  set fname [format "shifter%d_%s_%s_%s_%d_%s" $NBITS $opname $dirname [string toupper $SignExtendRsh] $NStages $BidirOptimization]
+  if {[string toupper $Direction] == "CUSTOM"} {
+    for {set i 0} {$i < $NStages} {incr i} {
+      set fname [format "%s_%s" $fname [lindex $CustomAlgorithm $i]]
+    }
+  }
+  set pnames [format ".In_H(\$\{In_H%s\}), .Out_H(\$\{Out_H%s\}), .ShiftAmt_H(\$\{ShiftAmt_H%s\}))" $vmax_bitrange $vmax_bitrange $vshf_bitrange]
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin {-70 280} -type fixed -name verilog -text $vprop 
+
+  ######################################
+  # spit out the behavioral verilog code
+  set filename "$fname.vb"
+  if {[catch "open $filename w" FILE_ID]} {
+    puts "WARNING: Couldn't open file $filename"
+  }
+
+
+  # header stuff
+  puts $FILE_ID "// Behavioral verilog for shifter:"
+  puts $FILE_ID "//   NBITS = $NBITS"
+  puts $FILE_ID "//   Operation = $Operation"
+  puts $FILE_ID "//   Direction = $Direction"
+  puts $FILE_ID "//   SignExtendRsh = $SignExtendRsh"
+  puts $FILE_ID "//   NStages = $NStages"
+  puts $FILE_ID "//   BidirOptimization = $BidirOptimization"
+  puts $FILE_ID "//   CustomAlgorithm = $CustomAlgorithm"
+
+  puts $FILE_ID [format "module %s (In_H, Out_H, ShiftAmt_H);" $fname]
+
+  puts $FILE_ID [format "\n\toutput %s\tOut_H;" $vmax_bitrange]
+  puts $FILE_ID [format "\tinput  %s\tIn_H;" $vmax_bitrange]
+  puts $FILE_ID [format "\tinput  %s\tShiftAmt_H;" $vshf_bitrange]
+
+  puts $FILE_ID [format "\n\tparameter\tinitial_value = 'b 0;"]
+
+  puts $FILE_ID [format "\n\treg %s\tOut_H;" $vmax_bitrange]
+  for {set i 0} {$i < [expr $NStages - 1]} {incr i} {
+    puts $FILE_ID [format "\treg %s\tL%d_H;" $vmax_bitrange $i]
+  }
+
+  # initialize
+  puts $FILE_ID [format "\n\tinitial"]
+  puts $FILE_ID [format "\t  begin"]
+  puts $FILE_ID [format "\t    Out_H = initial_value;"]
+  for {set i 0} {$i < [expr $NStages - 1]} {incr i} {
+    puts $FILE_ID [format "\t    L%d_H = initial_value;" $i]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+  # execute
+  puts $FILE_ID [format "\n\talways @(In_H or ShiftAmt_H)"]
+  puts $FILE_ID [format "\t  begin"]
+
+  set cshiftamt 0
+  for {set i 0} {$i < $NStages} {incr i} {
+    
+    # what's the unshifted input signal?
+    if {$i == 0} {
+      set in [format "In_H%s" $vmax_bitrange]
+      set insig "In_H"
+    } else {
+      set in [format "L%d_H%s" [expr $i - 1] $vmax_bitrange]
+      set insig [format "L%d_H" [expr $i - 1]]
+    }
+
+    # what's the left shifted input signal?
+    if {[string toupper $Operation] == "SHIFT"} {
+      if {$shiftamt($i) >= $NBITS} {
+	# all zero's
+	set lin [format "%d'b0" $NBITS]
+      } else {
+	set ubits [format "%s\[%d:0\]" $insig [expr $maxidx - $shiftamt($i)]]
+	# shift in zero's
+	set lbits [format "%d'b0" $shiftamt($i)]
+	set lin [format "\{%s,%s\}" $ubits $lbits]
+      }
+    } else {
+      # rotate
+      if {($shiftamt($i) % $NBITS) == 0} {
+	# equivalent to no rotate
+	set lin [format "%s\[%d:0\]" $insig $maxidx]
+      } else {
+	# rotation is modulo the size of the shifter
+	set samt [expr $shiftamt($i) % $NBITS]
+	set ubits [format "%s\[%d:0\]" $insig [expr $maxidx - $samt]]
+	# rotate the upper bits in
+	if {$samt == 1} {
+	  set lbits [format "%s\[%d\]" $insig $maxidx]
+	} else {
+	  set lbits [format "%s\[%d:%d\]" $insig $maxidx [expr $maxidx - $samt + 1]]
+	}	
+	set lin [format "\{%s,%s\}" $ubits $lbits]
+      }
+    }
+
+
+    # what's the right shifted input signal?
+    if {[string toupper $Operation] == "SHIFT"} {
+      if {$shiftamt($i) >= $NBITS} {
+	# all zero's or the sign extension
+	if {[string toupper $SignExtendRsh] == "Y"} {
+	  set rin [format "%d\{%s\[%d\]\}" $NBITS $insig $maxidx]
+	} else {
+	  set rin [format "%d'b0" $NBITS]
+	}
+      } else {
+	set lbits [format "%s\[%d:%d\]" $insig $maxidx $shiftamt($i)]
+	# shift in zero's or the sign extension
+	if {[string toupper $SignExtendRsh] == "Y"} {
+	  set ubits [format "%d\{%s\[%d\]\}" $shiftamt($i) $insig $maxidx]
+	} else {
+	  set ubits [format "%d'b0" $shiftamt($i)]
+	}
+	set rin [format "\{%s,%s\}" $ubits $lbits]
+      }
+    } else {
+      # rotate
+      if {($shiftamt($i) % $NBITS) == 0} {
+	# same as no rotate
+	set rin [format "%s\[%d:0\]" $insig $maxidx]
+      } else {
+	# rotation is modulo the size of the shifter
+	set samt [expr $shiftamt($i) % $NBITS]
+	set lbits [format "%s\[%d:%d\]" $insig $maxidx $samt]
+	# rotate the lower bits in
+	if {$samt == 1} {
+	  set ubits [format "%s\[0\]" $insig]
+	} else {
+	  set ubits [format "%s\[%d:0\]" $insig [expr $samt - 1]]
+	}	
+	set rin [format "\{%s,%s\}" $ubits $lbits]
+      }
+    }
+
+    # special case:  extra right shifted input at stage 0, for BidirOptimization = ModifyFirstStage
+    set shiftamt($i) 2
+    if {[string toupper $Operation] == "SHIFT"} {
+      if {$shiftamt($i) >= $NBITS} {
+	# all zero's or the sign extension
+	if {[string toupper $SignExtendRsh] == "Y"} {
+	  set rin2 [format "%d\{%s\[%d\]\}" $NBITS $insig $maxidx]
+	} else {
+	  set rin2 [format "%d'b0" $NBITS]
+	}
+      } else {
+	set lbits [format "%s\[%d:%d\]" $insig $maxidx $shiftamt($i)]
+	# shift in zero's or the sign extension
+	if {[string toupper $SignExtendRsh] == "Y"} {
+	  set ubits [format "%d\{%s\[%d\]\}" $shiftamt($i) $insig $maxidx]
+	} else {
+	  set ubits [format "%d'b0" $shiftamt($i)]
+	}
+	set rin2 [format "\{%s,%s\}" $ubits $lbits]
+      }
+    } else {
+      # rotate
+      if {($shiftamt($i) % $NBITS) == 0} {
+	# same as no rotate
+	set rin2 [format "%s\[%d:0\]" $insig $maxidx]
+      } else {
+	# rotation is modulo the size of the shifter
+	set samt [expr $shiftamt($i) % $NBITS]
+	set lbits [format "%s\[%d:%d\]" $insig $maxidx $samt]
+	# rotate the lower bits in
+	if {$samt == 1} {
+	  set ubits [format "%s\[0\]" $insig]
+	} else {
+	  set ubits [format "%s\[%d:0\]" $insig [expr $samt - 1]]
+	}	
+	set rin2 [format "\{%s,%s\}" $ubits $lbits]
+      }
+    }
+
+    
+    # what's the output signal?
+    if {$i == [expr $NStages - 1]} {
+      set out [format "Out_H%s" $vmax_bitrange]
+    } else {
+      set out [format "L%d_H%s" $i $vmax_bitrange]
+    }
+
+    # what's the shift amount signal?
+    if {$direction($i) == "both"} {
+      if {($i == 0) && ([string toupper $BidirOptimization] == "MODIFYFIRSTSTAGE")} {
+	set shift [format "ShiftAmt_H\[%d:%d\]" [expr $cshiftamt + 3] $cshiftamt]
+	set cshiftamt [expr $cshiftamt + 4]
+      } else {
+	set shift [format "ShiftAmt_H\[%d:%d\]" [expr $cshiftamt + 2] $cshiftamt]
+	set cshiftamt [expr $cshiftamt + 3]
+      }
+    } else {
+      if {$NStages == 1} {
+	set shift [format "ShiftAmt_H"]
+      } else {
+	set shift [format "ShiftAmt_H\[%d\]" $cshiftamt]
+	incr cshiftamt
+      }
+    }
+    
+    if {$direction($i) == "both"} {
+      if {($i == 0) && ([string toupper $BidirOptimization] == "MODIFYFIRSTSTAGE")} {
+	puts $FILE_ID [format "\n\t    case (%s)" $shift]
+	puts $FILE_ID [format "\t      4'b0001 :  %s = %s;" $out $in]
+	puts $FILE_ID [format "\t      4'b0010 :  %s = %s;" $out $lin]
+	puts $FILE_ID [format "\t      4'b0100 :  %s = %s;" $out $rin]
+	puts $FILE_ID [format "\t      4'b1000 :  %s = %s;" $out $rin2]
+	puts $FILE_ID [format "\t    endcase"]
+      } else {
+	puts $FILE_ID [format "\n\t    case (%s)" $shift]
+	puts $FILE_ID [format "\t      3'b001 :  %s = %s;" $out $in]
+	puts $FILE_ID [format "\t      3'b010 :  %s = %s;" $out $lin]
+	puts $FILE_ID [format "\t      3'b100 :  %s = %s;" $out $rin]
+	puts $FILE_ID [format "\t    endcase"]
+      }
+    } else {
+      puts $FILE_ID [format "\n\t    if (%s)" $shift]
+      if {$direction($i) == "left"} {
+	puts $FILE_ID [format "\t      %s = %s;" $out $lin]
+      }
+      if {$direction($i) == "right"} {
+	puts $FILE_ID [format "\t      %s = %s;" $out $rin]
+      }
+      puts $FILE_ID [format "\t    else"]
+      puts $FILE_ID [format "\t      %s = %s;" $out $in]
+    }
+  }
+
+  puts $FILE_ID [format "\n\t  end"]
+
+  # done
+  puts $FILE_ID [format "\nendmodule\t\t//%s" $fname]
+  close $FILE_ID
+}

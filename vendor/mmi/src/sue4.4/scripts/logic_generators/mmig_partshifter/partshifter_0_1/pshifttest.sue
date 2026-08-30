@@ -1,0 +1,14 @@
+# SUE version MMI_SUE4.0p1
+
+proc SCHEMATIC_pshifttest {} {
+  generate partshifter partshifter64_Shift_Both_Y_6_16_32_64 -NBITS 64 -Direction Both -NStages 6 -Datatypes {16 32 64}
+  make partshifter64_Shift_Both_Y_6_16_32_64 -origin {430 350}
+  make output -name {Out_H[63:0]} -origin {550 350}
+  make input -name {In_H[63:0]} -origin {310 350}
+  make input -name {ShiftAmt_H[1:0]} -origin {310 480}
+  make_wire 310 350 380 350
+  make_wire 310 480 430 480
+  make_wire 430 480 430 430
+  make_wire 480 350 550 350
+}
+

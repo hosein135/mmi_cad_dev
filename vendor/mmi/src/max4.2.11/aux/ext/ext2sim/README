@@ -1,0 +1,9 @@
+This version of ext2sim is a minor update of the original ext2sim 
+distribution. It maintains the diffusion area and perimeter information
+and the fet substrate connection in the sim file (the resistance classes
+of N and P diffusion should be 0 and 1 respectively).
+This way it is extremely easy to write an awk or perl script to obtain
+a flat spice netlist of the extracted circuit (in fact the included script
+named sim2spi does exactly that).
+
+For any problems contact sidirop@chroma.stanford.edu.

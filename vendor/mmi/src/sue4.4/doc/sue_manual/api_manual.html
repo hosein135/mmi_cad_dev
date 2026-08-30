@@ -1,0 +1,2183 @@
+<html>
+
+<head>
+<title>
+SUE API Reference Guide
+</title>
+</head>
+
+<BODY BGCOLOR="ffffff" >
+
+<TABLE width="96%" border="0" align="center">
+  <TR>
+    <TD rowspan="2" width="31%"><IMG src="images/mmi-logo.gif" width="155" height="79"></TD>
+    <TD width="69%" height="91" valign="bottom">
+      <H1 align="left">SUE API Reference Guide</H1>
+    </TD>
+  </TR>
+</TABLE>
+
+<br>
+<hr>
+
+
+<hr>
+
+<ul>
+<li>
+<pre>
+api_annotate_change_color
+</pre>
+
+Changes all annotation with a given tag to a given color.
+
+<p>
+
+USAGE: api_annotate_change_color &lt;tag> &lt;color>
+
+<p>
+
+For example,
+
+<p>
+
+<pre>
+        sue> api_annotate_line -coords "0 0 100 100" -color pink -tags "foo bar"
+        1
+        sue> api_annotate_change_color foo green
+        1
+</pre>
+
+Returns 1 if successful, 0 otherwise.
+
+<p>
+
+<li>
+<pre>
+api_annotate_filled_rect
+</pre>
+
+Adds a filled rectangle annotation to the current cell.  To get a hollow
+rectangle, use api_annotate_line.
+
+<p>
+
+USAGE: api_annotate_filled_rect -coords &lt;x1 y1 x2 y2> [-fill &lt;color>] [-outline &lt;color>] [-tags &lt;tags>]
+
+<p>
+
+color defaults to COLORS(anchor)
+
+<p>
+
+Optional tags can be supplied.  Without any tags, the annotations are
+removed by executing many SUE commands or by clicking on the screen.
+With tags, the annotations have to be cleared using
+api_clear_annotations with the appropriate argument.
+
+<p>
+
+For example,
+
+<p>
+
+<pre>
+        sue> api_annotate_filled_rect -coords "0 0 100 100" -fill green -outline yellow
+        1
+</pre>
+
+Returns 1 if successful, 0 otherwise.
+
+<p>
+
+<li>
+<pre>
+api_annotate_line
+</pre>
+
+Adds a line annotation to the current cell.  Annotations are temporary.
+Lines can be multi-segment such as in a rectangle.
+
+<p>
+
+USAGE: api_annotate_line -coords &lt;list> [-color &lt;color>] [-tags &lt;tags>]
+                         [-width &lt;width>]
+
+<p>
+
+color defaults to COLORS(anchor)
+width defaults to 1 (pixel)
+
+<p>
+
+Optional tags can be supplied.  Without any tags, the annotations are
+removed by executing many SUE commands or by clicking on the screen.
+With tags, the annotations have to be cleared using
+api_clear_annotations with the appropriate argument.
+
+<p>
+
+For example,
+
+<p>
+
+<pre>
+        sue> api_annotate_line -coords "0 0 100 0 100 100 0 100 0 0" -color green
+        1
+</pre>
+
+Returns 1 if successful, 0 otherwise.
+
+<p>
+
+<li>
+<pre>
+api_annotate_text
+</pre>
+
+Adds a text annotation to the current cell.  Annotations are temporary.
+
+<p>
+
+USAGE: api_annotate_text -text &lt;text> -origin &lt;list> 
+          [-anchor &lt;n|s|e|w|c|nw|ne|se|sw>] [-rotate &lt;0|1>]
+          [-color &lt;color>] [-size &lt;small|standard|large>] [-tags &lt;tags>]
+
+<p>
+
+anchor defaults to w
+rotate defaults to 0 -- not rotated
+color defaults to COLORS(anchor)
+size defaults to standard
+
+<p>
+
+Optional tags can be supplied.  Without any tags, the annotations are
+removed by executing many SUE commands or by clicking on the screen.
+With tags, the annotations have to be cleared using
+api_clear_annotations with the appropriate argument.
+
+<p>
+
+For example,
+
+<p>
+
+<pre>
+        sue> api_annotate_text -text "hi there" -origin "20 -40" -color pink
+        1
+</pre>
+
+Returns 1 if successful, 0 otherwise.
+
+<p>
+
+<li>
+<pre>
+api_bbox
+</pre>
+
+Returns a list of the coordinates of the bounding box of the current
+cell.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_bbox
+        10 10 200 300
+</pre>
+
+
+<p>
+
+USAGE: api_bbox
+
+<p>
+
+<li>
+<pre>
+api_cell_hierarchy
+</pre>
+
+Returns the list of cells pushed into to get to the current cell.  If
+called with an argument, sets the hierarchy to that argument and returns the previous hierarchy.
+
+<p>
+
+WARNING: setting the hierarchy to something invalid will have unforseen
+consequences.
+
+<p>
+
+The elements of this list are ordered so that the first one is the
+calling cell and the last one is the topmost cell.  If this is the
+topmost cell, nil is returned.
+
+<p>
+
+Each element of this list is a pair of values: the cell type and the
+id of the cell pushed into from that cell.  The id is required to
+prevent ambiguity when there is more than one instance of that cell type
+in the cell.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> set save_hierarchy [api_cell_hierarchy]
+        {adder8 581} {alu8 17}
+        sue> set save_cell [api_current_cell]
+        sue> api_goto_cell shift8
+        ...
+        sue> # restore cell and hierarchy
+        sue> api_goto_cell $save_cell
+        sue> api_cell_hierarchy $save_hierarchy
+</pre>
+
+
+<p>
+
+USAGE: api_cell_hierarchy [hierarchy]
+
+<p>
+
+<li>
+<pre>
+api_cell_info
+</pre>
+
+Returns information about the given cell or current cell in an
+associative list.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_cell_info
+        {filename /proj/foobar/adder.sue} {type S} {modified M} {generator 0}
+</pre>
+
+This cell is a schematic (type S) and is modified.  It is not a generator.
+
+<p>
+
+USAGE: api_cell_info [cell]
+
+<p>
+
+<li>
+<pre>
+api_cell_path
+</pre>
+
+Returns the list of cell names thru the hierarchy to create the hierachical
+path name to the cell.
+
+<p>
+
+USAGE: api_cell_path [&lt;type>]
+
+<p>
+
+Where &lt;type> defaults to "spice".  If &lt;type> is "verilog", returns the
+test module and rootcell module names also.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_cell_path
+        alu shifter_1
+        sue> api_cell_path verilog
+        test unit alu shifter_1
+</pre>
+
+To get the full path name of a selected wire, use:
+
+<p>
+
+<pre>
+        set local_net [get_assoc net [api_get_data [api_types wire selected]]]
+        set net [join [concat [api_cell_path] $local_net] .]
+</pre>
+
+for spice or
+
+<p>
+
+<pre>
+        set local_net [get_assoc net [api_get_data [api_types wire selected]]]
+        set net [join [concat [api_cell_path verilog] $local_net] .]
+</pre>
+
+for verilog.
+
+<p>
+
+<li>
+<pre>
+api_cells
+</pre>
+
+Returns a list of the cells that are currently loaded in SUE.  This
+list coresponds to the list of schematics in the schematics list box.
+
+<p>
+
+If an optional argument of "I" is added, then the icon views currently
+loaded are returned.
+
+<p>
+
+USAGE: api_cells [type]
+
+<p>
+
+<li>
+<pre>
+api_change_cell_path
+</pre>
+
+Changes the path of the current cell.  Subsequent saves and all
+associated files will go to this new path.
+
+<p>
+
+If the path is invalid (i.e. not a proper directory), the current
+cell's path is not modified and the function returns 0.  Else returns 1.
+
+<p>
+
+For example, to write the netlist of the current cell to /tmp, do the
+following:
+
+<p>
+
+<pre>
+        sue> set save_path [get_assoc filename [api_cell_info]]
+        /home/user/dpc_tut/alu8/alu8.sue
+        sue> api_change_cell_path /tmp
+        Changing path of cell "alu8" to /tmp/
+        sue> api_netlist
+        ...
+        sue> api_change_cell_path $save_path
+        Changing path of cell "alu8" to /home/user/dpc_tut/alu8/
+</pre>
+
+Sets the modified flag since the cell hasn't been saved at the new
+pathname.
+
+<p>
+
+USAGE: api_change_cell_path path
+
+<p>
+
+<li>
+<pre>
+api_change_prop
+</pre>
+
+Changes the icons with ids in &lt;id_list> in the current schematic
+which have the property &lt;property> to the value &lt;value>.  Note
+that any changed instances are given new ids.  This command will set
+the modified flag on the cell if anything is changed.  These changes
+can also be undone.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_change_prop "1252 1265 1275" dpc newbit
+        Changed 3 instances.
+</pre>
+
+Will change the "dpc" property on the icons with the above ids to the
+string "newbit".
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+USAGE: api_change_prop ids prop value
+
+<p>
+
+<li>
+<pre>
+api_change_simulation_mode
+</pre>
+
+To change the simulation mode once SUE has started, first change
+NETLIST_TYPE and NETLIST_PROPS to the appropriate values.  Next
+execute this command, which resets the "Sim" menu and flushes the
+caches.
+
+<p>
+
+Returns 1 if successful, 0 if NETLIST_TYPE is not valid.
+
+<p>
+
+USAGE: api_change_simulation_mode
+
+<p>
+
+<li>
+<pre>
+api_check_ios
+</pre>
+
+Checks that the schematic and icon I/O's match for a given cell.  If
+no cell is given, checks the current cell.
+
+<p>
+
+USAGE: api_check_ios [&lt;cell>]
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_check_ios
+</pre>
+
+Returns "" if equivalent, otherwise outputs differences.
+
+<p>
+
+<li>
+<pre>
+api_clean_connections
+</pre>
+
+Recomputes the connection information, breaking wires and adding
+solder dots and opens, on either the entire schematic or just the
+selected area.  Breaks wires that intersect with wire ends or icon
+terminals.  
+
+<p>
+
+USAGE: api_clean_connections [&lt;type>] [&lt;modify>]
+
+<p>
+
+If &lt;type> is "selected", only cleans connections on selected objects.
+This option is meant for performance purposes.  Cleaning entire large
+schematics can be slow.  The default is "" (clean everything).
+
+<p>
+
+If &lt;modify> is "" (the default), then api_clean_connections sets the
+modified flag on the current cell.  Otherwise the modify flag is not
+set.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_clean_connections "" no_modify
+</pre>
+
+NOTE: this procedure only applies to schematics.  Run on an icon or
+placement, it will return 0, else 1.
+
+<p>
+
+NOT UN-DOABLE
+
+<p>
+
+<li>
+<pre>
+api_clear_annotations
+</pre>
+
+Removes annotations from the current cell.
+
+<p>
+
+USAGE: api_clear_annotations [all|&lt;tags>]
+
+<p>
+
+If annotations are created with the api and given tags, then you must
+delete them by speicifing one of the tags or with "all".
+
+<p>
+
+Returns 1 if successful, 0 otherwise.
+
+<p>
+
+<li>
+<pre>
+api_current_cell
+</pre>
+
+Returns the name of the current cell.  If that cell is an ICON, the name of the cell is ICON_&lt;cell_name>.
+
+<p>
+
+USAGE: api_current_cell
+
+<p>
+
+<li>
+<pre>
+api_delete_selected
+</pre>
+
+Deletes the selected items in the current cell.
+
+<p>
+
+Returns 1.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+USAGE: api_delete_selected
+
+<p>
+
+<li>
+<pre>
+api_generate_term_names
+</pre>
+
+Generates terminal names for the current schematic.  This command is
+identical to clicking on "generate term names" in the "Sim"
+menu.  
+
+<p>
+
+This procedure does NOT generate netlisting instance names.  You must
+netlist to get those.
+
+<p>
+
+USAGE: api_generate_term_names
+
+<p>
+
+<li>
+<pre>
+api_get_data
+</pre>
+
+Returns an associative list of data about the given id.  ids of type
+instance, wire, line, arc, text, dot, and open are valid.  See the
+command "api_types" for how to get the desired id.
+
+<p>
+
+USAGE: api_get_data id [&lt;property>]
+
+<p>
+
+If an optional property is supplied, only returns the value for that
+property.  If the property doesn't exist, errors.  Also, if the id
+doesn't exist or is invalid, errors.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_get_data 1123
+        {type wire} {coords {330 70 380 70}} {net net_13}
+        sue> api_get_data 1123 type
+        wire
+        sue> api_get_data 576
+        {type line} {coords {290 -180 290 -110 370 -110 370 -180 290 -180}}
+        sue> api_get_data 299
+        {type text} {origin {-40 280}} {text {-type user -name name}}
+        {size standard} {anchor w} {rotate 0}
+        sue> api_get_data 834
+        {type arc} {bbox {40 -10 60 10}} {start 0} {extent 359}
+</pre>
+
+Note that "api_get_data" is equivalent to "api_instance_data" if the
+given id is an instance.
+
+<p>
+
+<li>
+<pre>
+api_goto_cell
+</pre>
+
+Changes the current cell to the given cell, if it exists.  Returns 1
+if succeeded, otherwise 0.
+
+<p>
+
+Tries to go to the schematic view of the cell, unless specifically
+given an "ICON_" name, but if none exists will go to the icon view
+instead.  NOTE: if goes to the other view, will return 0, even though
+it has changed the current cell.
+
+<p>
+
+Any hierarchy is lost, i.e. you cannot pop out of the cell.
+
+<p>
+
+If the schematic is not loaded but in the auto-load path, it will be
+loaded.
+
+<p>
+
+USAGE: api_goto_cell cell
+
+<p>
+
+<li>
+<pre>
+api_icon_listbox
+</pre>
+
+Add, delete, and modify contents of icon listboxes.
+
+<p>
+
+USAGE: api_icon_listbox -command &lt;dir|change|add|delete> [-index &lt;index>]
+                        [-dir &lt;dir_name>]
+
+<p>
+
+The indexes start from 0 for the top icon listbox (the one right below
+the schematic listbox) and increment downwards.  If the index is not
+specified in defaults to the bottom one.
+
+<p>
+
+If -command is "dir" then the directory linsted in the nth icon listbox given
+by &lt;index> is returned.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> for {set i 0} {$i &lt; [api_icon_listboxes]} {incr i} {
+        sue?   puts "icon listbox $i: [api_icon_listbox -command dir -index $i]"
+        sue? }
+        icon listbox 0: /proj/foobar/stdcell/sue
+        icon listbox 1: /proj/foobar/sue/devices
+        icon listbox 2: /proj/foobar/sue/mspice
+</pre>
+
+
+<p>
+
+<li>
+<pre>
+api_icon_listboxes
+</pre>
+
+Returns the number of icon listboxes.
+
+<p>
+
+USAGE: api_icon_listboxes
+
+<p>
+
+<li>
+<pre>
+api_instance_data
+</pre>
+
+Returns an associative list of properties and values for the icon with
+the given id.  Also, returns the netlist name if already netlisted.
+User-defined properties are prefixed with a "_".
+
+<p>
+
+USAGE: api_instance_data id [&lt;property>]
+
+<p>
+
+If an optional property is supplied, only returns the value for that property.
+If the property doesn't exist, errors.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_instance_data 25
+        {_model p} {_M {}} {_name {}} {orient R0} {_W 2.4} {type pmos}
+        {_L lp_min} {origin {470 450}} {bbox {410 410 470 490}}
+        {generator 0} {netlist_name {}}
+        sue> get_assoc origin [api_instance_data 25]
+        470 450
+        sue> api_instance_data 25 origin
+        470 450
+</pre>
+
+
+<p>
+
+<li>
+<pre>
+api_instance_type_data
+</pre>
+
+Returns an associative list of properties and values for the instance
+parameters for the instance of the given type.  User-defined
+properties are prefixed with a "_".  
+
+<p>
+
+USAGE: api_instance_type type [&lt;property>]
+
+<p>
+
+If the optional property argument is given, then returns the value
+for that property only.  If the property doesn't exist, errors.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_instance_type_data inverter
+        {defaults {{origin {0 0}} {orient R0} {name {}} {M {}} {WP 2}
+        {LP lp_min} {WN 1} {LN ln_min}}} {creator inverter} {_name,choices {}}
+        {_LN,choices {}} {prop_names {name M WP LP WN LN}} {gargs {}}
+        {_M {$M}} {_LP,choices {}} {_M,default {}} {_WN,choices {}}
+        {_verilog {assign $out = !($in)\;}} {generator inverter}
+        {gdefaults {{demorgan 0 binary} {bubble_only 0 binary}}}
+        {_WP,choices {}} {_name {$name}} {_LN {$LN}} {_name,default {}}
+        {_LN,default ln_min} {_LP {$LP}} {_WN {$WN}} {_LP,default lp_min}
+        {_WN,default 1} {_WP {$WP}} {_M,choices {}}
+        {arglist {$name $M $WP $LP $WN $LN}} {_WP,default 2}
+</pre>
+
+If you wanted to find the default value for the "LN" property of an
+inverter, you could use the following expression:
+
+<p>
+
+<pre>
+        sue> get_assoc _LN,default [api_instance_type_data inverter]
+        ln_min
+</pre>
+
+or simply:
+
+<p>
+
+<pre>
+        sue> api_instance_type_data inverter _LN,default
+        ln_min
+</pre>
+
+
+<p>
+
+<li>
+<pre>
+api_instances
+</pre>
+
+Returns a list of ids of all icons in the current schematic, or if the
+"selected" option is used, returns a list of selected objects.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_instances
+        1 5 9 13 17 21 25 36 47 56 65 76
+        sue> api_instances selected
+        1 9 25 36
+</pre>
+
+
+<p>
+
+USAGE: api_instances [type]
+
+<p>
+
+<li>
+<pre>
+api_load_cell
+</pre>
+
+Loads the cell with the given cell name.  If the cell is already
+loaded, just goes to it.
+
+<p>
+
+If the cell name includes a full path, then adds that path to the
+search paths and loads the cell.
+
+<p>
+
+USAGE: api_load_cell cell
+
+<p>
+
+<li>
+<pre>
+api_make
+</pre>
+
+Adds an icon to the current cell.  Like "make" but is undoable and
+doesn't require special procedures to be run either before or after
+it.  However, if wrapped with "api_zoom setup" and "api_zoom restore",
+multiple api_make commands will run faster.
+
+<p>
+
+NOTE: slower than "make".
+
+<p>
+
+USAGE: api_make &lt;icon_name> -origin &lt;x_y_list> [-orient &lt;orient>] 
+<pre>
+                &lt;keyword_arguments>
+</pre>
+
+&lt;orient> defaults to R0 and can be any of the standard SUE
+orientations: R0, RX, RY, RXY, R90X, R90Y, R270.
+
+<p>
+
+The keyword/argument pair order is unimportant.
+
+<p>
+
+&lt;keyword_arguements> are unique for each icon and depend on the user
+properties in the icon view of the cell.  Typically they contain at
+least the "name" property.
+
+<p>
+
+Special tcl characters such as []$ must be quoted for surrounded by {}.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_make inverter -origin {120 100} -orient RX -name foo
+</pre>
+
+Returns the id of the icon or "" if unsuccessful.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+<li>
+<pre>
+api_make_arc
+</pre>
+
+Adds an arc to the current cell.  Like "make_arc" but is
+undoable and doesn't require any special procedures to be run either
+before or after it.
+
+<p>
+
+Arcs are drawn by specifying the bounding box of an ellipse.  The
+start angle and the extent of the arc counterclockwise are also
+specified, both in degrees.  Circles are arcs with square bounding
+boxes and an extent of 359 degrees.
+
+<p>
+
+SUE does not support splines.
+
+<p>
+
+USAGE: api_make_arc x1 y1 x2 y2 -start &lt;start_angle> -extent &lt;extent_angle>
+
+<p>
+
+&lt;start_angle> defaults to 0 degrees which corresponds to the middle of
+the right side of the bounding box.  
+
+<p>
+
+&lt;extent_angle> defaults to 90 degrees and proceeds counterclockwise.
+Note: the maximum extent is 359 degrees and creates a closed
+circle/ellipse.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_make_arc 0 0 200 200 -start 90 -extent 180
+        sue> api_make_arc 100 100 300 300 -extent 359
+</pre>
+
+Returns the id of the line or "" if unsuccessful.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+<li>
+<pre>
+api_make_line
+</pre>
+
+Adds a line to the current cell.  Like "make_line" but is
+undoable and doesn't require any special procedures to be run either
+before or after it.
+
+<p>
+
+USAGE: api_make_line &lt;list_of_x_y_pairs>
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_make_line 120 150 200 300
+        sue> api_make_line 0 0 100 0 100 100 0 100 0 0
+</pre>
+
+Returns the id of the line or "" if unsuccessful.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+<li>
+<pre>
+api_make_text
+</pre>
+
+Adds text to the current cell.  Like "make_text" but is
+undoable and doesn't require any special procedures to be run either
+before or after it.
+
+<p>
+
+USAGE: api_make_text -origin &lt;x_y_list> -text &lt;text> [-size &lt;size>]
+                     [-anchor &lt;anchor>] [-rotate &lt;0|1>]
+
+<p>
+
+Text has two orientations: normal (0) and rotated (1).  Text defaults
+to normal (0).
+
+<p>
+
+Size can be one of: very-small, small, standard, large, very-large.
+Size defaults to standard.
+
+<p>
+
+Anchor can be one of: n, s, e, w, ne, nw, se, sw, center, or c.
+Anchor defaults to w.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_make_text -origin {120 140} -text "Doesn't need a keeper."
+</pre>
+
+Returns the id of the wire or "" if unsuccessful.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+<li>
+<pre>
+api_make_wire
+</pre>
+
+Adds a wire to the current schematic.  Like "make_wire" but is
+undoable and doesn't require any special procedures to be run either
+before or after it.  However, if wrapped with "api_zoom setup" and
+"api_zoom restore", multiple api_make_wire commands will run faster.
+
+<p>
+
+NOTE: slower than "make_wire".
+
+<p>
+
+USAGE: api_make_wire x1 y1 x2 y2
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_make_wire 100 200 180 200
+        sue> api_make_wire 180 200 180 240
+</pre>
+
+Merges connected wires.
+
+<p>
+
+Returns the id of the wire or "" if unsuccessful.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+<li>
+<pre>
+api_move_selected
+</pre>
+
+Moves selected objects, preserving connectivity.
+
+<p>
+
+Movements in x (dx) and y (dy) need to be rounded to multiples of 10, the
+minimum grid size, or else objects will go off-grid.
+
+<p>
+
+Returns 1, or 0 if nothing is selected or bad distance.
+
+<p>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+USAGE: api_move_selected dx dy
+
+<p>
+
+<li>
+<pre>
+api_netlist
+</pre>
+
+Netlists from the current schematic using the current netlist type.
+This command is identical to clicking on $NETLIST_TYPE netlist
+in the "Sim" menu.
+
+<p>
+
+Note: To change the netlist type, you must change BOTH of the global
+variables: NETLIST_TYPE and NETLIST_PROPS.
+
+<p>
+
+USAGE: api_netlist
+
+<p>
+
+<li>
+<pre>
+api_netlist_data
+</pre>
+
+With the optional &lt;term> argument, returns the net name assigned to
+the given terminal on the given instance id as computed by
+api_generate_term_names.  You can get the terminal names for a given
+instance type from the api_terminal_data command.  If the terminal
+hasn't been assigned a net yet, the value "" is returned.  If the
+given terminal is not associated with that id, the value 0 is
+returned.
+
+<p>
+
+Without the optional &lt;term> argument, the instance name assigned to
+the instance of the given id during netlisting is returned.  This
+name is unique across the schematic.  If the instance name has not
+been assigned, a value of "" is returned.  Instance names are only
+assigned during netlisting, not during api_generate_term_names.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_netlist_data 134 in
+        assert_low
+        sue> api_netlist_data 134
+        MMI_INVB_3
+</pre>
+
+
+<p>
+
+USAGE: api_netlist_data id [term]
+
+<p>
+
+<li>
+<pre>
+api_netlist_info
+</pre>
+
+Returns information about the netlist of the current cell or the
+optional givel cell.
+
+<p>
+
+USAGE: api_netlist_info status|warnings|errors [&lt;cell>]
+
+<p>
+
+"status" returns 1 if there is netlist information about the cell and
+0 if there is none.  "warnings" returns any netlist warnings about the
+cell and "errors" returns any netlist errors.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_netlist_info status
+        1
+        sue> api_netlist_info warnings
+        {NETLIST WARNING: Unconnected net on terminal "out" in icon inverter "" (1) in schematic "no_name".} {NETLIST WARNING: Unconnected net on terminal "in" in icon inverter "" (1) in schematic "no_name".}
+        sue> api_netlist_info errors
+        ""
+</pre>
+
+
+<p>
+
+<li>
+<pre>
+api_new_cell
+</pre>
+
+Creates a new schematic of icon cell and goes to it.
+
+<p>
+
+The given name should include the full pathname or will default to the
+current working directory.
+
+<p>
+
+If type is "S" (the default) a new schematic view is created.  If type
+is "I" a new icon view is created.
+
+<p>
+
+If the cell is already loaded, SUE will go to it.
+
+<p>
+
+Returns 1 if a new cell is created.
+
+<p>
+
+USAGE: api_new_cell name [type]
+
+<p>
+
+<li>
+<pre>
+api_orient_transform
+</pre>
+
+Transforms the given point through the given orientation around {0 0}.
+
+<p>
+
+For example,
+
+<p>
+
+<pre>
+        sue> api_orient_transform R0 "-20 10"
+</pre>
+        -20 10
+<pre>
+        sue> api_orient_transform R90 "-20 10"
+</pre>
+        -10 -20
+
+<p>
+
+Returns "" if either the orientation or point are invalid.
+
+<p>
+
+Remember that Y increases downward on the screen.
+
+<p>
+
+USAGE: api_orient_transform orient point
+
+<p>
+
+<li>
+<pre>
+api_overlap
+</pre>
+
+Returns a list of objects that overlap the rectangle given by the
+supplied coordinates.  
+
+<p>
+
+USAGE: api_overlap x1 y1 x2 y2 [&lt;mode>]
+
+<p>
+
+Returns a list of object id's.  if &lt;mode> is "overlap" (the default)
+then all objects are returned that are at least partially inside the
+given rectangle.  if &lt;mode> is "enclose", then only the objects that
+are completely enclosed by the rectangle are returned.
+
+<p>
+
+For computing connectivity, see "api_overlap_ports".
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_overlap 100 200 400 300
+        23 46 88 105
+        sue> api_overlap 100 200 400 300 enclose
+        23 105
+</pre>
+
+NOTE: text which is part of an icon is ignored when computing
+overlap/enclosure.
+
+<p>
+
+<li>
+<pre>
+api_overlap_ports
+</pre>
+
+Returns a list of objects and their ports whose ports overlap the
+given coordinates.  The radius defaults to 0.33 (1/3) grid which is
+used for determining connectivity.  Only icons and wires will ever be
+returned because they are the only objects that create connectivity.
+
+<p>
+
+The return list comprises pairs.  For icons, the pair contains the
+icon id followed by the port name.  For wires, the pair contains the
+wire id followed by the coordinates of the overlapping endpoint.
+
+<p>
+
+Returns "" if either the point or radius are invalid.
+
+<p>
+
+NOTE: a wire segment has two ports, one at each end of the line.  If
+neither of these ports overlaps the given coordinates, the wire will
+not be returned.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_overlap_ports "410 260"
+        {8 in} {36 {410 260}}
+        sue> api_overlap_ports "410 260" 2
+        {8 in} {36 {410 260}} {88 {410 270}}
+</pre>
+
+
+<p>
+
+USAGE: api_overlap_ports point [radius]
+
+<p>
+
+<li>
+<pre>
+api_pop
+</pre>
+
+Pops out of the current cell.
+
+<p>
+
+If already the topmost cell, does nothing.  Returns 1 is succeeded, 0
+if failed.
+
+<p>
+
+USAGE: api_pop
+
+<p>
+
+<li>
+<pre>
+api_print_cell
+</pre>
+
+Prints the current cell.  This command is identical to clicking on
+"print" in the "File" menu.
+
+<p>
+
+USAGE: api_print_cell
+
+<p>
+
+<li>
+<pre>
+api_push
+</pre>
+
+Pushes into the instance with the given id
+
+<p>
+
+Adds to the hierarchy and goes to the desired schematic, or if none
+exists the icon view.  api_pop restores this cell.
+
+<p>
+
+Returns 1 is succeeded, 0 if failed.
+
+<p>
+
+USAGE: api_push id
+
+<p>
+
+<li>
+<pre>
+api_replace_instances
+</pre>
+
+Replaces the instance with the given ids with an instance of the given type.
+Tries to keep all properties of the original instance.
+
+<p>
+
+USAGE: api_replace_instances &lt;list_of_ids> &lt;type>
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_replace_instances "34 102" INVB
+        1
+</pre>
+
+Returns 1 if successful, 0 otherwise
+
+<p>
+
+Note that SUE must know how to make &lt;type> or it will return 0.  If you 
+want to replace with a generated ICON that hasn't been generated in
+the SUE session yet, you will have to generate it yourself using the
+"generate" command.  For example:
+
+<p>
+
+<pre>
+        sue> api_replace_instances 68 MMI_NAND2D
+        0
+        sue> generate MMI_NAND2 MMI_NAND2D -Size D
+</pre>
+        -1
+<pre>
+        sue> api_replace_instances 68 MMI_NAND2D
+        1
+</pre>
+
+
+<p>
+
+<li>
+<pre>
+api_revert_cell
+</pre>
+
+Reverts the current cell to the last saved version.
+
+<p>
+
+USAGE: api_revert_cell
+
+<p>
+
+<li>
+<pre>
+api_save_cell
+</pre>
+
+Saves the current cell and associated schematic or icon.  
+
+<p>
+
+This command is identical to clicking on "save" in the "File" menu.
+
+<p>
+
+USAGE: api_save_cell
+
+<p>
+
+<li>
+<pre>
+api_select
+</pre>
+
+Selects the named object, either a net or an instance, in the current
+cell.  If successful returns 1, else 0.  Deselects first unless
+the "add" argument is given.  &lt;name> can include the * for
+wildcarding, for example:
+
+<p>
+
+USAGE: api_select &lt;name> [add]
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_select uc_*
+        1
+</pre>
+
+will select all the unconnected nets in the schematic and
+
+<p>
+
+<pre>
+        sue> api_select *
+        1
+</pre>
+
+will select everything in the schematic.
+
+<p>
+
+Other than for selecting all, you need to netlist the design in order
+to select instances (i.e. anything but wires).
+
+<p>
+
+<li>
+<pre>
+api_select_ids
+</pre>
+
+Selects the given ids in the current cell.  If successful returns 1,
+else 0.  Deselects first unless the "add" argument is given.
+
+<p>
+
+USAGE: api_select_ids &lt;ids> [add]
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_select_ids "24 88 104"
+        1
+</pre>
+
+To deselect everything, use:
+
+<p>
+
+<pre>
+        sue> api_select_ids ""
+        1
+</pre>
+
+
+<p>
+
+<li>
+<pre>
+api_show_connections
+</pre>
+
+Displays the connection information on a schematic.
+
+<p>
+
+Does NOT break wires -- use api_clean_connections for that.
+
+<p>
+
+USAGE: api_show_connections [&lt;type>]
+
+<p>
+
+If &lt;type> is "selected", only shows connections on selected objects.
+This option is meant for performance purposes.  The default is ""
+(show everywhere).
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_show_connections
+</pre>
+
+NOTE: this procedure only applies to schematics.  Run on an icon or
+placement, it will return 0, else 1.
+
+<p>
+
+<li>
+<pre>
+api_terminal_data
+</pre>
+
+Returns an associative list of terminals with an associative list of
+data for the given instance type.  Requires &lt;type> already to be
+instantiated someplace in SUE.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_terminal_data pmos
+        {d {{type inout} {origin {0 40}}}} {s {{type inout} {origin {0 -40}}}}
+        {g {{type input} {origin {-60 0}}}}
+</pre>
+
+
+<p>
+
+USAGE: api_terminal_data type
+
+<p>
+
+<li>
+<pre>
+api_transform_selected
+</pre>
+
+Transforms the selected objects.  Legal transforms are rotate
+clockwise (rotate), flip sideways (sideways), and flip upsidedown
+(upsidedown).  If something gets transformed, returns 1, else 0.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_transform_selected rotate
+        1
+</pre>
+
+Sets the modifed flag and is undoable.
+
+<p>
+
+USAGE: api_transform_selected xform
+
+<p>
+
+<li>
+<pre>
+api_types
+</pre>
+
+Returns a list of ids for all of the objects of the specified type in
+the current cell.  Legal types are: instance, wire, line, arc, text,
+dot, open.  If the optional keyword "selected" is given, only those
+objects that are selected are returned.
+
+<p>
+
+<pre>
+        sue> api_types wire
+        251 252 253 254 255 256 257 318
+        sue> api_types wire selected
+        257
+</pre>
+
+Note that "api_types instance [selected]" is equivalent to
+"api_instances [selected]".
+
+<p>
+
+USAGE: api_types type [selected]
+
+<p>
+
+<li>
+<pre>
+api_undo
+</pre>
+
+Undoes the last change to the current cell.
+
+<p>
+
+Returns 1.
+
+<p>
+
+USAGE: api_undo
+
+<p>
+
+<li>
+<pre>
+api_verilog_property
+</pre>
+
+Returns the verilog property text string for the current icon.
+
+<p>
+
+Creates the same string as in the menu command "Create Verilog Property."
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_verilog_property
+</pre>
+       -type auto -name verilog -text {MMI_AND2B [unique_name "" $name MMI_AND2B]  (.in0($in0), .in1($in1), .out($out))\;}
+
+<p>
+
+If the current cell is not an icon, returns "".
+
+<p>
+
+USAGE: api_verilog_property
+
+<p>
+
+<li>
+<pre>
+api_visible_bbox
+</pre>
+
+Returns the coordinates of the visible part of the screen for the
+current cell.
+
+<p>
+
+Useful for adding something to the screen that is guaranteed to be
+visible to the user without zooming.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_visible_bbox
+        650 -1470 1270 -930
+</pre>
+
+
+<p>
+
+USAGE: api_visible_bbox
+
+<p>
+
+<li>
+<pre>
+api_zoom
+</pre>
+
+Zooms the current schematic based on the argument.
+
+<p>
+
+The arguments can be any one of the following:
+
+<p>
+
+<pre>
+        fit      - zoom to fit.
+        selected - zoom the fit the selected in the window.
+        &lt;number> - zoom amount.  Less than 1 zoom out.  Greater than 1 in.
+        &lt;region> - zoom to fit region described by list of "x1 y1 x2 y2".
+        setup    - sets zoom for fastest response of certain api commands.
+        restore  - restores zoom after setup
+</pre>
+
+Certain repeated commands will run much quicker if they are surrounded
+by "api_zoom setup" and "api_zoom restore".  These command include:
+api_change_prop, api_instance_data, api_overlap_ports, api_overlap, api_make,
+api_make_wire, api_replace_instances.
+
+<p>
+
+In addition, make, make_wire, make_line, make_text, and make_arc must
+be preceded by "api_zoom setup" or be invoked in a new schematic.
+Otherwise, they will be placed incorrectly.
+
+<p>
+
+Don't need to do a restore after a setup.  A zoom to fit is fine, too.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> api_zoom fit
+        1
+        sue> api_zoom selected
+        1
+        sue> api_zoom setup
+        1
+        sue> api_...
+        sue> api_...
+        sue> api_zoom restore
+        1
+</pre>
+
+
+<p>
+
+USAGE: api_zoom arg
+
+<p>
+
+<li>
+<pre>
+launch
+</pre>
+
+Top-level wrapper for SUE API calls.  
+
+<p>
+
+All top-level tcl procedures that execute SUE API calls should be
+wrapped with the "launch" procedure instead of being executed directly.
+While commands will still work otherwise, they will be slower,
+especially if they switch the current cell using api_goto_cell,
+api_push, api_pop, api_load_cell, or api_new_cell.
+
+<p>
+
+example:
+
+<p>
+
+<pre>
+        sue> launch myproc
+</pre>
+
+or if the command takes arguments:
+
+<p>
+
+<pre>
+        sue> launch "myproc2 3"
+</pre>
+
+Procedures called from the menu or hotkeys and added using the
+"menu_add" command automatically get wrapped with the "launch" procedure.
+
+<p>
+
+The "launch" command also adds error catching.  If a tcl error occurs in
+a user procedure, the stack trace is placed in the "error" global
+variable.  To view it, use either:
+
+<p>
+
+<pre>
+        sue> set error
+</pre>
+
+or, equivalently,
+
+<p>
+
+<pre>
+        sue> puts $error
+</pre>
+
+
+<p>
+
+USAGE: launch command
+
+<p>
+
+<li>
+<pre>
+make
+</pre>
+
+Primitive procedure to add an instance of an icon to the current
+schematic at the given location with the given orientation and with
+the given properties values.
+
+<p>
+
+Usage:
+
+<p>
+
+<pre>
+        make &lt;icon_name> -origin &lt;x_y_list> [-orient &lt;orient>] &lt;keyword_arguments>
+</pre>
+
+The orientation defaults to R0.  
+
+<p>
+
+The keyword/argument pair order is unimportant.
+
+<p>
+
+&lt;keyword_arguements> are unique for each icon and depend on the user
+properties in the icon view of the cell.  Typically they contain at
+least the "name" property.
+
+<p>
+
+Special tcl characters such as []$ must be quoted for surrounded by {}.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> make inverter -name my_inv -origin {120 300} -orient RX
+        sue> lappend ids [make input -name {in[2]} -origin {80 300}]
+</pre>
+
+NOTE: this procedure can only be used on a new schematic or if
+proceeded by api_zoom setup.  Otherwise, its position may be incorrect
+or even off-grid.
+
+<p>
+
+ONLY the input, output, inout, and title_bar instances can be added to
+the icon view of a cell.  Everything else must be lines, arcs, or text.
+
+<p>
+
+Returns the id of the icon or "" if unsuccessful.
+
+<p>
+
+NOT UN-DOABLE
+
+<p>
+
+<li>
+<pre>
+make_arc
+</pre>
+
+Primitive procedure to add an arc to the current schematic.  
+
+<p>
+
+Arcs are drawn by specifying the bounding box of an ellipse.  The
+start angle (in degrees) and the extent of the arc counterclockwise
+(in degress) are also specified.  Circles are arcs with square
+bounding boxes and an extent of 359 degrees.
+
+<p>
+
+SUE does not support splines.
+
+<p>
+
+USAGE: make_arc x1 y1 x2 y2 -start &lt;start_angle> -extent &lt;extent_angle>
+
+<p>
+
+&lt;start_angle> defaults to 0 degrees which corresponds to the middle of
+the right side of the bounding box.  
+
+<p>
+
+&lt;extent_angle> defaults to 90 degrees and proceeds counterclockwise.
+Note: the maximum extent is 359 degrees and creates a closed
+circle/ellipse.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> make_arc 0 0 200 200 -start 90 -extent 180
+        sue> make_arc 100 100 300 300 -extent 359
+</pre>
+
+NOTE: this procedure can only be used on a new schematic or if
+proceeded by api_zoom setup.  Otherwise, its position may be incorrect
+or even off-grid.
+
+<p>
+
+NOT UN-DOABLE
+
+<p>
+
+<li>
+<pre>
+make_line
+</pre>
+
+Primitive procedure to add a line to the current schematic.  Lines
+contain 2 or more endpoints, i.e. unlike wires, they can be
+multi-segment.  Lines are for annotation/documentation purposes only:
+they are ignored by the netlister.  To create a closed polygon, simply
+make the first and last endpoint the same.  Rectangles are simply a
+line drawn to be a closed polygon.
+
+<p>
+
+USAGE: make_line &lt;list_of_x_y_pairs>
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> make_line 120 150 200 300
+        sue> make_line 0 0 100 0 100 100 0 100 0 0
+</pre>
+
+NOTE: this procedure can only be used on a new schematic or if
+proceeded by api_zoom setup.  Otherwise, its position may be incorrect
+or even off-grid.
+
+<p>
+
+NOT UN-DOABLE
+
+<p>
+
+<li>
+<pre>
+make_text
+</pre>
+
+Primitive procedure to add text to the current schematic.  
+
+<p>
+
+USAGE: make_text -origin &lt;x_y_list> -text &lt;text> [-size &lt;size>]
+                 [-anchor &lt;anchor>] [-rotate &lt;0|1>]
+
+<p>
+
+Text has two orientations: normal (0) and rotated (1).  Text defaults
+to normal (0).
+
+<p>
+
+Size can be one of: very-small, small, standard, large, very-large.
+Size defaults to standard.
+
+<p>
+
+Anchor can be one of: n, s, e, w, ne, nw, se, sw, center, or c.
+Anchor defaults to w.
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> make_text -origin {120 140} -text "Needs a keeper."
+</pre>
+
+NOTE: this procedure can only be used on a new schematic or if
+proceeded by api_zoom setup.  Otherwise, its position may be incorrect
+or even off-grid.
+
+<p>
+
+NOT UN-DOABLE
+
+<p>
+
+<li>
+<pre>
+make_wire
+</pre>
+
+Primitive procedure to add a wire to the current schematic.  Wires
+contain only two endpoints and hence are only one segment.  To create
+wires with multiple segments, add multiple make_wire lines with the
+segments overlapping at the endpoints.
+
+<p>
+
+USAGE: make_wire x1 y1 x2 y2
+
+<p>
+
+For example:
+
+<p>
+
+<pre>
+        sue> make_wire 100 200 180 200
+        sue> make_wire 180 200 180 240
+</pre>
+
+Wires will not automatically connect if the endpoint of one wire
+intersects another one in the middle of the segment.  Thus, to make a
+"T", you must specify 3 wire segements instead of 2.  To merge wires
+that aren't connected solely by endpoints, follow them with
+api_clean_connections.  Note that api_clean_connections is a slow
+operation so should only be used sparingly.
+
+<p>
+
+Here is an example of a "T" junction:
+
+<p>
+
+<pre>
+        sue> make_wire 100 200 180 200
+        sue> make_wire 180 200 250 200
+        sue> make_wire 180 200 180 240
+</pre>
+
+Which can also be done this way, but will be much slower:
+
+<p>
+
+<pre>
+        sue> make_wire 100 200 250 200
+        sue> make_wire 180 200 180 240
+        sue> api_clean_connections
+</pre>
+
+NOTE: this procedure can only be used on a new schematic or if
+proceeded by api_zoom setup.  Otherwise, its position may be incorrect
+or even off-grid.
+
+<p>
+
+DO NOT use this to add wires to the icon view of cell.  Wires do not
+belong in icon views.
+
+<p>
+
+NOT UN-DOABLE
+
+<p>
+
+</ul>
+
+
+
+</html>

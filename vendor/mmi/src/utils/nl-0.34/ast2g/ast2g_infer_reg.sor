@@ -1,0 +1,174 @@
+#header <<
+
+#ifndef AST2G_HEADER
+#  define AST2G_HEADER
+#  include "port.h"
+#  include "mem.h"
+#  include "ar.h"
+#  include "hashtab.h"
+#  include "nl.h"
+#endif
+
+#define malloc MALLOC
+#define calloc CALLOC
+#define realloc REALLOC
+#define free FREE
+
+#define USER_DEFINED_AST
+typedef struct nl_ast_s SORAST;
+
+#define zzASTright(x)         nl_ast_sibling (x)
+#define zzASTright_addr(x)    nl_ast_sibling_addr (x)
+#define zzASTdown(x)          nl_ast_child (x)
+#define zzASTset_right(x, y)  nl_ast_set_sibling (x, y)
+#define zzASTset_down(x, y)   nl_ast_set_child (x, y)
+#define zzASTtoken(x)	      nl_ast_token (x)
+#define zzASTset_token(x, y)  nl_ast_set_token (x, y)
+
+#define _refvar_inits ast2g_refvar_inits
+#define ast2g_no_viable_alt default_no_viable_alt
+#define ast2g_mismatched_token default_mismatched_token
+>>
+
+<<
+#include "errsupport.c"
+#include "ast2g_tokdefs.h"
+
+#undef ast2g_no_viable_alt
+#undef ast2g_mismatched_token
+
+static char *input_sense = NULL;
+static ar lhs_outs1 = NULL;
+static ar rhs_outs2 = NULL;
+static ar rhs_ins1 = NULL;
+static ar rhs_ins2 = NULL;
+static int reset_index = 0;
+static int reset_polarity = 0;
+
+static
+void
+ast2g_no_viable_alt (STreeParser *parser, char *rulename, nl_ast tree)
+{
+  /* fprintf (stderr, "No viable alt for %s at\n", rulename); */
+  /* nl_ast_dump (tree); */
+  error_throw (2);
+}
+
+
+static
+void
+ast2g_mismatched_token (STreeParser *parser, nl_token looking_for, nl_ast tree)
+{
+  fprintf (stderr, "Token mismatch.  Looking for %s at\n",
+	   nl_token_to_string (looking_for));
+  nl_ast_dump (tree);
+  error_throw (2);
+}
+
+
+>>
+
+register [int num_inputs, int num_outputs, int *rst_index_p,
+	  int *rst_polarity_p, char *input_sense, ar lhs_outs1, ar rhs_ins1,
+ 	  ar lhs_outs2, ar rhs_ins2]
+	: #( ALWAYS
+	     #( LIST ( sens_item [input_sense] )+ )
+	     body [rst_index_p, rst_polarity_p, lhs_outs1, rhs_ins1,
+	           lhs_outs2, rhs_ins2] )
+	;
+
+sens_item [char *input_sense]
+	: << int index; >>
+	  #( POSEDGE in > [index] )
+		<< input_sense[index] = 'R'; >>
+	| << int index; >>
+	  #( NEGEDGE in > [index] )
+		<< input_sense[index] = 'F'; >>
+	;
+
+body [int *rst_index_p, int *rst_polarity_p,
+      ar lhs_outs1, ar rhs_ins1, ar lhs_outs2, ar rhs_ins2]
+	: #( IF test [0, rst_polarity_p] > [*rst_index_p]
+		assignments [lhs_outs1, rhs_ins1]
+		assignments [lhs_outs2, rhs_ins2]
+	   )
+        | assignments [lhs_outs1, rhs_ins1]
+		<< *rst_index_p = -1; 
+		   *rst_polarity_p = 0;
+		>>
+	;
+
+test [int polarity, int *rst_polarity_p] > [int rst_index]
+	: #( LOGNOT test [1 - polarity, rst_polarity_p] > [rst_index] )
+	| #( BITNOT test [1 - polarity, rst_polarity_p] > [rst_index] )
+	| in > [rst_index]	<< *rst_polarity_p = polarity; >>
+	;
+
+assignments [ar lhs_outs, ar rhs_ins]
+	: assignment [lhs_outs, rhs_ins]
+	| #( BEGIN begin_name ( assignments [lhs_outs, rhs_ins] )+ )
+	;
+
+assignment [ar lhs_outs, ar rhs_ins]
+	: #( BLOCK_ASSIGN     rhs [rhs_ins] lhs [lhs_outs] { DELAY } )
+	| #( NONBLOCK_ASSIGN  rhs [rhs_ins] lhs [lhs_outs] { DELAY } )
+	;
+
+lhs [ar outs]
+	: << int index; >>
+	  out > [index]		<< ar_add (outs, &index); >>
+	| #( CONCAT ( lhs [outs] )+ )
+	;
+
+rhs [ar ins]
+	: << int index; >>
+	  in > [index]		<< ar_add (ins, &index); >>
+	| #( CONCAT ( rhs [ins] )+ )
+	| constant [ins]
+	;
+
+constant [ar ins]
+	: << int n;
+	     int num;
+	     char *bits;
+	     char r;
+	  >>
+	  ( #( BIN_RADIX number > [n] vnum > [bits] )	<< r = 'b'; >>
+	  | #( HEX_RADIX number > [n] vnum > [bits] ) 	<< r = 'h'; >>
+	  | #( DEC_RADIX number > [n] vnum > [bits] ) 	<< r = 'd'; >>
+	  | #( OCT_RADIX number > [n] vnum > [bits] ) 	<< r = 'o'; >>
+	  )
+			<< ast2g_get_constant_ins (n, r, bits, ins); >>
+	  | << int width;
+	       int num;
+	       char *digits;
+	    >>
+	    n_ast:number > [num]
+			<< width = nl_ast_width (n_ast);
+			   digits = alloca (16);
+			   sprintf (digits, "%d", num);
+			   ast2g_get_constant_ins (width, 'd', digits, ins);
+			>>
+	;
+
+number > [int result]
+	: #( n:NUMBER )	<< result = nl_number_ast_value ((nl_number_ast) n); >>
+	;
+
+vnum > [char *result]
+	: #( n:VERILOG_NUMBER )
+			<< result = nl_vnum_ast_bits ((nl_vnum_ast) n); >>
+	;
+
+in > [int index]
+	: #( n:IN )	<< index = nl_in_ast_index ((nl_in_ast) n); >>
+	;
+
+out > [int index]
+	: #( n:OUT )	<< index = nl_out_ast_index ((nl_out_ast) n); >>
+	;
+
+begin_name
+	: #( LIST )
+	| #( ID )
+	;

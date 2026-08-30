@@ -1,0 +1,134 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2001.10.19.22.43.33;	author jka;	state Exp;
+branches;
+next	;
+
+
+desc
+@test program for .lib parsers
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#include "port.h"
+#include "stdpccts.h"
+
+
+void
+cr_ast (AST *tree, Attrib *attr, int tok, char *txt)
+{
+  tree->token = tok;
+  tree->text = strdup (txt);
+}
+
+
+AST *
+mk_ast (AST *t, int tok, char *txt)
+{
+  cr_ast (t, NULL, tok, txt);
+
+  return t;
+}
+
+
+void
+dump_string (char *str)
+{
+  char *s = str;
+
+  putchar ('\"');
+
+  while ( *s ) {
+    if ( *s == '\"' || *s == '\\' ) {
+      putchar ('\\');
+    }
+    putchar (*s);
+    s++;
+  }
+
+  putchar ('\"');
+}
+
+
+void
+dump_token (char *str)
+{
+  printf (str);
+}
+
+
+void
+dump (AST *tree, int indent)
+{
+  while ( tree != NULL ) {
+    int i;
+
+    if ( tree->down ) {
+      printf ("\n");
+      for ( i = 0; i < indent; i++ )
+	putchar (' ');
+      printf ("(");
+    }
+
+    if ( tree->token == LIB_ID ) {
+      dump_token (tree->text);
+    }
+    else if ( tree->token == STRING ) {
+      dump_token (tree->text);
+    }
+    else {
+      dump_token (tree->text);
+    }
+
+    if ( tree->down ) {
+      printf (" ");
+      dump (tree->down, indent + 2);
+      printf(")");
+    }
+
+    tree = tree->right;
+
+    if ( tree != NULL )
+      printf (" ");
+  }
+}
+
+
+void
+dump_top (AST *tree)
+{
+  dump (tree, 0);
+}
+  
+
+void
+def_zzerr (const char *str)
+{
+  fprintf (stderr, "Error: line %d: %s\n", zzline, str);
+  exit (1);
+}
+
+
+main ()
+{
+  AST *root = NULL;
+
+  zzerr = def_zzerr;
+
+  ANTLR (library (&root), stdin);
+
+  dump_top (root);
+  printf ("\n");
+}
+@

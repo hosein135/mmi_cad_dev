@@ -1,0 +1,17 @@
+# SUE version MMI_SUE3.5
+
+proc SCHEMATIC_mmm {} {
+  generate mul mul16_Y_N_N_N -NBITS 16
+  make mul16_Y_N_N_N -origin {440 400}
+  make input -orient R270 -name ACin_H -origin {470 540}
+  make output -orient R270 -name ACout_H -origin {470 270}
+  make input -name {A_H[15:0]} -origin {290 360}
+  make input -name {B_H[15:0]} -origin {290 400}
+  make output -name {RES_H[31:0]} -origin {580 420}
+  make_wire 500 420 580 420
+  make_wire 380 360 290 360
+  make_wire 380 400 290 400
+  make_wire 470 480 470 540
+  make_wire 470 340 470 270
+}
+

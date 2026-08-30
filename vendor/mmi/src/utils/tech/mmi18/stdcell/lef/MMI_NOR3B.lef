@@ -1,0 +1,125 @@
+MACRO MMI_NOR3B
+	CLASS CORE ;
+	FOREIGN MMI_NOR3B 0 0 ;
+	SIZE 5.92 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.66 4.41 1 5.94 ;
+			LAYER M1 ;
+			RECT 3.82 4.41 4.16 5.94 ;
+			LAYER M1 ;
+			RECT 0.365 4.18 4.16 4.41 ;
+			LAYER M1 ;
+			RECT 0.365 2.815 0.595 4.18 ;
+			LAYER M1 ;
+			RECT 0.145 2.365 0.595 2.815 ;
+			LAYER M1 ;
+			RECT 0.365 2.355 0.595 2.365 ;
+			LAYER M1 ;
+			RECT 0.365 2.35 2.55 2.355 ;
+			LAYER M1 ;
+			RECT 0.365 2.125 2.6 2.35 ;
+			LAYER M1 ;
+			RECT 0.82 1.51 1.16 2.125 ;
+			LAYER M1 ;
+			RECT 2.26 1.51 2.6 2.125 ;
+		END
+		AntennaDiffArea 2.8152 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.61 3.595 4.765 3.775 ;
+			LAYER M1 ;
+			RECT 1.57 3.57 4.765 3.595 ;
+			LAYER M1 ;
+			RECT 1.57 3.545 4.82 3.57 ;
+			LAYER M1 ;
+			RECT 1.57 3.255 1.91 3.545 ;
+			LAYER M1 ;
+			RECT 2.365 3.26 3.25 3.545 ;
+			LAYER M1 ;
+			RECT 2.365 3.105 2.815 3.26 ;
+			LAYER M1 ;
+			RECT 4.48 3.23 4.82 3.545 ;
+		END
+		AntennaGateArea 1.1592 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 1.54 0.5 1.88 1.85 ;
+			LAYER M1 ;
+			RECT 2.98 0.5 3.32 2.35 ;
+			LAYER M1 ;
+			RECT 0 -0.5 5.92 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 5.185 3.555 5.525 3.655 ;
+			LAYER M1 ;
+			RECT 5.185 3.315 5.775 3.555 ;
+			LAYER M1 ;
+			RECT 5.325 3.105 5.775 3.315 ;
+			LAYER M1 ;
+			RECT 5.33 2.085 5.56 3.105 ;
+			LAYER M1 ;
+			RECT 3.625 1.855 5.56 2.085 ;
+			LAYER M1 ;
+			RECT 3.625 1.55 3.855 1.855 ;
+			LAYER M1 ;
+			RECT 3.57 1.21 3.91 1.55 ;
+		END
+		AntennaGateArea 1.1592 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 5.92 7.9 ;
+			LAYER M1 ;
+			RECT 2.24 4.66 2.58 6.9 ;
+			LAYER M1 ;
+			RECT 5.4 4.18 5.74 6.9 ;
+		END
+	END VDD
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.9 3.58 1.24 3.92 ;
+			LAYER M1 ;
+			RECT 0.96 2.925 1.19 3.58 ;
+			LAYER M1 ;
+			RECT 0.96 2.83 1.4 2.925 ;
+			LAYER M1 ;
+			RECT 3.76 2.83 4.1 3.08 ;
+			LAYER M1 ;
+			RECT 0.96 2.815 4.1 2.83 ;
+			LAYER M1 ;
+			RECT 0.96 2.6 4.295 2.815 ;
+			LAYER M1 ;
+			RECT 1.06 2.585 1.4 2.6 ;
+			LAYER M1 ;
+			RECT 3.845 2.365 4.295 2.6 ;
+		END
+		AntennaGateArea 1.1592 ;
+	END in0
+	OBS
+	END
+END MMI_NOR3B

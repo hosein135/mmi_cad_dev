@@ -1,0 +1,66 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_XNOR2C {} {
+  make output -name out -origin {870 360}
+  make global -name gnd -origin {660 560}
+  make global -orient RY -name vdd -origin {350 160}
+  make nmos -W 1.2 -origin {660 420}
+  make nmos -W 1.2 -origin {660 520}
+  make pmos -W 2.4 -origin {350 300}
+  make pmos -W 2.4 -origin {350 200}
+  make pmos -W 2.4 -origin {660 200}
+  make global -name gnd -origin {350 560}
+  make nmos -W 1.2 -origin {350 520}
+  make pmos -W 2.4 -origin {660 300}
+  make nmos -W 1.2 -origin {350 420}
+  make input -name in1 -origin {10 520}
+  make inverter -WP 1.2 -WN 0.6 -origin {450 520}
+  make inverter -WP 1.2 -WN 0.6 -origin {100 300}
+  make input -name in0 -origin {10 420}
+  make global -orient RY -name vdd -origin {660 160}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in0_L -origin {200 300}
+  make name_net -name in1_L -origin {540 520}
+  make name_net -name N1 -origin {720 360}
+  make inverter -WP 4.8 -WN 2.4 -origin {790 360}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {340 750}
+  make_wire 840 360 870 360
+  make_wire 350 380 350 360
+  make_wire 350 340 350 360
+  make_wire 350 240 350 260
+  make_wire 660 480 660 460
+  make_wire 660 240 660 260
+  make_wire 660 360 660 380
+  make_wire 350 480 350 460
+  make_wire 660 340 660 360
+  make_wire 560 420 600 420
+  make_wire 600 200 580 200
+  make_wire 580 200 580 520
+  make_wire 580 520 600 520
+  make_wire 290 200 240 200
+  make_wire 240 200 240 520
+  make_wire 20 300 20 420
+  make_wire 420 520 290 520
+  make_wire 70 300 20 300
+  make_wire 10 420 20 420
+  make_wire 290 300 410 300
+  make_wire 20 420 290 420
+  make_wire 10 520 240 520
+  make_wire 240 520 290 520
+  make_wire 200 300 150 300
+  make_wire 200 300 290 300
+  make_wire 350 360 660 360
+  make_wire 540 520 500 520
+  make_wire 540 520 580 520
+  make_wire 410 300 560 420
+  make_wire 560 300 410 420
+  make_wire 560 300 600 300
+  make_wire 410 420 290 420
+  make_wire 720 360 660 360
+  make_wire 720 360 760 360
+  make_text -origin {0 100} -text {Exclusive NOR}
+  make_text -origin {0 120} -text {C Size}
+  make_text -origin {0 80} -text MMI_XNOR2C -size large
+}
+

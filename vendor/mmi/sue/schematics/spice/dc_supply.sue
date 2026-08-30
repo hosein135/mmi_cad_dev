@@ -1,0 +1,19 @@
+proc ICON_dc_supply args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {voltage 0V}}
+  icon_term -type inout -origin {0 30} -name v_minus
+  icon_term -type inout -origin {0 -40} -name v_plus -orient RY
+  icon_line 0 -20 0 -40 0 -40
+  icon_line 0 30 0 10 0 10
+  icon_property -origin {-200 120} -type fixed -name spice \
+      -text {[unique_name V $name] $v_plus $v_minus DC $voltage}
+  icon_property -origin {-100 70} -type user -name name
+  icon_property -origin {-100 90} -type user -name voltage -default 0V
+  icon_line -15 20 -5 20
+  icon_line -15 -30 -5 -30
+  icon_line -10 -35 -10 -25
+  icon_line -20 -20 20 -20
+  icon_line -10 -10 10 -10
+  icon_line -20 0 20 0
+  icon_line -10 10 10 10
+  icon_property -origin {10 -30} -label {$voltage}
+}

@@ -1,0 +1,505 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t )
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "nl.h"
+#include "tcl.h"
+#include "ui.h"
+#include "ui_int.h"
+
+
+#(defcommand lambda
+  "Create a lambda object."
+  (args tcl_object "procedure arguments")
+  (body tcl_object "procedure body"))
+{
+  Tcl_Obj *procedure;
+  int status = ui_procedure_create (interp, args, body, &procedure);
+
+  if ( status != TCL_OK )
+    return status;
+
+  Tcl_SetObjResult (interp, procedure);
+
+  return TCL_OK;
+}
+
+
+static
+int
+ui_cmd_alias (ClientData data, Tcl_Interp *interp, int argc,
+	      Tcl_Obj *CONST argv[])
+{
+  char *src_cmd = Tcl_GetStringFromObj (argv[1], NULL);
+
+  if ( strcmp (src_cmd, "-help") == 0 ) {
+    Tcl_SetResult (interp, "Usage: alias name cmd [args...]", TCL_STATIC);
+    return TCL_OK;
+  }
+  else {
+    char *target_cmd =  Tcl_GetStringFromObj (argv[2], NULL);
+    char **new_argv = alloca ((argc - 3) * sizeof (*new_argv));
+    int i;
+    int status;
+
+    for ( i = 0; i < argc - 3; i++ ) {
+      new_argv[i] = Tcl_GetStringFromObj (argv[3+i], NULL);
+    }
+
+    status = Tcl_CreateAlias (interp, src_cmd, interp, target_cmd, argc - 3,
+			      new_argv);
+
+    return status;
+  }
+}
+
+
+static
+enum ui_arg_type
+ui_string_to_arg_type (Tcl_Interp *interp, char *str)
+{
+  if      ( !strcmp (str, "boolean") )		return ui_boolean;
+  else if ( !strcmp (str, "integer") )		return ui_integer;
+  else if ( !strcmp (str, "string") )		return ui_string;
+  else if ( !strcmp (str, "writable_file") )	return ui_writable_file;
+  else if ( !strcmp (str, "readable_file") )	return ui_readable_file;
+  else if ( !strcmp (str, "design") )		return ui_design;
+  else if ( !strcmp (str, "current_design") )	return ui_current_design;
+  else if ( !strcmp (str, "cell") )		return ui_cell;
+  else if ( !strcmp (str, "libcell") )		return ui_libcell;
+  else if ( !strcmp (str, "net") )		return ui_net;
+  else if ( !strcmp (str, "port") )		return ui_port;
+  else if ( !strcmp (str, "inet") )		return ui_inet;
+  else if ( !strcmp (str, "idesign") )		return ui_idesign;
+  else if ( !strcmp (str, "current_idesign") )	return ui_current_idesign;
+  else if ( !strcmp (str, "writable_channel") )	return ui_writable_channel;
+  else if ( !strcmp (str, "readable_channel") )	return ui_readable_channel;
+  else if ( !strcmp (str, "tcl_object") )	return ui_tcl_object;
+  else if ( !strcmp (str, "library") )		return ui_library;
+  else {
+    Tcl_AppendResult (interp, "Incorrect option or argument type: ",
+		      str, NULL);
+    return ui_null;
+  }
+}
+
+
+union ui_var_type {
+  int i;
+  void *ptr;
+};
+
+
+struct ui_cmd_getopt_data {
+  int num_uiopts;
+  struct ui_option *options;
+  char **switch_table;
+  union ui_var_type *opt_vars;
+  char **opt_var_names;
+  int num_uiargs;
+  struct ui_argument *arguments;
+  union ui_var_type *arg_vars;
+  ar *arg_paths;
+  char **arg_var_names;
+  char *doc;
+};
+
+
+static
+int
+ui_cmd_getopt_build_tables (Tcl_Interp *interp, Tcl_Obj *opt_obj,
+			    Tcl_Obj *arg_obj, Tcl_Obj *doc_obj,
+			    struct ui_cmd_getopt_data *data)
+{
+  int num_opts;
+  Tcl_Obj **opts;
+  int num_args;
+  Tcl_Obj **args;
+
+  Tcl_ListObjGetElements (interp, opt_obj, &num_opts, &opts);
+
+  {
+    int i;
+    int num_uiopts;
+    struct ui_option *uiopts = MALLOC ((num_opts + 2) * sizeof (*uiopts));
+    char **uiswtab = MALLOC ((num_opts + 2) * sizeof (*uiswtab));
+    union ui_var_type *opt_vars = MALLOC ((num_opts + 1) * sizeof (*opt_vars));
+    char **opt_var_names = MALLOC ((num_opts + 1) * sizeof (*opt_var_names));
+
+    uiswtab[0] = STRDUP ("-help");
+    opt_var_names[0] = NULL;
+    uiopts[0].name = uiswtab[0];
+    uiopts[0].type = ui_help;
+    uiopts[0].variable = NULL;
+    uiopts[0].doc = NULL;
+
+    for ( i = 0; i < num_opts; i++ ) {
+      int num_elems;
+      Tcl_Obj **elems;
+      char *type_str;
+
+      Tcl_ListObjGetElements (interp, opts[i], &num_elems, &elems);
+
+      if ( num_elems != 3 ) {
+	char buf[16];
+
+	sprintf (buf, "%d", num_elems);
+	
+	Tcl_AppendResult (interp, "option spec has incorrect number of "
+			  "elements, ", buf, ", should be 3.", NULL);
+	return TCL_ERROR;
+      }
+
+      uiswtab[i+1] = STRDUP (Tcl_GetStringFromObj (elems[0], NULL));
+      opt_var_names[i+1] = uiswtab[i+1] + 1;
+      uiopts[i+1].name = uiswtab[i+1];
+
+      type_str = Tcl_GetStringFromObj (elems[1], NULL);
+      uiopts[i+1].type = ui_string_to_arg_type (interp, type_str);
+
+      if ( uiopts[i+1].type == ui_null ) {
+	return TCL_ERROR;
+      }
+
+      opt_vars[i+1].ptr = NULL;
+      uiopts[i+1].variable = &opt_vars[i+1];
+
+      uiopts[i+1].doc = STRDUP (Tcl_GetStringFromObj (elems[2], NULL));
+    }
+
+    num_uiopts = num_opts + 1;
+    uiswtab[num_uiopts] = NULL;
+    uiopts[num_uiopts].name = NULL;
+    uiopts[num_uiopts].type = ui_null;
+    uiopts[num_uiopts].variable = NULL;
+    uiopts[num_uiopts].doc = NULL;
+
+    data->num_uiopts = num_uiopts;
+    data->options = uiopts;
+    data->switch_table = uiswtab;
+    data->opt_vars = opt_vars;
+    data->opt_var_names = opt_var_names;
+  }
+
+  Tcl_ListObjGetElements (interp, arg_obj, &num_args, &args);
+
+  {
+    int i;
+    int j;
+    int num_uiargs;
+    struct ui_argument *uiargs = MALLOC ((num_args + 1) * sizeof (*uiargs));
+    union ui_var_type *arg_vars = MALLOC (num_args * sizeof (*arg_vars));
+    ar * arg_paths = MALLOC (num_args * sizeof (*arg_paths));
+    char **arg_var_names = MALLOC ((num_args + 1) * sizeof (*arg_var_names));
+    int optional = 0;
+
+    for ( i = 0, j = 0; i < num_args; i++ ) {
+      int num_elems;
+      Tcl_Obj **elems;
+      char *arg_str = Tcl_GetStringFromObj (args[i], NULL);
+      char *arg_name;
+      char *type_str;
+
+      if ( strcmp (arg_str, "&optional") == 0 ) {
+	optional = 1;
+	continue;
+      }
+
+      Tcl_ListObjGetElements (interp, args[i], &num_elems, &elems);
+
+      if ( num_elems != 3 ) {
+	char buf[16];
+
+	sprintf (buf, "%d", num_elems);
+	
+	Tcl_AppendResult (interp, "argument spec has incorrect number of "
+			  "elements, ", buf, ", should be 3.", NULL);
+	return TCL_ERROR;
+      }
+
+      arg_name = Tcl_GetStringFromObj (elems[0], NULL);
+      arg_var_names[j] = STRDUP (arg_name);
+
+      type_str = Tcl_GetStringFromObj (elems[1], NULL);
+      uiargs[j].type = ui_string_to_arg_type (interp, type_str);
+
+      if ( uiargs[j].type == ui_null ) {
+	return TCL_ERROR;
+      }
+
+      arg_vars[j].ptr = NULL;
+      uiargs[j].variable = &arg_vars[j];
+
+      arg_paths[j] = NULL;
+      uiargs[j].path_variable = &arg_paths[j];
+
+      if ( optional ) {
+	uiargs[j].requirement = ui_optional;
+      }
+      else {
+	uiargs[j].requirement = ui_required;
+      }
+	
+      uiargs[j].doc = STRDUP (Tcl_GetStringFromObj (elems[2], NULL));
+      
+      j++;
+    }
+
+    num_uiargs = j;
+    uiargs[num_uiargs].type = ui_null;
+    uiargs[num_uiargs].variable = NULL;
+    uiargs[num_uiargs].path_variable = NULL;
+    uiargs[num_uiargs].requirement = ui_null;
+    uiargs[num_uiargs].doc = NULL;
+
+    data->num_uiargs = num_uiargs;
+    data->arguments = uiargs;
+    data->arg_vars = arg_vars;
+    data->arg_paths = arg_paths;
+    data->arg_var_names = arg_var_names;
+  }
+
+  {
+    char *doc = Tcl_GetStringFromObj (doc_obj, NULL);
+
+    data->doc = STRDUP (doc);
+  }
+
+  return TCL_OK;
+}
+
+
+static hashtab ui_cmd_getopt_table = NULL;
+static ht_attr ui_cmd_getopt_attr = NULL;
+
+
+static
+int
+ui_get_or_create_getopt_tables (char *proc_name, Tcl_Interp *interp, int argc,
+				Tcl_Obj *CONST argv[],
+				struct ui_cmd_getopt_data *data_p)
+{
+  ht_entry ent;
+
+  if ( ui_cmd_getopt_table == NULL ) {
+    ui_cmd_getopt_table
+      = ht_alloc (4, ht_hash_string, ht_compare_string, NULL, NULL);
+    ui_cmd_getopt_attr
+      = ht_new_attribute (ui_cmd_getopt_table, sizeof (*data_p), NULL, NULL);
+  }
+
+  ent = ht_lookup (ui_cmd_getopt_table, proc_name);
+
+  if ( ent != ht_null ) {
+    ht_get_attribute_for_entry (ui_cmd_getopt_attr, ent, data_p);
+  }
+  else {
+    Tcl_Obj *doc_obj = argv[2];
+    Tcl_Obj *opt_obj = argv[3];
+    Tcl_Obj *arg_obj = argv[4];
+    int status 
+      = ui_cmd_getopt_build_tables (interp, opt_obj, arg_obj, doc_obj, data_p);
+
+    if ( status != TCL_OK )
+      return status;
+
+    ent = ht_insert (ui_cmd_getopt_table, proc_name);
+    ht_set_attribute_for_entry (ui_cmd_getopt_attr, ent, data_p);
+  }
+
+  return TCL_OK;
+}
+
+
+static
+int
+ui_cmd_getopt (ClientData client_data, Tcl_Interp *interp, int argc,
+	       Tcl_Obj *CONST argv[])
+{
+  nl_context context = (nl_context) client_data;
+  char *proc_name = Tcl_GetStringFromObj (argv[1], NULL);
+  struct ui_cmd_getopt_data data;
+
+  if ( strcmp (proc_name, "-help") == 0 ) {
+    Tcl_SetResult (interp, "Usage: getopt proc_name option_spec argument_spec"
+		   " doc arguments.", TCL_STATIC);
+    return TCL_OK;
+  }
+  else {
+    int status =
+      ui_get_or_create_getopt_tables (proc_name, interp, argc, argv, &data);
+    int num_uiopts = data.num_uiopts;        
+    struct ui_option *uiopts = data.options;               
+    char **uiswtab = data.switch_table;         
+    union ui_var_type *opt_vars = data.opt_vars;            
+    char **opt_var_names = data.opt_var_names;  
+    int num_uiargs = data.num_uiargs;        
+    struct ui_argument *uiargs = data.arguments;             
+    union ui_var_type *arg_vars = data.arg_vars;            
+    ar *arg_paths = data.arg_paths;          
+    char **arg_var_names = data.arg_var_names;  
+    char *doc = data.doc;                      
+
+    if ( status != TCL_OK ) {
+      return status;
+    }
+    else {
+      int i;
+      int num_args;
+      Tcl_Obj **args;
+      int status = Tcl_ListObjGetElements (interp, argv[5], &num_args, &args);
+      int new_argc = num_args + 1;
+      Tcl_Obj **new_argv = alloca (new_argc * sizeof (*new_argv));
+
+      if ( status != TCL_OK ) {
+	return status;
+      }
+
+      new_argv[0] = argv[1];
+
+      for ( i = 0; i < num_args; i++ ) {
+	new_argv[i+1] = args[i];
+      }
+
+      for ( i = 0; i < num_uiopts; i++ ) {
+	opt_vars[i].i = 0;
+	opt_vars[i].ptr = NULL;
+      }
+
+      for ( i = 0; i < num_uiargs; i++ ) {
+	arg_vars[i].i = 0;
+	arg_vars[i].ptr = NULL;
+	arg_paths[i] = NULL;
+      }
+
+      error_catch {
+	status = ui_getopt (context, uiopts, uiswtab, uiargs, doc, interp,
+			    new_argc, new_argv);
+
+      }
+      error_on_tag (1) {
+	Tcl_ResetResult (interp);
+	Tcl_AppendResult (interp, proc_name, ": ", error_message, NULL);
+	return TCL_ERROR;
+      }
+      error_on_error {
+	Tcl_SetResult (interp, error_message, TCL_STATIC);
+	return TCL_ERROR;
+      }
+      error_end;
+
+      if ( status != TCL_OK ) {
+	return status;
+      }
+    }
+    
+    {
+      int i;
+
+      for ( i = 0; i < num_uiopts; i++ ) {
+	Tcl_Obj *opt_obj;
+	Tcl_Obj *var_obj;
+
+	if ( opt_var_names[i] == NULL ) {
+	  continue;
+	}
+
+	switch ( uiopts[i].type ) {
+	case ui_boolean:
+	case ui_integer:
+	  opt_obj = Tcl_NewIntObj (opt_vars[i].i);
+	  break;
+	case ui_string:
+	  opt_obj = Tcl_NewStringObj (opt_vars[i].ptr, -1);
+	  break;
+	case ui_tcl_object:
+	  if ( opt_vars[i].ptr == NULL ) {
+	    opt_obj = Tcl_NewStringObj ("", 0);
+	  }
+	  else {
+	    opt_obj = opt_vars[i].ptr;
+	  }
+	  break;
+	default:
+	  ASSERT (0);
+	}
+
+	var_obj = Tcl_NewStringObj (opt_var_names[i], -1);
+
+	Tcl_ObjSetVar2 (interp, var_obj, NULL, opt_obj, TCL_LEAVE_ERR_MSG);
+      }
+    }
+
+    {
+      int i;
+
+      for ( i = 0; i < num_uiargs; i++ ) {
+	Tcl_Obj *arg_obj;
+	Tcl_Obj *var_obj;
+
+	if ( arg_var_names[i] == NULL ) {
+	  continue;
+	}
+
+	switch ( uiargs[i].type ) {
+	case ui_boolean:
+	case ui_integer:
+	  arg_obj = Tcl_NewIntObj (arg_vars[i].i);
+	  break;
+	case ui_string:
+	  arg_obj = Tcl_NewStringObj (arg_vars[i].ptr, -1);
+	  break;
+	case ui_design:
+	case ui_idesign:
+	case ui_current_design:
+	case ui_current_idesign:
+	case ui_current_pdesign:
+	case ui_cell:
+	case ui_port:
+	case ui_net:
+	case ui_pin:
+	case ui_inet:
+	case ui_libcell:
+	case ui_library:
+	  arg_obj = ui_obj_create (arg_vars[i].ptr, arg_paths[i]);
+	  break;
+	case ui_readable_channel:
+	case ui_writable_channel:
+	case ui_tcl_object:
+	  if ( arg_vars[i].ptr == NULL ) {
+	    arg_obj = Tcl_NewStringObj ("", 0);
+	  }
+	  else {
+	    arg_obj = arg_vars[i].ptr;
+	  }
+	  break;
+	default:
+	  ASSERT (0);
+	}
+
+	var_obj = Tcl_NewStringObj (arg_var_names[i], -1);
+
+	Tcl_ObjSetVar2 (interp, var_obj, NULL, arg_obj, TCL_LEAVE_ERR_MSG);
+      }
+    }
+    return TCL_OK;
+  }
+}
+
+
+void
+ui_tcl_register_commands (Tcl_Interp *interp, char *prefix, nl_context context)
+{
+  ui_cmd_register (interp, "lambda", "", ui_cmd_lambda_wrap, context);
+  ui_cmd_register (interp, "alias", "", ui_cmd_alias, context);
+  ui_cmd_register (interp, "getopt", prefix, ui_cmd_getopt, context);
+}

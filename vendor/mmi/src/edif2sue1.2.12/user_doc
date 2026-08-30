@@ -1,0 +1,317 @@
+
+EDIF to SUE file translator
+
+USAGE
+
+"edif2sue" is a tool for translating an EDIF design file
+into a set of SUE cell files.  
+
+A usage message is available by invoking without parameters.
+The most basic usage is:
+
+	edif2sue ediffile.edf
+
+which (if ediffile.edf is a valid edif file) will create a
+set of files in the local subdirectory "sue", which should
+exist already.
+
+The translation process consists of two parts, which 
+are described below.
+	1. reading-in and parsing the EDIF file
+	2. extraction and writing-out SUE files.
+
+A tool to write EDIF files from sue is available as
+a plug-in option to SUE; see "sue2edif" documentation elsewhere.
+
+
+OPTIONS
+
+Options are specified in a "e2s_rc" file.  The default file is
+$MMI_TOOLS/edif2sue/e2s_rc.
+
+An explicit path can be specified using the "-config_file <path> 
+command line option.  Any number of paths can be specified;
+files will be read in the order specified.
+
+(calling edif2sue with no arguments will cause a usage messge
+to be printf'd)
+
+Within the e2src file, options are specified one per line.
+The fields of the line are read using the scanf; see the man page.
+The first field give the option keyword, as specified below;
+following fields are paramaters of the option, if required.
+
+
+	cellname_prefix:  A complete design can be expected to
+contain low-level components such as transistors or simple gates whose
+name may collide with similar but probably not identical components in
+the local library.  That will create an impossible situation if the
+intent is to edit the files.  Therefore the user should specify a
+prefix that will be applied to all the cell names extracted from the
+edif file (and consequently on the generated sue files).  So for
+example, if 
+		cellname_prefix fred_
+a cell named "inverter" would be renamed to fred_inverter, and its
+definition would appear in a file called fred_inverter.sue.
+
+	outdir: Gives a relative or absolute pathname of a directory
+where the generated sue files will be placed. The default is a local
+subdirectory named "sue". 
+
+	suppress_progress_messages: ordinarily the tool will 
+report what cell it is working on, which is reassuring and helpful
+for debugging, but may obscure important warning messages.
+This option will supress progress reports; only warning messages
+will be displayed.
+
+	continue_on_translate_errors: ordinarly the tool will 
+abort with an error message when it encounters a situation it doesn't
+understand.  Specifying this option will cause the tool to continue;
+obviously results will be unpredictable; a segmentation exception or
+invalid output may occur.
+
+	literal_netnames: Net names syntax is somewhat variable
+among CAD tools.  Ordinarily edif2sue will convert the names into 
+a format acceptable to sue.  Note that this may require generating
+"buscombine" psuedo-devices and additional generated names.
+The generated files may be more readable if the original netnames are 
+presented exactly as they are in EDIF, which this option will
+do; but note that in this case the generated files may not be
+netlistable.
+
+	ignore_property <property_name>: It may be found that some
+properties that are not useful for Sue cause excessive clutter;
+ie, the Cadence port_order property.  This option causes all instances
+of the named propert to be ignored.  The option should be specified
+as often as required to ignore multiple properties, eg:
+		ignore_property pin
+		ignore_property schType
+		ignore_property instancesLastChanged
+		ignore_property lastSchematicExtraction
+
+	use_global <cell_name> <global_name> {<orientation>}:
+This option says that an instance of <cell_name> should be treated
+as an instance of the Sue global <global_name>.  The optional orientation
+paramater specifies how the global symbol should be displayed. eg,
+		use_global VDD! vdd RXY
+says that a reference to "VDD!" turns into a Sue global called "vdd",
+and the symbol is displayed "upside down" (above its connection point).
+
+	parse_only: don't translate the file, just parse it
+and reconstitute the file to stdout. This has been occasionally
+useful for debugging.  It also leads to uniform prettyprinting.
+
+	skip_bad_ports: we have discovered some Cadence files that
+contain duplicate portimplementations for some net bundle signals.
+For example, a cell might have a port called DIN<7:0> (actually a 
+rename of this value), and portimplementations for DIN<3:0>, 
+DIN<7>, and whatever, in addition to a portimpelemntation for 
+DIN<7:0>.  This is quite against the EDIF standard, but what can 
+one do?  This hackaround just hopes that if the tool can't find 
+a port name that exactly matches the portimplementation reference,
+it is an instance of this case and can be ignored.  Obviously the
+option should only be invoked if the EDIF file is observed to 
+exhibit this anomoly.  If a port is skipped, a warning message is
+printf'd.
+
+	ignore_property <property_name>: properties with this name
+will be silently skipped over wherever encountered.  This is for
+clutter reduction, and also makes it easier to produce netlists
+usable by SPICE.
+
+	use_global <cell_name> <global_name> <orientation>:
+Rather than create an instance of a cell with this name (such as
+"VSS!"), link this net with the MMI global_name (such as "gnd").
+If orientation is specified, apply that transformation to the 
+global symbol, eg so that vdd symbols will hang down from the 
+top of the schematic as usually expected.
+
+	add_verilog_property_by_library <library-name>: add a verilog
+property to cells in the named library, identifying them as base
+components to the verilog simulator.
+
+	round_to_grid_lines: snap connection points to the nearest
+grid lines.  WARNING, In some cases this may pull connections apart.
+
+	add_title_bar: causes a title bar to be added to each cell
+
+	suppress_instance_name_prefix: causes instance names
+that begin with the specified string to be suppressed; for 
+edif files generated from sue, that prefix is "THING_".
+
+	ingore_cell_definition: if a definition for the named cell 
+is encountered, don't create a SUE file for it.  If an instance
+of the cell is encountered in the definition for some other cell,
+just write it out and hope SUE will know what to do.  
+
+	scale_coordinates: multiply all coordinates encountered by
+the given factor.  This might help get a translated schematic on-grid.
+(Note: in the ordinary course of things, edif2sue will issue a 
+warning if it encounters a coordinate that is off-grid.)
+
+	uniquify_duplicate_names: duplicate names within the same
+scope are supposed to be illegal in EDIF, but at least one known 
+edif writer doesn't respect this for power nets.  This option will
+cause a uniquifying string ("__77nn") to be appended to detected
+duplicate names.
+
+Cadence-specific options:
+
+	no_skip_bad_ports: In the case of "net splitter" type constructs,
+the subscripts on a portRef may not match those on the intended 
+corresponding portDef; strictly speaking this is a violation of the
+EDIF standard, but since we have enough information to do the right
+thing, we go ahead an connect the nets as probably intended.  If this
+option is specified, warning messages will be printf'd when a 
+mismatch is encountered, for human verification if desired.
+
+	cadence_property_conversion: cadence properties sometimes
+use a macro-substitution language; that is, they are not intended
+to be treated as the simple strings which they appear to be in the
+EDIF syntax.  If this option is specified, we make a stab at 
+interpreting the property.
+
+	show_rippers: A Cadence "ripper"
+is a pseudo-device with one port that extracts a subset from a 
+bus or net bundle.  Since it has only one port, Sue believes that
+the two sides of the ripper are shorted together, with bad
+results.  Therefore edif2sue normally suppresses the rippers and
+the wire segments connected to them.  Sue matches the nets by 
+name, so the schematic produced is equivalent.  If it is desired
+to view the schematics exactly as they are presented in the 
+EDIF, this option should be invoked; note that in this case the
+generated files may not be netlistable.
+
+
+
+
+PARSING
+
+The file is read in line-by-line.  EDIF expressions are 
+converted to a direct internal representation in a 
+recursive top-down fashion; there is very little compaction.
+
+Each expression is read in according to the definitions in
+the standard; errors such as missing required fields or 
+illegal fields will be detected and an error message 
+identifying the line number of the error is produced.
+
+Name references are resolved as they are encountered in a 
+completely correct manner.  Naming errors will generate error 
+messages.
+
+There is no error recovery; a parsing error is immediately
+fatal. 
+
+The process if fairly memory-intensive; experience shows that
+the internal representation is about as large as the input
+file.  It is helpful to have that much physical memory 
+available.  A large file can take 15-30 minutes to read in.
+
+
+EXTRACTION
+
+Once parsing has completed successfully, edif2sue will 
+walk over the tree of expressions looking for cell definitions,
+for all of which it will generate sue files.
+
+Every effort has been made to make this process robust; that
+is, to check that the EDIF structure is not just syntacticly
+correct, but is what we expect. In cases where the tool is
+surprised, as of this writing it will exit with with a message
+	    fatal error called
+giving an error number and a possibly helpful message;
+at this point one should send for help.  
+
+(One can also specify the "-continue_on_translate_errors" option
+as a stopgap, but this is obviously dangerous.)(Parsing errors
+cannot be continued.)
+
+Some questionable but non-fatal situations will be noted in 
+the standard output, which should be examined carefully when
+a new design is translated.  The option "-suppress_progress_messages"
+will make warning messages stand out more clearly.
+
+
+EDIF INFORMATION
+
+The EDIF supported is version 2 0 0 (EIA Recommended Standard
+EIA-548-1988, dated March 14, 1988.  Some information is 
+available from the EDIF Technical Center Web site; see
+http://edif-tc.cs.man.ac.uk/index.html.  Only "level 0"
+("the basic level - only literal constants are permitted")
+is supported; levels 1 and 2 ("addition of parameters and
+expressions" and "addition of control-flow constructs")
+is not supported.
+
+As of this writing, edif2sue will not give complete coverage
+for all legal EDIF constructs; however, meaningful error 
+messages should be produced in cases where the tool becomes
+confused.  
+
+There is also some question about how various CAD tools map
+their internal databases into EDIF; there is plenty of room
+for idiosyncracies or outright incorrectness.  The following
+have been seen:
+
+    CADENCE:
+	- net "joined" structure is not right for nets with
+	complex names (see Cadence documentation on 
+	"iterated names" to understand how they have created
+	a difficult problem for themselves)
+	(for edif2sue, we use the "figure" drawing information
+	to generate the schematics; we are unable to cross-check
+	the figures against the joins in all cases.)
+
+	- "ripper" cells have only one port (EDIF spec 
+	specifies that cell-type RIPPER objects have two ports);
+	Cadence has geometrical rules to determine which nets
+	connected to a ripper cell are connected to each other.
+	(edif2sue suppresses the cells and their attached 
+	wire segments)
+
+	- portimplementation references don't always match port
+	definitions for net bundles; see above concerning the
+	"skip_bad_ports" option 
+
+	- indentation is deplorable
+	("et pretty" command will fix it up if desired)
+
+    SYNOPSIS:
+	Limited experience, but no discrepancies have been noted)
+
+    TANNER:
+	duplicat net names for power nets (as, "VddB")	
+
+
+    No experience with other CAD tools.
+
+
+
+
+ET TOOL USAGE
+
+The "et" tool is intended to provide some help in inspecting
+and manipulating EDIF files, which are often too large for 
+ordinary editors to deal with usefully.  Invoking without 
+options will provide a usage message.  
+
+The following commands are available:
+
+	-get_cell <cellname> <infile> <outfile>: will search
+an EDIF infile for a definition of cell cellname, and write the
+definition out to outfile.  It reports the original line number
+of the start of the outfile. Extremely helpful when parsing
+fails a gazillion lines into a large EDIF file.
+
+	-pretty <infile> <outfile>: will prettyprint an
+EDIF file by adjusting the indentation, preserving the 
+line numbers.
+
+	-break_libs <infile>: write each library encountered
+in the infile out to a separate file called lib_n.  Unfortunately
+you can't do much with a library except paste it back into 
+an EDIF file, but one can at least construct a shortened 
+version 
+
+	 

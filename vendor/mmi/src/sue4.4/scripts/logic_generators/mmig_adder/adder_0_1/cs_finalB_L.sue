@@ -1,0 +1,118 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_cs_finalB_L {} {
+  make output -orient RY -name Sum_H -origin {1310 690}
+  make input -orient RY -name A_H -origin {-30 420}
+  make input -orient RY -name B_H -origin {-30 460}
+  make input -orient R90Y -name Cin1_L -origin {490 850}
+  make input -orient R90Y -name Cin0_L -origin {830 850}
+  make input -orient R90Y -name SelS_H -origin {1270 860}
+  make name_net -name Cout1_H -origin {980 100}
+  make name_net -name Cout0_H -origin {980 160}
+  generate row_spanner row_spanner150 -width 150
+  make row_spanner150 -origin {590 1010}
+  make name_net -name Sum1_H -origin {1130 660}
+  make name_net -name Sum0_H -origin {1130 720}
+  make name_net -name G_L -origin {370 440}
+  make name_net -name K_H -origin {370 520}
+  make OAI21B_ -orient R270 -origin {830 330}
+  make OAI21B_ -orient R270 -origin {490 330}
+  make name_net -name P_L -origin {370 590}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {70 1010}
+  make NAND2C -orient RY -origin {70 440}
+  make NOR2C_ -orient RY -origin {50 520}
+  make XNOR2A -orient RY -origin {1000 720}
+  make XNOR2A -orient RY -origin {650 660}
+  make INVA_ -origin {880 740}
+  make INVA_ -origin {540 680}
+  make INAND2B -orient RY -origin {240 590}
+  make MUX2B -orient RY -origin {1270 690}
+  make output -orient RY -name Cout_H -origin {1310 130}
+  make input -orient R90Y -name SelCI_H -origin {1270 350}
+  make MUX2B -orient RY -origin {1270 130}
+  make row_spanner150 -origin {940 1010}
+  make row_spanner150 -origin {1290 1010}
+  make cs_finalB_L -origin {170 190}
+  make sccs_title_bar -owner emc -version 1.2 -date 01/26/99 -origin {570 1130}
+  make_wire 1290 690 1310 690
+  make_wire 490 680 510 680
+  make_wire 1290 130 1310 130
+  make_wire 1270 170 1270 350
+  make_wire 590 680 610 680
+  make_wire 1270 730 1270 860
+  make_wire 590 590 590 640
+  make_wire 610 640 590 640
+  make_wire 830 740 850 740
+  make_wire 930 740 960 740
+  make_wire 940 590 940 700
+  make_wire 940 700 960 700
+  make_wire -30 460 0 460
+  make_wire 50 460 0 460
+  make_wire 20 420 -30 420
+  make_wire 20 420 50 420
+  make_wire 460 440 800 440
+  make_wire 800 420 800 440
+  make_wire 460 440 460 420
+  make_wire 1130 660 720 660
+  make_wire 1130 660 1250 660
+  make_wire 1130 720 1070 720
+  make_wire 1130 720 1250 720
+  make_wire 160 520 160 610
+  make_wire 160 610 200 610
+  make_wire 830 420 830 740
+  make_wire 830 740 830 850
+  make_wire 0 460 0 540
+  make_wire 0 540 30 540
+  make_wire 490 420 490 680
+  make_wire 490 680 490 850
+  make_wire 190 440 190 570
+  make_wire 190 570 200 570
+  make_wire 870 420 870 520
+  make_wire 530 520 870 520
+  make_wire 20 420 20 500
+  make_wire 20 500 30 500
+  make_wire 530 420 530 520
+  make_wire 140 440 190 440
+  make_wire 190 440 370 440
+  make_wire 370 440 460 440
+  make_wire 310 590 370 590
+  make_wire 370 590 590 590
+  make_wire 590 590 940 590
+  make_wire 120 520 160 520
+  make_wire 160 520 370 520
+  make_wire 370 520 530 520
+  make_wire 830 160 980 160
+  make_wire 830 160 830 250
+  make_wire 980 160 1250 160
+  make_wire 490 100 980 100
+  make_wire 490 100 490 250
+  make_wire 980 100 1250 100
+}
+
+proc ICON_cs_finalB_L args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin1_L
+  icon_term -type input -origin {-20 120} -orient R270 -name Cin0_L
+  icon_term -type input -origin {140 100} -orient RXY -name SelS_H
+  icon_term -type output -origin {-40 -120} -orient R90Y -name Cout_H
+  icon_term -type input -origin {140 80} -orient RX -name SelCI_H
+  icon_property -origin {-130 210} -type user -name name
+  icon_property -origin {-130 230} -type user -name M
+  icon_property -origin {-130 250} -type user -name pad
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin1_L
+  icon_property -origin {-20 110} -anchor e -rotate 1 -label Cin0_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 10} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label cs_finalB_L
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {130 100} -anchor e -label SelS_H
+  icon_property -origin {130 80} -anchor e -label SelCI_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+}
+

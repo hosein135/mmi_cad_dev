@@ -1,0 +1,317 @@
+# <tech>.display_styles
+#
+# BASED ON:
+#	mos.7bit.dsytle MOSIS distribution Version 8.0 
+#	(C) Copyright 1992, 1993, 1994 
+#	Jen-I Pi	       pi@isi.edu
+#	The MOSIS Service
+#	USC Information Sciences Institute	
+#	4676 Admiralty Way
+#	Marina del Rey, CA 90292
+#	(310) 822-1511 x640  fax (310)823-5624
+# 	All Rights Reserved.
+#
+# BASE VERSION:  mos.7bit.dstyle (from Magic 6.4.4) 
+#	supports 3 metal, 2 poly cmos processes.
+# THIS VERSION:
+#	supports 6 metal, 1 poly + local interconnect.
+#
+# BITPLANE USAGE:
+#
+#
+#		msb			      lsb
+#		+-------+-----------+-----------+
+#		| 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+#		+-------+-----------+-----------+
+#		  |   |   |   |   |   \_______/
+#	not used -+   |   |   |   |       |
+#	highlights ---+   |   |   |       +---- poly, diff, fets
+#	opaque/trans. ----+   |   +------------ metal1
+#			      +---------------- metal2
+#
+# Bits 0-2 represent the material on the poly-diff plane (poly,
+# different flavors of diffusion, different flavors of transistor)
+# with mutually-opaque colors.
+#
+# Bits 3-4 are used for the two metal layers.  Each layer has a
+# separate bit plane, so the two metal layers are mutually transparent,
+# and they are both transparent with respect to the poly-diff layers.
+#
+# If bit 5 is set, then bits 0-4 are used for one of 32 opaque colors
+# which override any other mask information.  These colors are used
+# for various stipples, contact crosses, etc.  They also provide a
+# palette of standard colors (red, green, etc.) for use in making
+# window borders, menus, etc.  The last of these colors to be drawn in
+# an area is the one that will appear.
+#
+# Bit 6 is used for highlights such as the box, the selection, etc.
+# It overrides any of the other bits and produces a pure white color.
+#
+# Bit 7 is not used in this display style file.  This is important for
+# Sun workstations, since they can't really give Magic all 8 bits.
+# For AEDs and other displays, this is a bit wasteful, but still seems
+# to work ok.
+#
+# OPAQUE COLOR ASSIGNMENT:
+#
+# 40-66 General Purpose colors ("Fixed") (see styles 129-151) below.
+# 67-73	Specific Purpose (e.g  labels)   (see styles 171-181) below.
+# 74 metal3
+# 75 metal4
+# 76 metal5
+# 77 not used.
+
+display_styles 7
+#
+# POLY-DIFF STYLES:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+# 0 mask in style 1 signals that group 1 styles are orthogonal!
+1	000	000	000	solid	0	-	signal orthogonal
+2	001	001	000	solid	0	-	polysilicon
+3	002	002	000	solid	0	-	ndiffusion
+4	002	002	000	stipple 12	-	ndiff_in_nwell
+5	004	004	000	solid	0	-	pdiffusion
+6	004	004	000	stipple 12	-	pdiff_in_pwell
+7	007	003	000	solid	0	-	ntransistor
+#8	007	002	000	stipple 7	-       ntransistor_stripes
+9	007	005	000	solid	0	-	ptransistor
+#10	007	004	000	stipple 5	-       ptransistor_stripes
+11	000	000	377	stipple 10	-	NOT USED.
+#
+# METAL STYLES:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+12	010	010	000	solid	0	-	metal1
+13	020	020	000	solid	0	-	metal2
+14	077	042	000	stipple 3	-	metal6
+15	077	076	000	stipple 3	-	metal5
+16	077	075	000	stipple 3	-	metal4
+17	077	074	000	stipple 3	-	metal3
+20	077	075	000	stipple 15	-	metal4
+21	077	076	000	stipple 16	-	metal5
+22	077	042	000	stipple 17	-	metal6
+#
+# NWELL & PPLUS:
+#
+26	077	051	000	stipple 1	-	nwell
+27	077	042	000	stipple 7	-	pplus
+28	077	076	000	stipple 5	-	nplus
+#
+# CONTACT STYLES:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+32	077	043	377	cross	0	-	contact_X'es
+33	077	043	377	stipple 2	-	via1 
+34	077	042	377	stipple 10	-	li contact
+37	077	043	377	stipple 8	-	via2
+38	077	043	377	stipple 13	-	via3
+39	077	043	377	stipple 14	-	via4
+40	077	043	377	stipple 19	-	via5
+#
+# ERROR STYLES:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+42	077	040	000	stipple 4	-	error_waffle
+43	077	060	000	stipple 4	-	drc
+#
+#
+#------------------------------------------------------
+# Versions of previous layers to use in non-edit cells:
+#------------------------------------------------------
+#
+# Poly-diff styles:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+65	000	000	000	stipple 6	-	signal orthogonal
+66	001	001	000	stipple 6	-	polysilicon
+67	002	002	000	stipple 6	-	ndiffusion
+68	002	002	000	stipple 12	-	ndiff_in_nwell
+69	004	004	000	stipple 6	-	pdiffusion
+70	004	004	000	stipple 12	-	pdiff_in_pwell
+71	007	003	000	stipple 6	-	ntransistor
+#72	007	002	000	stipple 7	-	ntransistor_stripes
+73	007	005	000	stipple 6	-	ptransistor
+#74	007	004	000	stipple 5	-	ptransistor_stripes
+75	000	000	377	stipple 10	-	NOT USED.
+#
+# Metal styles:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+76	010	010	000	stipple 6	-	metal1
+77	020	020	000	stipple 6	-	metal2
+78	077	042	000	stipple 17	-	metal6
+79	077	076	000	stipple 16	-	metal5
+80	077	075	000	stipple 15	-	metal4
+81	077	074	000	stipple 18	-	metal3
+84	077	075	000	stipple 15	-	metal4
+85	077	076	000	stipple 16	-	metal5
+86	077	042	000	stipple 17	-	metal6
+#
+# Nwell & pplus:
+#
+90	077	050	000	stipple 1	-	nwell
+91	077	041	000	stipple 7	-	pplus
+92	077	076	000	stipple 5	-	nplus
+#
+# Contact styles:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+96	077	043	377	cross	0	-	contact_X'es
+97	077	043	377	stipple 2	-	contact_waffle
+98	077	042	377	stipple 10	-	li contact
+101	077	043	377	stipple 8	-	via2
+102	077	043	377	stipple 13	-	via3
+103	077	043	377	stipple 14	-	via4
+104	077	043	377	stipple 19	-	via5
+#
+# Error styles:
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+106	077	040	000	stipple 4	-	error_waffle
+107	077	065	000	stipple 4	-	drc
+#
+#----------------------------------------------------------------------
+# Styles < 128 (above) are for use in the technology file.
+# Style #s must match use in the technology file.
+# 
+# Styles > 128 (below) are used internally by Magic for things
+# like menus, drawing the box, etc.  
+# Style numbers must match the definitions in style.h.
+#----------------------------------------------------------------------
+#
+# General-purpose opaque colors.  These entries define a whole
+# bunch of generally-useful colors.  Although all of the fill
+# styles here are solid, the same colors are used in many other
+# places with different fill and outline styles.
+#
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+129	077	040	000	solid	0	W	white
+130	077	041	000	solid	0	-	gray1 (pale)
+131	077	042	000	solid	0	-	gray2 (dark)
+132	077	043	000	solid	0	K	black
+133	077	044	000	solid	0	r	red1 (pale)
+134	077	045	000	solid	0	-	red2 (medium)
+135	077	046	000	solid	0	R	red3 (dark)
+136	077	047	000	solid	0	g	green1 (pale)
+137	077	050	000	solid	0	-	green2 (medium)
+138	077	051	000	solid	0	G	green3 (dark)
+139	077	052	000	solid	0	b	blue1
+140	077	053	000	solid	0	-	blue2
+141	077	054	000	solid	0	B	blue3
+142	077	055	000	solid	0	p	purple1
+143	077	056	000	solid	0	P	purple2
+144	077	057	000	solid	0	y	yellow1
+145	077	060	000	solid	0	Y	yellow2
+146	077	061	000	solid	0	o	orange1
+147	077	062	000	solid	0	O	orange2
+148	077	063	000	solid	0	-	brown1
+149	077	064	000	solid	0	-	brown2
+150	077	065	000	solid	0	-	magenta
+151	077	066	000	solid	0	-	cyan
+#
+#
+# Opaque styles used for drawing and erasing highlights, window borders,
+# etc.  Most of them use the color numbers defined above, in order
+# to conserve colors.
+#				       stipple  short    long
+# num   mask    color   outline  fill  number   name     name
+# ----+------+--------+--------+------+-------+------+--------------
+160	100	100	000	solid	0	-	solid_highlights
+161	100	100	000	stipple 6	-	medium_highlights
+162	100	100	000	stipple 9	-	pale_highlights
+163	100	100	000	stipple 10	-	horiz_highlights
+164	100	100	000	stipple 11	-	vert_highlights
+165	100	100	377	outline	0	-	outline_highlights
+166	100	100	314	outline 0	-	dotted_highlights
+#
+167	100	000	377	outline	0	-	erase_box
+168	100	000	000	solid	0	-	erase_highlights
+169	177	000	000	solid	0	-	erase_everything
+170	077	000	000	solid	0	-	erase_all_but_highl
+#
+171	077	073	377	outline	0	-	labels
+172	077	043	377	outline	0	-	bounding_boxes
+173	077	062	252	grid	0	-	dotted_grid
+174	077	062	377	grid	0	-	solid_grid
+175	077	062	000	solid	0	-	origin_square
+176	077	043	377	outline	0	-	draw_tile_details
+#
+177	177	067	000	solid	0	w	window_border
+178	177	067	377	stipple 6	-	window_elevator
+179	177	070	000	solid	0	-	window_caption
+180	177	071	000	solid	0	b	window_background
+#
+181	177	072	000	solid	0	-	color_editing
+#
+# The style below means "no color at all".  It is special, in that
+# it is used by cursors to indicate transparency.
+#
+182	177	000	000	solid	0	-	no_color_at_all
+
+stipples
+#-----------------------------------+---------------------------------------
+#		bit pattern	    |   description
+#-----------------------------------+---------------------------------------
+### pplus
+1  100 200 020 040 004 010 001 002	sparse hatched stripes, ll to ur
+### v1 
+2  314 314 000 000 063 063 000 000	coarse knight's move
+### m3/m4/m5/m6
+3  125 252 125 252 125 252 125 252	fine checkerboard d=1
+### drc error 
+4  000 000 314 314 000 000 314 314	
+### pfet stripes
+5  200 100 040 020 010 004 002 001	sparse diagonal stripes, ll to ur
+### not-edit-cell / highlights,medium / window elevator
+6  252 125 252 125 252 125 252 125	fine checkerboard d=1, complement of #3
+### nfet stripes / nwell
+7  002 004 010 020 040 100 200 001	sparse diagonal stripes, lr to ul
+### v2
+8 074 303 102 102 303 074 044 044	bubbles
+### highlights, pale
+9  201 300 140 060 030 014 006 003	wide sparse diagonal stripes, ll to ur
+### li contact
+10 000 000 000 377 000 000 000 377	horizontal stripes
+### highlights, vertical
+11 104 104 104 104 104 104 104 104	vertical stripes
+### well tiles
+12 063 063 777 777 314 314 777 777	coarse knight's move, complement of #2
+### v3
+13 020 070 174 377 377 174 070 020	big diamond
+### v4
+14 303 347 176 074 074 176 347 303	cross hatch
+### m4
+15 124 210 021 042 124 210 021 042 	#3 AND 2x2 checkerboard off=(0,0)
+### m5
+16 020 210 104 042 020 210 104 042      #3 AND 2x2 checkerboard off=(0,1)
+### m6
+17 104 042 021 210 104 042 021 210	#3 AND 2x2 checkerboard off=(1,0)
+### m3 not-edit-cell
+18 021 042 104 210 021 042 104 210      #3 AND 2x2 checkerboard off=(1,1)
+### v5
+19 377 201 201 201 201 201 201 377      grid 
+### pfet "background" 
+20 277 337 357 367 373 375 376 177	#5 inverted
+# NOTE:  pfet "background" (non-edit) uses 6  (#20 AND #6 = #6)
+### nfet "background" 
+21 375 373 367 357 337 277 177 376      #7 inverted
+### nfet "background" (non-edit)
+22 252 121 242 105 212 025 052 124      #21 AND #6  
+
+
+
+
+
+
+

@@ -1,0 +1,798 @@
+CmdArray --
+-----------
+
+Implement the "array" command.  Make everything in the selection
+into an array.  For paint and labels, just copy.  For subcells,
+make each use into an arrayed use.
+
+Usage:
+array xlo xhi ylo yhi
+array xsize ysize
+
+Results:
+None.
+
+Side effects:
+Changes the edit cell.
+
+CmdCalma --
+-----------
+
+Implement the "calma" command.
+
+Usage:
+calma option args
+
+Results:
+None.
+
+Side effects:
+There are no side effects on the circuit.  Currently, there
+is only a single option, "write", to write a CALMA stream
+file.
+
+CmdCheckPoint --
+----------------
+
+Implement the "checkpoint" command.
+Writes the EditCell out to the indicated file without changing the editcell
+without clearing modified bits in cd-flags.
+
+Usage:
+checkpoint file
+
+Results:
+None.
+
+Side effects:
+Writes the cell out to specified file.
+Clears the modified bit in the cd_flags.
+
+CmdCif --
+---------
+
+Implement the "cif" command.
+
+Usage:
+cif option args
+
+Results:
+None.
+
+Side effects:
+There are no side effects on the circuit.  Various options
+may produce cif files, read cif, or display cif information
+on the screen.
+
+CmdClockwise --
+---------------
+
+Implement the "clockwise" command.  Rotate the selection and the
+box clockwise around the point.
+
+Usage:
+clockwise [degrees]
+
+Results:
+None.
+
+Side effects:
+Modifies the edit cell.
+
+CmdCopy --
+----------
+
+Implement the "copy" command.
+
+Usage:
+copy [direction [amount]]
+copy to x y
+
+Results:
+None.
+
+Side effects:
+The selection is copied.
+
+CmdCorner --
+------------
+
+Implement the "corner" command.  Find all paint touching one side
+of the box, and paint it around two edges of the box in an "L"
+shape.
+
+Usage:
+corner firstDirection secondDirection [layers]
+
+Results:
+None.
+
+Side effects:
+The edit cell is modified.
+
+CmdDelete --
+------------
+
+Implement the "delete" command.
+
+Usage:
+delete
+
+Results:
+None.
+
+Side effects:
+The selection is deleted.
+
+CmdDrc --
+---------
+
+Implement the "drc" command.
+
+Usage:
+drc option
+
+Results:
+None.
+
+Side effects:
+Most options have no side effects.  The only major side
+effects are to turn continuous DRC on or off, or recheck an
+area of a cell.
+
+CmdDump --
+----------
+
+Implement the ":dump" command.
+
+Usage:
+dump cellName [child refPointChild] [parent refPointParent]
+
+where the refPoints are either a label name, e.g., SOCKET_A, or an x-y
+pair of integers, e.g., 100 200.  The words "child" and "parent" are
+keywords, and may be abbreviated.
+
+Results:
+None.
+
+Side effects:
+Copies the contents of a given cell into the edit cell,
+so that refPointChild in the child cell (or the lower-left
+corner of its bounding box) ends up at location refPointParent
+in the edit cell (or the location of the box tool's lower-left).
+
+MgcLayoutCmdWrapper --
+----------------------
+
+Tcl command procedure!
+Called back by tcl interp for magic layout commands
+
+Results:
+TODO.
+
+Side effects:
+Command is executed.
+
+MgcLayoutInit --
+----------------
+
+Register the Magic Layout commands in the above tables with tcl.
+
+Results:
+None.
+
+Side effects:
+Register Magic layout commands.
+
+CmdEdit --
+----------
+
+Implement the "edit" command.
+Use the cell that is currently selected as the edit cell.  If more than
+one cell is selected, use the point to choose between them.
+
+Usage:
+edit
+
+Results:
+None.
+
+Side effects:
+Sets EditCellUse.
+
+CmdErase --
+-----------
+
+Implement the "erase" command.
+Erase paint in the specified layers from underneath the box in
+EditCellUse->cu_def.
+
+Usage:
+erase [layers]
+
+Results:
+None.
+
+Side effects:
+Modified EditCellUse->cu_def.
+
+CmdExpand --
+------------
+
+Implement the "expand" command.
+
+Usage:
+expand
+expand toggle
+
+Results:
+None.
+
+Side effects:
+If "toggle" is specified, flips the expanded/unexpanded status
+of all selected cells.  Otherwise, aren't any unexpanded cells
+left under the box.  May read cells in from disk, and updates
+bounding boxes that have changed.
+
+CmdExtract --
+-------------
+
+Implement the "extract" command.
+
+Usage:
+extract option args
+
+Results:
+None.
+
+Side effects:
+There are no side effects on the circuit.  Various options
+may produce .ext files or change extraction parameters.
+
+CmdFeedback --
+--------------
+
+Implement the "feedback" command, which provides facilities
+for querying and manipulating feedback information provided
+by other commands when they have troubles or want to highlight
+certain things.
+
+Usage:
+feedback option [additional_args]
+
+Results:
+None.
+
+Side effects:
+Depends on the option.
+
+CmdFill --
+----------
+
+Implement the "fill" command.  Find all paint touching one side
+of the box, and paint it across to the other side of the box.  Can
+operate in any of four directions.
+
+Usage: 
+fill direction [layers]
+
+Results:
+None.
+
+Side effects:
+Modifies the edit cell definition.
+
+CmdFindBox --
+-------------
+
+Center the display on a corner of the box.  If 'zoom', then make the box
+fill the window.
+
+Usage:
+findbox [zoom]
+
+Results:
+None.
+
+Side effects:
+The window underneath the cursor is moved.
+
+CmdFlush --
+-----------
+
+Implement the "flush" command.
+Throw away all changes made within magic to the specified cell,
+and re-read it from disk.  If no cell is specified, the default
+is the current edit cell.
+
+Usage:
+flush [cellname]
+
+Results:
+None.
+
+Side effects:
+THIS IS NOT UNDO-ABLE!
+Modifies the specified CellDef.
+
+CmdGetcell --
+-------------
+
+Implement the ":getcell" command.
+
+Usage:
+getcell cellName [child refPointChild] [parent refPointParent]
+
+where the refPoints are either a label name, e.g., SOCKET_A, or an x-y
+pair of integers, e.g., 100 200.  The words "child" and "parent" are
+keywords, and may be abbreviated.
+
+Results:
+None.
+
+Side effects:
+Makes cellName a subcell of the edit cell, positioned so
+that refPointChild in the child cell (or the lower-left
+corner of its bounding box) ends up at location refPointParent
+in the edit cell (or the location of the box tool's lower-left).
+
+CmdGetnode --
+-------------
+
+Implement the "getnode" command.
+Returns the name of the node pointed by the mouse
+
+Usage:
+getnode
+getnode abort
+getnode abort string
+getnode alias on
+getnode alias off
+getnode fast
+
+Results:
+None.
+
+Side effects:
+The GetNode hash tables may be modified.
+
+CmdIdentify --
+--------------
+
+Implement the "identify" command.
+Sets the instance identifier for the currently selected cell.
+
+Usage:
+identify use_id
+
+Results:
+None.
+
+Side effects:
+Modifies the instance identifier for the selected cell (the
+first selected cell, if there are many).
+
+CmdLabel --
+-----------
+
+Implement the "label" command.
+Place a label at a specific point on a specific type in EditCell
+
+Usage:
+label text [direction [layer]]
+
+Direction may be one of:
+right left top bottom
+east west north south
+ne nw se sw
+or any unique abbreviation.  If not specified, it defaults to a value
+chosen to keep the label text inside the cell.
+
+Layer defaults to the type of material beneath the degenerate box.
+If the box is a rectangle, then use the lower left corner to determine
+the material.
+
+If more than more than one tiletype other than space touches the box,
+then the "layer" must be specified in the command.
+
+Results:
+None.
+
+Side effects:
+Modified EditCellUse->cu_def.
+
+CmdLoad --
+----------
+
+Implement the "load" command.
+
+Usage:
+load [name]
+
+If name is supplied, then the window containing the point tool is
+remapped so as to edit the cell with the given name.
+
+If no name is supplied, then a new cell with the name "(UNNAMED)"
+is created in the selected window.  If there is already a cell by
+that name in existence (eg, in another window), that cell gets loaded
+rather than a new cell being created.
+
+Results:
+None.
+
+Side effects:
+Sets EditCellUse.
+
+CmdMove --
+----------
+
+Implement the "move" command.
+
+Usage:
+move [direction [amount]]
+move to x y
+
+Results:
+None.
+
+Side effects:
+Moves everything that's currently selected.
+
+CmdPaint --
+-----------
+
+Implement the "paint" command.
+Paint the specified layers underneath the box in EditCellUse->cu_def.
+
+Usage:
+paint [layers]
+
+Results:
+None.
+
+Side effects:
+Modified EditCellUse->cu_def.
+
+MgcTclInit --
+-------------
+
+This procedure is called to register the Magic commands with the tcl
+interpreter.
+
+Results:
+None.
+
+Side effects:
+Register Magic commands with tcl.
+
+CmdRsim
+-------
+
+Starts Rsim under Max.
+
+Results:
+None.
+
+Side effects:
+Rsim is forked.
+
+CmdSave --
+----------
+
+Implement the "save" command.
+Writes the EditCell out to a disk file.
+
+Usage:
+save [file]
+
+Results:
+None.
+
+Side effects:
+Writes the cell out to file, if specified, or the file
+associated with the cell otherwise.
+Updates the caption in the window if the name of the edit
+cell has changed.
+Clears the modified bit in the cd_flags.
+
+CmdSee --
+---------
+
+This procedure is used to enable or disable display of certain
+things on the screen.
+
+Usage:
+see [no] stuff
+
+Stuff consists of mask layers or the keyword "allSame"
+
+Results:
+None.
+
+Side effects:
+The indicated mask layers are enabled or disabled from being
+displayed in the current window.
+
+CmdSelect --
+------------
+
+Implement the "select" command.
+
+Usage:
+select [option args]
+
+Results:
+None.
+
+Side effects:
+The current selection is modified.  See the user documentation
+for all the possible things this command can do.
+
+CmdSideways --
+--------------
+
+Implement the "sideways" command.
+
+Usage:
+sideways
+
+Results:
+None.
+
+Side effects:
+The selection and box are flipped left-to-right, using the
+center of the selection as the axis for flipping.
+
+CmdStartRsim
+------------
+
+This command starts Rsim under Max, escapes Rsim, and returns
+back to Max.
+
+Results:
+Rsim is forked from Max.
+
+Side effects:
+None.
+
+CmdSimCmd
+---------
+
+Applies the given rsim command to the currently selected nodes.
+
+Results:
+Whatever rsim replys to the commands input.
+
+Side effects:
+None.
+
+CmdStretch --
+-------------
+
+Implement the "stretch" command.
+
+Usage:
+stretch [-g] [direction [distance]]
+
+Results:
+None.
+
+Side effects:
+Moves everything that's currently selected, erases material that
+the selection would sweep over, and fills in material behind the
+selection.
+
+CmdParseLayers --
+-----------------
+
+Convert a string specifying a collection of layers into a TileTypeBitMask
+representing the layers specified.
+
+A special layer, '$', refers to all tile types underneath the point
+tool, except for the DRC "CHECKxxx" types.
+
+The layer '*' refers to all tile types except for "check-this" and
+the label and cell pseudo-types.
+
+Results:
+TRUE on success, FALSE if any layers are unrecognized.
+
+Side effects:
+Prints an error message if any layers are unrecognized.
+Sets bits in 'mask' according to layers in layer specification.
+Leaves 'mask' set to 0 if any layers are unrecognized.
+
+Eventually, this routine should return a "minimal" TileTypeBitMask,
+ie, one with the minimum number of bits set consistent with the
+string supplied it.
+
+CmdGetRootPoint --
+------------------
+
+Get the window containing the point tool, and return (in root cell
+coordinates for that window) the coordinates of the point, and of
+a minimum-grid-size rectangle enclosing the point.
+
+Results:
+Pointer to window containing the point tool, or NULL if the
+point tool is not present.
+
+Side effects:
+Sets *point to be the coordinates of the point tool in root
+coordinates, and *rect to be the minimum-grid-size enclosing
+rectangle.
+
+Prints an error message if the point is not found.
+
+If either arg is null pointer, it is not set.
+
+CmdGetEditPoint --
+------------------
+
+Get the window containing the point tool, and return (in edit cell
+coordinates for that window) the coordinates of the point, and of
+a minimum-grid-size rectangle enclosing the point.
+
+Results:
+Pointer to window containing the point tool, or NULL if the
+point tool is not present.
+
+Side effects:
+Sets *point to be the coordinates of the point tool in edit
+coordinates, and *rect to be the minimum-grid-size enclosing
+rectangle.
+
+If either arg is null pointer, it is not set.
+
+CmdGetSelectedCell --
+---------------------
+
+This procedure returns a pointer to the selected cell.
+
+Results:
+The return value is a pointer to the selected cell.  If more
+than one cell is selected, the upper-leftmost cell is returned.
+If no cell is selected, NULL is returned.
+
+Side effects:
+If pTrans isn't NULL, the area it points to is modified to hold
+the transform from coords of the selected cell to root coords.
+
+CmdIllegalChars --
+------------------
+
+Checks a string for any of a number of illegal characters.
+If any is found, it's printed in an error message.
+
+Results:
+TRUE is returned if any of the characters in "illegal" is
+also in "string", or if "string" contains any control or
+non-ASCII characters.	Otherwise, FALSE is returned.
+
+Side effects:
+None.
+
+CmdUnexpand --
+--------------
+
+Implement the "unexpand" command.
+
+Usage:
+unexpand
+
+Results:
+None.
+
+Side effects:
+Unexpands all cells under the box that don't completely
+contain the box.
+
+CmdUpsidedown --
+----------------
+
+Implement the "upsidedown" command.
+
+Usage:
+upsidedown
+
+Results:
+None.
+
+Side effects:
+The box and verything in the selection are flipped upside down
+using the point as the axis around which to flip.
+
+CmdCoord --
+-----------
+
+Show the coordinates of various things:
+Point tool		edit coords, root coords, curr coords
+Box tool		edit coords, root coords, curr coords
+Edit cell bounding box	edit coords, root coords
+Root cell bounding box	edit coords, root coords
+Curr cell bounding box	curr coords, root coords
+
+Results:
+None.
+
+Side effects:
+None.
+
+CmdExtractTest --
+-----------------
+
+Debugging of circuit extraction.
+
+Usage:
+*extract cmd [args]
+
+Results:
+None.
+
+Side effects:
+See comments in ExtractTest() in extract/ExtTest.c for details.
+
+CmdShowtech --
+--------------
+
+Usage:
+
+showtech [outfile]
+
+Display all the internal technology tables.
+
+Results:
+None.
+
+Side effects:
+May write to a disk file.
+
+CmdTilestats --
+---------------
+
+Generate statistics on tile utilization.
+The output is either to the terminal or to the file supplied.
+Usage:
+*tilestats -a [file]	to generate statistics for all cells
+*tilestats [file]	to generate statistics for the currently
+selected cell.
+
+If the argument 'file' is specified, it is created to hold the
+output of the *tilestats command.
+
+Results:
+None.
+
+Side effects:
+May create a disk file.
+
+CmdPsearch --
+-------------
+
+Run point search a number of times the point at the lower-left
+corner of the box tool to each point in the edit cell.
+
+Usage:
+psearch plane count
+
+Where plane is the name of the plane on which the search is to be
+carried out, and count is the number of searches to be performed.
+
+Results:
+None.
+
+Side effects:
+None.
+
+CmdWatch --
+-----------
+
+Enable/disable watching of tile planes in the given window.
+
+Results:
+None.
+
+Side effects:
+Causes the display package to display the actual tile structure
+for a given plane, or disables such display.
+

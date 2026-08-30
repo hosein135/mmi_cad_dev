@@ -1,0 +1,387 @@
+// ************************************************************************
+// 
+// Copyright (c) 1995-2002 Juniper Networks, Inc. All rights reserved.
+// 
+// Permission is hereby granted, without written agreement and without
+// license or royalty fees, to use, copy, modify, and distribute this
+// software and its documentation for any purpose, provided that the
+// above copyright notice and the following three paragraphs appear in
+// all copies of this software.
+// 
+// IN NO EVENT SHALL JUNIPER NETWORKS, INC. BE LIABLE TO ANY PARTY FOR
+// DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+// ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+// JUNIPER NETWORKS, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+// DAMAGE.
+// 
+// JUNIPER NETWORKS, INC. SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+// NON-INFRINGEMENT.
+// 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND JUNIPER
+// NETWORKS, INC. HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
+// UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+// 
+// ************************************************************************
+
+
+
+/*
+ * DBcellselect.c --
+ *
+ * Cell selection.
+ *
+ *     ********************************************************************* 
+ *     * Copyright (C) 1985, 1990 Regents of the University of California. * 
+ *     * Permission to use, copy, modify, and distribute this              * 
+ *     * software and its documentation for any purpose and without        * 
+ *     * fee is hereby granted, provided that the above copyright          * 
+ *     * notice appear in all copies.  The University of California        * 
+ *     * makes no representations about the suitability of this            * 
+ *     * software for any purpose.  It is provided "as is" without         * 
+ *     * express or implied warranty.  Export of this software outside     * 
+ *     * of the United States of America may require an export license.    * 
+ *     *********************************************************************
+ */
+
+/* MHA TODO:  seems like this should be in the select module!? */
+
+#include <stdio.h>
+#include "magic.h"
+#include "database.h"
+#include "databaseInt.h"
+#include "geometry.h"
+#include "tile.h"
+#include "hash.h"
+#include "database.h"
+#include "databaseInt.h"
+#include "utils.h"
+
+struct selectArg
+{
+    int			 csa_xmask;	/* Only the contents of uses whose
+					 * expand masks match csa_xmask are
+					 * visible.
+					 */
+    CellUse		*csa_lastuse;	/* Last cell selected */
+    Point		 csa_lastp;	/* X, Y indices of csa_lastuse */
+    bool		 csa_sawlast;	/* TRUE if csa_lastuse has been visited
+					 * in this pass.
+					 */
+    CellUse		*csa_retuse;	/* Cell we will return as selected */
+    CellUse		*csa_bestuse;	/* Best candidate seen in this pass */
+    Point		*csa_bestp;	/* X, Y indices of csa_bestuse */
+    Transform		*csa_besttrans;	/* Points to a Transform that will be
+					 * set to the transform from the parent
+					 * of csa_bestuse to the root use.
+					 */
+    TerminalPath	*csa_bestpath;	/* Pathname of best candidate found */
+    TerminalPath	 csa_curpath;	/* Current candidate's pathname */
+};
+
+/* Forward declarations */
+int dbSelectCellSr(register SearchContext *scx, register struct selectArg *arg);
+
+/*
+ * ----------------------------------------------------------------------------
+ *
+ * DBSelectCell --
+ *
+ * Select the next cell containing a given point.
+ *
+ * Results:
+ *	Returns a pointer to the next CellUse containing the given
+ *	point, or NULL if we have visited all CellUses containing it.
+ *	The ordering of CellUses visited is smallest in area to largest.
+ *	Both expanded cells, and unexpanded cells all of whose parents
+ *	are expanded, are returned.
+ *
+ * Side effects:
+ *	Sets *transform to be the transform from coordinates of
+ *	the CellUse's definition to those of the root cell use.
+ *	Sets *selp to be the x and y array indices of the selected cell.
+ *	Returns path in the argument "tpath".
+ *
+ * ----------------------------------------------------------------------------
+ */
+
+CellUse *
+DBSelectCell(CellUse *rootUse, 
+                     		/* Root cell use for the search (usually
+				 * that of the window containing the point
+				 * tool).  The pathname we construct into
+				 * tpath will be relative to this use.
+				 */
+	     CellUse *lastUse, 
+                     		/* Pointer to last CellUse returned by
+				 * DBSelectCell().  This is only used when
+				 * stepping through multiple overlapping
+				 * cells.
+				 */
+	     Point *lastP, 
+                 		/* X, Y array indices of last cell selected */
+	     Rect *rootRect, 
+                   		/* Box around point tool in coordinates of
+				 * the parent def of rootUse.
+				 */
+	     int xMask, 
+              			/* Expand bit mask for determining whether
+				 * a cell is expanded or not.
+				 */
+	     Transform *transform, 
+                         	/* Transform set by DBSelectCell, from
+				 * coordinates of the returned CellUse's
+				 * definition to those of the rootUse's
+				 * def.
+				 */
+	     Point *selp, 
+                		/* X, Y array indices of the selected cell,
+				 * also set by DBSelectCell.
+				 */
+	     TerminalPath *tpath)
+                        	/* Set to contain the use id of selected cell */
+{
+    int xlo, xhi, ylo, yhi, xbase, ybase, xsep, ysep;
+    char currentId[BUFSIZ];
+    SearchContext scontext;
+    struct selectArg arg;
+
+    arg.csa_curpath.tp_first = arg.csa_curpath.tp_next = currentId;
+    arg.csa_curpath.tp_last = &currentId[sizeof currentId - 2];
+    currentId[0] = '\0';
+
+    arg.csa_xmask = xMask;
+    arg.csa_lastp = *lastP;
+    arg.csa_sawlast = FALSE;
+    arg.csa_retuse = (CellUse *) NULL;
+    arg.csa_lastuse = (CellUse *) NULL;
+
+    /*
+     * Sanity check in case lastUse has somehow been freed
+     * prior to our being called.
+     */
+    if (lastUse && lastUse->cu_def)
+	arg.csa_lastuse = lastUse;
+
+    arg.csa_besttrans = transform;
+    arg.csa_bestp = selp;
+    arg.csa_bestuse = (CellUse *) NULL;
+    arg.csa_bestpath = tpath;
+
+    scontext.scx_use = rootUse;
+    scontext.scx_area = *rootRect;
+
+    if(!DBIsArray(rootUse))
+    {
+      scontext.scx_x = 0;
+      scontext.scx_y = 0;
+      scontext.scx_trans = GeoIdentityTransform;
+      dbSelectCellSr(&scontext, &arg);
+    }
+    else
+    {
+      DBArrayOverlap(rootUse, rootRect, &xlo, &xhi, &ylo, &yhi);
+
+      xsep = (rootUse->cu_xlo>rootUse->cu_xhi)?
+	-rootUse->cu_xsep : rootUse->cu_xsep;
+      ysep = (rootUse->cu_ylo>rootUse->cu_yhi)?
+	-rootUse->cu_ysep : rootUse->cu_ysep;
+
+      for (scontext.scx_y = ylo; scontext.scx_y <= yhi; scontext.scx_y++)
+      {
+	for (scontext.scx_x = xlo; scontext.scx_x <= xhi; scontext.scx_x++)
+	{
+	  xbase = xsep * (scontext.scx_x - rootUse->cu_xlo);
+	  ybase = ysep * (scontext.scx_y - rootUse->cu_ylo);
+	  GeoTransTranslate(xbase, 
+			    ybase, 
+			    &GeoIdentityTransform,
+			    &scontext.scx_trans);
+	  dbSelectCellSr(&scontext, &arg);
+	  if (arg.csa_retuse != (CellUse *) NULL) break;
+	}
+      }
+    }
+
+    return (arg.csa_bestuse);
+}
+
+/*
+ * Sets arg->csa_retuse if we've found the next use.  This enables us
+ * to short-circuit the remainder of the tree search (it has now been
+ * changed to abort the search).
+ *
+ * Sets arg->csa_bestuse to point to the best candidate yet found
+ * for being the next CellUse.  Sets arg->csa_sawlast to TRUE once
+ * arg->csa_lastuse has been seen.
+ */
+
+int
+dbSelectCellSr(register SearchContext *scx, register struct selectArg *arg)
+                                	/* Context describing the cell use, the
+					 * x and y array element under consider-
+					 * ation, the area surrounding the
+					 * selection point in coordinates of
+					 * the def of the cell use, and a
+					 * transform back to the "root".
+					 */
+                                   	/* Client data */
+{
+    double childArea, bestArea, lastArea;
+    TerminalPath *cpath = &arg->csa_curpath;
+    char *savenext;
+    Rect *pbx;
+    int n;
+
+    /*
+     * If we have already found the (use, element) to be returned,
+     * prune the search short.
+     */
+    if (arg->csa_retuse != (CellUse *) NULL)
+	return 1;
+
+    /*
+     * If this was the (use, element) last returned by DBSelectCell,
+     * we can prune the search not to look at any of its subcells.
+     * Since the area of a parent must be at least as great as the
+     * area of any of its subcells, these subcells must have already
+     * been returned by a previous call to DBSelectCell.
+     */
+    if (scx->scx_use == arg->csa_lastuse
+	    && scx->scx_x == arg->csa_lastp.p_x
+	    && scx->scx_y == arg->csa_lastp.p_y)
+    {
+	arg->csa_sawlast = TRUE;
+	return 0;
+    }
+
+    pbx = DBBBoxCellDef(scx->scx_use->cu_def);
+    if (!GEO_OVERLAP((pbx), (&scx->scx_area)))
+	return 0;
+
+    /* compute childArea */
+    {
+        double xDiff, yDiff;
+
+	xDiff = pbx->r_xtop - pbx->r_xbot;
+	yDiff = pbx->r_ytop - pbx->r_ybot;
+	childArea = xDiff*yDiff;
+    }
+
+    /* Append the use identifier of this instance to the current path */
+    savenext = arg->csa_curpath.tp_next;
+    if (cpath->tp_next != cpath->tp_first)
+      *cpath->tp_next++ = '\0';
+    n = cpath->tp_last - cpath->tp_next;
+    cpath->tp_next = DBSrPrintUseId(scx, cpath->tp_next, n);
+
+    /*
+     * Visit all the children of the def for this use first.
+     * If, during the visiting of any of these, we get a non-NULL
+     * arg->csa_retuse value, we can return immediately.
+     */
+    if (DBIsExpand(scx->scx_use, arg->csa_xmask))
+    {
+	(void) DBSrChildren(scx, dbSelectCellSr, (ClientData) arg);
+	if (arg->csa_retuse != (CellUse *) NULL)
+	{
+	    cpath->tp_next = savenext;
+	    *savenext = '\0';
+	    return 1;
+	}
+    }
+
+    if (arg->csa_lastuse != (CellUse *) NULL)
+    {
+	pbx = DBBBoxCellDef(arg->csa_lastuse->cu_def);
+
+	/* compute lastArea */
+	{
+	    double xDiff, yDiff;
+	  
+	    xDiff = pbx->r_xtop - pbx->r_xbot;
+	    yDiff = pbx->r_ytop - pbx->r_ybot;
+	    lastArea = xDiff * yDiff;
+	}
+    }
+    else
+	lastArea = 0.0;
+
+    if (arg->csa_sawlast)
+    {
+	/*
+	 * We have found a cell with the same area as the last cell
+	 * selected, later in the search tree than the last one.
+	 * We cut the search short and return this immediately.
+	 */
+        if (childArea == lastArea)
+	{
+	    arg->csa_bestp->p_x = scx->scx_x;
+	    arg->csa_bestp->p_y = scx->scx_y;
+	    arg->csa_retuse = arg->csa_bestuse = scx->scx_use;
+	    *arg->csa_besttrans = scx->scx_trans;
+
+	    /* Copy current path into best path */
+	    n = arg->csa_bestpath->tp_last - arg->csa_bestpath->tp_next;
+	    strncpy(arg->csa_bestpath->tp_next, cpath->tp_first, n);
+	    arg->csa_bestpath->tp_next[n] = '\0';
+
+	    /* Pop last component of current path */
+	    cpath->tp_next = savenext;
+	    *savenext = '\0';
+
+	    /* Abort the search */
+	    return 1;
+	}
+    }
+
+    /*
+     * We only update our best guess if this cell is larger than
+     * the last one selected.  This has the effect of ignoring all
+     * cells already returned by DBSelectCell in previous calls.
+     *
+     * This one might be okay.  It is larger than the previous one, but
+     * there may be a smaller one to do first.
+     */
+    
+    if ( childArea > lastArea)
+    {
+	if (arg->csa_bestuse != (CellUse *) NULL)
+	{
+	    pbx = DBBBoxCellDef(arg->csa_bestuse->cu_def);
+	    /* compute bestArea */
+	    {
+	        double xDiff, yDiff;
+	  
+		xDiff = pbx->r_xtop - pbx->r_xbot;
+		yDiff = pbx->r_ytop - pbx->r_ybot;
+		bestArea = xDiff * yDiff;
+	    }
+	    if (childArea >= bestArea)
+	    {
+		/* Too big: pop last component of current path */
+		cpath->tp_next = savenext;
+		*savenext = '\0';
+
+		/* Keep going */
+		return 0;
+	    }
+	}
+	arg->csa_bestp->p_x = scx->scx_x;
+	arg->csa_bestp->p_y = scx->scx_y;
+	arg->csa_bestuse = scx->scx_use;
+	*arg->csa_besttrans = scx->scx_trans;
+
+	/* Copy current path into best path */
+	n = arg->csa_bestpath->tp_last - arg->csa_bestpath->tp_next;
+	strncpy(arg->csa_bestpath->tp_next, cpath->tp_first, n);
+	arg->csa_bestpath->tp_next[n] = '\0';
+    }
+
+    /* Pop last component of current path */
+    cpath->tp_next = savenext;
+    *savenext = '\0';
+
+    return 0;
+}

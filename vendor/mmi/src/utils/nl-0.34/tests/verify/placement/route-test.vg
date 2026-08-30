@@ -1,0 +1,32 @@
+module sub1 (a, z);
+  input a;
+  output z;
+
+  wire x;
+
+  assign x = a;
+
+  MMI_INVB u1 (.in(x), .out(z));
+
+endmodule
+
+
+module sub2 (a, z);
+  input a;
+  output z;
+
+  assign z = a;
+
+endmodule
+
+
+module top (p, q);
+  input p;
+  output q;
+
+  wire y;
+
+  sub1 sub1 (.a(p), .z(y));
+
+  sub2 sub2 (.a(y), .z(q));
+endmodule

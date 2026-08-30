@@ -1,0 +1,133 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_AO31C {} {
+  make global -name gnd -origin {0 100}
+  make global -name gnd -origin {250 300}
+  make global -orient RY -name vdd -origin {0 -200}
+  make output -name out -origin {540 0}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -orient RY -name vdd -origin {500 -200}
+  make input -name in0 -origin {-90 -60}
+  make input -name in1 -origin {-90 -160}
+  make input -name in2 -origin {-90 160}
+  make input -name in3 -origin {-90 260}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {370 0}
+  make MMI_AO31C -origin {680 -340}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 3.08 -WN 1.54 -origin {450 0}
+  make nmos -W 0.52 -origin {0 60}
+  make nmos -W 1.56 -origin {250 60}
+  make nmos -W 1.56 -origin {250 160}
+  make nmos -W 1.56 -origin {250 260}
+  make pmos -W 2.08 -origin {0 -60}
+  make pmos -W 2.08 -origin {0 -160}
+  make pmos -W 2.08 -origin {250 -160}
+  make pmos -W 2.08 -origin {500 -160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {180 460}
+  make_wire 0 20 0 0
+  make_wire 0 -20 0 0
+  make_wire 0 0 250 0
+  make_wire 250 20 250 0
+  make_wire 0 -120 0 -100
+  make_wire 250 120 250 100
+  make_wire 250 -120 250 -100
+  make_wire 0 -100 250 -100
+  make_wire 250 220 250 200
+  make_wire 500 -120 500 -100
+  make_wire 250 -100 500 -100
+  make_wire 500 0 540 0
+  make_wire -70 -60 -70 60
+  make_wire -70 60 -60 60
+  make_wire -70 -60 -60 -60
+  make_wire -70 -60 -90 -60
+  make_wire -60 -160 -90 -160
+  make_wire -60 -160 80 -160
+  make_wire 80 60 190 60
+  make_wire 80 -160 80 60
+  make_wire 160 160 160 -160
+  make_wire 160 -160 190 -160
+  make_wire 160 160 190 160
+  make_wire 160 160 -90 160
+  make_wire 190 260 -90 260
+  make_wire 190 260 330 260
+  make_wire 330 260 330 -160
+  make_wire 330 -160 440 -160
+  make_wire 370 0 250 0
+  make_wire 370 0 420 0
+  make_text -origin {-130 -310} -text {AND-OR 3,1 Gate}
+  make_text -origin {-130 -290} -text {C Size}
+  make_text -origin {-130 -330} -text MMI_AO31C -size large
+}
+
+proc ICON_MMI_AO31C args {
+  set size C
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_AO31 icon body
+  if {$DeMorgan} {
+    # or
+    icon_line -88 -10 -40 -10
+    icon_line -88 50 -40 50
+    icon_arc -100 -10 10 130 -start 35 -extent 50
+    icon_arc -100 -90 10 50 -start 275 -extent 50
+    icon_arc -98 -10 -78 50 -start 270 -extent 180
+    # and
+    icon_line 50 -30 0 -30 0 30 50 30
+    icon_arc 10 -30 80 30 -start 277 -extent 166
+    # bubbles and stubs
+    icon_line -100 -30 -20 -30
+    icon_arc -100 30 -80 50 -start 0 -extent 359
+    icon_arc -100 30 -80 10 -start 0 -extent 359
+    icon_arc -100 -10 -80 10 -start 0 -extent 359
+    icon_arc 80 -10 100 10 -start 0 -extent 359
+    icon_arc -20 -40 0 -20 -start 0 -extent 359
+    # properties
+    icon_property -origin {3 -22} -size small -label F
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  } else {
+    # or
+    icon_line -10 -30 40 -30
+    icon_line -10 30 40 30
+    icon_arc -20 -30 90 110 -start 35 -extent 50
+    icon_arc -20 -110 90 30 -start 275 -extent 50
+    icon_arc -20 -30 0 30 -start 270 -extent 180
+    # and
+    icon_line -40 -10 -80 -10 -80 50 -40 50
+    icon_arc -80 -10 -10 50 -start 277 -extent 166
+    # stubs
+    icon_line -100 -30 -10 -30
+    icon_line -100 0 -80 0
+    icon_line -100 20 -80 20
+    icon_line -100 40 -80 40
+    icon_line 80 0 100 0
+    # properties
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {0 -22} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  }
+  # inputs
+  icon_term -type input -origin {-100 -30} -name in0
+  icon_term -type input -origin {-100 0} -name in1
+  icon_term -type input -origin {-100 20} -name in2
+  icon_term -type input -origin {-100 40} -name in3
+  # outputs
+  icon_term -type output -origin {100 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_AO31C
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .in2(\$\{in2\}), .in3(\$\{in3\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

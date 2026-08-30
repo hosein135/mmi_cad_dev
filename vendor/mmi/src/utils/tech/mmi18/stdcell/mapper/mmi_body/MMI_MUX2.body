@@ -1,0 +1,26 @@
+  # MMI_MUX2 icon body
+  icon_line -40 -70 -40 70 40 30 40 -30 -40 -70
+
+  if {$DeMorgan} {
+    icon_arc -60 -20 -40 -40 -start 0 -extent 359
+    icon_arc -60 20 -40 40 -start 0 -extent 359
+    icon_arc 60 -10 40 10 -start 0 -extent 359
+  } else {
+    icon_line -60 -30 -40 -30
+    icon_line -60 30 -40 30
+    icon_line 60 0 40 0
+  }
+
+  # properties
+  icon_property -origin {-37 -30} -size small -label 0 
+  icon_property -origin {0 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 -30} -name in0
+  icon_term -type input -origin {-60 30} -name in1
+  icon_term -type input -origin {0 50} -orient R270 -name sel
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+

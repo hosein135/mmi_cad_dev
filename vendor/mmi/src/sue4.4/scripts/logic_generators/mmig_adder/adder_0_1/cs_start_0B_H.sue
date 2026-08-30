@@ -1,0 +1,88 @@
+# SUE version MMI_SUE4.0x
+
+proc SCHEMATIC_cs_start_0B_H {} {
+  make output -orient RY -name Sum_H -origin {1200 650}
+  make input -orient RY -name A_H -origin {110 460}
+  make input -orient RY -name B_H -origin {110 500}
+  make output -orient R90Y -name Cout1_H -origin {460 180}
+  make output -orient R90Y -name Cout0_H -origin {730 180}
+  make XNOR2A -orient RY -origin {220 620}
+  generate row_spanner row_spanner100 -width 100
+  make row_spanner100 -origin {1050 1110}
+  make row_spanner100 -origin {210 1110}
+  make row_spanner100 -origin {480 1110}
+  make input -orient R270 -name Cin_H -origin {1100 930}
+  make output -orient R270 -name SelCO_H -origin {1100 180}
+  make cs_start_0B_H -origin {140 230}
+  make row_spanner100 -origin {720 1110}
+  make BUFB -orient R270 -origin {1100 830}
+  make INVA_ -origin {490 680}
+  make name_net -name G_L -origin {360 480}
+  make name_net -name K_H -origin {360 550}
+  make name_net -name Sum1_H -origin {730 620}
+  make name_net -name Sum0_H -origin {730 680}
+  make INVC_ -orient R270 -origin {730 350}
+  make INVC_ -orient R270 -origin {460 350}
+  make NAND2B -orient RY -origin {210 480}
+  make NOR2B_ -orient RY -origin {190 550}
+  make MUX2B -orient RY -origin {1000 650}
+  make sccs_title_bar -owner emc -version 1.4 -date 01/08/99 -origin {420 1270}
+  make_wire 110 500 140 500
+  make_wire 140 500 190 500
+  make_wire 110 460 160 460
+  make_wire 160 460 190 460
+  make_wire 460 180 460 300
+  make_wire 410 680 460 680
+  make_wire 410 620 410 680
+  make_wire 460 380 460 550
+  make_wire 1020 650 1200 650
+  make_wire 730 180 730 300
+  make_wire 730 380 730 480
+  make_wire 1100 900 1100 930
+  make_wire 1000 900 1100 900
+  make_wire 1100 900 1100 860
+  make_wire 1000 900 1000 690
+  make_wire 1100 800 1100 180
+  make_wire 730 680 540 680
+  make_wire 730 680 980 680
+  make_wire 360 550 460 550
+  make_wire 360 480 280 480
+  make_wire 360 480 730 480
+  make_wire 410 620 730 620
+  make_wire 730 620 980 620
+  make_wire 260 550 360 550
+  make_wire 160 530 170 530
+  make_wire 140 570 170 570
+  make_wire 160 600 180 600
+  make_wire 160 460 160 530
+  make_wire 160 530 160 600
+  make_wire 140 640 180 640
+  make_wire 140 500 140 570
+  make_wire 140 570 140 640
+  make_wire 290 620 410 620
+}
+
+proc ICON_cs_start_0B_H args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout1_H
+  icon_term -type output -origin {-20 -120} -orient R270 -name Cout0_H
+  icon_term -type input -origin {-40 120} -orient R90Y -name Cin_H
+  icon_term -type output -origin {140 -80} -orient RY -name SelCO_H
+  icon_property -origin {-40 220} -type user -name name
+  icon_property -origin {-40 240} -type user -name M
+  icon_property -origin {-40 260} -type user -name pad
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin_H
+  icon_property -origin {-40 -110} -rotate 1 -label Cout1_H
+  icon_property -origin {-20 -110} -rotate 1 -label Cout0_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label cs_start_0B_H
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {130 -80} -anchor e -label SelCO_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+}
+

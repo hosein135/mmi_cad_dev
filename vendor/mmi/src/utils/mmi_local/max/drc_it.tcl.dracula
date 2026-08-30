@@ -1,0 +1,257 @@
+# drc_it.tcl
+
+# This tcl procedure will run Cadence Dracula DRC on the current
+# cell and overlay the resultant error boxes on the cell.
+
+# requires the script drc_it.
+
+# type "drc_it view" on the command line to reread the last DRC
+# run error data.
+
+# The global variables below should be set in you .maxrc file.
+
+# server to run dracula drc
+#set DRC(SERVER) arsenic
+# drc deck location for error annotation
+#set DRC(DRC_DECK) /home/cad/drc/drc.deck
+# don't add any rules in this list to the feedback errors.
+#set DRC(IGNORE_RULES) "G601AA55"
+
+# if viewtype is feedback, this will convert all drc errors
+# to max feedback errors with error info annotation.
+set DRC(VIEW_TYPE) [use_first DRC(VIEWTYPE) 'feedback]
+# in feedback viewtype with combine set to 1 it will combine
+# multiple connected errors on the same error type.
+set DRC(COMBINE) [use_first DRC(COMBINE) '1]
+
+proc drc_it {{view_only ""}} -desc {
+  runs cadence dracula drc on the current cell
+} {
+  global DRC CELL
+
+  set cell [lay_rootcell]
+
+  if {$cell == "(UNNAMED)"} {
+    msg "Aborting, drc_it won't work with an unnamed cell.\n"
+    return
+  }
+
+  # find the directory
+  set dir [file dirname [lindex [cell_info $cell] 1]]
+
+  if {$view_only == ""} {
+    puts "Writing gds for cell \"$cell\" ..."
+    # write out the gds for the current cell
+    :calma write $cell
+
+    # run drc_it
+    puts "Starting dracula DRC on server $DRC(SERVER) ..."
+    exec rsh -n $DRC(SERVER) "cd $dir ; drc_it $cell" >& [exec tty]
+    puts "Dracula DRC completed."
+  }
+
+  # read in the gds error cells
+  puts "Reading gds \"${cell}_DRAC$CELL(gds_suffix)\" ..."
+  if {[msg_catch "gds_read $dir/${cell}_DRAC$CELL(gds_suffix)" \
+	   errorcell info warn]} {
+    puts $errorcell
+    set errorcell ""
+    puts $info
+    puts $warn
+  }
+
+  if {$errorcell == ""} {
+    set errorcell "OUT$cell"
+  }
+
+  if {$DRC(VIEW_TYPE) == "feedback"} {
+    display_drc_as_feedback $cell $errorcell
+  } else {
+    display_drc $cell $errorcell
+  }
+
+  puts "done."
+}
+
+
+# could have used a :getcell $errorcell child 0 0 paren 0 0
+
+proc display_drc {cell errorcell} {
+
+  puts "Placing DRC errors in current cell..."
+
+  # this bogosity to to find where the absolute coordinate is
+  if {[msg_catch ":load $errorcell"] == 1} {
+    # error
+    puts "Aborting, can't find cell \"$errorcell\"."
+    return
+  }
+
+  setl {x y} [lay_bbox]
+
+  :load $cell
+
+  # now place the error cell at the origin
+  lay_box $x $y $x $y
+
+  if {[msg_catch ":getcell $errorcell"] == 1} {
+    # error
+    puts "Aborting, can't find cell \"$errorcell\"."
+  }
+}
+
+
+# Also deletes the DRC cells
+
+proc display_drc_as_feedback {cell errorcell} {
+
+  global DRC_ERRORS DRC
+
+  puts "Converting DRC errors to feedback..."
+
+  if {[msg_catch ":load $errorcell"] == 1} {
+    # error
+    puts "Aborting, can't find cell \"$errorcell\"."
+    return
+  }
+
+  if {![info exists DRC_ERRORS]} {
+    make_drc_error_names
+  }
+
+  eval lay_box [lay_bbox]
+  :select area 
+
+  # goto each error instance cell
+  set cell_count 0
+  set error_count 0
+  set error_boxes ""
+
+  foreach instance [split [sel_what cells] \n] {
+    set inst_name [lindex $instance 1]
+    if {[lsearch $DRC(IGNORE_RULES) $inst_name] != -1} {
+      puts "Ignoring errors of type \"$inst_name\" [use_first DRC_ERRORS($inst_name)]"
+      continue
+    }
+
+    :load $inst_name
+    catch {unset region}
+    incr cell_count
+
+    # show the user the error types and explanations
+    puts "  $inst_name = [use_first DRC_ERRORS($inst_name)]"
+
+    
+    eval lay_box [lay_bbox]
+    :select area 
+
+    if {$DRC(COMBINE)} {
+      # combine boxes.  Less errors but can lose shape
+      foreach paint [split [sel_what paint] \n] {
+	setl {layer x1 y1 x2 y2} $paint
+	sel_region -point $x1 $y1 $layer
+	set paint_list [sel_what paint]
+	if {[info exists region($paint_list)]} {
+	  # already got this one
+	  continue
+	}
+	# got a new error
+	set region($paint_list) 1
+
+	incr error_count
+	# now need to get boundary of this region
+	set minx $x1
+	set miny $y1
+	set maxx $x2
+	set maxy $y2
+	foreach paint2 [split $paint_list \n] {
+	  setl {layer x1 y1 x2 y2} $paint2
+	  set minx [min $minx $x1]
+	  set miny [min $miny $y1]
+	  set maxx [max $maxx $x2]
+	  set maxy [max $maxy $y2]
+	}
+
+	lappend error_boxes \
+	    "$layer $minx $miny $maxx $maxy $inst_name: [use_first DRC_ERRORS($inst_name)]"
+      }
+    } else {
+      # don't combine boxes
+      foreach paint [split [sel_what paint] \n] {
+	incr error_count
+	lappend error_boxes \
+	    "$paint $inst_name: [use_first DRC_ERRORS($inst_name)]"
+      }
+    }
+
+    # now toast this cell
+    db_cell_delete
+    undo_flush
+    edit_stack_clear
+  }
+
+  # now toast this cell
+  :load $errorcell
+  db_cell_delete
+  undo_flush
+  edit_stack_clear
+
+  # return to the layout cell and add feedback layers
+  :load $cell
+  :feedback clear
+
+  foreach box $error_boxes {
+    eval lay_box [lrange $box 1 4]
+    :feedback add [lrange $box 5 end]
+  }
+
+  if {$error_count == 0} {
+    puts "$cell is DRC clean!"
+  } else {
+    puts "Cell \"$cell\" has $error_count drc errors in $cell_count error cells."
+  }
+}
+
+
+# reads in the drc deck and tries to figure out the rules in english
+
+proc make_drc_error_names {} {
+
+  global DRC DRC_ERRORS
+
+  if {[catch "open $DRC(DRC_DECK) r" FILE_ID]} {
+    # error
+    puts "Warning, can't read drc rules file: $FILE_ID"
+    return
+  } 
+
+  puts "parsing $DRC(DRC_DECK) ..."
+  # parses something of the form
+
+  # enc[t] v1m3 M2 lt 0.10 output G575B 55
+  # ; V1 must be within M2 >= 0.10
+
+  while {[gets $FILE_ID line] >= 0} {
+    set line [string trim $line]
+    if {[set pos [string first " output " $line]] == -1} {
+      continue
+    }
+
+    set error_code [string range $line [expr $pos + 8] end]
+    regsub " " $error_code "" error_code
+
+    # assume the next line is a comment with the english description
+    gets $FILE_ID line
+    set line [string trim $line]
+
+    if {[string first \; $line] == 0} {
+      # yes this fits the pattern, remember it
+      set DRC_ERRORS($error_code) [string trim [string range $line 1 end]]
+      # remember as all upper case, also
+      set DRC_ERRORS([string toupper $error_code]) $DRC_ERRORS($error_code)
+    }
+  }
+
+  # close the file
+  close $FILE_ID
+}

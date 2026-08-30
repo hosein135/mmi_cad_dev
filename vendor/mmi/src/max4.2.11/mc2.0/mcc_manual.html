@@ -1,0 +1,2010 @@
+<html>
+
+<head>
+<title>
+MMI MCC 2.0
+</title>
+</head>
+
+<BODY BGCOLOR="ffffff" >
+
+<h1>
+<img src="images/MMI_logo.gif" align=center>
+		MegaCell Compiler (MCC)
+		Version 2.0
+</h1>
+
+<hr>
+
+<hr>
+
+<ul>
+
+<li><h2>Contents</a></h2>
+
+<li><a href="#overview"> Overview </a>
+<li><a href="#setup">Setup </a>
+<li><a href="#running">Running MCC</a>
+<li><a href="#basics">Memory Design Basics</a>
+<li><a href="#creating">Creating Megacells</a>
+      <ul>
+	<li><a href="#tiling">Tiling:</a>
+        <li><a href="#programming">Via Programming:</a>
+        <li><a href="#propagation">Port Propagation:</a>
+      </ul>
+<li><a href="#netlisting">Netlisting </a>
+      <ul>
+	<li><a href="#spice">Spice Netlist:</a>
+        <li><a href="#verilog">Verilog Netlist:</a>
+        <li><a href="#cp">Critical Path Netlist:</a>
+      </ul>
+<li><a href="#batch">Running MCC in Batch Mode</a>
+
+</ul>
+
+<ul>
+
+<li><h2><a name="overview">Overview </a></h2>
+
+<p>
+
+The MegaCell Compiler (MCC) makes building all types of regular
+structures such as RAM's, Register Files, FIFO's, ROM's, PLA's,
+etc. fast and easy.  Throughout this manual, we will talk about
+building "memories" since those are the most common, but not only,
+structures built by the MegaCell Compiler.  For example, the MegaCell
+Compiler can also build pad rings.
+
+<p>
+
+MCC is a designer's helper.  It does not synthesize memories.  It
+enables the designer to easily generate and verify memories that have
+already been designed and the leaf cells layed out.  MCC is also fast.
+Even the largest designs are constructed in a matter of minutes.
+Typically, MCC can create memories almost as fast as it would take to
+load them from disk.
+
+<p>
+
+MCC allows the designer to parameterize the memory, i.e. build
+different sizes and configurations of the same basic memory structure
+simply by changing key parameters such as the number of rows or
+columns.  In the past, building structures that were parameterizable
+added significantly to the implementation time of the structure and
+thus was only practical if many configurations were required.  In
+contrast, parameterizing structures in MCC is so easy that designs
+where only one size is required are also parameterized.  This vastly
+speeds construction and verification, especially in large memory
+designs.  By doing all construction and verification first on a very
+small structure, the iteration time is minimized.  Only when the small
+structure passes, do you go to the full size, which typically passes
+on the first try.  Hence, parameterization helps in all but the
+smallest designs, irrespective of the number of final
+sizes/configurations desired.
+
+<p>
+
+MCC runs from MAX, giving you all the power of a full custom layer
+editor to view, edit, and modify your megacells before and after
+creation.  MCC requires both a MAX license and an MCC license in order
+to run.
+
+<p>
+
+<li><h2><a name="setup">Setup </a></h2>
+
+<p>
+
+If you have an MCC license (max_mcc), you need to enable the MCC menu
+commands with the command "mc_init".  Typically, you would add this
+command to the system .maxrc file so everyone would get it.  If only
+specific users will run MCC, you can have them add it to their own
+.maxrc files, instead.
+
+<p>
+
+The "mc_init" command adds the MCC commands to the "Tool" menu in MAX.
+All of the MCC commands are prefixed by the string "MC" for clarity.
+These commands are discussed below.  When a user attempts to execute
+any one of these commands, MAX checks that a valid MCC license is
+available, and if so, checks out that license for the remainder of the
+MAX session.  Note that the "mc_init" command by itself does NOT check
+out an MCC license.
+
+<p>
+
+<li><h2><a name="running">Running MCC</a></h2>
+
+<p>
+
+MCC provides 4 basic commands to MAX.  These are:
+
+<pre>
+	MC Build
+	MC Netlist
+	MC Critical Path
+	MC What
+</pre>
+
+<p>
+
+All of these commands can also be executed in "batch" mode or by
+scripts.  A discussion of their syntax is given in <a
+href="#batch">Running MCC in Batch Mode</a>.
+
+<p>
+
+<li><h4><a name="mcc_build">MCC Build:</a></h4>
+
+<p>
+
+The "MC Build" command tells MCC to build a megacell.  It first
+prompts you with a menu that lets you choose the name of the megacell
+to create.  This megacell must be defined and loaded into MAX through
+the control program described below in <a href="#creating">Creating
+Megacells</a>.  You can set the default megacell name by setting the
+following variable in the control program:
+
+<p>
+
+<pre>
+	set MC(default_generator) &lt;name>
+</pre>
+
+Thus if you were working on an sram you might add the line:
+
+<pre>
+	set MC(default_generator) sram
+</pre>
+
+so you wouldn't have to enter it in the menu every time you restarted
+MAX.
+
+<p>
+
+The menu also allows you to turn off via programming and/or port
+propagation.  Typically these should be turned on to create a complete
+megacell.  However, when debugging a megacell, you might want to turn
+off one or the other to speed up the megacell generation.
+
+<p>
+
+Once you have clicked on "done", a second and final menu appears which
+provides further options that are specific to the megacell you have
+chosen to generate.  The top of this menu contains a list of any
+parameters and their default values.  You can change these values
+here to create a different version of this megacell or change the
+defaults in tcl.  A description of how to set up these parameters is
+described below.
+
+<p>
+
+The bottom half of the menu (below the horizontal line) provides three
+different fields: prefix, suffix, and name.  When MCC builds a
+megacell, it typically creates a number of hierarchical cells.
+Depending on the input parameters, these cells probably contain
+different numbers of leaf cells or other hierarchical cells and thus
+need unique names.  For example, if you needed two types of srams on
+your chip, one that had 128 rows and another that had 256 rows, the
+memory cores and spine would be different between the two memories.
+The prefix and suffix fields allow you to add a prefix and suffix to
+all created cells.  The suffix defaults to the concatenation of all of
+the parameter values, separated by underscores.  Thus, in the example
+above, if you had the one parameter, ROWS, the hierarchical cells
+"memory_core" and "spine" would be named by default:
+
+<pre>
+	memory_core_256, spine_256
+</pre>
+
+for the case where ROWS=256 and
+
+<pre>
+	memory_core_128, spine_128
+</pre>
+
+for the case where ROWS=128.
+
+<p>
+
+In addition to the suffix, you might want to prefix all generated
+cells by a unique id.  This might be either the name of your company
+or the section of the chip that this megacell goes into.  To do this,
+simply change the prefix field.  For example, if these two previously
+described memories went into the instruction unit of the chip, you
+might set the prefix to be "IU_" and then the cells above would be
+named:
+
+<pre>
+	IU_memory_core_256, IU_spine_256, etc.
+</pre>
+
+Lastly, the top level cell of the megacell sometimes requires a
+special name, like ASYNC_RAM128X10 or some such, that doesn't fit with
+the prefix/suffix naming scheme.  The name field allows you to name
+this cell specially.
+
+<p>
+
+As described above, if a suffix is not specified, it defaults in the
+menu to the parameters separated by underscores.  The prefix, suffix,
+and name can also be set using the following lines:
+
+<pre>
+	set MC(&lt;megacell>,prefix) &lt;prefix>
+	set MC(&lt;megacell>,suffix) &lt;suffix>
+	set MC(&lt;megacell>,name) &lt;name>
+</pre>
+
+For example:
+
+<pre>
+	set MC(sram,prefix) IU_
+	set MC(sram,suffix) {_$ROWS}
+	set MC(sram,name) ASNYC_RAM128X10
+</pre>
+
+Note that if you have multiple parameters, you need to be careful of
+the tcl syntax.  For example if you have ROWS and COLUMNS as
+parameters and you want a suffix of the form 32X10, you need the line:
+
+<pre>
+	set MC(sram,suffix) {${ROWS}X$COLUMNS}
+</pre>
+
+The outside set of {}'s tells tcl to delay the evaluation of the
+variables.  The inside set of {}'s tells tcl that the variable is ROWS,
+not ROWSX.  The inside {}'s are also needed if an underscore replaces
+the X.
+
+<p>
+
+<li><h4><a name="mcc_netlist">MCC Netlist:</a></h4>
+
+<p>
+
+The "MCC Netlist" command will create either a spice or verilog
+netlist for the current MAX cell.  The created netlists are
+"two-level", i.e. they have a main cell that calls leaf cells.  In the
+case of spice, the leaf cells are extracted spice subckt's.  In
+verilog, they are hand built behavioral verilog modules (see <a
+href="#netlisting">Netlisting </a> below for more details).
+
+<p>
+
+The "MCC Netlist" command queries for the type of netlist and whether
+to include parasitics and/or comments (verbose mode).  If you are
+creating a spice netlist for LVS, you typically don't want parasitics,
+which you do for simulation.  Note that verilog netlisting ignores the
+parasitics switch.  The verbose mode will add comments to the netlist
+listing which text labels in the layout are attached to which nets.
+This is very handy for debugging, but otherwise makes the netlists
+very large.
+
+<p>
+
+<li><h4><a name="mcc_cp">MCC Critical Path:</a></h4>
+
+<p>
+
+The "MCC Critical Path" command creates a spice netlist of the
+circuits in the cone of logic emanating in both directions from the
+selected cell(s).  To run, you typically select the memory cell (for a
+memory) that is furthest away from the address/control inputs and then
+run "MCC Critical Path".  This command then automatically creates a
+critical path netlist of the design which is small (typically about
+1000 devices) and can be simulated to verify performance from an
+extracted layout.  The spice netlist includes R's and C's.  See the <a
+href="#cp">Critical Path Netlist</a> section below for more details.
+
+<p>
+
+<li><h4><a name="mcc_what">MC What:</a></h4>
+
+<p>
+
+the "MC What" command helps you to create the tiling programs for
+megacells.  It is not necessary to run but can help in creating tiling
+programs or converting megacells built by hand or by other tools into
+an MCC parameterized megacell.
+
+<p>
+
+The syntax for the tiler takes a little getting used to because of its
+lists-of-lists structure.  "MC What" allows you to simply drop the
+instances in a layout how you want them and "MC What" will try to
+figure out the appropriate tiling commands to create that layout.  See
+below for a description of the tiling commands.  Hence this make MCC
+more WYSIWYG.  Note that "MC What" only helps generate the tiling, it
+does not help set up via programming or port propagation (yet).
+
+<p>
+
+When you run "MC What", you get a menu with three options.  By
+default, "MC What" only creates the MACRO line for the current MAX
+cell (see <a href="#tiling">Tiling</a>) and does not descend the
+hierarchy.  If you turn on "hierarchy", "MC What" will attempt to
+create the tiling commands for that cell all the way down to leaf
+cells.  Thus if you ran "MC What" on an entire memory with hierarchy,
+you would get a complete tiling program for that memory -- if
+everything worked perfectly.  "MC What" will fail if the memory isn't
+partitioned correctly or it can't determine which cells are leaf
+cells.
+
+<p>
+
+The final two fields in the "MC What" menu are remove_prefix and
+remove_suffix.  These act like the prefix and suffix fields in the
+"MC Build" command except in reverse.  If you have a megacell that
+you are trying to decompose, you might want to strip off prefixes or
+suffixes from all hierarchical cells.  These fields allow you to do just
+that.
+
+<p>
+
+Note that "MC What" does not necessarily create the best way to build
+a megacell -- often times you can group things better than it can.
+Furthermore, "MC What" will not figure out when to add "TOP" or any
+other special keywords.  Also, in this version, "MC What" ignores any
+spaces between abutment boundaries of cells.
+
+<p>
+
+<li><h2><a name="basics">Memory Design Basics</a></h2>
+
+<p>
+
+Typically, a designer must go through four stages to create a complete
+and functional memory.
+
+<p>
+
+1. Design the memory.  This includes picking a memory architecture
+that meets the design goals, choosing the circuit structures, and sizing
+the circuits.  Typically, the designer generates a "design" schematic
+that includes the main critical path of the memory with estimated
+loadings and wire resistances.  Key components, in particular the memory
+cell, are layed out at this stage to help in estimating parasitics and
+determining key device sizes.  Since the "design" schematic only
+contains the critical path, simulating with HSPICE or other
+device-level simulators is quick and the design can be quickly
+iterated to yield the desired goals.
+
+<p>
+
+SUE crossprobing to the NST waveform viewer is ideal for this stage of
+the design.
+
+<p>
+
+2. Layout the leaf cells.  Except for the memory cell, all leaf cells
+are typically layed out once the design is complete.  The cells must
+all pitch match appropriately, typically to either a mutliple of the
+row height or bit pitch, depending on their position.  The abutment
+bounding boxes for the cells need to be indicated, usually through a
+special drawn abutment layer over the cell.  This allows cells to
+partially overlap to share contacts, source/drain areas, and wires.
+Furthermore, power and feedthrus are typically included in the leaf
+cell.
+
+<p>
+
+Max works well for laying out the leaf cells.  Alternatively, leaf
+cells designed in other tools can be imported into Max using the GDSII
+interface.
+
+<p>
+
+3. Create the entire memory.  This stage is broken into three parts:
+
+<p>
+<ul> 
+
+a. Tiling up the memory
+
+<p>
+
+b. Programming the rows, mux's, etc.
+
+<p>
+
+c. Propagating and naming ports such as the data inputs and outputs,
+   address lines, control lines, etc.
+
+</ul> 
+<p>
+
+These three parts are accomplished easily with the MegaCell Compiler
+as described in <a href="#creating">Creating Megacells</a>.
+
+<p>
+
+4. Verify the memory.  Memories are very difficult to fully verify
+because they can be very large and contain analog circuits (i.e.,
+where the digital approximation cannot be used).  There are typically
+four distinct types of verification required:
+
+<p>
+<ul> 
+
+a. Physical verification such as DRC, ERC, electromigration, supply
+drops, etc.
+
+<p>
+
+b. Functional verification typically through digital simulators like verilog.
+
+<p>
+
+c. Performance verification with a device-level simulator.
+
+<p>
+
+d. Noise susceptability from crosstalk, uneven supply rejection,
+inability to write reliably over process corners, sense amp input
+offsets, etc.
+
+</ul> 
+<p>
+
+The MegaCell Compiler provides excellent solutions to 4b and 4c as
+described in <a href="#netlisting">Netlisting</a>.
+
+<p>
+
+<li><h2><a name="creating">Creating Megacells</a></h2>
+
+<p>
+
+<li><h4><a name="overview">Overview:</a></h4>
+
+<p>
+
+In order to create a megacell, you need two things: the leaf cells in
+max format and the control program in tcl.  The control program sets
+up parameters and defines the tiling, via programming, and port
+propagation.  Typically this control file is sourced by the .maxrc
+file on startup.  Otherwise, it can be sourced from the command line
+in MAX.  It can also be included directly in the .maxrc file.
+
+<p>
+
+The MCC control program is sourced into a tcl interpreter and thus
+must abide by all tcl syntax conventions.  In addition, any tcl
+programs or expressions can be added to this control program to aid in
+building megacells.  The tcl language is a standard, free language and
+is described in many books and web pages (see, for example, <a
+href="http://www.scriptics.com/products/tcltk">the Scriptics tcl/tk
+page</a>).  MAX/MCC use the tcl/tk8.0 version of tcl.
+
+<p>
+
+The control program should define all the parameters and other
+options/variables needed for the compiler and netlisting.  These
+parameters/options/variables are described below.  Note that tcl and
+MAX/MCC are case sensitive.
+
+<p>
+
+The control program should also define the following special
+procedures:
+
+<pre>
+	setup_&lt;megacell>
+	program_&lt;megacell>
+</pre>
+
+The procedure setup_&lt;megacell>, e.g. setup_sram, is optional and is
+executed before the tiler.  It can be used to change the tiler,
+via programming, or port propagation that may be parameter dependent.
+For example, if you you want to substitute mux cells depending on a
+parameter which changes the data width, you would do it here.
+Alternatively, if you were programming a ROM, you might read the data
+file and set up the tiler here depending on the data file.
+
+<p>
+
+The procedure program_&lt;megacell>, e.g. program_sram, is called to via
+program the megacell.  It is also optional but almost always necessary
+to create the desired functionality.  What to put in this procedure is
+defined below in <a href="#programming">Via Programming</a>.
+
+<p>
+
+<li><h4><a name="parameters">Parameters:</a></h4>
+
+<p>
+
+Parameters are simply global tcl variables that you choose.  For
+example, if you want to have as parameters the number of rows and the
+number of columns of a memory, you might set the following parameters:
+
+<pre>
+	set ROWS 128
+	set COLUMNS 256
+</pre>
+
+Note that these values are the default values of these parameters.
+When you run MCC interactively, you will be given a chance to change
+these.
+
+<p>
+
+For MCC to know what parameters you wish to be in the parameter menu,
+you need to add them to the MC(&lt;megacell>,parameters) variable.  For
+example, in the above case you would add the line:
+
+<pre>
+	set MC(sram,parameters) "ROWS COLUMNS"
+</pre>
+
+You can have parameters that you do not give the user access to.
+Simply do not add them to the MC(&lt;megacell>,parameters) variable.
+Common examples of this are STRAP_SPACING, i.e. the number of cells
+between straps.  It is better to use a numeric string like
+STRAP_SPACING than a number even if you never want to change it since
+it will make the megcell control program more understandable.
+
+<p>
+
+We recommend that you choose parameters that pertain to the final
+output.  For example, if you are building an SRAM with the spine down
+the center and half the memory cells on the right of the spine and the
+other half on the left, you should create a parameter for the total
+number of memory columns.  Don't have the parameter specify the number
+of columns in each half -- that will only lead to confusion.
+
+<p>
+
+<li><h3><a name="tiling">Tiling:</a></h3>
+
+<p>
+
+Tiling is specified hierarchically.  The way a small group of cells
+fits together is first defined and given a name.  This is called a
+macro.  This macro is then used just as if it were a leaf cell to
+build even more complicated and larger structures.  When you have
+defined the entire megacell, you are done.  The name of the macro that
+defines the entire megacell is the name that you give to MCC to tell
+it to build that megacell ("sram" in the example given above).  Even
+though the tiler is specified hierarchically, the user can
+independently control the amount of hierarchy (if any) in the final
+layout as described below.
+
+<p>
+
+In order to tile up a design, you have to insure that leaf cells meet
+the following criteria.  They must contain wiring which will connect
+together when the cells are tiled -- MCC does not do any routing.  You
+can create leaf cells that only contain routing, if necessary.
+Sometimes, you need to create a leaf cell (for the tiler) that
+contains other leaf cells and routing.  For example, the base of an
+sram often must be done by hand.
+
+<p>
+
+The MCC tiler is controlled by a set of statements of the form:
+
+<pre>
+	set MACRO(&lt;name>) &lt;how_to_build_this>
+</pre>
+
+Which defines how to build the macro &lt;name>.  It is built from a
+combination of leaf cells and/or other macros.  Typically each macro
+stipulates a level of hierarchy in the final design however that is
+not necessary.
+
+<p>
+
+The actual syntax of how to build macros is shown here:
+
+<pre>
+	set MACRO(&lt;name>) {[CELL] &lt;row1> &lt;row2> ...}
+</pre>
+
+Note that the syntax is very important here -- you need to keep track
+of the {}'s very carefully.  At each level of the hierachy you can
+specify whether you want the combination of cells/macros to be a
+separate cell in the layout or not.  This selection is done by adding
+the keyword "CELL" to the beginning of the definition.  If you never
+use the "CELL" keyword, the final layout will be completely flat.
+
+<p>
+
+The MCC tiler places the specified rows one above the other.  The
+lower left-hand corner of the first row &lt;row1> is placed at the origin
+(0,0).  The next row &lt;row2> is abutted to the top of &lt;row1>
+aligned to the left edge of &lt;row1>, etc.  For example:
+
+<pre>
+		----------------------
+                |      row3          |
+		----------------------
+                |                 |
+                |      row2       |
+                |                 |
+		----------------------
+                |      row1          |
+		----------------------
+</pre>
+
+In this case &lt;row2> happens to be thinner and taller than the other rows.
+
+<p>
+
+Each row can, and often is, made up of cells/macros.  A row is
+defined as follows:
+
+<pre>
+	row := {object [object ...]}     or
+	row := object
+</pre>
+
+In every case except when object is a single word, you must put {}
+around them to signify a list.  The objects are placed from left to
+right, abutting on the sides.  The height of the entire row is
+determined by the height of the tallest object in that row.
+
+<p>
+
+Here is a simple example:
+
+<pre>
+	set MACRO(test) {CELL {foo bar} {foo foo bar}}
+</pre>
+
+Which produces:
+
+<pre>
+                           -------------
+               ------------|           |
+	       | foo | foo |    bar    |
+               -------------------------
+               ------|           |
+	       | foo |    bar    |
+               -------------------
+</pre>
+
+You can also specify the orientation and name (i.e. the instance name)
+of an object using the following syntax:
+
+<pre>
+	object := {&lt;cell|macro> &lt;orientation> &lt;instance_name>}      or
+	object := &lt;cell|macro>
+</pre>
+
+Where the orientation can be one of the following:
+
+<pre>
+	MAX	SUE	effect
+	====	====	======================
+	""	R0	standard orientation
+	fx	RX	mirrored left to right
+	fy	RY	flipped top to bottom
+	r180	RXY	mirrored and flipped
+	r90	R90	rotated 90 degrees clockwise
+	fy_r90	R90X	first flipped, then rotated 90 degrees
+	fx_r90	R90Y	first mirrored, then rotated 90 degrees
+	r270	R270	rotated 270 degrees clockwise
+</pre>
+
+You can specify orientations in either MAX or SUE format.  The MAX
+format is suggested as it corresponds to what you will see on the
+screen.
+
+<p>
+
+Note that if you include the orientation in the object you can't use
+the shorthand above for the row.
+
+<p>
+
+Here is an example which includes orientations:
+
+<pre>
+	set MACRO(cell_4) {CELL {cell {cell fx}} {{cell r180} {cell fy}}}
+</pre>
+
+This creates the following layout which is very common in SRAMs:
+
+<pre>
+		--------------------
+		|         |        |
+		|  cell   |  cell  |
+		|  r180   |   fy   |
+		|  cell_2 | cell_3 |
+		|        /|\       |
+		--------------------
+		|        \|/       |
+		|  cell   |  cell  |
+		|         |   fx   |
+		|  cell_0 | cell_1 |
+		|         |        |
+		--------------------
+</pre>
+
+If you don't want to type these lines in by hand, MCC will help you to
+create them.  Simply create a layout in MAX and add the cells/macros
+into it as you want them, including proper orientations.  Then run
+"MC What" in MAX's "Tool" menu.  MCC will output to the screen the
+appropriate MACRO line(s) to create the layout.  You can then cut and
+paste this output into your control program.
+
+<p>
+
+You can also specify the instance name for a given cell instead of
+letting MAX choose a name for it, of the form
+&lt;cell_name>_&lt;count>, by adding the instance name after the
+orientation.  For example, the following line:
+
+<pre>
+	set MACRO(cell_4) {CELL {{cell "" ll} {cell fx lr}} \
+                                {{cell r180 ul} {cell fy ur}}}
+</pre>
+
+produces:
+
+<pre>
+		--------------------
+		|         |        |
+		|  cell   |  cell  |
+		|  r180   |   fy   |
+		|   ul    |   ur   |
+		|         |        |
+		--------------------
+		|         |        |
+		|  cell   |  cell  |
+		|         |   fx   |
+		|   ll    |   lr   |
+		|         |        |
+		--------------------
+</pre>
+
+In this case, the 4 cells are named "ll", "lr", "ul", and "ur",
+instead of "cell_0", "cell_1", "cell_2", "cell_3" as in the previous
+example.  Note that if you specify duplicate instance names, MAX will
+add "_&lt;num>" to the specified instance name to make it unique.
+
+<p>
+
+By default, leaf cell names are used in the MACRO declaration above.
+Sometimes it is necessary to refer to a leaf cell of a different name
+based on the input parameters or the leaf cell name may simply be
+cumbersome or non-intuitive.  To alias a leaf cell to another name,
+add a line of the form:
+
+<pre>
+	set MC_DATA(&lt;desired_name>) &lt;leaf_cell_name>
+</pre>
+
+where &lt;leaf_cell_name> is the actual layout cell name and
+&lt;desired_name> is how you refer to it in the tiler.  If no MC_DATA
+field is present then MCC uses the default.  For example, you might
+add the line:
+
+<pre>
+        set MC_DATA(cell) L018CELL_V3_2
+</pre>
+
+to more easily refer to this sram cell by using the word "cell"
+instead of "L018CELL_V3_2".  Furthermore, it makes it much easier to
+substitute this cell for another, if needed.
+
+<p>
+
+<li><h4><a name="abutment">Abutment:</a></h4>
+
+<p>
+
+Before describing the more advanced features of the tiler, including
+the REPEAT keyword, let's talk about abutting cells.  The tiler places
+cells next to and on top of other cells.  It needs to know the desired
+cell abutment boundaries to do this correctly.  This is especially
+important for memories since leaf cells typically overlap and share
+contacts, wires, and source/drain areas.  Note that the cell origin
+does not matter at all, only the abutment boudaries.
+
+<p>
+
+MCC supports three different means of determining the cell abutment
+boundaries.  Note: Abutment boundaries must be rectangular.  The
+suggested and most common way is to draw a special layer in each leaf
+cell whose extent is the abutment boundary.  This layer is often
+called "prb" for "place and route boundary" but you can call it
+whatever you like.  To tell MCC what layer you are using, add the
+following line to your MCC control program:
+
+<pre>
+	set MC(boundary) &lt;layer_name>
+</pre>
+
+Thus if you used the "prb" layer, add this line:
+
+<pre>
+	set MC(boundary) prb
+</pre>
+
+Note that the "prb" layer is also the default, so if you use it, you
+don't even have to add this line.
+
+<p>
+
+A second approach is to add a label to each leaf cell whose bounding
+box is the desired abutment boundary and whose text is "bbox".
+Furthermore, the label must be on the layer "space" (i.e. not attached
+to any layer) and must be of type "comment" or "local".  This works
+exactly like the above abutment layer, except uses a label instead.
+If you don't have a spare layer or don't want to add one, you can use
+this approach.
+
+<p>
+
+A third approach is to type the coordinates of the abutment boundary
+into the MC_DATA array that was described earlier for aliasing leaf cell
+names.  The full syntax of this line is:
+
+<pre>
+	set MC_DATA(&lt;name>) "&lt;leaf_cell_name> &lt;x1> &lt;y1> &lt;x2> &lt;y2>"
+</pre>
+
+Thus if you had a leaf cell called "foo" whose abutment boundary was
+at the coordinates (0,0) and (13.4,8.6) you would add the following line:
+
+<pre>
+	set MC_DATA(foo) "foo 0 0 13.4 8.6"
+</pre>
+
+This is usually a cumbersome way to specify the abutment boundary and
+an easy way to introduce an error.  It is suggested that you only use
+this technique if you don't want to modify the leaf cell layouts at all.
+
+<p>
+
+If a leaf cell has none of the aformentioned specifications for the
+abutment boundary, MCC defaults to using the bounding box of the paint
+in the cell in MAX.  This simple technique is not sufficient if the
+cell overlaps with it neighbors.  Furthermore, it is rarely correct
+since implant and well layers usually extend beyond wiring.  However,
+it can be useful when getting started as MCC will work with this
+default.
+
+<p>
+
+<li><h4><a name="keywords">Special Keywords:</a></h4>
+
+<p>
+
+In addition to the keyword "CELL" described above, you can use the
+following special keywords REPEAT, TOP, BOTTOM, SPACE, and STRETCH.
+The REPEAT command is common and described next.  The rest of the
+keywords should be used very sparingly.
+
+<p>
+
+<li><h5><a name="repeat">REPEAT:</a></h5>
+
+<p>
+
+To create parameterized megacells, you need to use the REPEAT command.
+Any repetition of cells/macros in the MACRO lines can be simplified to
+the "REPEAT" keyword, the number of times to repeat it, and the thing
+to repeat.  The repeat value can be a single number, a variable
+(i.e. a parameter), or and expression.  Thus the syntax for REPEAT is:
+
+<pre>
+	object := {REPEAT &lt;value> &lt;cell|macro>}
+</pre>
+
+For example, if you wanted a macro called foo4 to place 4 copies of
+the leaf cell "foo" in a row like
+
+<pre>
+               ------------------------- 
+	       | foo | foo | foo | foo |
+               -------------------------
+</pre>
+
+you could add:
+
+<pre>
+	set MACRO(foo4) {CELL {foo foo foo foo}}
+</pre>
+
+or use the repeat command:
+
+<pre>
+	set MACRO(foo4) {CELL {{REPEAT 4 foo}}}
+</pre>
+
+Thus, the REPEAT simply repeats the next cell/group the desired number of
+times, just as if you had typed them that many times yourself AND it
+allows you to parameterize it.  For example, to parameterize foo4,
+just change the above line to:
+
+<pre>
+	set MACRO(foo4) {CELL {{REPEAT $NUM foo}}}
+</pre>
+
+where the global tcl variable "NUM" in this case is the parameter.
+
+<p>
+
+Note that the REPEAT command can be used for repeating objects in a
+row as shown in the previous example or repeating rows, depending on
+the depth of {}'s.  For example, to repeat the row "my_row" 6 times to
+create:
+
+<pre>
+                ---------------------
+                |      my_row       |
+                ---------------------
+                |      my_row       |
+                ---------------------
+                |      my_row       |
+                ---------------------
+                |      my_row       |
+                ---------------------
+                |      my_row       |
+                ---------------------
+                |      my_row       |
+                ---------------------
+</pre> 
+
+use the line:
+
+<pre>
+	set MACRO(my_rows) {CELL {REPEAT 6 my_row}}
+</pre>
+
+Which looks very similar to "foo4" but has one less set of {}'s.
+Remember, you can also create the desired cell layout in MAX and then
+use the "MC What" command to help you create these lines.
+
+<p>
+
+Parameterized megacells usually require expressions for the value of
+the repeat.  For example, in the following line, the block of 2x2 sram
+cells is repeated by the expression $COLS/4 to create a double-high
+row called row2.
+
+<pre>
+	set MACRO(row2) {CELL {{REPEAT [expr $COLS/4] cell_4}}}
+</pre>
+
+We first have to divide COLS by 2 because cell_4 is already 2 cells
+wide.  We then divide by another 2 since, in this implementation, the
+sram spine is in the center of the sram and thus half of the complete
+row is on the left of it and half on the right.
+
+<p>
+
+You can use any legal tcl expression, including function calls.  This
+expression is evaluated at the tcl top level and thus all global
+variables are available.
+
+<p>
+
+<li><h5><a name="top">TOP/BOTTOM:</a></h5>
+
+<p>
+
+By default, objects in rows are aligned to the bottom of the first
+object in the row, which is aligned to the top of the previous row.
+Sometimes it is necessary to align the objects to the top of the first
+object in the row.  This has only been found useful in the first row
+of a macro.  In order to align to the top of the row, instead of the
+bottom, insert the TOP keyword at the beginning of the row.
+
+<p>
+
+Here is a common example of a simple top-level sram macro that uses
+the TOP keyword:
+
+<pre>
+	set MACRO(sram) \
+		{CELL {TOP {side fx} base side} {{core fx} spine core}}
+</pre>
+
+Which yields:
+
+<pre>
+		----------------------------------
+		|              |   |             |
+		|              | s |             |
+		|              | p |             |
+		|     core     | i |    core     |
+		|      fx      | n |             |
+		|              | e |             |
+		|              |   |             |
+		|              |   |             |
+		|              |   |             |
+		----------------------------------
+		|              |   |             |
+		|     side     | b |    side     |
+		|      fx      | a |             |
+		|              | s |             |
+		---------------| e |--------------
+              (0,0)            |   |
+                               -----
+</pre>
+
+The TOP keyword is necessary because the "base" macro is taller than
+the "side" macros.  Note that the TOP keyword only applies to the row
+that it is in.  If you need to resume the bottom alignment in a row
+beginning with TOP, you must add the keyword BOTTOM where you want the
+bottom alignment to procede (this is pretty rare).
+
+<p>
+
+Megacells are placed with their lower left corner at the coordinates
+(0,0).  In the above case, however, the "base" macro will stick below
+the 0 y-coordinate.  Furthermore, the megacell size reported by MCC will
+not include the part of base that sticks below the 0 y-coordinate.  If
+the first object in the row is the tallest object in the row, unlike
+in the case below, everything will work normally.  If this is a
+problem, you can add another level of hierarchy, for example:
+
+<pre>
+	set MACRO(bottom) {CELL {TOP {side fx} base side}}
+	set MACRO(sram) {CELL bottom {{core fx} spine core}}
+</pre>
+
+<p>
+
+<li><h5><a name="space">SPACE:</a></h5>
+
+<p>
+
+Sometimes it is necessary to add additional space between objects or
+rows -- i.e. you don't want the objects/rows to abut.  You can
+accomplish this with the SPACE command.  The SPACE command takes one
+argument, the space value in microns.  Depending on the context --
+whether it is inside a row or not -- it will either add spaces between
+objects in a row or between rows.
+
+<p>
+
+Consider the following example:
+
+<pre>
+	set MACRO(test) {CELL {thin {SPACE 2} thin} {fat fat}}
+</pre>
+
+This creates the following cell placement:
+
+<pre>
+		-------------------------------------
+		|	   	    |               |
+		|      fat	    |      fat      |
+		|		    |               |
+		-------------------------------------
+		|           |       |           |
+		|   thin    |&lt;----->|   thin    |
+		|           | 2 um  |           |
+		-------------       -------------
+</pre>
+
+Note: you should NOT use the SPACE command as a substitute for setting
+the abutment boundaries of the leaf cells.  You will get very
+frustrated if you try to.  Furthermore, you should use the SPACE
+command sparingly since it will not track changes to the leaf cells or
+process shrinks.
+
+<p>
+
+To add a vertical space, the "SPACE" command must be placed slightly
+differently.  Consider the following example:
+
+<pre>
+	set MACRO(test2) {CELL {foo foo} {SPACE 2} bar}
+</pre>
+
+which produces the following cell placement:
+
+<pre>
+		--------------------
+		|                  |
+		|       bar        |
+		|                  |
+	        --------------------
+	       	    ^
+		    | 2 um
+		    v
+		------------------------
+		|          |           |
+		|   foo    |   foo     |
+		|          |           |
+		------------------------
+</pre>
+
+In this case, the {SPACE 2} command has one less set of {}'s around it
+than in the previous example.
+
+<p>
+
+<li><h5><a name="stretch">STRETCH:</a></h5>
+
+<p>
+
+Sometimes you want cells to be separated, i.e. have space between
+their abutment boundaries, yet preserve connectivity.  For example, in
+a pad ring, you might want to change the pad spacing but not have to
+re-layout all of the different types of pad cells, yet still preserve
+the connectivity of the power ring through them.  You can do this with
+the STRETCH command.
+
+The STRETCH command is an extension to the object syntax described
+above.  The extended syntax is:
+
+<pre>
+	object := {&lt;cell|macro> &lt;orientation> &lt;instance_name> \
+                   [STRETCH &lt;left_spacing> &lt;right_spacing>}    or
+	object := {&lt;cell|macro> &lt;orientation> &lt;instance_name> \
+                   [STRETCH &lt;spacing> center}
+
+</pre>
+
+where all of the spacings are in microns.  Thus, you can either
+specify the spacing on the left and the spacing on the right of the
+cell or you can specify the total spacing and tell MCC to place the
+cell in the center.
+
+For example, a snipet of the west pad ring on a chip might look like
+the following:
+
+<pre>
+        set spacing 10
+
+        set MACRO(pad_w) {CELL {pr_corner
+          {pad_vddq "" "" STRETCH $spacing center}
+          {pad_vdd "" "" STRETCH $spacing center}
+          {pad_gnd "" "" STRETCH $spacing center}
+          {pad_gndq "" "" STRETCH $spacing center}
+          {pad_out "" dout12 STRETCH $spacing center}
+          {pad_vddq "" "" STRETCH $spacing center}
+          {pad_out "" dout13 STRETCH $spacing center}
+          {pad_gndq "" "" STRETCH $spacing center}
+          ...
+        }
+</pre>
+
+In this example, an additional 10 microns of space is added between
+each pad in the pad ring.  The resultant cell placement would look
+something like the following, with the wires added:
+
+<pre>
+        ------------    ------    ------    ------    ------    ------
+        |          |    |pad_|    |pad_|    |pad_|    |pad_|    |pad_|
+        | pr_corner|====|vddq|====|vdd |====|gnd |====|gndq|====|out |
+        |          |    |    |    |    |    |    |    |    |    |    | . . .
+        |          |====|    |====|    |====|    |====|    |====|dout|
+        |          |    |    |    |    |    |    |    |    |    |12  |
+        ------------    ------    ------    ------    ------    ------
+                              <--> 10 microns
+</pre>
+
+When MCC stretches a cell, it only stretches the metal layers that
+intersect the abutment boundary of the cell.  Metals layers are
+specified in the technology source files for MAX.
+
+<p>
+
+Note: in this version you can only stretch left and right.  You cannot
+stretch up and down.
+
+<p>
+
+<li><h3><a name="programming">Via Programming:</a></h3>
+
+<p>
+
+Once you have tiled up a memory, you need to make every memory cell
+unique.  In memories, this entails, at the very least, programming the
+word line decoders so that each one gets a unique set of addresses.
+One programming technique is to create overlay cells that contain the
+desired connections.  MCC instead uses via programming.  Connections
+are done with vias and programmed algorithmically.  We have found that
+this approach makes programming very easy.
+
+<p>
+
+To further simplify via programming, MCC figures out where to put the
+vias and what vias to use by tracing nets.  You need only specify the
+desired ports to be connected and MCC will figure out where the nets
+overlap, what the layers are, and add the appropriate vias.  If you
+need to change your design or port it to another process, the via
+programming will still work since it is not hard-coded to any
+positions.
+
+<p>
+
+Note that MAX labels (text) must be attached to the layer that
+will connect to the via.  For example, if you want MCC to add a via
+between metal2 and metal3, then the labels must be attached to metal2
+and metal3, respectively.  While MAX can trace through all layers, for
+efficiency, MCC only traces a single layer during via programming.
+
+<p>
+
+MCC Via programming is NOT meant for ROM's that are via programmed.
+That is better done with two types of leaf cells, one with the via and
+one without.
+
+<p>
+
+When building memories, it is typically not important that the address
+lines decode sequential rows of memory cells.  It is only important
+that the addresses uniquely decode every row.  However, if you want to
+build memories with fewer numbers of rows, you will need to be
+careful to tie off the address lines that decode the removed rows.
+
+<p>
+
+To set up the via programming for a megacell, you need to create a tcl
+procedure with the name "program_&lt;megacell>" where &lt;megacell> is the
+name of the megacell.  Typically, this procedure is in the control
+program.  When you tell MCC to build a megacell named &lt;megacell>, the
+program_&lt;megacell> procedure will be called after the tiler and before
+port propagation, unless you have told MCC not to program the
+megacell.
+
+<p>
+
+The "program_&lt;megacell>" procedure contains two types of MCC commands:
+
+<pre>
+	program_cell &lt;cell>  and
+	program &lt;args>
+</pre>
+
+The "program_cell" command tells MCC which cell to place the vias in
+and the "program" command tells MCC how to place the vias.  If you
+want the vias placed in the top level cell, then you don't need the
+program_cell command.  Typically, you want to program the vias in the
+cell that contains the instances to be programmed.  For example, if
+you were programming the word-line decoder/driver cells (wld), you
+would want to program in the cell that contained them which might be
+called wlds.
+
+<p>
+
+An example procedure for programming an sram might look like this:
+
+<pre>
+	proc program_sram {} {
+
+	  program_cell wlds
+
+	  program ...
+	  program ...
+	  program ...
+	}
+</pre>
+
+Where the actual program lines are discussed below.  Note that since
+this is a tcl procedure, you can also call other procedures and do
+other tasks here.
+
+<p>
+
+The "program" command actually drives the programmming of vias.  The
+program command takes the following arguments:
+
+<pre>
+	program \
+	  &lt;list of ports to alternatively connect> \
+	  &lt;port to connect to in cell> \
+	  &lt;format of name of cell to connect in> \
+	  &lt;number of cells to make connections in> \
+	  &lt;number of cells to program before moving to next port>
+</pre>
+
+This is easiest to describe by way of example.  Below is a very simple
+programming example:
+
+<pre>
+	program \
+	  {a1_L a1} \
+	  in1 \
+	  wld_%d \
+	  $ROWS \
+	  1
+</pre>
+
+This program command will add vias in the cell specified in the
+program_cell command.  They will connect the wires containing,
+alternately, ports "a1_L" and "a1" to the port "in1" in the cells
+"wld_0", "wld_1", etc. up to "wld_63" (if ROWS=64).  The "%d" in
+"wld_%d" gets replaced with the intergers 0, 1, etc.
+
+<p>
+
+The next address might look like this:
+
+<pre>
+	program \
+	  {a2_L a2} \
+	  in2 \
+	  wld_%d \
+	  $ROWS \
+	  2
+</pre>
+
+The main difference, in addition to the different ports, is that the
+last argument is now a 2 which means that the port "a2_L" will be
+tied to port "in2" in cells "wld_0" and "wld_1", "a2" goes to "wld_2"
+and "wld_3", etc.  By programming 2 cells before alternating the port
+from "a2_L" to "a2", we can build up a binary count.
+
+<p>
+
+In all but the smallest memories, some form of address predecoding is
+usually employed.  In the case of 3-bit predecoding, 3 addresses are
+predecoded onto 8 wires.  Here is an example of how to modify the
+above example to handle 3 bit predecoding.
+
+<pre>
+	program \
+	  {a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8} \
+	  in1 \
+	  wld_%d \
+	  $ROWS \
+	  1
+</pre>
+
+Now, the ports will alternate through 8 wld cells before repeating.
+
+<p>
+
+Sometimes the cells that you want to program don't have the names
+&lt;cell>_0, &lt;cell>_1, etc.  Note that this is the way the MAX names
+cells.  For example, you might want to program every other cell,
+i.e. &lt;cell>_0, &lt;cell>_2, etc.  In this case you can use a more
+sophisticated format which is:
+
+<pre>
+	{&lt;cell>_%d [expr f($i)]}
+</pre>
+
+where $i will be replaced by the values 0,1,2, etc.  Thus to program
+every other wld, you would use:
+
+<pre>
+	{wld_%d [expr 2 * $i]}
+</pre>
+
+instead of simply
+
+<pre>
+	wld_%d
+</pre>
+
+<p>
+
+<li><h3><a name="propagation">Port Propagation:</a></h3>
+
+<p>
+
+Once you have tiled up and via programmed a megacell, it is time to
+add the I/O and global ports to the megacell for verification and
+connection to the outside world.  MCC adds these ports by propagating
+them directly up from the leaf cells and renaming them (if needed).
+The ports are simply added to the top level on the same layer and at
+the same location that the ports are in the leaf cells as if the
+entire megacell were flattened.  For example, the data output line of
+the sense amplifier in a sram might be called "out" in the leaf cell.
+You would then propagate this port in all copies of the sense amp to
+the top level and name them, for example, d_out[0] - d_out[31].  You
+might find it necessary to move leaf cell port locations so that when
+they are propagated they are in the desired positions.
+
+<p>
+
+To instruct MCC how to propagate the ports, you need to add the
+following line to your control program:
+
+<pre>
+	set MC(&lt;megacell>,propagate) {&lt;prop_list> [&lt;prop_list> ...]}
+</pre>
+
+where &lt;megacell> is the name of the megacell such as "sram".  A
+&lt;prop_list> is a command to propagate ports and has the form:
+
+<pre>
+	&lt;prop_list> := {prop|count &lt;command> [&lt;command> ...]}
+</pre>
+
+To propagate a single port, you would use the "prop" command.  If you
+simply want to propagate a port from a specific cell in the hierarchy,
+you wound add the following &lt;prop_list>:
+
+<pre>
+	{prop &lt;path_to_port>}
+</pre>
+
+For example, to propagate the "clk" input from the cell base, use:
+
+<pre>
+	{prop base_0/clk}
+</pre>
+
+Note that the "_0" is necessary here because you are specifying which
+instance of which cell to use and MAX appends "_0" to the first
+instance of any cell.  You can also find this by selecting the cell
+base in MAX and looking at its name.
+
+<p>
+
+Typically you want to rename the port and possibly even change it's
+port direction (not from input to ouput but from no direction to input
+or output).  In this case you use the following syntax:
+
+<pre>
+	{prop {&lt;path_to_port> &lt;new_port_name> &lt;port_direction>}}
+</pre>
+
+For example, to propagate the "clk" input from the cell base, change
+its name and make sure that it is an input, use:
+
+<pre>
+	{prop {base_0/clk CLOCK input}}
+</pre>
+
+When propagating inputs and outputs that are a function of the size of
+the megacell, you typically want to use the "count" command.  The
+count command will propagate each port in a group of leaf cells with
+unique names.  The syntax of the count command is:
+
+<pre>
+	{count {&lt;leaf_cell>/&lt;port> &lt;new_port> &lt;port_direction> &lt;count_direction>}}
+</pre>
+
+In this case you don't specify the path to the port, just the leaf
+cell that the port comes from.  For example to propagate the data out
+ports from the sense amp leaf cells, you might use the following line:
+
+<pre>
+	{count {sense_amp/out d_out[%d]}}
+</pre>
+
+If there are 32 copies of the sense_amp leaf cell in the design, you
+will get the ports d_out[0] to d_out[31].
+
+<p>
+
+In the count command, the ports can be labeled from right-to-left
+(left), left-to-right (right), top-to-bottom (down), or bottom-to-top
+(top).  The default count direction is right-to-left but can be
+changed with the tcl line:
+
+<pre>
+	set MC(default_propagate_direction) left|right|down|up
+</pre>
+
+You can also change the count direction for each count line.  For
+example, to propagate the ports from left-to-right in the previous
+example, use the line:
+
+<pre>
+	{count {sense_amp/out d_out[%d] output right}}
+</pre>
+
+<p>
+
+<li><h2><a name="netlisting">Netlisting </a></h2>
+
+<p>
+
+Once a megacell has been built, it must be verified.  Furthermore, a
+netlist (typically in spice format) of the megacell must be provided
+with the layout for higher level or full chip LVS.  Otherwise, even if
+the megacell by itself is perfect and hooked up correctly to the
+surrounding circuitry, the chip may not work because someone
+accidentally ran a wire over it and shorted part of it out.
+
+<p>
+
+In the past, this netlist has typically been created by drawing a
+schematic for the entire megacell and then netlisting that.  Since
+megacells can be quite large, this is a cumbersome and error-prone
+process.  Automating this schematic creation can also been done but
+writing the schematic generator and verifying it is a large task in
+itself.  Furthermore, the schematic for the entire megacell is
+typically created for only two purposes: creating the netlist and
+documentation.
+
+<p>
+
+An alternative approach is to extract a netlist directly from the
+megacell layout and verify the megacell from that netlist.  This
+eliminates the time consuming task of creating a full schematic of the
+megacell and iterating with LVS in order to verify that the schematic
+and layout are the same.  Furthermore, the time of creating and
+verifying the schematic are only multiplied if multiple sizes or
+configurations of megacells are to be created.
+
+<p>
+
+In order to use the MCC netlisting functions, your layout needs to
+abide by these restrictions:
+
+<p>
+
+1. All ports of leaf cells must have labels.  Furthermore, the labels
+must use the MAX types of either input, output, inout, or global.  You
+cannot connect to a leaf cell other than through a port.  If you do,
+the extracted netlists will be incorrect.  A good practice is to run
+LVS between the extracted netlist and the layout.  If you find any
+discrepancies, it is most likely because you have violated this rule.
+
+<p>
+
+2. Fets must be made from manhattan geometries only.  This is a
+limitation of this version of MAX and will be relaxed in MAX4.  Thus,
+bent gate transistors will not netlist correctly.  Similarly,
+non-rectangular shaped source/drain area will likely not netlist
+correctly.
+
+<p>
+
+<li><h3><a name="spice">Spice Netlist:</a></h3>
+
+<p>
+
+MCC creates a two level spice netlist of your megacell by executing
+the "MC Netlist" command and selecting the spice option.  The netlist
+contains a top level subckt call which instantiates all of the leaf
+cells and inserts loads on all of the top level nets.  Each leaf cell
+also has a subckt definition which includes loads on all nets except
+for I/O's, since these are included in the top level subckt.  A leaf
+cell is defined as a cell which contains a transistor or transistor
+cell like a gcell in it.
+
+<p>
+
+The spice netlist has the following limitations.  The power network is
+not explicitly extracted and thus might not contain isolated power
+supplies if present in the design.  On the leaf cell level, isolated
+power supplies (assumed to be connected at a higher level) are
+reported as warnings.  Also, FET bulk connections are not
+extracted.  It is always a good idea to run a commercial LVS program
+between the spice netlist and the layout to insure a correct
+extraction.
+
+<p>
+
+Before running the spice netlister, you must set up the following
+parameters: the desired fet models, bulk terminals, and power supplies.
+Add the following lines to your control program or .maxrc to control:
+
+<pre>
+	set MC(&lt;fet>,model) &lt;fet_model>
+</pre>
+
+to set the desired fet models, the defaults are:
+
+<pre>
+	set MC(nfet,model) n
+	set MC(pfet,model) p
+</pre>
+
+To set the bulk connections, use:
+
+<pre>
+	set MC(&lt;fet>,bulk) &lt;supply>
+</pre>
+
+The defaults are
+
+<pre>
+	set MC(nfet,bulk) gnd
+	set MC(pfet,bulk) vdd
+</pre>
+
+To set the supplies for grounding of explicit capacitances and to tie
+off fets (mostly for critical path netlisting), use:
+
+<pre>
+	set MC(supply,high|low) &lt;supply>
+</pre>
+
+The defaults are
+
+<pre>
+	set MC(supply,high) vdd
+	set MC(supply,low) gnd
+</pre>
+
+<p>
+
+<li><h3><a name="verilog">Verilog Netlist:</a></h3>
+
+<p>
+
+MCC creates a two-level verilog netlist of your megacell by executing
+the "MC Netlist" command and selecting the verilog option.  This
+verilog netlist is meant for functional verification of the megacell.
+For example, if you have created an sram, you want to insure that each
+memory cell is uniquely addressed and that there are no unwanted sign
+inversions.
+
+<p>
+
+If the chip that this megacell is going into is verified in verilog,
+you can also substitute this extracted verilog model for the
+behavioral model used in simulation and verification of the entire
+chip.  Although the extracted model will be much slower than the
+behavioral model to simulate, it allows you to verify that you are
+indeed getting the desired functionality out of your megacell.  Often
+megacells, such as memories, are black-boxed manually which provides a
+likely spot for errors if you can't verify the actual megacell.
+
+<p>
+
+The netlist contains a top level module which instantiates all of the
+leaf cells.  The leaf cells must be created by hand since verilog can
+only simulate the simplest transistor circuits and thus MCC requires
+you to build models for all leaf cells.  Fortunately, most of the
+behavioral models are quite simple.  For example, a word-line
+decoder/driver (wld) verilog module might look like this:
+
+<pre>
+	// word-line decoder/driver behavioral model
+
+	module wld (wl, in0, in1, in2);
+
+	input	in0, in1, in2;
+	output	wl;
+
+	buf buf0 (wl, in0 && in1 && in2);
+
+	endmodule	// wld
+</pre>
+
+Circuits that are inherently bidirectional or analog are slightly more
+difficult.  Here is a example of a 6t sram cell behavioral model in
+verilog:
+
+<pre>
+	// 6T sram cell behavioral model
+
+	module cell (wl, bl, bl_L);
+
+		input	wl;
+		inout	bl, bl_L;
+
+		trireg	q;
+
+		// reading
+		rnmos n1 (bl, q, wl);
+		rnmos n2 (bl_L, ~q, wl);
+
+		// writing
+		bufif1 bf1 (q, bl, wl & (bl ^ bl_L));
+
+	endmodule	// cell
+</pre>
+
+Verilog needs to understand what logical states each supply refers
+to.  In order for MCC to set these correctly, you need to set the
+following variables:
+
+<pre>
+	set MC(supply,&lt;supply_name>) supply0|supply1
+</pre>
+
+The following are the defaults:
+
+<pre>
+	set MC(supply,VDD) supply1
+	set MC(supply,GND) supply0
+</pre>
+
+You can also alias the supplies, using the following syntax:
+
+<pre>
+	set MC(tie,&lt;supply>) &lt;new_name>
+</pre>
+
+The following aliases are defined by default:
+
+<pre>
+	set MC(tie,vdd) VDD
+	set MC(tie,gnd) GND
+</pre>
+
+These two lines will rename any lower case vdd and gnd ports to be VDD
+and GND, respectively.
+
+<p>
+
+Once you have a verilog netlist of the megacell, you need to create a
+test bench to exercise the entire megacell.  To test an sram, you
+might want to write unique data into every address of the sram and then
+read it out and compare.  An example of just such a test bench in show
+below:
+
+<p>
+
+[TODO: include example]
+
+<p>
+
+Other tests for srams check that enables and byte writes work as
+advertised, etc.
+
+<p>
+
+<li><h3><a name="cp">Critical Path Netlist:</a></h3>
+
+<p>
+
+MCC will create a critical path netlist of your megacell through any
+cell(s) that you select.  This netlist is generated by tracing the
+cone of logic backwards to the input ports and forwards to the output
+ports from the selected cell(s).  Thus if you select the memory cell
+that is furthest away from the decoders and ask MCC to generate a
+critical path with the "MCC Critical Path" command, you should get the
+critical path for the entire sram.  Note: be sure to select a leaf
+cell and not a hierarchical cell.  Also, be sure to select a cell
+whose cone of logic does not include too much information.  For
+example, if you select an input address flipflop, you will get the
+entire sram netlist out.
+
+<p>
+
+The "MCC Critical Path" command is not the same as a static timing
+analyser which searches all legal paths to find the longest path.  The
+MCC command simply creates the netlist through the selected path.  In
+most memory structures, the critical path is easy to identify and thus
+this netlist will be the critical path.  You can also select the
+memory cell that is the closest to the decoders and get a different
+type of critical path that is most susceptible to race conditions.
+
+<p>
+
+MCC tries to create as accurate a critical path netlist as possible
+while minimizing simulation time.  All wire resistances and
+capacitances on the critical path are included.  All gates that load
+the critical path are tied off appropriately.  For large megacells of 1
+million or more transistors, the critical paths typically contain only
+a few thousand devices.
+
+<p>
+
+Consider the small critical path section illustrated in the following
+example:
+
+<pre>
+  			        |     |
+			        |     |
+                |\              +-----------|---\
+                | \	net_23	      |     |    \
+         . . .--|C >o-----------+-----------| A   >o--- . . .
+                | /		|     |	    |    /
+                |/		|     +-----|---/
+	       	               	|     |
+	        	        |     |
+                                +-----------|---\
+                                      |     |    \
+                          ------------------| B   >o---
+           		              |	    |    /
+                	              +-----|---/
+</pre>
+
+and assuming the critical path is being traced thru the NAND3 gate "A"
+above as illustrated.  The NAND3 gate "B" is a load on the critical
+path on net_23 and is modeled by the gates of the input devices of B
+tied off, i.e.:
+
+<pre>
+			     gnd     vdd
+                             ---     ---
+                              |       |
+                              |       |
+		  net_23     --      --
+		-------------|------o|
+			     --      --
+                              |       |
+                              |       |
+                             ---     ---
+			     gnd     vdd
+</pre>
+
+with the transistor sizes extracted from the layout.  MCC will also tie
+off pass gates (source/drain inputs/outputs) appropriately.
+
+<p>
+
+The MCC critical path netlister uses the same variables as the MCC
+spice netlister (see <a href="#spice">Spice Netlist</a>).  When tying
+off transistors as shown above, it ties them to their bulks, i.e. to
+the value defined in the variable MC(&lt;fet>,bulk).
+
+<p>
+
+Sometimes, when running the MCC critical path netlister the cone of
+logic gets too large or there are parts of the cone of logic that you
+do not wish to include.  Paths can be eliminated by setting the CP_TIE
+array.  Paths can be terminated whenever they reach an instance type,
+using the following syntax:
+
+<pre>
+	set CP_TIE(&lt;instance_type>) {{&lt;port> &lt;tie>} [{&lt;port> &lt;tie>} ...]}
+</pre>
+
+Where &lt;port> is the port in &lt;instance_type> to tie off and &lt;tie> is
+what to tie it to.
+
+<p>
+
+For example, if you have a two port memory and only wish to trace the
+critical path through one of the two ports, you might add the
+following line to ignore the second port:
+
+<pre>
+	set CP_TIE(cell) {{wl2 gnd} {bl2 vdd} {bl2_L vdd}
+</pre>
+
+Thus, any memory cells (cell) that are traced will automatically have
+their second word lines (wl2) tied low and their second bit lines
+(bl2,bl2_L) tied high.
+
+<p>
+
+Executing "MCC Critical Path", creates a spice netlist with the name
+&lt;megacell>_cp.sp.  If you don't have a file called
+&lt;megacell>_cp.h, it will also create a basic header file to drive
+the critical path simulation.  The header file looks like this:
+
+<pre>
+	* &lt;Insert spice models, options, and conditions>
+
+	.INCLUDE '/cad/dev/sram/sram_256_256_cp.sp'
+
+	* Input stimulus
+	Vclk clk gnd 0V
+	Vdin[0] din[0] gnd 0V
+	Va[0] a[0] gnd 0V
+	Va[1] a[1] gnd 0V
+	Va[2] a[2] gnd 0V
+	Va[3] a[3] gnd 0V
+	Va[4] a[4] gnd 0V
+	Va[5] a[5] gnd 0V
+	Va[6] a[6] gnd 0V
+	Ven en gnd 0V
+
+	* Output loads
+	Cdout[0] dout[0] gnd 100fF
+
+	*.END
+</pre>
+
+All of the inputs to the critical path have been grounded and all of
+the outputs have been loaded with 100fF of capacitance.  To use this
+header, you must insert your spice models, options and conditions at
+the top of the file.  Then change the appropriate inputs from grounded
+to PWL (piece-wise linear) sources or PULSE sources to exercise the
+critical path.  Also, change the output loads to the desired values.
+
+<p>
+
+Once the critical path has been generated, MCC highlites all of the
+cells in the critical path and brings up a menu.  If you close the
+menu, you can get it back by running "MCC Critical Path" and selecting
+"menu".  The menu allows you to hightlite the cells in the critical
+path, the cells and loads in the critical path, or the nets in the
+critical path.
+
+<p>
+
+Once you have run a spice simulation of your critical path, you can
+cross probe directly from the layout to the Micro Magic NST waveform
+viewer.  Simply start NST and load the data file from the spice
+simulation, for example, by typing the following at a unix prompt:
+
+<pre>      
+        nst sram_256_256_cp.tr0
+</pre>      
+
+Next, highlite a single net in max that is part of the critical path
+(if you are unsure what nets are part of the critical path, hit the
+"select CP nets" button to see them all and then select one by
+double-clicking on it).  Finally, hit the "plot net" button of the
+"MCC CP" menu and MCC will plot that net in NST.  You can also unplot
+nets using the "unplot net" command.  This interface makes it quite
+easy to debug, measure, and verify the performance and functionality
+of your megacell.
+
+<p>
+
+Note that you can only have one copy of NST on your window system,
+otherwise MCC doesn't know which one to cross probe to.  Also note
+that you will need to tell MCC what the suffix of the data output file
+is if you aren't using hspice.  The default suffix is .tr0 but you can
+change it by adding the following line with your desired suffix:
+
+<pre>
+	set MC(cp_suffix) .tr0
+</pre>
+
+<p>
+
+<li><h2><a name="batch">Running MCC in Batch Mode</a></h2>
+
+<p>
+
+All of the MCC commands in the "Tool" window can also be executed from
+tcl in "batch mode".  For example, if you wanted to build 4 different
+sizes of the same memory and spice netlist them, you could do this
+from a script instead of having to babysit MCC.
+
+<p>
+
+<li><h4><a name="batch_commands">Batch mode commands:</a></h4>
+
+<p>
+
+To build a megacell of name &lt;megacell>, use the following command:
+
+<pre>
+	mc_build [-program 0|1] [-propagate 0|1] &lt;megacell>
+</pre>
+
+where the optional "-program" and "-propagate" switches default to 1
+(on).  Changing either to 0 (off), would prevent via programming
+and/or port propagation.  These are the same options that are
+available in the "MC Build" menu.  To change various parameters for
+building different size megacells, simply change the corresponding tcl
+global variables in the script.  Remember to make all variables global
+variables using the "global" tcl command if you are in a procedure.
+
+<p>
+
+To netlist a megacell which is the current MAX cell, use the following
+command:
+
+<pre>
+	mc_netlist [-parasitics 0|1] [-verbose 0|1] spice|verilog
+</pre>
+
+Where the optional "-parasitics" and "-verbose" switches default to
+0.
+
+<p>
+
+To generate a critical path of a megacell, use the command:
+
+<pre>
+	mc_cp netlist|menu
+</pre>
+
+The desired megacell must be the current MAX cell and you must have
+selected the desired cell(s) to create the critical path through.  You
+can use the "sel_cell" command in MAX to select the cell -- see the
+MAX text command documentation.
+
+<p>
+
+To run "MC What" from batch mode, use the following command:
+
+<pre>
+	mc_what batch
+</pre>
+
+To set the hierarchy, prefix, and suffix, set the following tcl variables:
+MC(create,hierarchy), MC(create,prefix), MC(create,suffix).
+
+<p>
+
+<hr>
+<address>
+MCC Manual / <a name=mmi> Micro Magic, Incorporated </a> (408-735-9200 x220) /
+<a href="MAILTO:cadinfo@micromagic.com"> cadinfo@micromagic.com </a> /
+last revised 10/18/99
+</em>
+</address>
+
+
+</body>
+</html>

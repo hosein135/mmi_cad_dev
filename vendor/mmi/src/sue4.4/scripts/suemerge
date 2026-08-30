@@ -1,0 +1,91 @@
+#! /usr/local/bin/wish -f
+
+# This simple script tries to do the best type of merge it can on two
+# different versions of a SUE file.  It is meant to be called the same
+# way as rcsmerge.  It merges the ICON_ and SCHEMATIC_ procs into the
+# same file and renames the golden ones based on the SUFFIX below.
+
+# written by Lee Tavrow, 3/96
+
+set SUFFIX ^
+
+
+# appends file2 onto file1 after renaming the functions in file2
+
+proc merge {file1 file2} {
+
+  global SUFFIX
+
+  # open the second file
+  if {[catch {set ID [open $file2 r]}] != 0} {
+    puts "Aborting suemerge, could not open file \"$file2\""
+    return 0
+  }
+
+  # load in the files
+  set data [read $ID]
+
+  # close'm up
+  close $ID
+
+  # open the first file for appending
+  if {[catch {set ID [open $file1 a]}] != 0} {
+    puts "Aborting suemerge, could not append to file \"$file1\""
+    return 0
+  }
+
+  # rename all procedures of type SCHEMATIC_<name> or ICON_<name>
+  regsub -all {proc (SCHEMATIC_|ICON_)[0-9a-zA-Z_]+} $data "&$SUFFIX" data
+
+  # append onto the first file
+  puts $ID "\n\# Renamed and merged procedures below\n"
+  puts $ID $data
+
+  close $ID
+
+  # success
+  return 1
+}
+
+# make a unique temp file name
+set tmpfile "tmp[pid]"
+
+# need to fix these to look for switches, etc.
+set count 0
+set golden ""
+foreach arg $argv {
+  if {[string range $arg 0 1] == "-r"} {
+    incr count
+  }
+  if {$count == 2 && $golden == ""} {
+    set golden $arg
+  }
+}
+
+# the rcs file path is the last argument
+set rcsfilepath [lindex $argv [expr $argc - 1]]
+
+# get the current filename out of the rcs file path
+set filename [file tail $rcsfilepath]
+regsub {,v$} $filename {} filename
+
+# get the last golden version and put it into a temp file.
+catch {exec sh -c "exec co $golden -p $rcsfilepath > $tmpfile"}
+
+# now duplicate/rename last golden file onto current file.
+set done [merge $filename $tmpfile]
+
+# lose the temp file
+catch {exec rm -f $tmpfile}
+
+if {$done == 1} {
+  if {$golden == ""} {
+    set golden "  <last>"
+  }
+  puts "suemerge merged \"$filename\" version [string range $golden 2 end] (cvs golden) renamed to \"[file root $filename]$SUFFIX\" into current"
+} else {
+  puts "suemerge failed."
+}
+
+exit 1
+

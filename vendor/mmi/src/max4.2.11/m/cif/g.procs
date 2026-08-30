@@ -1,0 +1,752 @@
+CIFGenLayer --
+--------------
+
+This routine will generate one CIF layer.
+It provides the core of the CIF generator.
+
+Results:
+Returns a malloc'ed plane with tiles of type CIF_SOLIDTYPE
+marking the area of this CIF layer as built up by op.
+
+Side effects:
+None, except to create a new plane holding the CIF for the layer.
+The CIF that's generated may fall outside of area... it's what
+results from considering everything in area.  In most cases the
+caller will clip the results down to the desired area.
+
+CIFGen --
+---------
+
+This procedure generates a complete set of CIF layers for
+a particular area of a particular cell.  NOTE: if the argument
+genAllPlanes is FALSE, only planes for those layers having
+a bit set in 'layers' are generated; the others are set
+to NULL.
+
+Results:
+None.
+
+Side effects:
+The parameters realPlanes and tempPlanes are modified
+to hold the CIF and temporary layers for area of cellDef,
+as determined by the current CIF generation rules.
+
+CIFClearPlanes --
+-----------------
+
+This procedure clears out a collection of CIF planes.
+
+Results:
+None.
+
+Side effects:
+Each of the planes in "planes" is re-initialized to point to
+an empty paint plane.
+
+CIFInitCells --
+---------------
+
+This procedure just sets up cell definitions and uses needed
+for hierarchical checking and other CIF uses.
+
+Results:
+None.
+
+Side effects:
+DRCUse, DRCDef, and DRCDummyUse are set up if they're not
+there already.
+
+CIFGenSubcells --
+-----------------
+
+This procedure computes all of the CIF that must be added to
+a given area to compensate for interactions between subcells.
+
+Results:
+None.
+
+Side effects:
+The parameter "output" is modified (by OR'ing) to hold all
+the CIF that was generated for subcells.
+
+CIFGenArrays --
+---------------
+
+This procedure computes all of the CIF that must be added to
+a given area of a parent to compensate for interactions between
+elements of arrays in that area.
+
+Results:
+None.
+
+Side effects:
+The parameter output is modified (by OR'ing) to hold all
+the CIF that was generated for array interactions.
+
+CIFPrintStats --
+----------------
+
+This procedure prints out CIF statistics including both
+total values and counts since the last printing.
+
+Results:
+None.
+
+Side effects:
+Several messages are printed.
+
+CIFSetStyle --
+--------------
+
+This procedure changes the current CIF output style to the one
+named by the parameter.
+
+Results:
+None.
+
+Side effects:
+The current CIF style is changed.  If the name doesn't match,
+or is ambiguous, then a list of all CIF styles is output.
+
+The variables exporting unit sizes are set to this style.
+
+CIFNameToMask --
+----------------
+
+Finds the CIF planes for a given name.
+
+Results:
+TRUE if successful, FALSE if "name" failed to match any layers.
+
+Side effects:
+If there's no match, then an error message is output.
+The sets 'result' to be all types containing the CIF layer named
+"name".  The current CIF style is used for the lookup.
+
+CIFError --
+-----------
+
+This procedure is called by low-level CIF generation routines
+when a problem is encountered in generating CIF.  This procedure
+notes the problem using the feedback mechanism.
+
+Results:
+None.
+
+Side effects:
+Feedback information is added.  The caller must have set CIFErrorDef
+to point to the cell definition that area refers to.  If CIFErrorDef
+is NULL, then errors are ignored.
+
+CIFReadCellInit --
+------------------
+
+This procedure initializes the data structures in this
+module just prior to reading a CIF or GDS file.
+
+If ptrkeys is 0, the keys used in this hash table will
+be strings; if it is 1, the keys will be CIF numbers.
+
+Results:
+None.
+
+Side effects:
+The cell hash table is initialized, and things are set up
+to put information in the EditCell first.
+
+CIFReadCellCleanup --
+---------------------
+
+Free temporary storage after a CIF or GDS file has been read in.
+
+CIFParseStart --
+----------------
+
+Parse the beginning of a symbol (cell) definition.
+ds ::= D { blank } S integer [ sep integer sep integer ]
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+Set up information for the new cell, including the CIF
+planes and creating a Magic cell (if one doesn't exist
+already).
+
+CIFPaintCurrent --
+------------------
+
+This procedure does geometrical processing on the current
+set of CIF planes, and paints the results into the current
+CIF cell.
+
+Results:
+None.
+
+Side effects:
+Lots of information gets added to the current Magic cell.
+
+CIFParseFinish --
+-----------------
+
+This procedure is called at the end of a cell definition.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+Process the CIF planes and paint the results into the Magic
+cell.
+
+CIFParseDelete --
+-----------------
+
+This procedure is called to handle delete-symbol statements.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+The mapping between numbers and cells is modified to eliminate
+some symbols.
+
+CIFParseCall --
+---------------
+
+This procedure processes subcell uses.  The syntax of a call is
+call ::= C integer transform
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+A subcell is added to the current Magic cell we're generating.
+
+CIFParseUser --
+---------------
+
+This procedure is called to process user-defined statements.
+The syntax is user ::= digit usertext.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+Depends on the user command.
+
+CIFReadCellFinish --
+--------------------
+
+This procedure is called after processing the CIF file.
+(not GDS!) to perform final processing after the cif has
+been read in.
+
+Results:
+None.
+
+Side effects:
+The area of each cell is DRC'ed and redisplayed.  Error
+messages are output for any cells whose contents weren't
+in the CIF file.  An error message is also output if
+we're still in the middle of reading a subcell.
+
+CIFPolyToRects --
+-----------------
+
+Converts a manhattan polygon (specified as a path) into a
+linked list of rectangles.
+
+Results:
+The return value is a linked list of rectangles, or NULL if
+something went wrong.
+
+Side effects:
+Memory is allocated to hold the list of rectangles.  It is
+the caller's responsibility to free up the memory.
+
+CIFParseBox --
+--------------
+
+This procedure parses a CIF box command.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+A box is added to the CIF information for this cell.  The
+box better not have corners that fall on half-unit boundaries.
+
+CIFParseFlash --
+----------------
+
+This routine parses and processes a roundflash command.  The syntax is:
+roundflash ::= R diameter center
+
+We approximate a roundflash by a box.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+Paint is added to the current CIF plane.
+
+CIFParseWire --
+---------------
+
+This procedure parses CIF wire commands, and adds paint
+to the current CIF cell.  A wire command consists of
+an integer width, then a path.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+The current CIF planes are modified.
+
+CIFParseLayer --
+----------------
+
+This procedure parses layer changes.  The syntax is:
+layer ::= L { blank } processchar layerchars
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+Switches the CIF plane where paint is being saved.
+
+CIFParsePoly --
+---------------
+
+This procedure reads and processes a polygon command.  The syntax is:
+polygon ::= path
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+Paint is added to the current CIF plane.
+
+CIFReadNameToType --
+--------------------
+
+This procedure finds the type (integer index) of a given
+layer name.
+
+Results:
+The return value is the type.  If we ran out of space in
+the CIF layer table, or if the layer wasn't recognized and
+it isn't OK to make a new layer, -1 gets returned.
+
+Side effects:
+If no layer exists by the given name and newOK is TRUE, a
+new layer is created.
+
+CIFCalmaLayerToCifLayer --
+--------------------------
+
+Find the CIF number of the layer matching the supplied Calma
+layer number and datatype.
+
+Results:
+Returns the CIF number of the above layer, or -1 if it
+can't be found.
+
+Side effects:
+None.
+
+CIFParseReadLayers --
+---------------------
+
+Given a comma-separated list of CIF layer names, builds a
+bit mask of all those layer names.
+
+Results:
+Number of layers in list.
+
+Side effects:
+Modifies the parameter pointed to by mask so that it contains
+a mask of all the CIF layers indicated.  If any of the CIF
+layers didn't exist, new ones are created.  If we run out
+of CIF layers, an error message is output.
+
+CIFReadTechInit --
+------------------
+
+Called once at the beginning of technology file read-in to
+initialize data structures.
+
+Results:
+None.
+
+Side effects:
+Clears out the layer data structure.
+
+CIFReadTechLine --
+------------------
+
+This procedure is called once by the tech module for each line
+in the "cifinput" section of the technology file.
+
+Results:
+None.
+
+Side effects:
+Sets up information in the tables used to read CIF, and prints
+error messages if problems arise.
+
+CIFReadTechFinal --
+-------------------
+
+This procedure is invoked after all the lines of a technology
+file have been read.  It checks to make sure that the information
+read in "cifinput" sections is reasonably complete.
+
+Results:
+None.
+
+Side effects:
+Error messages may be output.
+
+CIFReadError --
+---------------
+
+This procedure is called to print out error messages during
+CIF file reading.
+
+Results:
+None.
+
+Side effects:
+An error message is printed.
+
+Note:
+You can add more arguments if three turns out not to be enough.
+
+CIFSkipBlanks --
+----------------
+
+This procedure skips over whitespace in the CIF file,
+keeping track of the line number and other information
+for error reporting.
+
+Results:
+None.
+
+Side effects:
+Advances through the CIF file.
+
+CIFSkipSep --
+-------------
+
+Skip over separators in the CIF file.  Blanks and upper-case
+characters are separators.
+
+Results:
+None.
+
+Side effects:
+Advances through the CIF file.
+
+CIFSkipToSemi --
+----------------
+
+This procedure is called after errors.  It skips everything
+in the CIF file up to the next semi-colon.
+
+Results:
+None.
+
+Side effects:
+Advances through the CIF file.
+
+CIFSkipSemi --
+--------------
+
+Skips a semi-colon, including blanks around the semi-colon.
+
+Results:
+None.
+
+Side effects:
+Advances through the CIF file.
+
+CIFParseSInteger --
+-------------------
+
+This procedure parses a signed integer from the CIF file.
+
+Results:
+TRUE is returned if the parse completed without error,
+FALSE otherwise.
+
+Side effects:
+The integer pointed to by valuep is modified with the
+value of the signed integer.
+
+CIFParseInteger --
+------------------
+
+Parses a positive integer from the CIF file.
+
+Results:
+TRUE is returned if the parse was completed successfully,
+FALSE otherwise.
+
+Side effects:
+The value pointed to by valuep is modified to hold the integer.
+
+CIFParsePoint --
+----------------
+
+Parse a point from a CIF file.  A point is two integers
+separated by CIF separators.
+
+Results:
+TRUE is returned if the point was parsed correctly, otherwise
+FALSE is returned.
+
+Side effects:
+The parameter pointp is filled in with the coordinates of
+the point.
+
+CIFParsePath --
+---------------
+
+This procedure parses a CIF path, which is sequence of
+one or more points.
+
+If the path is non-Manhattan, we introduce additional
+stair-steps a minimum of one Max DB unit 
+high and wide along each non-Manhattan segment.
+
+Results:
+TRUE is returned if the path was parsed successfully,
+FALSE otherwise.
+
+Side effects:
+Modifies the parameter pathheadpp to point to the path
+that is constructed.
+
+CIFMakeManhattanPath --
+-----------------------
+
+Convert a non-Manhattan path into a Manhattan one by adding
+additional points.  These points are added using a simple
+scan-conversion algorithm that generates a series of stair
+steps that are at least one Max Database units
+high and wide (but which may be higher or wider).
+
+Results:
+None.
+
+Side effects:
+May insert additional points in the path.
+
+CIFFreePath --
+--------------
+
+This procedure frees up a path once it has been used.
+
+Results:
+None.
+
+Side effects:
+All the elements of path are returned to the storage allocator.
+
+CIFDirectionToTrans --
+----------------------
+
+This procedure is used to convert from a direction vector
+to a Magic transformation.  The direction vector is a point
+giving a direction from the origin.  It better be along
+one of the axes.
+
+Results:
+The return value is the transformation corresponding to
+the direction, or the identity transform if the direction
+isn't along one of the axes.
+
+Side effects:
+None.
+
+CIFParseTransform --
+--------------------
+
+This procedure is called to read in a transform from a
+CIF file.
+
+Results:
+TRUE is returned if the parse completed successfully, and
+FALSE is returned otherwise.
+
+Side effects:
+The parameter pointed to by transformp is modified to
+contain the transform indicated by the CIF file.
+
+CIFReadFile --
+--------------
+
+
+CIFSetReadStyle --
+------------------
+
+This procedure changes the current style used for reading
+CIF.
+
+Results:
+None.
+
+Side effects:
+The CIF style is changed to the one specified by name.  If
+there is no style by that name, then a list of all valid
+styles is output.
+
+CIFSeeLayer --
+--------------
+
+Generates CIF over a given area of a given cell, then
+highlights a particular CIF layer on the screen.
+
+Results:
+None.
+
+Side effects:
+Highlight information is drawn on the screen.
+
+CIFSeeHierLayer --
+------------------
+
+This procedure is similar to CIFSeeLayer except that it only
+generates hierarchical interaction information.
+
+Results:
+None.
+
+Side effects:
+CIF information is highlighed on the screen.  If arrays is
+TRUE, then CIF that stems from array interactions is displayed.
+if subcells is TRUE, then CIF stemming from subcell interactions
+is displayed.  If both are TRUE, then both are displayed.
+
+CIFTechInit --
+--------------
+
+Called once at beginning of technology file read-in to
+initialize data structures.
+
+Results:
+None.
+
+Side effects:
+Just clears out the layer data structures.
+
+CIFTechLine --
+--------------
+
+This procedure is called once for each line in the "cif"
+section of the technology file.
+
+Results:
+TRUE normally, FALSE on error.
+
+Side effects:
+Sets up information in the tables of CIF layers, and
+prints error messages where there are problems.
+
+CIFTechFinal --
+---------------
+
+This procedure is invoked after all the lines of a technology
+file have been read.  It checks to make sure that the
+section ended at a consistent point, and computes the interaction
+distances for hierarchical CIF processing.
+
+Results:
+None.
+
+Side effects:
+Error messages are output if there's incomplete stuff left.
+Interaction distances get computed for each CIF style
+in two steps.  First, for each layer the total grow and
+shrink distances are computed.	These are the maximum distances
+that edges may move because of grows and shrinks in creating
+the layer.  Second, the	radius for the style is computed.
+The radius is used in two ways: first to determine how far
+apart two subcells may be and still interact during CIF
+generation;  and second, to see how much material to yank in
+order to find all additional CIF resulting from interactions.
+Right now, a conservative approach is used:  use the greater
+of twice the largest grow distance or twice the largest shrink
+distance for both.  Twice the grow distance must be considered
+because two pieces of material may each grow towards the other
+and interact in the middle.  Twice the largest shrink distance
+is needed because subcells considered individually may each
+shrink away from a boundary where they touch;  the parent must
+fill in the gap.  To do this, it must include 2S additional
+material:  S is the size of the gap that must be filled, but
+its outside edge will shrink in by S, so we must start with
+2S material to have S left after the shrink.  Finally, one extra
+unit gets added because two pieces of material one radius apart
+can interact:  to find all this material we must look one unit
+farther out for anything overlapping (the search routines only
+look for overlapping material and ignore abutting material).
+
+CIFWrite --
+-----------
+
+Write out the entire tree rooted at the supplied CellDef in CIF format,
+to the specified file.
+
+Results:
+TRUE if the cell could be written successfully, FALSE otherwise.
+
+Side effects:
+Writes a file to disk.
+In the event of an error while writing out the cell,
+the external integer errno is set to the UNIX error
+encountered.
+
+Algorithm:
+We make a depth-first traversal of the entire design tree,
+marking each cell with a CIF symbol number and then outputting
+it to the CIF file.  If a given cell is not read in when we
+visit it, we read it in.
+
+No hierarchical design rule checking or bounding box computation
+occur during this traversal -- both are explicitly avoided.
+
+CIFWriteFlat --
+---------------
+
+Write out the entire tree rooted at the supplied CellDef in CIF format,
+to the specified file, but write non-hierarchical CIF.  
+
+Results:
+TRUE if the cell could be written successfully, FALSE otherwise.
+
+Side effects:
+Writes a file to disk.
+In the event of an error while writing out the cell,
+the external integer errno is set to the UNIX error
+encountered.
+
+Algorithm:
+We operate on the cell in chunks chosen to keep the memory utilization
+reasonable.  Foreach chunk, we use DBSearchPaint and cifHierCopyFunc to 
+flatten the 
+chunk into a yank buffer ("eliminating" the subcell problem), then use 
+cifOut to generate the CIF.
+No hierarchical design rule checking or bounding box computation
+occur during this operation -- both are explicitly avoided.
+

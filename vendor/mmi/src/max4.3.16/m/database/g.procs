@@ -1,0 +1,2775 @@
+DBArrayTransformInfo
+--------------------
+
+transform celluse array info 
+
+DBMakeArray --
+--------------
+
+Turn cellUse into an array whose X indices run from xlo through xhi
+and whose Y indices run from ylo through yhi.  The separation between
+adjacent array elements is xsep in the X direction, and ysep in the
+Y direction.
+
+The X and Y information is in coordinates of the root cell def.
+It gets transformed down to the def of cellUse according to the
+transform supplied.  What we do guarantee is that the array
+indices will appear, in root coordinates, to run from xlo to xhi
+left-to-right, and from ylo to yhi bottom-to-top.
+
+Results:
+None.
+
+Side Effects:
+The array information if toCellUse is modified.
+
+DBArrayOverlap --
+-----------------
+
+Determine which elements of an array overlap the supplied clipping
+rectangle.  Assumes that the clipping rectangle overlaps at least
+some part of the array area.
+
+Results:
+None.
+
+WARNING:
+This code is very sensitive to being changed.  Make sure you
+understand it before you change it.
+
+Side Effects:
+Sets *pxlo, *pxhi, *pylo, *pyhi to be the inclusive range of array
+indices which overlay the given clipping rectangle.
+
+If there is any overlap in X, *pxlo <= *pxhi; similarly, if there
+is any overlap in Y, *pylo <= *pyhi.
+
+DBComputeArrayArea --
+---------------------
+
+Given an area in native coordinates of a celldef, computes the
+corresponding area in a parent's coordinates, for a particular
+celluse and a particular element of an array.
+
+Results:
+None.
+
+Side Effects:
+Sets *prect to the given area in the given array instance,
+subject to the arraying and transformation inforamtion in
+the given cellUse.
+
+DBGetArrayTransform --
+----------------------
+
+This procedure computes the transform from a particular element
+of an array to the coordinates of the array as a whole.
+
+Results:
+The return result is a pointer to a transform describing how
+coordinates of use->cu_def must be transformed in order to
+appear in the (x,y) element location.  In other words, if the
+transform for the whole array (use->cu_transform) were
+GeoIdentityTransform, this is the transform from use->cu_def
+to the parent use for the (x,y) element.  By the way, the
+return result is a locally-allocated transform that goes away
+the next time this procedure is called, so use it carefully.
+
+Side effects:
+None.
+
+DBBoxCellInitial --
+-------------------
+
+Sets cells bbox to rectangle with corners at (0,0) and (1,1)
+Used as (initial) bbox for empty cells.
+
+DBBoxPlane --
+-------------
+
+Determine the bounding box for the supplied tile plane.
+The bounding box is the smallest rectangle that completely
+encloses all non-space tiles.
+
+If the tile plane is completely empty, we return a 0x0 bounding
+box at the origin.
+
+Results:
+TRUE if the tile plane contains any geometry, FALSE
+if it is completely empty.
+
+Side effects:
+Sets *rect to the bounding rectangle.
+
+DBBoundPlane --
+---------------
+
+Determine the bounding rectangle for the supplied tile plane.
+The bounding rectangle is the smallest rectangle that completely
+encloses all non-space tiles.
+
+If the tile plane is completely empty, we return a 0x0 bounding
+box at the origin.
+
+Results:
+TRUE if the tile plane contains any geometry, FALSE
+if it is completely empty.
+
+Side effects:
+Sets *rect to the bounding rectangle.
+
+DBBoundPlaneVert --
+-------------------
+
+Determine the bounding rectangle for the supplied tile plane,
+which is organized into maximal vertical strips instead of
+maximal horizontal ones.
+
+The bounding rectangle is the smallest rectangle that completely
+encloses all non-space tiles.
+
+If the tile plane is completely empty, we return a 0x0 bounding
+box at the origin.
+
+Results:
+TRUE if the tile plane contains any geometry, FALSE
+if it is completely empty.
+
+Side effects:
+Sets *rect to the bounding rectangle.
+
+DBCellLookDef --
+----------------
+
+Find the definition of the cell with the given name.
+
+Results:
+Returns a pointer to the CellDef with the given name if it
+exists.  Otherwise, returns (CellDef *) NULL.
+
+Side effects:
+None.
+
+DBCellNewDef --
+---------------
+
+Create a new cell definition with the given name.  There must not
+be any cells already known with the same name.
+
+Results:
+Returns a pointer to the newly created CellDef.  The CellDef
+is completely initialized, showing no uses and having all
+tile planes initialized via TiNewPlane() to contain a single
+space tile.  The filename associated with the cell is set to
+the name supplied, but no attempt is made to open it or create
+it.
+
+If the cellName supplied is NULL, the cell is entered into
+the symbol table with a name of UNNAMED.
+
+Returns NULL if a cell by the given name already exists.
+
+Side effects:
+The name of the CellDef is entered into the symbol table
+of known cells.
+
+DBCellRenameDef --
+------------------
+
+Renames the indicated CellDef.
+
+Results:
+TRUE if successful, FALSE if the new name was not unique.
+
+Side effects:
+The name of the CellDef is entered into the symbol table
+of known cells.  The CDMODIFIED bit is set in the flags
+of each of the parents of the CellDef to force them to
+be written out using the new name.
+
+DBCellDeleteDef --
+------------------
+
+Removes the CellDef from the symbol table of known CellDefs and
+frees the storage allocated to the CellDef.  
+
+If the CellDef is referenced (has uses), its contents are cleared
+and it is marked unavailable, but the def is not actually removed. 
+
+NOTE:  If the cell is removed, the undo stack is flushed, since it
+could contain references to the def.
+
+Results:
+TRUE if successful, FALSE if there were any outstanding
+CellUses found.
+
+DBNewYank --
+------------
+
+Create a new yank buffer with name 'yname'.
+
+Results:
+None.
+
+Side effects:
+Fills in *pydef with a newly created CellDef by that name, and
+*pyuse with a newly created CellUse pointing to the new def.
+The CellDef pointed to by *pydef has the CD_INTERNAL flag
+set, and is marked as being available.
+
+DBCellClearContents --
+----------------------
+
+Empties out all tile planes of the indicated CellDef, making it
+as though the def had been newly allocated.
+
+Results:
+None.
+
+Side effects:
+The paint and subcells stored in the CellDef are all deleted.
+Sets the bounding box to the degenerate (0,0)::(1,1) box.
+
+DBCellClearContentsUp --
+------------------------
+
+Wrapper around DBCellClearContents that does all appropriate updates,
+e.g. display and drc.
+
+Empties out all tile planes of the indicated CellDef, making it
+as though the def had been newly allocated.
+
+Results:
+None.
+
+Side effects:
+The paint and subcells stored in the CellDef are all deleted.
+Sets the bounding box to the degenerate (0,0)::(1,1) box.
+
+DBCellSetAvail --
+-----------------
+DBCellClearAvail --
+
+Mark a cell as available/unavailable.
+These exist mainly to create a cell for the first time, and to
+allow a cell to be 'flushed' via the "flush" command.
+
+Results:
+None.
+
+Side effects:
+Modifies flags in cellDef.
+
+DBCellSrDefs --
+---------------
+
+Search for all cell definitions matching a given pattern.
+For each cell definition whose flag word contains any of the
+bits in pattern, the supplied procedure is invoked.
+
+The procedure should be of the following form:
+int
+func(cellDef, cdata)
+CellDef *cellDef;
+ClientData cdata;
+{
+}
+Func should normally return 0.  If it returns 1 then the
+search is aborted.
+
+Results:
+Returns 1 if the search completed normally, 1 if it aborted.
+
+Side effects:
+Whatever the user-supplied procedure does.
+
+DBSelectCell --
+---------------
+
+Select the next cell containing a given point.
+
+Results:
+Returns a pointer to the next CellUse containing the given
+point, or NULL if we have visited all CellUses containing it.
+The ordering of CellUses visited is smallest in area to largest.
+Both expanded cells, and unexpanded cells all of whose parents
+are expanded, are returned.
+
+Side effects:
+Sets *transform to be the transform from coordinates of
+the CellUse's definition to those of the root cell use.
+Sets *selp to be the x and y array indices of the selected cell.
+Returns path in the argument "tpath".
+
+DBCellNewUse --
+---------------
+
+Create a new cell use of the supplied CellDef.
+
+Results:
+Returns a pointer to the new CellUse.  The CellUse is initialized
+to reflect that cellDef is its definition.  The transform is
+initialized to the identity, and the parent pointer initialized
+to NULL.
+
+Side effects:
+Updates the use list for cellDef.
+
+DBCellInitTempUse --
+--------------------
+
+Initialize a temporary use.  
+
+This is bascially a light weight alternative to DBCellNewUse, for use
+in DBSearch routines to create initial use (handle) from which to start 
+search.  Avoids Malloc (can be passed a use from stack), and does not
+link use in cd_uses list, so DBCellDeleteUse() call is not needed. 
+
+Results:
+None.
+
+Side effects:
+Initializes use. 
+
+DBCellDeleteUse --
+------------------
+
+Remove a CellUse.
+Frees the storage allocated to the CellUse, 
+unlinks use from corresponding defs cd_use list.
+
+It is required that the CellUse has been removed from any CellTileBodies
+in the subcell plane of its parent.  The parent pointer for this
+CellUse must therefore be NULL.
+
+Results:
+TRUE if the CellUse was successfully removed, FALSE if
+the parent pointer were not NULL.
+
+Side effects:
+All storage for the CellUse is freed.
+The list of all CellUses associated with a given CellDef is
+updated to reflect the absence of the deleted CellUse.
+
+DBCellUseSetBBox --
+-------------------
+
+Compute the bounding box for a CellUse in coordinates of its parent.
+
+Results:
+None.
+
+Side effects:
+
+Sets cellUse->cu_bbox to be the bounding box for the indicated CellUse
+in coordinates of that CellUse's parent.
+
+Sets cu_vBBOX to cd_vBBOX of subcell.
+
+DBCellUseSetArray --
+--------------------
+
+Copy the array information from fromCellUse to toCellUse
+
+Results:
+None.
+
+Side Effects:
+The array information if toCellUse is modified.
+
+DBCellUseSetTrans --
+--------------------
+
+Change the transform for cellUse to that supplied.
+
+Results:
+None.
+
+Side Effects:
+Updates cellUse->cu_trans and cellUse->cu_bbox
+
+DBChangedArea --
+----------------
+
+Handle all the bookkeeping necessary when a change has been made
+to the database, including:
+
+redisplay scheduling   
+drc notification
+keeping bounding box info up to date.
+
+DBChangeNewInstance --
+----------------------
+
+Called by DBInstanceAdd()
+
+Checks versions on new instance and sets cd_changesPending in
+parent as required (to be propagated on next DBChangedArea())
+
+Assumes DBChangedArea() will be called on the 
+area including the instance!
+
+DBChunk --
+----------
+
+This procedure finds largest rectangular chunk of homogeneous material
+on given layer and covering given area.
+
+largest:
+first, maximum minimum dimension.
+second (subordinate to above), maximum maximum dimension.
+
+Adjusts scx_area to chunk.  
+
+DBTreeCopyConnect --
+--------------------
+
+This procedure copies connected information from a given cell
+hierarchy to a given (flat) cell.  Starting from the tile underneath
+the given area, this procedure copies all connected paint 
+(in all cells) to the result cell.
+
+If there are several electrically
+distinct nets underneath the given area, one is picked at "random".
+
+NOTE: This routine assumes the dest cell starts out empty!
+May not work correctly if the dest cell doesn't start out empty.
+
+DBTechInitContact --
+--------------------
+
+Mark all types as being non-contacts initially.
+
+Results:
+None.
+
+Side effects:
+Initializes dbLayerInfo.
+Also marks each type in DBLayerTypeMaskTbl[] as consisting
+only of itself (no other images).
+
+DBTechAddContact --
+-------------------
+
+Add the definition of a new contact type.
+The syntax of each line in the "contact" section is:
+
+contactType res1 res2 [res3]
+
+where res1, res2, and res3 are the residue types on the planes
+connected by the contact.  At most three residue types may be
+specified.  Furthermore, one must be on the home plane of the
+contact (the plane specified in the "types" section for the type
+contactType), and the others must be on adjacent planes.  Finally,
+there can be only a single contactType that has the same residues.
+
+Results:
+FALSE on error, TRUE if successful.
+
+Side effects:
+Adds the definition of a new contact type.
+
+DBTechFinalContact --
+---------------------
+
+Conclude reading the "contact" section of a technology file.
+At this point, all tile types are known so we can call dbTechInitPaint()
+to fill in the default paint/erase tables, and dbTechInitMasks() to fill
+in the various exported TileTypeBitMasks.
+
+Results:
+None.
+
+Side effects:
+Fills in the dbLayerInfo table for non-contacts.
+Sets DBLayerTypeMaskTbl to its final value.
+Initializes DBTypePlaneMaskTbl[] and DBPlaneTypes[].
+
+DBTechGetContact --
+-------------------
+
+Given two tile types, determine the corresponding contact type.
+
+Results:
+Returns a contact type.
+
+Side effects:
+Prints stuff if it can't find a contact type.
+
+DBCopyPaint --
+--------------
+
+Copy paint and polygons from scx->scx_use and descendents
+to targetUse, transforming according to the transform in scx.
+
+Only the types specified by typeMask are copied.
+
+Flags:
+DBCP_NON_RECURSIVE - paint from top cell only.
+DBCP_ACTIVE_GROUP_ONLY - only copy active group.
+DBCP_NO_TILES - don't copy paint tiles. 
+DBCP_NO_POLY - don't copy polygons
+DBCP_NO_WP - don't copy wirepaths
+
+DBCellCopyAllLabelsG --
+-----------------------
+
+Copy labels from the tree rooted at scx->scx_use to targetUse,
+transforming according to the transform in scx.  Only labels
+attached to layers of the types specified by mask are copied.
+The area to be copied is determined by GEO_LABEL_IN_AREA.
+
+Results:
+None.
+
+Side effects:
+Copies labels to targetUse, clipping against scx->scx_area.
+If pArea is given, store in it the bounding box of all the
+labels copied.
+
+DBCellCopyAllLabels --
+----------------------
+
+Copy labels from the tree rooted at scx->scx_use to targetUse,
+transforming according to the transform in scx.  Only labels
+attached to layers of the types specified by mask are copied.
+The area to be copied is determined by GEO_LABEL_IN_AREA.
+
+Results:
+None.
+
+Side effects:
+Copies labels to targetUse, clipping against scx->scx_area.
+If pArea is given, store in it the bounding box of all the
+labels copied.
+
+DBCellCopyLabelsG --
+--------------------
+
+Copy labels from scx->scx_use to targetUse, transforming according to
+the transform in scx.  Only labels attached to layers of the types
+specified by mask are copied.  If mask contains the L_LABEL bit, then
+all labels are copied regardless of their layer.  The area copied is 
+determined by GEO_LABEL_IN_AREA.
+
+Results:
+None.
+
+Side effects:
+Updates the labels in targetUse.  If pArea is given, it will
+be filled in with the bounding box of all labels copied.
+
+DBCellCopyLabels --
+-------------------
+
+Copy labels from scx->scx_use to targetUse, transforming according to
+the transform in scx.  Only labels attached to layers of the types
+specified by mask are copied.  If mask contains the L_LABEL bit, then
+all labels are copied regardless of their layer.  The area copied is 
+determined by GEO_LABEL_IN_AREA.
+
+Results:
+None.
+
+Side effects:
+Updates the labels in targetUse.  If pArea is given, it will
+be filled in with the bounding box of all labels copied.
+
+DBCellCopyAllCells --
+---------------------
+
+Copy unexpanded subcells from the tree rooted at scx->scx_use
+to the subcell plane of targetUse, transforming according to
+the transform in scx.
+
+This effectively "flattens" a cell hierarchy in the sense that
+all unexpanded subcells in a region (which would appear in the
+display as bounding boxes) are copied into targetUse without
+regard for their original location in the hierarchy of scx->scx_use.
+If an array is unexpanded, it is copied as an array, not as a
+collection of individual cells.
+
+Results:
+None.
+
+Side effects:
+Updates the cell plane in targetUse.  If pArea is given, it
+will be filled in with the total area of all cells copied.
+
+DBCellCopyCells --
+------------------
+
+Copy all subcells that are immediate children of scx->scx_use->cu_def
+into the subcell plane of targetUse, transforming according to
+the transform in scx.  Arrays are copied as arrays, not as a
+collection of individual cells.  If a cell is already present in
+targetUse that would be exactly duplicated by a new cell, the new
+cell isn't copied.
+
+Results:
+None.
+
+Side effects:
+Updates the cell plane in targetUse.  If pArea is given, it will
+be filled in with the bounding box of all cells copied.
+
+DBNewPaintTable --
+------------------
+
+This procedure changes the paint table to be used by 
+DBCopyPaint()
+
+Results:
+The return value is the address of the paint table that used
+to be in effect.  It is up to the client to restore this
+value with another call to this procedure.
+
+Side effects:
+A new paint table takes effect.
+
+DBNewPaintPlane --
+------------------
+
+This procedure changes the painting procedure to be used by the
+DBCellCopyPaint and DBCellCopyAllPaint procedures.
+
+Results:
+The return value is the address of the paint procedure that
+used to be in effect.  It is up to the client to restore this
+value with another call to this procedure.
+
+Side effects:
+A new paint procedure takes effect.
+
+DBCellCopyDef--
+---------------
+
+Copies the contents of the source cell def to the destination cell def.
+Does not clear the dest def first!
+
+DBTreeCountPaint --
+-------------------
+
+Allow the client to compute statistics on the paint in a subtree.
+The client provides three functions: 'count', 'hiercount', and
+'cleanup', which should be of the following form:
+
+int
+count(def, cdata)
+CellDef *def;
+ClientData cdata;
+{
+}
+
+The 'count' function is applied in a pre-order traversal of the
+cell graph; if it returns 0 then the subcells of 'def' are visited;
+if it returns 1 then the subcells are not visited.
+
+Void
+hiercount(parent, uses, child, cdata)
+CellDef *parent, *child;
+int uses;		/# Scale factor: number of times child
+# is used by parent
+#/
+ClientData cdata;
+{
+}
+
+The 'hiercount' function is applied in a post-order traversal of
+the cell graph, ie, it is applied only after all children of a
+cell have been visited.
+
+int
+cleanup(def, cdata)
+CellDef *def;
+ClientData cdata;
+{
+}
+
+The 'cleanup' function is applied in a pre-order traversal of the
+cell graph; if it returns 0 then the subcells of 'def' are visited;
+if it returns 1 then the subcells are not visited.
+
+Results:
+None.
+
+Side effects:
+Applies the client procedures as described above.
+The client is free to use each CellDef's cd_client
+field, but should reset this field to zero when the
+cleanup procedure is supplied.
+
+Algorithm:
+We first visit all CellDefs in the tree, applying the
+client's 'count' procedure to each CellDef.
+
+Next, we make a second pass over the cells, applying
+the client's 'hiercount' procedure to each CellDef
+in post-order (ie, the 'hiercount' procedure is first
+applied recursively to all the subtrees of a given
+def before being applied to the def itself).
+
+Finally, we make a pass over all CellDefs and apply
+the client's 'cleanup' procedure.
+
+DBEnumRoots --
+--------------
+
+Apply the supplied procedure to each root CellUse that contains the baseDef
+either as rootdef or descendent.
+
+A root is a CellUse with no parent def.
+
+The procedure should be of the following form:
+int
+func(cellUse, transform, cdarg)
+CellUse *cellUse;
+Transform *transform;
+ClientData cdarg;
+{
+}
+
+Transform is from coordinates of baseDef to those of the def of cellUse.
+Func normally returns 0.  If it returns 1 then the search is aborted.
+
+Results:
+0 is returned if the search terminated normally.  1 is returned
+if it was aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+DBEnumChildren --
+-----------------
+
+Apply the supplied procedure once to each CellUse in the subcell tile
+plane of the supplied CellDef.  
+
+Note differs from DBSrChildren in that this is not an area search and
+does not use scx.
+
+
+The procedure should be of the following form:
+int
+func(use, cdarg)
+CellUse *use;
+ClientData cdarg;
+{
+}
+
+Func returns 0 normally, 1 to abort the search.
+
+Results:
+0 if search terminated normally, 1 if it aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+TODO: consider recoding DBEnumChildren() using kid strucs instead of subcell plane 
+
+DBEnumArrayElements --
+----------------------
+
+Finds all elements of an array that fall in a particular area
+of the parent, and calls func for each element found.
+
+The procedure should be of the following form:
+int
+func(cellUse, trans, x, y, cdarg)
+CellUse *celluse;
+Transform *trans;
+int x, y;
+ClientData cdarg;
+{}
+
+In the above, cellUse is the original cellUse, trans is
+a transformation from the coordinates of the cell def to
+the coordinates of the use (for this array element), x and
+y are the indices of this array element, and cdarg is
+the ClientData supplied to us.	If 1 is returned by func,
+it is a signal to abort the search.
+
+Results:
+0 is returned if the search finished normally.  1 is returned
+if the search was aborted.
+
+Side effects:
+Whatever func does.
+
+DBExpand --
+-----------
+
+Expand/unexpand a single CellUse.
+
+Results:
+None.
+
+Side effects:
+If expandFlag is TRUE, sets all the bits of expandMask in
+the flags of the given cellUse.
+If expandFlag is FALSE, clears all bits of expandMask.
+
+If expandFlag is TRUE and the cell being expanded has not
+been read in, reads it in from disk.
+
+DBExpandAll --
+--------------
+
+Recursively expand/unexpand all cells which intersect or are
+contained within the given rectangle.  Furthermore, if func is
+non-NULL, it is invoked for each cell whose status has changed,
+just after the change has been made.  The calling sequence is
+
+int
+func(cellUse, cdarg)
+CellUse *cellUse;
+ClientData cdarg;
+{
+}
+
+In the calls to func, cellUse is the use whose expand bit has just
+been changed, and cdarg is the argument that the caller gave to us.
+Func should normally return 0.  If it returns a non-zero value, then
+the call terminates immediately and no more cells are expanded.
+
+Results:
+None.
+
+Side effects:
+If expandFlag is TRUE, sets all the bits specified by
+expandMask in the flags of each CellUse found to intersect
+the given rectangle.  If expandFlag is FALSE, clears all bits
+of expandMask.
+
+NOTE:  a cell that is unexpanded and read-in and whose previous bbox
+(stored with parent) does not intersect the area, will not be
+expanded, since we do not know that it intersects the area. 
+
+DBCellReadArea --
+-----------------
+
+Recursively read all cells which intersect or are contained within
+the given rectangle.
+
+Results:
+None.
+
+Side effects:
+May make new cells known to the database.  Sets the CDAVAILABLE
+bit in all cells intersecting the search area.
+
+DBFlyLineNotifyLabelChange --
+-----------------------------
+
+Called to notify flyline module whenever a label is added or deleted.
+
+Adjusts flyline endpoints attached to labels (if any) and notifys
+Layout module for redisplay.
+
+DBFlyLineInstanceChangeNotify --
+--------------------------------
+
+Called to notify flyline module whenever an instance is changed in a way
+that could impact flylines.
+
+Adjusts flyline endpoints attached to labels (if any) and notifys
+Layout module for redisplay.
+
+DBGroupTileTypesMask --
+-----------------------
+
+returns mask of all tile types of tile (all groups)
+
+DBGroupTileTypes2S --
+---------------------
+
+convert tiles groups/types to string (writes to buf)
+
+DBGroupClassNew --
+------------------
+
+Define a new group class
+
+Returns pointer to the new group class
+
+DBGroupClassFromName--
+----------------------
+
+Lookup named group class
+
+Returns pointer to named group (0 if not found)
+
+DBGroupAttributeSet --
+----------------------
+
+Set attribute value.
+
+DBGroupAttributeGet--
+---------------------
+
+get attribute value
+
+DBGroupNew --
+-------------
+
+Add a group to a cell def.
+
+Returns pointer to the new group
+
+DBGroupFromName--
+-----------------
+
+Lookup named group
+
+Returns pointer to named group (0 if not found)
+
+DBInit --
+---------
+
+Initialize this module.
+
+Results:
+None.
+
+DBInstanceFindByName --
+-----------------------
+
+Find the instance with the given id in the supplied parent CellDef.
+
+Results:
+Returns a pointer to the found CellUse, or NULL if it was not
+found.
+
+Side effects:
+None.
+
+DBIsChild --
+------------
+
+Test to see if cu1 is a child of cu2.
+
+Results:
+TRUE if cu1 is a child of cu2, FALSE otherwise.
+
+Side effects:
+None.
+
+DBIsAncestor --
+---------------
+
+Determine if cellDef1 is an ancestor of cellDef2.
+
+Results:
+TRUE if cellDef1 is an ancestor of cellDef2, FALSE if not.
+
+Side effects:
+None.
+
+DBInstanceAdd --
+----------------
+
+Make a celluse an instance.
+
+flags:
+DBIA_INFOMSG_ON_RENAME - print message when changing instance id
+(to make it unique).
+
+DBIA_ERROR_ON_RENAME   - generate error, if instance id not unique.
+
+DBIA_INFOMSG_ON_DUP    - print message when not adding instance, since
+exact duplicate already present.
+
+DBIA_ERROR_ON_DUP      - generate error if exact dupicate instance already
+present.
+
+cellkid and cellpar sturctures are also updated.
+
+This operation is not recorded on the undo list, as it always accompanies
+the creation of a new cell use.
+
+Results:
+TRUE on success, FALSE on failure
+
+Deletes use on failure.
+
+DBInstanceUnlink --
+-------------------
+
+Update the use-id hash table in parentDef to reflect the fact
+that 'use' no longer is known by instance-id use->cu_id.
+
+Notfiy flyline (sub)module of instance change.
+
+Results:
+None.
+
+Side effects:
+See above.
+
+DBInstanceRename --
+-------------------
+
+Change the instance id of the supplied CellUse.
+If the instance id is non-NULL, and the new id is the same
+as the old one, we do nothing.
+
+Results:
+Returns TRUE if successful, FALSE if the new name was not
+unique within the parent def.
+
+Side effects:
+May modify the cu_id of the supplied CellUse.
+
+DBInstancePlace --
+------------------
+
+Add a CellUse to the subcell tile plane of a CellDef.
+Assumes prior check that the new CellUse is not an exact duplicate
+of one already in place.
+
+Results:
+None.
+
+Side effects:
+Modifies the subcell tile plane of the given CellDef.
+CellDef's parent pointer to point to the parent def.
+
+DBInstanceUnplace --
+--------------------
+
+Remove a CellUse from the subcell tile plane of a CellDef.
+
+Results:
+None.
+
+Side effects:
+Modifies the subcell tile plane of the CellDef, sets the
+parent pointer of the deleted CellUse to NULL.
+
+DBLabelKindName --
+------------------
+
+
+Results:
+Name string for label kind
+
+DBLabelTypedText --
+-------------------
+
+Put label text, with prepended label kind id in nameBuf
+
+DBLabelKindParse --
+-------------------
+
+convert kind name string to integer code.
+
+Results:
+Label kind, -1 on error.
+
+DBLabelAlloc --
+---------------
+
+Allocate a label, copy text into it.
+
+Label is not linked into a cell.  
+
+See also: DBLabelLink() and DBLabelAddG() 
+
+DBLabelDup --
+-------------
+
+Allocate a new label, and copy old label values into it.
+
+Label is not linked into a cell.  
+NOTE: new label does not inherit old labels group (since groups are per def) 
+
+See also: DBLabelLink() and DBLabelAddG() 
+
+DBLabelLink --
+--------------
+
+Link label into cell def.
+If duplicate, frees (new) label and returns.
+
+Goes to pains to add label to end of list (may be required by extractor?)
+
+NOTE: there is no DBLabelUnlink() only DBLabelErase() - if you add
+DBLabelUnlink(), beware that undoing a DBLabelLink() frees the label!
+
+DBLabelEraseNext --
+-------------------
+
+unlink and free label with given next pointer
+returns pointer to next label in cells list.
+
+DBLabelAddG --
+--------------
+
+Place a rectangular label in the database, in given group in given cell.
+
+Results:
+The return value is the actual alignment position used for
+the label.  This may be different from align, if align is
+defaulted.
+
+Side effects:
+Updates the label list in the CellDef to contain the label.
+Updates cd_labelHash 
+
+DBLabelAdd --
+-------------
+
+Place a rectangular label in the database, in a particular cell
+in the currently active group.
+
+Results:
+The return value is the actual alignment position used for
+the label.  This may be different from align, if align is
+defaulted.
+
+Side effects:
+Updates the label list in the CellDef to contain the label.
+
+DBLabelErase --
+---------------
+
+Delete given label from given def.
+
+DBLabelsEraseArea --
+--------------------
+
+Delete labels attached to tiles of the indicated types that
+are in the given area (as determined by the macro GEO_LABEL_IN_AREA).  
+If this procedure is called as part of a command that also modifies paint, 
+then the paint modifications should be done BEFORE calling here.
+
+Only erases labels from activeGroup 
+
+Results:
+TRUE if any labels were deleted, FALSE otherwise.
+
+Side effects:
+This procedure tries to be clever in order to avoid deleting
+labels whenever possible.  If there's enough material on the
+label's attached layer so that the label can stay on its
+current layer, or if the label can be migrated to a layer that
+connects to its current layer, then the label is not deleted.
+Deleting up to the edge of a label won't cause the label
+to go away.  There's one final exception:  if the mask includes
+L_LABEL, then labels are deleted from all layers even if there's
+still enough material to keep them around.
+
+DBLabelsEraseByContentG --
+--------------------------
+
+Erase any labels found on the label list for the given
+CellDef and specified group that match the given specification.
+
+Results:
+None.
+
+Side effects:
+Modifies the label list for the argument CellDef.  The
+Layind module is notified about any labels that were
+deleted.
+
+DBLabelsEraseByContent --
+-------------------------
+
+Erase any labels found on the label list for the given
+CellDef, that match the given specification.
+
+Only labels in the currently active group are erased.
+
+Results:
+None.
+
+Side effects:
+Modifies the label list for the argument CellDef.  The
+Layind module is notified about any labels that were
+deleted.
+
+DBLabelsClear --
+----------------
+
+Remove all labels from celldef.
+
+DBSearchLabel --
+----------------
+
+Search for all occurrences of a point label matching the pattern in the
+region rect in the indicated cell and all of its children.  On each label
+matching the pattern found in the area, the supplied procedure is invoked.
+
+The supplied procedure should be of the form
+int
+func(scx, label, tpath, cdarg)
+SearchContext *scx;
+Label *label;
+TerminalPath *tpath;
+ClientData cdarg;
+{
+}
+
+In the above, scx is a search context specifying the cell use whose
+def was found to contain the label, and label is a pointer to the
+Label structure itself.  The transform specified in scx is from
+coordinates of the def of the cell containing the label to "root"
+coordinates.  Func should normally return 0.  If it returns 1 then
+the search is aborted.
+
+Results:
+If the search terminates normally, 0 is returned.  1 is
+returned if the search was aborted.
+
+Side effects:
+Applies the supplied procedure to each tile containing a label
+matching the pattern.
+
+WARNING: because of the way regex(3) works, it is possible to be
+searching for at most one pattern at a time.
+
+DBTreeFindUse --
+----------------
+
+This procedure finds the cell use with the given hierarchical name.
+
+Results:
+None.
+
+Side effects:
+Sets scx->scx_use to the cell use found, with scx->scx_trans
+and scx->scx_x, scx->scx_y also valid.  If the cell was not
+found, leaves scx->scx_use set to NULL.
+
+DBSrLabelLoc --
+---------------
+
+This procedure finds the locations of all labels with a given
+hierarchical name.  For each label found, a client-supplied
+search function is called.  The search function has the form:
+
+int
+func(scx, rect, name, label, cdarg)
+SearchContext *scx;
+Rect *rect;
+char *name;
+Label *label;
+ClientData cdarg;
+
+Rect is the location of the label, in the coordinates of rootUse->cu_def,
+name is the label's hierarchical name (just the parameter passed to us),
+label is a pointer to the label, and cdarg is the client data passed in
+to us by the client.  Note that there can be more than one label with the
+same name.  Func should normally return 0.  If it returns 1, then the
+search is aborted.
+
+Results:
+The return value is 0, unless func returned a non-zero value,
+in which case the return value is 1.
+
+Side effects:
+Whatever the search function does.
+
+DBSrLabelLocDef --
+------------------
+
+Just like DBSrlabelLoc() except first arg is def not use!
+
+This procedure finds the locations of all labels with a given
+hierarchical name.  For each label found, a client-supplied
+search function is called.  The search function has the form:
+
+int
+func(scx, rect, name, label, cdarg)
+SearchContext *scx;
+Rect *rect;
+char *name;
+Label *label;
+ClientData cdarg;
+
+Rect is the location of the label, in the coordinates of rootUse->cu_def,
+name is the label's hierarchical name (just the parameter passed to us),
+label is a pointer to the label, and cdarg is the client data passed in
+to us by the client.  Note that there can be more than one label with the
+same name.  Func should normally return 0.  If it returns 1, then the
+search is aborted.
+
+Results:
+The return value is 0, unless func returned a non-zero value,
+in which case the return value is 1.
+
+Side effects:
+Whatever the search function does.
+
+DBNearestLabel --
+-----------------
+
+This procedure finds the nearest label to a given point
+and returns its hierarchical name and location.
+
+Results:
+Area is searched in cellUse to find the nearest label
+to point.  TRUE is returned if any label was found.
+If there is no label in the given area, FALSE is
+returned.
+
+Side effects:
+The parameter labelArea is filled in with the location of
+the label, if one was found.  LabelName is filled in with
+the hierarchical name of the label.
+
+DBTechNameType --
+-----------------
+
+Map from a type name into a type number.  If the type name has
+the form "<type>/<plane>" and <type> is a contact, then the
+type returned is the image of the contact on <plane>.  Of
+course, in this case, <type> must have an image on <plane>.
+
+Results:
+Type number.  A value of -2 indicates that the type name was
+unknown; -1 indicates that it was ambiguous.
+
+Side effects:
+None.
+
+DBTechNoisyNameType --
+----------------------
+
+Map from a type name into a type number, complaining if the type
+is unknown.
+
+Results:
+Type number.  A value of -2 indicates that the type name was
+unknown; -1 indicates that it was ambiguous.
+
+Side effects:
+Prints a diagnostic message if the type name is unknown.
+
+DBTechNamePlane --
+------------------
+
+Map from a plane name into a plane number.
+
+Results:
+Plane number.  A value of -2 indicates that the plane name was
+unknown; -1 indicates that it was ambiguous.
+
+Side effects:
+None.
+
+DBTechNoisyNamePlane --
+-----------------------
+
+Map from a plane name into a plane number, complaining if the plane
+is unknown.
+
+Results:
+Plane number.  A value of -2 indicates that the plane name was
+unknown; -1 indicates that it was ambiguous.
+
+Side effects:
+Prints a diagnostic message if the type name is unknown.
+
+DBTypeShortName --
+------------------
+DBPlaneShortName --
+
+Return the short name for a type or plane.
+The short name is the "official abbreviation" for the type or plane,
+identified by a leading '*' in the list of names in the technology
+file.
+
+Results:
+Pointer to the primary short name for the given type or plane.
+If the type or plane has no official abbreviation, returns
+a pointer to the string "???".
+
+Side effects:
+None.
+
+DBTechTypesToPlanes --
+----------------------
+
+Convert a TileTypeBitMask into a mask of the planes which may
+contain tiles of that type.
+
+Results:
+A mask with bits set for those planes in which tiles of
+the types specified by the mask may reside.  The mask
+is guaranteed only to contain bits corresponding to
+paint tile planes.
+
+Side effects:
+None.
+
+DBTechPrintTypes --
+-------------------
+
+This routine prints out all the layer names for types defined
+in the current technology.
+
+Results:
+None.
+
+Side effects:
+Stuff is printed.
+
+DBTechNoisyNameMask --
+----------------------
+
+Parses an argument string that selects a group of layers.
+The string may contain one or more layer names separated
+by commas.  The special layer name of "0" specifies no layer,
+it is used as a place holder, e.g., to specify a null
+layer list for the CornerTypes field in a drc edge-rule.
+In addition, a tilde may be used to indicate
+"all layers but", and parentheses may be used for grouping.
+Thus ~x means "all layers but x", and ~(x,y),z means "z plus
+everything except x and y)".  When contacts are specified,
+ALL images of the contact are automatically included, unless
+a specific plane is indicated in the layer specification
+using "/".  For example, x/foo refers to the image of contact
+"x" on plane "foo".  The layer specification may also follow
+a parenthesized group.  For example, ~(x,y)/foo refers to
+all layers on plane "foo" except "x" and "y".
+
+Results:
+None.
+
+Side effects:
+Error messages are output if layers aren't understood.
+Sets the TileTypeBitMask 'mask' to all the layer names indicated.
+
+DBTechMinSetPlanes --
+---------------------
+
+Given a TileTypeBitMask, find the minimum set of planes that
+contains one image for each of the tile types in the mask.
+Also return a new tile type mask that contains the images
+of the original tiles that fall in the result planes.
+
+WARNING: must be called AFTER all the database technology
+initialization has completed.
+
+Results:
+A mask of planes.
+
+Side effects:
+The parameter newTypes is modified.
+
+DBTechSubsetLayers --
+---------------------
+
+Eliminate all bits from one mask that aren't in another, and
+check to be sure that this elimination only occurs for contact
+types that will still have one image in the result.
+
+Results:
+TRUE is returned if the subsetting was successful.  Success
+means that for each layer in "src", the corresponding layer
+is in "mask" or else "src" contains another image of the bit
+that is in "mask".
+
+Side effects:
+The mask pointed to by "result" is modified to contain the
+subset of "src" that is in "mask".
+
+DBTechAddPlane --
+-----------------
+
+Define a tile plane type for the new technology.
+
+Results:
+TRUE if successful, FALSE on error
+
+Side effects:
+Updates the database technology variables.
+In particular, updates the number of known tile planes.
+
+DBTechAddType --
+----------------
+
+Define a tile type for the new technology.
+
+Results:
+TRUE if successful, FALSE on error
+
+Side effects:
+Updates the database technology variables.
+In particular, updates the number of known tile types.
+
+DBTechFinalType --
+------------------
+
+After processing the types and planes sections, compute the
+various derived type and plane masks and tables.
+
+Results:
+None.
+
+Side effects:
+Initializes DBNumUserLayers to be DBNumTypes at the time
+this procedure is called, since none of the automatically
+generated plane images have yet been created.
+Initializes the following bit masks:
+DBAllTypeBits
+DBSpaceBits
+DBBuiltinLayerBits
+DBAllButSpaceBits
+DBAllButSpaceAndDRCBits
+DBUserLayerBits
+DBNonSpaceUserLayerBits
+DBFlyLineBits
+
+DBNextEdge --
+-------------
+
+Find next edge in given direction.
+
+Results:
+pointer to statically allocated point of intersection between ray from 
+starting point in given direction and the edge that was found.
+
+NULL if no edge found.
+
+NOTE:  boundary conditions handled carefully to make code using this
+routine direction independent.  e.g. we hide which edges are contained
+in a tile from caller.
+
+DBNextDistance --
+-----------------
+
+Find next point in given direction where distance to edge changes on given
+side (right-side or left-side)
+
+Results:
+Final point.
+
+NOTE:  boundary conditions handled carefully to make code using this
+routine direction independent.  e.g. we hide which edges are contained
+in a tile from caller.
+
+DBNextEdgeH --
+--------------
+
+Find next edge in given direction.
+Like DBNextEdge(), but hierarchical (looks at instances)
+
+Results:
+point of intersection between ray from 
+starting point in given direction and the edge that was found.
+
+NULL if no edge found.
+
+NOTE:  boundary conditions handled carefully to make code using this
+routine direction independent.  e.g. we hide which edges are contained
+in a tile from caller.
+
+DBNextDistanceH --
+------------------
+
+Find next point in given direction where distance to edge changes on given
+side (right-side or left-side)
+Like DBNextDistance(), but hierarchical (looks at instances)
+
+Results:
+new point.
+
+NOTE:  boundary conditions handled carefully to make code using this
+routine direction independent.  e.g. we hide which edges are contained
+in a tile from caller.
+
+DBNextLargestBoxInit --
+-----------------------
+
+Resets planes for DBNextLargestBox.
+
+DBNextLargestBox --
+-------------------
+
+Find largest box containing point on layer, without width change.
+(Hierarchical (looks at subcells))
+
+Results:
+largest box.
+
+DBPaintPlaneG --
+----------------
+
+Paint a rectangular area ('area') on a single tile plane ('plane'), for 
+a specified group.
+
+The argument 'resultTbl' is a table, indexed by the type of each tile
+found while enumerating 'area', that gives the result type for this
+operation.  The semantics of painting, erasing, and "writing" (storing
+a new type in the area without regard to the previous contents) are
+all encapsulated in this table. 
+
+If undo is desired, 'undo' should point to a PaintUndoInfo struct
+that contains everything needed to build an undo record.  Otherwise,
+'undo' can be NULL.
+
+Results:
+None.
+
+Side effects:
+Modifies the database plane that contains the given tile.
+
+REMINDER:
+Callers are responsible for change notification on the cell
+being modified
+
+DBPaintPlane --
+---------------
+
+Paint a rectangular area ('area') on a single tile plane ('plane'), for 
+group 0.
+
+See documentation for DBPaintPlaneG().
+
+DBPaintPlaneMergeOnce --
+------------------------
+
+This routine used in place of DBPaintPlane above by drc.
+Unlike DBPaintPlane, it is non interruptable.
+NOTE:  CURRENTLY this routine is not "group aware"
+
+Paint a rectangular area ('area') on a single tile plane ('plane').
+This is identical to DBPaintPlane(), except that we work in two
+passes:
+
+Pass 1: clip all tiles to lie inside the area to be painted,
+merging all outside tiles as required.  Change the
+types of each of these internal tiles.
+
+Pass 2:	re split and merge to insure that the database is
+once again in maximal horizontal strips.
+
+See DBPaintPlane for other comments.
+
+Results:
+None.
+
+Side effects:
+Modifies the database plane that contains the given tile.
+
+DBPaint --
+----------
+
+Paint a rectangular area with a specific tile type.
+All paint tile planes in cellDef are painted.
+
+Up to caller to call DBChangedArea() to notify of change.
+
+Results:
+None.
+
+Side effects:
+Modifies potentially all paint tile planes in cellDef.
+
+DBErase --
+----------
+
+Erase a specific tile type from a rectangular area.
+The plane in which tiles of the given type reside is modified
+in cellDef.
+
+Up to caller to call DBChangedArea()
+
+Results:
+None.
+
+Side effects:
+Modifies potentially all paint tile planes in cellDef.
+
+DBEraseG --
+-----------
+
+Erase a specific tile type from a rectangular area.
+The plane in which tiles of the given type reside is modified
+in cellDef.
+
+Only the active group is erased.
+
+Up to caller to call DBChangedArea()
+
+Results:
+None.
+
+Side effects:
+Modifies potentially all paint tile planes in cellDef.
+
+DBPaintMask --
+--------------
+
+Paint a rectangular area with all tile types specified in the
+mask supplied.
+
+Results:
+None.
+
+Side effects:
+Modifies potentially all paint tile planes in cellDef.
+
+DBEraseMask --
+--------------
+
+Erase a rectangular area with all tile types specified in the
+mask supplied.
+
+Results:
+None.
+
+Side effects:
+Modifies potentially all paint tile planes in cellDef.
+
+DBEraseMask --
+--------------
+
+Erase a rectangular area with all tile types specified in the
+mask supplied.
+
+Results:
+None.
+
+Side effects:
+Modifies potentially all paint tile planes in cellDef.
+
+DBTechInitCompose --
+--------------------
+
+Initialize the painting and erasing rules prior to processing
+the "compose" section.  The rules for builtin types are computed
+here, as well as the default rules for all other types.  This
+procedure must be called after the "types" and "contacts" sections
+have been read, since we need to know about all existing tile types.
+
+Results:
+None.
+
+Side effects:
+Modifies the paint and erase tables.
+
+DBTechAddCompose --
+-------------------
+
+Process a single compose/erase rule.  If the type being described is
+a contact, save the rule and defer processing it until the end of this
+section, because we need to know the behavior of all non-contact types
+that might be residues before processing a contact composition rule.
+Rules for non-contact types are processed here.
+
+Results:
+TRUE if successful, FALSE on error.
+
+Side effects:
+Modifies the paint/erase tables if the type being described
+is not a contact; otherwise, appends a rule to the list of
+contact erase/compose rules for later processing.  Marks the
+paint/erase table entries affected to show that they contain
+user-specified rules instead of the default ones, so we don't
+override them later.
+
+DBTechFinalCompose --
+---------------------
+
+Process all the contact erase/compose rules saved by DBTechAddCompose
+when it was reading in the "compose" section of a technology file.
+Also sets up the default paint/erase rules for contacts.
+
+Since by the end of this section we've processed all the painting
+rules, we initialize the tables that say which planes get affected
+by painting/erasing a given type.
+
+There's a great deal of work done here, so it's broken up into a
+number of separate procedures, each of which implements a single
+operation or default rule.  Most of the work deals with painting
+and erasing contacts.
+
+Results:
+None.
+
+Side effects:
+Modifies the paint/erase tables.
+Initializes DBTypePaintPlanesTbl[] and DBTypeErasePlanesTbl[].
+
+DBPlaneNew --
+-------------
+
+Allocates and initializes a new tile plane for a cell.
+The new plane contains a single tile whose body is specified by
+the caller.  The tile extends from minus infinity to plus infinity.
+
+Results:
+Returns a pointer to a new tile plane.
+
+Side effects:
+None.
+
+DBFreePaintPlane --
+-------------------
+
+Deallocate all tiles in a paint tile plane of a given CellDef.
+Don't deallocate the four boundary tiles, or the plane itself.
+
+This is a procedure internal to the database.  
+
+Results:
+None.
+
+Side effects:
+Deallocates a lot of memory.  
+
+*** WARNING ***
+
+This procedure uses a carfully constructed non-recursive area 
+enumeration algorithm.  Care is taken to not access a tile that has
+been deallocated.  The only exception is for a tile that has just been
+passed to TiFree(), but no more calls to TiFree() or TiAlloc() have been made.  
+All this care is obsolete!  As long as no TiAlloc() calls are made 
+and ti_client fields of freed tiles are not referenced, everything 
+is hunky-doory.
+
+DBPlaneClearPaint --
+--------------------
+
+Similar in effect to painting space over an entire tile plane, but
+much faster.  The resultant tile plane is guaranteed to contain a
+single central space tile, exactly as though it had been newly allocated.
+
+Results:
+None.
+
+Side effects:
+Modifies the database plane given.
+
+DBPlaneResetClients --
+----------------------
+
+Reset the ti_client fields of all tiles in a paint tile plane to
+the value 'cdata'.
+
+Results:
+None.
+
+Side effects:
+Resets the ti_client fields of all tiles.
+
+DBPlaneCheckMaxHStrips --
+-------------------------
+
+Check the maximal horizontal strip property for the
+tile plane 'plane' over the area 'area'.
+
+Results:
+Normally returns 0; returns 1 if the procedure
+(*proc)() returned 1 or if the search were
+aborted with an interrupt.
+
+Side effects:
+Calls the procedure (*proc)() for each offending tile.
+This procedure should have the following form:
+
+int
+proc(tile, side, cdata)
+Tile *tile;
+int side;
+ClientData cdata;
+{
+}
+
+The client data is the argument 'cdata' passed to us.
+The argument 'side' is one of GEO_NORTH, GEO_SOUTH,
+GEO_EAST, or GEO_WEST, and indicates which side of
+the tile the strip property was violated on.
+If (*proc)() returns 1, we abort and return 1
+to our caller.
+
+DBPlaneCheckMaxVStrips --
+-------------------------
+
+Check the maximal vertical strip property for the
+tile plane 'plane' over the area 'area'.
+
+Results:
+Normally returns 0; returns 1 if the procedure
+(*proc)() returned 1 or if the search were
+aborted with an interrupt.
+
+Side effects:
+See DBPlaneCheckMaxHStrips() above.
+
+DBPlaneEnumAreaInstances --
+---------------------------
+
+Search the cell plane of a def over the specified area.
+
+Applies the given procedure to each non space (i.e. subcell) tile found.
+The procedure should be of the following form:
+
+int
+func(tile, cdata)
+Tile *tile;
+ClientData cdata;
+{
+}
+
+Func normally should return 0.  If it returns 1 then the search
+will be aborted.  
+
+WARNING: THE CALLED PROCEDURE MUST NOT MODIFY THE PLANE BEING SEARCHED!
+
+WARNING: THE ORDER OF ENUMERATION (NW TO SE WAVEFRONT) IS RELIED UPONT
+BY DBInstancePlace() AND DBInstanceUnplace()
+
+Results:
+0 is returned if the search completed normally.  1 is returned
+if it aborted.
+
+DBPlaneEnumAreaPaint --
+-----------------------
+
+Find all tiles overlapping a given area whose types are contained
+in the mask supplied.  Apply the given procedure to each such tile.
+The procedure should be of the following form:
+
+int
+func(tile, cdata)
+Tile *tile;
+ClientData cdata;
+{
+}
+
+Func normally should return 0.  If it returns 1 then the search
+will be aborted.  WARNING: THE CALLED PROCEDURE MAY NOT MODIFY
+THE PLANE BEING SEARCHED!!!
+
+
+Results:
+0 is returned if the search completed normally.  1 is returned
+if it aborted.
+
+NOTE:  for searching PL_CELL plane (subcell plane) use
+DBPlaneEnumAreaInstances() instead.
+
+DBPlaneEnumAreaPaintG --
+------------------------
+
+Like DBPlaneEnumAreaPaint, but enumerates given group.
+
+Find all tiles overlapping a given area whose types are contained
+in the mask supplied.  Apply the given procedure to each such tile.
+The procedure should be of the following form:
+
+int
+func(tile, cdata)
+Tile *tile;
+ClientData cdata;
+{
+}
+
+Func normally should return 0.  If it returns 1 then the search
+will be aborted.  WARNING: THE CALLED PROCEDURE MAY NOT MODIFY
+THE PLANE BEING SEARCHED!!!
+
+
+Results:
+0 is returned if the search completed normally.  1 is returned
+if it aborted.
+
+NOTE:  for searching PL_CELL plane (subcell plane) use
+DBPlaneEnumAreaInstances() instead.
+
+DBPlaneEnumAreaPaintClient --
+-----------------------------
+
+Find all tiles overlapping a given area whose types are contained
+in the mask supplied, and whose ti_client field matches 'client'.
+Apply the given procedure to each such tile.  The procedure should
+be of the following form:
+
+int
+func(tile, cdata)
+Tile *tile;
+ClientData cdata;
+{
+}
+
+Func normally should return 0.  If it returns 1 then the search
+will be aborted.
+
+Results:
+0 is returned if the search completed normally.  1 is returned
+if it aborted.
+
+Side effects:
+Whatever side effects result from application of the
+supplied procedure.
+
+DBPointsAlloc --
+----------------
+
+Malloc a new point array, and copy in to it
+
+if in is NULL, no initialization.
+
+DBPointsFree --
+---------------
+
+Free point array.
+
+if in is NULL, no copy is done.
+
+DBPointsBBox --
+---------------
+
+compute bbox of point array.
+
+NOTE: result is overwritten on next call.
+
+DBPointsDump --
+---------------
+
+print points for debugging.
+
+DBPolyNew --
+------------
+
+Create new polygon.  
+If def is not null, links polygon into def.
+if def non-null, and not part of wirepath (notifies undo)
+
+Returns:
+pointer to new polygon  
+
+Side effects:
+Calls the undo package.
+
+NOTE: points array will be FREEd when polygon is deleted!
+
+DBPolyDelete --
+---------------
+
+Delete polygon.  
+If def is not null, unlinks polygon from def.
+if def non null (and not part of wirepath) undo is notified.
+
+NOTE: frees polygons point array. 
+
+DBPolygonCopy --
+----------------
+
+Copy polygon. 
+If def is not null, links polygon into def.
+If trans, not null, transforms polygon while copying.
+
+Returns:
+pointer to new polygon  
+
+Side effects:
+Notifys undo package (if polygon is linked into def)
+
+DBPolyFind --
+-------------
+
+Find polygon in def matching the given specification
+
+Returns pointer to matching Polygon (NULL if none found).
+
+DBPolygonIntersectRectQ1 --
+---------------------------
+
+Does real work for inline func DBPolygonIntersectQ()
+
+Check for intersection between polygon and rect.
+Two point polygons are treated as circle inscribed in
+"polygon" bbox.
+
+Returns TRUE if "poly" intersected with the closed rectangle
+"rect" is non-empty and FALSE otherwise.
+
+NOTE: assumes rect is not inverted:  "ll.x < ur.x" and "ll.y < ur.y"
+
+NOTE: assumes caller has already checked that following special cases
+do not hold:
+1. polygon bbox contained in rect.
+2. polygon bbox and rect disjoint.
+
+DBPolygonIntersectRect1 --
+--------------------------
+
+Does real work for inline function DBPolygonIntersectRect()
+
+This routine clips "poly" against "rect".  
+
+RETURNS the number of resulting polygons, >= 0.
+
+storage is allocated for and:
+dbPolyPoints is filled in with points for the clipped polygon(s).
+dbPolyList is filled in with pointers to the start of the points 
+for each polygon in the result.  An additional final entry 
+in "list" points one beyond the end of the points in clip.
+This is so "list[i+1] - list[i]" always gives the number 
+of points in polygon i (which start at "list[i]").
+THESE DATA AREAS ARE REUSED ON NEXT CALL.
+
+*listp is set to point to dbPolyList.
+
+This algorithm is based on "Efficient Clipping of Arbitrary Polygons"
+by Gunther Greiner and Kai Hormann, ACM Transactions on Graphics,
+Vol. 17, No. 4, April 1998, pages 71-83.  It has been specialized
+for one of the polygons being a rectangle (in places).
+
+
+NOTE:  results are overwritten on next call to this routine.
+
+NOTE: assumes rect is not inverted:  "ll.x < ur.x" and "ll.y < ur.y"
+
+NOTE: assumes caller has already checked that following special cases
+do not hold:
+
+1. polygon bbox contained in rect.
+2. polygon bbox and rect disjoint.
+
+NOTE:
+
+DBPolygonIntersectPolyQ1 --
+---------------------------
+
+Does real work for inline func DBPolygonIntersectPolyQ()
+
+Check for intersection between polygon and polygon.
+Two point polygons (circles) are not treated.
+
+Returns TRUE if "poly1" intersected with "poly2" 
+is non-empty and FALSE otherwise.
+
+NOTE: assumes rect is not inverted:  "ll.x < ur.x" and "ll.y < ur.y"
+
+NOTE: assumes caller has already checked that following special case
+do not hold:
+1. poly1 bbox and poly2 bbox.
+
+DBPolygonIntersectPolygonQ1 --
+------------------------------
+
+Does real work for inline func DBPolygonIntersectPolygonQ()
+
+RETURNS:  TRUE if one polygon, "poly1", intersected with another
+polygon, "poly2", is non-empty and FALSE otherwise.
+
+
+NOTE: Caller (DBPolygonIntersectPolygonQ) handles case where polygon
+bboxes are disjoint.
+
+DBPropInitDef --
+----------------
+
+Called when def initialized to set up property hash table.
+
+DBPropSet --
+------------
+
+Set property value.
+
+(if value is NULL, delete property) 
+
+DBPropGet--
+-----------
+
+get property value
+
+DBPropEnum --
+-------------
+
+call supplied func on each property in def
+
+DBPropClearDef --
+-----------------
+
+clear all properties and reclaim associated storage
+(used to when restoring cell to initial (empty) state) 
+
+DBPropFreeDef --
+----------------
+
+Free all properties and reclaim associated storage
+(used when deallocating celldef)
+
+DBGetTech --
+------------
+
+Reads the first few lines of a file to find out what technology
+it is.
+
+Results:
+The return value is a pointer to a string containing the name
+of the technology of the file containing cell cellName.  NULL
+is returned if the file couldn't be read or isn't in Magic
+format.  The string is stored locally to this procedure and
+will be overwritten on the next call to this procedure.
+
+Side effects:
+None.
+
+DBCellRead --
+-------------
+
+If the cell is already marked as available (CDAVAILABLE), do nothing.
+
+If the cell is generated (a gcell) call tcl proc "gcell_load name"   
+and set CDAVAILABLE
+
+Otherwise, read in the paint for a cell from its associated disk file.
+If a filename for the cell is specified, we try to open it
+somewhere in the search path.  Otherwise, we try the filename
+already associated with the cell, or the name of the cell itself
+as the name of the file containing the definition of the cell.
+
+Mark the cell definition as "read in" (CDAVAILABLE), and
+call DBChangedArea() to process database changes.
+
+Results:
+TRUE if the cell could be read successfully, FALSE
+otherwise.  If the cell is already read in, TRUE is
+also returned.
+
+Side effects:
+Updates the cell definition.
+In the event of an error while reading in the cell,
+the external integer errno is set to the UNIX error
+encountered.
+
+The cell definition is marked as available.
+The cell's MODIFIED bit is cleared by this routine. 
+
+DBCellReadTree --
+-----------------
+
+Read in entire cell tree rooted at def.  
+Does not read in cells already in memory.
+
+DBSrChildrenNested --
+---------------------
+
+Like DBSrChildren() above, but does not update cu_bbox of root use.
+(This is useful for recursive DBSrChildren() calls when cells read in,
+since it doesn't screw up the PL_CELL plane of the "parent" search)  
+
+Apply the supplied procedure to each of the cellUses found in the
+given area in the subcell plane of the child def of the supplied
+search context.
+
+The procedure is applied to each array element in each cell use that
+overlaps the clipping rectangle.  The scx_x and scx_y parts of
+the SearchContext passed to the filter function correspond to the
+array element being visited.  The same CellUse is, of course, passed
+as scx_use for all elements of the array.
+
+The array elements are visited by varying the X coordinate fastest.
+
+The procedure should be of the following form:
+int
+func(scx, cdarg)
+SearchContext *scx;
+ClientData cdarg;
+{
+}
+
+Func normally returns 0.  If it returns 1 then the search is
+aborted.  If it returns 2, then any remaining elements in the
+current array are skipped.
+
+Results:
+0 is returned if the search terminated normally.  1 is
+returned if it was aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+DBSrPrintUseId --
+-----------------
+
+Generate the print name of the use identifier indicated by the supplied
+SearchContext.
+
+Results:
+Returns a pointer to the NULL byte at the end of the string
+generated.
+
+Side effects:
+The character string pointed to by name is set to contain the use
+id of scx->scx_use followed by any array indices.  If scx->scx_use
+is a two dimensional array, the array indices are of the form [y,x],
+otherwise there is a single array index either of the form [y] or [x].
+The array indices are taken from scx->scx_x and scx->scx_y.  At most
+size characters are copied into the string pointed to by name.
+
+DBSearchPaintNew2 --
+--------------------
+
+Recursively search downward from the supplied CellUse for
+all visible paint tiles and/or polygons matching the supplied type mask.
+
+The callback procedures should be of the following form:
+int func(Tile *tile,TreeContext *cxp);
+int polygonFunc(SearchContext *scx, 
+Polygon *poly, 
+ClientData cdarg)
+int wirePathFunc(SearchContext *scx, 
+WirePath *wp, 
+ClientData cdarg)
+
+If tpath is nonnull a 4th tpath arg is appended to polygonFunc() and
+wirePathFunc().
+
+To search only tiles or only polygons set the other func arg to NULL.
+
+The SearchContext is stored in cxp->tc_scx, and the user's arg is stored
+in cxp->tc_filter->tf_arg.
+
+In the above, the scx transform is the net transform from the coordinates
+of tile to "world" coordinates (or whatever coordinates the initial
+transform supplied to DBSearchPaint was a transform to).  Func and 
+polygonFunc return 0 under normal conditions.  If 1 is returned, 
+it is a request to abort the search.
+
+*** WARNING ***
+
+The client procedure should not modify any of the paint planes in
+the cells visited by DBSearchPaint, because we use DBPlaneEnumAreaPaint
+as our paint-tile enumeration function.
+
+Results:
+0 is returned if the search finished normally.  1 is returned
+if the search was aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+DBSearchLabels --
+-----------------
+
+Recursively search downward from the supplied CellUse for
+all visible labels attached to layers matching the supplied
+type mask.
+
+The procedure should be of the following form:
+int
+func(scx, label, tpath, cdarg)
+SearchContext *scx;
+Label *label;
+TerminalPath *tpath;
+ClientData cdarg;
+{
+}
+
+In the above, the use associated with scx is the parent of the
+CellDef containing the tile which contains the label, and the
+transform associated is the net transform from the coordinates
+of the tile to "root" coordinates.  Func normally returns 0.  If
+func returns 1, it is a request to abort the search without finding
+any more labels.
+
+Results:
+0 is returned if the search terminated normally.  1 is returned
+if the search was aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+DBSearchFlyLines --
+-------------------
+
+Recursively search downward from the supplied CellUse for
+all visible flylines.
+
+The procedure should be of the following form:
+
+int func(scx *SearchContext, FlyLine *flyline, Clientdata cdarg)
+
+In the above, the use associated with scx is the parent of the
+CellDef containing the fly line, and the
+transform associated is the net transform from the coordinates
+of the use to "root" coordinates.  Func normally returns 0.  If
+func returns 1, it is a request to abort the search without finding
+any more flylines.
+
+Results:
+0 is returned if the search terminated normally.  1 is returned
+if the search was aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+DBSearchInstances --
+--------------------
+
+Recursively search downward from the supplied CellUse for
+all CellUses whose parents are expanded but which themselves
+are unexpanded (unless DBSI_INCLUDE_EXPANDED set).
+
+The procedure should be of the following form:
+int func(SearchContext *scx, ClientData cdarg) {}
+
+If tpath is nonnull a 3rd tpath arg is added to the procedure call.
+
+In the above, the transform scx->scx_trans is from coordinates of
+the def of scx->scx_use to the "root".  The array indices
+scx->scx_x and scx->scx_y identify this element if it is a
+component of an array.  Func normally returns 0.  If func returns
+1, then the search is aborted.  If func returns 2, then all
+remaining elements of the current array are skipped, but the
+search is not aborted.
+
+Each element of an array is returned separately.
+
+Results:
+0 is returned if the search terminated normally.  1 is
+returned if it was aborted.
+
+Side effects:
+Whatever side effects are brought about by applying the
+procedure supplied.
+
+DBSrTouchingTypes --
+--------------------
+
+Generate mask of all types touching or covering a given point. 
+
+Results:
+Mask of all types touching or covering a given point in cellUse or
+expanded subcell.  If an unexpanded subcell is 
+covering or touching point TT_SUBCELL is included in the result as
+well.
+
+Side effects:
+None.
+
+DBTclInit --
+------------
+
+Initialize database tcl commands.
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+
+DBTechInit --
+-------------
+
+Clear technology description information for database module.
+CURRENTLY A NO-OP.  EVENTUALLY WILL CLEAR OUT ALL TECHNOLOGY
+VARIABLES PRIOR TO REINITIALIZING A NEW TECHNOLOGY.
+
+Results:
+None.
+
+Side effects:
+None.
+
+DBTechSetTech --
+----------------
+
+Set the name for the technology.
+
+Results:
+Returns FALSE if there were an improper number of
+tokens on the line.
+
+Side effects:
+Sets DBTechName to the name of the technology.
+
+DBTechSetVersion --
+-------------------
+
+Set the version number & description for the technology.
+
+Results:
+Returns FALSE if there were an improper number of
+tokens on the line.
+
+Side effects:
+Sets DBTechVersion and DBTechDescription.
+
+DBTechInitConnect --
+--------------------
+
+Initialize the connectivity tables.
+
+Results:
+None.
+
+Side effects:
+Initializes DBConnectTbl[], DBConnPlanes[], and DBAllConnPlanes[].
+
+DBTechAddConnect --
+-------------------
+
+Add connectivity information.
+Record the fact that material of the types in the comma-separated
+list types1 connects to material of the types in the list types2.
+
+Results:
+TRUE if successful, FALSE on error
+
+Side effects:
+Updates DBConnectTbl[].
+
+DBTechFinalConnect --
+---------------------
+
+Postprocessing for the connectivity information.
+Modify DBConnectTbl[] so that:
+
+(1) Any type connecting to one of the images of a contact
+connects to all images of the contact.
+(2) Each image of a contact connects to the union of what
+all the images connect to.
+
+Modify DBConnPlanes[] so that only types belonging to a contact
+appear to connect to any plane other than their own.
+
+Constructs DBAllConnPlanes, which will be non-zero for those planes
+to which each type connects, exclusive of that type's home plane and
+those planes to which it connects as a contact.
+
+Create DBNotConnectTbl[], the complement of DBConnectTbl[].
+
+Results:
+None.
+
+Side effects:
+Modifies DBConnPlanes[], DBAllConnPlanes[], and DBConnectTbl[]
+as above.
+
+DBUndoFlush --
+--------------
+
+Called by undo module whenever the undo stack is flushed.
+database module.
+
+DBUndoPutLabel --
+-----------------
+
+Record on the undo list the painting of a new label.
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUndoEraseLabel --
+-------------------
+
+Record on the undo list the erasing of an existing label
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUndoAddPoly --
+----------------
+
+Record a polygon add on the undo list.
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUndoDeletePoly --
+-------------------
+
+Record polygon deletion on undo list.
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUndoAddWP --
+--------------
+
+Record a wirepath add on the undo list.
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUndoDeleteWP --
+-----------------
+
+Record wirepath deletetion on undo list.
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUndoCellUse --
+----------------
+
+Record one of the following subcell actions:
+UNDO_CELL_PLACE		placement in a parent
+UNDO_CELL_DELETE	removal from a parent
+UNDO_CELL_CLRID		deleting the use id
+UNDO_CELL_SETID		setting the use id
+
+The last two, deleting and setting the use id, normally occur in
+pairs except when the name is set for the first time.
+
+Because both the parent and child cell uses are stored
+in the def, we don't bother to use or update dbUndoLastCell.
+
+Results:
+None.
+
+Side effects:
+Updates the undo list.
+
+DBUpdate1 --
+------------
+
+Does the real work for inline DBUpdate().
+Make all bboxes in cell tree rooted at def up-to-date
+Make drc change areas up-to-date for tree rooted at def
+
+DBWPathEnumPolygons --
+----------------------
+
+calls func for each (implicit) polygon in wirepath.
+
+func should returns 0 to continue search, 1 to abort search.
+
+Results:
+0 is returned if the search finished normally.  1 is returned
+if the search was aborted.
+
+NOTE: (re)creates polygon points, does not search for them!
+
+DBWPathNew --
+-------------
+
+Create new WirePath
+If def is not null, links polygon into def.
+if def non-null, notify undo
+
+Returns:
+pointer to new wirepath
+
+Side effects:
+Calls the undo package.
+
+NOTE: points array will be FREEd when polygon is deleted!
+
+DBWPathDelete --
+----------------
+
+Delete wirepath.  
+If def is not null, unlinks wp from def.
+if def non null undo is notified.
+
+NOTE: frees wirepaths point array. 
+
+DBWPathFind --
+--------------
+
+Find wirepath in def matching the given specification
+
+Returns pointer to matching wirepath (NULL if none found).
+
+DBWirePathIntersectRectQ1 --
+----------------------------
+
+Does real work for inline func DBWirePathIntersectQ()
+
+Check for intersection between wirepath and rect.
+
+Returns TRUE if "wp" intersected with the closed rectangle
+"rect" is non-empty and FALSE otherwise.
+
+NOTE: assumes rect is not inverted:  "ll.x < ur.x" and "ll.y < ur.y"
+
+NOTE: assumes caller has already checked that following special cases
+do not hold:
+1. wp bbox contained in rect.
+2. wp bbox and rect disjoint.
+
+DBWirePathIntesectPolygonQ --
+-----------------------------
+
+Does real work for inline DBWirePathIntersectPolygonQ()
+
+Returns TRUE if "wp" intersects the polygon
+
+NOTE: assumes caller handles following special case:
+wp bbox and poly bbox disjoint.
+
+DBCellWrite --
+--------------
+
+Write a cell to its associated disk file.
+Mark the cell as having been written out. 
+
+This code is fairly tricky to ensure that we never destroy the
+original contents of a cell in the event of an I/O error.  We
+try the following approaches in order.
+
+1.	If we can create a temporary file in the same directory as the
+target cell, do so.  Then write to the temporary file and rename
+it to the target cell name.
+
+2.	If we can't create the above temporary file, open the target
+cell for APPENDING, then write the new contents to the END of
+the file.  If successful, rewind the now-expanded file and
+overwrite the beginning of the file, then truncate it.
+
+Results:
+TRUE if the cell could be written successfully, FALSE otherwise.
+
+Side effects:
+Writes a file to disk.
+If successful, clears the CDMODIFIED
+in cellDef->cd_flags.
+
+In the event of an error while writing out the cell,
+the external integer errno is set to the UNIX error
+encountered, and the above bits are not cleared in
+cellDef->cd_flags.
+
+BUG:  Currently on some errors CDMODIFIED is set.   2/17/95 mha
+BUG:  (cont.) other flags are left cleared.         2/17/95 mha 
+
+DBPanicSave --
+--------------
+
+Save all modified cells to disk, in files "cellname.max_panic_save".
+This is intended as an emergency measure for cases when max
+has to die (eg, upon receiving a SIGTERM signal).  
+
+Results:
+None.
+
+Side effects:
+Writes cells to disk.
+Does NOT clear the modified bits.
+

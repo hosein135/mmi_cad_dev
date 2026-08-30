@@ -1,0 +1,51 @@
+# WARNING:
+#
+# The .max file format continues to evolve.
+#
+# Micro Magic recommends you do not write or parse .max files directly.
+# Instead use the Max API (e.g. 'db_search' and 'db_paint' commands).
+# The API is also easier to interface to.  See 'Text Commands' under
+# the Max 'Help' menu for full documentation on the API.
+
+max 3
+tech mmi15
+resolution 0.001
+
+
+DEF
+
+SECTION VERSIONS {
+vMAIN 966634507 88
+vDRC 966634507 88
+vBBOX 966634507 69
+} SECTION VERSIONS
+
+SECTION RECTS {
+layer checkpaint
+-1638 -1498 2258 8018
+layer nw
+-360 3100 980 6740
+layer nwc
+0 6025 620 6375
+layer pwc
+0 -175 620 175
+layer pplus
+-90 3100 710 5980
+-90 -220 710 220
+layer nplus
+-90 5980 710 6420
+-90 220 710 3100
+layer ct
+220 6110 400 6290
+220 -90 400 90
+layer m1
+0 5780 620 6620
+0 -420 620 420
+layer prb
+0 0 620 6200
+} SECTION RECTS
+
+SECTION LABELS {
+lab m1 310 0 310 0 0 3 gnd
+lab m1 310 6200 310 6200 0 3 vdd
+} SECTION LABELS

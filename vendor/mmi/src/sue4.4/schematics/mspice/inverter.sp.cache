@@ -1,0 +1,8 @@
+set NETLIST_CACHE(inverter,cells) {{icon nmos {}} {icon pmos {}}}
+set netlist_props spice
+set netlist_level 1000
+set NETLIST_CACHE(inverter,globals) {gnd vdd}
+set NETLIST_CACHE(inverter,version) MMI_SUE4.2.15
+set NETLIST_CACHE(inverter) {{.SUBCKT inverter in out WP=2 LP=lp_min WN=1 LN=ln_min} {M_0 out in gnd gnd n W='WN*1u' L=LN ad='arean(WN,sdd)' as='arean(WN,sdd)' } {+ pd='perin(WN,sdd)' ps='perin(WN,sdd)' } {M_1 out in vdd vdd p W='WP*1u' L=LP ad='areap(WP,sdd)' as='areap(WP,sdd)' } {+ pd='perip(WP,sdd)' ps='perip(WP,sdd)' } {.ENDS	$ inverter} {}}
+set NETLIST_CACHE(inverter,names) {{550 200 {0 M_1}} {550 240 {0 out}} {550 160 {1 vdd} {2 vdd}} {570 280 {1 out}} {490 360 {0 in}} {550 400 {1 gnd} {2 gnd}} {550 360 {0 M_0}} {450 280 {1 in}} {490 200 {0 in}} {550 320 {0 out}}}
+set NETLIST_CACHE(inverter,wires) {{470 200 490 200 in} {470 360 490 360 in} {450 280 470 280 in} {470 280 470 360 in} {470 200 470 280 in} {550 280 570 280 out} {550 240 550 280 out} {550 280 550 320 out}}

@@ -1,0 +1,977 @@
+ADJUST_PC	tclExecute.c	/^#define ADJUST_PC(instBytes) \\$/
+ASSERT	tclAlloc.c	/^#define	ASSERT(p)   if (!(p)) panic(# p)$/
+AcceptCallbackProc	tclIOCmd.c	/^AcceptCallbackProc(callbackData, chan, address, po/
+AdvanceToNextWord	tclCompile.c	/^AdvanceToNextWord(string, envPtr)$/
+AfterCleanupProc	tclTimer.c	/^AfterCleanupProc(clientData, interp)$/
+AfterProc	tclTimer.c	/^AfterProc(clientData)$/
+AliasCmd	tclInterp.c	/^AliasCmd(clientData, interp, objc, objv)$/
+AliasCmdDeleteProc	tclInterp.c	/^AliasCmdDeleteProc(clientData)$/
+AliasCreationHelper	tclInterp.c	/^AliasCreationHelper(curInterp, slaveInterp, master/
+AppendLocals	tclCmdIL.c	/^AppendLocals(interp, listPtr, pattern, includeLink/
+ArrayCreate	tclHash.c	/^ArrayCreate(tablePtr, key, newPtr)$/
+ArrayFind	tclHash.c	/^ArrayFind(tablePtr, key)$/
+AsyncHandlerProc	tclTest.c	/^AsyncHandlerProc(clientData, interp, code)$/
+BgErrorDeleteProc	tclEvent.c	/^BgErrorDeleteProc(clientData, interp)$/
+BogusCreate	tclHash.c	/^BogusCreate(tablePtr, key, newPtr)$/
+BogusFind	tclHash.c	/^BogusFind(tablePtr, key)$/
+BumpCmdRefEpochs	tclResolve.c	/^BumpCmdRefEpochs(nsPtr)$/
+CACHE_STACK_INFO	tclExecute.c	/^#define CACHE_STACK_INFO() \\$/
+CHAR_TYPE	tclInt.h	/^#define CHAR_TYPE(src,last) \\$/
+CallTraceProcedure	tclExecute.c	/^CallTraceProcedure(interp, tracePtr, cmdPtr, comma/
+CallTraces	tclVar.c	/^CallTraces(iPtr, arrayPtr, varPtr, part1, part2, f/
+ChannelEventScriptInvoker	tclIO.c	/^ChannelEventScriptInvoker(clientData, mask)$/
+ChannelTimerProc	tclIO.c	/^ChannelTimerProc(clientData)$/
+CheckForDeadChannel	tclIO.c	/^CheckForDeadChannel(interp, chanPtr)$/
+CheckForStdChannelsBeingClosed	tclIO.c	/^CheckForStdChannelsBeingClosed(chan)$/
+CheckIfVarUnset	tclTestObj.c	/^CheckIfVarUnset(interp, varIndex)$/
+CheckVersion	tclPkg.c	/^CheckVersion(interp, string)$/
+CheckmemCmd	tclMain.c	/^CheckmemCmd(clientData, interp, argc, argv)$/
+CleanupChannelHandlers	tclIO.c	/^CleanupChannelHandlers(interp, chanPtr)$/
+CleanupTestSetassocdataTests	tclTest.c	/^CleanupTestSetassocdataTests(clientData, interp)$/
+CleanupVar	tclVar.c	/^CleanupVar(varPtr, arrayPtr)$/
+ClientData	tclCompile.h	/^typedef ClientData (AuxDataDupProc)  _ANSI_ARGS_((/
+CloseChannel	tclIO.c	/^CloseChannel(interp, chanPtr, errorCode)$/
+CloseChannelsOnExit	tclIO.c	/^CloseChannelsOnExit(clientData)$/
+CmdDelProc1	tclTest.c	/^CmdDelProc1(clientData)$/
+CmdDelProc2	tclTest.c	/^CmdDelProc2(clientData)$/
+CmdProc1	tclTest.c	/^CmdProc1(clientData, interp, argc, argv)$/
+CmdProc2	tclTest.c	/^CmdProc2(clientData, interp, argc, argv)$/
+CmdTraceDeleteProc	tclTest.c	/^CmdTraceDeleteProc(clientData, interp, level, comm/
+CmdTraceProc	tclTest.c	/^CmdTraceProc(clientData, interp, level, command, c/
+CollectArgInfo	tclCompile.c	/^CollectArgInfo(interp, string, lastChar, flags, ar/
+ComparePkgVersions	tclPkg.c	/^ComparePkgVersions(v1, v2, satPtr)$/
+CompileAddExpr	tclCompExpr.c	/^CompileAddExpr(interp, infoPtr, flags, envPtr)$/
+CompileBitAndExpr	tclCompExpr.c	/^CompileBitAndExpr(interp, infoPtr, flags, envPtr)$/
+CompileBitOrExpr	tclCompExpr.c	/^CompileBitOrExpr(interp, infoPtr, flags, envPtr)$/
+CompileBitXorExpr	tclCompExpr.c	/^CompileBitXorExpr(interp, infoPtr, flags, envPtr)$/
+CompileBraces	tclCompile.c	/^CompileBraces(interp, string, lastChar, flags, env/
+CompileCmdWordInline	tclCompile.c	/^CompileCmdWordInline(interp, string, lastChar, fla/
+CompileCondExpr	tclCompExpr.c	/^CompileCondExpr(interp, infoPtr, flags, envPtr)$/
+CompileEqualityExpr	tclCompExpr.c	/^CompileEqualityExpr(interp, infoPtr, flags, envPtr/
+CompileExprWord	tclCompile.c	/^CompileExprWord(interp, string, lastChar, flags, e/
+CompileLandExpr	tclCompExpr.c	/^CompileLandExpr(interp, infoPtr, flags, envPtr)$/
+CompileLorExpr	tclCompExpr.c	/^CompileLorExpr(interp, infoPtr, flags, envPtr)$/
+CompileMathFuncCall	tclCompExpr.c	/^CompileMathFuncCall(interp, infoPtr, flags, envPtr/
+CompileMultipartWord	tclCompile.c	/^CompileMultipartWord(interp, string, lastChar, fla/
+CompileMultiplyExpr	tclCompExpr.c	/^CompileMultiplyExpr(interp, infoPtr, flags, envPtr/
+CompilePrimaryExpr	tclCompExpr.c	/^CompilePrimaryExpr(interp, infoPtr, flags, envPtr)/
+CompileRelationalExpr	tclCompExpr.c	/^CompileRelationalExpr(interp, infoPtr, flags, envP/
+CompileShiftExpr	tclCompExpr.c	/^CompileShiftExpr(interp, infoPtr, flags, envPtr)$/
+CompileUnaryExpr	tclCompExpr.c	/^CompileUnaryExpr(interp, infoPtr, flags, envPtr)$/
+CompileWord	tclCompile.c	/^CompileWord(interp, string, lastChar, flags, envPt/
+Convert	tclDate.c	/^Convert(Month, Day, Year, Hours, Minutes, Seconds,/
+ConvertToStringType	tclStringObj.c	/^ConvertToStringType(objPtr)$/
+CopyAndTranslateBuffer	tclIO.c	/^CopyAndTranslateBuffer(chanPtr, result, space)$/
+CopyData	tclIO.c	/^CopyData(csPtr, mask)$/
+CopyEventProc	tclIO.c	/^CopyEventProc(clientData, mask)$/
+CopyRenameOneFile	tclFCmd.c	/^CopyRenameOneFile(interp, source, target, copyFlag/
+CreateExceptionRange	tclCompile.c	/^CreateExceptionRange(type, envPtr)$/
+CreateInterpObject	tclInterp.c	/^CreateInterpObject(interp, masterPtr, objc, objv)$/
+CreateScriptRecord	tclIO.c	/^CreateScriptRecord(interp, chanPtr, mask, script)$/
+CreateSlave	tclInterp.c	/^CreateSlave(interp, masterPtr, slavePath, safe)$/
+CreatedCommandProc	tclTest.c	/^CreatedCommandProc(clientData, interp, argc, argv)/
+CreatedCommandProc2	tclTest.c	/^CreatedCommandProc2(clientData, interp, argc, argv/
+DECACHE_STACK_INFO	tclExecute.c	/^#define DECACHE_STACK_INFO() \\$/
+DSTcorrect	tclDate.c	/^DSTcorrect(Start, Future)$/
+DelCallbackProc	tclTest.c	/^DelCallbackProc(clientData, interp)$/
+DelCmdProc	tclTest.c	/^DelCmdProc(clientData, interp, argc, argv)$/
+DelDeleteProc	tclTest.c	/^DelDeleteProc(clientData)$/
+DeleteAlias	tclInterp.c	/^DeleteAlias(interp, slaveInterp, aliasName)$/
+DeleteArray	tclVar.c	/^DeleteArray(iPtr, arrayName, varPtr, flags)$/
+DeleteChannelTable	tclIO.c	/^DeleteChannelTable(clientData, interp)$/
+DeleteImportedCmd	tclNamesp.c	/^DeleteImportedCmd(clientData)$/
+DeleteInterpObject	tclInterp.c	/^DeleteInterpObject(interp, masterPtr, objc, objv)$/
+DeleteInterpProc	tclBasic.c	/^DeleteInterpProc(interp)$/
+DeleteOneInterpObject	tclInterp.c	/^DeleteOneInterpObject(interp, masterPtr, path)$/
+DeleteScriptRecord	tclIO.c	/^DeleteScriptRecord(interp, chanPtr, mask)$/
+DeleteSearches	tclVar.c	/^DeleteSearches(arrayVarPtr)$/
+DescribeAlias	tclInterp.c	/^DescribeAlias(interp, slaveInterp, aliasName)$/
+DictionaryCompare	tclCmdIL.c	/^DictionaryCompare(left, right)$/
+DiscardInputQueued	tclIO.c	/^DiscardInputQueued(chanPtr, discardSavedBuffers)$/
+DiscardOutputQueued	tclIO.c	/^DiscardOutputQueued(chanPtr)$/
+DoRead	tclIO.c	/^DoRead(chanPtr, bufPtr, toRead)$/
+DoTildeSubst	tclFileName.c	/^DoTildeSubst(interp, user, resultPtr)$/
+DoWrite	tclIO.c	/^DoWrite(chanPtr, srcPtr, slen)$/
+DupBooleanInternalRep	tclObj.c	/^DupBooleanInternalRep(srcPtr, copyPtr)$/
+DupByteCodeInternalRep	tclCompile.c	/^DupByteCodeInternalRep(srcPtr, copyPtr)$/
+DupCmdNameInternalRep	tclExecute.c	/^DupCmdNameInternalRep(srcPtr, copyPtr)$/
+DupDoubleInternalRep	tclObj.c	/^DupDoubleInternalRep(srcPtr, copyPtr)$/
+DupForeachInfo	tclCompile.c	/^DupForeachInfo(clientData)$/
+DupIndexInternalRep	tclIndexObj.c	/^DupIndexInternalRep(srcPtr, copyPtr)$/
+DupIntInternalRep	tclObj.c	/^DupIntInternalRep(srcPtr, copyPtr)$/
+DupListInternalRep	tclListObj.c	/^DupListInternalRep(srcPtr, copyPtr)$/
+DupNsNameInternalRep	tclNamesp.c	/^DupNsNameInternalRep(srcPtr, copyPtr)$/
+DupStringInternalRep	tclStringObj.c	/^DupStringInternalRep(srcPtr, copyPtr)$/
+EncodeCmdLocMap	tclCompile.c	/^EncodeCmdLocMap(envPtr, codePtr, startPtr)$/
+EnterCmdExtentData	tclCompile.c	/^EnterCmdExtentData(envPtr, cmdIndex, numSrcChars, /
+EnterCmdStartData	tclCompile.c	/^EnterCmdStartData(envPtr, cmdIndex, srcOffset, cod/
+EnvTraceProc	tclEnv.c	/^EnvTraceProc(clientData, interp, name1, name2, fla/
+EvalStatsCmd	tclExecute.c	/^EvalStatsCmd(unused, interp, argc, argv)$/
+ExitProcEven	tclTest.c	/^ExitProcEven(clientData)$/
+ExitProcOdd	tclTest.c	/^ExitProcOdd(clientData)$/
+ExpandObjectArray	tclCompile.c	/^ExpandObjectArray(envPtr)$/
+ExprAbsFunc	tclExecute.c	/^ExprAbsFunc(interp, eePtr, clientData)$/
+ExprBinaryFunc	tclExecute.c	/^ExprBinaryFunc(interp, eePtr, clientData)$/
+ExprCallMathFunc	tclExecute.c	/^ExprCallMathFunc(interp, eePtr, objc, objv)$/
+ExprDoubleFunc	tclExecute.c	/^ExprDoubleFunc(interp, eePtr, clientData)$/
+ExprIntFunc	tclExecute.c	/^ExprIntFunc(interp, eePtr, clientData)$/
+ExprRandFunc	tclExecute.c	/^ExprRandFunc(interp, eePtr, clientData)$/
+ExprRoundFunc	tclExecute.c	/^ExprRoundFunc(interp, eePtr, clientData)$/
+ExprSrandFunc	tclExecute.c	/^ExprSrandFunc(interp, eePtr, clientData)$/
+ExprUnaryFunc	tclExecute.c	/^ExprUnaryFunc(interp, eePtr, clientData)$/
+ExtractWinRoot	tclFileName.c	/^ExtractWinRoot(path, resultPtr, offset)$/
+FAIL	regexp.c	/^#define	FAIL(m)	{ TclRegError(m); return(NULL); }$/
+FileBasename	tclFCmd.c	/^FileBasename(interp, path, bufferPtr)$/
+FileCopyRename	tclFCmd.c	/^FileCopyRename(interp, argc, argv, copyFlag)$/
+FileForRedirect	tclPipe.c	/^FileForRedirect(interp, spec, atOK, arg, nextArg, /
+FileForceOption	tclFCmd.c	/^FileForceOption(interp, argc, argv, forcePtr)$/
+FileNameCleanup	tclFileName.c	/^FileNameCleanup(clientData)$/
+FinalizeFreeObjList	tclObj.c	/^FinalizeFreeObjList()$/
+FinalizeTypeTable	tclObj.c	/^FinalizeTypeTable()$/
+FindPackage	tclPkg.c	/^FindPackage(interp, name)$/
+FindVariable	tclEnv.c	/^FindVariable(name, lengthPtr)$/
+FlushChannel	tclIO.c	/^FlushChannel(interp, chanPtr, calledFromAsyncFlush/
+FormatClock	tclClock.c	/^FormatClock(interp, clockVal, useGMT, format)$/
+FormatNumber	tclBinary.c	/^FormatNumber(interp, type, src, cursorPtr)$/
+FreeAfterPtr	tclTimer.c	/^FreeAfterPtr(afterPtr)$/
+FreeArgInfo	tclCompile.c	/^FreeArgInfo(argInfoPtr)$/
+FreeByteCodeInternalRep	tclCompile.c	/^FreeByteCodeInternalRep(objPtr)$/
+FreeCmdNameInternalRep	tclExecute.c	/^FreeCmdNameInternalRep(objPtr)$/
+FreeForeachInfo	tclCompile.c	/^FreeForeachInfo(clientData)$/
+FreeListInternalRep	tclListObj.c	/^FreeListInternalRep(listPtr)$/
+FreeNsNameInternalRep	tclNamesp.c	/^FreeNsNameInternalRep(objPtr)$/
+GetAfterEvent	tclTimer.c	/^GetAfterEvent(assocPtr, string)$/
+GetChannelTable	tclIO.c	/^GetChannelTable(interp)$/
+GetCmdLocEncodingSize	tclCompile.c	/^GetCmdLocEncodingSize(envPtr)$/
+GetEOL	tclIO.c	/^GetEOL(chanPtr)$/
+GetFormatSpec	tclBinary.c	/^GetFormatSpec(formatPtr, cmdPtr, countPtr)$/
+GetInput	tclIO.c	/^GetInput(chanPtr)$/
+GetInterp	tclInterp.c	/^GetInterp(interp, masterPtr, path, masterPtrPtr)$/
+GetNamespaceFromObj	tclNamesp.c	/^GetNamespaceFromObj(interp, objPtr, nsPtrPtr)$/
+GetSrcInfoForPc	tclExecute.c	/^GetSrcInfoForPc(pc, codePtr, lengthPtr)$/
+GetTarget	tclInterp.c	/^GetTarget(askingInterp, path, aliasName)$/
+GetTimesCmd	tclTest.c	/^GetTimesCmd(unused, interp, argc, argv)$/
+GetToken	tclCompExpr.c	/^GetToken(interp, infoPtr, envPtr)$/
+GetTypeFromMode	tclCmdAH.c	/^GetTypeFromMode(mode)$/
+GetVariableIndex	tclTestObj.c	/^GetVariableIndex(interp, string, indexPtr)$/
+GrowEvaluationStack	tclExecute.c	/^GrowEvaluationStack(eePtr)$/
+HERE	tclCompExpr.c	/^#define HERE(production, level) \\$/
+HOUR	tclDate.c	/^#define HOUR(x)         ((int) (60 * x))$/
+HandleBgErrors	tclEvent.c	/^HandleBgErrors(clientData)$/
+HashString	tclHash.c	/^HashString(string)$/
+HiddenCmdsDeleteProc	tclBasic.c	/^HiddenCmdsDeleteProc(clientData, interp)$/
+ISMULT	regexp.c	/^#define	ISMULT(c)	((c) == '*' || (c) == '+' || (c)/
+IS_INF	tclExecute.c	/^#   define IS_INF(v) (((v) > DBL_MAX) || ((v) < -D/
+IS_NAN	tclExecute.c	/^#define IS_NAN(v) ((v) != (v))$/
+IllegalExprOperandType	tclExecute.c	/^IllegalExprOperandType(interp, opCode, opndPtr)$/
+InfoArgsCmd	tclCmdIL.c	/^InfoArgsCmd(dummy, interp, objc, objv)$/
+InfoBodyCmd	tclCmdIL.c	/^InfoBodyCmd(dummy, interp, objc, objv)$/
+InfoCmdCountCmd	tclCmdIL.c	/^InfoCmdCountCmd(dummy, interp, objc, objv)$/
+InfoCommandsCmd	tclCmdIL.c	/^InfoCommandsCmd(dummy, interp, objc, objv)$/
+InfoCompleteCmd	tclCmdIL.c	/^InfoCompleteCmd(dummy, interp, objc, objv)$/
+InfoDefaultCmd	tclCmdIL.c	/^InfoDefaultCmd(dummy, interp, objc, objv)$/
+InfoExistsCmd	tclCmdIL.c	/^InfoExistsCmd(dummy, interp, objc, objv)$/
+InfoGlobalsCmd	tclCmdIL.c	/^InfoGlobalsCmd(dummy, interp, objc, objv)$/
+InfoHostnameCmd	tclCmdIL.c	/^InfoHostnameCmd(dummy, interp, objc, objv)$/
+InfoLevelCmd	tclCmdIL.c	/^InfoLevelCmd(dummy, interp, objc, objv)$/
+InfoLibraryCmd	tclCmdIL.c	/^InfoLibraryCmd(dummy, interp, objc, objv)$/
+InfoLoadedCmd	tclCmdIL.c	/^InfoLoadedCmd(dummy, interp, objc, objv)$/
+InfoLocalsCmd	tclCmdIL.c	/^InfoLocalsCmd(dummy, interp, objc, objv)$/
+InfoNameOfExecutableCmd	tclCmdIL.c	/^InfoNameOfExecutableCmd(dummy, interp, objc, objv)/
+InfoPatchLevelCmd	tclCmdIL.c	/^InfoPatchLevelCmd(dummy, interp, objc, objv)$/
+InfoProcsCmd	tclCmdIL.c	/^InfoProcsCmd(dummy, interp, objc, objv)$/
+InfoScriptCmd	tclCmdIL.c	/^InfoScriptCmd(dummy, interp, objc, objv)$/
+InfoSharedlibCmd	tclCmdIL.c	/^InfoSharedlibCmd(dummy, interp, objc, objv)$/
+InfoTclVersionCmd	tclCmdIL.c	/^InfoTclVersionCmd(dummy, interp, objc, objv)$/
+InfoVarsCmd	tclCmdIL.c	/^InfoVarsCmd(dummy, interp, objc, objv)$/
+InitArgInfo	tclCompile.c	/^InitArgInfo(argInfoPtr)$/
+InitByteCodeExecution	tclExecute.c	/^InitByteCodeExecution(interp)$/
+InitNotifier	tclNotify.c	/^InitNotifier()$/
+InitTimer	tclTimer.c	/^InitTimer()$/
+InitTypeTable	tclObj.c	/^InitTypeTable()$/
+InterpAliasHelper	tclInterp.c	/^InterpAliasHelper(interp, masterPtr, objc, objv)$/
+InterpAliasesHelper	tclInterp.c	/^InterpAliasesHelper(interp, masterPtr, objc, objv)/
+InterpEvalHelper	tclInterp.c	/^InterpEvalHelper(interp, masterPtr, objc, objv)$/
+InterpExistsHelper	tclInterp.c	/^InterpExistsHelper(interp, masterPtr, objc, objv)$/
+InterpExposeHelper	tclInterp.c	/^InterpExposeHelper(interp, masterPtr, objc, objv)$/
+InterpHiddenHelper	tclInterp.c	/^InterpHiddenHelper(interp, masterPtr, objc, objv)$/
+InterpHideHelper	tclInterp.c	/^InterpHideHelper(interp, masterPtr, objc, objv)$/
+InterpInvokeHiddenHelper	tclInterp.c	/^InterpInvokeHiddenHelper(interp, masterPtr, objc, /
+InterpIsSafeHelper	tclInterp.c	/^InterpIsSafeHelper(interp, masterPtr, objc, objv)$/
+InterpMarkTrustedHelper	tclInterp.c	/^InterpMarkTrustedHelper(interp, masterPtr, objc, o/
+InterpShareHelper	tclInterp.c	/^InterpShareHelper(interp, masterPtr, objc, objv)$/
+InterpSlavesHelper	tclInterp.c	/^InterpSlavesHelper(interp, masterPtr, objc, objv)$/
+InterpTargetHelper	tclInterp.c	/^InterpTargetHelper(interp, masterPtr, objc, objv)$/
+InterpTransferHelper	tclInterp.c	/^InterpTransferHelper(interp, masterPtr, objc, objv/
+InvokeImportedCmd	tclNamesp.c	/^InvokeImportedCmd(clientData, interp, objc, objv)$/
+IsLocalScalar	tclCompile.c	/^IsLocalScalar(varName, length)$/
+JOIN	tcl.h	/^# define JOIN(a,b) JOIN1(a,b)$/
+JOIN1	tcl.h	/^# define JOIN1(a,b) a##b$/
+LinkTraceProc	tclLink.c	/^LinkTraceProc(clientData, interp, name1, name2, fl/
+LoadCleanupProc	tclLoad.c	/^LoadCleanupProc(clientData, interp)$/
+LoadExitProc	tclLoad.c	/^LoadExitProc(clientData)$/
+LookupCompiledLocal	tclCompile.c	/^LookupCompiledLocal(name, nameChars, createIfNew, /
+LookupWord	tclDate.c	/^LookupWord(buff)$/
+MakeUpvar	tclVar.c	/^MakeUpvar(iPtr, framePtr, otherP1, otherP2, otherF/
+MarkTrusted	tclInterp.c	/^MarkTrusted(interp)$/
+MasterRecordDeleteProc	tclInterp.c	/^MasterRecordDeleteProc(clientData, interp)$/
+MemoryCmd	tclCkalloc.c	/^MemoryCmd (clientData, interp, argc, argv)$/
+MergeLists	tclCmdIL.c	/^MergeLists(leftPtr, rightPtr, infoPtr)$/
+MergeSort	tclCmdIL.c	/^MergeSort(headPtr, infoPtr)$/
+MoreCore	tclAlloc.c	/^MoreCore($/
+NEXT	regexp.c	/^#define	NEXT(p)	(((*((p)+1)&0377)<<8) + (*((p)+2)&/
+NamespaceChildrenCmd	tclNamesp.c	/^NamespaceChildrenCmd(dummy, interp, objc, objv)$/
+NamespaceCodeCmd	tclNamesp.c	/^NamespaceCodeCmd(dummy, interp, objc, objv)$/
+NamespaceCurrentCmd	tclNamesp.c	/^NamespaceCurrentCmd(dummy, interp, objc, objv)$/
+NamespaceDeleteCmd	tclNamesp.c	/^NamespaceDeleteCmd(dummy, interp, objc, objv)$/
+NamespaceEvalCmd	tclNamesp.c	/^NamespaceEvalCmd(dummy, interp, objc, objv)$/
+NamespaceExportCmd	tclNamesp.c	/^NamespaceExportCmd(dummy, interp, objc, objv)$/
+NamespaceForgetCmd	tclNamesp.c	/^NamespaceForgetCmd(dummy, interp, objc, objv)$/
+NamespaceFree	tclNamesp.c	/^NamespaceFree(nsPtr)$/
+NamespaceImportCmd	tclNamesp.c	/^NamespaceImportCmd(dummy, interp, objc, objv)$/
+NamespaceInscopeCmd	tclNamesp.c	/^NamespaceInscopeCmd(dummy, interp, objc, objv)$/
+NamespaceOriginCmd	tclNamesp.c	/^NamespaceOriginCmd(dummy, interp, objc, objv)$/
+NamespaceParentCmd	tclNamesp.c	/^NamespaceParentCmd(dummy, interp, objc, objv)$/
+NamespaceQualifiersCmd	tclNamesp.c	/^NamespaceQualifiersCmd(dummy, interp, objc, objv)$/
+NamespaceTailCmd	tclNamesp.c	/^NamespaceTailCmd(dummy, interp, objc, objv)$/
+NamespaceWhichCmd	tclNamesp.c	/^NamespaceWhichCmd(dummy, interp, objc, objv)$/
+NewVar	tclVar.c	/^NewVar()$/
+NoopCmd	tclTest.c	/^NoopCmd(unused, interp, argc, argv)$/
+NoopObjCmd	tclTest.c	/^NoopObjCmd(unused, interp, objc, objv)$/
+NotifierExitHandler	tclNotify.c	/^NotifierExitHandler(clientData)$/
+O2S	tclExecute.c	/^#define O2S(objPtr) \\$/
+OP	regexp.c	/^#define	OP(p)	(*(p))$/
+OPERAND	regexp.c	/^#define	OPERAND(p)	((p) + 3)$/
+OneWordCreate	tclHash.c	/^OneWordCreate(tablePtr, key, newPtr)$/
+OneWordFind	tclHash.c	/^OneWordFind(tablePtr, key)$/
+POP_OBJECT	tclExecute.c	/^#define POP_OBJECT() \\$/
+PUSH_OBJECT	tclExecute.c	/^#define PUSH_OBJECT(objPtr) \\$/
+ParseSearchId	tclVar.c	/^ParseSearchId(interp, varPtr, varName, string)$/
+PreserveExitProc	tclPreserve.c	/^PreserveExitProc(clientData)$/
+PrintByteCodeInfo	tclExecute.c	/^PrintByteCodeInfo(codePtr)$/
+ProcBodyDup	tclProc.c	/^static void ProcBodyDup(srcPtr, dupPtr)$/
+ProcBodyFree	tclProc.c	/^ProcBodyFree(objPtr)$/
+ProcBodySetFromAny	tclProc.c	/^ProcBodySetFromAny(interp, objPtr)$/
+ProcBodyTestInitInternal	tclTestProcBodyObj.c	/^ProcBodyTestInitInternal(interp, isSafe)$/
+ProcBodyTestProcObjCmd	tclTestProcBodyObj.c	/^ProcBodyTestProcObjCmd (dummy, interp, objc, objv)/
+ProcBodyUpdateString	tclProc.c	/^ProcBodyUpdateString(objPtr)$/
+Procbodytest_Init	tclTestProcBodyObj.c	/^Procbodytest_Init(interp)$/
+Procbodytest_SafeInit	tclTestProcBodyObj.c	/^Procbodytest_SafeInit(interp)$/
+QuoteEnd	tclParse.c	/^QuoteEnd(string, lastChar, term)$/
+RANDOM_INDEX	tclHash.c	/^#define RANDOM_INDEX(tablePtr, i) \\$/
+RANGE_ASSERT	tclAlloc.c	/^#define RANGE_ASSERT(p) if (!(p)) panic(# p)$/
+RebuildTable	tclHash.c	/^RebuildTable(tablePtr)$/
+RecordTracebackInfo	tclExecute.c	/^RecordTracebackInfo(interp, pc, codePtr)$/
+RecycleBuffer	tclIO.c	/^RecycleBuffer(chanPtr, bufPtr, mustDiscard)$/
+RegisterCommand	tclTestProcBodyObj.c	/^static int RegisterCommand(interp, namespace, cmdT/
+RegisterTcpServerInterpCleanup	tclIOCmd.c	/^RegisterTcpServerInterpCleanup(interp, acceptCallb/
+RelativeDate	tclDate.c	/^RelativeDate(Start, DayOrdinal, DayNumber)$/
+RelativeMonth	tclDate.c	/^RelativeMonth(Start, RelMonth, TimePtr)$/
+ReplaceString	tclEnv.c	/^ReplaceString(oldStr, newStr)$/
+STK_INT	tclExecute.c	/^#define STK_INT(offset)     (STK_ITEM(offset).i)$/
+STK_ITEM	tclExecute.c	/^#define STK_ITEM(offset)    (stackPtr[stackTop + (/
+STK_OBJECT	tclExecute.c	/^#define STK_OBJECT(offset)  (STK_ITEM(offset).o)$/
+STK_POINTER	tclExecute.c	/^#define STK_POINTER(offset) (STK_ITEM(offset).p)$/
+STRINGIFY	tcl.h	/^# define STRINGIFY(x) STRINGIFY1(x)$/
+STRINGIFY1	tcl.h	/^# define STRINGIFY1(x) #x$/
+ScanBufferForEOL	tclIO.c	/^ScanBufferForEOL(chanPtr, bufPtr, translation, eof/
+ScanInputForEOL	tclIO.c	/^ScanInputForEOL(chanPtr, bytesQueuedPtr)$/
+ScanNumber	tclBinary.c	/^ScanNumber(buffer, type)$/
+ScriptEnd	tclParse.c	/^ScriptEnd(p, lastChar, nested)$/
+SetBlockMode	tclIO.c	/^SetBlockMode(interp, chanPtr, mode)$/
+SetBooleanFromAny	tclObj.c	/^SetBooleanFromAny(interp, objPtr)$/
+SetByteCodeFromAny	tclCompile.c	/^SetByteCodeFromAny(interp, objPtr)$/
+SetCmdNameFromAny	tclExecute.c	/^SetCmdNameFromAny(interp, objPtr)$/
+SetDoubleFromAny	tclObj.c	/^SetDoubleFromAny(interp, objPtr)$/
+SetIndexFromAny	tclIndexObj.c	/^SetIndexFromAny(interp, objPtr)$/
+SetIntFromAny	tclObj.c	/^SetIntFromAny(interp, objPtr)$/
+SetListFromAny	tclListObj.c	/^SetListFromAny(interp, objPtr)$/
+SetNsNameFromAny	tclNamesp.c	/^SetNsNameFromAny(interp, objPtr)$/
+SetStringFromAny	tclStringObj.c	/^SetStringFromAny(interp, objPtr)$/
+SetVarToObj	tclTestObj.c	/^SetVarToObj(varIndex, objPtr)$/
+SetupAppendBuffer	tclUtil.c	/^SetupAppendBuffer(iPtr, newSpace)$/
+SkipToChar	tclFileName.c	/^SkipToChar(stringPtr, match)$/
+SlaveAliasHelper	tclInterp.c	/^SlaveAliasHelper(interp, slaveInterp, slavePtr, ob/
+SlaveAliasesHelper	tclInterp.c	/^SlaveAliasesHelper(interp, slaveInterp, slavePtr, /
+SlaveEvalHelper	tclInterp.c	/^SlaveEvalHelper(interp, slaveInterp, slavePtr, obj/
+SlaveExposeHelper	tclInterp.c	/^SlaveExposeHelper(interp, slaveInterp, slavePtr, o/
+SlaveHiddenHelper	tclInterp.c	/^SlaveHiddenHelper(interp, slaveInterp, slavePtr, o/
+SlaveHideHelper	tclInterp.c	/^SlaveHideHelper(interp, slaveInterp, slavePtr, obj/
+SlaveInvokeHiddenHelper	tclInterp.c	/^SlaveInvokeHiddenHelper(interp, slaveInterp, slave/
+SlaveIsSafeHelper	tclInterp.c	/^SlaveIsSafeHelper(interp, slaveInterp, slavePtr, o/
+SlaveMarkTrustedHelper	tclInterp.c	/^SlaveMarkTrustedHelper(interp, slaveInterp, slaveP/
+SlaveObjectCmd	tclInterp.c	/^SlaveObjectCmd(clientData, interp, objc, objv)$/
+SlaveObjectDeleteProc	tclInterp.c	/^SlaveObjectDeleteProc(clientData)$/
+SlaveRecordDeleteProc	tclInterp.c	/^SlaveRecordDeleteProc(clientData, interp)$/
+SortCompare	tclCmdIL.c	/^SortCompare(objPtr1, objPtr2, infoPtr)$/
+SpecialFree	tclTest.c	/^static void SpecialFree(blockPtr)$/
+SplitMacPath	tclFileName.c	/^SplitMacPath(path, bufPtr)$/
+SplitUnixPath	tclFileName.c	/^SplitUnixPath(path, bufPtr)$/
+SplitWinPath	tclFileName.c	/^SplitWinPath(path, bufPtr)$/
+StaticInitProc	tclTest.c	/^StaticInitProc(interp)$/
+StopCopy	tclIO.c	/^StopCopy(csPtr)$/
+StoreStatData	tclCmdAH.c	/^StoreStatData(interp, varName, statPtr)$/
+StringCreate	tclHash.c	/^StringCreate(tablePtr, key, newPtr)$/
+StringFind	tclHash.c	/^StringFind(tablePtr, key)$/
+StringForResultCode	tclExecute.c	/^StringForResultCode(result)$/
+StringValue	tclLink.c	/^StringValue(linkPtr, buffer)$/
+TAG_SIZE	tclCkalloc.c	/^#define TAG_SIZE(bytesInString) ((unsigned) sizeof/
+TCL_ALIGN	tclInt.h	/^#define TCL_ALIGN(x) (((int)(x) + 7) & ~7)$/
+TCL_VARARGS	tcl.h	/^#   define TCL_VARARGS(type, name) (type name, .../
+TCL_VARARGS_DEF	tcl.h	/^#   define TCL_VARARGS_DEF(type, name) (type name,/
+TCL_VARARGS_START	tcl.h	/^#   define TCL_VARARGS_START(type, name, list) (va/
+TRACE	tclExecute.c	/^#define TRACE(a) \\$/
+TRACE_WITH_OBJ	tclExecute.c	/^#define TRACE_WITH_OBJ(a, objPtr) \\$/
+TclAccess	tclIOUtil.c	/^TclAccess(path, mode)$/
+TclAccessDeleteProc	tclIOUtil.c	/^TclAccessDeleteProc(proc)$/
+TclAccessInsertProc	tclIOUtil.c	/^TclAccessInsertProc(proc)$/
+TclAllocateFreeObjects	tclObj.c	/^TclAllocateFreeObjects()$/
+TclCleanupByteCode	tclCompile.c	/^TclCleanupByteCode(codePtr)$/
+TclCleanupChildren	tclPipe.c	/^TclCleanupChildren(interp, numPids, pidPtr, errorC/
+TclCleanupCommand	tclBasic.c	/^TclCleanupCommand(cmdPtr)$/
+TclClearVarUndefined	tclInt.h	/^#define TclClearVarUndefined(varPtr) \\$/
+TclCompileBreakCmd	tclCompile.c	/^TclCompileBreakCmd(interp, string, lastChar, flags/
+TclCompileCatchCmd	tclCompile.c	/^TclCompileCatchCmd(interp, string, lastChar, flags/
+TclCompileContinueCmd	tclCompile.c	/^TclCompileContinueCmd(interp, string, lastChar, fl/
+TclCompileDollarVar	tclCompile.c	/^TclCompileDollarVar(interp, string, lastChar, flag/
+TclCompileExpr	tclCompExpr.c	/^TclCompileExpr(interp, string, lastChar, flags, en/
+TclCompileExprCmd	tclCompile.c	/^TclCompileExprCmd(interp, string, lastChar, flags,/
+TclCompileForCmd	tclCompile.c	/^TclCompileForCmd(interp, string, lastChar, flags, /
+TclCompileForeachCmd	tclCompile.c	/^TclCompileForeachCmd(interp, string, lastChar, fla/
+TclCompileIfCmd	tclCompile.c	/^TclCompileIfCmd(interp, string, lastChar, flags, e/
+TclCompileIncrCmd	tclCompile.c	/^TclCompileIncrCmd(interp, string, lastChar, flags,/
+TclCompileQuotes	tclCompile.c	/^TclCompileQuotes(interp, string, lastChar, termCha/
+TclCompileSetCmd	tclCompile.c	/^TclCompileSetCmd(interp, string, lastChar, flags, /
+TclCompileString	tclCompile.c	/^TclCompileString(interp, string, lastChar, flags, /
+TclCompileWhileCmd	tclCompile.c	/^TclCompileWhileCmd(interp, string, lastChar, flags/
+TclCopyAndCollapse	tclUtil.c	/^TclCopyAndCollapse(count, src, dst)$/
+TclCopyChannel	tclIO.c	/^TclCopyChannel(interp, inChan, outChan, toRead, cm/
+TclCreateAuxData	tclCompile.c	/^TclCreateAuxData(clientData, typePtr, envPtr)$/
+TclCreateExecEnv	tclExecute.c	/^TclCreateExecEnv(interp)$/
+TclCreatePipeline	tclPipe.c	/^TclCreatePipeline(interp, argc, argv, pidArrayPtr,/
+TclCreateProc	tclProc.c	/^TclCreateProc(interp, nsPtr, procName, argsPtr, bo/
+TclCurrCodeOffset	tclCompile.h	/^#define TclCurrCodeOffset()  ((envPtr)->codeNext -/
+TclDatecvtok	tclDate.c	/^int TclDatecvtok(int i)$/
+TclDateerror	tclDate.c	/^TclDateerror(s)$/
+TclDatelex	tclDate.c	/^TclDatelex()$/
+TclDateparse	tclDate.c	/^int TclDateparse(void)$/
+TclDbNewObj	tclInt.h	/^#  define TclDbNewObj(objPtr, file, line) \\$/
+TclDecrRefCount	tclInt.h	/^#  define TclDecrRefCount(objPtr) \\$/
+TclDeleteCompiledLocalVars	tclVar.c	/^TclDeleteCompiledLocalVars(iPtr, framePtr)$/
+TclDeleteExecEnv	tclExecute.c	/^TclDeleteExecEnv(eePtr)$/
+TclDeleteVars	tclVar.c	/^TclDeleteVars(iPtr, tablePtr)$/
+TclDoGlob	tclFileName.c	/^TclDoGlob(interp, separators, headPtr, tail)$/
+TclDumpMemoryInfo	tclCkalloc.c	/^TclDumpMemoryInfo(outFile) $/
+TclEmitForwardJump	tclCompile.c	/^TclEmitForwardJump(envPtr, jumpType, jumpFixupPtr)/
+TclEmitInstInt1	tclCompile.h	/^#define TclEmitInstInt1(op, i, envPtr) \\$/
+TclEmitInstInt4	tclCompile.h	/^#define TclEmitInstInt4(op, i, envPtr) \\$/
+TclEmitInstUInt1	tclCompile.h	/^#define TclEmitInstUInt1(op, i, envPtr) \\$/
+TclEmitInstUInt4	tclCompile.h	/^#define TclEmitInstUInt4(op, i, envPtr) \\$/
+TclEmitInt1	tclCompile.h	/^#define TclEmitInt1(i, envPtr) \\$/
+TclEmitInt4	tclCompile.h	/^#define TclEmitInt4(i, envPtr) \\$/
+TclEmitOpcode	tclCompile.h	/^#define TclEmitOpcode(op, envPtr) \\$/
+TclEmitPush	tclCompile.h	/^#define TclEmitPush(objIndex, envPtr) \\$/
+TclEnsureCodeSpace	tclCompile.h	/^#define TclEnsureCodeSpace(nBytes, envPtr) \\$/
+TclEnsureCodeSpace1	tclCompile.h	/^#define TclEnsureCodeSpace1(envPtr) \\$/
+TclExecuteByteCode	tclExecute.c	/^TclExecuteByteCode(interp, codePtr)$/
+TclExpandCodeArray	tclCompile.c	/^TclExpandCodeArray(envPtr)$/
+TclExpandJumpFixupArray	tclCompile.c	/^TclExpandJumpFixupArray(fixupArrayPtr)$/
+TclExpandParseValue	tclParse.c	/^TclExpandParseValue(pvPtr, needed)$/
+TclExprFloatError	tclExecute.c	/^TclExprFloatError(interp, value)$/
+TclFileAttrsCmd	tclFCmd.c	/^TclFileAttrsCmd(interp, objc, objv)$/
+TclFileCopyCmd	tclFCmd.c	/^TclFileCopyCmd(interp, argc, argv)$/
+TclFileDeleteCmd	tclFCmd.c	/^TclFileDeleteCmd(interp, argc, argv)$/
+TclFileMakeDirsCmd	tclFCmd.c	/^TclFileMakeDirsCmd(interp, argc, argv)$/
+TclFileRenameCmd	tclFCmd.c	/^TclFileRenameCmd(interp, argc, argv)$/
+TclFinalizeAuxDataTypeTable	tclCompile.c	/^TclFinalizeAuxDataTypeTable()$/
+TclFinalizeCompExecEnv	tclObj.c	/^TclFinalizeCompExecEnv()$/
+TclFinalizeEnvironment	tclEnv.c	/^TclFinalizeEnvironment()$/
+TclFinalizeExecEnv	tclExecute.c	/^TclFinalizeExecEnv()$/
+TclFindElement	tclUtil.c	/^TclFindElement(interp, list, listLength, elementPt/
+TclFindProc	tclProc.c	/^TclFindProc(iPtr, procName)$/
+TclFixupForwardJump	tclCompile.c	/^TclFixupForwardJump(envPtr, jumpFixupPtr, jumpDist/
+TclFormatInt	tclUtil.c	/^TclFormatInt(buffer, n)$/
+TclFreeCompileEnv	tclCompile.c	/^TclFreeCompileEnv(envPtr)$/
+TclFreeJumpFixupArray	tclCompile.c	/^TclFreeJumpFixupArray(fixupArrayPtr)$/
+TclFreeObj	tclObj.c	/^TclFreeObj(objPtr)$/
+TclFreePackageInfo	tclPkg.c	/^TclFreePackageInfo(iPtr)$/
+TclGetAuxDataType	tclCompile.c	/^TclGetAuxDataType(typeName)$/
+TclGetDate	tclDate.c	/^TclGetDate(p, now, zone, timePtr)$/
+TclGetElementOfIndexedArray	tclVar.c	/^TclGetElementOfIndexedArray(interp, localIndex, el/
+TclGetEnv	tclEnv.c	/^TclGetEnv(name)$/
+TclGetExceptionRangeForPc	tclExecute.c	/^TclGetExceptionRangeForPc(pc, catchOnly, codePtr)$/
+TclGetExtension	tclFileName.c	/^TclGetExtension(name)$/
+TclGetFrame	tclProc.c	/^TclGetFrame(interp, string, framePtrPtr)$/
+TclGetIndexedScalar	tclVar.c	/^TclGetIndexedScalar(interp, localIndex, leaveError/
+TclGetInstructionTable	tclCompile.c	/^TclGetInstructionTable()$/
+TclGetInt1AtPtr	tclCompile.h	/^#   define TclGetInt1AtPtr(p) ((int) *((char *) p)/
+TclGetInt4AtPtr	tclCompile.h	/^#define TclGetInt4AtPtr(p) (((int) TclGetInt1AtPtr/
+TclGetIntForIndex	tclUtil.c	/^TclGetIntForIndex(interp, objPtr, endValue, indexP/
+TclGetInterpProc	tclProc.c	/^TclGetInterpProc()$/
+TclGetLoadedPackages	tclLoad.c	/^TclGetLoadedPackages(interp, targetName)$/
+TclGetLong	tclGet.c	/^TclGetLong(interp, string, longPtr)$/
+TclGetNamespaceForQualName	tclNamesp.c	/^TclGetNamespaceForQualName(interp, qualName, cxtNs/
+TclGetObjInterpProc	tclProc.c	/^TclGetObjInterpProc()$/
+TclGetOpenMode	tclIOUtil.c	/^TclGetOpenMode(interp, string, seekFlagPtr)$/
+TclGetOriginalCommand	tclNamesp.c	/^TclGetOriginalCommand(command)$/
+TclGetRegError	regexp.c	/^TclGetRegError()$/
+TclGetStringFromObj	tclInt.h	/^#define TclGetStringFromObj(objPtr, lengthPtr) \\$/
+TclGetUInt1AtPtr	tclCompile.h	/^#define TclGetUInt1AtPtr(p) ((unsigned int) *(p))$/
+TclGetUInt4AtPtr	tclCompile.h	/^#define TclGetUInt4AtPtr(p) ((unsigned int) (*(p) /
+TclGlobalInvoke	tclBasic.c	/^TclGlobalInvoke(interp, argc, argv, flags)$/
+TclGuessPackageName	tclLoadNone.c	/^TclGuessPackageName(fileName, bufPtr)$/
+TclHideUnsafeCommands	tclBasic.c	/^TclHideUnsafeCommands(interp)$/
+TclInExit	tclEvent.c	/^TclInExit()$/
+TclIncrElementOfIndexedArray	tclVar.c	/^TclIncrElementOfIndexedArray(interp, localIndex, e/
+TclIncrIndexedScalar	tclVar.c	/^TclIncrIndexedScalar(interp, localIndex, incrAmoun/
+TclIncrObjsAllocated	tclInt.h	/^#  define TclIncrObjsAllocated() \\$/
+TclIncrObjsFreed	tclInt.h	/^#  define TclIncrObjsFreed() \\$/
+TclIncrVar2	tclVar.c	/^TclIncrVar2(interp, part1Ptr, part2Ptr, incrAmount/
+TclInitAuxDataTypeTable	tclCompile.c	/^TclInitAuxDataTypeTable()$/
+TclInitByteCodeObj	tclCompile.c	/^TclInitByteCodeObj(objPtr, envPtr)$/
+TclInitCompileEnv	tclCompile.c	/^TclInitCompileEnv(interp, envPtr, string)$/
+TclInitCompiledLocals	tclCompile.c	/^TclInitCompiledLocals(interp, framePtr, nsPtr)$/
+TclInitJumpFixupArray	tclCompile.c	/^TclInitJumpFixupArray(fixupArrayPtr)$/
+TclInitNamespaces	tclNamesp.c	/^TclInitNamespaces()$/
+TclInitStringRep	tclInt.h	/^#define TclInitStringRep(objPtr, bytePtr, len) \\$/
+TclInterpInit	tclInterp.c	/^TclInterpInit(interp)$/
+TclInvoke	tclBasic.c	/^TclInvoke(interp, argc, argv, flags)$/
+TclInvokeObjectCommand	tclBasic.c	/^TclInvokeObjectCommand(clientData, interp, argc, a/
+TclInvokeStringCommand	tclBasic.c	/^TclInvokeStringCommand(clientData, interp, objc, o/
+TclIsProc	tclProc.c	/^TclIsProc(cmdPtr)$/
+TclIsVarArgument	tclInt.h	/^#define TclIsVarArgument(varPtr) \\$/
+TclIsVarArray	tclInt.h	/^#define TclIsVarArray(varPtr) \\$/
+TclIsVarArrayElement	tclInt.h	/^#define TclIsVarArrayElement(varPtr) \\$/
+TclIsVarLink	tclInt.h	/^#define TclIsVarLink(varPtr) \\$/
+TclIsVarResolved	tclInt.h	/^#define TclIsVarResolved(varPtr) \\$/
+TclIsVarScalar	tclInt.h	/^#define TclIsVarScalar(varPtr) \\$/
+TclIsVarTemporary	tclInt.h	/^#define TclIsVarTemporary(varPtr) \\$/
+TclIsVarUndefined	tclInt.h	/^#define TclIsVarUndefined(varPtr) \\$/
+TclLoadFile	tclLoadNone.c	/^TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr/
+TclLog2	tclExecute.c	/^TclLog2(value)$/
+TclLooksLikeInt	tclUtil.c	/^TclLooksLikeInt(p)$/
+TclLookupVar	tclVar.c	/^TclLookupVar(interp, part1, part2, flags, msg, cre/
+TclMax	tclCompile.h	/^#define TclMax(i, j)   ((((int) i) > ((int) j))? (/
+TclMin	tclCompile.h	/^#define TclMin(i, j)   ((((int) i) < ((int) j))? (/
+TclNeedSpace	tclUtil.c	/^TclNeedSpace(start, end)$/
+TclNewObj	tclInt.h	/^#  define TclNewObj(objPtr) \\$/
+TclNewProcBodyObj	tclProc.c	/^TclNewProcBodyObj(procPtr)$/
+TclObjCommandComplete	tclParse.c	/^TclObjCommandComplete(cmdPtr)$/
+TclObjIndexForString	tclCompile.c	/^TclObjIndexForString(string, length, allocStrRep, /
+TclObjInterpProc	tclProc.c	/^TclObjInterpProc(clientData, interp, objc, objv)$/
+TclObjInvoke	tclBasic.c	/^TclObjInvoke(interp, objc, objv, flags)$/
+TclObjInvokeGlobal	tclBasic.c	/^TclObjInvokeGlobal(interp, objc, objv, flags)$/
+TclObjTest_Init	tclTestObj.c	/^TclObjTest_Init(interp)$/
+TclOpenFileChannelDeleteProc	tclIOUtil.c	/^TclOpenFileChannelDeleteProc(proc)$/
+TclOpenFileChannelInsertProc	tclIOUtil.c	/^TclOpenFileChannelInsertProc(proc)$/
+TclParseBraces	tclParse.c	/^TclParseBraces(interp, string, termPtr, pvPtr)$/
+TclParseNestedCmd	tclParse.c	/^TclParseNestedCmd(interp, string, flags, termPtr, /
+TclParseQuotes	tclParse.c	/^TclParseQuotes(interp, string, termChar, flags, te/
+TclPrecTraceProc	tclUtil.c	/^TclPrecTraceProc(clientData, interp, name1, name2,/
+TclPreventAliasLoop	tclInterp.c	/^TclPreventAliasLoop(interp, cmdInterp, cmd)$/
+TclPrintByteCodeObj	tclCompile.c	/^TclPrintByteCodeObj(interp, objPtr)$/
+TclPrintInstruction	tclCompile.c	/^TclPrintInstruction(codePtr, pc)$/
+TclPrintSource	tclCompile.c	/^TclPrintSource(outFile, string, maxChars)$/
+TclProcCleanupProc	tclProc.c	/^TclProcCleanupProc(procPtr)$/
+TclProcCompileProc	tclProc.c	/^TclProcCompileProc(interp, procPtr, bodyPtr, nsPtr/
+TclProcDeleteProc	tclProc.c	/^TclProcDeleteProc(clientData)$/
+TclProcInterpProc	tclProc.c	/^TclProcInterpProc(clientData, interp, argc, argv)$/
+TclRegComp	regexp.c	/^TclRegComp(exp)$/
+TclRegError	regexp.c	/^TclRegError(string)$/
+TclRegExec	regexp.c	/^TclRegExec(prog, string, start)$/
+TclRegisterAuxDataType	tclCompile.c	/^TclRegisterAuxDataType(typePtr)$/
+TclRenameCommand	tclBasic.c	/^TclRenameCommand(interp, oldName, newName)$/
+TclResetObjResult	tclInt.h	/^#define TclResetObjResult(interp) \\$/
+TclResetShadowedCmdRefs	tclNamesp.c	/^TclResetShadowedCmdRefs(interp, newCmdPtr)$/
+TclServiceIdle	tclTimer.c	/^TclServiceIdle()$/
+TclSetElementOfIndexedArray	tclVar.c	/^TclSetElementOfIndexedArray(interp, localIndex, el/
+TclSetEnv	tclEnv.c	/^TclSetEnv(name, value)$/
+TclSetIndexedScalar	tclVar.c	/^TclSetIndexedScalar(interp, localIndex, newValuePt/
+TclSetPreInitScript	tclInitScript.h	/^TclSetPreInitScript (string)$/
+TclSetVarArray	tclInt.h	/^#define TclSetVarArray(varPtr) \\$/
+TclSetVarArrayElement	tclInt.h	/^#define TclSetVarArrayElement(varPtr) \\$/
+TclSetVarLink	tclInt.h	/^#define TclSetVarLink(varPtr) \\$/
+TclSetVarScalar	tclInt.h	/^#define TclSetVarScalar(varPtr) \\$/
+TclSetVarUndefined	tclInt.h	/^#define TclSetVarUndefined(varPtr) \\$/
+TclSetupEnv	tclEnv.c	/^TclSetupEnv(interp)$/
+TclSockGetPort	tclIOSock.c	/^TclSockGetPort(interp, string, proto, portPtr)$/
+TclSockMinimumBuffers	tclIOSock.c	/^TclSockMinimumBuffers(sock, size)$/
+TclStat	tclIOUtil.c	/^TclStat(path, buf)$/
+TclStatDeleteProc	tclIOUtil.c	/^TclStatDeleteProc (proc)$/
+TclStatInsertProc	tclIOUtil.c	/^TclStatInsertProc (proc)$/
+TclStoreInt1AtPtr	tclCompile.h	/^#define TclStoreInt1AtPtr(i, p) \\$/
+TclStoreInt4AtPtr	tclCompile.h	/^#define TclStoreInt4AtPtr(i, p) \\$/
+TclTeardownNamespace	tclNamesp.c	/^TclTeardownNamespace(nsPtr)$/
+TclTestChannelCmd	tclIO.c	/^TclTestChannelCmd(clientData, interp, argc, argv)$/
+TclTestChannelEventCmd	tclIO.c	/^TclTestChannelEventCmd(dummy, interp, argc, argv)$/
+TclUnsetEnv	tclEnv.c	/^TclUnsetEnv(name)$/
+TclUpdateInstInt1AtPc	tclCompile.h	/^#define TclUpdateInstInt1AtPc(op, i, pc) \\$/
+TclUpdateInstInt4AtPc	tclCompile.h	/^#define TclUpdateInstInt4AtPc(op, i, pc) \\$/
+TclUpdateReturnInfo	tclProc.c	/^TclUpdateReturnInfo(iPtr)$/
+TclWordEnd	tclParse.c	/^TclWordEnd(start, lastChar, nested, semiPtr)$/
+Tcl_AddErrorInfo	tclBasic.c	/^Tcl_AddErrorInfo(interp, message)$/
+Tcl_AddInterpResolvers	tclResolve.c	/^Tcl_AddInterpResolvers(interp, name, cmdProc, varP/
+Tcl_AddObjErrorInfo	tclBasic.c	/^Tcl_AddObjErrorInfo(interp, message, length)$/
+Tcl_AfterObjCmd	tclTimer.c	/^Tcl_AfterObjCmd(clientData, interp, objc, objv)$/
+Tcl_Alloc	tcl.h	/^#  define Tcl_Alloc(x) Tcl_DbCkalloc(x, __FILE__, /
+Tcl_AllowExceptions	tclBasic.c	/^Tcl_AllowExceptions(interp)$/
+Tcl_AppendAllObjTypes	tclObj.c	/^Tcl_AppendAllObjTypes(interp, objPtr)$/
+Tcl_AppendElement	tclUtil.c	/^Tcl_AppendElement(interp, string)$/
+Tcl_AppendExportList	tclNamesp.c	/^Tcl_AppendExportList(interp, namespacePtr, objPtr)/
+Tcl_AppendObjCmd	tclVar.c	/^Tcl_AppendObjCmd(dummy, interp, objc, objv)$/
+Tcl_AppendToObj	tclStringObj.c	/^Tcl_AppendToObj(objPtr, bytes, length)$/
+Tcl_ArrayObjCmd	tclVar.c	/^Tcl_ArrayObjCmd(dummy, interp, objc, objv)$/
+Tcl_AsyncCreate	tclAsync.c	/^Tcl_AsyncCreate(proc, clientData)$/
+Tcl_AsyncDelete	tclAsync.c	/^Tcl_AsyncDelete(async)$/
+Tcl_AsyncInvoke	tclAsync.c	/^Tcl_AsyncInvoke(interp, code)$/
+Tcl_AsyncMark	tclAsync.c	/^Tcl_AsyncMark(async)$/
+Tcl_AsyncReady	tclAsync.c	/^Tcl_AsyncReady()$/
+Tcl_BackgroundError	tclEvent.c	/^Tcl_BackgroundError(interp)$/
+Tcl_Backslash	tclCompile.c	/^Tcl_Backslash(src, readPtr)$/
+Tcl_BadChannelOption	tclIO.c	/^Tcl_BadChannelOption(interp, optionName, optionLis/
+Tcl_BinaryObjCmd	tclBinary.c	/^Tcl_BinaryObjCmd(dummy, interp, objc, objv)$/
+Tcl_BreakCmd	tclCmdAH.c	/^Tcl_BreakCmd(dummy, interp, argc, argv)$/
+Tcl_CallWhenDeleted	tclBasic.c	/^Tcl_CallWhenDeleted(interp, proc, clientData)$/
+Tcl_CancelIdleCall	tclTimer.c	/^Tcl_CancelIdleCall(proc, clientData)$/
+Tcl_CaseObjCmd	tclCmdAH.c	/^Tcl_CaseObjCmd(dummy, interp, objc, objv)$/
+Tcl_CatchObjCmd	tclCmdAH.c	/^Tcl_CatchObjCmd(dummy, interp, objc, objv)$/
+Tcl_CdObjCmd	tclCmdAH.c	/^Tcl_CdObjCmd(dummy, interp, objc, objv)$/
+Tcl_Channel	tclInt.h	/^typedef Tcl_Channel (TclOpenFileChannelProc_) _ANS/
+Tcl_ClockObjCmd	tclClock.c	/^Tcl_ClockObjCmd (client, interp, objc, objv)$/
+Tcl_Close	tclIO.c	/^Tcl_Close(interp, chan)$/
+Tcl_CloseObjCmd	tclIOCmd.c	/^Tcl_CloseObjCmd(clientData, interp, objc, objv)$/
+Tcl_CommandComplete	tclParse.c	/^Tcl_CommandComplete(cmd)$/
+Tcl_Concat	tclUtil.c	/^Tcl_Concat(argc, argv)$/
+Tcl_ConcatObj	tclUtil.c	/^Tcl_ConcatObj(objc, objv)$/
+Tcl_ConcatObjCmd	tclCmdAH.c	/^Tcl_ConcatObjCmd(dummy, interp, objc, objv)$/
+Tcl_ContinueCmd	tclCmdAH.c	/^Tcl_ContinueCmd(dummy, interp, argc, argv)$/
+Tcl_ConvertCountedElement	tclUtil.c	/^Tcl_ConvertCountedElement(src, length, dst, flags)/
+Tcl_ConvertElement	tclUtil.c	/^Tcl_ConvertElement(src, dst, flags)$/
+Tcl_ConvertToType	tclObj.c	/^Tcl_ConvertToType(interp, objPtr, typePtr)$/
+Tcl_CreateAlias	tclInterp.c	/^Tcl_CreateAlias(slaveInterp, slaveCmd, targetInter/
+Tcl_CreateAliasObj	tclInterp.c	/^Tcl_CreateAliasObj(slaveInterp, slaveCmd, targetIn/
+Tcl_CreateChannel	tclIO.c	/^Tcl_CreateChannel(typePtr, chanName, instanceData,/
+Tcl_CreateChannelHandler	tclIO.c	/^Tcl_CreateChannelHandler(chan, mask, proc, clientD/
+Tcl_CreateCloseHandler	tclIO.c	/^Tcl_CreateCloseHandler(chan, proc, clientData)$/
+Tcl_CreateCommand	tclBasic.c	/^Tcl_CreateCommand(interp, cmdName, proc, clientDat/
+Tcl_CreateEventSource	tclNotify.c	/^Tcl_CreateEventSource(setupProc, checkProc, client/
+Tcl_CreateExitHandler	tclEvent.c	/^Tcl_CreateExitHandler(proc, clientData)$/
+Tcl_CreateHashEntry	tcl.h	/^#define Tcl_CreateHashEntry(tablePtr, key, newPtr)/
+Tcl_CreateInterp	tclBasic.c	/^Tcl_CreateInterp()$/
+Tcl_CreateMathFunc	tclCompExpr.c	/^Tcl_CreateMathFunc(interp, name, numArgs, argTypes/
+Tcl_CreateNamespace	tclNamesp.c	/^Tcl_CreateNamespace(interp, name, clientData, dele/
+Tcl_CreateObjCommand	tclBasic.c	/^Tcl_CreateObjCommand(interp, cmdName, proc, client/
+Tcl_CreateSlave	tclInterp.c	/^Tcl_CreateSlave(interp, slavePath, isSafe)$/
+Tcl_CreateTimerHandler	tclTimer.c	/^Tcl_CreateTimerHandler(milliseconds, proc, clientD/
+Tcl_CreateTrace	tclBasic.c	/^Tcl_CreateTrace(interp, level, proc, clientData)$/
+Tcl_DStringAppend	tclUtil.c	/^Tcl_DStringAppend(dsPtr, string, length)$/
+Tcl_DStringAppendElement	tclUtil.c	/^Tcl_DStringAppendElement(dsPtr, string)$/
+Tcl_DStringEndSublist	tclUtil.c	/^Tcl_DStringEndSublist(dsPtr)$/
+Tcl_DStringFree	tclUtil.c	/^Tcl_DStringFree(dsPtr)$/
+Tcl_DStringGetResult	tclUtil.c	/^Tcl_DStringGetResult(interp, dsPtr)$/
+Tcl_DStringInit	tclUtil.c	/^Tcl_DStringInit(dsPtr)$/
+Tcl_DStringLength	tcl.h	/^#define Tcl_DStringLength(dsPtr) ((dsPtr)->length)/
+Tcl_DStringResult	tclUtil.c	/^Tcl_DStringResult(interp, dsPtr)$/
+Tcl_DStringSetLength	tclUtil.c	/^Tcl_DStringSetLength(dsPtr, length)$/
+Tcl_DStringStartSublist	tclUtil.c	/^Tcl_DStringStartSublist(dsPtr)$/
+Tcl_DStringValue	tcl.h	/^#define Tcl_DStringValue(dsPtr) ((dsPtr)->string)$/
+Tcl_DbCkalloc	tclCkalloc.c	/^Tcl_DbCkalloc(size, file, line)$/
+Tcl_DbCkfree	tclCkalloc.c	/^Tcl_DbCkfree(ptr, file, line)$/
+Tcl_DbCkrealloc	tclCkalloc.c	/^Tcl_DbCkrealloc(ptr, size, file, line)$/
+Tcl_DbDecrRefCount	tclObj.c	/^Tcl_DbDecrRefCount(objPtr, file, line)$/
+Tcl_DbIncrRefCount	tclObj.c	/^Tcl_DbIncrRefCount(objPtr, file, line)$/
+Tcl_DbIsShared	tclObj.c	/^Tcl_DbIsShared(objPtr, file, line)$/
+Tcl_DbNewBooleanObj	tclObj.c	/^Tcl_DbNewBooleanObj(boolValue, file, line)$/
+Tcl_DbNewDoubleObj	tclObj.c	/^Tcl_DbNewDoubleObj(dblValue, file, line)$/
+Tcl_DbNewListObj	tclListObj.c	/^Tcl_DbNewListObj(objc, objv, file, line)$/
+Tcl_DbNewLongObj	tclObj.c	/^Tcl_DbNewLongObj(longValue, file, line)$/
+Tcl_DbNewObj	tclObj.c	/^Tcl_DbNewObj(file, line)$/
+Tcl_DbNewStringObj	tclStringObj.c	/^Tcl_DbNewStringObj(bytes, length, file, line)$/
+Tcl_DecrRefCount	tcl.h	/^#   define Tcl_DecrRefCount(objPtr) \\$/
+Tcl_DeleteAssocData	tclBasic.c	/^Tcl_DeleteAssocData(interp, name)$/
+Tcl_DeleteChannelHandler	tclIO.c	/^Tcl_DeleteChannelHandler(chan, proc, clientData)$/
+Tcl_DeleteCloseHandler	tclIO.c	/^Tcl_DeleteCloseHandler(chan, proc, clientData)$/
+Tcl_DeleteCommand	tclBasic.c	/^Tcl_DeleteCommand(interp, cmdName)$/
+Tcl_DeleteCommandFromToken	tclBasic.c	/^Tcl_DeleteCommandFromToken(interp, cmd)$/
+Tcl_DeleteEventSource	tclNotify.c	/^Tcl_DeleteEventSource(setupProc, checkProc, client/
+Tcl_DeleteEvents	tclNotify.c	/^Tcl_DeleteEvents(proc, clientData)$/
+Tcl_DeleteExitHandler	tclEvent.c	/^Tcl_DeleteExitHandler(proc, clientData)$/
+Tcl_DeleteHashEntry	tclHash.c	/^Tcl_DeleteHashEntry(entryPtr)$/
+Tcl_DeleteHashTable	tclHash.c	/^Tcl_DeleteHashTable(tablePtr)$/
+Tcl_DeleteInterp	tclBasic.c	/^Tcl_DeleteInterp(interp)$/
+Tcl_DeleteNamespace	tclNamesp.c	/^Tcl_DeleteNamespace(namespacePtr)$/
+Tcl_DeleteTimerHandler	tclTimer.c	/^Tcl_DeleteTimerHandler(token)$/
+Tcl_DeleteTrace	tclBasic.c	/^Tcl_DeleteTrace(interp, trace)$/
+Tcl_DetachPids	tclPipe.c	/^Tcl_DetachPids(numPids, pidPtr)$/
+Tcl_DoOneEvent	tclNotify.c	/^Tcl_DoOneEvent(flags)$/
+Tcl_DoWhenIdle	tclTimer.c	/^Tcl_DoWhenIdle(proc, clientData)$/
+Tcl_DontCallWhenDeleted	tclBasic.c	/^Tcl_DontCallWhenDeleted(interp, proc, clientData)$/
+Tcl_DumpActiveMemory	tcl.h	/^#  define Tcl_DumpActiveMemory(x)$/
+Tcl_DuplicateObj	tclObj.c	/^Tcl_DuplicateObj(objPtr)$/
+Tcl_Eof	tclIO.c	/^Tcl_Eof(chan)$/
+Tcl_EofObjCmd	tclIOCmd.c	/^Tcl_EofObjCmd(unused, interp, objc, objv)$/
+Tcl_ErrnoId	tclPosixStr.c	/^Tcl_ErrnoId()$/
+Tcl_ErrnoMsg	tclPosixStr.c	/^Tcl_ErrnoMsg(err)$/
+Tcl_ErrorObjCmd	tclCmdAH.c	/^Tcl_ErrorObjCmd(dummy, interp, objc, objv)$/
+Tcl_Eval	tclBasic.c	/^Tcl_Eval(interp, string)$/
+Tcl_EvalFile	tclIOUtil.c	/^Tcl_EvalFile(interp, fileName)$/
+Tcl_EvalObj	tclBasic.c	/^Tcl_EvalObj(interp, objPtr)$/
+Tcl_EvalObjCmd	tclCmdAH.c	/^Tcl_EvalObjCmd(dummy, interp, objc, objv)$/
+Tcl_EventuallyFree	tclPreserve.c	/^Tcl_EventuallyFree(clientData, freeProc)$/
+Tcl_ExecCmd	tclIOCmd.c	/^Tcl_ExecCmd(dummy, interp, argc, argv)$/
+Tcl_Exit	tclEvent.c	/^Tcl_Exit(status)$/
+Tcl_ExitObjCmd	tclCmdAH.c	/^Tcl_ExitObjCmd(dummy, interp, objc, objv)$/
+Tcl_Export	tclNamesp.c	/^Tcl_Export(interp, namespacePtr, pattern, resetLis/
+Tcl_ExposeCommand	tclBasic.c	/^Tcl_ExposeCommand(interp, hiddenCmdToken, cmdName)/
+Tcl_ExprBoolean	tclBasic.c	/^Tcl_ExprBoolean(interp, string, ptr)$/
+Tcl_ExprBooleanObj	tclBasic.c	/^Tcl_ExprBooleanObj(interp, objPtr, ptr)$/
+Tcl_ExprDouble	tclBasic.c	/^Tcl_ExprDouble(interp, string, ptr)$/
+Tcl_ExprDoubleObj	tclBasic.c	/^Tcl_ExprDoubleObj(interp, objPtr, ptr)$/
+Tcl_ExprLong	tclBasic.c	/^Tcl_ExprLong(interp, string, ptr)$/
+Tcl_ExprLongObj	tclBasic.c	/^Tcl_ExprLongObj(interp, objPtr, ptr)$/
+Tcl_ExprObj	tclBasic.c	/^Tcl_ExprObj(interp, objPtr, resultPtrPtr)$/
+Tcl_ExprObjCmd	tclCmdAH.c	/^Tcl_ExprObjCmd(dummy, interp, objc, objv)$/
+Tcl_ExprString	tclBasic.c	/^Tcl_ExprString(interp, string)$/
+Tcl_FblockedObjCmd	tclIOCmd.c	/^Tcl_FblockedObjCmd(unused, interp, objc, objv)$/
+Tcl_FconfigureCmd	tclIOCmd.c	/^Tcl_FconfigureCmd(clientData, interp, argc, argv)$/
+Tcl_FcopyObjCmd	tclIOCmd.c	/^Tcl_FcopyObjCmd(dummy, interp, objc, objv)$/
+Tcl_FileEventCmd	tclIO.c	/^Tcl_FileEventCmd(clientData, interp, argc, argv)$/
+Tcl_FileObjCmd	tclCmdAH.c	/^Tcl_FileObjCmd(dummy, interp, objc, objv)$/
+Tcl_Finalize	tclEvent.c	/^Tcl_Finalize()$/
+Tcl_FindCommand	tclNamesp.c	/^Tcl_FindCommand(interp, name, contextNsPtr, flags)/
+Tcl_FindHashEntry	tcl.h	/^#define Tcl_FindHashEntry(tablePtr, key) \\$/
+Tcl_FindNamespace	tclNamesp.c	/^Tcl_FindNamespace(interp, name, contextNsPtr, flag/
+Tcl_FindNamespaceVar	tclNamesp.c	/^Tcl_FindNamespaceVar(interp, name, contextNsPtr, f/
+Tcl_FirstHashEntry	tclHash.c	/^Tcl_FirstHashEntry(tablePtr, searchPtr)$/
+Tcl_Flush	tclIO.c	/^Tcl_Flush(chan)$/
+Tcl_FlushObjCmd	tclIOCmd.c	/^Tcl_FlushObjCmd(dummy, interp, objc, objv)$/
+Tcl_ForCmd	tclCmdAH.c	/^Tcl_ForCmd(dummy, interp, argc, argv)$/
+Tcl_ForeachObjCmd	tclCmdAH.c	/^Tcl_ForeachObjCmd(dummy, interp, objc, objv)$/
+Tcl_ForgetImport	tclNamesp.c	/^Tcl_ForgetImport(interp, namespacePtr, pattern)$/
+Tcl_FormatObjCmd	tclCmdAH.c	/^Tcl_FormatObjCmd(dummy, interp, objc, objv)$/
+Tcl_Free	tcl.h	/^#  define Tcl_Free(x)  Tcl_DbCkfree(x, __FILE__, _/
+Tcl_FreeResult	tclUtil.c	/^Tcl_FreeResult(interp)$/
+Tcl_GetAlias	tclInterp.c	/^Tcl_GetAlias(interp, aliasName, targetInterpPtr, t/
+Tcl_GetAliasObj	tclInterp.c	/^Tcl_GetAliasObj(interp, aliasName, targetInterpPtr/
+Tcl_GetAssocData	tclBasic.c	/^Tcl_GetAssocData(interp, name, procPtr)$/
+Tcl_GetBoolean	tclGet.c	/^Tcl_GetBoolean(interp, string, boolPtr)$/
+Tcl_GetBooleanFromObj	tclObj.c	/^Tcl_GetBooleanFromObj(interp, objPtr, boolPtr)$/
+Tcl_GetChannel	tclIO.c	/^Tcl_GetChannel(interp, chanName, modePtr)$/
+Tcl_GetChannelBufferSize	tclIO.c	/^Tcl_GetChannelBufferSize(chan)$/
+Tcl_GetChannelHandle	tclIO.c	/^Tcl_GetChannelHandle(chan, direction, handlePtr)$/
+Tcl_GetChannelInstanceData	tclIO.c	/^Tcl_GetChannelInstanceData(chan)$/
+Tcl_GetChannelMode	tclIO.c	/^Tcl_GetChannelMode(chan)$/
+Tcl_GetChannelName	tclIO.c	/^Tcl_GetChannelName(chan)$/
+Tcl_GetChannelOption	tclIO.c	/^Tcl_GetChannelOption(interp, chan, optionName, dsP/
+Tcl_GetChannelType	tclIO.c	/^Tcl_GetChannelType(chan)$/
+Tcl_GetCommandFromObj	tclExecute.c	/^Tcl_GetCommandFromObj(interp, objPtr)$/
+Tcl_GetCommandFullName	tclBasic.c	/^Tcl_GetCommandFullName(interp, command, objPtr)$/
+Tcl_GetCommandInfo	tclBasic.c	/^Tcl_GetCommandInfo(interp, cmdName, infoPtr)$/
+Tcl_GetCommandName	tclBasic.c	/^Tcl_GetCommandName(interp, command)$/
+Tcl_GetCurrentNamespace	tclNamesp.c	/^Tcl_GetCurrentNamespace(interp)$/
+Tcl_GetDouble	tclGet.c	/^Tcl_GetDouble(interp, string, doublePtr)$/
+Tcl_GetDoubleFromObj	tclObj.c	/^Tcl_GetDoubleFromObj(interp, objPtr, dblPtr)$/
+Tcl_GetErrno	tclIOUtil.c	/^Tcl_GetErrno()$/
+Tcl_GetGlobalNamespace	tclNamesp.c	/^Tcl_GetGlobalNamespace(interp)$/
+Tcl_GetHashKey	tcl.h	/^#define Tcl_GetHashKey(tablePtr, h) \\$/
+Tcl_GetHashValue	tcl.h	/^#define Tcl_GetHashValue(h) ((h)->clientData)$/
+Tcl_GetIndexFromObj	tclIndexObj.c	/^Tcl_GetIndexFromObj(interp, objPtr, tablePtr, msg,/
+Tcl_GetInt	tclGet.c	/^Tcl_GetInt(interp, string, intPtr)$/
+Tcl_GetIntFromObj	tclObj.c	/^Tcl_GetIntFromObj(interp, objPtr, intPtr)$/
+Tcl_GetInterpPath	tclInterp.c	/^Tcl_GetInterpPath(askingInterp, targetInterp)$/
+Tcl_GetInterpResolvers	tclResolve.c	/^Tcl_GetInterpResolvers(interp, name, resInfoPtr)$/
+Tcl_GetLongFromObj	tclObj.c	/^Tcl_GetLongFromObj(interp, objPtr, longPtr)$/
+Tcl_GetMaster	tclInterp.c	/^Tcl_GetMaster(interp)$/
+Tcl_GetNameOfExecutable	tclUtil.c	/^Tcl_GetNameOfExecutable()$/
+Tcl_GetNamespaceResolvers	tclResolve.c	/^Tcl_GetNamespaceResolvers(namespacePtr, resInfoPtr/
+Tcl_GetObjResult	tclUtil.c	/^Tcl_GetObjResult(interp)$/
+Tcl_GetObjType	tclObj.c	/^Tcl_GetObjType(typeName)$/
+Tcl_GetPathType	tclFileName.c	/^Tcl_GetPathType(path)$/
+Tcl_GetServiceMode	tclNotify.c	/^Tcl_GetServiceMode()$/
+Tcl_GetSlave	tclInterp.c	/^Tcl_GetSlave(interp, slavePath)$/
+Tcl_GetStdChannel	tclIO.c	/^Tcl_GetStdChannel(type)$/
+Tcl_GetStringFromObj	tclObj.c	/^Tcl_GetStringFromObj(objPtr, lengthPtr)$/
+Tcl_GetStringResult	tclUtil.c	/^Tcl_GetStringResult(interp)$/
+Tcl_GetVar	tclVar.c	/^Tcl_GetVar(interp, varName, flags)$/
+Tcl_GetVar2	tclVar.c	/^Tcl_GetVar2(interp, part1, part2, flags)$/
+Tcl_GetVariableFullName	tclVar.c	/^Tcl_GetVariableFullName(interp, variable, objPtr)$/
+Tcl_Gets	tclIO.c	/^Tcl_Gets(chan, lineRead)$/
+Tcl_GetsObj	tclIO.c	/^Tcl_GetsObj(chan, objPtr)$/
+Tcl_GetsObjCmd	tclIOCmd.c	/^Tcl_GetsObjCmd(dummy, interp, objc, objv)$/
+Tcl_GlobCmd	tclFileName.c	/^Tcl_GlobCmd(dummy, interp, argc, argv)$/
+Tcl_GlobalEval	tclBasic.c	/^Tcl_GlobalEval(interp, command)$/
+Tcl_GlobalEvalObj	tclBasic.c	/^Tcl_GlobalEvalObj(interp, objPtr)$/
+Tcl_GlobalObjCmd	tclVar.c	/^Tcl_GlobalObjCmd(dummy, interp, objc, objv)$/
+Tcl_HashStats	tclHash.c	/^Tcl_HashStats(tablePtr)$/
+Tcl_HideCommand	tclBasic.c	/^Tcl_HideCommand(interp, cmdName, hiddenCmdToken)$/
+Tcl_IfCmd	tclCmdIL.c	/^Tcl_IfCmd(dummy, interp, argc, argv)$/
+Tcl_Import	tclNamesp.c	/^Tcl_Import(interp, namespacePtr, pattern, allowOve/
+Tcl_IncrCmd	tclCmdIL.c	/^Tcl_IncrCmd(dummy, interp, argc, argv)$/
+Tcl_IncrRefCount	tcl.h	/^#   define Tcl_IncrRefCount(objPtr) \\$/
+Tcl_InfoObjCmd	tclCmdIL.c	/^Tcl_InfoObjCmd(clientData, interp, objc, objv)$/
+Tcl_InitHashTable	tclHash.c	/^Tcl_InitHashTable(tablePtr, keyType)$/
+Tcl_InitMemory	tclCkalloc.c	/^Tcl_InitMemory(interp)$/
+Tcl_InputBlocked	tclIO.c	/^Tcl_InputBlocked(chan)$/
+Tcl_InputBuffered	tclIO.c	/^Tcl_InputBuffered(chan)$/
+Tcl_InterpDeleted	tclBasic.c	/^Tcl_InterpDeleted(interp)$/
+Tcl_InterpObjCmd	tclInterp.c	/^Tcl_InterpObjCmd(clientData, interp, objc, objv)$/
+Tcl_InvalidateStringRep	tclObj.c	/^Tcl_InvalidateStringRep(objPtr)$/
+Tcl_IsSafe	tclInterp.c	/^Tcl_IsSafe(interp)$/
+Tcl_IsShared	tcl.h	/^#   define Tcl_IsShared(objPtr) \\$/
+Tcl_JoinObjCmd	tclCmdIL.c	/^Tcl_JoinObjCmd(dummy, interp, objc, objv)$/
+Tcl_JoinPath	tclFileName.c	/^Tcl_JoinPath(argc, argv, resultPtr)$/
+Tcl_LappendObjCmd	tclVar.c	/^Tcl_LappendObjCmd(dummy, interp, objc, objv)$/
+Tcl_LindexObjCmd	tclCmdIL.c	/^Tcl_LindexObjCmd(dummy, interp, objc, objv)$/
+Tcl_LinkVar	tclLink.c	/^Tcl_LinkVar(interp, varName, addr, type)$/
+Tcl_LinsertObjCmd	tclCmdIL.c	/^Tcl_LinsertObjCmd(dummy, interp, objc, objv)$/
+Tcl_ListObjAppendElement	tclListObj.c	/^Tcl_ListObjAppendElement(interp, listPtr, objPtr)$/
+Tcl_ListObjAppendList	tclListObj.c	/^Tcl_ListObjAppendList(interp, listPtr, elemListPtr/
+Tcl_ListObjCmd	tclCmdIL.c	/^Tcl_ListObjCmd(dummy, interp, objc, objv)$/
+Tcl_ListObjGetElements	tclListObj.c	/^Tcl_ListObjGetElements(interp, listPtr, objcPtr, o/
+Tcl_ListObjIndex	tclListObj.c	/^Tcl_ListObjIndex(interp, listPtr, index, objPtrPtr/
+Tcl_ListObjLength	tclListObj.c	/^Tcl_ListObjLength(interp, listPtr, intPtr)$/
+Tcl_ListObjReplace	tclListObj.c	/^Tcl_ListObjReplace(interp, listPtr, first, count, /
+Tcl_LlengthObjCmd	tclCmdIL.c	/^Tcl_LlengthObjCmd(dummy, interp, objc, objv)$/
+Tcl_LoadCmd	tclLoad.c	/^Tcl_LoadCmd(dummy, interp, argc, argv)$/
+Tcl_LrangeObjCmd	tclCmdIL.c	/^Tcl_LrangeObjCmd(notUsed, interp, objc, objv)$/
+Tcl_LreplaceObjCmd	tclCmdIL.c	/^Tcl_LreplaceObjCmd(dummy, interp, objc, objv)$/
+Tcl_LsearchObjCmd	tclCmdIL.c	/^Tcl_LsearchObjCmd(clientData, interp, objc, objv)$/
+Tcl_LsortObjCmd	tclCmdIL.c	/^Tcl_LsortObjCmd(clientData, interp, objc, objv)$/
+Tcl_Main	tclMain.c	/^Tcl_Main(argc, argv, appInitProc)$/
+Tcl_MakeSafe	tclInterp.c	/^Tcl_MakeSafe(interp)$/
+Tcl_Merge	tclUtil.c	/^Tcl_Merge(argc, argv)$/
+Tcl_NamespaceObjCmd	tclNamesp.c	/^Tcl_NamespaceObjCmd(clientData, interp, objc, objv/
+Tcl_NewBooleanObj	tcl.h	/^#  define Tcl_NewBooleanObj(val) \\$/
+Tcl_NewDoubleObj	tcl.h	/^#  define Tcl_NewDoubleObj(val) \\$/
+Tcl_NewIntObj	tcl.h	/^#  define Tcl_NewIntObj(val) \\$/
+Tcl_NewListObj	tcl.h	/^#  define Tcl_NewListObj(objc, objv) \\$/
+Tcl_NewLongObj	tcl.h	/^#  define Tcl_NewLongObj(val) \\$/
+Tcl_NewObj	tcl.h	/^#  define Tcl_NewObj() \\$/
+Tcl_NewStringObj	tcl.h	/^#  define Tcl_NewStringObj(bytes, len) \\$/
+Tcl_NextHashEntry	tclHash.c	/^Tcl_NextHashEntry(searchPtr)$/
+Tcl_NotifyChannel	tclIO.c	/^Tcl_NotifyChannel(channel, mask)$/
+Tcl_ObjGetVar2	tclVar.c	/^Tcl_ObjGetVar2(interp, part1Ptr, part2Ptr, flags)$/
+Tcl_ObjSetVar2	tclVar.c	/^Tcl_ObjSetVar2(interp, part1Ptr, part2Ptr, newValu/
+Tcl_OpenCmd	tclIOCmd.c	/^Tcl_OpenCmd(notUsed, interp, argc, argv)$/
+Tcl_OpenCommandChannel	tclPipe.c	/^Tcl_OpenCommandChannel(interp, argc, argv, flags)$/
+Tcl_OpenFileChannel	tclIOUtil.c	/^Tcl_OpenFileChannel(interp, fileName, modeString, /
+Tcl_PackageCmd	tclPkg.c	/^Tcl_PackageCmd(dummy, interp, argc, argv)$/
+Tcl_ParseVar	tclParse.c	/^Tcl_ParseVar(interp, string, termPtr)$/
+Tcl_PkgProvide	tclPkg.c	/^Tcl_PkgProvide(interp, name, version)$/
+Tcl_PkgRequire	tclPkg.c	/^Tcl_PkgRequire(interp, name, version, exact)$/
+Tcl_PopCallFrame	tclNamesp.c	/^Tcl_PopCallFrame(interp)$/
+Tcl_PosixError	tclIOUtil.c	/^Tcl_PosixError(interp)$/
+Tcl_Preserve	tclPreserve.c	/^Tcl_Preserve(clientData)$/
+Tcl_PrintDouble	tclUtil.c	/^Tcl_PrintDouble(interp, value, dst)$/
+Tcl_ProcObjCmd	tclProc.c	/^Tcl_ProcObjCmd(dummy, interp, objc, objv)$/
+Tcl_PushCallFrame	tclNamesp.c	/^Tcl_PushCallFrame(interp, callFramePtr, namespaceP/
+Tcl_PutEnv	tclEnv.c	/^Tcl_PutEnv(string)$/
+Tcl_PutsObjCmd	tclIOCmd.c	/^Tcl_PutsObjCmd(dummy, interp, objc, objv)$/
+Tcl_PwdCmd	tclCmdMZ.c	/^Tcl_PwdCmd(dummy, interp, argc, argv)$/
+Tcl_QueueEvent	tclNotify.c	/^Tcl_QueueEvent(evPtr, position)$/
+Tcl_Read	tclIO.c	/^Tcl_Read(chan, bufPtr, toRead)$/
+Tcl_ReadObjCmd	tclIOCmd.c	/^Tcl_ReadObjCmd(dummy, interp, objc, objv)$/
+Tcl_Realloc	tcl.h	/^#  define Tcl_Realloc(x,y) Tcl_DbCkrealloc((x), (y/
+Tcl_ReapDetachedProcs	tclPipe.c	/^Tcl_ReapDetachedProcs()$/
+Tcl_RecordAndEval	tclHistory.c	/^Tcl_RecordAndEval(interp, cmd, flags)$/
+Tcl_RecordAndEvalObj	tclHistory.c	/^Tcl_RecordAndEvalObj(interp, cmdPtr, flags)$/
+Tcl_RegExpCompile	tclUtil.c	/^Tcl_RegExpCompile(interp, string)$/
+Tcl_RegExpExec	tclUtil.c	/^Tcl_RegExpExec(interp, re, string, start)$/
+Tcl_RegExpMatch	tclUtil.c	/^Tcl_RegExpMatch(interp, string, pattern)$/
+Tcl_RegExpRange	tclUtil.c	/^Tcl_RegExpRange(re, index, startPtr, endPtr)$/
+Tcl_RegexpCmd	tclCmdMZ.c	/^Tcl_RegexpCmd(dummy, interp, argc, argv)$/
+Tcl_RegisterChannel	tclIO.c	/^Tcl_RegisterChannel(interp, chan)$/
+Tcl_RegisterObjType	tclObj.c	/^Tcl_RegisterObjType(typePtr)$/
+Tcl_RegsubCmd	tclCmdMZ.c	/^Tcl_RegsubCmd(dummy, interp, argc, argv)$/
+Tcl_Release	tclPreserve.c	/^Tcl_Release(clientData)$/
+Tcl_RemoveInterpResolvers	tclResolve.c	/^Tcl_RemoveInterpResolvers(interp, name)$/
+Tcl_RenameObjCmd	tclCmdMZ.c	/^Tcl_RenameObjCmd(dummy, interp, objc, objv)$/
+Tcl_ResetResult	tclUtil.c	/^Tcl_ResetResult(interp)$/
+Tcl_ReturnObjCmd	tclCmdMZ.c	/^Tcl_ReturnObjCmd(dummy, interp, objc, objv)$/
+Tcl_ScanCmd	tclCmdMZ.c	/^Tcl_ScanCmd(dummy, interp, argc, argv)$/
+Tcl_ScanCountedElement	tclUtil.c	/^Tcl_ScanCountedElement(string, length, flagPtr)$/
+Tcl_ScanElement	tclUtil.c	/^Tcl_ScanElement(string, flagPtr)$/
+Tcl_Seek	tclIO.c	/^Tcl_Seek(chan, offset, mode)$/
+Tcl_SeekCmd	tclIOCmd.c	/^Tcl_SeekCmd(clientData, interp, argc, argv)$/
+Tcl_ServiceAll	tclNotify.c	/^Tcl_ServiceAll()$/
+Tcl_ServiceEvent	tclNotify.c	/^Tcl_ServiceEvent(flags)$/
+Tcl_SetAssocData	tclBasic.c	/^Tcl_SetAssocData(interp, name, proc, clientData)$/
+Tcl_SetBooleanObj	tclObj.c	/^Tcl_SetBooleanObj(objPtr, boolValue)$/
+Tcl_SetChannelBufferSize	tclIO.c	/^Tcl_SetChannelBufferSize(chan, sz)$/
+Tcl_SetChannelOption	tclIO.c	/^Tcl_SetChannelOption(interp, chan, optionName, new/
+Tcl_SetCmd	tclVar.c	/^Tcl_SetCmd(dummy, interp, argc, argv)$/
+Tcl_SetCommandInfo	tclBasic.c	/^Tcl_SetCommandInfo(interp, cmdName, infoPtr)$/
+Tcl_SetDoubleObj	tclObj.c	/^Tcl_SetDoubleObj(objPtr, dblValue)$/
+Tcl_SetErrno	tclIOUtil.c	/^Tcl_SetErrno(err)$/
+Tcl_SetHashValue	tcl.h	/^#define Tcl_SetHashValue(h, value) ((h)->clientDat/
+Tcl_SetIntObj	tclObj.c	/^Tcl_SetIntObj(objPtr, intValue)$/
+Tcl_SetListObj	tclListObj.c	/^Tcl_SetListObj(objPtr, objc, objv)$/
+Tcl_SetLongObj	tclObj.c	/^Tcl_SetLongObj(objPtr, longValue)$/
+Tcl_SetMaxBlockTime	tclNotify.c	/^Tcl_SetMaxBlockTime(timePtr)$/
+Tcl_SetNamespaceResolvers	tclResolve.c	/^Tcl_SetNamespaceResolvers(namespacePtr, cmdProc, v/
+Tcl_SetObjErrorCode	tclUtil.c	/^Tcl_SetObjErrorCode(interp, errorObjPtr)$/
+Tcl_SetObjLength	tclStringObj.c	/^Tcl_SetObjLength(objPtr, length)$/
+Tcl_SetObjResult	tclUtil.c	/^Tcl_SetObjResult(interp, objPtr)$/
+Tcl_SetPanicProc	panic.c	/^Tcl_SetPanicProc(proc)$/
+Tcl_SetRecursionLimit	tclBasic.c	/^Tcl_SetRecursionLimit(interp, depth)$/
+Tcl_SetResult	tclUtil.c	/^Tcl_SetResult(interp, string, freeProc)$/
+Tcl_SetServiceMode	tclNotify.c	/^Tcl_SetServiceMode(mode)$/
+Tcl_SetStdChannel	tclIO.c	/^Tcl_SetStdChannel(channel, type)$/
+Tcl_SetStringObj	tclStringObj.c	/^Tcl_SetStringObj(objPtr, bytes, length)$/
+Tcl_SetVar	tclVar.c	/^Tcl_SetVar(interp, varName, newValue, flags)$/
+Tcl_SetVar2	tclVar.c	/^Tcl_SetVar2(interp, part1, part2, newValue, flags)/
+Tcl_SignalId	tclPosixStr.c	/^Tcl_SignalId(sig)$/
+Tcl_SignalMsg	tclPosixStr.c	/^Tcl_SignalMsg(sig)$/
+Tcl_SocketCmd	tclIOCmd.c	/^Tcl_SocketCmd(notUsed, interp, argc, argv)$/
+Tcl_SourceObjCmd	tclCmdMZ.c	/^Tcl_SourceObjCmd(dummy, interp, objc, objv)$/
+Tcl_SplitList	tclUtil.c	/^Tcl_SplitList(interp, list, argcPtr, argvPtr)$/
+Tcl_SplitObjCmd	tclCmdMZ.c	/^Tcl_SplitObjCmd(dummy, interp, objc, objv)$/
+Tcl_SplitPath	tclFileName.c	/^Tcl_SplitPath(path, argcPtr, argvPtr)$/
+Tcl_StaticPackage	tclLoad.c	/^Tcl_StaticPackage(interp, pkgName, initProc, safeI/
+Tcl_StringMatch	tclUtil.c	/^Tcl_StringMatch(string, pattern)$/
+Tcl_StringObjCmd	tclCmdMZ.c	/^Tcl_StringObjCmd(dummy, interp, objc, objv)$/
+Tcl_SubstCmd	tclCmdMZ.c	/^Tcl_SubstCmd(dummy, interp, argc, argv)$/
+Tcl_SwitchObjCmd	tclCmdMZ.c	/^Tcl_SwitchObjCmd(dummy, interp, objc, objv)$/
+Tcl_Tell	tclIO.c	/^Tcl_Tell(chan)$/
+Tcl_TellCmd	tclIOCmd.c	/^Tcl_TellCmd(clientData, interp, argc, argv)$/
+Tcl_TimeObjCmd	tclCmdMZ.c	/^Tcl_TimeObjCmd(dummy, interp, objc, objv)$/
+Tcl_TraceCmd	tclCmdMZ.c	/^Tcl_TraceCmd(dummy, interp, argc, argv)$/
+Tcl_TraceVar	tclVar.c	/^Tcl_TraceVar(interp, varName, flags, proc, clientD/
+Tcl_TraceVar2	tclVar.c	/^Tcl_TraceVar2(interp, part1, part2, flags, proc, c/
+Tcl_TranslateFileName	tclFileName.c	/^Tcl_TranslateFileName(interp, name, bufferPtr)$/
+Tcl_Ungets	tclIO.c	/^Tcl_Ungets(chan, str, len, atEnd)$/
+Tcl_UnlinkVar	tclLink.c	/^Tcl_UnlinkVar(interp, varName)$/
+Tcl_UnregisterChannel	tclIO.c	/^Tcl_UnregisterChannel(interp, chan)$/
+Tcl_UnsetObjCmd	tclVar.c	/^Tcl_UnsetObjCmd(dummy, interp, objc, objv)$/
+Tcl_UnsetVar	tclVar.c	/^Tcl_UnsetVar(interp, varName, flags)$/
+Tcl_UnsetVar2	tclVar.c	/^Tcl_UnsetVar2(interp, part1, part2, flags)$/
+Tcl_UntraceVar	tclVar.c	/^Tcl_UntraceVar(interp, varName, flags, proc, clien/
+Tcl_UntraceVar2	tclVar.c	/^Tcl_UntraceVar2(interp, part1, part2, flags, proc,/
+Tcl_UpVar	tclVar.c	/^Tcl_UpVar(interp, frameName, varName, localName, f/
+Tcl_UpVar2	tclVar.c	/^Tcl_UpVar2(interp, frameName, part1, part2, localN/
+Tcl_UpdateCmd	tclEvent.c	/^Tcl_UpdateCmd(clientData, interp, argc, argv)$/
+Tcl_UpdateLinkedVar	tclLink.c	/^Tcl_UpdateLinkedVar(interp, varName)$/
+Tcl_UplevelObjCmd	tclProc.c	/^Tcl_UplevelObjCmd(dummy, interp, objc, objv)$/
+Tcl_UpvarObjCmd	tclVar.c	/^Tcl_UpvarObjCmd(dummy, interp, objc, objv)$/
+Tcl_ValidateAllMemory	tclCkalloc.c	/^Tcl_ValidateAllMemory (file, line)$/
+Tcl_Var	tclInt.h	/^typedef Tcl_Var (Tcl_ResolveRuntimeVarProc) _ANSI_/
+Tcl_VarTraceInfo	tclVar.c	/^Tcl_VarTraceInfo(interp, varName, flags, proc, pre/
+Tcl_VarTraceInfo2	tclVar.c	/^Tcl_VarTraceInfo2(interp, part1, part2, flags, pro/
+Tcl_VariableObjCmd	tclVar.c	/^Tcl_VariableObjCmd(dummy, interp, objc, objv)$/
+Tcl_VwaitCmd	tclEvent.c	/^Tcl_VwaitCmd(clientData, interp, argc, argv)$/
+Tcl_WhileCmd	tclCmdMZ.c	/^Tcl_WhileCmd(dummy, interp, argc, argv)$/
+Tcl_Write	tclIO.c	/^Tcl_Write(chan, srcPtr, slen)$/
+Tcl_WrongNumArgs	tclIndexObj.c	/^Tcl_WrongNumArgs(interp, objc, objv, message)$/
+TclpAlloc	tclAlloc.c	/^TclpAlloc($/
+TclpCheckStackSpace	tclInt.h	/^#define TclpCheckStackSpace() (1)$/
+TclpFree	tclAlloc.c	/^TclpFree($/
+TclpRealloc	tclAlloc.c	/^TclpRealloc($/
+Tcltest_Init	tclTest.c	/^Tcltest_Init(interp)$/
+TcpAcceptCallbacksDeleteProc	tclIOCmd.c	/^TcpAcceptCallbacksDeleteProc(clientData, interp)$/
+TcpServerCloseProc	tclIOCmd.c	/^TcpServerCloseProc(callbackData)$/
+TestAccessProc1	tclTest.c	/^TestAccessProc1(path, mode)$/
+TestAccessProc2	tclTest.c	/^TestAccessProc2(path, mode)$/
+TestAccessProc3	tclTest.c	/^TestAccessProc3(path, mode)$/
+TestMathFunc	tclTest.c	/^TestMathFunc(clientData, interp, args, resultPtr)$/
+TestMathFunc2	tclTest.c	/^TestMathFunc2(clientData, interp, args, resultPtr)/
+TestOpenFileChannelProc1	tclTest.c	/^TestOpenFileChannelProc1(interp, fileName, modeStr/
+TestOpenFileChannelProc2	tclTest.c	/^TestOpenFileChannelProc2(interp, fileName, modeStr/
+TestOpenFileChannelProc3	tclTest.c	/^TestOpenFileChannelProc3(interp, fileName, modeStr/
+TestPanicCmd	tclTest.c	/^TestPanicCmd(dummy, interp, argc, argv)$/
+TestStatProc1	tclTest.c	/^TestStatProc1(path, buf)$/
+TestStatProc2	tclTest.c	/^TestStatProc2(path, buf)$/
+TestStatProc3	tclTest.c	/^TestStatProc3(path, buf)$/
+TestaccessprocCmd	tclTest.c	/^TestaccessprocCmd (dummy, interp, argc, argv)$/
+TestasyncCmd	tclTest.c	/^TestasyncCmd(dummy, interp, argc, argv)$/
+TestbooleanobjCmd	tclTestObj.c	/^TestbooleanobjCmd(clientData, interp, objc, objv)$/
+TestchmodCmd	tclTest.c	/^TestchmodCmd(dummy, interp, argc, argv)$/
+TestcmdinfoCmd	tclTest.c	/^TestcmdinfoCmd(dummy, interp, argc, argv)$/
+TestcmdtokenCmd	tclTest.c	/^TestcmdtokenCmd(dummy, interp, argc, argv)$/
+TestcmdtraceCmd	tclTest.c	/^TestcmdtraceCmd(dummy, interp, argc, argv)$/
+TestconvertobjCmd	tclTestObj.c	/^TestconvertobjCmd(clientData, interp, objc, objv)$/
+TestcreatecommandCmd	tclTest.c	/^TestcreatecommandCmd(dummy, interp, argc, argv)$/
+TestdcallCmd	tclTest.c	/^TestdcallCmd(dummy, interp, argc, argv)$/
+TestdelCmd	tclTest.c	/^TestdelCmd(dummy, interp, argc, argv)$/
+TestdelassocdataCmd	tclTest.c	/^TestdelassocdataCmd(clientData, interp, argc, argv/
+TestdoubleobjCmd	tclTestObj.c	/^TestdoubleobjCmd(clientData, interp, objc, objv)$/
+TestdstringCmd	tclTest.c	/^TestdstringCmd(dummy, interp, argc, argv)$/
+TestexithandlerCmd	tclTest.c	/^TestexithandlerCmd(clientData, interp, argc, argv)/
+TestexprlongCmd	tclTest.c	/^TestexprlongCmd(clientData, interp, argc, argv)$/
+TestexprstringCmd	tclTest.c	/^TestexprstringCmd(clientData, interp, argc, argv)$/
+TestfeventCmd	tclTest.c	/^TestfeventCmd(clientData, interp, argc, argv)$/
+TestfileCmd	tclTest.c	/^TestfileCmd(dummy, interp, argc, argv)$/
+TestgetassocdataCmd	tclTest.c	/^TestgetassocdataCmd(clientData, interp, argc, argv/
+TestgetplatformCmd	tclTest.c	/^TestgetplatformCmd(clientData, interp, argc, argv)/
+TestgetvarfullnameCmd	tclTest.c	/^TestgetvarfullnameCmd(dummy, interp, objc, objv)$/
+TestindexobjCmd	tclTestObj.c	/^TestindexobjCmd(clientData, interp, objc, objv)$/
+TestinterpdeleteCmd	tclTest.c	/^TestinterpdeleteCmd(dummy, interp, argc, argv)$/
+TestintobjCmd	tclTestObj.c	/^TestintobjCmd(clientData, interp, objc, objv)$/
+TestlinkCmd	tclTest.c	/^TestlinkCmd(dummy, interp, argc, argv)$/
+TestobjCmd	tclTestObj.c	/^TestobjCmd(clientData, interp, objc, objv)$/
+TestopenfilechannelprocCmd	tclTest.c	/^TestopenfilechannelprocCmd (dummy, interp, argc, a/
+TestsetassocdataCmd	tclTest.c	/^TestsetassocdataCmd(clientData, interp, argc, argv/
+TestsetnoerrCmd	tclTest.c	/^TestsetnoerrCmd(dummy, interp, argc, argv)$/
+TestsetobjerrorcodeCmd	tclTest.c	/^TestsetobjerrorcodeCmd(dummy, interp, objc, objv)$/
+TestsetplatformCmd	tclTest.c	/^TestsetplatformCmd(clientData, interp, argc, argv)/
+TestsetrecursionlimitCmd	tclTest.c	/^TestsetrecursionlimitCmd(dummy, interp, objc, objv/
+TeststaticpkgCmd	tclTest.c	/^TeststaticpkgCmd(dummy, interp, argc, argv)$/
+TeststatprocCmd	tclTest.c	/^TeststatprocCmd (dummy, interp, argc, argv)$/
+TeststringobjCmd	tclTestObj.c	/^TeststringobjCmd(clientData, interp, objc, objv)$/
+TesttranslatefilenameCmd	tclTest.c	/^TesttranslatefilenameCmd(dummy, interp, argc, argv/
+TestupvarCmd	tclTest.c	/^TestupvarCmd(dummy, interp, argc, argv)$/
+TestwordendObjCmd	tclTest.c	/^TestwordendObjCmd(dummy, interp, objc, objv)$/
+TimerCheckProc	tclTimer.c	/^TimerCheckProc(data, flags)$/
+TimerExitProc	tclTimer.c	/^TimerExitProc(clientData)$/
+TimerHandlerEventProc	tclTimer.c	/^TimerHandlerEventProc(evPtr, flags)$/
+TimerSetupProc	tclTimer.c	/^TimerSetupProc(data, flags)$/
+ToSeconds	tclDate.c	/^ToSeconds(Hours, Minutes, Seconds, Meridian)$/
+TraceVarProc	tclCmdMZ.c	/^TraceVarProc(clientData, interp, name1, name2, fla/
+UCHAR	tclInt.h	/^#define UCHAR(c) ((unsigned char) (c))$/
+UCHARAT	regexp.c	/^#define	UCHARAT(p)	((int)*(unsigned char *)(p))$/
+UnregisterTcpServerInterpCleanupProc	tclIOCmd.c	/^UnregisterTcpServerInterpCleanupProc(interp, accep/
+UpdateInterest	tclIO.c	/^UpdateInterest(chanPtr)$/
+UpdateStringOfBoolean	tclObj.c	/^UpdateStringOfBoolean(objPtr)$/
+UpdateStringOfByteCode	tclCompile.c	/^UpdateStringOfByteCode(objPtr)$/
+UpdateStringOfCmdName	tclExecute.c	/^UpdateStringOfCmdName(objPtr)$/
+UpdateStringOfDouble	tclObj.c	/^UpdateStringOfDouble(objPtr)$/
+UpdateStringOfIndex	tclIndexObj.c	/^UpdateStringOfIndex(objPtr)$/
+UpdateStringOfInt	tclObj.c	/^UpdateStringOfInt(objPtr)$/
+UpdateStringOfList	tclListObj.c	/^UpdateStringOfList(listPtr)$/
+UpdateStringOfNsName	tclNamesp.c	/^UpdateStringOfNsName(objPtr)$/
+UpdateStringOfString	tclStringObj.c	/^UpdateStringOfString(objPtr)$/
+VERBATIM	tcl.h	/^#define VERBATIM(x) x$/
+ValidateMemory	tclCkalloc.c	/^ValidateMemory(memHeaderP, file, line, nukeGuards)/
+ValidatePcAndStackTop	tclExecute.c	/^ValidatePcAndStackTop(codePtr, pc, stackTop, stack/
+VarErrMsg	tclVar.c	/^VarErrMsg(interp, part1, part2, operation, reason)/
+VarNameEnd	tclParse.c	/^VarNameEnd(string, lastChar)$/
+VwaitVarProc	tclEvent.c	/^VwaitVarProc(clientData, interp, name1, name2, fla/
+YYBACKUP	tclDate.c	/^#define YYBACKUP( newtoken, newvalue )\\$/
+YYCOPY	tclDate.c	/^#define YYCOPY(to, from, type) \\$/
+YYENLARGE	tclDate.c	/^#define YYENLARGE( from, type) \\$/
+YYLEX	tclDate.c	/^#define YYLEX()		TclDatecvtok(TclDatelex())$/
+YYNEW	tclDate.c	/^#define YYNEW(type)	malloc(sizeof(type) * TclDaten/
+YYRECOVERING	tclDate.c	/^#define YYRECOVERING()	(!!TclDateerrflag)$/
+_ANSI_ARGS_	panic.c	/^void (*panicProc) _ANSI_ARGS_(TCL_VARARGS(char *,f/
+ckalloc	tcl.h	/^#  define ckalloc(x) Tcl_DbCkalloc(x, __FILE__, __/
+ckfree	tcl.h	/^#  define ckfree(x)  Tcl_DbCkfree(x, __FILE__, __L/
+ckrealloc	tcl.h	/^#  define ckrealloc(x,y) Tcl_DbCkrealloc((x), (y),/
+int	tcl.h	/^typedef int (Tcl_AppInitProc) _ANSI_ARGS_((Tcl_Int/
+mstats	tclAlloc.c	/^mstats($/
+panic	panic.c	/^panic(format, arg1, arg2, arg3, arg4, arg5, arg6, /
+reg	regexp.c	/^reg(paren, flagp, rcstate)$/
+regatom	regexp.c	/^regatom(flagp, rcstate)$/
+regbranch	regexp.c	/^regbranch(flagp, rcstate)$/
+regc	regexp.c	/^regc(b, rcstate)$/
+regdump	regexp.c	/^regdump(r)$/
+reginsert	regexp.c	/^reginsert(op, opnd, rcstate)$/
+regmatch	regexp.c	/^regmatch(prog, restate)$/
+regnext	regexp.c	/^regnext(p)$/
+regnode	regexp.c	/^regnode(op, rcstate)$/
+regoptail	regexp.c	/^regoptail(p, val)$/
+regpiece	regexp.c	/^regpiece(flagp, rcstate)$/
+regprop	regexp.c	/^regprop(op)$/
+regrepeat	regexp.c	/^regrepeat(p, restate)$/
+regtail	regexp.c	/^regtail(p, val)$/
+regtry	regexp.c	/^regtry(prog, string, restate)$/
+strcspn	regexp.c	/^strcspn(s1, s2)$/
+void	tcl.h	/^typedef void (Tcl_ChannelProc) _ANSI_ARGS_((Client/

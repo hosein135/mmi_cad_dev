@@ -1,0 +1,46 @@
+#!/bin/csh -f
+
+# Shell script to make translate and concat the LEFs of the cell library.
+
+set LIBNAME = mmi18
+
+set ROOT = /proj/tech/${LIBNAME}
+set LEFDIR = ${ROOT}/stdcell/lef
+set LIBDIR = ${ROOT}/library/lef
+set SCRIPTDIR = ${ROOT}/scripts
+
+# munge the individual cell lefs and append them together
+#
+echo "Concatenating LEFs ..."
+
+# get the list of stdcell lef files
+set STDCELL_LIST = `ls ${LEFDIR}/*.lef`
+
+cd $LIBDIR
+
+rm -f stdcell.lef >& /dev/null
+
+foreach i (${STDCELL_LIST})
+ 	sed \
+		    -e 's/gnd/GND/'\
+		    -e 's/vdd/VDD/'\
+	            -e '/^MACRO/,/^END/p'\
+		    -n $i >> stdcell.lef
+end
+
+# make the full lef
+cat header.lef stdcell.lef other.lef > ${LIBNAME}.lef
+echo END LIBRARY >> ${LIBNAME}.lef
+
+echo "Wrote ${LIBDIR}/${LIBNAME}.lef"
+
+# generate the verilog module headers for Silicon Ensemble from
+# the lef file
+# echo "Creating verilog header file ${LIBDIR}/${LIBNAME}.v ..."
+# ${SCRIPTDIR}/lef2v.tcl ${LIBNAME}.lef > ${LIBNAME}.v
+
+# now generate the dpc file for SUE
+${SCRIPTDIR}/lef2dpc.tcl
+
+echo "done."
+

@@ -1,0 +1,5 @@
+#!/bin/csh -f
+$1 < $2 >! $3
+echo "send $4 set GO 1 ; exit" | mmi_wish
+
+

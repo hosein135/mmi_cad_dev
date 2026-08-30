@@ -1,0 +1,53 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_CLKBUFB {} {
+  make output -name scan_en -origin {110 -1070}
+  make output -name clk -origin {110 -1190}
+  make input -name g_clk -origin {-300 -1190}
+  make input -orient RX -name scan_in -origin {110 -930}
+  make input -name g_scan_en -origin {-300 -1070}
+  make output -orient RX -name scan_out -origin {-300 -930}
+  make name_net_s -name unused -origin {230 -1270}
+  make inverter -WP 4.8 -WN 2.4 -origin {130 -1270}
+  make inverter -WP 1.2 -WN 0.6 -origin {-240 -1190}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 2.4 -WN 1.2 -origin {-40 -1190}
+  make inverter -WP 1.2 -WN 0.6 -origin {-240 -1070}
+  make inverter1 -WP 2.4 -WN 1.2 -origin {-40 -1070}
+  make inverter -orient RX -WP 1.6 -WN 0.8 -origin {-20 -930}
+  make inverter1 -orient RX -WP 4.8 -WN 2.4 -origin {-220 -930}
+  generate name_net_s name_net -cell name_net
+  make name_net -name g_scan_en_L -origin {-120 -1070}
+  make name_net -name g_clk_L -origin {-120 -1190}
+  make name_net -name scan_in_L -origin {-120 -930}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 07/19/99 -origin {-180 -720}
+  make_wire 60 -1190 60 -1270
+  make_wire 60 -1270 100 -1270
+  make_wire 60 -1190 110 -1190
+  make_wire 180 -1270 230 -1270
+  make_wire 10 -1190 60 -1190
+  make_wire -300 -1190 -270 -1190
+  make_wire -270 -1070 -300 -1070
+  make_wire -270 -930 -300 -930
+  make_wire 10 -1070 110 -1070
+  make_wire 10 -930 110 -930
+  make_wire -120 -1190 -70 -1190
+  make_wire -120 -1070 -70 -1070
+  make_wire -120 -930 -70 -930
+  make_wire -190 -930 -120 -930
+  make_wire -190 -1070 -120 -1070
+  make_wire -190 -1190 -120 -1190
+  make_text -origin {-510 -1500} -text {Clock buffer to drive a row of FlipFlops from one end}
+  make_text -origin {-510 -1480} -text {B Size: for driving ~1-4 FFs}
+  make_text -origin {-510 -1300} -text {could eventually include a lock-up latch on scan_in}
+  make_text -origin {60 -1140} -text {local to a row of flipflops}
+  make_text -origin {-490 -1140} -text {global to all CLKBUFs}
+  make_text -origin {70 -980} -text {from q output of nearest FF}
+  make_text -origin {-530 -990} -text {to scan_in input of farthest
+FF on next row or block output}
+  make_text -origin {100 -1320} -text {provides load to match delay of other CLK_BUFs}
+  make_text -origin {-510 -1440} -text {Note: User should not place this cell.  Autosizing will substitute this for a MMI_CLKBUFE}
+  make_text -origin {-510 -1520} -text MMI_CLKBUFB -size large
+}
+

@@ -1,0 +1,81 @@
+# default customization file for NST.
+
+# default geometry of NST window
+set DEFAULT_GEOMETRY 1000x850+100+0
+
+# setup the default width and height for the NST window.  "-geometry xxx"
+# on the command line overrides this.
+option add *Graph.Width		8i
+option add *Graph.Height	4i
+
+# NST colors that are displayed
+set NST_COLORS {green yellow pink red lightblue}
+
+# default plot mode, either {mono | gray | color}
+set NST_PS_MODE mono
+
+# Default suffix for file selector box
+set SUFFIX(default) *.tr*
+#set SUFFIX(default) *.ac*
+
+# either {on | off}.  Horizontal scrollbar only -- for really long transients.
+# Note scrollbar breaks if X-axis is logscale.
+set SCROLLBAR on
+
+# either {0 = linear | 1 = log} scale.
+set LOG_LINEAR(x) 0
+set LOG_LINEAR(y) 0
+
+# command to print to default printer (-r removes the file after printing)
+set PRINT_COMMAND "lpr -r"
+
+# either increasing, decreasing, or both.  Increasing indicates that
+# if x is not monotonically increasing then a new trace is shown, 
+# thus multiple traces won't show a line returning to the beginning.
+option add *Graph.Element.Trace increasing
+
+# either {0 = only an x-axis if different | 1 = always an x-axis per panel}
+set ALWAYS_XAXIS 0
+
+# font size
+option add *Font *-helvetica-bold-r-normal-*-120-*
+
+# either (true | false)
+set GRID_HIDDEN false
+#set GRID_PATTERN {4 4}
+set GRID_PATTERN {1 5}
+set GRID_PRINT_PATTERN {1 10}
+set MINOR_GRID true
+
+set X_SUBDIVISIONS 2
+set Y_SUBDIVISIONS 2
+
+# Important because it overlaps with legend
+set RIGHT_MARGIN 90
+
+# either {true | false} for crosshairs
+set CROSSHAIRS false
+
+# make lines wider for color printers
+set COLOR_LINEWIDTH 2
+
+# Offset to derived node derivative calculation, i.e. (y1-y0)/(x1-x0+offset)
+set DERIVATIVE_OFFSET 1.0e-3
+
+# box color for zoom and delta measurements.
+set BOX_COLOR white
+
+# default derivations
+set DERIVE ""
+lappend DERIVE "vdd2 = vdd/2.0"
+
+# set the default y coordinate for measuring (usually mid-supply)
+# if this is a plotted entity, will use the first point (usually x=0)
+set MEASURE_YCOORD vdd2
+
+set visual [winfo screenvisual .]
+if { $visual != "staticgray" && $visual != "grayscale" } {
+  # if you really want to run this with a B/W monitor, set this up here
+}
+
+set DEFAULT_BROWSER netscape

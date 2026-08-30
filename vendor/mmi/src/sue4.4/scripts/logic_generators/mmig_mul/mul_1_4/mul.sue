@@ -1,0 +1,874 @@
+# This is a generator for a multiplier made up of 4:2 adders.
+
+proc NAME_mul args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {UseMulCin "N"} {AddExtraCSA "N"} {IncludePPG "Y"} {A "Unsigned"} {B "Unsigned"} {IncludeCPA "Y"} {ReduceInputLoad "N"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # NBITS_A
+  set nom [format "mul_%d" $NBITS_A]
+
+  # A
+  if {[string toupper $A] == "SIGNED"} {
+    set nom [format "%sSx" $nom]
+  }
+  if {[string toupper $A] == "UNSIGNED"} {
+    set nom [format "%sUx" $nom]
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set nom [format "%sBx" $nom]
+  }
+
+  # NBITS_B
+  set nom [format "%s%d" $nom $NBITS_B]
+
+  # B
+  if {[string toupper $B] == "SIGNED"} {
+    set nom [format "%sS_" $nom]
+  }
+  if {[string toupper $B] == "UNSIGNED"} {
+    set nom [format "%sU_" $nom]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set nom [format "%sB_" $nom]
+  }
+
+  # UseMulCin
+  if {[string toupper $UseMulCin] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # AddExtraCSA
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # IncludePPG
+  if {[string toupper $IncludePPG] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # IncludeCPA
+  if {[string toupper $IncludeCPA] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # ReduceInputLoad
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # HalfHeight
+  if {[string toupper $HalfHeight] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # bitslice
+  if {[string toupper $bitslice] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mul args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {UseMulCin "N"} {AddExtraCSA "N"} {IncludePPG "Y"} {A "Unsigned"} {B "Unsigned"} {IncludeCPA "Y"} {ReduceInputLoad "N"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # make the arguments more digestible
+  set useMulCin 0
+  if {[string toupper $UseMulCin] == "Y"} {
+    set useMulCin 1
+  }
+  set addCSA 0
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set addCSA 1
+  }
+  set includePPG 0
+  if {[string toupper $IncludePPG] == "Y"} {
+    set includePPG 1
+  }
+  set includeCPA 0
+  if {[string toupper $IncludeCPA] == "Y"} {
+    set includeCPA 1
+  }
+
+  # drawing origin
+  set base_x -500
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  set x 0
+  set y $base_y
+
+  ##################### Partial Product Generation ######################
+
+  # ppg icon info
+  set ppgname [NAME_ppg -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -Algorithm Simple -ReduceInputLoad $ReduceInputLoad -HalfHeight $HalfHeight -bitslice $bitslice]
+  generate ppg $ppgname -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -Algorithm Simple -ReduceInputLoad $ReduceInputLoad -HalfHeight $HalfHeight -bitslice $bitslice
+
+  setl {ppg_icon_x ppg_icon_y ppg_icon_left ppg_icon_bot ppg_icon_right ppg_icon_top} [generators_get_icon_size $ppgname]
+
+  setl {count inpins outpins inoutpins} [generators_get_pin_info $ppgname]  
+  setl {ppg_port_a_x ppg_port_a_y} [generators_get_pin_xy [format "A_H\[%d:0\]" $maxaidx] $inpins]
+  setl {ppg_port_b_x ppg_port_b_y} [generators_get_pin_xy [format "B_H\[%d:0\]" $maxbidx] $inpins]
+
+  set ppgpincount [get_assoc noutputs $count]
+  for {set i 0} {$i < $ppgpincount} {incr i} {
+    set data [lindex $outpins $i]
+    set ppg_port_x($i) [lindex $data 1]
+    set ppg_port_y($i) [lindex $data 2]
+  }
+
+  if {$includePPG == 1} {
+    # generate PPG logic
+    make $ppgname -origin "$x $y"
+
+    # hook up the inputs
+    set pin_x [expr $x + $ppg_icon_left]
+    set inflag_x [expr $pin_x - 200]
+    set pin_y [expr $y + $ppg_port_a_y]
+    make_wire $pin_x $pin_y $inflag_x $pin_y
+    set wname [format "A_H\[%d:0\]" $maxaidx]
+    make input -origin "$inflag_x $pin_y" -name $wname
+    # record for later use
+    set ainflag "$inflag_x $pin_y"
+
+    set pin_y [expr $y + $ppg_port_b_y]
+    make_wire $pin_x $pin_y $inflag_x $pin_y
+    set wname [format "B_H\[%d:0\]" $maxbidx]
+    make input -origin "$inflag_x $pin_y" -name $wname
+
+    if {[string toupper $A] == "BOTH"} {
+      setl {ppg_port_asigned_x ppg_port_asigned_y} [generators_get_pin_xy "ASigned_H" $inpins]
+      set pin_x [expr $x + $ppg_port_asigned_x]
+      set pin_y [expr $y + $ppg_port_asigned_y]
+      make_wire $pin_x $pin_y $pin_x [expr $pin_y + 3*$ws1]
+      make input -origin "$pin_x [expr $pin_y + 3*$ws1]" -orient R270 -name "ASigned_H"
+    }
+    if {[string toupper $B] == "BOTH"} {
+      setl {ppg_port_bsigned_x ppg_port_bsigned_y} [generators_get_pin_xy "BSigned_H" $inpins]
+      set pin_x [expr $x + $ppg_port_bsigned_x]
+      set pin_y [expr $y + $ppg_port_bsigned_y]
+      make_wire $pin_x $pin_y $pin_x [expr $pin_y + 3*$ws1]
+      make input -origin "$pin_x [expr $pin_y + 3*$ws1]" -orient R270 -name "BSigned_H"
+    }
+
+    # hook up the PPG outputs
+    set pin_x [expr $x + $ppg_icon_right]
+    set name_net_x [expr $pin_x + 3*$ws1]
+    set wire_end_x [expr $pin_x + 5*$ws1]
+    for {set i 0} {$i < $NBITS_A} {incr i} {
+      set pin_y [expr $y + $ppg_port_y($i)]
+      make_wire $pin_x $pin_y $name_net_x $pin_y
+      set wname [format "PP%d_H\[%d:0\]" $i $maxresidx]
+      make name_net_s -origin "$name_net_x $pin_y" -name $wname
+      set ppg_wire_loc($i) "$wire_end_x $pin_y"
+      make_wire $name_net_x $pin_y $wire_end_x $pin_y
+    }
+
+    # new x
+    set x $wire_end_x
+  } else {
+    # PPG outputs are the inputs to this drawing
+    set inflag_x [expr $x - 200]
+    set wire_end_x $x
+    for {set i 0} {$i < $NBITS_A} {incr i} {
+      set pin_y [expr $y + $ppg_port_y($i)]
+      set wname [format "PP%d_H\[%d:0\]" $i $maxresidx]
+      make input -origin "$inflag_x $pin_y" -name $wname
+      set ppg_wire_loc($i) "$wire_end_x $pin_y"
+      make_wire $inflag_x $pin_y $wire_end_x $pin_y
+    }
+    # new x
+    set x $wire_end_x
+  }
+  
+
+
+  ########################## Multiplier Array ###########################
+
+  # generate the array icon
+  # if the A input to the multiplier is signed, we must use a mul cin bit to complete the ppg logic
+  if {([string toupper $UseMulCin] == "Y") ||
+      (([string toupper $A] != "UNSIGNED") && ([string toupper $IncludePPG] == "Y"))} {
+    set useMulCin 1
+    set useMulCinText "Y"
+  } else {
+    set useMulCin 0
+    set useMulCinText "N"
+  }
+  set mulname [NAME_mul_array -NBITS_A $NBITS_A -NBITS_B $NBITS_B -UseMulCin $useMulCinText -AddExtraCSA $AddExtraCSA -HalfHeight $HalfHeight -bitslice $bitslice]
+  generate mul_array $mulname -NBITS_A $NBITS_A -NBITS_B $NBITS_B -UseMulCin $useMulCinText -AddExtraCSA $AddExtraCSA -HalfHeight $HalfHeight -bitslice $bitslice
+
+  # multiplier array icon box info
+  setl {icon_w icon_h icon_left icon_bot icon_right icon_top} [generators_get_icon_size $mulname]
+
+  setl {count inpins outpins inoutpins} [generators_get_pin_info $mulname]
+
+  # new origin
+  set origin_x [expr $x + $icon_w]
+  set origin_y -20
+
+  # place it
+  make $mulname -origin "$origin_x $origin_y"
+
+  # hook up pp inputs
+  for {set i 0} {$i < $ppgpincount} {incr i} {
+    set port_ppg($i) [generators_get_pin_xy [format "PP%d_H\[%d:0\]" $i $maxresidx] $inpins]
+  }
+  for {set i 0} {$i <$NBITS_A} {incr i} {
+    set wire_x [lindex $ppg_wire_loc($i) 0]
+    set wire_y [lindex $ppg_wire_loc($i) 1]
+    set pin_x [expr $origin_x + [lindex $port_ppg($i) 0]]
+    set pin_y [expr $origin_y + [lindex $port_ppg($i) 1]]
+    make_wire $wire_x $wire_y $pin_x $pin_y
+  }
+
+
+  # hook up optional CSA input
+  if {$addCSA == 1} {
+    # CSA_A_H
+    set pname [format "CSA_A_H\[%d:0\]" $maxresidx]
+    set port_csa_a [generators_get_pin_xy $pname $inpins]
+    set csa_a_x [expr $origin_x + [lindex $port_csa_a 0]]
+    set csa_a_y [expr $origin_y + [lindex $port_csa_a 1]]
+    set wire_bend_x [expr $csa_a_x - $ws1]
+    set inflag_y [expr $icon_top - 200]
+    make_wire $csa_a_x $csa_a_y $wire_bend_x $csa_a_y
+    make_wire $wire_bend_x $csa_a_y $wire_bend_x $inflag_y
+    make_wire $wire_bend_x $inflag_y $inflag_x $inflag_y
+    make input -name $pname -origin "$inflag_x $inflag_y"
+    # CSA_B_H
+    set pname [format "CSA_B_H\[%d:0\]" $maxresidx]
+    set port_csa_b [generators_get_pin_xy $pname $inpins]
+    set csa_b_x [expr $origin_x + [lindex $port_csa_b 0]]
+    set csa_b_y [expr $origin_y + [lindex $port_csa_b 1]]
+    set wire_bend_x [expr $csa_b_x - 2*$ws1]
+    set inflag_y [expr $inflag_y + 40]
+    make_wire $csa_b_x $csa_b_y $wire_bend_x $csa_b_y
+    make_wire $wire_bend_x $csa_b_y $wire_bend_x $inflag_y
+    make_wire $wire_bend_x $inflag_y $inflag_x $inflag_y
+    make input -name $pname -origin "$inflag_x $inflag_y"
+  }
+
+  
+  # optionally hook up carry in's
+  if {$useMulCin == 1} {
+    # figure out how many rows of 4:2 adders are needed
+    set j 1
+    for {set i 4} {$i <= $NBITS_A} {set i [expr $i * 2]} {
+      incr j
+      set log2($i) $j
+    }
+    if {[expr pow(2,$j)] == $NBITS_A} {
+      # NBITS_A is a power of 2
+      set rowcount [expr $j - 1]
+    } else {
+      # no it's not
+      set rowcount $j
+    }
+    set lastrow [expr $rowcount - 1]
+    
+    # figure out how many boxes are in each row, and how many total boxes
+    set totboxcount 0
+    set boxcount(0) [expr int($NBITS_A / 4)]
+    if {[expr $NBITS_A % 4] != 0} {
+      incr boxcount(0)
+    }
+    set totboxcount [expr $totboxcount + $boxcount(0)]
+    
+    for {set i 1} {$i < $rowcount} {incr i} {
+      set prevbc $boxcount([expr $i - 1])
+      set boxcount($i) [expr int($prevbc / 2)]
+      if {[expr $prevbc % 2] != 0} {
+	incr boxcount($i)
+	set remainder($i) 1
+      } else {
+	set remainder($i) 0
+      }
+      set totboxcount [expr $totboxcount + $boxcount($i)]
+    }
+
+    # add an extra row if an extra CSA is desired
+    if {[string toupper $AddExtraCSA] == "Y"} {
+      set boxcount($rowcount) 1
+      set adderloc($lastrow,1) "0 0 0"
+      incr rowcount
+      incr lastrow
+      incr totboxcount
+    }
+
+    set c_count [expr $totboxcount - 1]
+    set carry_count [expr $c_count - 1]
+    
+    if {$c_count == 0} {
+      set c_bitrange ""
+    } else {
+      set c_bitrange [format "\[%d\:0\]" $c_count]
+    }
+    if {$carry_count == 0} {
+      set carry_bitrange ""
+    } else {
+      set carry_bitrange [format "\[%d\:0\]" $carry_count]
+    }
+
+    # find the pin locations
+    set port_cin [generators_get_pin_xy "MCin_L$c_bitrange" $inpins]
+    set port_cin_x [expr $origin_x + [lindex $port_cin 0]]
+    set port_cin_y [expr $origin_y + [lindex $port_cin 1]]
+    set port_carryin [generators_get_pin_xy "MCarry_H$carry_bitrange" $inpins]
+    set port_carryin_x [expr $origin_x + [lindex $port_carryin 0]]
+    set port_carryin_y [expr $origin_y + [lindex $port_carryin 1]]
+
+    if {([string toupper $IncludePPG] == "Y") && ([string toupper $A] != "UNSIGNED")} {
+      # use the msb of MCin_L to complete the PPG logic
+      if {$c_count > 0} {
+	make_wire $port_cin_x $port_cin_y $port_cin_x [expr $port_cin_y + $ws1]
+	make name_net_s -origin "$port_cin_x [expr $port_cin_y + $ws1]" -name "MMCin_L$c_bitrange"
+	make_wire $port_cin_x [expr $port_cin_y + $ws1] $port_cin_x [expr $port_cin_y + $ws1 + 20]
+	set wire_x [expr $port_cin_x - 10]
+	set wire_y [expr $port_cin_y + 2*$ws1]
+	generate bus_combine bus_combine2 -ninputs 2
+	make bus_combine2 -origin "$port_cin_x [expr $wire_y - 10]" -orient R270
+	make_wire [expr $port_cin_x + 10] [expr $port_cin_y + 2*$ws1] [expr $port_cin_x + 10] [expr $port_cin_y + 3*$ws1]
+	if {$c_count == 1} {
+	  set c_bitrange ""
+	} else {
+	  set c_bitrange [format "\[%d\:0\]" [expr $c_count - 1]]
+	}
+	if {[string toupper $UseMulCin] == "Y"} {
+	  make input -origin "[expr $port_cin_x + 10] [expr $port_cin_y + 3*$ws1]" -orient R270 -name "MCin_L$c_bitrange"
+	} else {
+	  set pin_x [expr $port_cin_x + 10] 
+	  set pin_y [expr $port_cin_y + 3*$ws1]
+	  set end_y [expr $pin_y + $ws1]
+	  make name_net_s -origin "$pin_x $pin_y" -name "MCin_L$c_bitrange"
+	  make_wire $pin_x $pin_y $pin_x $end_y
+	  make sign_extend -origin "$pin_x [expr $end_y + 10]" -orient R270	  
+	  make global -origin "$pin_x [expr $end_y + 20]" -name vdd      
+ 	}
+      } else {
+	set wire_x $port_cin_x
+	set wire_y [expr $port_cin_y + 2*$ws1]
+	make_wire $port_cin_x $port_cin_y $wire_x $wire_y
+      }
+
+      if {[string toupper $A] == "SIGNED"} {
+	make_wire $wire_x $wire_y [expr $wire_x - $ws1] $wire_y
+	# MMI_INV
+	set invname [NAME_MMI_INV -Size C -DeMorgan 0]
+	generate MMI_INV $invname -Size C -DeMorgan 0
+	setl {invcount invinpins invoutpins invinoutpins} [generators_get_pin_info "MMI_INV"]
+	# in
+	set data [lindex $invinpins 0]
+	set inv_in_x [lindex $data 1]
+	set inv_in_y [lindex $data 2]
+	# out
+	set data [lindex $invoutpins 0]
+	set inv_out_x [lindex $data 1]
+	set inv_out_y [lindex $data 2]
+	# dimensions
+	set icon_dim [generators_get_icon_size "MMI_INV"]
+	set inv_x [lindex $icon_dim 0]
+	set inv_y [lindex $icon_dim 1]
+
+	set inv_origin_x [expr $wire_x - $ws1 - $inv_out_x]
+	set inv_origin_y $wire_y
+	make $invname -origin "$inv_origin_x $inv_origin_y"
+	set pin_x [expr $inv_origin_x + $inv_in_x]
+	set pin_y [expr $inv_origin_y + $inv_in_y]
+	make_wire $pin_x $pin_y [expr $pin_x - $ws1] $pin_y
+	set wname [format "A_H\[%d\]" $maxaidx]
+	make name_net_s -origin "[expr $pin_x - $ws1] $pin_y" -name $wname
+      }
+      if {[string toupper $A] == "BOTH"} {
+	make_wire $wire_x $wire_y [expr $wire_x - $ws1] $wire_y
+	# icon info
+	# MMI_NAND2
+	set nandname [NAME_MMI_NAND2 -Size C -DeMorgan 0]
+	generate MMI_NAND2 $nandname -Size C -DeMorgan 0
+	setl {nandcount nandinpins nandoutpins nandinoutpins} [generators_get_pin_info "MMI_NAND2"]
+	# inputs
+	set nports [get_assoc ninputs $nandcount]
+	for {set p 0} {$p < $nports} {incr p} {
+	  set data [lindex $nandinpins $p]
+	  set nand_in_x($p) [lindex $data 1]
+	  set nand_in_y($p) [lindex $data 2]
+	}
+	# output
+	set data [lindex $nandoutpins 0]
+	set nand_out_x [lindex $data 1]
+	set nand_out_y [lindex $data 2]
+	# dimensions
+	set icon_dim [generators_get_icon_size "MMI_NAND2"]
+	set nand_x [lindex $icon_dim 0]
+	set nand_y [lindex $icon_dim 1]
+	
+	set nand_origin_x [expr $wire_x - $ws1 - $nand_out_x]
+	set nand_origin_y $wire_y
+	make $nandname -origin "$nand_origin_x $nand_origin_y"
+	set pin_x [expr $nand_origin_x + $nand_in_x(0)]
+	set pin_y [expr $nand_origin_y + $nand_in_y(0)]
+	make_wire $pin_x $pin_y [expr $pin_x - $ws1] $pin_y
+	set wname [format "A_H\[%d\]" $maxaidx]
+	make name_net_s -origin "[expr $pin_x - $ws1] $pin_y" -name $wname
+	set pin_x [expr $nand_origin_x + $nand_in_x(1)]
+	set pin_y [expr $nand_origin_y + $nand_in_y(1)]
+	make_wire $pin_x $pin_y [expr $pin_x - $ws1] $pin_y
+	make name_net_s -origin "[expr $pin_x - $ws1] $pin_y" -name "ASigned_H"
+      }
+    } else {
+      make_wire $port_cin_x $port_cin_y $port_cin_x [expr $port_cin_y + 3*$ws1]
+      make input -origin "$port_cin_x [expr $port_cin_y + 3*$ws1]" -orient R270 -name "MCin_L$c_bitrange"
+    }
+
+    if {$c_count != 0} {
+      set pin_y [expr $port_carryin_y + 3*$ws1]
+      make_wire $port_carryin_x $port_carryin_y $port_carryin_x $pin_y
+      if {[string toupper $UseMulCin] == "Y"} {
+	make input -origin "$port_carryin_x $pin_y" -orient R270 -name "MCarry_H$carry_bitrange"
+      } else {
+	set end_y [expr $pin_y + $ws1]
+	make name_net_s -origin "$port_carryin_x $pin_y" -name "MCarry_H$carry_bitrange"
+	make_wire $port_carryin_x $pin_y $port_carryin_x $end_y
+	make sign_extend -origin "$port_carryin_x [expr $end_y + 10]" -orient R270
+	make global -origin "$port_carryin_x [expr $end_y + 20]" -name gnd
+      }
+    }
+  } 
+
+  # hook up the sum, carry outputs
+  # sum
+  set wname [format "Sum_H\[%d:0\]" $maxresidx]
+  set port_sum [generators_get_pin_xy $wname $outpins]
+  set pin_x [expr $origin_x + [lindex $port_sum 0]]
+  set name_net_x [expr $pin_x + 3*$ws1]
+  set wire_end_x [expr $pin_x + 5*$ws1]
+  set pin_y [expr $origin_y + [lindex $port_sum 1]]
+  make_wire $pin_x $pin_y $name_net_x $pin_y
+  if {$includeCPA == 1} {
+    make name_net_s -origin "$name_net_x $pin_y" -name $wname
+    make_wire $name_net_x $pin_y $wire_end_x $pin_y
+    set sum_wire_loc "$wire_end_x $pin_y"
+  } else {
+    make output -origin "$name_net_x $pin_y" -name $wname
+  }
+  # carry
+  set wname [format "Carry_H\[%d:0\]" $maxresidx]
+  set port_carry [generators_get_pin_xy $wname $outpins]
+  set pin_x [expr $origin_x + [lindex $port_carry 0]]
+  set pin_y [expr $origin_y + [lindex $port_carry 1]]
+  make_wire $pin_x $pin_y $name_net_x $pin_y
+  if {$includeCPA == 1} {
+    make name_net_s -origin "$name_net_x $pin_y" -name $wname
+    make_wire $name_net_x $pin_y $wire_end_x $pin_y
+    set carry_wire_loc "$wire_end_x $pin_y"
+  } else {
+    make output -origin "$name_net_x $pin_y" -name $wname
+  }
+
+
+  # title bar
+  make sccs_title_bar -origin "$origin_x [expr $icon_bot + 12*$ws1]" -owner emc -version 1.4 -date 02/29/00
+
+
+  ####################### Carry Propagate Adder #########################
+
+  if {$includeCPA == 1} {
+    # new origin
+    set origin_x [expr [lindex $sum_wire_loc 0] + 200]
+    set origin_y 0
+
+    # generate the adder icon
+    set addername [NAME_adder -NBITS $NRESBITS -Type CarrySelect -Partition N -OutputSize C -HalfHeight $HalfHeight -bitslice Y]
+    generate adder $addername -NBITS $NRESBITS -Type CarrySelect -Partition N -OutputSize C -HalfHeight $HalfHeight -bitslice Y
+
+    # adder icon properties
+    setl {count inpins outpins inoutpins} [generators_get_pin_info $addername]
+    # pins
+    set pname [format "A_H\[%d:0\]" $maxresidx]
+    setl {port_cs_a_x port_cs_a_y} [generators_get_pin_xy $pname $inpins]
+    set pname [format "B_H\[%d:0\]" $maxresidx]
+    setl {port_cs_b_x port_cs_b_y} [generators_get_pin_xy $pname $inpins]
+    set pname [format "SUM_H\[%d:0\]" $maxresidx]
+    setl {port_cs_sum_x port_cs_sum_y} [generators_get_pin_xy $pname $outpins]
+    setl {port_cs_cin_x port_cs_cin_y} [generators_get_pin_xy "CIN_H" $inpins]
+    setl {port_cs_cout_x port_cs_cout_y} [generators_get_pin_xy "COUT_H" $outpins]
+
+    # place the adder icon
+    make $addername -origin "$origin_x $origin_y"
+    
+    # hook up multiplier array's sum bits to adder A input
+    set cs_a_x [expr $origin_x + $port_cs_a_x]
+    set cs_a_y [expr $origin_y + $port_cs_a_y]
+    set sum_wire_x [lindex $sum_wire_loc 0]
+    set sum_wire_y [lindex $sum_wire_loc 1]
+    make_wire $cs_a_x $cs_a_y [expr $cs_a_x - $ws1] $cs_a_y
+    make_wire [expr $cs_a_x - $ws1] $cs_a_y [expr $cs_a_x - $ws1] $sum_wire_y
+    make_wire [expr $cs_a_x - $ws1] $sum_wire_y $sum_wire_x $sum_wire_y
+    
+    # hook up multiplier array's carry bits to adder B input
+    # note we must shift the carry vector up one bit position
+    set cs_b_x [expr $origin_x + $port_cs_b_x]
+    set cs_b_y [expr $origin_y + $port_cs_b_y]
+    set carry_wire_x [lindex $carry_wire_loc 0]
+    set carry_wire_y [lindex $carry_wire_loc 1]
+    make_wire $cs_b_x $cs_b_y [expr $cs_b_x - 20] $cs_b_y
+    generate bus_combine bus_combine2 -ninputs 2
+    make bus_combine2 -origin "[expr $cs_b_x - 40] $cs_b_y"
+    make_wire [expr $cs_b_x - $ws1] [expr $cs_b_y - 10] [expr $cs_b_x - $ws1] $carry_wire_y
+    make_wire [expr $cs_b_x - $ws1] $carry_wire_y [expr $cs_b_x - $ws1 - 20] $carry_wire_y
+    set wname [format "\[%d:0\]" [expr $maxresidx - 1]]
+    make name_net_s -name $wname -origin "[expr $cs_b_x - $ws1 - 20] $carry_wire_y" 
+    make_wire [expr $cs_b_x - $ws1 - 20] $carry_wire_y $carry_wire_x $carry_wire_y
+    make global -name gnd -origin "[expr $cs_b_x - $ws1] [expr $cs_b_y + 10]"
+    
+    # hook up result output
+    set cs_sum_x [expr $origin_x + $port_cs_sum_x]
+    set cs_sum_y [expr $origin_y + $port_cs_sum_y]
+    make_wire $cs_sum_x $cs_sum_y [expr $cs_sum_x + 2 * $ws1] $cs_sum_y
+    make output -origin "[expr $cs_sum_x + 2 * $ws1] $cs_sum_y" -name "Result_H\[$maxresidx:0\]"
+    
+    # hook up adder carry in
+    set cs_cin_x [expr $origin_x + $port_cs_cin_x]
+    set cs_cin_y [expr $origin_y + $port_cs_cin_y]
+    make_wire $cs_cin_x $cs_cin_y $cs_cin_x 300
+    make input -name "ACin_H" -origin "$cs_cin_x 300" -orient R90Y
+    
+    # hook up adder carry out
+    set cs_cout_x [expr $origin_x + $port_cs_cout_x]
+    set cs_cout_y [expr $origin_y + $port_cs_cout_y]
+    make_wire $cs_cout_x $cs_cout_y $cs_cout_x [expr $cs_cout_y - 300]
+    make output -name "ACout_H" -origin "$cs_cout_x [expr $cs_cout_y - 300]" -orient R90Y
+  }
+  # end carry propagate adder insertion
+
+
+}
+
+
+
+proc ICON_mul args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS_A 8} {NBITS_B 8} {UseMulCin "N"} {AddExtraCSA "N"} {IncludePPG "Y"} {A "Unsigned" {radio Signed Unsigned Both}} {B "Unsigned" {radio Signed Unsigned Both}} {IncludeCPA "Y"} {ReduceInputLoad "N"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # don't let the user get too crazy
+  if {$NRESBITS > 128} {
+    error "ERROR: NBITS_A + NBITS_B = $NRESBITS not supported"
+  }
+  if {$NBITS_A < 1} {
+    error "ERROR: NBITS_A ($NBITS_A) not supported"
+  }
+  if {$NBITS_B < 1} {
+    error "ERROR: NBITS_B ($NBITS_B) not supported"
+  }
+  # check for acceptable response on UseMulCin query
+  if {([string toupper $UseMulCin] != "Y") && ([string toupper $UseMulCin] != "N")} {
+    error "ERROR: UseMulCin property ($UseMulCin) must be Y or N"
+  }
+  # check for acceptable response on AddExtraCSA query
+  if {([string toupper $AddExtraCSA] != "Y") && ([string toupper $AddExtraCSA] != "N")} {
+    error "ERROR: AddExtraCSA property ($AddExtraCSA) must be Y or N"
+  }
+  set addCSA 0
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set addCSA 1
+  }
+  # check for acceptable response on IncludePPG query
+  if {([string toupper $IncludePPG] != "Y") && ([string toupper $IncludePPG] != "N")} {
+    error "ERROR: IncludePPG property ($IncludePPG) must be Y or N"
+  }
+  set includePPG 0
+  if {[string toupper $IncludePPG] == "Y"} {
+    set includePPG 1
+  }
+  # check for acceptable response on A query
+  if {([string toupper $A] != "SIGNED") &&
+      ([string toupper $A] != "UNSIGNED") &&
+      ([string toupper $A] != "BOTH")} {
+    error "ERROR: A property ($A) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on B query
+  if {([string toupper $B] != "SIGNED") &&
+      ([string toupper $B] != "UNSIGNED") &&
+      ([string toupper $B] != "BOTH")} {
+    error "ERROR: B property ($B) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on IncludeCPA query
+  if {([string toupper $IncludeCPA] != "Y") && ([string toupper $IncludeCPA] != "N")} {
+    error "ERROR: IncludeCPA property ($IncludeCPA) must be Y or N"
+  }
+  # check for acceptable response on ReduceInputLoad query
+  if {([string toupper $ReduceInputLoad] != "Y") && ([string toupper $ReduceInputLoad] != "N")} {
+    error "ERROR: ReduceInputLoad property ($ReduceInputLoad) must be Y or N"
+  }
+  # check for acceptable response on HalfHeight query
+  if {([string toupper $HalfHeight] != "Y") && ([string toupper $HalfHeight] != "N")} {
+    error "ERROR: HalfHeight property ($HalfHeight) must be Y or N"
+  }
+  # check for acceptable response on bitslice query
+  if {([string toupper $bitslice] != "Y") && ([string toupper $bitslice] != "N")} {
+    error "ERROR: bitslice property ($bitslice) must be Y or N"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  # calculate height of left and right sides
+  # pin_spacer must be divisible by 2
+  set pin_spacer 40
+  set cs_spacer 100
+  if {$includePPG == 0} {
+    set icon_h [expr ($NBITS_max * $pin_spacer) + (2 * $cs_spacer)]
+  } else {
+    set icon_h [expr (2 * $pin_spacer) + (2 * $cs_spacer)]
+  }
+  # note icon_w must be evenly divisible by 4
+  set icon_w 400
+  set icon_left [expr -($icon_w / 2)]
+  set icon_left_label [expr $icon_left + 10]
+  set icon_right [expr ($icon_w / 2)]
+  set icon_right_label [expr $icon_right - 10]
+  # note total offset between the 2 top (bottom) corners must be evenly divisible by 4
+  set icon_topl_y [expr -($icon_h / 2) + 20]
+  set icon_botl_y [expr ($icon_h / 2) + 20]
+  set icon_topr_y [expr -($icon_h / 2) - 20]
+  set icon_botr_y [expr ($icon_h / 2) - 20]
+  icon_line $icon_left $icon_topl_y $icon_right $icon_topr_y $icon_right $icon_botr_y $icon_left $icon_botl_y $icon_left $icon_topl_y
+
+  # primary inputs
+  # if the PPG logic is included, the inputs are A & B.  
+  # otherwise, the inputs are partial product vectors generated elsewise.
+  if {$includePPG == 0} {  
+    set pin_y [expr $icon_botl_y - $cs_spacer]
+    set b_y $pin_y
+    for {set i 0} {$i < $NBITS_max} {incr i} {
+      set pname [format "PP%d_H" $i]
+      set pidx [format "\[%d:0\]" $maxresidx]
+      set pin_name [format "%s%s" $pname $pidx]
+      icon_term -type input -origin "$icon_left $pin_y" -name $pin_name
+      icon_property -origin "$icon_left_label $pin_y" -size small -label $pname
+      if {$i == 0} {
+	icon_property -origin "$icon_left_label [expr $pin_y + 20]" -size small -label $pidx
+      }
+      set pin_y [expr $pin_y - $pin_spacer]
+    }
+    set a_y [expr $pin_y + $pin_spacer]
+  } else {
+    set pin_y [expr -($pin_spacer / 2)]
+    set a_y $pin_y
+    icon_term -type input -origin "$icon_left $pin_y"  -name "A_H\[$maxaidx:0\]"
+    icon_property -origin "$icon_left_label $pin_y" -size small -label A_H
+    icon_property -origin "$icon_left_label [expr $pin_y + 10]" -size small -label "\[$maxaidx:0\]"
+    set pin_y [expr $pin_y + $pin_spacer]
+    set b_y $pin_y
+    icon_term -type input -origin "$icon_left $pin_y" -name "B_H\[$maxbidx:0\]"
+    icon_property -origin "$icon_left_label $pin_y" -size small -label B_H
+    icon_property -origin "$icon_left_label [expr $pin_y + 10]" -size small -label "\[$maxbidx:0\]"
+    if {[string toupper $A] == "BOTH"} {
+      set pin_y [expr $a_y - $pin_spacer]
+      icon_term -type input -origin "$icon_left $pin_y"  -name "ASigned_H"
+      icon_property -origin "$icon_left_label $pin_y" -size small -label ASigned_H
+    }
+    if {[string toupper $B] == "BOTH"} {
+      set pin_y [expr $b_y + $pin_spacer]
+      icon_term -type input -origin "$icon_left $pin_y"  -name "BSigned_H"
+      icon_property -origin "$icon_left_label $pin_y" -size small -label BSigned_H
+    }
+  }
+
+  # if IncludeCPA == Y, then a carry propagate adder will be included, so the output is
+  # the result of the carry propagate add.  otherwise, the output is the redundant sum
+  # and carry vectors from the multiplier array.
+  if {[string toupper $IncludeCPA] == "Y"} {
+    icon_term -type output -origin "$icon_right 0" -name "Result_H\[$maxresidx:0\]"
+    icon_property -origin "$icon_right_label 0" -size small -anchor e -label Result_H
+    icon_property -origin "$icon_right_label 10" -size small -anchor e -label "\[$maxresidx:0\]"
+    set pin_x [expr ($icon_w / 4)]
+    set pin_y [expr $icon_topr_y + 10]
+    icon_term -type output -origin "$pin_x $pin_y" -name "ACout_H" -orient R270
+    icon_property -origin "$pin_x [expr $pin_y + 10]" -size small -anchor center -label ACout_H
+    set pin_y [expr $icon_botr_y + 10]
+    icon_term -type input -origin "$pin_x $pin_y" -name "ACin_H" -orient R270
+    icon_property -origin "$pin_x [expr $pin_y - 10]" -size small -anchor center -label ACin_H
+  } else {
+    set pin_y [expr -($pin_spacer / 2)]
+    icon_term -type output -origin "$icon_right $pin_y" -name "Sum_H\[$maxresidx:0\]"
+    icon_property -origin "$icon_right_label $pin_y" -size small -anchor e -label Sum_H
+    icon_property -origin "$icon_right_label [expr $pin_y + 20]" -size small -anchor e -label "\[$maxresidx:0\]"
+    set pin_y [expr $pin_y + $pin_spacer]
+    icon_term -type output -origin "$icon_right $pin_y" -name "Carry_H\[$maxresidx:0\]"
+    icon_property -origin "$icon_right_label $pin_y" -size small -anchor e -label Carry_H
+  }
+
+  # if UseMulCin == Y, make the multiplier carryin ports accessible
+  if {[string toupper $UseMulCin] == "Y"} {
+    # figure out how many rows of 4:2 adders are needed
+    set j 1
+    for {set i 4} {$i <= $NBITS_A} {set i [expr $i * 2]} {
+      incr j
+      set log2($i) $j
+    }
+    if {[expr pow(2,$j)] == $NBITS_A} {
+      # NBITS_A is a power of 2
+      set rowcount [expr $j - 1]
+    } else {
+      # no it's not
+      set rowcount $j
+    }
+    set lastrow [expr $rowcount - 1]
+
+    # figure out how many boxes are in each row, and how many total boxes
+    set totboxcount 0
+    set boxcount(0) [expr int($NBITS_A / 4)]
+    if {[expr $NBITS_A % 4] != 0} {
+      incr boxcount(0)
+    }
+    set totboxcount [expr $totboxcount + $boxcount(0)]
+    
+    for {set i 1} {$i < $rowcount} {incr i} {
+      set prevbc $boxcount([expr $i - 1])
+      set boxcount($i) [expr int($prevbc / 2)]
+      if {[expr $prevbc % 2] != 0} {
+	incr boxcount($i)
+	set remainder($i) 1
+      } else {
+	set remainder($i) 0
+      }
+      set totboxcount [expr $totboxcount + $boxcount($i)]
+    }
+    
+    # add an extra row if an extra CSA is desired
+    if {[string toupper $AddExtraCSA] == "Y"} {
+      set boxcount($rowcount) 1
+      set adderloc($lastrow,1) "0 0 0"
+      incr rowcount
+      incr lastrow
+      incr totboxcount
+    }
+    
+    set c_count_orig [expr $totboxcount - 1]
+    set carry_count [expr $c_count_orig - 1]
+    # if A is signed, we need to use MCin_L[msb] to complete the PPG logic
+    if {([string toupper $A] != "UNSIGNED") && ([string toupper $IncludePPG] == "Y")} {
+      set c_count [expr $c_count_orig - 1]
+    } else {
+      set c_count $c_count_orig
+    }
+
+    if {$c_count == 0} {
+      set c_bitrange ""
+    } else {
+      set c_bitrange [format "\[%d\:0\]" $c_count]
+    }
+    if {$carry_count == 0} {
+      set carry_bitrange ""
+    } else {
+      set carry_bitrange [format "\[%d\:0\]" $carry_count]
+    }
+
+    if {$c_count >= 0} {
+      set pin_x [expr -($icon_w / 4)]
+      set pin_y [expr $icon_botl_y - 10]
+      icon_term -type input -origin "$pin_x $pin_y" -name "MCin_L$c_bitrange" -orient R270
+      icon_property -origin "$pin_x [expr $pin_y - 10]" -size small -anchor center -label "MCin_L$c_bitrange"
+    }
+    if {$c_count_orig > 0} {
+      set pin_x 0
+      set pin_y [expr ($icon_h / 2)]
+      icon_term -type input -origin "$pin_x $pin_y" -name "MCarry_H$carry_bitrange" -orient R270
+      icon_property -origin "$pin_x [expr $pin_y - 10]" -size small -anchor center -label "MCarry_H$carry_bitrange"
+    }      
+  }
+
+  # if AddExtraCSA == Y, add CSA inputs 
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set pin_y [expr $a_y - (2 * $pin_spacer)]
+    icon_term -type input -origin "$icon_left $pin_y" -name "CSA_A_H\[$maxresidx:0\]"
+    icon_property -origin "$icon_left_label $pin_y" -size small -label CSA_A_H
+    icon_property -origin "$icon_left_label [expr $pin_y + 10]" -size small -label "\[$maxresidx:0\]"
+    
+    set pin_y [expr $b_y + (2 * $pin_spacer)]
+    icon_term -type input -origin "$icon_left $pin_y" -name "CSA_B_H\[$maxresidx:0\]"
+    icon_property -origin "$icon_left_label $pin_y" -size small -label CSA_B_H
+    icon_property -origin "$icon_left_label [expr $pin_y + 10]" -size small -label "\[$maxresidx:0\]"
+  }
+
+  # text
+  set lname [format "%dx%dbit" $NBITS_A $NBITS_B]
+  icon_property -origin {0 -60} -size large -anchor center -label $lname
+  icon_property -origin {0 20} -size large -anchor center -label Multiplier
+  if {[string toupper $A] == "UNSIGNED"} {
+    set as "U"
+  }
+  if {[string toupper $A] == "SIGNED"} {
+    set as "S"
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set as "U,S"
+  }
+  if {[string toupper $B] == "UNSIGNED"} {
+    set bs "U"
+  }
+  if {[string toupper $B] == "SIGNED"} {
+    set bs "S"
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set bs "U,S"
+  }
+  set lname [format "%s x %s" $as $bs]
+  icon_property -origin {0 -20} -size large -anchor center -label $lname
+  set mods ""
+  if {[string toupper $HalfHeight] == "Y"} {
+    set mods " HH "
+  }
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set mods [format "%s%s" $mods " R "]
+  }
+  icon_property -origin {0 60} -anchor center -label $mods
+
+  # junk
+  set junk_y [expr ($icon_h / 2) + 200]
+  icon_property -origin "0 $junk_y" -type user -name name
+  icon_property -origin "0 [expr $junk_y + 20]" -type user -name M
+  icon_property -origin "0 [expr $junk_y + 40]" -type user -name dpc
+  icon_special -type sccs_title_bar -origin "0 [expr $junk_y + 100]" -owner emc -version 1.4 -date 02/29/00
+
+}

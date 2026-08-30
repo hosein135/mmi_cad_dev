@@ -1,0 +1,21 @@
+default_max_fanout             : 64;
+default_max_transition         : 2.00;
+default_max_capacitance        : 1.00;
+default_cell_leakage_power     : 100;
+default_fanout_load            : 1.0;
+default_inout_pin_cap          : 0.0;
+default_input_pin_cap          : 0.0;
+default_output_pin_cap         : 0.0;
+ 
+operating_conditions("typ_115_1.35") {
+        process : 1.0 ;
+        temperature : 115 ;
+        voltage : 1.35 ;
+        tree_type : "balanced_tree" ;
+}
+operating_conditions("fast_25_1.65") {
+        process : 0.7 ;
+        temperature : 25 ;
+        voltage : 1.65 ;
+        tree_type : "balanced_tree" ;
+}

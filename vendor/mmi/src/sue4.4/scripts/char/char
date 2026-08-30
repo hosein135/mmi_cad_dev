@@ -1,0 +1,2493 @@
+#!/bin/sh
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit $?
+
+## ************************************************************************
+## 
+## Copyright (c) 1995-2002 Juniper Networks, Inc. All rights reserved.
+## 
+## Permission is hereby granted, without written agreement and without
+## license or royalty fees, to use, copy, modify, and distribute this
+## software and its documentation for any purpose, provided that the
+## above copyright notice and the following three paragraphs appear in
+## all copies of this software.
+## 
+## IN NO EVENT SHALL JUNIPER NETWORKS, INC. BE LIABLE TO ANY PARTY FOR
+## DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+## ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+## JUNIPER NETWORKS, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+## DAMAGE.
+## 
+## JUNIPER NETWORKS, INC. SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+## INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+## MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+## NON-INFRINGEMENT.
+## 
+## THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND JUNIPER
+## NETWORKS, INC. HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
+## UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+## 
+## ************************************************************************
+
+# Written by Lee Tavrow, 1998
+
+# Characterize a cell in spice based on input stimulus is <cell>.ctl file.
+# Also works with ADM but doesn't compute input capactiances because
+# ADM doesn't support .meas INTEG function.
+
+#################### Overridden by char.setup ######################
+
+# Units for numbers without units (eventually all numbers will
+# have units).
+set TIMES(units) ns
+
+# Rise/fall times of input pulses.  Note that these pulses are always
+# buffered by the driver cell before reaching the inputs of the
+# device under test so you should never have to change this.
+set TIMES(rise_time) 0.2
+
+# static signals will be setup this soon before dynamic signals
+set TIMES(setup_time) 2.0
+
+# Cycle time of simulation
+set TIMES(step) 5.0
+
+# Makes an nxm matrix for the table driven lookup of delays based on
+# the following inputs.  Note that the output slopes are desired and
+# converted to capacitances that give approximately the correct slope.
+set TIMES(input_slopes) "200ps 400ps"
+set TIMES(clock_slopes) "300ps"
+set TIMES(output_slew) 400ps
+set DATA(output_loads) "0.25 0.5 1.0"
+
+# Used for measuring the rise/fall slopes.  Setup up for 10-90 
+# or 20-80, etc.
+set TIMES(slope_low_percent) 0.1
+set TIMES(slope_high_percent) 0.9
+
+# These are the initial guesses for the setup times.  If none of these
+# values is large enough it will expand.  Note that you need to
+# have at least three values in this list and more is better.
+set TIMES(setup) "0.6 0.5 0.4 0.3 0.2 0.1"
+set TIMES(hold) "0.6 0.5 0.4 0.3 0.2 0.1"
+
+# This is the input slope used when calculating the setup times.
+set TIMES(setup_slope) 300ps
+
+# The program will continue to iterate until the setup time is found
+# to within this tolerance.
+#set TIMES(setup_tol) 25ps
+set TIMES(setup_tol) 200ps
+
+# Capacitance (and 2x this number) placed on inputs and outputs to compute
+# relation between capacitance and slope.  This ratio is then used to
+# automatically scale loads for desired slopes.
+set DATA(nominal_cap) 100fF
+
+# transient step value used in the ".TRAN" statement.
+set TIMES(tran_step) 10p
+
+# This is the driver cell spice netlist used to drive the inputs
+# of the device under test
+set DATA(driver_file) /home/tavrow/char/driver.sp
+
+# Specifies spice header, voltage, and temperature (C) for all
+# corners of interest.  The desired corner is specified from the
+# command line.
+set DATA(corner,tt) "/home/tavrow/char/header.tt 3.0V 105"
+set DATA(corner,ss) "/home/tavrow/char/header.ss 3.0V 105"
+set DATA(corner,ff) "/home/tavrow/char/header.ff 3.45V 25"
+
+# Synopsys header information added to output file.
+set DATA(synopsys_header_file) /home/tavrow/char/synopsys.header
+
+# This is the name of the spice file that gets created to be run
+# through spice/adm to actually measure parameters
+set DATA(spice_file) tmp.sp
+
+# Choose your simulator.  Currently either spice or adm.
+set DATA(simulator) spice
+#set DATA(simulator) adm
+
+######################################################################
+
+if {[catch "source char.setup"]} {
+  puts stderr "Can't find file \"char.setup\", using defaults"
+} else {
+  puts "Using setup file \"char.setup\""
+}
+
+# set the starting time of the simulation
+set TIMES(current) 0.0
+
+# Used to convert 1's and 0's into voltages
+set DATA(0) 0V
+set DATA(1) vddp
+
+# used for .meas statements in hspice
+set DATA(^) "rise=1"
+set DATA(v) "fall=1"
+
+# for translating long names
+set DATA(xlate) 0
+
+# user definable offset for delays
+set DATA(user,offset) 0
+
+
+# main procedure
+
+proc characterize {args} {
+
+  global DATA CAP VARS TIMES FUNCTION OUTPUT DELAYS CAPS
+
+  # fix up these numbers
+  set DATA(nominal_cap) [parse_pp_number $DATA(nominal_cap)]
+
+  setl {DATA(corner) DATA(filename) cell ctlfile} [lindex $args 0]
+
+  if {![info exists DATA(corner,$DATA(corner))]} {
+    puts stderr "Aborting, corner $DATA(corner) not defined."
+    exit 1
+  }
+  setl {DATA(header_file) DATA(vdd) DATA(TEMP)} $DATA(corner,$DATA(corner))
+
+  if {$cell == ""} {
+    set cell [file rootname [file tail $DATA(filename)]]
+  }
+
+  if {$ctlfile == ""} {
+      set ctlfile "$cell.ctl"
+  }
+
+  puts "Characterization cell \"$cell\" at corner $DATA(corner) ..."
+
+  parse_ctl_file $cell $ctlfile
+  puts "done."
+
+  # trying this three times
+  for {set i 0} {$i < 3} {incr i} {
+
+    # first create a spice deck with nominal load capacitances
+    assemble_spicedeck $cell
+
+    set results1 [run_spice $cell "with nominal load capacitances ([pp_number $DATA(nominal_cap)]F) ..."]
+
+    # save the input capacitances
+    foreach var [array names VARS] {
+      if {$VARS($var) == "input" || $VARS($var) == "inout"} {
+        set CAPS($var,rise) [get_assoc ${var}_c^ $results1]
+        set CAPS($var,fall) [get_assoc ${var}_cv $results1]
+      }
+    } 
+
+    # now 2x load capacitances
+    foreach var [array names CAP] {
+      set CAP($var) 2.0
+    }
+
+    assemble_spicedeck $cell
+
+    set results2 \
+	[run_spice $cell "with 2x nominal load capacitances ..."]
+
+    set return [compute_rise_vs_capacitance $results1 $results2]
+
+    if {$return == "failed"} {
+      puts "Trying again to compute capacitance vs. rise_times"
+      set DATA(nominal_cap) [expr $DATA(nominal_cap) / 2.0]
+      # back to 1x load capacitances
+      foreach var [array names CAP] {
+	set CAP($var) 1.0
+      }
+
+    } else {
+      puts "Computed capacitance vs. rise_times."
+      break
+    }
+  }
+
+  if {$return == "failed"} {
+    puts "Aborting, failed 3 attempts."
+    exit
+  }
+
+  # now run the real characterization
+  # sweep the input capacitance for each output capacitance
+  set count 0
+  set total [expr [llength $TIMES(input_slopes)] * \
+		 [llength $DATA(output_loads)]]
+
+  set x 0
+  set y 0
+
+  # sweep input slopes
+  foreach input_slope $TIMES(input_slopes) {
+    foreach var [array names VARS] {
+      if {$VARS($var) == "input"} {
+	set_load_capacitance $var [parse_pp_number $input_slope]
+      }
+    }
+
+    # sweep output capacitances
+    foreach output_load $DATA(output_loads) {
+      foreach var [array names VARS] {
+	if {$VARS($var) == "output"} {
+	  set_load_capacitance $var [parse_pp_number $TIMES(output_slew)]
+          set CAP($var) [expr $CAP($var) * $output_load]
+	}
+      }
+
+#      parray CAP
+
+      assemble_spicedeck $cell
+      set results [run_spice $cell "characterization ([incr count]/$total) ..."]
+      
+#      puts stderr $results
+
+      if {$x == 0} {
+	foreach var [array names VARS] {
+	  if {$VARS($var) != "output"} {
+	    continue
+	  }
+	  lappend DELAYS(${var},index_1) [expr $CAP($var) * $DATA(nominal_cap)]
+	}
+      }
+
+      foreach var [array names VARS] {
+	if {$VARS($var) != "output"} {
+	  continue
+	}
+	foreach invar [array names VARS] {
+	  if {$VARS($invar) != "input"} {
+	    continue
+	  }
+
+          # check what paths exist, and decide if it's a clk/enable pin
+          set rise_path ""
+          set fall_path ""
+          foreach indir "^ v" {
+            foreach outdir "^ v" {
+              set value [get_assoc $invar$indir$var$outdir $results]
+              if {$value != ""} {
+                if {$indir == "^"} {
+                   set rise_path "true"
+                } else {
+                   set fall_path "true"
+                }
+              }
+            }
+          }
+          if {$rise_path == "true" && $fall_path == "" &&
+              ![info exists DATA(preset,$invar)] &&
+              ![info exists DATA(clear,$invar)]} {
+             set DATA(rising_edge) $invar
+          }
+          if {$rise_path == "" && $fall_path == "true" &&
+              ![info exists DATA(preset,$invar)] &&
+              ![info exists DATA(clear,$invar)]} {
+             set DATA(falling_edge) $invar
+          }
+
+	  if {[info exists DATA(rising_edge)] && $DATA(rising_edge) == $invar} {
+	    # for positive edge triggered stuff
+	    set groups \
+		{{rising_edge ^ ^ rise} {rising_edge ^ v fall}}
+	  } elseif {[info exists DATA(falling_edge)] && $DATA(falling_edge) == $invar}  {
+	    # for negative edge triggered stuff
+	    set groups \
+		{{falling_edge v ^ rise} {falling_edge v v fall}}
+	  } else {
+	    set groups \
+		{{positive_unate ^ ^ rise} {positive_unate v v fall} \
+		     {negative_unate v ^ rise} {negative_unate ^ v fall}}
+	  }
+
+	  foreach group $groups {
+	    setl {unate input_dir output_dir dir} $group
+
+	    set value [get_assoc $invar$input_dir$var$output_dir $results]
+	    if {$value != ""} {
+	      # save the value
+	      lappend DELAYS(${var},${unate},$invar,$dir,values) $value
+	      lappend DELAYS(${var},${unate},$invar,$dir,tr_values) \
+		  [get_assoc $invar$input_dir$var$output_dir! $results]
+	    }
+	  }
+	}
+      }
+
+      incr y
+    }
+
+    # get the actual input slopes.
+    # only have to do this for each row.
+    foreach var [array names VARS] {
+      if {$VARS($var) != "output"} {
+	continue
+      }
+      foreach invar [array names VARS] {
+	if {$VARS($invar) != "input"} {
+	  continue
+	}
+
+	if {[info exists DATA(rising_edge)] && $DATA(rising_edge) == $invar} {
+	  # for positive edge triggered stuff
+	  set groups \
+	      {{rising_edge ^ ^ rise} {rising_edge ^ v fall}}
+	} elseif {[info exists DATA(falling_edge)] && $DATA(falling_edge) == $invar}  {
+	  # for negative edge triggered stuff
+	  set groups \
+	      {{falling_edge v ^ rise} {falling_edge v v fall}}
+	} else {
+	  set groups \
+	      {{positive_unate ^ ^ rise} {positive_unate v v fall} \
+		   {negative_unate v ^ rise} {negative_unate ^ v fall}}
+	}
+
+	foreach group $groups {
+	  setl {unate input_dir output_dir dir} $group
+
+	  set value [get_assoc $invar$input_dir!$var$output_dir $results]
+	  if {$value != ""} {
+	    lappend DELAYS(${var},${unate},$invar,$dir,index_2) $value
+	  }
+	}
+      }
+    }
+
+    incr x
+  }
+
+  # do the setup characterization
+  setup_char $cell
+
+  hold_char $cell
+
+  make_synopsys_model $cell
+
+  make_verilog_model $cell
+
+  puts "Characterization of cell \"$cell\" completed."
+}
+
+# creates a synopsys model for the cell if a functional description is
+# given and writes to <cell>.syn
+
+proc make_synopsys_model {cell} {
+
+  global FUNCTION VARS DATA TIMES DELAYS CAPS VIOS OUTPUT 
+
+  set filename $cell.syn
+
+  # open the synopsys output file
+  if {[catch "open $filename w" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  set size1 [llength $DATA(output_loads)]
+  set size2 [llength $TIMES(input_slopes)]
+  set size3 [llength $TIMES(clock_slopes)]
+
+  # write the synopsys header
+  puts $FILE_ID "library ($cell) \{"
+  puts $FILE_ID "date : \"[clock format [clock seconds]]\";"
+  puts $FILE_ID "comment : \"Built from MMI char.tcl\";"
+  puts $FILE_ID "delay_model : table_lookup;"
+  puts $FILE_ID "lu_table_template(li${size1}X${size2}) \{"
+  puts $FILE_ID "\tvariable_1 : total_output_net_capacitance;"
+  puts $FILE_ID "\tvariable_2 : input_net_transition;"
+
+  set tmp ""
+  for {set i 0} {$i < $size1} {incr i} {
+    lappend tmp $i
+  }
+  puts $FILE_ID "\tindex_1 (\"[join $tmp {, }]\");"
+
+  set tmp ""
+  for {set i 0} {$i < $size2} {incr i} {
+    lappend tmp $i
+  }
+  puts $FILE_ID "\tindex_2 (\"[join $tmp {, }]\");"
+  puts $FILE_ID "\}"
+
+  puts $FILE_ID "lu_table_template(cr${size3}X${size2}) \{"
+  puts $FILE_ID "\tvariable_1 : related_pin_transition;"
+  puts $FILE_ID "\tvariable_2 : constrained_pin_transition;"
+ 
+  set tmp ""
+  for {set i 0} {$i < $size3} {incr i} {
+    lappend tmp $i
+  }
+  puts $FILE_ID "\tindex_1 (\"[join $tmp {, }]\");"
+ 
+  set tmp ""
+  for {set i 0} {$i < $size2} {incr i} {
+    lappend tmp $i
+  }
+  puts $FILE_ID "\tindex_2 (\"[join $tmp {, }]\");"
+  puts $FILE_ID "\}"
+
+
+#  lu_table_template(cr2X2){
+#    variable_1 : related_pin_transition;
+#    variable_2 : constrained_pin_transition;
+#    index_1 ("0, 1");
+#    index_2 ("0, 1");
+#  }
+
+  # puts in synopsys header info
+  puts $FILE_ID "nom_process                 : 1.0;"
+  puts $FILE_ID "nom_temperature             : [string trim $DATA(TEMP) Cc];"
+  puts $FILE_ID "nom_voltage                 : [string trim $DATA(vdd) Vv];"
+  puts $FILE_ID "pulling_resistance_unit     : \"1kohm\";"
+  puts $FILE_ID "time_unit                   : \"1ns\";"
+  puts $FILE_ID "voltage_unit                : \"1V\";"
+  puts $FILE_ID "current_unit                : \"1A\";"
+  puts $FILE_ID "capacitive_load_unit (1.0,pf);"
+
+  # put in additional user-specified synopsys header info
+  if {[catch "exec cat $DATA(synopsys_header_file)" msg]} {
+    puts stderr $msg
+  } else {
+    puts $FILE_ID $msg
+  }
+
+  # write out any bus tables
+
+# type (bus5) {
+#        base_type : array;
+#        data_type : bit;
+#        bit_width : 5;
+#        bit_from : 4;
+#        bit_to : 0;
+#        downto : true;
+#}
+
+  foreach bit [array names DATA bus,*] {
+    setl {toss max min} [split $DATA($bit) "\[:\]"]
+    set length [expr $max - $min + 1]
+
+    set DATA(bus_type,[lindex [split $bit ,] 1]) "bus${max}_$min"
+
+    if {[info exists BUSES(${max}_$min)]} {
+      continue
+    }
+    set BUSES(${max}_$min) 1
+
+    puts $FILE_ID "type (bus${max}_$min) \{"
+    puts $FILE_ID "\tbase_type : array;"
+    puts $FILE_ID "\tdata_type : bit;"
+    puts $FILE_ID "\tbit_width : $length;"
+    puts $FILE_ID "\tbit_from : $max;"
+    puts $FILE_ID "\tbit_to : $min;"
+    puts $FILE_ID "\tdownto : true;"
+    puts $FILE_ID "\}"
+  }
+
+  # write out the timing tables
+  puts $FILE_ID "cell ($cell) \{"
+
+  if {[info exists DATA(comment)]} {
+    puts $FILE_ID "/*"
+    foreach comment $DATA(comment) {
+      puts $FILE_ID " *\t$comment"
+    }
+    puts $FILE_ID " */"
+  }
+
+  if {[info exists DATA(header)]} {
+    foreach header $DATA(header) {
+      puts $FILE_ID "$header"
+    }
+  }
+
+  foreach var [array names VARS] {
+    if {$VARS($var) != "output"} {
+      continue
+    }
+
+    if {[info exists DATA(bus,$var)]} {
+      # this is a bus
+      set var_name [lindex [split $var \[] 0]
+      puts $FILE_ID "\tbus ($var_name) \{"
+      puts $FILE_ID "\t    bus_type : $DATA(bus_type,$var);"
+      puts $FILE_ID "\t    direction : output;"
+
+      foreach string [array names OUTPUT] {
+	# lookup for this variable name
+	set value [get_assoc $var_name $OUTPUT($string)] 
+	if {$value == ""} {
+	  # no luck, look for default
+	  set value [get_assoc __DEFAULT__ $OUTPUT($string)] 
+	}
+	if {$value == ""} {
+	  # no value, skip
+	  continue
+	}
+	# add it
+	puts $FILE_ID "\t    $string : $value;"
+      }
+
+      puts $FILE_ID "\t    pin ($DATA(bus,$var)) \{"
+
+    } else {
+      puts $FILE_ID "\tpin ($var) \{"
+      puts $FILE_ID "\t\tdirection : output;"
+
+      foreach string [array names OUTPUT] {
+	# lookup for this variable name
+	set value [get_assoc $var $OUTPUT($string)] 
+	if {$value == ""} {
+	  # no luck, look for default
+	  set value [get_assoc __DEFAULT__ $OUTPUT($string)] 
+	}
+	if {$value == ""} {
+	  # no value, skip
+	  continue
+	}
+	# add it
+	puts $FILE_ID "\t\t$string : $value;"
+      }
+
+      puts $FILE_ID "\t\tmax_capacitance : [format "%.4f" [expr [eval set_load_capacitance $var [parse_pp_number $TIMES(max_slew)]] * $DATA(nominal_cap) * 1.0e12]];"
+      puts $FILE_ID "\t\tmax_fanout : [format "%.4f" [expr [eval set_load_capacitance $var [parse_pp_number $TIMES(max_slew)]] * $DATA(nominal_cap) / [parse_pp_number $DATA(fanout_load)]]];"
+      puts $FILE_ID "\t\tmax_transition : [format "%.4f" [expr [eval parse_pp_number $TIMES(max_slew)] * 1.0e9]];"
+      if {[info exists FUNCTION($var)]} {
+	puts $FILE_ID "\t\tfunction : \"$FUNCTION($var)\";"
+      }
+    }
+
+    foreach unate "positive_unate negative_unate rising_edge falling_edge" {
+
+      foreach _invar [array names VARS] {
+	if {$VARS($_invar) == "output"} {
+	  continue
+	}
+
+	# need to quote brackets for this to work
+	regsub {\[} $_invar {\[} __invar
+	regsub {\]} $__invar {\]} __invar
+	set types [array names DELAYS ${var},$unate,$__invar,*,values]
+	if {$types == ""} {
+	  continue
+	}
+
+	puts $FILE_ID "\t\ttiming () \{"
+
+	if {[info exists DATA(clear,$_invar)]} {
+	  puts $FILE_ID "\t\t\ttiming_type : clear;"
+	}
+	if {[info exists DATA(preset,$_invar)]} {
+	  puts $FILE_ID "\t\t\ttiming_type : preset;"
+	}
+
+	if {[string first edge $unate] != -1} {
+	  puts $FILE_ID "\t\t\ttiming_type : ${unate};"
+	} else {
+	  puts $FILE_ID "\t\t\ttiming_sense : ${unate};"
+	}
+
+	puts $FILE_ID "\t\t\trelated_pin  : \"$_invar\"";
+
+	foreach type $types {
+	  setl {junk1 junk2 invar dir} [split $type ,]
+
+	  # rise/fall
+	  puts $FILE_ID "\t\t\tcell_${dir}(li[llength $DELAYS(${var},index_1)]X[llength $DELAYS(${var},${unate},$invar,$dir,index_2)]) \{"
+	  puts $FILE_ID "\t\t\t\tindex_1([scale_print $DELAYS(${var},index_1) $size1 1.0e12]);"
+	  puts $FILE_ID "\t\t\t\tindex_2([scale_print $DELAYS(${var},${unate},$invar,$dir,index_2) $size2 1.0e9]);"
+	  puts $FILE_ID "\t\t\t\tvalues([scale_print $DELAYS(${var},${unate},$invar,$dir,values) $size1 1.0e9 "\t\t\t\t        " [parse_pp_number $DATA(user,offset)]]);"
+	  puts $FILE_ID "\t\t\t\}"
+
+	  # transition
+	  puts $FILE_ID "\t\t\t${dir}_transition(li[llength $DELAYS(${var},index_1)]X[llength $DELAYS(${var},${unate},$invar,$dir,index_2)]) \{"
+	  puts $FILE_ID "\t\t\t\tindex_1([scale_print $DELAYS(${var},index_1) $size1 1.0e12]);"
+	  puts $FILE_ID "\t\t\t\tindex_2([scale_print $DELAYS(${var},${unate},$invar,$dir,index_2) $size2 1.0e9]);"
+	  puts $FILE_ID "\t\t\t\tvalues([scale_print $DELAYS(${var},${unate},$invar,$dir,tr_values) $size1 1.0e9]);"
+	  puts $FILE_ID "\t\t\t\}"
+	}
+	
+	puts $FILE_ID "\t\t\}"
+      }
+    }
+
+    if {[info exists DATA(bus,$var)]} {
+      puts $FILE_ID "\t    \}"
+    }
+
+    puts $FILE_ID "\t\}"
+  }
+
+  # now put in input capacitances for inputs and any setup/holds.
+  set dv [parse_pp_number $DATA(vdd)]
+
+  foreach var [array names VARS] {
+    if {$VARS($var) != "input"} {
+      continue
+    }
+
+    if {[info exists DATA(bus,$var)]} {
+      # this is a bus
+      puts $FILE_ID "\tbus ([lindex [split $var \[] 0]) \{"
+      puts $FILE_ID "\t    bus_type : $DATA(bus_type,$var);"
+      puts $FILE_ID "\t    direction : input;"
+      puts $FILE_ID "\t    pin ($DATA(bus,$var)) \{"
+
+    } else {
+      puts $FILE_ID "\tpin ($var) \{"
+      puts $FILE_ID "\t\tdirection : input;"
+    }
+
+    if {[info exists DATA(user,${var}_c^)]} {
+      # use the value from the ctl file.
+      puts $FILE_ID "\t\tcapacitance : $DATA(user,${var}_c^);"
+
+    } else {
+
+      if {$CAPS($var,rise) != "" || $CAPS($var,fall) != ""} {
+	if {$CAPS($var,rise) != "" && $CAPS($var,fall) != ""} {
+	  # average them (should we use the maximum???)
+	  set value [expr (abs($CAPS($var,rise)) + abs($CAPS($var,fall))) / (2.0 * $dv)]
+	} elseif {$CAPS($var,rise)  != ""} {
+	  set value [expr abs($CAPS($var,rise)) / $dv]
+	} else {
+	  set value [expr abs($CAPS($var,fall)) / $dv]
+	}
+
+	puts $FILE_ID "\t\tcapacitance : [format "%.4f" [expr $value * 1.0e12]];"
+	puts $FILE_ID "\t\tfanout_load : [format "%.4f" [expr $value / [eval parse_pp_number $DATA(fanout_load)]]];"
+      }
+    }
+
+    if {[info exists DATA(clock_pin)] && $DATA(clock_pin) == $var} {
+      puts $FILE_ID "\t\tclock : true;"
+    }
+
+    foreach viotype "setup_rising setup_falling hold_rising hold_falling" {
+
+      foreach _invar [array names VARS] {
+        if {$VARS($_invar) == "output"} {
+          continue
+        }
+
+        regsub {\[} $_invar {\[} __invar
+        regsub {\]} $__invar {\]} __invar
+
+        regsub -all {\[} $var {\[} _var
+        regsub -all {\]} $_var {\]} _var
+
+        set vios [array names VIOS "$_var,$viotype,$__invar,*,values"]
+        if {$vios != ""} {
+          puts $FILE_ID "\t\ttiming () \{"
+          puts $FILE_ID "\t\t\ttiming_type  : $viotype;"
+          puts $FILE_ID "\t\t\trelated_pin : \"$invar\";"
+    
+          foreach vio $vios {
+    
+	    setl {dir} [lindex [split $vio ,] 3]
+    	
+            puts $FILE_ID "\t\t\t${dir}_constraint(cr[llength $VIOS($_var,$viotype,$__invar,$dir,index_1)]X[llength $VIOS($_var,$viotype,$__invar,$dir,index_2)]) \{"
+	    puts $FILE_ID "\t\t\t\tindex_1([scale_print $VIOS($_var,$viotype,$__invar,$dir,index_1) [llength $VIOS($_var,$viotype,$__invar,$dir,index_1)] 1.0e9]);"
+	    puts $FILE_ID "\t\t\t\tindex_2([scale_print $VIOS($_var,$viotype,$__invar,$dir,index_2) [llength $VIOS($_var,$viotype,$__invar,$dir,index_2)] 1.0e9]);"
+	    puts $FILE_ID "\t\t\t\tvalues([scale_print $VIOS($_var,$viotype,$__invar,$dir,values) [llength $VIOS($_var,$viotype,$__invar,$dir,index_1)] 1.0e9 "\t\t\t\t        " [parse_pp_number $DATA(user,offset)]]);"
+            puts $FILE_ID "\t\t\t\}"
+          }
+	  puts $FILE_ID "\t\t\}"
+        }
+
+        if {[info exists DATA(bus,$var)]} {
+          puts $FILE_ID "\t    \}"
+        }
+
+      }
+    }
+    puts $FILE_ID "\t\}"
+  }
+
+  # closes the cell
+  puts $FILE_ID "\}"
+  # closes the library
+  puts $FILE_ID "\}"
+
+  # close the file
+  close $FILE_ID
+
+  puts "Wrote synopsys model for cell \"$cell\" to file \"$filename\"."
+}
+
+
+# creates a verilog model for the cell if a functional description is
+# given and writes to <cell>.v
+
+proc make_verilog_model {cell} {
+
+  global FUNCTION VARS DATA
+
+  if {[array names FUNCTION] == ""} {
+    # no functional model, punt
+    # Pat added message:
+    puts stderr "No function model, aborting verilog generation for $cell"
+    return
+  }
+
+  set filename $cell.v
+
+  # open the verilog output file
+  if {[catch "open $filename w" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  # don't want a continuation in this line.
+  puts $FILE_ID "// Autogenerated by char on [clock format [clock seconds] -format %D].\n"
+
+  set vars [lsort [array names VARS]]
+
+  verilog_puts $FILE_ID "module $cell ([join $vars ,]);"
+
+  foreach var $vars {
+    verilog_puts $FILE_ID "\t$VARS($var)\t$var;"
+  }
+
+  verilog_puts $FILE_ID ""
+
+  # put the function in
+  if {[info exists DATA(verilog)]} {
+      foreach aline $DATA(verilog) {
+        verilog_puts $FILE_ID "$aline"
+      }
+  } else {
+      foreach function [array names FUNCTION] {
+	verilog_puts $FILE_ID "\tassign $function = $FUNCTION($function);"
+      }
+  }
+
+  verilog_puts $FILE_ID ""
+
+  verilog_puts $FILE_ID "endmodule"
+  verilog_puts $FILE_ID ""
+
+  # close the file
+  close $FILE_ID
+
+  puts "Wrote verilog model for cell \"$cell\" to file \"$filename\"."
+}
+
+
+# make the table look nice
+
+proc scale_print {list width scale {prefix "\t\t\t\t        "} {offset 0}} {
+
+  # reorder the table (flip x and y)
+  set i 0
+  foreach num $list {
+    lappend LIST([expr [incr i] % $width]) $num
+  }
+
+  set list ""
+  for {set i 1} {$i <= $width} {incr i} {
+    set list [concat $list $LIST([expr $i % $width])]
+  }
+
+  set nums ""
+  foreach num $list {
+    lappend nums [format "%.4f" [expr ($num + $offset) * $scale]]
+  }
+
+  if {[llength $list] > $width} {
+    set width [expr [llength $list] / $width]
+  }
+  set wm1 [expr $width - 1]
+
+  set result "^[join [lrange $nums 0 $wm1] ,]^"
+  for {set i $width} {$i < [llength $nums]} {incr i $width} {
+    set result "$result,\\\n$prefix^[join [lrange $nums $i [expr $i + $wm1]] ,]^"
+  }
+
+  regsub -all {\^} $result \" result
+
+  return $result
+}
+
+
+# make something of the form
+
+#	cell_rise(li5X5){
+#		index_1("0.0185, 0.0369, 0.0738, 0.1476, 0.2953");
+#		index_2("0.108, 0.162, 0.279, 0.517, 0.995");
+#		values("0.231, 0.246, 0.271, 0.304, 0.330",\
+#		"0.269, 0.284, 0.310, 0.343, 0.372",\
+#		"0.343, 0.357, 0.384, 0.418, 0.448",\
+#		"0.487, 0.501, 0.528, 0.561, 0.592",\
+#		"0.767, 0.781, 0.808, 0.841, 0.873");
+#	}
+
+# lu_table_template(li5X5){
+#	variable_1 : total_output_net_capacitance;
+#	variable_2 : input_net_transition;
+#	index_1 ("0, 1, 2, 3, 4");
+#	index_2 ("0, 1, 2, 3, 4");
+# }
+
+
+
+# parses the characterization control file for the cell
+
+proc parse_ctl_file {cell filename} {
+    
+  global DATA VARS LINE TIMES VARS MULTIPLIER FUNCTION XLATE OUTPUT
+
+  set XLATE(__index__) 1
+
+  if {[catch "open $filename r" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  puts "parsing $filename ..."
+  # parses something of the form
+
+  # set cap|setup|hold <string>
+  # bus foo[7:0] = foo[1]
+  # step {clk ^v} {d0 0} {d1 0} {sel 0} {scan_in 0} {scan_en 0}
+  # measure {q ^} with {d0 1} {clk ^v} 
+  # measure {q v} with {sel 1} {clk ^v} 
+  # cap d0 with {sel 0} {clk 0}
+  # setup {d0 ^} to {q ^} with {clk ^v} {sel 0}
+
+  set line_no 0
+  while {[gets $FILE_ID line] >= 0} {
+    incr line_no
+
+    set LINE(line_no) $line_no
+    set LINE(line) $line
+
+    # Note they don't need to be well-formed lists
+    set line [string trim $line]
+
+    if {[string index $line 0] == "\#"} {
+      # comment
+      continue
+    }
+
+    set pos [string first " " $line]
+    if {$pos == -1} {
+      if {[set pos [string length $line]] == 0} {
+	# must be a blank line
+	continue
+      }
+    }
+
+    switch [string range $line 0 [expr $pos - 1]] {
+
+      "set" {
+	# user setup parameters
+	switch [string tolower [lindex $line 1]] {
+	  cap - setup - hold {
+	    set DATA(user,[string tolower [lindex $line 1]]) [lindex $line 2]
+	  }
+	  offset {
+	    # offset addded to delays (not setup or hold)
+	    set DATA(user,offset) [parse_pp_number [lindex $line 2]]
+	  }
+	  clear {
+	    # asynchronous clear (flipflop)
+	    set DATA(clear,[lindex $line 2]) 1
+	  }
+	  preset {
+	    # asynchronous set (flipflop)
+	    set DATA(preset,[lindex $line 2]) 1
+	  }
+	  default {
+	    ctl_error "Syntax error"
+	  }
+	}
+      }
+
+      "verilog" {
+	# special verilog code, usually for flipflops
+	while {[gets $FILE_ID line] >= 0} {
+	  incr line_no
+	
+	  if {[string trim $line] == "end"} {
+	    # verilog code ends at the line with the word "end"
+	    break
+	  }
+
+	  lappend DATA(verilog) $line
+	}
+      }
+
+      "header" {
+	# special header, usually for flipflops
+	while {[gets $FILE_ID line] >= 0} {
+	  incr line_no
+	
+	  if {[string trim $line] == "end"} {
+	    # header ends at the line with the word "end"
+	    break
+	  }
+
+	  lappend DATA(header) $line
+	}
+      }
+
+      "output" {
+	# special text to include on output pins
+	setl {tmp string value var} $line
+	lappend OUTPUT($string) [list [use_first var '__DEFAULT__] $value]
+      }
+
+      "comment" {
+	# comment added to timing file for this cell
+	regsub "^comment" $line "" tmp
+	lappend DATA(comment) [string trim $tmp]
+      }
+
+      "driver" {
+	# for increasing the driver size on certain inputs (like clk)
+	setl {inputs M} [lrange $line 1 end]
+	if {$M == "" || [catch "expr 1 + $M"]} {
+	  ctl_error "Syntax error.  3rd argument (spice multipler) must be a number"	    
+	}
+	foreach input $inputs {
+	  set MULTIPLIER($input) $M
+	}
+      }
+
+      "bus" {
+	regsub -all = $line " " line
+	setl {toss bus bit} $line
+	set DATA(bus,$bit) $bus
+      }
+
+      "step" {
+	# for setting up conditions without measuring anything.
+	hspice_stim $cell "" [lrange $line 1 end]
+      }
+
+      "function" {
+	# function for synopsys and to create verilog model of cell
+	regsub = $line " = " line
+	set FUNCTION([lindex $line 1]) [lrange $line 3 end]
+      }
+
+      "measure" {
+	set pos [lsearch $line with]
+	if {$pos == -1} {
+	  ctl_error "Syntax error"
+	}
+
+	hspice_stim $cell [lrange $line 1 [expr $pos - 1]] \
+	    [lrange $line [expr $pos + 1] end]
+      }
+
+      "cap" {
+	# measure capacitance
+	set list [lrange $line 3 end]
+	lappend list "[lindex $line 1] ^v"
+	hspice_stim $cell cap $list
+      }
+
+      "setup" {
+	set pos [lsearch $line with]
+	set pos2 [lsearch $line to]
+	if {$pos == -1 || $pos2 == -1} {
+	  ctl_error "Syntax error"
+	}
+
+	# remember this for later setup characterization
+	lappend DATA(setup) [list [lindex $line 1] [lindex $line 3] \
+				 [lrange $line [expr $pos + 1] end]]
+
+	if {![info exists DATA(user,setup)]} {
+	  # must toggle these inputs to compute slope vs cap.
+	  hspice_stim $cell "" [lrange $line [expr $pos + 1] end] 0
+	
+	  # backup time to a setup time before clock and then restore time.
+	  set TIMES(current) [expr $TIMES(current) - [lindex $TIMES(setup) 0]]
+	  hspice_stim $cell "" [list [lindex $line 1]] 0
+
+	  setl {input_var input_dir} [lindex $line 1]
+	  set VARS($input_var) input
+	  build_name_translation $input_var
+	  measure_rise_fall $input_var$input_dir! $input_var $input_dir \
+	      $TIMES(current)
+
+	  set TIMES(current) [expr $TIMES(current) + [lindex $TIMES(setup) 0] \
+				  + $TIMES(step) + $TIMES(setup_time)]
+	}
+      }
+
+      "hold" {
+        set pos [lsearch $line with]
+        set pos2 [lsearch $line to]
+        if {$pos == -1 || $pos2 == -1} {
+          ctl_error "Syntax error"
+        }
+ 
+        # remember this for later hold characterization
+        lappend DATA(hold) [list [lindex $line 1] [lindex $line 3] \
+                                 [lrange $line [expr $pos + 1] end]]
+        # assume there is a setup time measurement for each hold
+        # time measurement - hence stimulus from setups is OK for
+        # slope/load measurement.
+	if {[info exists DATA(user,setup)] && ![info exists DATA(user,hold)]} {
+	  # must toggle these inputs to compute slope vs cap.
+	  hspice_stim $cell "" [lrange $line [expr $pos + 1] end] 0
+	
+	  # backup time to a setup time before clock and then restore time.
+	  set TIMES(current) [expr $TIMES(current) - [lindex $TIMES(setup) 0]]
+	  hspice_stim $cell "" [list [lindex $line 1]] 0
+
+	  setl {input_var input_dir} [lindex $line 1]
+	  set VARS($input_var) input
+	  build_name_translation $input_var
+	  measure_rise_fall $input_var$input_dir! $input_var $input_dir \
+	      $TIMES(current)
+
+	  set TIMES(current) [expr $TIMES(current) + [lindex $TIMES(setup) 0] \
+				  + $TIMES(step) + $TIMES(setup_time)]
+        }
+      }
+
+      default {
+	ctl_error "Syntax error"
+      }
+    }
+  }
+
+  # close the file
+  close $FILE_ID
+}
+
+
+# Since spice allows only 14 characters and we are going to build
+# measurement entities with the name <var1>^<var2>^, need to translate
+# long names.
+
+proc build_name_translation {var} {
+
+  global XLATE
+
+  if {[info exists XLATE($var)]} {
+    # already built this one
+    return
+  }
+
+  if {[string length $var] > 6} {
+    # name too long, translate
+    set XLATE($var) __$XLATE(__index__)__
+    set XLATE(__$XLATE(__index__)__) $var
+    incr XLATE(__index__)
+  } else {
+    # no translation needed
+    set XLATE($var) $var
+  }
+}
+
+
+# builds the hspice stimulus lines
+
+proc hspice_stim {cell measure_list stim_list {measure 1}} {
+
+  global TIMES DATA MEASURE VARS
+
+  set input_data ""
+  foreach pair $stim_list {
+    setl {name stim} $pair
+
+    if {[info exists used($name)]} {
+      ctl_error "Syntax error.  Duplicate stimulus variable \"$name\"."
+    }
+    set used($name) 1
+
+    # special case for a bus
+    set list [bus_expand $name]
+    if {[set i [llength $list]] > 1} {
+      # this is a bus
+      # pad value
+      if {$stim == 1} {
+	set pad "11111111111111111111111111111111111111111111111111111111111111111"
+      } else {
+	# pad msb with 0's
+	set pad "00000000000000000000000000000000000000000000000000000000000000000"
+      }
+      set stim \
+	  "[string range $pad 0 [expr $i - [string length $stim] - 1]]$stim"
+
+      foreach bit $list {
+	incr i -1
+
+	switch_voltage $bit $TIMES(current) [string index $stim $i]
+      }
+
+      continue
+    }
+
+    if {$stim == "0" || $stim == "1"} {
+      switch_voltage $name $TIMES(current) $stim
+
+    } elseif {$stim == "^"} {
+      # rise (after a setup time)
+      lappend input_data $pair
+
+      switch_voltage $name $TIMES(current) 1 $TIMES(setup_time)
+
+    } elseif {$stim == "v"} {
+      # rise (after a setup time)
+      lappend input_data $pair
+
+      switch_voltage $name $TIMES(current) 0 $TIMES(setup_time)
+
+    } elseif {$stim == "^v"} {
+      if {$measure_list != "cap"} {
+	set DATA(clock_pin) $name
+      }
+      # rise (after a setup time) and then fall later
+      lappend input_data "$name ^"
+
+      switch_voltage $name $TIMES(current) 1 $TIMES(setup_time)
+      switch_voltage $name \
+	  [expr $TIMES(current) + $TIMES(setup_time) + $TIMES(step)/2.0] 0
+    } elseif {$stim == "v^"} {
+      if {$measure_list != "cap"} {
+	set DATA(clock_pin) $name
+      }
+      # fall (after a setup time) and then rise later
+      lappend input_data "$name v"
+
+      switch_voltage $name $TIMES(current) 0 $TIMES(setup_time)
+      switch_voltage $name \
+	  [expr $TIMES(current) + $TIMES(setup_time) + $TIMES(step)/2.0] 1
+    }
+  }
+
+  if {$measure_list == "cap"} {
+    if {[llength $input_data] != 1} {
+      ctl_error "Syntax error"
+    }
+    set input_var [lindex [lindex $input_data 0] 0]
+
+    set VARS($input_var) input
+    build_name_translation $input_var
+
+    if {[info exists DATA(user,cap)]} {
+      # put in the users value here instead of the computed
+      set DATA(user,${input_var}_c^) $DATA(user,cap)
+      set DATA(user,${input_var}_cv) $DATA(user,cap)
+
+    } else {
+      # compute measurements statements for input cap measurement
+      set t1 "[expr $TIMES(current) + $TIMES(setup_time)]$TIMES(units)"
+      set t2 "[expr $TIMES(current) + $TIMES(step)/2.0 + $TIMES(setup_time)]$TIMES(units)"
+      set t3 "[expr $TIMES(current) + $TIMES(step) + $TIMES(setup_time)]$TIMES(units)"
+
+      if {$DATA(simulator) == "spice"} {
+	set MEASURE(${input_var}_c^) ".MEAS TRAN ${input_var}_c^ INTEG I(VD_$input_var) FROM=$t1 TO=$t2"
+	set MEASURE(${input_var}_cv) ".MEAS TRAN ${input_var}_cv INTEG I(VD_$input_var) FROM=$t2 TO=$t3"
+      }
+    }
+
+  } elseif {!$measure} {
+    # don't add any measure statements
+    # NOTE: also doesn't increment time
+    return
+
+  } elseif {$input_data == "" && $measure_list != ""} {
+    ctl_error "Syntax error, no input in stimulus list $stim_list"
+
+  } else {
+    # compute measure statements if there is a measure list
+    foreach pair $measure_list {
+      setl {name dir} $pair
+
+      foreach pair $input_data {
+	setl {input_var input_dir} $pair
+	set VARS($input_var) input
+	build_name_translation $input_var
+
+	# measure input rise/fall time
+	measure_rise_fall $input_var$input_dir!$name$dir $input_var $input_dir \
+	    $TIMES(current)
+	# for input load capacitance scaling
+	measure_rise_fall $input_var$input_dir! $input_var $input_dir $TIMES(current)
+      }
+    }
+
+    # NOTE: input_var and input_dir are the last ones in the list
+    # which is the setup input on a setup line
+
+    foreach pair $measure_list {
+      setl {name dir} $pair
+      set VARS($name) output
+      build_name_translation $name
+
+      # measure output delay and output rise/fall time
+      measure_delay $input_var$input_dir$name$dir $input_var $input_dir \
+	  $name $dir $TIMES(current)
+      measure_rise_fall $input_var$input_dir$name$dir! $name $dir $TIMES(current)
+      # for output load capacitance scaling
+      measure_rise_fall $name$dir! $name $dir $TIMES(current)
+    }
+  }
+
+  set TIMES(current) [expr $TIMES(current) + $TIMES(step) + \
+			  + $TIMES(setup_time) + $TIMES(rise_time)]
+}
+
+
+proc measure_delay {name var1 dir1 var2 dir2 td} {
+
+  global MEASURE DATA TIMES
+
+  if {[string length $name] > 13} {
+    # need to translate name, too long for spice
+    set tmp xlate_[incr DATA(xlate)]
+    set DATA(xlate,$tmp) $name
+    set name $tmp
+  }
+
+  set MEASURE($name) ".MEAS TRAN $name TRIG V($var1) val='vddp/2.0' $DATA($dir1) td=$td$TIMES(units) TARG V($var2) val='vddp/2.0' $DATA($dir2) td=$td$TIMES(units)"
+}
+
+
+proc measure_rise_fall {name var dir td} {
+
+  global MEASURE DATA TIMES
+
+  if {[string length $name] > 13} {
+    # need to translate name, too long for spice
+    set tmp xlate_[incr DATA(xlate)]
+    set DATA(xlate,$tmp) $name
+    set name $tmp
+  }
+
+  if {$dir == "^"} {
+    # rising
+    set MEASURE($name) ".MEAS TRAN $name TRIG V($var) val='vddp*$TIMES(slope_low_percent)' $DATA($dir) td=$td$TIMES(units) TARG V($var) val='vddp*$TIMES(slope_high_percent)' $DATA($dir) td=$td$TIMES(units)"
+  } else {
+    # falling
+    set MEASURE($name) ".MEAS TRAN $name TRIG V($var) val='vddp*[expr 1 - $TIMES(slope_low_percent)]' $DATA($dir) td=$td$TIMES(units) TARG V($var) val='vddp*[expr 1 - $TIMES(slope_high_percent)]' $DATA($dir) td=$td$TIMES(units)"
+  }
+}
+
+proc measure_value {name var td} {
+ 
+  global MEASURE DATA TIMES
+ 
+  if {[string length $name] > 13} {
+    # need to translate name, too long for spice
+    set tmp xlate_[incr DATA(xlate)]
+    set DATA(xlate,$tmp) $name
+    set name $tmp
+  }
+ 
+  set MEASURE($name) ".MEAS TRAN $name FIND V($var) AT=$td$TIMES(units)"
+}
+
+
+
+# Setup the PWL source to change the value of the voltage to the new
+# voltage unless it is already there.
+
+proc switch_voltage {name time value {setup_time 0}} {
+  
+  global PWL TIMES DATA
+
+  if {![info exists PWL($name)]} {
+    # no last value, just set it and go
+    lappend PWL($name) "0$TIMES(units) $DATA($value)"
+  }
+
+  # figure out the last value
+  set last_value [lindex [lindex $PWL($name) \
+			      [expr [llength $PWL($name)] - 1]] 1]
+
+  set new_time [expr $time + $setup_time]
+
+  if {$last_value == $DATA($value) && $setup_time != 0} {
+    # special case of signal being in the wrong position for an
+    # edge measurement.  Must switch first
+    set last_time [parse_pp_number [lindex [lindex $PWL($name) \
+			[expr [llength $PWL($name)] - 1]] 0]]
+    if {$last_time != $time} {
+      lappend PWL($name) "$time$TIMES(units) $DATA($value)"
+    }
+    set last_value $DATA([expr 1 - $value])
+    lappend PWL($name) \
+	"[expr $time + $TIMES(rise_time)]$TIMES(units) $last_value"
+  }
+
+  if {$last_value != $DATA($value)} {
+    # switch the voltage
+    lappend PWL($name) "$new_time$TIMES(units) $last_value"
+    lappend PWL($name) \
+	"[expr $new_time + $TIMES(rise_time)]$TIMES(units) $DATA($value)"
+  }
+}
+
+
+proc setup_char {cell} {
+
+  global DATA MEASURE TIMES VARS PWL VIOS CAP
+
+  if {![info exists DATA(setup)] || $DATA(setup) == ""} {
+    # no setup characterization
+    return
+  }
+
+  if {[info exists DATA(user,setup)]} {
+    # skip setup characterization.  Use user values instead
+    foreach line $DATA(setup) {
+      setl {setup_input output stims} $line
+      setl {name dir} $setup_input
+      foreach pair $stims {
+        setl {clk_var clk_dir} $pair
+        if {$clk_dir == "^v"} {
+          set clk_dir ^
+          set type "setup_rising"
+          break
+        }
+        if {$clk_dir == "v^"} {
+          set clk_dir v
+          set type "setup_falling"
+          break
+        }
+        if {$clk_dir == "^"} {
+          set type "setup_rising"
+          lappend setup_input $clk_var
+          break
+        }
+        if {$clk_dir == "v"} {
+          set type "setup_falling"
+          lappend setup_input $clk_var
+          break
+        }
+      }
+      if {$dir == "^"} {
+        set in_dir "rise"
+      }
+      if {$dir == "v"} {
+        set in_dir "fall"
+      }
+      foreach input_slope $TIMES(input_slopes) {
+        lappend VIOS($name,$type,$clk_var,$in_dir,index_2) [parse_pp_number $input_slope]
+        foreach clk_slope $TIMES(clock_slopes) {
+          lappend VIOS($name,$type,$clk_var,$in_dir,values) [parse_pp_number $DATA(user,setup)]
+        }
+      }
+      foreach clk_slope $TIMES(clock_slopes) {
+        lappend VIOS($name,$type,$clk_var,$in_dir,index_1) [parse_pp_number $clk_slope]
+      }
+    }
+    
+    return
+  }
+
+  puts "Setup Time Characterization ..."
+
+  # walk through each setup line and compute individually
+  foreach line $DATA(setup) {
+    setl {setup_input output stims} $line
+    setl {name dir} $setup_input
+
+    setl {out_var out_dir} $output
+    # find the clock variable
+    foreach pair $stims {
+      setl {clk_var clk_dir} $pair
+      if {$clk_dir == "^v"} {
+	set clk_dir ^
+        set type "setup_rising"
+	lappend setup_input $clk_var
+	break
+      }
+      if {$clk_dir == "v^"} {
+        set clk_dir v
+        set type "setup_falling"
+        lappend setup_input $clk_var
+        break
+      }
+      if {$clk_dir == "^"} {
+        set type "setup_rising"
+	lappend setup_input $clk_var
+	break
+      }
+      if {$clk_dir == "v"} {
+        set type "setup_falling"
+        lappend setup_input $clk_var
+        break
+      }
+    }
+    if {$dir == "^"} {
+      set in_dir "rise"
+    }
+    if {$dir == "v"} {
+      set in_dir "fall"
+    }
+
+    set x 0
+    foreach input_slope $TIMES(input_slopes) {
+      set y 0
+      foreach clk_slope $TIMES(clock_slopes) {
+
+        catch {unset DATA(setup,$name)}
+        # repeat until measured rise/fall times are within tolerance
+        set repeat 1
+        while {$repeat} {
+          set repeat 0
+          set tol 0
+
+          # reset setup to this point
+          set TIMES(current) 0.0
+          catch {unset MEASURE}
+          catch {unset PWL}
+
+          foreach var [array names VARS] {
+            if {$var == $clk_var} {
+	      set_load_capacitance $var [parse_pp_number $clk_slope]
+            } elseif {$var == $name} {
+	      set_load_capacitance $var [parse_pp_number $input_slope]
+            } else {
+              set CAP($var) 0
+            }
+          }
+
+          # use the special search times for this input if they exist
+          if {![info exists DATA(setup,$name)]} {
+	    set DATA(setup,$name) $TIMES(setup)
+          }
+          set setup_times $DATA(setup,$name)
+          set count 0
+          set dup 1
+          # do the first one twice to setup
+          foreach delay [concat [lindex $setup_times 0] $setup_times] {
+
+	    hspice_stim $cell [list $output] $stims 0
+
+	    # now add input that you are measuring setup time of
+	    if {$dir == "^"} {
+	      switch_voltage $name $TIMES(current) 1 \
+	          [expr $TIMES(setup_time) - $delay]
+	      switch_voltage $name \
+	          [expr $TIMES(current) + $TIMES(setup_time) + $TIMES(step)/2.0] 0
+	    } else {
+	      switch_voltage $name $TIMES(current) 0 \
+	          [expr $TIMES(setup_time) - $delay]
+	      switch_voltage $name \
+	          [expr $TIMES(current) + $TIMES(setup_time) + $TIMES(step)/2.0] 1
+	    }
+
+	    # add measurements
+
+	    # measure actual setup time (remember we drive through a buffer)
+	    measure_delay $name$dir$count $name $dir \
+	        $clk_var $clk_dir $TIMES(current)
+
+	    # measure clk-q delay
+	    measure_delay $name$dir$count! $clk_var $clk_dir \
+	        $out_var $out_dir $TIMES(current)
+
+            measure_rise_fall $name$dir${count}_ $clk_var $clk_dir $TIMES(current)
+
+            measure_rise_fall $name$dir${count}% $name $dir $TIMES(current)
+
+	    set TIMES(current) [expr $TIMES(current) + $TIMES(step) + \
+				    $TIMES(rise_time)]
+
+	    # restore ourselves for another go (adds another cycle)
+	    hspice_stim $cell [list $output] $stims 0
+
+	    set TIMES(current) [expr $TIMES(current) + $TIMES(step) + \
+				    $TIMES(rise_time)]
+
+	    if {$dup} {
+	      set dup 0
+	    } else {
+	      incr count
+	    }
+          }
+
+          # create a spice deck 
+          assemble_spicedeck $cell
+    
+          set results [run_spice $cell "for setup measurement of $setup_input ..."]
+#    puts stderr $results
+
+          set count 0
+          set pass 1.0e9
+          set fail -1.0e9
+          set fail_pos -1
+
+          foreach delay $TIMES(setup) {
+	    set setup_time [get_assoc $name$dir$count $results]
+	    set value [get_assoc $name$dir$count! $results]
+            set clk_slew [get_assoc $name$dir${count}_ $results]
+            set var_slew [get_assoc $name$dir${count}% $results]
+	    if {$value != ""} {
+	      if {$value == 0 || $value > \
+		      [parse_pp_number $TIMES(step)$TIMES(units)]} {
+	        # failed
+	        if {$setup_time > $fail} {
+	          set fail $setup_time
+	          set fail_pos $count
+	        }
+	        set value 1
+	      } else {
+	        # passed
+	        if {$setup_time < $pass} {
+	          set pass $setup_time
+	          set pass_pos $count
+	        }
+	      }
+  
+	      #puts stderr "$setup_input ==> $setup_time $value"
+	    }
+	
+	    incr count
+          }
+
+          set tol [max $tol [expr $pass - $fail]]
+
+          if {$pass > 1.0e6} {
+	    # never passed, extend range upwards
+	    set points [llength $TIMES(setup)]
+	    set fail_value [lindex $DATA(setup,$name) 0]
+	    set dt [expr $fail_value - [lindex $DATA(setup,$name) 1]]
+	    set DATA(setup,$name) ""
+	
+	    for {set i 0} {$i < $points} {incr i} {
+	      lappend DATA(setup,$name) \
+	          [expr $fail_value + ($points - $i - 1) * $dt]
+	    }
+
+	    set repeat 1
+	    puts "  setup time larger than [pp_number [expr ($fail_value * [parse_pp_number 1$TIMES(units)])]]s.  Extending range upwards."
+	
+          } elseif {$fail < -1.0e6} {
+	    # all passed, extend range downward
+	    set points [llength $TIMES(setup)]
+	    set pass_value [lindex $DATA(setup,$name) [expr $points - 1]]
+	    set dt [expr $pass_value - [lindex $DATA(setup,$name) [expr $points - 2]]]
+	    set DATA(setup,$name) ""
+	
+	    for {set i 0} {$i < $points} {incr i} {
+	      lappend DATA(setup,$name) \
+	          [expr $pass_value + $i * $dt]
+	    }
+
+	    set repeat 1
+	    puts "  setup time less than [pp_number [expr ($pass_value * [parse_pp_number 1$TIMES(units)])]]s.  Extending range downwards."
+	
+          } else {
+	    if {[expr $pass - $fail] > [parse_pp_number $TIMES(setup_tol)]} {
+	      # not done
+	      set repeat 1
+            } else {
+              lappend VIOS($name,$type,$clk_var,$in_dir,values) $pass
+              if {$x == 0} {
+                lappend VIOS($name,$type,$clk_var,$in_dir,index_1) $clk_slew
+              }
+              if {$y == 0} {
+                lappend VIOS($name,$type,$clk_var,$in_dir,index_2) $var_slew
+              }
+            }
+	    # refine steps
+	    set points [llength $TIMES(setup)]
+	    set pass_value [lindex $DATA(setup,$name) $pass_pos]
+	    if {$fail_pos == -1} {
+	      # extend range downwards
+	      set dt [expr $pass_value / ($points - 1) ]
+	    } else {
+	      set dt [expr ($pass_value - [lindex $DATA(setup,$name) $fail_pos]) / ($points - 1) ]
+	    }
+
+	    set DATA(setup,$name) ""
+	    for {set i 0} {$i < $points} {incr i} {
+	      lappend DATA(setup,$name) [expr $pass_value - $i * $dt]
+	    }
+
+	    puts "  worst case tolerance is [pp_number $tol]s (goal is [pp_number $TIMES(setup_tol)]s).  Passed [pp_number $pass]s."
+          }
+        }
+        incr y
+      }
+      incr x
+    }
+  }
+}
+
+proc hold_char {cell} {
+
+  global DATA MEASURE TIMES VARS PWL VIOS CAP
+
+  if {![info exists DATA(hold)] || $DATA(hold) == ""} {
+    # no hold characterization
+    return
+  }
+
+  if {[info exists DATA(user,hold)]} {
+    # skip hold characterization.  Use user values instead
+    foreach line $DATA(hold) {
+      setl {hold_input output stims} $line
+      setl {name dir} $hold_input
+      foreach pair $stims {
+        setl {clk_var clk_dir} $pair
+        if {$clk_dir == "^v"} {
+          set clk_dir ^
+          set type "hold_rising"
+          break
+        }
+        if {$clk_dir == "v^"} {
+          set clk_dir v
+          set type "hold_falling"
+          break
+        }
+        if {$clk_dir == "^"} {
+          set type "hold_rising"
+          lappend hold_input $clk_var
+          break
+        }
+        if {$clk_dir == "v"} {
+          set type "hold_falling"
+          lappend hold_input $clk_var
+          break
+        }
+      }
+      if {$dir == "^"} {
+        set in_dir "rise"
+      }
+      if {$dir == "v"} {
+        set in_dir "fall"
+      }
+      foreach input_slope $TIMES(input_slopes) {
+        lappend VIOS($name,$type,$clk_var,$in_dir,index_2) [parse_pp_number $input_slope]
+        foreach clk_slope $TIMES(clock_slopes) {
+          lappend VIOS($name,$type,$clk_var,$in_dir,values) [parse_pp_number $DATA(user,hold)]
+        }
+      }
+      foreach clk_slope $TIMES(clock_slopes) {
+        lappend VIOS($name,$type,$clk_var,$in_dir,index_1) [parse_pp_number $clk_slope]
+      }
+    }
+    
+    return
+  }
+
+  puts "Hold Time Characterization ..."
+
+  # walk through each hold line and compute individually
+  foreach line $DATA(hold) {
+    setl {hold_input output stims} $line
+    setl {name dir} $hold_input
+
+    setl {out_var out_dir} $output
+    # find the clock variable
+    foreach pair $stims {
+      setl {clk_var clk_dir} $pair
+      if {$clk_dir == "^v"} {
+	set clk_dir ^
+        set type "hold_rising"
+	lappend hold_input $clk_var
+	break
+      }
+      if {$clk_dir == "v^"} {
+        set clk_dir v
+        set type "hold_falling"
+        lappend hold_input $clk_var
+        break
+      }
+      if {$clk_dir == "^"} {
+        set type "hold_rising"
+	lappend hold_input $clk_var
+	break
+      }
+      if {$clk_dir == "v"} {
+        set type "hold_falling"
+        lappend hold_input $clk_var
+        break
+      }
+    }
+    if {$dir == "^"} {
+      set in_dir "rise"
+    }
+    if {$dir == "v"} {
+      set in_dir "fall"
+    }
+
+    set x 0
+    foreach input_slope $TIMES(input_slopes) {
+      set y 0
+      foreach clk_slope $TIMES(clock_slopes) {
+
+        catch {unset DATA(hold,$name)}
+        # repeat until measured rise/fall times are within tolerance
+        set repeat 1
+        while {$repeat} {
+          set repeat 0
+          set tol 0
+
+          # reset hold to this point
+          set TIMES(current) 0.0
+          catch {unset MEASURE}
+          catch {unset PWL}
+
+          foreach var [array names VARS] {
+            if {$var == $clk_var} {
+	      set_load_capacitance $var [parse_pp_number $clk_slope]
+            } elseif {$var == $name} {
+	      set_load_capacitance $var [parse_pp_number $input_slope]
+            } else {
+              set CAP($var) 0
+            }
+          }
+
+          # use the special search times for this input if they exist
+          if {![info exists DATA(hold,$name)]} {
+	    set DATA(hold,$name) $TIMES(hold)
+          }
+          set hold_times $DATA(hold,$name)
+      
+          set count 0
+          set dup 1
+          # do the first one twice to setup
+          foreach delay [concat [lindex $hold_times 0] $hold_times] {
+
+	    hspice_stim $cell [list $output] $stims 0
+
+	    # now add input that you are measuring hold time of
+	    if {$dir == "^"} {
+	      switch_voltage $name $TIMES(current) 0
+	      switch_voltage $name [expr $TIMES(current) + $TIMES(setup_time) + $delay] 1
+	    } else {
+	      switch_voltage $name $TIMES(current) 1
+	      switch_voltage $name [expr $TIMES(current) + $TIMES(setup_time) + $delay] 0
+	    }
+
+	    # add measurements
+
+	    # measure actual hold time (remember we drive through a buffer)
+	    measure_delay $name$dir$count $clk_var $clk_dir $name $dir $TIMES(current)
+
+	    # measure q value
+	    measure_value $name$dir$count! $out_var [expr $TIMES(current) + $TIMES(step)]
+
+            measure_rise_fall $name$dir${count}_ $clk_var $clk_dir $TIMES(current)
+
+            measure_rise_fall $name$dir${count}% $name $dir $TIMES(current)
+
+	    set TIMES(current) [expr $TIMES(current) + $TIMES(step) + \
+				    $TIMES(rise_time)]
+
+	    # restore ourselves for another go (adds another cycle)
+	    hspice_stim $cell [list $output] $stims 0
+
+	    set TIMES(current) [expr $TIMES(current) + $TIMES(step) + \
+				    $TIMES(rise_time)]
+
+	    if {$dup} {
+	      set dup 0
+	    } else {
+	      incr count
+	    }
+          }
+
+          # create a spice deck 
+          assemble_spicedeck $cell
+    
+          set results [run_spice $cell "for hold measurement of $hold_input ..."]
+#    puts stderr $results
+
+          set count 0
+          set pass 1.0e9
+          set fail -1.0e9
+          set fail_pos -1
+
+          foreach delay $TIMES(hold) {
+	    set hold_time [get_assoc $name$dir$count $results]
+	    set value [get_assoc $name$dir$count! $results]
+            set clk_slew [get_assoc $name$dir${count}_ $results]
+            set var_slew [get_assoc $name$dir${count}% $results]
+	    if {$value != ""} {
+	      if {$value > [eval parse_pp_number $DATA(vdd)] / 2.0 && $dir == "^" ||
+                  $value < [eval parse_pp_number $DATA(vdd)] / 2.0 && $dir == "v"} {
+	        # failed
+	        if {$hold_time > $fail} {
+	          set fail $hold_time
+	          set fail_pos $count
+	        }
+	      } else {
+	        # passed
+	        if {$hold_time < $pass} {
+	          set pass $hold_time
+	          set pass_pos $count
+	        }
+	      }
+  
+	      # puts stderr "$hold_input ==> $hold_time $value"
+	    }
+	
+	    incr count
+          }
+
+          set tol [max $tol [expr $pass - $fail]]
+
+          if {$pass > 1.0e6} {
+	    # never passed, extend range upwards
+	    set points [llength $TIMES(hold)]
+	    set fail_value [lindex $DATA(hold,$name) 0]
+	    set dt [expr $fail_value - [lindex $DATA(hold,$name) 1]]
+	    set DATA(hold,$name) ""
+	
+	    for {set i 0} {$i < $points} {incr i} {
+	      lappend DATA(hold,$name) \
+	          [expr $fail_value + ($points - $i - 1) * $dt]
+	    }
+
+	    set repeat 1
+	    puts "  hold time larger than [pp_number [expr ($fail_value * [parse_pp_number 1$TIMES(units)])]]s.  Extending range upwards."
+	
+          } elseif {$fail < -1.0e6} {
+	    # never failed, extend range downwards
+	    set points [llength $TIMES(hold)]
+	    set pass_value [lindex $DATA(hold,$name) [expr $points - 1]]
+	    set dt [expr $pass_value - [lindex $DATA(hold,$name) [expr $points - 2]]]
+	    set DATA(hold,$name) ""
+	
+	    for {set i 0} {$i < $points} {incr i} {
+	      lappend DATA(hold,$name) \
+	          [expr $pass_value + $i * $dt]
+	    }
+
+	    set repeat 1
+	    puts "  hold time less than [pp_number [expr ($pass_value * [parse_pp_number 1$TIMES(units)])]]s.  Extending range downwards."
+	
+          } else {
+	    if {[expr $pass - $fail] > [parse_pp_number $TIMES(setup_tol)]} {
+	      # not done
+	      set repeat 1
+            } else {
+              lappend VIOS($name,$type,$clk_var,$in_dir,values) $pass
+              if {$x == 0} {
+                lappend VIOS($name,$type,$clk_var,$in_dir,index_1) $clk_slew
+              }
+              if {$y == 0} {
+                lappend VIOS($name,$type,$clk_var,$in_dir,index_2) $var_slew
+              }
+            }
+	    # refine steps
+	    set points [llength $TIMES(hold)]
+	    set pass_value [lindex $DATA(hold,$name) $pass_pos]
+	    if {$fail_pos == -1} {
+	      # extend range downwards
+	      set dt [expr $pass_value / ($points - 1) ]
+	    } else {
+	      set dt [expr ($pass_value - [lindex $DATA(hold,$name) $fail_pos]) / ($points - 1) ]
+	    }
+
+	    set DATA(hold,$name) ""
+	    for {set i 0} {$i < $points} {incr i} {
+	      lappend DATA(hold,$name) [expr $pass_value - $i * $dt]
+	    }
+
+	    puts "  worst case tolerance is [pp_number $tol]s (goal is [pp_number $TIMES(setup_tol)]s).  Passed [pp_number $pass]s."
+          }
+        }
+        incr y
+      }
+      incr x
+    }
+  }
+}
+
+# Build the spice input deck from the data in the global vars.
+
+proc assemble_spicedeck {cell} {
+
+  global TIMES PWL DATA MEASURE VARS CAP MULTIPLIER
+
+  set filename $cell$DATA(spice_file)
+
+  if {[catch "open $filename w" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  spice_puts $FILE_ID "*** Characterization deck for cell $cell ***\n"
+
+  spice_puts $FILE_ID ".INCLUDE '$DATA(header_file)'\n"
+
+  spice_puts $FILE_ID ".TEMP $DATA(TEMP)"
+  spice_puts $FILE_ID ".TRAN $TIMES(tran_step) [expr $TIMES(current) + $TIMES(step)]$TIMES(units)\n"
+
+  spice_puts $FILE_ID ".PARAM vddp=$DATA(vdd)"
+  spice_puts $FILE_ID "VDD vdd 0 DC vddp\n"
+
+  spice_puts $FILE_ID ".INCLUDE '$DATA(driver_file)'\n"
+
+  spice_puts $FILE_ID ".INCLUDE '$DATA(filename)'\n"
+
+  # instantiate cell
+  set ios [parse_spice_cell $cell $DATA(filename)]
+  regsub -all {\{|\}} $ios "" ios
+
+  spice_puts $FILE_ID "X_DOT $ios $cell\n"
+
+  # instantiate input buffers
+  spice_puts $FILE_ID "* Input buffers *"
+  foreach input [lsort [array names PWL]] {
+    if {[info exists MULTIPLIER($input)]} {
+      # add a spice multipler to the input driver
+      set M " M=$MULTIPLIER($input)"
+    } else {
+      set M ""
+    }
+
+    spice_puts $FILE_ID "XD_$input ${input}! ${input}_ driver$M"
+    # for measuring capacitance
+    spice_puts $FILE_ID "VD_$input ${input}_ ${input} 0V"
+  }
+  spice_puts $FILE_ID ""
+
+  # add voltage sources
+  spice_puts $FILE_ID "* Input stimulus *"
+  set index 0
+  foreach input [array names PWL] {
+    spice_puts $FILE_ID \
+	"VD_[incr index] ${input}! gnd PWL [join $PWL($input) {, }]"
+  }
+
+  # add load capacitances on inputs and outputs
+  spice_puts $FILE_ID ""
+  spice_puts $FILE_ID "* Load capacitances *"
+  set index 0
+  foreach var [lsort [array names VARS]] {
+    if {![info exists CAP($var)]} {
+      set CAP($var) 1.0
+    }
+    if {$VARS($var) == "input"} {
+      # place capacitance on driver side of current measuring voltage source
+      set name ${var}_
+    } else {
+      set name $var
+    }
+
+    if {[info exists CAP($var)]} {
+      spice_puts $FILE_ID \
+	  "CL_[incr index] $name gnd '$CAP($var)*$DATA(nominal_cap)'"
+    }
+  }
+
+  # add measurement statements
+  spice_puts $FILE_ID ""
+  foreach line [lsort [array names MEASURE]] {
+    regsub -all {\{|\}} $MEASURE($line) "" measure
+    spice_puts $FILE_ID $measure
+  }
+
+  spice_puts $FILE_ID "\n.GLOBAL gnd vdd\n"
+
+  spice_puts $FILE_ID ".END"
+
+  # close the file
+  close $FILE_ID
+}  
+
+
+# puts but adds spice continuations
+
+proc spice_puts {FILE_ID line} {
+
+  while {[string length $line] > 70} {
+
+    set pos [string last " " [string range $line 0 70]]
+    if {$pos == -1} {
+      set pos [string first " " $line]
+    }
+  
+    puts $FILE_ID [string range $line 0 $pos]
+    set line "+[string range $line $pos end]"
+  }
+  puts $FILE_ID $line
+}
+
+
+# puts but breaks long lines
+
+proc verilog_puts {FILE_ID line} {
+
+  while {[string length $line] > 70} {
+
+    set pos [string last " " [string range $line 0 70]]
+    if {$pos == -1} {
+      set pos [string first " " $line]
+    }
+  
+    puts $FILE_ID [string range $line 0 $pos]
+    set line "\t[string range $line $pos end]"
+  }
+  puts $FILE_ID $line
+}
+
+
+proc parse_spice_cell {cell filename} {
+
+  if {[catch "open $filename r" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  while {[gets $FILE_ID line] >= 0} {
+    # make everything uppercase
+    set line [string toupper $line]
+
+    if {[string first .SUBCKT $line] != -1} {
+      if {[lindex $line 1] != [string toupper $cell]} {
+	# wrong subcircuit
+	continue
+      }
+
+      set ios [lrange $line 2 end]
+      # look for continuation lines
+      while {[gets $FILE_ID line] >= 0} {
+	set line [string trim $line]
+	if {[string index $line 0] == "+"} {
+	  set ios [concat $ios [string trim [string range $line 1 end]]]
+	} else {
+	  break
+	}
+      }
+
+      # close the file
+      close $FILE_ID
+
+      # successful
+      return $ios
+    }      
+  }
+  
+  # close the file
+  close $FILE_ID
+
+  puts stderr "Aborting, Can't find subckt $cell in file $filename."
+  exit 1
+}  
+
+
+
+# computes function (assumed linear) between load capacitance
+# and rise/fall time.
+
+proc compute_rise_vs_capacitance {results1 results2} {
+
+  global VARS SLOPE Y_INT DATA TIMES
+
+  # compute the load capacitance scale factors
+  foreach var [array names VARS] {
+    set slope_f 0
+    set slope_r 0
+
+    set value1 [get_assoc ${var}^! $results1]
+    set value2 [get_assoc ${var}^! $results2]
+    if {$value1 != "" && $value2 != ""} {
+      if {$value1 < 0 || $value2 < 0} {
+	# failed
+	return failed
+      }
+
+      set slope_r [expr ($value2 - $value1) / $DATA(nominal_cap)]
+      set y_int_r [expr $value1 - $slope_r * $DATA(nominal_cap)]
+
+      set SLOPE($var) $slope_r
+      set Y_INT($var) $y_int_r
+    }
+
+    set value1 [get_assoc ${var}v! $results1]
+    set value2 [get_assoc ${var}v! $results2]
+    if {$value1 != "" && $value2 != ""} {
+      if {$value1 < 0 || $value2 < 0} {
+	# failed
+	return failed
+      }
+
+      set slope_f [expr ($value2 - $value1) / $DATA(nominal_cap)]
+      set y_int_f [expr $value1 - $slope_f * $DATA(nominal_cap)]
+
+      set SLOPE($var) $slope_f
+      set Y_INT($var) $y_int_f
+    }
+
+    if {$slope_f != 0 && $slope_r != 0} {
+      # average rise and fall slopes
+      set SLOPE($var) [expr ($slope_f + $slope_r) / 2.0]
+      set Y_INT($var) [expr ($y_int_f + $y_int_r) / 2.0]
+    }
+  }
+
+  global DEBUG
+  if {[use_first DEBUG] == 1} {
+    parray SLOPE
+    parray Y_INT
+  }
+
+  return ""
+}
+
+
+proc set_load_capacitance {var rise} {
+
+  global CAP SLOPE Y_INT DATA VARS
+
+  if {![info exists Y_INT($var)]} {
+    return 0
+  }
+
+  set CAP($var) [max 0 [expr ($rise - $Y_INT($var)) / \
+			    $SLOPE($var) / $DATA(nominal_cap)]]
+
+  if {$CAP($var) == 0} {
+    if {$rise < $Y_INT($var)} {
+      puts stderr "WARNING, can't drive net \"$var\" as fast as desired [pp_number $rise]s, best possible is [pp_number $Y_INT($var)]s."
+      if {$VARS($var) == "input"} {
+	puts stderr "Probably need larger driver cell or use the \"driver\" command."
+      }
+    } elseif {$SLOPE($var) < 0} {
+      puts stderr "Aborting, capacitance vs. delay slope ($Y_INT($var)) is negative"
+      exit 1
+    } else {
+      puts stderr "Aborting, error $rise $Y_INT($var) $SLOPE($var) $DATA(nominal_cap)"
+      exit 1
+    }
+  }
+
+  return $CAP($var)
+}
+
+
+# run's spice using the "spice" script from mmi.  Exits on error.
+
+proc run_spice {cell msg} {
+
+  global DATA
+
+  set spicefile $cell$DATA(spice_file)
+
+  puts "\[[clock format [clock seconds] -format %H:%M:%S]\] Running $DATA(simulator) on $spicefile $msg"
+
+  set info "[file root $cell$DATA(spice_file)].info"
+### ???
+  catch {exec rm -f $output}
+
+  if {$DATA(simulator) == "spice"} {
+    exec spice $spicefile > $info
+    # figure out if spice exited successfully
+    catch {exec grep info $info} result
+
+    set output "[file root $spicefile].out"
+    if {[string first info $result] == -1} {
+      # must be an error
+      puts stderr "Spice failed, see output file $output for more information."
+      
+      puts stderr [exec cat $info]
+
+      puts stderr "Aborting Characterization."
+      exit 1
+    }
+
+    global DEBUG
+    if {[use_first DEBUG] == 1} {
+      set clock [clock seconds]
+      catch "file copy -force -- $output $output.$clock"
+      set tr "[file root $spicefile].tr0"
+      catch "file copy -force -- $tr $tr.$clock"
+    }
+
+  } elseif {$DATA(simulator) == "adm"} {
+    exec adm_go $spicefile > $info
+
+    # figure out if adm exited successfully
+    catch {exec grep aborted $info} result
+
+    if {[string first aborted $result] != -1} {
+      # must be an error
+      set output "[file root $spicefile].info"
+      puts stderr "Spice failed, see output file $output for more information."
+      
+      puts stderr [exec cat $info]
+
+      puts stderr "Aborting Characterization."
+      exit 1
+    }
+  } else {
+    puts stderr "Aborting, unknown simulator $DATA(simulator)"
+    exit 1
+  }
+
+  # everything is O.K.
+  return [parse_mt0_file [file root $spicefile]]
+}
+
+
+# Alert user to error in control file
+
+proc ctl_error {msg} {
+
+  global LINE
+
+  puts stderr "Aborting, $msg"
+  puts stderr "in line \#$LINE(line_no): \"$LINE(line)\"."
+
+  exit 1
+}
+
+
+proc parse_mt0_file {filename} {
+
+  global DATA
+
+  if {$DATA(simulator) == "spice"} {
+    set filename "$filename.mt0"
+  } else {
+    set filename "$filename.mt"
+  }
+
+  if {[catch "open $filename r" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  # first read two bogus lines
+  gets $FILE_ID line
+  gets $FILE_ID line
+
+  # now read parameters until we find a # character
+  set params ""
+  while {[gets $FILE_ID line] >= 0} {
+    set params [concat $params [string trimright $line \#]]
+
+    if {[string first \# $line] != -1} {
+      # this marks the end of the parameters
+      break
+    }
+  }
+
+  set values ""
+  while {[gets $FILE_ID line] >= 0} {
+    set values [concat $values $line]
+  }
+  
+  # close the file
+  close $FILE_ID
+
+  set results ""
+  foreach param $params {
+    if {$values == ""} {
+      puts stderr "Aborting, bad syntax in mt0 file $filename."
+      exit 1
+    }
+
+    set value [lindex $values 0]
+    if {$value <= 0} {
+      # check if this is measuring current which can be negative
+      if {[string first _c^ $param] == -1 && [string first _cv $param] == -1 \
+	      && ![regexp {[0-9]+\!$} $param] \
+	      && ![regexp {[\v\^][0-9]+$} $param]} {
+	puts stderr "ERROR, parameter $param not found ($value)."
+      }
+    }
+
+    # translate param if necessary
+    if {[info exists DATA(xlate,$param)]} {
+      set param $DATA(xlate,$param)
+    }
+
+    lappend results "$param $value"
+    set values [lrange $values 1 end]
+  }
+
+  return $results
+}  
+
+
+# sets the nth variable name to be the nth value
+
+proc setl {names values} {
+  set i 0
+  foreach name $names {
+    uplevel [list set $name [lindex $values $i]]
+    incr i
+  }
+  # returns number of variables set
+  return $i
+}
+
+# returns maximum of two numbers
+
+proc max {a b} {
+
+  if {$a > $b} {
+    return $a
+
+  } else {
+    return $b
+  }
+}
+
+# returns minimum of two numbers
+
+proc min {a b} {
+
+  if {$a < $b} {
+    return $a
+
+  } else {
+    return $b
+  }
+}
+
+
+# Gets the value out of an associative list keyed by arg.  If the optional
+# index is given, will get the "index" value out of the list which is
+# used for getting the default value.
+# NOTE, this is case insensitive
+
+proc get_assoc {name list {nth 1}} {
+
+  set match ""
+  regsub -all {\[|\]|\^|\!} $name \\\\& name
+  regexp -nocase "\{$name .*" $list match
+  return [lindex [lindex $match 0] $nth]
+}
+
+
+proc put_assoc {value name list {index 1}} {
+
+  set new_list ""
+  foreach assoc $list {
+    if {[lindex $assoc 0] == $name} {
+      lappend new_list [lreplace $assoc $index $index $value]
+    } else {
+      lappend new_list $assoc
+    }
+  }
+  return $new_list
+}
+
+
+# Pretty prints a number using the spice metric suffixes
+
+proc pp_number {num {format %g%s}} {
+
+  set num [parse_pp_number $num]
+
+  if {$num == 0} {
+    return 0
+  }
+  set suffixes {G M K "" m u n p f a}
+  set logscale [expr floor(log10(abs($num))/3.0)]
+  set mantissa [expr $num/pow(10,3.0*$logscale)]
+  set exp [lindex $suffixes [expr round(3 - $logscale)]]
+  return [format $format $mantissa $exp]
+}
+
+
+# Parses a string with spice notation into a number.  Trailing units
+# are ignored.  Examples: 3.2e-4, 32.4fF, 23 Ohms
+
+proc parse_pp_number {string} {
+  regexp -indices -nocase {[a-d]|[f-z]} $string index
+  
+  if {[info exists index] == 0} {
+    return $string
+  }
+
+  set mantissa [string range $string 0 [expr [lindex $index 0]-1]]
+
+  set suffixes "GMK munpfa"
+  set suffix [string range $string [lindex $index 0] [lindex $index 1]]
+  set pos [string first $suffix $suffixes]
+  if {$pos == -1} {
+    return $mantissa
+  }
+  set num [expr $mantissa * pow(10,3.0*(3-$pos))]
+  return $num
+}
+
+
+# returns a list of all signal names on a bus
+# Only understands foo, foo[num], foo[msb:lsb]
+
+proc bus_expand {name} {
+
+  set name_list [split $name "\[:\]"]
+
+  if {[llength $name_list] < 4} {
+    # not a bus
+    return $name
+  }
+
+  setl {root msb lsb} $name_list
+  if {$lsb > $msb} {
+    # bad form
+    return $name
+  }
+
+  set list ""
+  for {set i $lsb} {$i <= $msb} {incr i} {
+    if {$i > 256} {
+      # error
+      break
+    }
+
+    # too bad lappend doesn't work here
+    set list [concat $list $root\[$i\]]
+  }
+
+  return $list
+}
+
+# To test: create verilog only.
+# setl {DATA(corner) DATA(filename) cell ctlfile} $argv
+# puts "cell=$cell ctlfile=$ctlfile"
+# parse_ctl_file $cell $ctlfile
+# make_verilog_model $cell
+# exit
+
+
+
+# do it
+
+if {[set pos [lsearch -exact $argv "-debug"]] != -1} {
+  set DEBUG 1
+  set argv [lreplace $argv $pos $pos]
+}
+
+if {[llength $argv] < 2} {
+  puts "Auto characterization script\n"
+  puts "Usage:\n"
+  puts "char \[-debug\] <corner> <spice_file> \[<cell_name>\] \[<ctl_file>\]\n"
+  puts "Default ctl_file is named <cell_name>.ctl\n"
+  puts "Also requires a char.setup file in this directory\n"
+  puts "NOTE: need to include cell name only if not the same as the spice"
+  puts "      file name without the suffix and directory.\n"
+  exit 
+}
+
+set start [clock seconds]
+
+characterize $argv
+
+set end [clock seconds]
+set seconds [expr $end - $start]
+puts "Elapsed time: [expr $seconds/60] Min., [expr $seconds % 60] Sec."
+
+exit

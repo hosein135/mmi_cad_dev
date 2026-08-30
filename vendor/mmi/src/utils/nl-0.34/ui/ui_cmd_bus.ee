@@ -1,0 +1,12 @@
+#(defcommand create_array_type
+   "Create a type with the specified parameters."
+   (left integer "left bound of the array")
+   (right integer "right bound of the array")
+   (base type "the type of the array members"))
+{
+  nl_object result = nl_type_get_array (base, left, right);
+
+  ui_cmd_object_result (interp, result, NULL);
+}
+
+

@@ -1,0 +1,67 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_XOR2C {} {
+  make output -name out -origin {890 360}
+  make global -name gnd -origin {680 560}
+  make global -orient RY -name vdd -origin {350 160}
+  make nmos -W 1.2 -origin {680 420}
+  make nmos -W 1.2 -origin {680 520}
+  make pmos -W 2.4 -origin {350 300}
+  make pmos -W 2.4 -origin {350 200}
+  make pmos -W 2.4 -origin {680 200}
+  make global -name gnd -origin {350 560}
+  make nmos -W 1.2 -origin {350 520}
+  make pmos -W 2.4 -origin {680 300}
+  make nmos -W 1.2 -origin {350 420}
+  make input -name in1 -origin {-10 520}
+  make inverter -WP 1.2 -WN 0.6 -origin {450 520}
+  make inverter -WP 1.2 -WN 0.6 -origin {90 420}
+  make input -name in0 -origin {-10 420}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in0_L -origin {200 420}
+  make name_net -name in1_L -origin {540 520}
+  make global -orient RY -name vdd -origin {680 160}
+  make name_net -name N1 -origin {730 360}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 4.8 -WN 2.4 -origin {810 360}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 07/19/99 -origin {320 740}
+  make_wire 860 360 890 360
+  make_wire 350 380 350 360
+  make_wire 350 340 350 360
+  make_wire 350 240 350 260
+  make_wire 680 480 680 460
+  make_wire 680 240 680 260
+  make_wire 680 360 680 380
+  make_wire 350 480 350 460
+  make_wire 680 340 680 360
+  make_wire 580 420 620 420
+  make_wire 620 200 600 200
+  make_wire 600 200 600 520
+  make_wire 600 520 620 520
+  make_wire 290 300 410 300
+  make_wire 290 200 240 200
+  make_wire 240 200 240 520
+  make_wire 420 520 290 520
+  make_wire 30 300 30 420
+  make_wire 30 420 60 420
+  make_wire -10 420 30 420
+  make_wire 30 300 290 300
+  make_wire -10 520 240 520
+  make_wire 240 520 290 520
+  make_wire 200 420 140 420
+  make_wire 350 360 680 360
+  make_wire 200 420 290 420
+  make_wire 540 520 500 520
+  make_wire 540 520 600 520
+  make_wire 410 300 580 420
+  make_wire 580 300 410 420
+  make_wire 580 300 620 300
+  make_wire 410 420 290 420
+  make_wire 730 360 680 360
+  make_wire 730 360 780 360
+  make_text -origin {-20 100} -text {Exclusive OR}
+  make_text -origin {-20 120} -text {C Size}
+  make_text -origin {-20 80} -text MMI_XOR2C -size large
+}
+

@@ -1,0 +1,38 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_BUFC {} {
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make global -name gnd -origin {850 400}
+  make global -orient RY -name vdd -origin {850 160}
+  make output -name out -origin {870 280}
+  make pmos -W 4.8 -origin {850 200}
+  make nmos -W 2.4 -origin {850 360}
+  make nmos -W 0.8 -origin {550 360}
+  make pmos -W 1.6 -origin {550 200}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {660 280}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.6 -date 07/19/99 -origin {590 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_wire 770 200 790 200
+  make_wire 770 360 790 360
+  make_wire 770 280 770 360
+  make_wire 770 280 770 200
+  make_wire 850 280 870 280
+  make_wire 850 280 850 240
+  make_wire 850 280 850 320
+  make_wire 660 280 770 280
+  make_wire 660 280 550 280
+  make_text -origin {360 90} -text Buffer
+  make_text -origin {360 110} -text {C Size}
+  make_text -origin {360 70} -text MMI_BUFC -size large
+}
+

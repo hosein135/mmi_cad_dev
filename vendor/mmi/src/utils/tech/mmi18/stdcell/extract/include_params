@@ -1,0 +1,23 @@
+
+* header for pathmill
+
+.TEMP 105
+*epic tech="voltage 1.62"
+
+.lib '/home/cad/mmi_local/sue/tech/tsmc18.l' TT
+.lib '/home/cad/mmi_local/sue/tech/tsmc18.l' TT_3V
+
+* default parameters
+.param  arean(w,sdd) = '(w*sdd*1p)'
+.param  areap(w,sdd) = '(w*sdd*1p)'
+.param  perin(w,sdd) = '(2u*(w+sdd))'
+.param  perip(w,sdd) = '(2u*(w+sdd))'
+
+.param ln_min   =  0.18u
+.param lp_min   =  0.18u
+.param WNA      =  0.46u
+.param WMIN     =  0.42u
+.param WMN2     =  0.62u
+
+* used in source/drain area/perimeter calculation
+.param sdd        =  0.48

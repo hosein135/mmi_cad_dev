@@ -1,0 +1,2076 @@
+Max change log (2000)
+=====================
+
+VERSION HISTORY
+---------------
+
+Major customer releases:
+	April 2000:  max3.2.14  
+	Dec   2000:  max4.0.2
+
+12/19/00 4.0.2
+	Initial Max 4 release (to customers!)
+	(updated to 4.0.3 on 1/10/01)
+
+11/6/00	Max 3.5.11
+
+	(since Max3.5.10)
+
+	gds read of gcells implemented.
+
+	fixed selection flakiness 
+	(by implementing sel_buffer and using in selection_restore)
+
+	fixed db_cell_copy coredump (flyline problem.) 
+
+	command line processing changed to handle 'foo.':  now loads 'foo.max'.
+	(C and tcl changes.)
+
+	added gds_plot_key command.   Will be used to allow gdsplot to be invoked 
+	from Max without requiring a separate gdsplot license)
+
+10/3/00	Max 3.5.7
+	support for more layers (100+ layers)
+	(including palette scroll bar!)
+	
+	'true' color support (aka 24 bit-color)  
+	('max -visual true' for 8 bit true color on your desk top SPARC)
+
+	.max write performance bug fixed 
+	(Was slow when writing many small files.)
+
+	flyline redisplay bug fixed.
+
+	gds write flatten gcells option fixed to work for groups.
+
+8/16/00	Max 3.2.17
+	extractor fixes.
+	security fixes (secure Tcl_Eval) and strip comments on MCC
+
+6/9/00  Max 3.3.1
+	saving gcells to parent .max files (new .max format)
+	implemented non-bit mapped highlighting.
+
+7/10/00 Max 3.2.16
+	fixed bug in mc (mc2.0.4)	
+
+3/21/00 Max 3.2.14 (BASED ON 3.2.11, official release?)
+	Does not include changes of 3.2.12 and 3.2.13,
+	Identical to 3.2.11, except:
+	
+	License problem fixed.
+	mcc tutorial added.		
+
+3/15/00 Max 3.2.13 BETA 
+	files homed to  directory of gds file being read.
+	modified 'db_search cells -any_cell' to include expanded instances.
+	fixed documentation of 'db_search cells'
+	fixed sel_cell so it doesn't force read-in of selected cell.
+
+2/16/00 Max 3.2.12 BETA
+	added LAY_COARSE_FACTOR to contro coarse redisplay generation
+	changed def of infinity to allow bigger coordinates.
+	added -no_labels option to sel_net
+	added MAX_VERSION_TAG (e.g. BETA)
+	added compile time to abort message.
+
+2/9/00 Max 3.2.11 (shipped as official release)
+	fixed 'f' command
+	(temporarily) backed out of 'bigger' INFINITY
+	added -boolean to 'sel_what cells' 
+	improved performance of 'sel_what types'
+	
+1/25/0 Max 3.2.9
+	added wirepath mitering.
+
+	added bounds checking (and clipping) of coordinates given
+	on commands.
+
+	added periodic feedback on number of elements read
+	to GDS reading.
+
+	rmed doubleint stuff in preparation for 64 bit port.
+
+	latest and greatest maxtcl.
+
+1/11/0 Max 3.2.8
+        fixed new colormap handling
+
+        added GDS_READ_NO_DRC switch
+
+        added cs_hierInteractions (auto detects no hierarchical
+        interactions for fast GDS WRITING)
+
+        latest and greatest maxtcl
+
+
+DATE    FILES
+----    -----
+         CHANGES
+         -------
+
+1/3/0	xfering changes back to MMI
+	
+1/4/0	graphics1.c
+	Fixed grErrorHandler() error message.
+
+1/5/0  gdsRead.c gdsReadCell.c database.h
+	added GDS_READ_TAG
+	added postprocessing to drc clean.
+
+1/5/0  drc.h DRCmain.c DRCtcl.c
+	added DRCClean() procedure.
+	added drc_clean tcl command. 
+
+1/5/0  make/* Makefile max/Makefile max/max_version
+	adding 'make install'
+	adding auto architecture detect
+	rming make/config link.
+	renaming to max3 (just in time for max4)
+
+1/6/0  CHANGE_LOG CHANGE_LOG.99
+	'archiving' 99 log
+
+1/6/0  aux/ ext2spice/ ext2sim/ extcheck/ prleak/
+	made aux/ dir and moved ext*/ and prleak there.
+
+1/6/0  max/*
+
+	cleaned up test cases.
+
+1/6/0	make/*
+	cleaned up.
+
+	make etc working again!
+
+1/6/0  CHECKPOINT
+	make tar
+
+1/7/0  m/*/depend_include
+	rmed this links (obsolete)
+
+1/7/0  mnMain.c
+	added warp_cusor defn to mnInitTcl() (used by prop_menu)
+
+1/7/0  Makefile
+	modified 'make tar' to exclude .prep_h files from maxtcl and mc dirs.
+	(not source files)
+
+1/7/0   XFER TO MMI
+	make tar
+
+1/7/0	aux/ doc/
+	mved to ~mha/archive/max/
+	mved doc ~mha/archive/max/doc.old
+
+1/7/0	gcells/ images/ tech/
+	
+1/7/0  CHANGE_LOG* TODO NOTES 
+	mved to doc.priv
+
+1/7/0  doc.priv/ docp/
+	doc.priv -> docp
+
+1/7/0  README
+	updated
+
+1/7/0  Makefile
+	fixed screening of backup files for 'make tar'
+	added 'make update' (sucks latest maxtcl/ and mc2.0/ over)
+
+1/7/0	maxtcl/Makefile
+	fixed so 'make update' doesn't choke on LOG file.
+
+1/7/0	make/gmax
+	modified to search max not max2
+
+1/7/0	cifTech.c cifInt.h
+	added cs_hierInteractions (set if hierarchical gds processing req.)
+	computing cs_hierInteractions.
+
+1/7/0	gdsWrite.c
+	Modified to only process hier interactions if cs_hierInteractions
+	is TRUE.
+
+1/10/0	XFER to MMI
+	make tar
+	
+1/10/0  maxtcl/Makefile
+        fixed 'make update'
+
+1/10/0  Makefile
+	modified 'make install' to skip backup files in proto. 
+
+1/11/0  gdsReadCell.c gdsInt.h gdsTcl.c
+        added GDS_READ_REPORT_INTERVAL
+
+1/13/0  XFER back to MHA
+
+1/13/0	gdsInt.h gdsTcl.c gdsReadCell.c
+	GDS_READ_REPORT_INTERVAL -> GDS_READ_MESSAGE_INTERVAL
+	changed default value from 50,000 to 25,000
+
+1/14/0  heap.h heap.c
+	removed doubleint key type.
+
+1/14/0	DBcellSelect.c
+	converted childArea, bestArea, lastArea in dbSelectCellSr()
+	from doubleint to double.
+
+1/14/0  doubleint.h doubleint.c
+	obsolete, and could be problematic for 64 bit port.
+
+1/14/0  utils.h resSimple.c mnMain.c
+	rmed references to doubleints
+
+1/17/0	XFER to MMI
+	make tar
+	
+1/20/0	DBwirepath.c
+	adding mitering.
+
+1/21/0	DBwirepath.c
+	compiling and running again (mitering still incomplete)
+
+1/22/0  DBwirepath.c
+	mitering working.
+	Working on single polygon code.
+	TODO:  truncation, end styles.
+
+1/24/0	DBwirepath.c DBtcl.c
+	added DB_WIRE_PATH_SINGLE_POLYGON
+	wirepath single polygon rendering is working.
+
+1/24/0	XFER to MMI
+	make tar
+
+1/25/0	DBwirepath.c
+	rmed memory leak from dbWPathEnumSinglePolygon()
+	rmed debugging.
+	added back rounded ends.
+
+1/25/0  mnUnits.c
+	clipping and warning when coordinates out of bounds.
+
+1/25/0	max_version
+	3.2.9
+
+1/25/0	XFER to MMI
+	make tar
+
+1/26/0	DBcellSelect.c
+	fixed 'f' command.  (I had botched the conversion from doubleint to
+	double)
+
+1/26/0 DBchunk.c DBtcl.c selCreate.c
+	added debugs.
+	
+2/9/0 tile.h
+        temporarily backed out of less conservative infinity (for current release)
+
+2/7/0 tile.h
+	Changed def. of infinity to allow bigger coordinates.
+2/9/0 selTcl.c
+	added -boolean option to 'sel_what cells'	
+	improved performance of 'sel_what types' for big stuff.  
+
+2/9/0   max/max_version
+        3.2.11
+
+2/9/0   make update
+
+2/9/0   INSTALL
+        make install
+
+2/14/0  layCoarse.c layint.h layMain.c
+        added LAY_COARSE_FACTOR to control coarse redisplay generation.
+
+2/14/0 tile.h
+        Changed def. of infinity to allow bigger coordinates (again).
+
+2/16/0	selTcl.c selCreate.c select.h mgcRS.c
+	added -no_labels option to sel_net
+
+2/16/0  max_version max/Makefile maxVersion.c magic.h mnMain.c mnAbort.c 
+	added MAX_VERSION_TAG (e.g. BETA)
+	(exported as tcl variable)
+
+	added compile time to abort messages.
+
+2/16/0  max_version
+	3.2.12 BETA
+
+2/17/0  path.c utils.h
+	coding PaSplitName()
+
+2/17/0	mgcAD.c
+	rmed ':calma read' and ':calma write'
+
+2/17/0  gdsInt.h gds.h gdsRead.c gdsWrite.c
+	GDSReadFile() -> gdsReadFile()
+	GDSWriteFile() -> gdsWriteFile()
+
+2/17/0  gdsTcl.c gdsRead.c gdsReadCell.c
+	files homed to directory of gds file being read.
+
+2/23/0	utils/talloc.h tallocInt.h
+	began implementation of typed pointers.
+
+2/24/0  utils/mmTcl.c
+	fixed comments
+	rmed initialization of mnMsg and mnUnits!
+
+2/24/0  utils/talloc.h tallocInt.h talloc.c
+	implementing!
+
+2/24/0  mnMain.c
+	added call to TATclInit()
+	
+2/29/0  utils/future talloc*
+	mved talloc stuff back out of release for now.
+
+2/29/0  mnMain.c commented out TATclInit() ref.
+
+2/29/0	Backed out of DBchunk.c changes.
+
+2/29/0  DBtcl.c 
+	Commented out db_chunk debug.2/28/0  DBSearch.c database.h
+
+2/29/0  DBsearch.c database.h
+        implemented DBSI_INCLUDE_EXPANDED for DBSearchInstances2
+
+2/29/0  DBtcl.c
+        modified 'db_search cells -any_cell' to include expanded instances.
+        NOT WORKING YET?
+
+2/29/0  DRCsubcell.c select/* database/* mgc/*
+	xMask of 0 = ALL EXPANDED (-1 = ALL UNEXPANDED as before)
+
+2/29/0  DBsearch.c DBtcl.c
+	db_search cells [-cell foo] [-any_cell] 
+	now seems to work properly!
+
+2/29/0  max_version
+	3.2.13
+
+2/29/0  CHECKPOINT
+	make tar
+
+2/29/0	XFER
+	xfer to MMI
+	installing as maxx
+
+2/29/0	mgcAD.c
+	put back ':calma write' (there is no gds_ analog!)	
+
+2/29/0  gdsWrite.c gdsInt.h gds.h
+	gdsWriteFile -> GDSWriteFile
+
+3/9/0	bplane.h bplaneInt.h bpRectC.h bpTcl.c
+	beginning coding of bplane Module!
+
+3/9/0	mnMain.c
+	added call to BPTclInit();
+
+3/9/0	max/Makefile
+	added bplane to module list.
+
+3/10/0	bpRectC.c bpRectC.h
+	coded minimal set of access funcs:
+
+	BPRectCPlaneNew --
+	BPRectCAdd --
+	BPRectCEnumInit --
+	BPEnumNext --
+
+3/10/0  bpTcl.c
+	coded tcl access to above.
+
+3/13/0  make tar
+	ARCHIVE/ XFER TO MMI
+
+3/14/0  DBtcl.c
+	fixed documentation of db_search cells
+
+3/14/0  selTcl.c
+	moved read in of leaf cell from DBTreeFindUse() DBSrLabelLoc()
+	(so that sel_cell doesn't force selected cell to be read in).
+
+3/15/0	bplane/*
+	made compile.
+
+3/15/0  mnMain.c mnTcl.c
+	changed license check of max_mcc from type 1 to type 2
+	(prints long error message on failure).
+	
+3/15/0  make tar
+	XFER TO MMI
+
+3/15/0  mnTcl.c
+	changed license check of max_mcc back to type 1
+	(no long error message on failure).
+
+3/16/0  bplane/*
+	added hier processing to bpEnum
+	compiles.
+	TODO:  add headers for bpBinArea() and bpBinDir() to bplaneInt.h
+	test/debug for flat bins.
+	generate hier bins. :-)
+
+3/16/0  DBtcl.c
+	Fix dbCellsFunc() so that 'db_search cells' outputs 
+	root coordinates.
+
+3/17/00 bplane/*
+	hier create/dump/enum working!
+	working on 'add'.
+
+3/20/00 geometry.h
+	Added GeoIncludeRectFInBboxF()
+
+3/21/00 make/config.*
+	converted config files to include config.main
+
+	 
+3/21/00 mnMain.c mnScripts.c
+	implementing -maxtcl flag.
+	
+3/22/00 geometry.h
+	added GEO_WIDTHF(), GEO_HEIGHTF(), GEO_SURROUNDF() and
+	GEO_SURROUND_STRONGF()
+
+3/22/00	mnMain.c mnScripts.c mainInt.h
+	finished implementation of '-maxtcl <dir>'
+	added MN_SCRIPT_FILE variable (set only during readin of max0.tcl,
+	or max.tcl from disk)
+
+3/22/00 max_version
+	3.2.15 BETA
+
+3/22/00	make tar
+	xfering to mmi (installing as maxx)
+
+3/23/00 bplane/*
+	continued development.
+
+3/23/00 mnUnits.c
+	corrected UnitsI2S(), e.g. to work for 4000.001
+	
+3/25/00 make/config.linuxp
+	fixed defines to include -DGMON	
+
+3/27/00 make tar
+	CHECKPOINT
+	xfer to MMI
+
+3/27/00 selCreate.c
+	Optimized SelectClear() when selection undo disabled. 
+
+3/28/00 DBtcl.c
+	added '-limit n' option to db_search subcommands.
+
+3/28/00 make tar
+	CHECKPOINT
+	xfer to MMI
+
+3/31/00 DBplane.c
+	DBPlaneNew() initialize group in initial space tile to NULL!
+	Fixes intermittent bbox screw up.  Maybe other bugs too!
+
+4/5/00  DRCsubcell.c
+	Fix DBSearchInstances() call in DRCFindInteractions()
+	fixes drc and extractor!
+
+4/5/00  ExtSubtree.c
+	supplied missing arg to DRCFindInteractions()
+
+4/6/00 	ExtHard.c
+	Fixed extHardGenerateLabel()
+	fixes extractor bug when connection to subcell does
+	not intersect label (but subcell node labeled).
+
+4/6/00	make tar
+	CHECKPOINT
+	xfer to MMI
+
+4/14/00 DBread.c
+	improved version history comment 
+
+4/14/00 DBwrite.c
+	reorg to write gcells.
+
+4/14/00 ihash.h ihash.c
+	added IHashEntries()
+
+4/14/00 DBproperties.c
+	added dbPropertiesQ()
+
+4/19/00 DBinstance.c
+	fixed bug in dbInstancesRead1
+	vMAIN in uses was not getting set (causing unnecessary updates?)!!!
+
+4/19/00 database.h DBcellUse.c
+	added cu_client field to celluse 
+	initialize to zero in new use. (dbInitUse())
+
+4/20/00 utils.h string.c
+	added StrPropGet(), StrPropAdd(), StrQuote() and StrQuoteParse()
+
+4/21/00 DBvstamp.c
+	extended (gcell) hash func to include labels, polygons and wirepaths
+
+4/21/00 CHECKPOINT
+	make tar
+	(saved gcells working)
+
+4/21/00 DBgroup.c database.h
+	added DBGroupsQ()
+
+4/21/00 database/* utils/*
+	max file format 3 (saved gcells) seems to be working!
+
+4/21/00 INSTALL as maxy
+	make tar
+
+4/26/00 layTcl.c
+	fixed lay_labels documentation.
+
+4/27/00 main/debug.c
+	added DumpRectU() and DumpRectFU() (convert to user units) 
+
+4/27/00 bplane/
+	converting to power of 2 bin sizes, int bboxes, bin refinement.
+	bplane.h 
+	bplaneInt.h 
+	bpRectC.c - down to enum stuff.
+	bpBin.c down to BPBinCreate().
+
+4/27/00 maxtcl/
+	imported latest checked-in.
+
+4/28/00 bplane/
+	compiles.
+	limping back to life.
+	working on bp_add
+
+4/28/00 maxtcl/max0.tcl
+	imported fix from Pat.
+
+4/28/00 CHECKPOINT
+	make tar
+	
+4/28/00 layTcl.c
+	fixed syntax error in comment.
+
+4/28/00 main/debug.c
+	fixed typo.
+
+5/2/00  DBplane.c database.h
+	added DBPlaneEmptyQ()
+
+5/2/00  graphics1.c graphics.h
+	added GrPixmapWidth() and GrPixmapHeight()
+
+5/2/00  layMain.c
+	rmed windFree() not used.
+
+5/2/00  layMain.c layout.h
+	added lay_genOverlay field to layout struc.
+	initializing lay_genOverlay.
+
+5/2/00  layDisplay.c
+	layFrameUpdate() added lay_genOverlay setup.
+
+5/4/00  mgcCmd.c
+	improved feedback documentation.
+
+5/5/00	layStyles.c
+	rmed need to signal first group orthogonal with style 1. 
+
+5/18/00 main/mnMain.c
+	added 2000 to copyright notice.
+
+5/18/00 layStyles.c styles.h layDisplayHL.c
+	added selection styles:
+	SELECTION_SOLID, SELECTION_STIPPLED, SELECTION_OUTLINE    
+
+5/18/00 layDisplayGen.c layDisplayHL.c layMain.c layint.h
+	rmed layStippleSelection (now always stippling selection)
+
+5/19/00 CHECKPOINT
+	make tar
+
+5/19/00 styles.h layStyles.c layDisplayHL.c 
+	added annotation and flyline styles.
+
+5/19/00 database.h
+	uped MAXPLANES from 60 to 128
+
+5/19/00 bplane/*
+	HIDE broken code.
+
+5/19/00 ExtTest.c ExtLength.c
+	fixed refs to STYLE_*
+
+5/22/00 CHECKPOINT
+	make tar
+	(and scp to mmi)
+
+6/5/00	database.h
+	reduced MAXPLANES to 32 
+	(max limit since using int for plane mask)
+
+6/6/00	pal.tcl colors.tcl layout/* etc.
+	redisplay put back together
+	more than 32 planes defered
+
+6/6/00	CHECKPOINT
+	make tar
+
+6/6/00  DBread.c
+	fixed so that use name preserved when changing gcell use to saved
+	version.
+
+6/7/00	DBlabel.c
+	DBLabelAddG() - rmed auto align 
+	dependence on bbox led to confusion with saved gcells, and also
+	potential performance bug.
+
+6/7/00 	database/*
+	fixed bugs with saved gcells.
+
+6/7/0	utils/string.c
+	interpolated Marshall's handling of escapes by StrQuote() and
+	StrParse().
+
+6/7/00	CHECKPOINT
+	make tar
+
+6/7/00  database/*
+	further modification of Max file format.
+
+6/8/00  max/max_version
+	3.3.1 EXPERIMENTAL
+
+6/8/00	maxtcl/* pal.tcl colors.tcl 
+	got latest and greatest
+	cped in my versions of pal.tcl colors.tcl
+	added slight change to pal.tcl that was made since I diverged.
+
+6/9/00	XFER TO MMI 
+	make tar
+	(installing as maxx).
+
+
+6/9/00	layDraw.h
+	fixed layDrawRect() to handle outlines on solid/stipple styles.
+
+
+6/16/00	CHECKPOINT
+	make tar
+
+6/19/00 lawDraw.h
+	fixed typo, removed Debug.
+
+6/19/00 layDisplayHL.c
+	rmed Debug1
+
+6/19/00 NOTE
+	format error bug gone?
+
+6/19/00 maxtcl/ mc/
+	make update
+
+6/19/00 pal.tcl
+	gave selection_outline a non null outline!
+
+6/20/00	CHECKPOINT
+	make tar
+	import back to kiwi.
+
+6/21/00	DBread.c
+	fixed dbReadSections() to return value at end.
+
+6/21/00 pal.tcl
+	changed masks from 0177 to 0077
+	(still using HL bit for pixmaps).
+	fixes blackbird redisplay bug.
+
+6/22/00 make tar
+	import back to kiwi
+
+6/22/00 layout/*
+	added LAY_LABEL_SIZE_FACTOR, and LAY_LABEL_MIN_SELECTED_MARK
+
+6/22/00 layout/*
+	added label_dim, unexpanded_subcell_dim and flyline_dim. 
+
+6/23/00 make tar
+	back to mmi!
+
+6/23/00 pal.tcl colors.tcl
+	changed attenuation for dimmed versions of labels/text/flylines
+	(could not distinguish dim from non-dim on MMI systems)
+
+6/26/00 pal.tcl colors.tcl
+	checked in changes.
+
+6/26/00 maxtcl/Makefile
+	added remove_comments
+
+6/27/00	make tar
+	back to kiwi
+
+6/27/00 database/DBnext.c DBtcl.c database.h
+	integrated Marshall's enhancements to db_next_distance
+
+6/28/00 layDisplay.c
+	fixed label redisplay bug.
+
+6/28/00 DBread.c
+	added ability to read sized labels ignoring size for now,
+	and not writing them yet! - but this will allow us to
+	add sized labels without changing .max format.
+
+6/28/00 layDisplayHL.c
+	Modified layRedisplayCellFunc to not show ports.
+	(Fixes double display of ports when cell expanded.)
+
+6/28/00	pal.tcl
+	use colors >64 for non-paint.
+	changed paint color limit to 63.
+	TODO: check in pal.tcl
+
+6/28/00 database.h DBnext.c DBtcl.c
+	integrate Marshall's latest changes.
+
+6/28/00 database.h DBnext.c DBtcl.c
+	rm db_largest_box (not used and broken).
+
+6/28/00 INSTALL 
+	as maxy at MMI
+	make tar
+
+6/29/00	mgcCmd.c
+	updated :see documentation.
+
+6/29/00 maxtcl/Makefile
+	disabled comment stripping
+
+6/29/00 max/max_version
+	changed tag from EXPERIMENTAL to BETA
+
+6/29/00  INSTALL
+	as maxx at MMI
+	make tar
+
+6/29/00 DBnext.c
+	fixed db_next_distance to not choke on negative coords.
+
+6/30/00 graphics.h graphics1.c
+	modified GrTicService() to return info on pending events.
+	NOTE: not working properly yet?
+
+6/30/00 mnTcl.c
+	added mn_tic command
+
+7/3/00	xfer to MMI
+	make tar
+
+7/3/00	mnTcl.c mnTic.c
+	rmed DEBUG delay loops from mn_tic
+	rmed DEBUG from mnTic.c
+
+7/3/00	database.h DBnext.c 
+	cped Marshall's latest.
+
+7/3/00	DBtcl.c 
+	integrated Marshall's latest.
+	updated/improved documentation of db_next_ commands.
+	modified switch parsing (may not have been necessary!)
+
+7/3/00	mnScripts.c
+	Tried to implement secure Tcl_Eval.
+	not working?
+
+7/5/00 xfer to KIWI
+	make tar
+
+7/5/00	mnScripts.c
+	fixed secure eval.
+
+7/5/00	database.h
+	integrated Myron's changes (for netlister).
+	changed CD_NTL_WPARENT to CD_NETLIST_WITH_PARENT
+
+7/5/00  netlist/
+	added Myron's netlister module
+
+7/5/00  ntlMain.c ntlOutput.c
+	CD_NTL_WPARENT -> CD_NETLIST_WITH_PARENT
+
+7/5/00	STYLE_PALEHIGHLIGHTS -> STYLE_FEEDBACK_PALE
+
+7/5/00  max/Makefile
+	add netlist module 
+
+7/6/00  ntlTcl.c netlist.h netlistInt.h mnMain.c
+	added tcl interface for netlist module 
+	added ntl_netlist command.
+
+7/6/00  netlist.h netlistInt.h ntlDebugInt.h
+	rmed ntlDebugInt.h (consolidated into netlistInt.h)
+	added already loaded tests to .h files.
+
+7/6/00	CHECKPOINT
+	xfer to MMI (to become maxx)
+
+7/7/00	ntlTcl.c ntlMain.c
+	tcl link ntlUseGlobals and ntlCommentTopDef
+
+7/7/00	maxtcl
+	imported latest from mmi.
+
+7/7/00	ExtCell.c
+	fixed extFileOpen() to not screw up for cell names with '.' in them,
+	e.g. Gcells.  
+	NOT DONE!
+
+7/10/00 CHECKPOINT
+	xfer to MMI 
+
+7/10/00 netlist/
+	Myron hacked on it (working to get fet code going)
+
+7/11/00	make tar
+	xfer to kiwi (and new base version for Myron)
+
+7/12/00	ExtCell.c
+	finished
+	fix of extFileOpen() to not screw up for cell names with '.' in them,
+	e.g. Gcells.  
+
+7/12/00 gdsReadPaint.c
+	fixed gdsPolygonDBType() to return -1 rather than 0 on failure.
+
+7/12/00	CHECKPOINT
+	xfer to MMI
+
+7/12/00	maxtcl/ mc/
+	make update
+
+7/12/00	mnScripts.c
+	fixed sourcing of MC script (length was off by one).
+
+7/12/00	maxtcl/Makefile
+	added back comment stripping
+	(works now!)
+
+7/12/00 CHECKPOINT
+	xfer back to KIWI
+
+7/13/00	DBwrite.c
+	modified to write out sub-gcells as well (in post order).
+
+7/13/00 DBtcl.c
+	modified db_vstamp to return a 'proper list' (no {}).
+
+7/13/00 maxtcl/gcell.tcl
+	modified to use new db_vstamp syntax. 
+	rmed "don't use groups" popup.
+	checked in at mmi.
+
+7/13/00 CHECKPOINT
+	xfer to MMI
+	install as maxx!
+
+	make tar
+ 
+7/13/00	maxtcl/ mc/
+	make update
+
+7/13/00	INSTALL
+	installed as maxx @ MMI
+
+7/17/00	selTcl.c
+	adding -less capability to sel_labels
+	NOT DONE!
+
+7/18/00	CHECKPOINT
+	xfer to kiwi
+	make tar
+
+7/18/00	selTcl.c
+	sel_labels -less working!
+
+7/18/00	DBtcl.c mgcCmd.cp
+	fixed -kind documentation for db_label and :label.
+	
+7/18/00 layDisplayHL.c
+	fixed layDisplayHLSelection() to display box labels correctly.
+
+7/18/00	DBpolygon.c DBwirepath.c
+	initialize poly_client and wp_client fields.
+
+7/18/00	DBinstance.c database.h
+	added DBIA_DUP_OK flag to DBInstanceAdd()
+
+7/18/00	selTcl.c
+	created sel_move command.
+
+7/19/00 select.h selTcl.c mgcAD.c mgcLQ.c mgcRS.c mgcTZ.c
+	added dupOK arg to SelectTransform
+
+7/19/00	selInt.h selCreate.c selOps.c
+	add dupOK arg to selectAndCopy2()
+
+7/19/00	database.h DBcopy.c
+	add dupOK arg to DBCellCopyAllCells() 
+
+7/19/00 select.h selOps.c mgcAD.c 
+	added dupOK arg to SelectCopy()
+
+7/18/00	selTcl.c mgcCmd.c
+	added sel_duplicate command (with -dup_ok option).
+
+7/19/00 DBtcl.c
+	fixed db_instance documentation.
+	added -dup_ok option to db_instance.
+
+7/19/00 selOps.c select.h mgcAD.c
+	added dupOK arg to SelectDump()
+
+7/20/00	mgcAD.c mgcFI.c mgcint.h
+	recoded cmdDumpParseArgs() to parse -dup_ok switch.
+	added -dup_ok option to :getcell and :dump 
+
+7/20/00 mgcCmd.c
+	documented -dup_ok for :getcell and :dump
+
+7/20/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+7/20/00 maxtcl/ mc/
+	make update.
+
+7/20/00	selOps.c
+	fixed typo.
+
+7/20/00 INSTALL
+	installing as maxx.
+
+7/24/00 mnMain.c
+	added Pat's new lsearch2 cmd. 
+	(mmi tcl mod)
+
+7/24/00 DBcell.c
+	Added init of netlister CellDef fields to dbCellDefAlloc().
+
+7/24/00	DBtcl.c
+	fixed db_instance documentation.
+
+7/25/00	CHECKPOINT
+	make tar
+	xfer to kiwi (& Myron)
+
+7/26/00 DBundo.c
+	added DBIA_DUP_OK flag to instance undo/redo
+
+7/26/00 selEnum.c
+	modified SelEnumCells() (actually selEnumCFunc2()) to
+	check cell ids when matching selection use with real use.
+
+7/26/00	selEnum.c
+	rmed warning on missing real use (can now happen when dups 
+	eliminated since matching on id.)
+
+7/26/00	netlist
+	Got Myron's latest and greatest (/home/myron/pdx/ntl_0725000.tgz)
+
+7/26/00 CHECKPOINT
+	make tar
+	xfer to MMI
+	
+7/26/00 DBnext.c
+	fixed bug in DBnext.c (assumed top level cell was editcell)
+
+7/27/00	DBtcl.c
+	modified db_cells not to do updates!
+
+7/27/00 mgcAD.c
+	fixed :dump,:load arg parsing (I broke it when adding -dup_ok)
+
+7/31/00 CHECKPOINT
+	make tar 
+	xfer to MMI
+
+7/31/00 maxtcl/* mc/*
+	make update
+
+7/31/00	DBchange.c DBupdate.c
+	rmed debugs.
+
+7/31/00	INSTALL
+	Installing as maxx at MMI.
+
+7/31/00	CHECKPOINT
+	make tar
+	xfer back to MHA
+	
+7/31/00	DBtcl.c DBnext.c
+	working on db_next_edge -cell and -any_cell bugs.
+
+8/2/00  DBnext.c DBtcl.c database.h
+	fixed db_next* commands to work right with edit-in-place, -cell, and
+	-any_cell options.
+	TODO: xmask, return "" on failure.
+
+8/3/00	CHECKPOINT
+	make tar
+
+8/3/00	DBtcl.c DBnext.c database.h
+	fixed db_next* to use cell expansion info.
+
+8/4/00	utils/geometry.h
+	added GEO_ENCLOSE_STRONG and GEO_ENCLOSE_STRONGF
+
+8/4/00	DBtcl.c DBnext.c
+	Changed db_next_edge and db_next_distance to return nil 
+	on failure.
+
+8/7/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+8/7/00	maxtcl/* mc/*
+	make update
+
+8/7/00	INSTALL
+	installed as maxx @ mmi
+
+8/7/00	DBchange.c DBupdate.c database.h
+	added fprintf's to change/update code.
+
+8/7/00  selTcl.c
+	fixed sel_labels -less bug.
+
+8/8/00	maxtcl/* mc/*
+	make update
+	Pat's new stuff!
+
+8/8/00	CHECKPOINT
+	make tar
+	xfer to kiwi.
+
+8/8/00	gcell.tcl
+	restored changes of 7/13 that Pat lost.
+
+8/8/00  mgcCD.c
+	rmed debugs from dump/load arg parsing.
+
+8/8/00	DBcell.c
+	fixed DBCellClearContents() to not create undo entrys for wirepaths.
+
+8/8/00	DBupdate.c DBchange.c database.h
+
+8/8/00  max/max_version
+	3.5.0 BETA
+
+8/8/00	CHECKPOINT
+	make tar
+	xfer to mmi.
+
+8/8/00  maxtcl/ mc/ 
+        make update 
+
+8/8/00  DBtcl.c
+	added -not_available flag to db_cell_new
+
+8/9/00	DBwrite.c
+	fixed dbCellWRiteFileGCells() to not stomp on cd_next
+	(fixes 'yikes' bug)
+
+8/9/00  maxtcl/ mc/ 
+        make update 
+ 
+8/9/00  INSTALL 
+        installed as maxx 
+ 
+8/9/00  INSTALL 
+        make install  
+        max3.5.0 
+
+8/10/00	DBcopy.c
+	fixed comment on xMask of -1 (important).
+
+8/10/00	database.h DBcopy.c selCreate.c selOps.c
+	added instances list return arg to DBCellCopyAllCells()
+
+8/10/00 selCreate.c
+	fixed selAndCopy2 (fixes :dump bug) 	
+
+8/10/00 max/max_version
+	3.5.1 BETA
+
+8/10/00	CHECKPOINT
+	make tar
+	xfer to MMI.
+
+8/11/00	netlist/*
+	updated to Mryon's latest
+	( ~myron/pdx/ntl_080700.tgz)
+
+8/11/00	ntlMain.c
+	Changed NTL_USE_GLOBALS default to set.
+
+8/11/00 ntlLabel.c
+	rmed redundant "extern int ntlUseGlobals" (belongs in .h)
+
+8/11/00 ntlTcl.c
+	changed ntl_netlist to netlist edit cell by default and take
+	-cell option.
+
+8/11/00 INSTALL
+	installed as maxx.
+
+8/11/00 DBchange.c DBupdate.c database.h
+	enabled debugging.
+	 
+	note changed area called for bot unnamed and selection
+	update called repeatedly for unnamed, and once for selection.
+	update1 only called for selection (after a while?).
+
+8/14/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+8/14/00 gdsReadPaint.c	
+	added debug fprintf's
+
+8/14/00	geometry.h
+	added GeoScaleIntGrid() and GeoScalePointGrid() functions. 
+	
+8/15/00	CHECKPOINT
+	make tar
+	xfer back to KIWI
+
+8/15/00	geometry.h
+	fix typo. 
+
+8/15/00	gdsReadPaint.c
+	CalmaElementBoundary()
+	added points to warning message on conversion of manhattan polygon.
+
+8/15/00	gdsRead.c gdsInt.h gdsReadPaint.c
+	implemented snap-to arbitrary grid on gds input. 
+
+8/15/00	geometry.h
+	fixed  error calc in GeoScaleIntGrid()
+
+8/15/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+8/15/00	gdsReadPaint.c
+	changed error message for bad manhattan polygon to output point in
+	microns.
+
+8/15/00	gdsReadMsg.c gdsRead.c
+	added cell name to messages.
+
+8/17/00	CHECKPOINT
+	mv to MMI
+
+8/18/00 KIWI
+	got doc/jazio from MMI
+
+8/18/00	database.h DBupdate.c
+	added debugging for change/update.
+
+8/18/00	cifRdTech.c cifTech.c cifInt.h cifGen.c
+	Added shrinkx and shrinky mask ops.
+	(For asymetric via enclosure checks)
+
+8/18/00	CHECKPOINT
+	install at MMI (as maxx)
+	make tar
+
+8/22/00	DBtcl.c DBcopy.c database.h
+	implementing -offset option to db_copy
+
+8/24/00 selCreate.c select.h selTcl.c	
+	implemented -no_labels for sel_area
+	(performance stop gap for wiring until we speed up label processing)
+
+8/24/00 layUndo.c layLoad.c
+	Fixed undo for load and edit cell changes to not keep pointers to
+	CD_NO_UNDO since these cells can be deleted.
+
+8/24/00 layPixel.c layint.h layDisplayHL.c layDisplayGen.c 
+        added layPixelValid() func. 
+        Being careful not to force single pixel update of whole 
+        cell when not zoomed out.  (Caused performance problem!)
+
+8/24/00	gdsWrite.c
+	properly clearing cell def client fields on exit
+
+8/24/00 DBwrite.c
+	defensively clear all cell def client fields.
+
+8/24/00	DBwrite.c
+	Don't mark -_edit gcells with (S).
+
+8/25/00	selCreate.c selOps.c selInt.h
+	rm newSourceDef arg from selectAndCopy2() (must be EditRootDef!).
+	fix trasform when generating new celluse selection (was
+	wrong for subedit).
+
+8/25/00	DBcopy.c DBpolygon.c DBwirepath.c selCreate.c
+	apply transform to labels, polygons, wirepaths
+
+8/25/00 DBtcl.c
+	fixed label position transform for 'db_search labels -cell'
+	(previously assumed EditRootCell)
+		 
+8/25/00	ntlTcl.c
+	added ntl_mha and code to (temporarily) raise paint and labels
+	from subcells.
+
+8/28/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+8/29/00 database.h
+	added plane list structure 
+	added PlaneListAlloc() 
+	added PlaneListFree()
+
+8/29/00 debug.h debug.c
+	added DumpPlaneList()
+
+8/29/00 DBlayers.c
+	added DBPlaneListAdd()
+	added DBPlaneListFromTypes()
+
+8/29/00	DBTcl.c
+	added db_mha to exercise plane list code.	
+
+8/30/00	database.h
+	fixed PlaneListFree();
+
+8/30/00	layDisplayGen.c layPixel.c
+	layDisplayPaintZO(), layPixelPaintGroup():
+	  DBTechTypesToPlanes() -> DBPlaneListFromTypes()
+
+8/30/00	database.h DBSearch.c
+	filter.tf_planes changed from mask to list.	
+
+8/30/00	database.h
+	uped # planes to 100
+
+8/30/00	CHECKPOINT
+	make tar
+	more that 32 layers working, sans warnings.
+
+8/30/00	cifTech.c mgcRS.c DRCTech.c selOps.c selCreate.c DBlayers.c
+	rming references to DBLayerTypeMaskTbl[] 
+	which is obsolete/always 'identity', since not
+	using Magic style contacts anymore.
+
+8/30/00 DBlayers.c database.h
+	rmed DBLayerTypeMaskTbl[], no longer needed since not using
+	Magic style contacts.
+
+8/30/00 selUnselect.c
+	rmed test for type > DBNumUserLayers (image) 
+	can't happen anymore!
+
+8/30/00 DBwrite.c
+	rmed comment about contact images.
+
+8/30/00	DBpaintTech.c DBpaintTech2.c
+	rmed a bundle of contact code.
+
+8/31/00	DBmagicio.c DBtcl.c databaseInt.h 
+	rmed db_magic / DBmagicio.c
+
+8/31/00	DBlayers.c DBread.c ExtBasic.c ExtLength.c ExtNghbors.c ntlNghbors.c
+	rming DBConnPlanes[] and all references.
+	rming DBConnPlanes[] references.
+
+8/31/00	ResUtils.c database.h DBtech.c				
+	rming DBConnPlanes[] and all references.
+	rming DBConnPlanes[] references.
+
+8/31/00 databaseInt.h database.h
+	rming dbNumContacts,dbNumImages,dbContactInfo[]	
+	rming DBContactBits DBImageBits
+
+8/31/00 database.h DBcontact.c mnTech.c
+	rmed DBTechInitContact()
+
+8/31/00	CHECKPOINT
+	make tar
+	Contact cruft removed.
+	max compiles and seems to work allright.
+
+8/31/00 mnTech.c database.h layStyles.c DBcontact.c
+	rmed DBcontact.c !
+	
+	obsoleted style and contact sections of .tech file.
+
+9/1/00	database.h DBtech.c 
+	implemented DBConnectPlanes() (to take place of DBAllConnPlanes)
+
+9/1/00	ExtBasic.c ExtLength.c ExtNghbors.c ntlNghbors.c
+	DBAllConnPlanes[] -> DBConnectPlanes[]
+
+9/1/00	layDisplayGen.c layPixel.c
+	fix PlaneList frees.
+ 
+9/1/00	ExtLength.c ExtBasic.c
+	DBTechTypesToPlanes() -> DBPlaneListFromTypes()
+
+9/5/00	database.h DBlayers.c
+	coded DBPlaneListHasPlane()
+9/5/00	extractInt.h ExtTech.c
+	exts_overlapPlanes,
+	exts_overlapOtherPlanes,
+	exts_overlapShieldPlanes,
+	exts_sideOverlapOtherPlanes, 
+	exts_sideOverlapShieldPlanes:
+	  mask -> planelist.
+
+9/5/00  ntlHier2.c ntlNode.c
+	convert calls to DBTechTypesToPlanes() to DBLayerListFromTypes()
+
+9/5/00	DBlayers.c database.h
+	rmed DBTechTypesToPlanes() using DBPlaneListFromTypes() instead.
+
+9/5/00	extCouple.c
+	commented out uncoverted code with HIDE_PLANES 
+
+9/6/00	CHECKPOINT
+	(compiles and runs.)
+	make tar
+
+9/6/00	database.h DBlayers.c DBtcl.c
+	rmed DBTypePlaneMaskTbl
+
+9/6/00	DBpaintTech.c databaseInt.h
+	rmed Paint/Erase rules from compose section.	
+	restricted compose/decompose rules to active plane.
+
+9/6/00	database.h DBpaintTech.c DBpaintTech2.c DBpaint2.c DRCtech.c cifRdCl.c
+	cifHier.c DBcopy.c mgcWizard.c DBtech.c DBlayers.c
+	
+	rmed DBTypePaintPlanesTbl, DBTypeErasePlanesTbl, DBPaintOnPlane(),
+	DBEraseOnPlane()
+
+COMPILING and RUNNING.
+
+9/6/00	DBlayers.c DRCtech.c database.h
+	rmed DBTechMinSetPlanes(), 
+
+9/6/00	database.h layPixel.c
+	rmed PlaneNumToMaskBit() and PlaneMaskHasPlane() 
+
+9/6/00	ntlTest.c
+	rmed extShowTech()
+
+9/6/00  DBlayers.c  
+	added check for multi-type planes (other than active).
+
+9/6/00	DBnext.c DBtcl.c
+	integrated Pat's changes.
+
+9/6/00	max/max_version
+	max3.5.4
+
+9/6/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+9/6/00	maxtcl/ mc/
+	make update
+
+9/6/00  INSTALL
+	installed as maxx at MMI.
+
+9/6/00	CHECKPOINT
+	make tar
+	(max 3.5.4)	
+	xfer to Myron and back to kiwi. 
+	
+9/7/00	pal.tcl colors..tcl
+	changed hard-coded "very special case" test from $stipple == 3
+	to $stipple == 7
+	TODO replace 7 with symbolic value.
+	commented out # if pseudo_transparent if.
+
+9/12/00	pal.tcl pal_file.tcl colors.tcl color_editor.tcl
+	split up pal.tcl,colors.tcl:
+		pal.tcl - build and mainpulate palette widget.
+		pal_read.tcl - read .palette file.
+		colors.tcl   - setup layout widget colors/styles.
+		color_editor.tcl - widget for editing layer appearance.	
+
+9/13/00	CHECKPOINT
+	make tar
+
+9/13/00	pal.tcl colors.tcl color_editor.tcl
+	completed stipple_only mode.
+	auto converts to all solid layers.
+	TODO:  can't edit some layers 
+		(work around:  save palette and restart Max).
+
+9/13/00	max/max_version
+	max 3.5.5
+
+9/13/00	CHECKPOINT
+	make tar
+
+	xfering to MMI
+	checking in tcl changes.
+	and INSTALL as maxx.
+
+9/15/00	layStyles.c
+	fixed to set style group 2 to non-orthogonal!  Fixes redisplay
+	bug when m3/m5 in separate subcells overlaps.
+
+9/15/00 layStyles.c
+	fixed bug in lay_style_groups
+	(was always setting group 1 to orthogonal)
+
+9/15/00	colors.tcl
+	setting to one style group for stipple_only mode (for efficiency).
+
+9/15/00 colors.tcl color_editor.tcl 
+	reserve temp style:  PAL(temp_style) for use by color_editor
+
+9/15/00	colors.tcl color_editor.tcl pal.tcl pal_file.tcl
+	fixed editing of outline styles (in stipple_only mode).
+	tuned so stipple_only mode invoked exactly when normal mode won't work.
+
+9/13/00	CHECKPOINT
+	make tar
+
+	xfering to MMI
+	checking in tcl changes.
+	and INSTALL as maxx.
+
+9/18/00	graphics/*
+	added GrColorMapped
+	test for colormapped visual.
+	If not colormapped, don't allocate planes, or map from logical to
+	physical planes!
+
+9/19/00	graphics/*
+	auto configure 'depth' 
+
+9/19/00	layMain.c
+	tcl linked GR_COLOR_MAPPED, GR_DEPTH, GR_RED_MASK, GR_GREEN_MASK,
+	GR_BLUE_MASK
+
+9/19/00	graphics1.c graphics.h
+	added GrRGBToColor()
+
+9/19/00	layStyles.c layint.h
+	added r/g/b to styles.
+	added -direct mode to lay_style
+
+9/19/00 layStyles.c layint.h
+	backed out of most of above!
+
+9/19/00	grTcl.c layMain.c mnMain.c
+	moved GR_* tcl linked vars to grTcl.c	
+	added gr_rgb_to_pixel
+	
+9/20/00	colors.tcl etc.
+	true color limping along!
+
+9/25/00	CHECKPOINT
+	make tar
+
+	xfer to MMI.
+
+9/25/00	grInline.h
+	commented out debugs.	
+
+9/27/00 grInline.h graphics.h
+	added GrSetColorUnmapped()
+
+9/27/00	layCache.c
+	using GrSetColorUnmapped() to clear pixmaps (so
+	that system bit gets cleared too).
+
+9/27/00	graphics1.c
+	augmented grInitPlanes() to set 'extra bit' entrys
+	for pixel and plane map arrays
+	
+9/27/00	graphics/* layout/*
+	switching from highlight bit to system bit for pixmap write bit.
+	(more colors for layers).
+
+9/28/00	CHECKPOINT
+	make tar
+	xfer back to kiwi.
+
+9/28/00	graphics1.c
+	rm DEBUG / early exit.
+
+9/28/00	layDisplay.c
+	switched layMaskPixWrite to 'system' bit.
+
+9/28/00	pal_file.tcl colors.tcl color_editor.tcl
+	from Lee.
+
+9/28/00	colors.tcl
+	rmed GR_COLOR_MAPPED set.
+	rmed stipple_only force
+
+9/28/00 layDisplay.c
+	auto-compute of layMaskPixWrite
+
+9/28/00	make/config.linux 
+	reduce optimization to -O1 to fix linux compile
+	problem @ MMI
+
+9/28/00	CHECKPOINT
+	make tar
+	xfer back to MMI.
+
+9/28/00	DBlabel.c database.h
+	Chanbed DBLabelAdd() and DBLabelAddG() to return pointer to label. 
+
+9/28/00	layDisplayHL.c
+	fixed flyline redisplay bug.
+
+9/28/00	DBtcl.c
+	Pat's additions to db_search documentation.
+
+9/28/00	selTcl.c
+	Pat's addition to sel_what documentation.
+
+9/29/00	pal_file.tcl colors.tcl color_editor.tcl
+	got Lee's changes.
+
+9/29/00	grTcl.c layStyle.c
+	fixed gr_rgb_to_pixel, lay_style to format colors identically.
+
+9/29/00	CHECKPOINT
+	make tar
+	installing as maxx at MMI.
+
+9/29/00	cifGen.c
+	fixed cifSrTiles to 'flatten' descendents of flattened gcells. 
+	(writing of groups was broken before.)
+
+10/1/00	CHECKPOINT
+	make tar
+	transfer to MMI.
+
+10/2/00	make/config.solarisp
+	rmed -lgmon 
+
+10/2/00	DBwrite.c
+	Simplified DBCellWrite() to avoid overhead of tempfile
+        creation, etc.  (The tcl code handles this stuff).
+
+10/2/00	database.h
+	TT_MAXTYPES 96 -> 127  
+	(128+ leads to potential sign extension problems)
+	MAXPLANES 128
+
+	(goal support 100 layers.)
+
+10/2/00	maxtcl/ 
+	make update
+
+10/3/00	CHECKPOINT
+	make tar
+	transfer back to kiwi.
+
+10/3/00	DBwrite.c
+	rmed dead code
+
+10/3/00	database.h
+	changed tt macros to work on 4 words (>96 layers).
+
+10/3/00	CHECKPOINT
+	make tar
+	transfer back to MMI
+
+10/3/00	make update
+
+10/3/00 max/max_version 
+        max3.5.7 
+ 
+10/3/00 INSTALLED @ MMI 
+
+	latest from Pat and Lee. 
+
+10/4/00	 max/doc/*
+	house cleaning and reorg.
+
+10/4/00	layout.h
+	changed lay_lastLabelSizeFactor to double
+	(fixes label redisplay problem when label size factor changed.) 
+	
+10/9/00 maxtcl/* 
+        latest maxtcl. 
+ 
+10/9/00 mgcCmd.c mgcRS.c commands.h  
+        removed :select  
+ 
+10/9/00 netlist/* 
+        imported Myron's latest. 
+ 
+10/10/00 xfer changes back to kiwi. 
+
+10/11/00 graphics/* layout/*
+	Cleaning up by adding 'GrMaskFlag' (flag bit concept).
+	Pseudo-color redisplay bug for 
+
+10/12/00 graphics/* layout/*
+	rm debugs.
+ 
+10/12/00 CHECKPOINT
+	make tar
+	transfer to MMI
+
+10/12/00 max/max_version
+	max3.5.8
+
+10/12/00 maxtcl/
+	cleaned up.
+
+10/12/00 utils/mm.c
+	upped MMChunkSize, MMHoldMax (to accomodate bloated tech style due
+	to greater number of layers).
+
+10/12/00 layPixel.c
+	set GrMaskFlag in single pixel values so non-zero when something
+	gets set.
+
+10/13/00 layout/* graphics/*
+	fixed true color mode.	
+
+10/17/00 CHECKPOINT
+	make tar
+	xfer to MMI
+		
+10/18/00 DBwrite.c
+	Restored cd_client clear at beginning of dbCellWriteFileGCells.
+	Also prints message when non-null cd_client encountered!
+	
+	PERFORMANCE BUG!  TODO, remove after making all modules good
+	citizens with respect to cd_client.
+
+10/18/00 max/max_version
+	max3.5.9
+
+10/18/00 CHECKPOINT
+	make tar
+	xfer to MMI
+	
+
+10/24/00 DRCcif.c
+	fixed drcCIFDimension() and drcCIFDimension2() to check for
+	zero value, and always return a positive value (like drcDimension()
+	and drcDimension2() do.)  
+
+	Avoids coredump on 0 distance cif rule!
+
+10/25/00 DBcell.c
+	added DBCellClearDefClients(bool check).
+
+10/25/00 DBwrite.c
+	using DBCellClearDefClients() to check.
+
+10/25/00 ExtMain.c ExtTimes.c
+	using DBCellClearDefClients() to check, and to clear afterwards!
+	Fixes bug where extractor left some cd_clients set (for cells
+	which it did not have to reextract to be exact.)
+
+10/25/00 ntlMain.c
+	converted to DBCellClearDefClients() and fixed to clear at
+	end.
+
+10/25/00 mgcAD.c mgcCmd.c cif/*
+	rmed cif read/write. (was already broken anyway.)
+	left some cruft needed by gds module.
+
+10/25/00 gdsWrite.c
+	converted to DBCellClearDefClients() 	
+
+10/25/00 mgcWizard.c
+	Added DBCellClearDefClients() assertions to CmdTilestats()
+
+10/25/00 layint.h layStyles.c layPixel.c layDisplayGen.c
+	fixed style group discrimination to check all high order bits!
+	Fixes problem with styles going into wrong group!
+
+10/26/00 CHECKPOINT
+	make tar
+	Code stable, prior to gds write / gcell changes.
+
+10/27/00 gds/* database/*
+	implementing gds gcell read.
+
+10/30/00 CHECKPOINT
+	make tar
+	mv to MMI.
+
+10/30/00 make/config.linux
+	changed to -O0 (flexlm problem).
+
+10/30/00 max/max_version 
+        Max 3.5.10 
+
+11/2/00	string.c utils.h
+	added StrMap funcs.
+
+11/2/00	gdsRead.h gdsReadCell.h gdsInt.h 
+	Converting to use StrMap funcs.
+
+11/3/00	gds/* utils/string.c,utils.h
+	added StrPropSet()
+	finally "done" with gds read of gcells!
+
+11/3/00	CHECKPOINT
+	make tar
+
+11/4/00	select.h selCreate.c selTcl.c
+	added SelectBuffer() and sel_buffer commands.
+
+
+11/5/00 DBcopy.c database.h selCreate.c gdsRead.c
+	added db change notification to DBCellCopy() and changed
+	name to DBCellCopyNotify() 
+
+	Modified callers accordingly.
+
+	(Needed for flyline processing).
+
+11/5/00	utils/path.c
+	modified PaHasExtension() to PaExtendedName() to not consider
+	final '.' an extension.
+	
+	(allows 'max t.' to load t.max)
+ 
+11/6/00	CHECKPOINT
+	make tar
+	xfer to MMI
+
+11/6/00	make update
+
+11/6/00 max/max_version
+	max 3.5.11
+
+11/6/00	gdsTcl.c
+	added gds_plot_key cmd.
+
+11/6/00	make/config.solaris config.solarisd config.solarisp
+	added gdsplot.a to libs (needed by gds_plot_key)
+
+11/6/00	INSTALL
+	max3.5.11
+
+11/7/00	CHECKPOINT
+	make tar
+	xfer back to KIWI
+
+	
+11/7/00	maxtcl/ mc/
+	make update
+	(gds plot tcl code)
+
+11/7/00	max/max_version
+	max3.5.12
+
+11/7/00	INSTALL
+	make install
+	max3.5.12
+	
+11/7/00	DBtcl.c DBcell.c mgcSubrs.c
+	took reset of modified and available flags out of DBCellClearContentsUp() 
+	added db_cell_clear command.
+
+11/10/00 DRCmain.c
+	drcWhyFunc() fixed to not recheck DRC_WITH_PARENT cells.
+	Fixes ':drc why' bogus errors bugs for groups containing
+	subcells.
+ 			
+11/12/00 CHECKPOINT
+	make tar
+
+11/12/00 gdsTcl.c gdsCompile.c
+	adding gds_compile command (gds ASCII --> gds).
+	TODO: conversion routines for R4,R8, and BITMAP datatypes.
+
+11/12/00 gdsInt.h gdsRead.c gdsDump.c
+	add datatype to gds record type table.
+
+11/13/00 CHECKPOINT
+	make tar
+	xfer to MMI	
+
+11/13/00 gdsWrite.c
+	changed GDSWriteFlattenGCells to default to TRUE.
+
+11/13/00 DRCsubcell.c
+	rmed DEBUGs.
+
+11/13/00 DBcell.c DBread.c gdsReadCell.c
+	remove no_undo from gcells so changes to groups are undoable.
+
+11/13/00 maxtcl/Makefile
+	fixed 'make update'
+
+11/13/00 max/max_version	
+	max3.5.13
+
+11/13/00 maxtcl/ mc/
+	make update
+
+11/13/00 DBtcl.c
+	fixed db_instance to leave setting of generator related flags
+	to load code.
+
+11/13/00 DBgcell.c
+	rmed DEBUG.
+
+11/13/00 DBcell.c
+	DBCellClearDefClients(bool check), modified to do check only
+	when debugging on (PARANOID set.)		
+	(otherwise write of gobs of .max files is slow.)
+
+11/14/00 CHECKPOINT
+	make tar
+	back to kiwi.	
+
+11/14/00 DBlabel.c database.h 
+	added DBLabelMaxDim
+
+11/14/00 layDisplayGen.c layDisplayHL.c layDisplay.c
+	Using DBLabelMaxDim to avoid label overhead when zoomed way out.
+	Also no longer drawing subpixel box labels.
+
+	Fixes perf redisplay problem when labels on and zoomed out.
+
+11/15/00 CHECKPOINT
+	make tar
+	to mmi
+
+11/15/00 gdsWrite.c
+	Added comment to calmaOutDate() noting that 2000 is coming out
+	as 100, but that this is consistent with other tools. 
+
+11/15/00 Makefile
+	modified to get doc dir from /mmi-cad/src/max/doc instead of
+	/mmi-cad/src/max/proto
+
+11/16/00 CHECKPOINT
+	make tar	
+	back to kiwi.
+
+
+11/28/00 CHECKPOINT			
+	make tar
+	back to mmi
+
+12/2/00	layCache.c
+	modified layCacheCopy() to be noop.  DEBUG!
+
+12/4/00 CHECKPOINT
+	make tar
+	back to mmi
+
+12/4/00	maxtcl/ mc/
+	make update
+
+12/4/00	graphic1.c
+	commented out DEBUGS.
+
+12/4/00	layDisplayGen.c layCache.c
+	commented out DEBUGS.	
+
+12/4/00	layMain.c
+	added XFree 4 bug to LAY_CACHE_STIPPLE_METHOD doc.
+
+12/4/00	layDisplayGen.c
+	changed layCacheStippleMethod default to TRUE
+	circumvents XFree86 4.001 bug (Redhat 7).
+	TODO:  try clipping regions in layCache.c to fix problem.
+
+12/4/00 max/maxVersion.c
+	rmed include of main.h (magic.h and main.h conflict in def of
+	w_char under Linux7?).
+
+12/4/00 Makefile max/Makefile make/Makefile.module
+	changed way of determining if we are on Linux 
+	(old way was broken for Linux7)
+	
+12/4/00	mnTcl.c mnMain.c
+	flex Debug.
+
+12/4/00 maxtcl/stdcell.tcl
+	license_check
+
+12/4/00	mnMain.c
+	skipping alot of init. 
+
+12/5/00 mnMain.c
+	restore init stuff.
+
+12/5/00 make/config.linuxd
+	try -O0
+
+12/5/00 max/Makefile
+	try compiling everything static.
+
+12/7/00 max/Makefile
+	stop making everything static
+
+12/7/00	make/config.linuxd
+	rm -O0
+
+12/7/00	make/config.linux
+	restore -O2
+
+12/7/00 mnTcl.c mnMain.c
+	restore flex. 
+
+12/7/00 maxtcl/ mc/
+	make update
+
+12/7/00 mnTech.c
+	rmed double close of .tech27 file 
+	(was causing malloc heap corruption under linux7!)
+
+12/7/00 mnMain.c 
+	link in LUCKY_VARIABLE
+
+12/7/00	max/max_version
+	max 3.5.14
+
+12/7/00	CHECKPOINT
+	make tar
+	xfer back to kiwi.
+
+12/8/00	mnMain.c
+	LuckyVariable hack (to make work for mha).
+
+12/8/00 layDisplayGen.c
+	rmed DEBUG.
+
+12/8/00 selEnum.c
+	changed selEnumCFunc2 to prefer but not requre matching ids
+	between real and selection use.  Should fix sel_what bug.
+
+12/8/00	max/max_version
+	max 3.5.15
+
+12/8/00	selEnum.c layDisplayGen.c max/max_version.c
+	xfer to MMI.
+	INSTALL.
+
+12/9/00 gdsInt.h
+	added READ_BITARRAY() macro.
+	added calmaOutBitArray() macro
+
+12/9/00 gdsDump.c
+	added CALMA_BITARRAY case to gdsDumpRecord.  
+
+12/9/00 gdsCompile.c
+	added CALMA_BITARRAY case to gdsCompileRecord.  
+
+12/9/00 gdsRead.c
+	corrected type of PROPVALUE
+
+12/9/00	gdsInt.h gdsRead.c
+	added calma record types 60 through 69
+
+12/9/00	gdsInt.h 
+	coded real calmaOutR8() and calmaOutR4() funcs.
+
+12/11/00 CHECKPOINT
+	make tar
+	xfer to mmi
+
+12/11/00 gdsTcl.c gdsCompile.c
+	rmed DEBUGs.
+
+12/11/00 INSTALL
+	installed solaris and linux maxx
+ 
+12/12/00 maxtcl/ mc/
+	make update.
+
+12/12/00 max/max_version
+	3.5.16
+
+12/12/00 INSTALL
+	make install
+
+12/12/00 max/max_version
+	4.0.0
+	Also rmed beta tag.
+
+12/12/00 INSTALL
+	make install
+
+12/15/00 max/max_version
+	 4.0.1
+
+12/15/00 maxtcl/ mc/
+	 make update
+
+12/15/00 INSTALL
+	 make install
+
+12/19/00 maxtcl/ mc/
+	make update
+
+12/19/00 max/max_versions
+	4.0.2
+
+12/19/00 INSTALL
+	make install (TODO)
+
+12/20/00 CHECKPOINT
+	xfer to kiwi
+
+12/20/00 selTcl.c
+	added DEBUG.
+	selEnumCFunc2() - fixed strcmp test on cu_id's.
+
+12/20/00 select.h selEnum.c selOps.c selTcl.c 
+	added second terminal path to SelEnumCells() to hold tentative
+	match while search continues.
+
+12/20/00 layTcl.c mgcE.c mgcFI.c mgcSubrs.c mgcTZ.c
+	second arg to SelEnumCells() calls!
+
+12/20/00 CHECKPOINT
+	xfer back to mmi
+	make tar
+
+12/20/00 maxtcl/ mc/
+	make update
+
+12/20/00 INSTALL
+	installed as maxx. (solaris max4.0.2)
+
+	
+	
+
+
+
+
+
+
+
+

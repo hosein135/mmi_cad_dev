@@ -1,0 +1,31 @@
+# SUE version MMI_SUE4.3.2
+
+proc ICON_wireRCPi args {
+  icon_setup $args {{origin {0 0}} {orient R0} {length 100u} {width 0.44u} {wire M3} {top M4} {bot M2} {spaceLeft 0.46u} {millerLeft 1} {spaceRight 0.46u} {millerRight 1} {process typ} {piSegments 1}}
+  icon_term -type inout -origin {-50 0} -orient RX -name t1
+  icon_term -type inout -origin {50 0} -name t2
+  icon_line -30 15 -30 25 -35 25 -25 25
+  icon_line 50 0 18 0 15 -5 10 5 5 -5 0 5 -5 -5 -10 5 -15 -5 -18 0 -50 0
+  icon_property -origin {-30 30} -size small -anchor center -label gnd
+  icon_arc -50 15 -10 45 -start 66 -extent 47
+  icon_line -30 0 -30 10 -37 10 -23 10
+  icon_line 30 15 30 25 25 25 35 25
+  icon_property -origin {30 30} -size small -anchor center -label gnd
+  icon_arc 10 15 50 45 -start 66 -extent 47
+  icon_line 30 0 30 10 23 10 37 10
+  icon_line -50 -40 -50 40 50 40 50 -40 -50 -40
+  icon_property -origin {-110 70} -type user -name length -default 100u
+  icon_property -origin {-110 460} -type fixed -name spice -text {[genPiSpice $t1 $t2 [quickRCsp R  $wire $length $width $process ] [quickRCsp C ${top}_${wire}_${bot} $length $width $spaceLeft $millerLeft $spaceRight $millerRight $process ] $piSegments] }
+  icon_property -origin {-110 100} -type user -name width -default 0.44u
+  icon_property -origin {-40 -30} -text {$wire $length[if {$width != "0.44u"} {list /$width}] Rnom [expr round([quickRC R $wire $length $width $process 25])] C [expr round([quickRC C ${top}_${wire}_${bot} $length $width $spaceLeft $millerLeft $spaceRight $millerRight $process 25])]}
+  icon_property -origin {-110 130} -type user -name wire -default M3 -choices {popup  "PO M1 M2 M3 M4 M5 M6"}
+  icon_property -origin {-110 160} -type user -name top -default M4 -choices {popup  "M1 M2 M3 M4 M5 M6 NO"}
+  icon_property -origin {-110 190} -type user -name bot -default M2 -choices {popup  "FOX OD PO M1 M2 M3 M4 M5"}
+  icon_property -origin {-110 220} -type user -name spaceLeft -default 0.46u
+  icon_property -origin {-110 250} -type user -name millerLeft -default 1
+  icon_property -origin {-110 280} -type user -name spaceRight -default 0.46u
+  icon_property -origin {-110 310} -type user -name millerRight -default 1
+  icon_property -origin {-110 340} -type user -name process -default typ -choices {popup "typ best worst"}
+  icon_property -origin {-110 370} -type user -name piSegments -default 1
+}
+

@@ -1,0 +1,98 @@
+#!/bin/csh -f
+
+# Runs calibre.  This shell script is invoked from the Max Calibre... command.
+# Copyright (C) 1996 - 1999 Micro Magic, Inc.  All rights reserved.
+
+##################################################################
+##################################################################
+#           SITE CUSTOMIZATION
+
+# This is where the node locked license lives.
+#set calibrehost=mmics6.micromagic.com
+# for the local host, use
+set calibrehost = `uname -n`
+
+# Set this variable to point to calibre drc deck for the appropriate
+# max technology.
+if ($3 == "mmi25") then
+  set calibre_deck = /proj/tech/mmi25/mmi25.calibre
+else if ($3 == "mmi18") then
+  set calibre_deck = /proj/tech/mmi18/mmi18.calibre
+else
+  echo "Aborting, don't know what calibre deck to use with tech = $3."
+  exit 1
+endif
+
+# NOTE: you must remove any lines in your calibre deck of that start with
+#
+#        LAYOUT PRIMARY
+#        LAYOUT PATH
+#        DRC RESULTS DATABASE
+#        DRC SUMMARY REPORT
+
+# Set the variable "setup" to contain any setup required to run calibre
+set setup=""
+#set setup="source ~cad/cad_cshrc"
+
+##################################################################
+##################################################################
+
+if ($1 == "" || $1 == "-h" || $1 == "-help") then
+  echo ""
+  echo "Usage: drc <filename> [<cell>] [<tech>]"
+  echo ""
+  echo "<filename> must include extension."
+  echo "<cell> is top level cell if different from the filename minus extension"
+  echo "<tech> is the max technology name"
+  echo "To view results in max, use: drc_it view"
+  echo ""
+  exit
+endif
+
+if (! -e $1) then
+  echo "Aborting, can't find file $1"
+  exit 1
+endif
+
+date
+
+set cellname = $2
+if ($2 == "") then
+  set cellname = `basename $1:r`
+endif
+
+set filename = $1:r
+
+# Hack to get "" in the next file
+set q = '"'
+
+# create header file for this run.
+echo "INCLUDE $calibre_deck\
+LAYOUT PRIMARY $q$cellname$q\
+LAYOUT PATH $q$1$q\
+DRC RESULTS DATABASE $q$filename.drc_maskdb$q ASCII\
+DRC SUMMARY REPORT $q$filename.drc_sum$q REPLACE" \
+> $filename.calibre
+
+# Remove the old drc results file
+rm -f $cellname.drc_maskdb >& /dev/null
+
+# now run calibre
+set host = `uname -n`
+# If already on mmics6, do not use rsh
+if ( "$host" == "$calibrehost" ) then
+    $setup ; calibre -drc $filename.calibre >! $filename.calibre_log
+else
+    rsh $calibrehost "cd `pwd`; $setup ; calibre -drc $filename.calibre >! $filename.calibre_log"
+endif
+
+# get the error count
+# looking for:
+#   TOTAL DRC Results Generated:     0
+
+grep "TOTAL Original" $filename.drc_sum
+grep "TOTAL DRC" $filename.drc_sum
+
+date
+
+exit

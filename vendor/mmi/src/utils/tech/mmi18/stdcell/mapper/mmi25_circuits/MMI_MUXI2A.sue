@@ -1,0 +1,58 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_MUXI2A {} {
+  make global -name gnd -origin {620 520}
+  make global -orient RY -name vdd -origin {370 120}
+  make nmos -W 1.2 -origin {620 380}
+  make nmos -W 1.2 -origin {620 480}
+  make pmos -W 2.4 -origin {370 260}
+  make pmos -W 2.4 -origin {370 160}
+  make pmos -W 2.4 -origin {620 160}
+  make global -name gnd -origin {370 520}
+  make nmos -W 1.2 -origin {370 480}
+  make pmos -W 2.4 -origin {620 260}
+  make nmos -W 1.2 -origin {370 380}
+  make input -name sel -origin {-20 380}
+  make output -name out -origin {710 320}
+  make inverter -WP 1.2 -WN 0.6 -origin {50 380}
+  make input -name in1 -origin {520 480}
+  make input -name in0 -origin {220 480}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel_L -origin {170 380}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 07/19/99 -origin {340 630}
+  make_wire 370 340 370 320
+  make_wire 370 300 370 320
+  make_wire 370 200 370 220
+  make_wire 620 440 620 420
+  make_wire 620 200 620 220
+  make_wire 370 120 620 120
+  make_wire 620 320 620 340
+  make_wire 370 440 370 420
+  make_wire 620 300 620 320
+  make_wire 520 380 560 380
+  make_wire 560 160 540 160
+  make_wire 540 160 540 480
+  make_wire 540 480 560 480
+  make_wire 540 480 520 480
+  make_wire 370 320 620 320
+  make_wire 620 320 710 320
+  make_wire 310 260 430 260
+  make_wire 310 160 260 160
+  make_wire 260 160 260 480
+  make_wire 260 480 310 480
+  make_wire -20 380 20 380
+  make_wire -20 260 -20 380
+  make_wire 220 480 260 480
+  make_wire -20 260 310 260
+  make_wire 170 380 100 380
+  make_wire 170 380 310 380
+  make_wire 430 260 520 380
+  make_wire 520 260 430 380
+  make_wire 520 260 560 260
+  make_wire 430 380 310 380
+  make_text -origin {20 50} -text {Inverting 2:1 Mux}
+  make_text -origin {20 70} -text {A Size}
+  make_text -origin {20 30} -text MMI_MUXI2A -size large
+}
+

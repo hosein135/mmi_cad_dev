@@ -1,0 +1,18 @@
+proc ICON_or args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {delay 0}}
+  icon_term -type output -origin {40 0} -name out
+  icon_term -type input -origin {-30 -20} -name in
+  icon_term -type input -origin {-30 0} -name in
+  icon_term -type input -origin {-30 20} -name in
+  icon_property -origin {-60 50} -type user -name name
+  icon_arc -60 -29 50 111 -start 35 -extent 50
+  icon_arc -50 -29 -30 31 -start 270 -extent 180
+  icon_line -40 -29 0 -29
+  icon_line -40 31 0 31
+  icon_arc -60 -109 50 31 -start 275 -extent 50
+  icon_property -origin {-20 0} -text {[if {$delay != "0"} {set delay}]}
+  icon_property -origin {-60 70} -type user -name delay -default 0
+  icon_property -origin {-60 100} -type fixed -name verilog \
+	-text {or \#$delay [unique_name "" $name or_]\($out, $in\)\;}
+}
+

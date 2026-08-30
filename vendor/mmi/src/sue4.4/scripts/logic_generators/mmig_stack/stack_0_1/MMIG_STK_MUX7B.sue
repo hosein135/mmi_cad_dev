@@ -1,0 +1,111 @@
+# SUE version MMI_SUE4.0p3
+
+proc SCHEMATIC_MMIG_STK_MUX7B {} {
+  make MMI_AOI22 -origin {380 400}
+  make MMI_AOI22 -origin {380 560}
+  make MMI_AOI22 -origin {380 720}
+  make output -name out -origin {820 480}
+  generate MMI_NAND4 MMI_NAND4B_ -Size B -DeMorgan 1
+  make MMI_NAND4B_ -origin {690 480}
+  make MMIG_STK_MUX7B -origin {760 80}
+  make MMI_NAND2 -origin {340 270}
+  make input -name in0 -origin {70 250}
+  make input -name in1 -origin {70 350}
+  make input -name in2 -origin {70 410}
+  make input -name in3 -origin {70 510}
+  make input -name in4 -origin {70 570}
+  make input -name in5 -origin {70 670}
+  make input -name in6 -origin {70 730}
+  make input -name {sel[6:0]} -origin {70 770}
+  make name_net_s -name {[0]} -origin {240 290}
+  make name_net_s -name {[1]} -origin {240 390}
+  make name_net_s -name {[2]} -origin {240 450}
+  make name_net_s -name {[3]} -origin {240 550}
+  make name_net_s -name {[4]} -origin {240 610}
+  make name_net_s -name {[5]} -origin {240 710}
+  make name_net_s -name {[6]} -origin {240 770}
+  make name_net_s -name N1 -origin {540 270}
+  make name_net_s -name N2 -origin {540 400}
+  make name_net_s -name N3 -origin {540 560}
+  make name_net_s -name N4 -origin {540 720}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.5 -date 06/04/99 -origin {290 1000}
+  make_wire 820 480 750 480
+  make_wire 280 390 240 390
+  make_wire 240 390 160 390
+  make_wire 240 550 160 550
+  make_wire 280 610 240 610
+  make_wire 240 610 160 610
+  make_wire 280 710 240 710
+  make_wire 240 710 160 710
+  make_wire 160 450 240 450
+  make_wire 240 450 280 450
+  make_wire 280 550 240 550
+  make_wire 240 770 280 770
+  make_wire 240 770 160 770
+  make_wire 70 770 160 770
+  make_wire 160 290 160 390
+  make_wire 160 290 240 290
+  make_wire 240 290 280 290
+  make_wire 160 390 160 450
+  make_wire 160 450 160 550
+  make_wire 160 550 160 610
+  make_wire 160 610 160 710
+  make_wire 160 710 160 770
+  make_wire 280 730 70 730
+  make_wire 280 670 70 670
+  make_wire 280 570 70 570
+  make_wire 280 510 70 510
+  make_wire 280 410 70 410
+  make_wire 280 350 70 350
+  make_wire 280 250 70 250
+  make_wire 600 270 600 450
+  make_wire 600 450 630 450
+  make_wire 570 400 570 470
+  make_wire 570 470 630 470
+  make_wire 570 560 570 490
+  make_wire 570 490 630 490
+  make_wire 600 720 600 510
+  make_wire 600 510 630 510
+  make_wire 540 720 480 720
+  make_wire 540 720 600 720
+  make_wire 540 560 480 560
+  make_wire 540 560 570 560
+  make_wire 540 400 480 400
+  make_wire 540 400 570 400
+  make_wire 540 270 400 270
+  make_wire 540 270 600 270
+  make_text -origin {0 30} -text {7 Input Mux} -size large
+  make_text -origin {0 -10} -text MMIG_STK_MUX7B -size large
+}
+
+proc ICON_MMIG_STK_MUX7B args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -60} -name in0
+  icon_term -type input -origin {-60 -40} -name in1
+  icon_term -type input -origin {-60 -20} -name in2
+  icon_term -type input -origin {-60 0} -name in3
+  icon_term -type input -origin {-60 20} -name in4
+  icon_term -type input -origin {-60 40} -name in5
+  icon_term -type input -origin {0 80} -orient R270 -name {sel[6:0]}
+  icon_term -type input -origin {-60 60} -name in6
+  icon_property -origin {-60 200} -type user -name name
+  icon_property -origin {-60 220} -type user -name M
+  icon_property -origin {-60 240} -type user -name dpc
+  icon_line -40 -100 -40 80
+  icon_line 60 0 40 0
+  icon_line -60 -60 -40 -60
+  icon_line -60 -40 -40 -40
+  icon_line -60 -20 -40 -20
+  icon_line -60 0 -40 0
+  icon_line -60 20 -40 20
+  icon_line -60 40 -40 40
+  icon_property -origin {0 0} -anchor center -label {STK B}
+  icon_property -origin {-30 -60} -size small -label 0
+  icon_line -40 -100 40 -60
+  icon_line 40 -60 40 40
+  icon_line -60 60 -40 60
+  icon_line -40 -100 40 -60 40 60 -40 100 -40 -100
+}
+

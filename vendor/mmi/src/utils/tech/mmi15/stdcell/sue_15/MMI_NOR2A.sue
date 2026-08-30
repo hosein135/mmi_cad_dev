@@ -1,0 +1,77 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_NOR2A {} {
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {160 140}
+  make global -orient RY -name vdd -origin {0 -140}
+  make output -name out -origin {320 50}
+  make input -name in1 -origin {-100 -100}
+  make input -name in0 -origin {-100 0}
+  make MMI_NOR2A -origin {550 -230}
+  make nmos -W 0.385 -origin {0 100}
+  make nmos -W 0.385 -origin {160 100}
+  make pmos -W 1.54 -origin {0 0}
+  make pmos -W 1.54 -origin {0 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {50 300}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire 0 50 160 50
+  make_wire -100 0 -60 0
+  make_wire 160 60 160 50
+  make_wire -60 -100 100 -100
+  make_wire 0 -40 0 -60
+  make_wire 100 100 100 -100
+  make_wire 160 50 320 50
+  make_wire -100 -100 -60 -100
+  make_text -origin {-180 -200} -text {2 Input NOR}
+  make_text -origin {-180 -180} -text {A Size}
+  make_text -origin {-180 -220} -text MMI_NOR2A -size large
+}
+
+proc ICON_MMI_NOR2A args {
+  set size A
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "A")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_NOR2 icon body
+  if {$DeMorgan} {
+    icon_arc -30 -30 40 30 -start 277 -extent 166
+    icon_line 10 -30 -40 -30 -40 30 10 30
+    icon_line 40 0 60 0
+    icon_arc -60 10 -40 30 -start 0 -extent 359
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc -60 -30 50 110 -start 35 -extent 50
+    icon_arc -60 -110 50 30 -start 275 -extent 50
+    icon_arc -58 -30 -38 30 -start 270 -extent 180
+    icon_line -48 -30 0 -30
+    icon_line -48 30 0 30
+    icon_line -40 -20 -60 -20
+    icon_line -40 20 -60 20
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+  }
+  # properties
+  icon_property -origin {-37 -22} -size small -label F
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 20} -name in1
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_NOR2A
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

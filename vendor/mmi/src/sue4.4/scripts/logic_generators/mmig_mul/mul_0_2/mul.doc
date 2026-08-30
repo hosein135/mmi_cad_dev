@@ -1,0 +1,127 @@
+Documentation for mul
+---------------------
+rev 0.2, 2/2/99
+
+The multiplier generator is used to derive a multiplier made up of 4:2 adder
+trees.
+
+The complete multiplier is made up of these three generators:  
+  ppg:  partial product generation logic
+  mul_array:  multipler array made up of 4:2 adders
+  adder:  carry propagate adder, forms the final result
+
+ppg and adder can be optionally included or excluded, to allow for substitution
+of different types of logic, or insertion of pipe latches.
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS_A:
+    Definition:
+      The number of bits in input value A_H.  The width of the
+      multiplier's output will be NBITS_A + NBITS_B.
+    Legal Values:
+      4, 8, 16, 32, 64
+    Default:
+      8
+
+  NBITS_B:
+    Definition:
+      The number of bits in input value B_H.  The width of the
+      multiplier's output will be NBITS_A + NBITS_B.
+    Legal Values:
+      4, 8, 16, 32, 64 (note: must be the same value as NBITS_A)
+    Default:
+      8
+
+  UseMulCin:
+    Definition:
+      This argument makes the multiplier's carry in bits accessible to 
+      the user, or not.  If the user elects not to use the carry ins,
+      they will be wired to a logic 0.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+  AddExtraCSA:
+    Definition:
+      This argument allows the user to specify that an extra row of carry 
+      save (4:2) adders be included in the multiplier array.  In addition,
+      two extra input vectors (CSA_A_H and CSA_B_H), each of width 2 * NBITS, 
+      are provided as the additional inputs to this final row of adders.
+      This feature allows the user to implement a multiply-adder, or multiply-
+      accumulator.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      N
+
+  IncludePPG:
+    Definition:
+      This argument allows the user to specify whether the partial product
+      generation logic is included in the multiplier.  If IncludePPG = Y,
+      the ppg generator is used to generate simple (nand-invert) ppg logic.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+  SignExtendInputs:
+    Definition:
+      This argument allows the user to specify whether the multiplier's
+      inputs are sign or zero extended.
+    Legal Values:
+      The allowed values of this argument are "Y" (perform sign extension) 
+      and "N" (perform zero extension).
+    Default:
+      N
+      
+  IncludeCPA:
+    Definition:
+      This argument allows the user to specify whether the carry propagate
+      adder which forms the multiplier's final result is included in the
+      generated schematics or not.  Omitting the carry propagate adder 
+      allows the user to generate their own special purpose adder, or 
+      insert registers at the multiplier tree's output.
+      If the adder is included, a carry select adder of width 2 * NBITS
+      is inserted at the output of the multiplier tree.  This adder is
+      generated from the adder generator.  The adder's carry in and carry
+      out signals are accessible to the user.
+    Legal Values:
+      The allowed values of this argument are "Y" (include carry propagate
+      adder) and "N" (omit adder).
+    Default:
+      Y
+
+  bitslice:    
+    Definition:
+      This argument directs DPC to enforce bitslice layout, or not.  
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+
+INPUT SIGNALS:
+--------------
+If IncludePPG = Y:
+  A_H (multiplier) and B_H (multiplicand)
+If IncludePPG = N:
+  PP*_H (partial product vectors)
+If AddExtraCSA = Y:
+  CSA_A_H, CSA_B_H (extra inputs to the final row of CSA's)
+If UseMulCin = Y:
+  MCin_L, MCarry_H (carry in values to multiplier array)
+If IncludeCPA = Y:
+  ACin_H (adder carry in)
+
+
+OUTPUT SIGNALS:
+---------------
+If IncludeCPA = Y:
+  Result_H (final multiply result)
+  ACout_H (adder carry out)
+If IncludeCPA = N:
+  Sum_H, Carry_H (multiply array redundant outputs)
+
+

@@ -1,0 +1,62 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_INVB {} {
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make pmos -W '4*WNA' -origin {550 200}
+  make nmos -W '2*WNA' -origin {550 360}
+  make MMI_INVB -origin {1000 50}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {500 550}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 80} -text Inverter
+  make_text -origin {360 100} -text {B Size}
+  make_text -origin {360 60} -text MMI_INVB -size large
+}
+
+proc ICON_MMI_INVB args {
+  set size B
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_INV icon body
+  icon_line -30 -30 -30 30 30 0 -30 -30
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_line 30 0 60 0
+  } else {
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+    icon_line -30 0 -60 0
+  }
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_INVB
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in(\$\{in\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

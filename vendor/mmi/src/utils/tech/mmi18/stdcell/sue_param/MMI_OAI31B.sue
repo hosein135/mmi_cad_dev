@@ -1,0 +1,165 @@
+# SUE version MMI_SUE4.1.7
+
+proc SCHEMATIC_MMI_OAI31B {} {
+  make global -orient RY -name vdd -origin {-50 -100}
+  make global -orient RY -name vdd -origin {340 -300}
+  make global -name gnd -origin {-50 200}
+  make output -name out -origin {780 0}
+  make input -name in0 -origin {-150 -60}
+  make input -name in1 -origin {-110 160}
+  make input -name in2 -origin {100 160}
+  make global -orient RY -name vdd -origin {470 -300}
+  make input -name in3 -origin {250 160}
+  make global -orient RY -name vdd -origin {590 -300}
+  make global -orient RY -name vdd -origin {710 -300}
+  make global -name gnd -origin {150 200}
+  make global -name gnd -origin {310 200}
+  make MMI_OAI31B -origin {860 -430}
+  make nmos -W '4*WNA' -origin {-50 60}
+  make nmos -W '4*WNA' -origin {-50 160}
+  make nmos -W '4*WNA' -origin {150 160}
+  make nmos -W '4*WNA' -origin {310 160}
+  make pmos -W '4*WNA' -origin {-50 -60}
+  make pmos -W '3*WNA' -origin {340 -60}
+  make pmos -W '3*WNA' -origin {450 -60}
+  make pmos -W '3*WNA' -origin {590 -60}
+  make pmos -W '3*WNA' -origin {690 -60}
+  make pmos -W '3*WNA' -origin {340 -160}
+  make pmos -W '3*WNA' -origin {460 -160}
+  make pmos -W '3*WNA' -origin {590 -160}
+  make pmos -W '3*WNA' -origin {700 -160}
+  make pmos -W '3*WNA' -origin {710 -250}
+  make pmos -W '3*WNA' -origin {590 -250}
+  make pmos -W '3*WNA' -origin {470 -250}
+  make pmos -W '3*WNA' -origin {340 -250}
+  make LayGen -routing_tracks_above_center 0 -origin {-100 310}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/10/00 -origin {190 460}
+  make_wire -50 -20 -50 0
+  make_wire -50 20 -50 0
+  make_wire -50 120 -50 100
+  make_wire 340 -120 340 -100
+  make_wire 340 -20 340 0
+  make_wire -110 60 -130 60
+  make_wire -130 60 -130 -60
+  make_wire -130 -60 -110 -60
+  make_wire -130 -60 -150 -60
+  make_wire -110 160 20 160
+  make_wire 340 -210 340 -200
+  make_wire 340 -300 340 -290
+  make_wire 20 -60 20 160
+  make_wire 450 -20 450 0
+  make_wire 100 -160 100 160
+  make_wire 90 160 100 160
+  make_wire 150 100 150 120
+  make_wire 280 -250 250 -250
+  make_wire 690 -20 690 0
+  make_wire 590 -300 590 -290
+  make_wire 590 -210 590 -200
+  make_wire 590 -20 590 0
+  make_wire 590 -120 590 -100
+  make_wire -50 0 340 0
+  make_wire 310 100 310 120
+  make_wire 100 -160 280 -160
+  make_wire 20 -60 280 -60
+  make_wire 280 -60 390 -60
+  make_wire -50 100 150 100
+  make_wire 150 100 310 100
+  make_wire 250 160 250 -250
+  make_wire 690 0 780 0
+  make_wire 340 0 450 0
+  make_wire 450 0 590 0
+  make_wire 590 0 690 0
+  make_wire 530 -60 390 -60
+  make_wire 530 -60 630 -60
+  make_wire 400 -160 280 -160
+  make_wire 460 -120 460 -100
+  make_wire 450 -100 460 -100
+  make_wire 280 -250 410 -250
+  make_wire 460 -210 470 -210
+  make_wire 460 -210 460 -200
+  make_wire 470 -300 470 -290
+  make_wire 400 -160 530 -160
+  make_wire 530 -160 640 -160
+  make_wire 700 -120 700 -100
+  make_wire 690 -100 700 -100
+  make_wire 410 -250 530 -250
+  make_wire 530 -250 650 -250
+  make_wire 700 -210 710 -210
+  make_wire 700 -210 700 -200
+  make_wire 710 -300 710 -290
+  make_text -origin {-160 -320} -text {B Size}
+  make_text -origin {-160 -360} -text MMI_OAI31B -size large
+  make_text -origin {-160 -340} -text {Inverting OR-AND 3,1 Gate}
+}
+
+proc ICON_MMI_OAI31B args {
+  set size B
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_OAI31 icon body
+  if {$DeMorgan} {
+    # or
+    icon_line -10 -30 40 -30
+    icon_line -10 30 40 30
+    icon_arc -20 -30 90 110 -start 35 -extent 50
+    icon_arc -20 -110 90 30 -start 275 -extent 50
+    icon_arc -20 -30 0 30 -start 270 -extent 180
+    # and
+    icon_line -40 -10 -80 -10 -80 50 -40 50
+    icon_arc -80 -10 -10 50 -start 277 -extent 166
+    # bubbles and stubs
+    icon_line -100 -30 -30 -30
+    icon_arc -100 30 -80 50 -start 0 -extent 359
+    icon_arc -100 30 -80 10 -start 0 -extent 359
+    icon_arc -100 -10 -80 10 -start 0 -extent 359
+    icon_line 80 0 100 0
+    icon_arc -30 -40 -10 -20 -start 0 -extent 359
+    # properties
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {0 -22} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  } else {
+    # or
+    icon_line -88 -10 -40 -10
+    icon_line -88 50 -40 50
+    icon_arc -100 -10 10 130 -start 35 -extent 50
+    icon_arc -100 -90 10 50 -start 275 -extent 50
+    icon_arc -98 -10 -78 50 -start 270 -extent 180
+    # and
+    icon_line 50 -30 0 -30 0 30 50 30
+    icon_arc 10 -30 80 30 -start 277 -extent 166
+    # stubs
+    icon_line -100 -30 0 -30
+    icon_line -100 0 -80 0
+    icon_line -100 20 -78 20
+    icon_line -100 40 -80 40
+    icon_arc 80 -10 100 10 -start 0 -extent 359
+    # properties
+    icon_property -origin {3 -22} -size small -label F
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  }
+  # inputs
+  icon_term -type input -origin {-100 -30} -name in0
+  icon_term -type input -origin {-100 0} -name in1
+  icon_term -type input -origin {-100 20} -name in2
+  icon_term -type input -origin {-100 40} -name in3
+  # outputs
+  icon_term -type output -origin {100 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_OAI31B
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .in2(\$\{in2\}), .in3(\$\{in3\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

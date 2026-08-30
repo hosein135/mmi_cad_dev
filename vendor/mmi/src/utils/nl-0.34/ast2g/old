@@ -1,0 +1,108 @@
+
+#(define-rewrite ast2g_infer_Fxxx :preorder
+   (replace
+    (ALWAYS
+     (LIST (NEGEDGE $clk))
+     ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+      $rhs
+      $lhs))
+
+    (ALWAYS (LIST)
+     (BLOCK_ASSIGN 
+      (FUNCALL '*SEQGEN_Rxxx* $clk $rhs)
+      $lhs))))
+
+
+#(define-rewrite ast2g_infer_RHxx :preorder
+   (replace
+    (ALWAYS
+     (LIST (POSEDGE $clk))
+     (IF $reset
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  (call-predicate ast2g_is_constant)
+	  (OUT &rest) =lhs &rest)
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  $data
+	  (and (OUT &rest)
+	       (test 
+		"nl_out_ast_index ((nl_out_ast) __tree) == $lhs.out_index")))))
+
+    (ALWAYS (LIST)
+     (BLOCK_ASSIGN 
+      (FUNCALL '*SEQGEN_RHxx* $clk $reset $data)
+      $lhs))))
+
+
+#(define-rewrite ast2g_infer_RRxx :preorder
+   (replace
+    (ALWAYS
+     (LIST (POSEDGE $clk) (POSEDGE (REF (ID &rest) =reset)))
+     (IF (and (REF (ID &rest) =reset2)
+	      (test "strcmp ($reset2.name, $reset.name) == 0"))
+	 
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  (call-predicate ast2g_is_constant)
+	  (OUT &rest) =lhs &rest)
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  $data
+	  (and (OUT &rest)
+	       (test 
+		"nl_out_ast_index ((nl_out_ast) __tree) == $lhs.out_index")))))
+
+    (ALWAYS (LIST)
+     (BLOCK_ASSIGN 
+      (FUNCALL '*SEQGEN_RHxx* $clk $reset $data)
+      $lhs))))
+
+
+#(define-rewrite ast2g_infer_FFN :preorder
+   (replace
+    (ALWAYS
+     (LIST (NEGEDGE $clk))
+     (IF $reset
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  (call-predicate ast2g_is_constant)
+	  (OUT &rest) =lhs &rest)
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  $data
+	  (and (OUT &rest)
+	       (test 
+		"nl_out_ast_index ((nl_out_ast) __tree) == $lhs.out_index")))))
+
+    (ALWAYS (LIST)
+     (BLOCK_ASSIGN 
+      (FUNCALL '*SEQGEN_FHxx* $clk $reset $data)
+      $lhs))))
+
+
+#(define-rewrite ast2g_infer_XX_ :preorder
+   (replace
+    (ALWAYS
+     (LIST ((POSEDGE NEGEDGE) =clk_sense $clk)
+	   ((POSEDGE NEGEDGE) =rst_sense $clk))
+     
+     (IF $reset
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  (call-predicate ast2g_is_constant) =const
+	  (OUT &rest) =lhs &rest)
+
+	 ((NONBLOCK_ASSIGN BLOCK_ASSIGN)
+	  $data
+	  (and (OUT &rest)
+	       (test 
+		"nl_out_ast_index ((nl_out_ast) __tree) == $lhs.out_index")))))
+
+    (ALWAYS (LIST)
+     (BLOCK_ASSIGN 
+      (FUNCALL (if "$clk_sense.token == nl_token_posedge"
+		   '*SEQGEN_RHx*
+		 '*SEQGEN_FHx*)
+	       $clk $reset $const $rhs)
+      $lhs))))
+

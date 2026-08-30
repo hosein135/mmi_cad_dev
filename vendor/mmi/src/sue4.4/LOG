@@ -1,0 +1,980 @@
+
+
+--- 4.0p2 ---
+
+990402	Can't edit hotkeys help window
+
+990405	All popup windows are relative to SUE window (except dialog)
+
+990405	fixed undo bug seen in generators but also could happen
+	if you edit an icon and then tried to undo an instance
+	of that icon
+
+990405	fixed a property menu bug so that if you had radio buttons
+	or other fancy features and didn't change anything then
+	it understood.
+
+990407	changed default font sizes for menu, etc. in .suerc to
+	be compatible with PC's.
+
+990408	added read_sdf to primetime if .sdf suffix in time_it
+
+990420	added menu option to file a bug report
+
+990427	added entry and leave bindings to show help over listboxes
+
+990428	added log file (suelog.date) for all of sue's output using tee
+
+--- 4.0p3 ---
+
+990429	fixed bug in netlist cache that resulted in getting a SUE
+	ERROR when dpc netlisting of the form "0 + <name>".
+
+990429	added new feature to make the default netlisting be to ignore
+	a verilog (or other) property.  Add the line to the icon:
+		-type fixed -name netlist_level -text 2000
+
+990429	improved error reporting -- includes lowest level procedure
+	name that had the problem.
+
+990503  tried to solve memory usage problem.  rewrote get_net_equiv.  removed
+	use_first of large associative array.
+
+990504  fixed panning
+
+--- 4.0p4 ---
+
+990510	added api_bbox which returns the current bounding box of the schematic
+
+990604	improved max cross probing so you don't have to initialize in both max
+	and sue.
+
+990604	add DESIGN statement to beginning of place.def file
+
+990604	if nothing in cell before pasting, doesn't force user to move it
+
+990604	fixed paste bug that sometimes move an icon from the origin
+	schematic
+
+990614	fixed bug that didn't compute est cap for bused instances on megacells
+
+990618	if ports file changed (before SUE started), invalidates disk cache
+	Note: if ports file removed, must manually remove cache files.
+
+990618  if a wire is selected, push into connected instance and highlight wire
+	there.  Highlight an instance to prefer it.
+
+990625	fixed up pearl interface to produce better error and warning
+	messages.
+
+990625	new version of storing port locations internally to save
+	memory.  Note: this will NOT work correctly (as is) with
+	primetime.
+
+990628	executes NAME_<generator> with the arguements so the user can define
+	how to name a generator instead of relying on the argument
+	concatentation which can generate very long names.
+
+990715	Default generators from listbox now also call NAME_ procedure
+	to get names.
+
+990716	cursor changes to resize over left edge of listboxes and drag button1
+	for resize.
+
+--- 4.0p5 ---
+
+--- 4.0p6 ---
+
+990801	removed <> that controlled listbox width.  Replaced with drag
+	mouse on boundary when cursor changes to <=>.
+
+990805	Fixed fonts so you can scale the standard font.
+
+990810	Improved handling of generator names in title bar of window.
+
+990810	Improved pearl interface to dpc.
+
+990810	Added pathmill interface to dpc.
+
+990810	Rewrote spice script to run spice.
+
+990811	Improved netlist caches to check for changes in	dpc cell sizes.
+
+990812	If multiple items selected and do a push into, gives warning
+	unless you highlite one of them (only works from hotkeys)
+
+990812	Added api_select to select something in the schematic by name
+
+--- 4.1.1 ---
+
+990824	Added ability to rotate, flip, mirror when dropping an icon
+
+990825	Added "display in other view" to toggle between placement and
+	schematic in dpc and select corresponding icon.
+
+990826	Improved Pathmill handling of sequential logic -- displays
+	slack times.
+
+990827	Added a filter to Pathmill to remove redundant paths with differing
+	rise/falls based on a .suerc variable.
+
+990827	Only autoload library once in AUTOLIB (ignore duplicates)
+
+990827	When finishing a wire to closest, tries to come in in the
+	direction of the I/O.
+
+--- 4.1.2 ---
+
+990831	Added rspf for pearl.
+
+--- 4.1.3 ---
+
+990920	Fixed bug in running spice/adm/powermill
+
+--- 4.1.4 ---
+
+990922	Changed to use new licensing
+
+990922	Changed for solaris/linux cohabitation
+
+990922	Also reads .suerc from ~/mmi_private/sue
+
+990922	Improved push into from a selected wire
+
+990924	Pop connected (thanks, in part, to Doug)
+
+990927	Added api_transform_selected.  Changed api_select * to select all.
+
+990928	Looks first in ~/mmi_private/sue for spice, adm_go, and powermill_go.
+
+--- 4.1.5 ---
+
+991115	Fixed undo bug that caused off grid sometimes.  Added an
+	internal ERROR message if it happens (shouldn't).
+
+991115	Can turn on/off sue log at the command line or with the
+	environment variable SUE_LOG.  Defaults to off.
+
+991115  Fixed pathmill spice last critical path to use the appropriate
+	spice script, not just the first one in the path.
+
+991116	Improved binary constant netlisting in spice mode.
+
+991124	Improved printing so it uses unique file names.  Otherwise
+	some print queue's didn't work correctly with multiple files.
+
+991130	Improved error handling on spacers in DPC.
+
+991216	fixed bug with making an implicit bus out of a named wire that is
+	connected by name to a scalar I/O.
+
+991217	Added hierachical flipping in DPC.
+
+991220	Enhanced replace instance to replace multiple selected instances.
+
+991220	Fixed bug in unexpanding placement in DPC when you have
+	multiple levels showing.
+
+991220  In DPC, non-bused instances now look for p=<num> in dpc property
+	for bit position in the same way that bused instances do.
+
+000105	Added cursor warping to most popups.
+
+--- 4.1.6 ---
+
+000113	Sets TclIndex to be rw for all.
+
+000115	Adds support for HSPICE 9601 binary format for cross-probing
+	to nst.  Auto detects tr0 format and translates or not signal
+	names accordingly for nst crossprobing.
+	NST2.2 enhanced to read 9601 format.
+
+000118	DPC uses verilog module type instead of cell name.  The two
+	can be different depending on the verilog property.
+	Otherwise, the verilog and def placement file don't match.
+
+000119	When making other view, I/O's are placed in alphabetical order.
+
+000119	Bus notation now supports [msb:lsb] AND [lsb:msb]
+
+000120	Improved tclIndex behavior.  You don't need to be able to
+	write tclIndex's any more.  If they are out of date and you
+	can't write them, SUE will just compute them and use them
+	without writing (i.e. caching) them.
+
+000128	Added 2 new api routines: api_netlist_data, api_instance_type_data
+
+000128	Added show instance origins menu command
+
+--- 4.1.7 ---
+
+000203	changed DPC_TIMING(max_gate_delay) to a more accurate name of
+	DPC_TIMING(max_transition).  The old name still works for backwards
+	compatibility.  Note, this value should have units.
+
+000203	Improved DPC primetime interface
+
+000203	Added origin and bbox return fields to api_instance_data
+
+000203	New api routines api_types and api_get_data.  api_types gets the
+	ids of instances, wires, lines, arcs, and text in the current cell.
+	api_get_data gets data about specific ids.
+
+000204	Added unix environment variable SUE_IGNORE_SUERC to disable
+        selective .suerc file loading.
+
+000207	updated pearl interface to save timing values for all layers of
+	hierarchy.  Also fixed bug parsing negative times from pearl.
+
+000210	cleaned up hotkey stuff
+
+000210	DPC critical path list scrolls if more than 20 cp's
+
+000211	Display critical path on timing now follows port locations on
+	megacells (or anything with ports specified).
+
+000214	New "edit object names" menu item.  From Doug's code.
+
+000221	Improved wiring interface:
+		added zooming/unzooming capability during wiring
+		added start wire at closest
+		added Control-Button-1 for closest
+		fixed infrequent undo wire segment bug
+
+000221	Added an "a" button to alphabetize the schematics listbox.
+
+000222	Improved when user makes a new schematic or copies a schematic.
+	Warns user if conflicts.
+
+--- 4.1.8 ---
+
+000225	Improved Ctrl-C when netlisting.  Seems to work now.
+
+000225	Improved implicit bus detemination when using connect by name.
+
+000228	Improved busing to allow foo[31:0] to be arrayed into in[1:0] on an
+	instance that has the bus name [15:0].
+	Added warnings if busing not done correctly.
+
+000302	Changed NETLIST_MAX_NAME_LENGTH to be defined in the .suerc file
+	and not changed during netlisting.  It used to be set to 13
+	for netlisting to spice format but this is no longer needed.
+
+000302	Fixed bug in DPC capacitance calculation with an uneven grid.
+	x,y in both DPC(SCALE) and DPC(MICRON_CAP_FACTOR) refer to
+	x,y in layout dimensions which is rotated 90 degrees from DPC.
+
+000303	Changed spice netlisting to use similar naming scheme to
+	verilog except retains [] instead of converting to $.
+
+000306	Fixed estimated capacitance bug from an arrayed instance
+	that is a leaf cell AND has a bused port (i.e. sel[3:0]).
+
+000309	Added popup to choose what bit of a bus to display in hspice
+	probing.
+
+000310	Added ability to make cells read-only -- no modifications
+	allowed.  Can toggle with the menu.  New global variable
+	READ_ONLY in .suerc.  If 1 all cells are read only.
+
+000313	Added DPC(PORT_ADD_CAP) for adding additional capacitance to certain
+	ports (e.g. q output on flipflop for later scan load).
+
+	For example, to add 10fF to the q output of flipflop MMI_SFFB:
+	     lappend DPC(PORT_ADD_CAP) {MMI_SFFB/q 10}
+
+000317	Added "Text Commands" window with on line documentation of the
+	SUE Programming interface (API).
+
+000317	Added api_change_cell_path function.  Handy to change path of
+	cell, netlist, and then change it back.
+
+000317  Fixed read verilog I/O's to handle with multiple verilog
+	modules in a file
+
+000320	Improved "edit object names" to include text objects, unnamed
+	and return characters.
+
+000322	Added global variables to "Text Commands".  Note: only a small
+	number of global variables added so far.
+
+--- 4.1.10 ---
+
+000327  Added api_revert, api_push, api_pop, api_cell_hierarchy,
+-000417	api_annotate_text, api_annotate_line, api_orient_transform,
+	api_overlap_ports, api_zoom, api_clear_annotations,
+	api_delete_selected, api_undo, api_move_selected,
+	api_new_cell, api_cells, api_change_simulation_mode,
+        api_icon_listbox, api_icon_listboxes, api_show_connections,
+	api_make, api_make_wire, api_make_text, api_select_ids, api_overlap,
+	api_make_line, api_make_arc, api_visible_bbox
+
+000331	Removed "flashing" of loaded cells when netlisting.  If you
+	want it back, add
+		set FLASH_CELL_ON_LOAD 1
+	to .suerc.  NOTE: will be slower with flashing.
+
+000403	Changed pan command to follow mouse without any acceleration.
+
+000413  Added zoom when dropping an icon into a schematic from a listbox,
+	when duplicating, and when pasting.
+
+000414	New interface with menus for changing text size and anchor when
+	modifying text.  Also Escape now aborts text mode and undo undoes
+	changes is text size or anchor position.
+
+*** SUE FORMAT CHANGE ***
+
+000414	Added 2 more text sizes: very-small and very-large.  Older
+	versions of SUE will not read these text sizes and cause errors.
+
+000414	SUE now looks for sue.rc files in addition to .suerc files.
+	sue.rc is not a unix hidden file (doesn't require ls -a to see)
+	with the hope that users will see them easier.
+
+000418	Fixed "delete selected" to not show connection info in icons
+	and placements.
+
+000418	Added current hierarchy to title bar.
+
+000420	Added a flip line to the DPC ports file.  Flip defaults to 1
+	which means that the next row is flipped.  If the line: "flip 0"
+	is included in the ports file, then the next row is not
+	flipped.
+
+000420	Fixed a bug with inconsistency between dpc names and est_cap
+	files that was introduced around 4.1.7
+
+000420	During spice netlisting, you can now also supply a footer (like a
+	header but added to the end of the netlist before the .ENDS
+	statement).  The default suffix for footers is ".f".
+
+000421	Added sue2edif (edif writing) thanks to Marshall.
+
+000421	Fixed a bug with netlisting multiple times that was introduced
+	around 4.1.9.
+
+--- 4.1.11 ---
+
+000425	Enhanced connection code so that when moving/duplicating a
+        wire so that it overlaps a terminal or another wire endpoint,
+        not at the endpoint of the original wire, it shows connections
+        correctly.
+
+000425	Enhanced sim (irsim) probe to automatically make buses into
+	irsim vectors.
+
+000426	"Check file system" now reports to a popup window and to the
+	the SUE command window.
+
+000431	Added input_transition to the time_it popup in DPC.  Also
+	fixed the Pearl interface to override the pearl.tech file
+	and use the DPC_TIMING(input_transition) value instead.
+
+--- 4.1.12 ---
+
+000431  Added a local menu and changed the default menu in menu_add
+	to put stuff there.
+
+000431	Rearranged menu items, added "Cut to Clipboard", and uppercased the
+	first character of each menu item.
+
+000522	Fixed estimated cap file in DPC for bused globals.
+
+000522	Fixed spice last critical path for pathmill with sequential circuits
+	to use correct syntax.
+
+000524	Changed naming so that instances in spice and verilog netlists
+	will have the same names if you substitute [] and $.
+
+000524	All Alt- bindings are also defined as Meta-.  Thus to hit Alt-c
+	you could hit Meta-c since Alt- is sometimes eaten by the
+	window manager.
+
+000525	Added zoom in/out capability when stretching a selection box.
+
+000525	Added message when including headers in spice and verilog
+	netlists as to where they came from.
+
+000525	Added api_cell_path for getting complete hierachical net names from
+	a netlisted schematic
+
+000526	Changed icon/schematic I/O checking to check for reversed buses
+	and other things.
+	NOTE: Can't break up buses in icons now, which produced incorrent
+	verilog (but correct spice).
+
+--- 4.2.0 ---
+
+000615	Added steiner routing and DSPF file generation to DPC (i.e. RC
+	parasitic extraction).
+
+000616	Added "Zoom In on Cursor" menu item/hotkey.  If called from
+	menu will wait for user to position cursor and then zoom.
+
+000616	Added menu items "Edit Selected" and "Edit Generator" that
+	do the same as double-button-1 and shift-double-button-1.
+
+000616	Changed some hotkey definitions to unify with MAX.
+
+000621	Improved font handling, including a tiny font.
+
+--- 4.2.1 ---
+
+000622	Fixed bug in "Object Name Editor".  Didn't sort by x,y.
+
+000623	Fixed security bug in core files.
+
+000627	Fixed bug when printing with PRINT(DONT_PRINT_ICONS).  No longer
+	modifies buffer or flashes screen.  Note: now leaves a
+	possible connection dot.
+
+000627	Added api_annotate_filled_rect, api_replace_instances,
+	api_check_ios.
+
+000629	Changed csh -c to csh -cf in timing when calling sta.
+
+000630	Fixed toggle show placement to do nothing (not go to top
+	level cell) if no placement exists.
+
+--- 4.2.2 ---
+
+000712	Added tags to annotations.  Added api_annotate_change_color.
+
+000718	Fixed so when you move cursor over listboxes, the window
+	title doesn't flash.
+
+000719	Added concatenated buses.  Name_nets (but not I/O's or globals
+	or instance names) can be of the form <signal>,<signal>,...
+	There is one known incompatibility with the old sue:
+
+		[3:0]	     [3:2]	   [3:0]            [3:2]
+		    |\      +--+---            |\          +--+---
+                    | \     |                  | \   [3:0] |
+		 ---|  )O---+         ==>   ---|  )O---+---+
+                    | /     |                  | /         |
+		    |/      +--+---            |/          +--+---
+			     [1:0]                          [1:0]
+
+	SUE will no longer figure out picture on the left without
+	labeling (with a name_net) the output wire.
+
+NOTE: must fix sue2edif to handle
+
+000719	Added checks and warnings for buses widths mismatched to port
+	widths.
+
+000721	Can now ctrl-c out of DPC absolute placement.  Also doesn't
+	leave any open file pointers when ctrl-c'ing.
+
+000721	If cell has a problem loading such as "can't find icon" then
+	it is now made read_only instead of modified.
+
+000721	Netlister flags an error if netlisting a cell with a missing
+	icon.  The error warns the user and prevents the netlist
+	from getting cached.
+
+000724	In addition telling SUE to create a log file, you can now name
+	the logfile.  0 means no log file.  1 means log file with
+	deafult log file name (suelog.[pid]).  Anything else means
+	logfile with that name.
+
+000724	If you want an icon to show up in the DPC placement file but
+	not in the verilog netlist, you can add a "//" (i.e. comment
+	character) to the beginning of the verilog property now.
+
+000801	Changed hotkey notation in menus to display G as Shift-g, etc.
+
+000801	Rewrote entire "Wires and Buses" section of the SUE manual
+	to include concatentated buses and other stuff.
+
+000807	Improved verilog interactive display term values to print all
+	values even on huge schematics or very long values.  Warns
+	user if fails.
+
+000809	Fixed bug when creating a large rectangle.
+
+000811	Added 10X additional zoom out capability.
+
+--- 4.2.3 ---
+
+000824	Push into with push into an icon if nothing is selected but the icon
+	is highlighted
+
+000829	Enhanced Toggle Placement View to return to hierarchy from
+	which you came.
+
+000829	Grid spacing menu now automatically changes when you hit the 
+	uniform button.
+
+--- 4.2.4 ---
+
+000830	Added SUE_EXECUTE variable.  Any command added to this
+	variable, preferably with the lappend command, will get
+	executed after SUE comes up but before any command line 
+	commands.
+
+000830	Fixed est_dspf bug with bused ports found by jdj.
+
+000830  Fixed bug in push_connected to a bused terminal reported by jdj.
+
+000830	Check added so can't make a verilog prop if any unnamed ports.
+
+000901	In addition to anchors e,w,c added s,n,ne,nw,se,sw.
+	Shift-space brings up help window when editing text.
+
+000901	In addition to moving edit markers, line/rectangle drawing and
+	arc/circle drawing is off-grid if Control key held down.
+	If Control key in move mode, allows to move off grid if
+	enabled.
+
+000901	Add api_visible_bbox and api_verilog_property commands.
+
+--- 4.2.5 ---
+
+000904	Fixed bug with hier_assigns (never worked).  Hier assigns are
+	feedthrus in subcircuits.
+
+000906	Fixed visible_bbox and similar to be cleaner and not have rounding
+	errors.  Allowed canvases to be bigger without problems with zoom.
+
+--- 4.2.6 ---
+
+001002	Added a Critical Path (CP) instances menu for quickly
+	highlighting instances in a DPC critical path.
+
+001002	Added a check during generate terminal names to flag input I/O's
+	driving outputs and output I/O's driven by inputs.
+
+001002  added push_into_schematic {} prefer_highlited for jdj.
+
+001005	Fixed so when change a schematic I/O doesn't flash the icon
+	even if	it isn't loaded.
+
+001005	Changed launch to execute with uplevel 1.  Note: launch
+	evaluates arguments and thus can't be given foo[3] for example.
+	
+001005	Enhanced api_instance_data, api_get_data and api_instance_type_data
+	to take an optional property argument and then return the
+	value for that property	only.
+
+001005	Added Swap View Selected that swaps views but also selects the
+	I/O's in the new view that were selected in the old view.  Useful
+	for very large schematics.
+
+001006	Added api_netlist_info which gives netlist information about cells.
+
+001009	Changed default pan magnification from 1 to 2 and added PAN_MAG global
+	for user to change if desired.
+
+001012	Fixed read verilog I/O's and edit verilog to understand verilog tasks.
+
+001012	API reference guide can be auto generated from make_api_manual.
+
+001106	SUE now parses decimal, octal, and hex constants in addition
+	to binary constants thanks to Doug.
+
+001108	Interactive verilog probing enhanced to include constants,
+	concatentated buses, and try not to overlap values.	
+
+001128	Added global binary variable NETLIST_CONVERT_CONSTANT.  If
+	true (1) converts all non-binary constants (hex, decimal, octal)
+	into binary in the verilog netlist.
+	
+001130	Improved grid to cover larger areas.
+
+--- 4.2.7 ---
+
+001206	Fixed bug in plot memory (spice) where broke if had both currents
+	and voltages.
+
+001207	Add LuckyVariable check.  Warns on any modification if true.
+
+001212	Fixed Modify Properties so you can use * not as a wildcard
+	by prefixing with the quote character \ (i.e. \*).
+
+001213	Fixed show_connects so causes schematic to show modified if
+	it breaks wires unless a generator.
+
+001214	Fixed bug so generate bus_combine bus_combine doesn't put
+	bus_combine into the generators menu.
+
+--- 4.2.8 ---
+
+010102	Moved Micro Magic SUE message before license message.
+
+010102	Fixed bug in dpc arrayed instances across rows.  
+
+010105	Fixed edif output for new text sizes and anchors.
+
+010105	Added SPICE_EXTRACTED_CELL_PATH to allow you to use extracted
+	subckt netlists in spice simulation for leafcells.
+
+010109	Fixed message for cut to clipboard.
+
+010109	Added a message to the message window whenever you try to 
+	do something to a READ-ONLY cell.
+
+010109	Fixed bug where no missing icon is shown for missing icons.
+
+--- 4.2.9 ---
+
+010117	Added api_delete.  Fixed api_delete_selected so it doesn't
+	flash the screen.
+
+010117	Fixed a bug where the scrollbars sometimes didn't get set correctly.
+	
+010117	Fixed toggle read only to reset message window so you don't
+	continue to see the READ ONLY message if it was there.
+
+010130	Added "intel" SPICE_TYPE.
+
+
+--- 4.2.10 ---
+
+010206	Fixed bug in generate term names for case: a[3:0]---[3],[1],[2],[0]
+
+010206	Added fix for special case of moving an open froma terminal past
+	another terminal in one direction.  Now causes a connect.
+
+010206	The r= field in the dpc property can now specify skipped rows.  It
+	also sets negative rows to 0 and turns expressions into integers.
+
+010213	Fixed show possibility and parsing so no bogus errors.
+
+010213	Fixed inputslew to only include inputs, not * which got
+	outputs, too.
+
+010214	Fixed bug in parasitic file writing for primetime.  Removed
+	extraneous {}.
+
+010215	Before running a spice like simulator, changed the way that we
+	move the old binary data file.  If it is a link, now copies
+	to file.
+
+010215	Fixed bug where an open didn't know what net it was attached to.
+
+
+--- 4.2.11 ---
+
+010301	Added hierarchical cell mirroring to DPC in addition to flipping.
+
+010301	Added default arrival time and default setup time to time_it
+	menu.  Note: default setup time used for departure time since
+	it is clearer.
+	
+010307	Updated signalscan interface to work with signalscan V6.
+	Removed signalscan4 probe command.  
+
+010307	Fixed bug where port coordinates were swapped in DPC-generated
+	dspf file -- NOTE: these were only comments.
+
+010308	Fixed bug where cells that had different verilog names (e.g. from the
+	mapper) and were arrayed didn't get the correct size.
+
+--- 4.2.12 ---
+
+010315  Fixed bug with hierarchical mirroring.
+
+010315	Changed Apropos to Search in Text Commands/Variables menu.
+
+010315	Added delay option to inverter and nand2 spice generators
+	for verilog netlisting.
+
+010319	Fixed name objects bug in icon when origin is selected.
+
+010322	Changed row_spanner to spanner to be less confusing.  Added
+	  set GENERATORS(row_spanner) "generate spanner row_spanner -cell spanner"
+	to the system .suerc file to convert the old name to the new one
+	NOTE: to load into older versions of sue, will have to make
+	a reverse GENERATORS to replace this one.
+
+010323	Removed special case fixes for primetime assign nets with
+	parasitics bug.  Must run primetime 2000.11 release or later
+	which fixes this bug.
+	
+--- 4.2.13 ---
+
+010323	When reading ports files, first looks for one with the name
+	from the verilog line and then looks for one from the name
+	of the cell (different when using the mapper).
+
+010323	Added translation of ports if cell name is different then
+	verilog name for dspf file generation (different with mapper).
+
+010326	Fixed bug where 0 row spacer caused a row to be inserted in an
+	otherwise empty row.
+
+010326  Added init_probe with options for Intel along with
+	INTEL_CORNER global variable default of _1.
+
+--- 4.2.14 ---
+
+010327	Fixed bug in bug introduced with spacer bug fix.
+
+010327	Added a ruler command to the view menu.  Mainly for DPC placements.
+
+010327	Uses GENERATORS array as an alias for generators, too.
+
+010328	Added NETLIST(ignore_connected_outputs) to ignore errors if
+	outputs are tied together.
+
+010402	Added ability to define preroutes in DPC
+
+010403	Fixed error handling with SCCS.
+
+010404	Enhanced DPC Primetime interface to include input pins (otherwise
+	the reporting was confusing and the backannotation incorrect
+	for nets with RC's) and use the -f option so the output file
+	includes the commands from the input file.
+	
+--- 4.2.15 ---
+
+010409	Fixed bug where could not override arrayed name in DPC of 
+	foo[3:0] with [4:1] in dpc property.
+
+010409	Added option to create pins during DPC based on orientation
+	of I/O symbol in schematic.
+
+010409	Added a halo option DPC(HALO), default 0, to dpc for adding
+	extra routing tracks around a placement.
+
+010409	Changed verilog names like foo$-2$ to foo$m2$ to make them legal.
+
+
+--- 4.2.16 ---
+
+010509	Fixed bug where 3'b0,w[2:0] was not dealt with correctly.
+	Parasitics on w[2:0] were lost.
+
+
+--- 4.3.0 ---
+
+010420	Uses nl database.
+
+010420	New feature "Display Connections" in the placement view.
+
+010420	Steiner routing includes to pin locations.
+
+010426	Added a ruler setup command to change ruler parameters.
+	New ruler parameter to toggle default ruler mode of
+	either manhattan or diagonal.
+
+010430	When reading ports file, sets flip based of number of rows: odd flip
+	once, even don't flip.  This can be overridden with a "flip"
+	line in the ports file.
+
+010430	Fixed bug in PORT_ADD_CAP.
+
+010502	Added preroutes to pins.
+
+010502	Display in other view made to work with top-level pins.
+
+010503	Added display CP on placement to include top level pins if present.
+
+010504	When looking for a clock in DPC timing, looks at each bit in every
+	input bus.
+
+010504	Added name translation to pins during pin placement.
+
+010509	Show selected terms now works on hierarchical placement cells.  Also
+	shows pin direction.
+
+010510	Moved parasitic creation to time_it so DPC Netlist doesn't
+	do the parasitic creation.  Note: time_it won't redo
+	parasitics unless it has to.
+
+010518	Added last modified by to title bars
+
+010523	Changed "Edit Selected" to "Edit Properties..." to better explain
+	function and make in line with max.
+
+010524	Added Control-Button-1 in schematics list box to drop the
+	corresponding icon into the current schematic.
+
+010611	Bug Fix.  If icon is changed and there is a schematic, now uncaches the
+	schematic for netlisting.  Otherwise, changes in user properties, like
+	defaults, may not show up in netlist.
+
+010611	Fixed bug when reverting an icon, threw away hierachy for popping.
+
+010611  In DPC_TIMING(ctlf_file), If a path name includes "ctlf" in the
+        name (or extension), uses readctlf in Pearl, otherwise uses readtlf.
+
+--- 4.3.1 ---
+
+010612  Added ability to rotate leaf cells with ports files and a
+        specified orientation.  Add R90 (case sensitive) to the dpc
+	property to rotate 90 degrees.  Use R90 with mirror and flip 
+	to get all orientations.
+
+010612  When dpc property r=2 or greater and a blank row(s), uses
+	default row height instead of maximum row height.
+
+010612	If icon has a special property called "comment" and that property is
+	non-nil then it is added to the verilog netlist, prefixed by // .
+	Note: the comment is only written once, even for arrayed instances.
+
+010613	Added a check for ports in the ports file being different than in the
+	icon.  Warns if different.
+
+--- 4.3.2 ---
+
+010620	A scalar signal into a bused input is now duplicated in verilog as was
+	done in spice.
+
+010711	Added an option to Select Simulator menu in spice mode to
+	specify the output data suffix.  For spice this defaults to
+	.tr0 with the SPICE_SUFFIX(spice) variable but if running an
+	ac simulation you want to change this to .ac0.
+	
+010712	Added & to print comment so it doesn't hang SUE until the print is done.
+
+010713	Ignores duplicate property definitions in icons.
+
+010716	Enhanced api_cell_info to return read_only status of cell and to take
+	an optional property.
+
+010716	Added a new "name_net" called a suggested_name.  It is part of
+	the "name_net_s" generator -- i.e. just shift-double-click on
+	a name_net and you will see it.  A suggested_name on a net
+	will only name the net if nothing else names it -- i.e. it has
+	a lower priority than either globals, I/O's or name_nets.
+	Furthermore, unlike a name_net, nets with the same suggested
+	name will NOT get tied together.  Instead, one of the nets
+	will get a unique name.  The suggested names were added so
+	that you can have unnamed nets whose name doesn't change with
+	each netlisting.  To facilitate this, there is a new global
+	variable called CREATE_SUGGESTED_NAMES which defaults to false
+	(0) but when set to true (1) will added suggested_name icons
+	to all unnamed nets after netlisting (technically after
+	generating term names).  
+
+010716	Added api_clipboard so you can cut, copy, and paste from
+	the api.
+
+010730	Added by_type option to api_select and new api_generate_inst_names.	
+	Can also choose "Search by instance type" in the "Select by Name"
+	menu.
+
+010802	Options to starting sue are now case insensitive.  For
+	example, can now do: sue -set foo=3
+
+010806	Prompt, title, and icon name are now synchoronized visually
+	for multiple sue sessions.  The second simultaneous sue
+	session is called SUE#2, etc.
+
+010806	Added Pat's -option code to proc command.	
+	
+010813	Added api_modify_cell to mark the current cell modified,
+	api_delete_buffer to delete a SUE buffer, and api_is_selected
+	which returns 1 if the given id is selected.
+
+--- 4.3.3 ---
+
+010914  Add api_toggle_placement which has the same behavior as the
+	DPC menu command "Toggle Placement View".
+
+010914  If generate terminal names changes any suggested_name nets 
+	now marks the cell as modified.
+
+010914	Changed title bar to display actual file where generators come
+	from.
+
+010914	Changed stdcell library to have no schematic, be nonhierdemorgan,
+	and not have M property.
+
+010927 Improved Max Cross Probe Init to ask user what max to use if
+       there is one or to start a new one.
+
+--- 4.3.4 ---
+
+011101 Added congestion menu item which computes and displays the
+       congestion from DPC on the placement view.
+
+011102 Changed display design hierarchy to query the user if in a
+       schematic that is not in the current netlist hierarchy.  User
+       can make current the new top level or switch to existing
+       neltist hierarchy.
+
+011106 Added DPC(LEF_PATH) which contains a list of paths to LEF leaf
+       cell definitions.  Not required.  Wildcarding allowed.  If
+       present, overrides DPC(PATH).  DPC(VERILOG_PATH) deprecated.
+
+011114 Fixed change path of cell if icon without schematic to not put ICON_
+       in file select box.  Minor.
+
+011115 Fixed so can't display timing in the wrong schematic or placement and
+       so the display timing window goes away when netlisting but not 
+       running timing.  Also changed timng window to have the title:
+       "DPC Timing for <cell>" instead of "SUE Timing".
+
+--- 4.3.5 ---
+
+011126 The exit command now takes an optional argument -error_code.
+       If present and if there have been any errors during that sue session,
+       sue returns an error code 2, otherwise 0.
+
+011211 Fixed sue to nst interface to use full path name of data file
+       so changing directories doesn't matter.
+
+011213 Fixed congestion bugs/core dumps.  Added edge cells.
+
+--- 4.3.6 ---
+
+020105 New nl with close file bug fixed
+
+020105 Only reads LEF first time in DPC.  Can clear with api_reset_library.
+
+020108 Sped up object name editor if lots on substitions (1000). 
+
+020108 Added NETLIST(update_instance_names).  If set to 1 then
+       after netlisting each instance will be updated with its netlist name.
+       You can then save the cell to keep the new names.  Note:
+       if the name is, for example, "foo" and you duplicate the cell,
+       the new cell will get the name "foo_1", however, the icon will
+       still display "foo" until something else cause it to rebuild.
+
+020108 If the name of and instance starts with the instance name, then
+       it is not displayed.  For Example, if the instance name is MMI_NAND2 and
+       the name is MMI_NAND2_4, it is not displayed.  If it is
+       MMI_NAND2_1[3:0], only [3:0] is displayed.
+
+020108 Modified unique_name to try without _# if there is a conflict.
+       For example: a_1 will go to a_2 instead of a_1_0.
+
+020117 Added -norc 1 option to start up.  All .suerc's are ignored if set.
+
+020117 Display project (if exists) in About Sue.
+
+020117 Fixed spice assign for buses.
+
+020122 Fixed "Note" in 020108.  Object named "foo" will display
+       "foo_1" if changed AND name is default -- not added with $name
+       to icon.
+
+020128 Fixed DPC primetime interface for multiple clocks
+
+020211 Fixed -norc to load only system .suerc.
+
+020213 Changed to load project file after system .suerc so system
+       .suerc doesn't clobber everything just set up.  Note: still
+       loads site .suerc (and others) after project file.
+
+
+--- 4.4.0 ---
+
+020412 Fixed a bug with dpc flip where cell orientations were wrong
+
+
+
+--- 4.4.1 ---
+
+020603 Added _BREAK_ user property that breaks a property menu into
+       multiple columns if too many properties.
+
+020605 In spice netlisting, allows you to pass a parameter through
+       multiple levels.
+
+020610 Fixed verilog netlisting when module name too long (> ~60 chars)
+       used to get a new line on endmodule without a comment char.

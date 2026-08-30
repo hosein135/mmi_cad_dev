@@ -1,0 +1,134 @@
+MACRO MMI_OA31B
+	CLASS CORE ;
+	FOREIGN MMI_OA31B 0 0 ;
+	SIZE 5.92 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.18 4.61 0.52 6.37 ;
+			LAYER M1 ;
+			RECT 0.29 3.555 0.52 4.61 ;
+			LAYER M1 ;
+			RECT 0.145 3.105 0.595 3.555 ;
+			LAYER M1 ;
+			RECT 0.18 2.08 0.52 3.105 ;
+		END
+		AntennaDiffArea 1.3248 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 2.365 3.34 2.815 3.555 ;
+			LAYER M1 ;
+			RECT 2.18 3.105 2.815 3.34 ;
+			LAYER M1 ;
+			RECT 2.18 3 2.52 3.105 ;
+		END
+		AntennaGateArea 0.6624 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.9 0.5 1.24 2.92 ;
+			LAYER M1 ;
+			RECT 3.04 0.5 3.38 1.885 ;
+			LAYER M1 ;
+			RECT 4.48 0.5 4.82 2.385 ;
+			LAYER M1 ;
+			RECT 0 -0.5 5.92 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.105 3.55 3.555 3.555 ;
+			LAYER M1 ;
+			RECT 3.105 3.21 3.62 3.55 ;
+			LAYER M1 ;
+			RECT 3.105 3.105 3.555 3.21 ;
+		END
+		AntennaGateArea 0.6624 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 5.92 7.9 ;
+			LAYER M1 ;
+			RECT 0.9 5.09 1.24 6.9 ;
+			LAYER M1 ;
+			RECT 3.28 5.1 3.62 6.9 ;
+		END
+	END VDD
+	PIN in3
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.52 4.145 3.86 4.255 ;
+			LAYER M1 ;
+			RECT 3.52 3.915 4.815 4.145 ;
+			LAYER M1 ;
+			RECT 4.585 3.555 4.815 3.915 ;
+			LAYER M1 ;
+			RECT 4.585 3.11 4.975 3.555 ;
+			LAYER M1 ;
+			RECT 4 3.105 4.975 3.11 ;
+			LAYER M1 ;
+			RECT 4 2.88 4.815 3.105 ;
+			LAYER M1 ;
+			RECT 4 2.77 4.34 2.88 ;
+		END
+		AntennaGateArea 0.6624 ;
+	END in3
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.625 4.19 2.075 4.295 ;
+			LAYER M1 ;
+			RECT 1.375 3.85 2.075 4.19 ;
+			LAYER M1 ;
+			RECT 1.625 3.845 2.075 3.85 ;
+		END
+		AntennaGateArea 0.3312 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 1.7 4.84 2.04 5.91 ;
+		LAYER M1 ;
+		RECT 4.86 4.84 5.2 5.91 ;
+		LAYER M1 ;
+		RECT 0.865 4.61 5.2 4.84 ;
+		LAYER M1 ;
+		RECT 0.865 3.5 1.095 4.61 ;
+		LAYER M1 ;
+		RECT 0.825 3.495 1.165 3.5 ;
+		LAYER M1 ;
+		RECT 0.825 3.265 1.83 3.495 ;
+		LAYER M1 ;
+		RECT 0.825 3.16 1.165 3.265 ;
+		LAYER M1 ;
+		RECT 1.6 2.385 1.83 3.265 ;
+		LAYER M1 ;
+		RECT 1.6 1.545 1.94 2.385 ;
+		LAYER M1 ;
+		RECT 2.32 2.155 4.1 2.385 ;
+		LAYER M1 ;
+		RECT 2.32 1.545 2.66 2.155 ;
+		LAYER M1 ;
+		RECT 3.76 1.545 4.1 2.155 ;
+	END
+END MMI_OA31B

@@ -1,0 +1,92 @@
+# WARNING:
+#
+# The .max file format continues to evolve.
+#
+# Micro Magic recommends you do not write or parse .max files directly.
+# Instead use the Max API (e.g. 'db_search' and 'db_paint' commands).
+# The API is also easier to interface to.  See 'Text Commands' under
+# the Max 'Help' menu for full documentation on the API.
+
+max 3
+tech mmi15
+resolution 0.001
+
+
+DEF
+
+SECTION VERSIONS {
+vMAIN 1 146
+vDRC 1 146
+vBBOX 1001549084 21
+} SECTION VERSIONS
+
+SECTION PROPERTIES {
+	vc_rcs_version {$Revision$}
+	vc_sccs_version %I%
+	module sub2
+	PORT(foo,place) unplaced
+	grid fplan-block
+	cell_area_util 90
+	min_area 345.96
+	PORT(foo,layerspec) space
+	vc_modify_string {$Revision$ %R%}
+} SECTION PROPERTIES
+
+SECTION RECTS {
+layer checkpaint
+3722 48438 25098 53438
+-6278 43438 25098 48438
+-16278 43098 25098 43438
+-17723 38722 25098 43098
+-17723 38438 15098 38722
+-21278 33438 25098 38438
+-36278 28438 35098 33438
+-61278 23438 -49902 28438
+-41278 23722 35098 28438
+-41278 23438 34953 23722
+-66278 20098 35098 23438
+-66278 13722 38438 20098
+-66278 13438 34953 13722
+-66278 5098 35098 13438
+-66278 -1278 38438 5098
+-41278 -1498 34953 -1278
+-41278 -1598 25228 -1498
+-41278 -1698 17138 -1598
+-41278 -6278 98 -1698
+25272 -1793 34953 -1498
+27297 -1993 34953 -1793
+layer prb
+0 0 20000 20000
+} SECTION RECTS
+
+SECTION LABELS {
+lab space 10000 10000 10000 10000 3 6 foo
+} SECTION LABELS
+
+SECTION INSTANCES {
+def MMI_BUFD
+vMAIN 1 143
+vDRC 1 143
+vBBOX 971476004 332
+bbox -360 -420 3460 6740
+uses {
+	_3 1 0 360 0 1 420
+	_4 0 1 10420 -1 0 3460
+	_5 -1 0 23460 0 -1 6740
+	_10 0 -1 36740 1 0 360
+	_9 1 0 10360 0 -1 21740
+	_14 0 -1 26740 -1 0 18460
+	_18 0 -1 36740 -1 0 18460
+	_8 -1 0 3460 0 1 15420
+	_13 1 0 20360 0 1 45420
+	_15 1 0 5360 0 1 40420
+	_7 1 0 -49640 0 -1 21740
+	_17 -1 0 -61540 0 1 15420
+	_6 0 1 -49580 -1 0 3460
+	_16 1 0 -64640 0 1 420
+	_12 0 -1 -13260 -1 0 18460
+	_2 0 -1 -13260 1 0 360
+	_11 0 1 -34580 1 0 15360
+	_1 -1 0 -31540 0 -1 6740
+}
+} SECTION INSTANCES

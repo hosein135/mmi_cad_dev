@@ -1,0 +1,1063 @@
+DQInit --
+---------
+
+Initialize a new queue to have a certain capacity.
+
+Results:
+None.
+
+Side Effects:
+None.
+
+DQFree --
+---------
+
+Free up a queue.
+
+Results:
+None.
+
+Side Effects:
+None.
+
+DQChangeSize --
+---------------
+
+Change the size of a DQueue -- either increase or decrease.
+
+Results:
+None
+
+Side Effects:
+The DQueue changes size.
+
+DQCopy --
+---------
+
+Copy one DQueue into another.
+
+Results:
+None.
+
+Side Effects:
+Elements (ClientData pointers) are copied.
+
+Main --
+-------
+
+Test out this module.
+
+Results:
+None.
+
+Side Effects:
+Stuff on the screen.
+
+GeoTransPoint --
+----------------
+Transforms a point from one coordinate system to another.
+
+Results:	None.
+
+Side Effects:
+P2 is set to contain the coordinates that result from transforming
+p1 by t.
+
+GeoTransPointFOut --
+--------------------
+Transforms a point from one coordinate system to another.
+
+Results:	None.
+
+Side Effects:
+P2 is set to contain the coordinates that result from transforming
+p1 by t.
+
+GeoTransPointF --
+-----------------
+Transforms a point from one coordinate system to another.
+
+Results:	None.
+
+Side Effects:
+P2 is set to contain the coordinates that result from transforming
+p1 by t.
+
+GeoTransRect --
+---------------
+Transforms a rectangle from one coordinate system to another.
+
+Results:	None.
+
+Side Effects:
+R2 is set to contain the coordinates that result from transforming
+r1 by t.
+
+GeoTranslateTrans --
+--------------------
+Translate a transform by the indicated (x, y) amount.
+
+Results:	None.
+
+Side Effects:
+Trans2 is set to the result of transforming trans1 by
+a translation of (x, y).
+
+GeoTransTranslate --
+--------------------
+Transform a translation by the indicated (x, y) amount.
+
+This is the dual of GeoTranslateTrans, in that if
+Tinv is the inverse of T,
+
+GeoTransTranslate(T, x, y) * GeoTranslateTrans(Tinv, -x, -y)
+is the identity transform.
+
+Results:	None.
+
+Side Effects:
+Trans2 is set to the result of transforming a translation
+of (x, y) by trans1.
+
+GeoTransTrans --
+----------------
+This routine transforms a transform.
+
+Results:	None.
+
+Side Effects:
+The transform referred to by net is set to produce a geometrical
+transformation equivalent in effect to the application of transform
+first, followed by the application of transform second.
+
+GeoNameToTrans --
+-----------------
+Map a transform name (orientation) to corresponding transform. 
+
+Returns NULL if name invalid
+
+GeoTransToName --
+-----------------
+Map a transform to its name (orientation)
+
+GeoNameToPos --
+---------------
+Map the name of a position into an integer position parameter.
+Position names may be unique abbreviations for direction names.
+
+Results:
+Returns a position parameter (0 - 8, corresponding to GEO_CENTER
+through GEO_NORTHWEST), -1 if the position name was ambiguous,
+and -2 if it was unrecognized.
+
+Side Effects:	None.
+
+GeoPosToName --
+---------------
+
+Given a geometric name, return its position name.
+
+Results:
+Pointer to a static string holding the position name.
+NOTE: you'd better not try to alter the returned string!
+
+Side effects:
+None.
+
+GeoTransPos --
+--------------
+This routine computes the transform of a relative position.
+
+Results:
+The return value is a position equal to the position parameter
+transformed by t.
+
+Side Effects:	None.
+
+GeoInvertTrans --
+-----------------
+This routine computes the inverse of a transform.
+
+Results:	None.
+
+Side Effects:
+The transform pointed to by inverse is overwritten with
+the inverse transform of t.  Note:  this method of inversion
+only works for rotations that are multiples of 90 degrees with
+unit scale factor.  Beware any changes to this!
+
+GeoInclude --
+-------------
+This routine includes one rectangle into another by expanding
+the second.
+
+Results:
+TRUE is returned if the destination had to be enlarged.
+
+Side Effects:
+The destination is enlarged (if necessary) so that it completely
+contains the area of both the original src and dst rectangles.
+
+GeoIncludeAll --
+----------------
+This routine includes one rectangle into another by expanding
+the second.  This routine differs from GeoInclude in that zero-
+size source rectangles are processed.  The source or destination
+rectangle is considered to be NULL only if its lower-left corner
+is above or to the right of its upper right corner.  In this
+case, the other rectangle is the result.
+
+Results:
+TRUE is returned if the destination is enlarged; otherwise FALSE.
+
+Side Effects:
+The destination is enlarged (if necessary) so that it completely
+contains the area of both the original src and dst rectangles.
+
+GeoIncludePoint --
+------------------
+This routine includes a point into a rectangle by expanding
+the rectangle if necessary.  If the destination rectangle has
+its lower left corner above or to the right of its upper right
+corner, then use the source point to initialize the destination
+rectangle.
+
+Results:
+None.
+
+Side Effects:
+The destination is enlarged (if necessary) so that it completely
+contains the area of both the original src and dst.
+
+GeoClip --
+----------
+clips one rectangle against another.
+
+Results:	None.
+
+Side Effects:
+Rectangle r is clipped so that it includes only the
+intersection area between r and area.  The rectangle
+may end up being turned inside out (xbot>xtop) if
+there was absolutely no intersection between the two
+boxes.
+
+GeoClipPoint --
+---------------
+Clips one point against a rectangle, moving the point into
+the rectangle if needed.
+
+Results:	None.
+
+Side Effects:
+Point p is clipped so that it lies within or on the rectangle.
+
+GeoDisjoint --
+--------------
+
+Clip a rectanglular area against a clipping box, applying the
+supplied procedure to each rectangular region in "area" which
+falls outside "clipbox".  This works in tile space, where a
+rectangle is assumed to contain its lower x- and y-coordinates
+but not its upper coordinates.  It does NOT work in pixel space
+(think about this carefully before using it for pixels!).
+
+The procedure should be of the form:
+bool func(box, cdarg)
+Rect	   * box;
+ClientData   cdarg;
+
+Results:
+Return TRUE unless the supplied function returns FALSE.
+
+Side effects:
+The side effects of the invoked procedure.
+
+GeoCanonicalRect --
+-------------------
+Turns a rectangle into a canonical form in which the
+lower left is really below and to the left of the upper right.
+
+Results:	None.
+
+Side Effects:
+Rectangle rnew is set to the canonical form of rectangle r.
+
+GeoScale --
+-----------
+
+Returns the scale factor associated with a transform.
+
+Results:
+Scale factor.
+
+Side Effects:
+None.
+
+GeoRectPointSide --
+-------------------
+
+Returns the side of the rect on which a point lies.
+
+Results:
+A direction, or GEO_CENTER if the point is off the boundary.
+
+Side Effects:
+None.
+
+GeoRectRectSide --
+------------------
+
+Returns the side of the first rect on which the second one
+lies.
+
+Results:
+A direction, or GEO_CENTER if the rects don't share some
+coordinate.  Note, this won't detect the case where the
+rectangles don't touch but do share some coordinate.
+
+Side Effects:
+None.
+
+GeoDecomposeTransform --
+------------------------
+
+Break a transform up into an optional mirror followed by an optional
+rotation.  Translation is ignored.  Maybe someone will add this at
+a later date.
+
+Results:
+None.
+
+Side Effects:
+Modifies 'angle' and 'upsidedown' parameters.
+
+GetRect --
+----------
+
+Parse a rectangle from a file and fill in the supplied rect struct.
+We assume that the rectangle consists of four decimal numbers, each
+separated from the next by a single space, and terminated by a newline.
+
+ESTHETIC WARNING:
+The algorithm used here is gross but extremely fast.
+
+Results:
+FALSE on end of file or error, TRUE otherwise.
+
+Side effects:
+Fills in the contents of *rect.
+
+HashInit --
+-----------
+HashInitClient --
+
+These procedures simply set up the hash table.  The standard
+way of initializing the hash table is to use HashInit(), but
+if it's desired to provide the hash module with procedures to
+use for comparing and copying hash table keys, use HashInitClient().
+
+The number of buckets in the table at the start is 'nBuckets',
+which is automatically rounded up to a power of two.  This isn't
+a limit on the number of buckets the table will eventually contain,
+though, since more buckets are automatically created if the table
+gets too full (the number of buckets increases by 4x).
+
+Results:
+None.
+
+Side Effects:
+Memory is allocated for the initial bucket area.
+
+Table Organization:
+Tables can be organized in either of four ways, depending
+on the type of comparison keys as specified by ptrKeys.
+
+HT_STRINGKEYS:
+Keys are NULL-terminated; their address is passed to
+HashFind as a (char *).
+
+HT_WORDKEYS:
+These are any 32-bit word, passed to HashFind as a (char *).
+
+HT_STRUCTKEYS:
+Actually, any value of ptrKeys >= HT_STRUCTKEYS means
+that keys are ptrKeys-word values whose ADDRESS is
+passed to HashFind as a (char *).
+
+HT_CLIENTKEYS:
+Like HT_WORDKEYS, these are also 32-bit values, passed
+to HashFind as a (char *).  However, they are compared
+and copied using user-supplied procedures passed to
+HashInitClient() when the hash table was created.
+(Note that hash tables with keys of type HT_CLIENTKEYS
+can ONLY be created using HashInitClient()).
+
+Single-word values, a la HT_WORDKEYS, are fastest but most
+restrictive.
+
+Client procedures:
+Four client procedures are provided to HashInitClient()
+for use in dealing with HT_CLIENTKEYS data.  They should
+be of the following form:
+
+Compare two hash keys; return 0 if equal, 1 if not.  If this
+procedure is NULL, comparison is just 32-bit comparison of
+k1 and k2.
+
+int
+(*compareFn)(k1, k2)
+char *k1, *k2;
+{
+}
+
+Create a copy of a hash key for storing in a newly created
+hash entry.  If this procedure is NULL, the key is stored
+without being copied.
+
+char *
+(*copyFn)(key)
+char *key;
+{
+}
+
+Produce a single 32-bit integer for a key value that will
+then be randomized by the hashing function.  If NULL, then
+the key itself is used as the 32-bit integer.
+
+int
+(*hashFn)(key)
+char *key;
+{
+}
+
+Free a key that had been allocated with (*copyFn)().
+If NULL, then nothing is done.
+
+Void
+(*killFn)(key)
+char *key;
+{
+}
+
+HashLookOnly --
+---------------
+
+Searches a hash table for an entry corresponding to key.
+
+Results:
+The return value is a pointer to the entry for key,
+if key was present in the table.  If key was not
+present, NULL is returned.
+
+Side Effects:
+None.
+
+HashFind --
+-----------
+
+Searches a hash table for an entry corresponding to
+key.  If no entry is found, then one is created.
+
+Results:
+The return value is a pointer to the entry for key.
+If the entry is a new one, then the h_pointer field
+of the entry we return is zero.
+
+Side Effects:
+Memory is allocated, and the hash buckets may be modified.
+
+HashStats --
+------------
+
+This routine merely prints statistics about the
+current bucket situation.
+
+Results:
+None.
+
+Side Effects:
+Junk gets printed.
+
+HashStartSearch --
+------------------
+
+This procedure sets things up for a complete search
+of all entries recorded in the hash table.
+
+Results:
+None.
+
+Side Effects:
+The information in hs is initialized so that successive
+calls to HashNext will return successive HashEntry's
+from the table.
+
+HashNext --
+-----------
+
+This procedure returns successive entries in the
+hash table.
+
+Results:
+The return value is a pointer to the next HashEntry
+in the table, or NULL when the end of the table is
+reached.
+
+Side Effects:
+The information in hs is modified to advance to the
+next entry.
+
+HashKill --
+-----------
+
+This routine removes everything from a hash table
+and frees up the memory space it occupied.
+
+Results:
+None.
+
+Side Effects:
+Lots of memory is freed up.
+
+HeapInit --
+-----------
+HeapInitType --
+
+Initialize a heap.  The first form is a heap with integer keys; the
+second allows specification of the type of key to use.
+
+Note that with this addressing scheme it is necessary to allocate
+2**n + 1 locations for the heap block, location 0 being unused.
+
+Results:
+None.
+
+Side effects:
+Allocates storage for the heap.  Initializes the fields in the heap
+struct.  Memory is allocated.
+
+HeapKill --
+-----------
+
+Deallocate all storage associated with the heap.
+
+Results:
+None.
+
+Side effects:
+Storage is freed.  Fields in the heap record are reset.  If func is
+not NULL then call it with each heap element before freeing the heap
+entry.
+
+HeapFreeIdFunc --
+-----------------
+
+Supplied function to HeapKill.  Frees the referenced entry id if it
+is a string, otherwise do nothing.
+
+Results:
+None.
+
+Side effects:
+Memory is freed.
+
+HeapRemoveTop --
+----------------
+Delete the top element from the heap.
+
+Results:
+Pointer to the removed heap element, which is the same as the entry
+pointer passed to the function from outside,  or NULL if no entries
+remain.
+
+Side effects:
+If the heap has been touched, restore the heap property before removing
+the top element.
+
+HeapLookAtTop --
+----------------
+
+Return pointer to top element, but don't remove it.
+
+Results:
+Pointer to the top heap element, or NULL if heap is empty.
+
+Side effects:
+If the heap has been touched, restore the heap property before 
+returning the top element.
+
+HeapAdd --
+----------
+
+Add an item to the bottom of the heap.  Restore the heap structure
+by propagating the item upwards.
+
+Results:
+None.
+
+Side effects:
+Things get shuffled around in the heap.
+Free the old block and allocate a larger block if necessary.
+
+Warning:
+Something awful may happen if the id value was declared a string in
+HeapInit and you provide something else.
+
+HeapDump --
+-----------
+Dump the contents of the heap for debugging purposes.
+
+Results:
+None.
+
+Side effects:
+None.
+
+Lookup --
+---------
+Searches a table of strings to find one that matches a given
+string.  It's useful mostly for command lookup.
+
+Only the portion of a string in the table up to the first
+blank character is considered significant for matching.
+
+Results:
+If str is the same as
+or an unambiguous abbreviation for one of the entries
+in table, then the index of the matching entry is returned.
+If str is not the same as any entry in the table, but 
+an abbreviation for more than one entry, 
+then -1 is returned.  If str doesn't match any entry, then
+-2 is returned.  Case differences are ignored.
+
+NOTE:  
+Table entries need no longer be in alphabetical order
+and they need not be lower case.  The irouter command parsing
+depends on these features.
+
+Side Effects:
+None.
+
+LookupStruct --
+---------------
+
+Searches a table of structures, each of which contains a string
+pointer as its first element, in a manner similar to that of Lookup()
+above.  Each structure in the table has the following form:
+
+struct
+{
+char *string;
+... rest of structure
+};
+
+The 'string' field of each structure is matched against the
+argument 'str'.  The size of a single structure is given by
+the argument 'size'.
+
+Results:
+If str is the same as
+or an unambiguous abbreviation for one of the entries
+in table, then the index of the matching entry is returned.
+If str is not the same as any entry in the table, but 
+an abbreviation for more than one entry, 
+then -1 is returned.  If str doesn't match any entry, then
+-2 is returned.  Case differences are ignored.
+
+NOTE:  Table entries need no longer be in alphabetical order
+and they need not be lower case.  The irouter command parsing
+depends on these features.
+
+Side Effects:
+None.
+
+LookupFull --
+-------------
+
+Look up a string in a table of pointers to strings.  The last
+entry in the string table must be a NULL pointer.
+This is much simpler than Lookup() in that it does not
+allow abbreviations.
+
+Results:
+Index of the name supplied in the table, or -1 if the name
+is not found.
+
+Side effects:
+None.
+
+LookupAny --
+------------
+
+Look up a single character in a table of pointers to strings.  The last
+entry in the string table must be a NULL pointer.
+The index of the first string in the table containing the indicated
+character is returned.
+
+Results:
+Index of the name supplied in the table, or -1 if the name
+is not found.
+
+Side effects:
+None.
+
+Match --
+--------
+
+Sees if two strings match, using csh-like pattern matching.
+
+Results:
+TRUE is returned if the two strings match, FALSE is returned
+if they don't.  The first string, pattern, can contain the
+special characters *, ?, \, and [], which are matched as by
+the csh.
+
+Side effects:
+None.
+
+PaConvertTilde --
+-----------------
+This routine converts tilde notation into standard directory names.
+
+NOTE:  Intended for search paths, for single names, see PaTildeExpand()
+below.
+
+Results:
+If the conversion was done successfully, then the return value
+is the number of bytes of space left in the destination area.
+If a user name couldn't be found in the password file, then
+-1 is returned.
+
+Side Effects:
+If the first character of the string indicated by psource is a
+tilde ("~") then the subsequent user name is converted to a login
+directory name and stored in the string indicated by dest.  Then
+remaining characters in the file name at psource are copied to
+pdest (the file name is terminated by white space, a null character,
+or a colon) and psource is updated.  Upon return, psource points
+to the terminating character in the source file name, and pdest
+points to the null character terminating the expanded name.
+If a tilde cannot be converted because the user name cannot
+be found, psource is still advanced past the current entry, but
+nothing	is stored at the destination.  At most size characters
+(including the terminating null character) will be stored at pdest.
+Note:  the name "~" with no user name expands to the home directory.
+
+PaTildeExpandName --
+--------------------
+This routine expands tilde notation in a name.
+
+Results:
+Returns a newly mallocated string giving the tilde ('~') expanded name.
+Returns NULL if the conversion failed.
+
+Side Effects:
+mallocs a string larger enough to hold the result.
+
+PaHasExtension --
+-----------------
+Check if given name already has an extension.
+(i.e. has . in part of name after final /)
+
+Results:
+TRUE if extension present, else FALSE
+
+Side Effects:
+None.
+
+PaExtendedName --
+-----------------
+if fName doesn't have extension, default extension tacked on.
+Results:
+Extended file name
+NOTE:  result destroyed on next call to this routine.
+
+PaOpen --
+---------
+This routine does a file lookup using the current path and
+supplying a default extension.
+
+Results:
+A pointer to a FILE, or NULL if the file couldn't be found.
+
+Side Effects:
+If ext is specified, and file has no extension (no '.' following
+final '/', then ext is tacked onto the end of
+the given file name.  
+
+If the first character of the
+file name is "~" or "/" or if nosearch is TRUE, then we try
+to look up the file with the original name, doing tilde
+expansion of course and returning that result.  If none of 
+these conditions is met, we go through the path	trying to
+look up the file once for each path entry by prepending the
+path entry to the original file name. This concatenated name
+is stored in a static string and made available to the caller
+through prealName if the open succeeds.  If the entire path is
+tried, and still nothing works, then we try each entry in the
+library path next.
+Note: the static string will be trashed on the next call to this
+routine.  Also, note that no individual file name is allowed to
+be more than MAXSIZE characters long.  Excess characters are lost.
+
+Path Format:
+A path is a string containing directory names separated by
+colons or white space.  Tilde notation may be used within paths.
+
+PaSubsWD --
+-----------
+
+Replaces all uses of the working directory in a path
+by some fixed directory.
+
+Results:
+The return result is a path that is just like the path
+argument except that every implicit or explicit use of
+the working directory is replaced by the newWD argument.
+The result is a static array, which will be trashed on
+the next call to this procedure.
+
+Side effects:
+None.
+
+PaEnum --
+---------
+
+Call a client procedure with each directory in a path
+prepended to a filename.  The client procedure is as
+follows:
+
+int
+(*proc)(name, cdata)
+char *name;		/# A directory in the path prepended to
+# a file name.
+#/
+ClientData *cdata;	/# Provided by caller #/
+{
+}
+
+The client procedure should return 0 normally, or 1 to abort
+the path enumeration.  If a directory in the search path
+refers to a non-existent user name (using the ~user syntax),
+we skip that component.
+
+Results:
+Returns 0 if all the clients returned 0, or 1 if
+some client returned 1.  When a client returns 1
+we abort the enumeration.
+
+Side effects:
+Calls the client procedure.
+
+PaSplitName --
+--------------
+
+Split a path name, into directory part, base name, and extension.
+e.g. for "/home/foo/bar.max":
+dir = "/home/foo/"
+base = "bar"
+ext = ".max"
+
+RunStats --
+-----------
+
+This procedure collects information about the process.
+Depending on the flags provided, the following information is
+returned:
+
+RS_TCUM	 -- cumulative user and system time
+RS_TINCR -- difference between current cumulative user and system
+time and that when RunStats was last called with RS_TINCR
+as a flag.
+RS_MEM	 -- number of bytes in the heap area.
+
+Results:
+The return value is a string of the form "[ ... <stuff> ...]",
+where <stuff> contains the information specified by the flags.
+Times are of the form "mins:secsu mins:secss", where the first
+time is the amount of user-space CPU time this process has
+used, and the second time is the amount of system time used.
+Memory is specified by a string of the form "Nk", where N
+is the number of kilobytes of heap area used so far.
+
+Side Effects:
+If RS_TINCR is specified, the parameters lastt and deltat
+are set (if they are both non-NULL).  Both point to tms structs;
+the one pointed to by deltat is set to the difference between
+the current user/system time and the time given in the tms struct
+pointed to by lastt; the one pointed to by lastt is then set to
+the current user/system time.
+
+RunStatsRealTime --
+-------------------
+
+Reports the real time, both since the first invocation and incremental
+since the last invocation.
+
+Results:
+A statically allocated string of the form:
+x:xx.x x:xx.x
+where the first number is the amount of elapsed real time since the
+first call to this routine, and the second is the amount of elapsed
+real time since the lastest call to this routine.
+
+Side Effects:
+None.
+
+StackNew --
+-----------
+
+Allocate and initialize a new Stack.
+
+Results:
+Returns a pointer to a newly heap-allocated and initialized
+stack, with its growth increment set to the specified
+size (in entries).
+
+Side effects:
+None.
+
+StackFree --
+------------
+
+Deallocate a Stack.
+
+Results:
+None.
+
+Side effects:
+Deallocates all memory currently assigned to the Stack.
+
+StackPush --
+------------
+
+Push a new element on to a stack.
+
+Results:
+None.
+
+Side effects:
+The argument stack is updated to reflect the new
+item placed upon it.
+
+StackPop --
+-----------
+
+Pop the top element from a Stack and return it.
+
+Results:
+Top element from stack.
+If the stack is already empty, returns NULL.
+Callers should probably avoid popping from an empty
+stack.
+
+Side effects:
+Updates the stack to reflect the result of popping its top.
+
+StackLook --
+------------
+
+Return the top element from a Stack, but don't pop it off.
+
+Results:
+Top element from stack.
+If the stack is already empty, returns NULL.
+
+Side effects:
+None.
+
+StackEnum --
+------------
+
+Enumerate all elements on the stack.  Call the supplied function
+for each occurrence.
+
+The supplied function is of the form:
+int func(stackItem, i, clientData)
+ClientData stackItem;    Item put on the stack
+int i;		     Index of the item on stack
+ClientData cd;	     Points to whatever you want
+The function normally returns 0.  The enumeration terminates if it
+returns anything else.
+
+Results:
+None.
+
+Side effects:
+None.
+
+StackCopy --
+------------
+
+Make a copy of a stack.
+
+Results:
+Memory may get allocated if the copystr parameter says to copy
+strings rather than pointers to them.
+
+Side effects:
+dest gets a copy of src.  If dest is non-null, it gets freed.
+
+StrDup --
+---------
+
+Return a malloc'd copy of a string.
+
+Results:
+Returns a pointer to a newly malloc'd character array just
+large enough to hold the supplied string and its trailing
+null byte, which contains a copy of the supplied string.
+
+Side effects:
+MALLOC's a character array large enough to hold str, and
+copies str into it, unless str is NULL.  If str is NULL, no
+MALLOC is done.  Also, if oldstr is non-NULL, then a) if
+*oldstr is not NULL, frees the storage allocated to oldstr,
+and b) sets *oldstr to the new string allocated, or to
+NULL if str is NULL.
+
+StrIsWhite:
+-----------
+
+Check to see if a string is all white space or is a comment.
+
+Results:
+True if it is all white, false otherwise.
+
+Side effects:
+none.
+
+StrIsInt --
+-----------
+
+Check a string for being an integer.
+
+Results:
+TRUE if the string is a well-formed integer, FALSE otherwise.
+
+Side effects:
+None.
+
+StrIsDecimal --
+---------------
+
+Check a string for being a valid decimal number.
+
+Results:
+TRUE if the string is a well-formed float without exponential
+notation, FALSE otherwise.
+
+Side effects:
+None.
+
+StrToLower --
+-------------
+
+Convert string to all lowercase.
+
+StrToUpper --
+-------------
+
+Convert string to all lowercase.
+

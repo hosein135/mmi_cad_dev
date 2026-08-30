@@ -1,0 +1,61 @@
+
+C API function			TCL procedure
+
+nl_cell_create			nl_create_cell
+nl_cell_disconnect	
+nl_cell_get_pin_by_refpin	
+nl_cell_rename			nl_rename_cell
+nl_design_create		nl_create_design
+nl_design_remove_cell		nl_remove_cell
+nl_design_remove_port		nl_remove_port
+nl_design_remove_net		nl_remove_net
+nl_design_remove_reference	
+nl_design_remove_attr		nl_remove_attribute
+nl_design_get_cell_by_name	nl_find_cells
+nl_design_get_reference_by_name	nl_find_references
+nl_design_get_net_by_name	nl_find_nets
+nl_design_get_net_or_bus_by_name
+nl_design_get_object_by_name
+nl_design_get_port_by_name	nl_find_ports
+nl_design_get_type_by_name	nl_find_types
+nl_design_get_attr_by_name	nl_find_attributes
+nl_design_add_supply0		nl_create_net
+nl_design_add_supply1		nl_create_net
+nl_design_num_nets		llength [nl_list_nets]
+nl_design_num_net_buses		
+nl_design_num_cells		llength [nl_list_cells]
+nl_design_num_cell_buses	
+nl_design_num_ports		llength [nl_list_ports]
+nl_design_num_port_buses	
+nl_design_num_references	llength [nl_list_references]
+nl_design_num_types		llength [nl_list_types]
+nl_design_num_attrs
+nl_context_create		n.a.
+nl_context_free			n.a.
+nl_context_remove_design	nl_remove_design
+nl_context_remove_library
+nl_context_get_design_by_name	nl_find_designs
+nl_reference_create		nl_create_reference
+nl_reference_add_bus		
+nl_reference_num_instances	llength [nl_get_reference_cells]
+nl_reference_get_refpin_by_name	nl_find_refpins
+nl_reference_input_width	
+nl_reference_output_width
+nl_reference_inout_width
+nl_refpin_create		nl_create_refpin
+nl_pin_create			nl_create_pin
+nl_pin_connect_net		nl_connect_pin
+nl_pin_disconnect		nl_disconnect_pin
+nl_pin_direction		nl_get_pin_direction
+nl_net_create			nl_create_net
+nl_net_rename			nl_rename_net
+nl_port_create			nl_create_port
+nl_port_connect_net		nl_connect_pin
+nl_port_rename			nl_rename_port
+nl_type_get_scalar		nl_get_scalar_type
+nl_type_get_integer		nl_get_integer_type
+nl_type_get_array		nl_get_array_type
+nl_type_width			
+nl_type_copy			
+nl_idesign_remove_attr		
+nl_library_create		nl_create_library

@@ -1,0 +1,49 @@
+# Templates for creating new technolog files.
+
+# use colors numbers 001xxxxx (32-64 decimal, 40-77 octal)
+# use display styles 23-63 (duplicate +64 for dim)
+# don't use same color for same style
+
+# Commment, # must be first non-white character on line for comment
+
+# dash (-) in any column means none or default
+
+# type: act, poly, metal, via, ignore, bbox, other (default)
+
+# metals and vias connect in order given
+
+# bugs
+# TODO overlaps
+# TODO color hints for "other" layers
+# TODO iname
+
+# gds:dt defaults to gds:* for input, gds:0 for output.
+
+# all distances in microns
+
+# fields separated by whitespace (either space or tab)
+
+# layer	gds:dt txt:dt	type	width	space
+#======	==============	=======	=======	=======
+NWELi	2	-	-	0.86    0.6
+ODi	4	-	act	0.45	-
+POLYi	13	-	poly	0.18    0.25
+N2Vi	61	-	-	0.44    0.44
+N3Vi	5	-	-	0.44    0.44
+# high voltage implant
+PPi	7	-	-	0.44    0.44
+NPi	8	-	-	0.44    0.44
+COi	15	-	via	0.22    0.25
+m1	16	40	metal	0.23    0.23
+VIA1i	17	-	via	0.26    0.26
+M2i	18	-	metal	0.28    0.28
+VIA2i	27	-	via	0.26    0.26
+M3i	28	-	metal	0.28    0.28
+VIA3i	29	-	via	0.26    0.26
+M4i	31	-	metal	0.28    0.28
+VIA4i	32	-	via	0.26    0.26
+M5i	33	-	metal	0.28    0.28
+VIA5i	39	-	via	0.36    0.35
+M6i	38	-	metal	0.44    0.46
+CBi	19	-	-	-	-
+# passivation

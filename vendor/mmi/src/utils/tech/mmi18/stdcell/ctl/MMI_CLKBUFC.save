@@ -1,0 +1,22 @@
+comment Clock buffer, scan_en buffer, and scan chain
+comment buffer all in one.
+
+function clk = g_clk
+function scan_en = g_scan_en
+function scan_out = scan_in
+
+measure {clk ^} with {g_clk ^} {g_scan_en 0} {scan_in 0}
+measure {clk v} with {g_clk v} 
+
+measure {scan_en ^} with {g_scan_en ^} 
+measure {scan_en v} with {g_scan_en v} 
+
+measure {scan_out ^} with {scan_in ^} 
+measure {scan_out v} with {scan_in v} 
+
+# measure the input capacitance
+cap g_clk
+cap g_scan_en
+cap scan_in
+
+

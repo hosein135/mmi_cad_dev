@@ -1,0 +1,123 @@
+UndoAddClient --
+----------------
+
+Define an undo "type".
+
+Results:
+Returns an UndoType which must be passed in future calls
+to UndoNewEvent().  If -1 is returned, this means that there
+are too many clients of the undo package.
+
+Side effects:
+Initializes local state in the undo package.
+
+UndoDisable --
+--------------
+
+Turn the undo package off.
+Future calls to UndoNewEvent() will return NULL, and future calls
+to UndoIsEnabled() will return FALSE, until the next call to
+UndoEnable();
+
+Results:
+None.
+
+Side effects:
+Disables undoing until the next call to UndoEnable().
+
+UndoEnable --
+-------------
+
+Turn the undo package on.
+Re-enables the undo package after a call to UndoDisable().
+
+Results:
+None.
+
+Side effects:
+Re-enables undoing.
+
+UndoFlush --
+------------
+
+Flush the current undo list.
+
+Results:
+None.
+
+Side effects:
+Deletes everything from the undo list.
+
+UndoNewEvent --
+---------------
+
+Return a pointer to a new UndoEvent of the specified type and capable
+of holding size bytes of client data.
+
+Results:
+A pointer to a new UndoEvent.
+
+WARNING:
+The pointer to the new UndoEvent must not be retained past the
+next call to any of the routines in the undo package, as the
+event is liable to be reallocated. ???
+
+Side effects:
+Appends new event after the current
+event, and makes it current (events forward of the current event
+are flushed, i.e. no redo info after a new event is added.)
+
+UndoDelim --
+------------
+
+Delimit a sequence of operations to the undo package with an event
+delimiter.  
+
+(Operations between delims are treated as single command for
+purposes of undo/redo.)
+
+Results:
+None.
+
+Side effects:
+Appends a marker to the undo list signifying a "command" boundary.
+
+UndoBackward --
+---------------
+
+Play the undo log backward n events.
+
+Argument of 0 means delete recent events (i.e. up to last delim).
+
+Results:
+The number of events actually played backward.  Normally, this
+will be equal to n unless we encounter the beginning of the log.
+
+Side effects:
+Applies the client backEvent() procedures to each event encountered
+in playing the log backward.
+
+UndoForward --
+--------------
+
+Play the undo log forward n events.
+
+Results:
+The number of events actually played forward.  Normally, this
+will be equal to n unless we encounter the end of the log.
+
+Side effects:
+Applies the client forwEvent() procedures to each event encountered
+in playing the log forward.
+
+UndoTclInit --
+--------------
+
+Register tcl commands in this module.
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+

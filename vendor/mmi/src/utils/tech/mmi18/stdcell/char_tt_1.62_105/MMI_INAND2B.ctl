@@ -1,0 +1,1 @@
+../ctl/MMI_INAND2B.ctl

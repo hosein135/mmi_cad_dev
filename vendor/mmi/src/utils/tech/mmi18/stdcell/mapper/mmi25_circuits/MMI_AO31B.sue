@@ -1,0 +1,62 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_AO31B {} {
+  make global -name gnd -origin {0 100}
+  make global -name gnd -origin {250 300}
+  make global -orient RY -name vdd -origin {0 -200}
+  make output -name out -origin {500 0}
+  make nmos -W 1.8 -origin {250 60}
+  make nmos -W 1.8 -origin {250 160}
+  make nmos -W 1.8 -origin {250 260}
+  make pmos -W 2.4 -origin {0 -60}
+  make pmos -W 2.4 -origin {0 -160}
+  make pmos -W 2.4 -origin {250 -160}
+  make pmos -W 2.4 -origin {500 -160}
+  make nmos -W 0.6 -origin {0 60}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -orient RY -name vdd -origin {500 -200}
+  make input -name in0 -origin {-90 -60}
+  make input -name in1 -origin {-90 -160}
+  make input -name in2 -origin {-90 160}
+  make input -name in3 -origin {-90 260}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 2.4 -WN 1.2 -origin {420 0}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {360 0}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {150 470}
+  make_wire 0 20 0 0
+  make_wire 0 -20 0 0
+  make_wire 0 0 250 0
+  make_wire 250 20 250 0
+  make_wire 0 -120 0 -100
+  make_wire 250 120 250 100
+  make_wire 250 -120 250 -100
+  make_wire 0 -100 250 -100
+  make_wire 250 220 250 200
+  make_wire 500 -120 500 -100
+  make_wire 250 -100 500 -100
+  make_wire 470 0 500 0
+  make_wire 190 60 70 60
+  make_wire 70 -160 70 60
+  make_wire -70 -60 -70 60
+  make_wire -90 -160 -60 -160
+  make_wire -60 -160 70 -160
+  make_wire -70 -60 -90 -60
+  make_wire -70 -60 -60 -60
+  make_wire -70 60 -60 60
+  make_wire 190 -160 160 -160
+  make_wire 160 -160 160 160
+  make_wire 160 160 190 160
+  make_wire 160 160 -90 160
+  make_wire 190 260 -90 260
+  make_wire 190 260 330 260
+  make_wire 330 260 330 -160
+  make_wire 440 -160 330 -160
+  make_wire 360 0 390 0
+  make_wire 360 0 250 0
+  make_text -origin {-140 -300} -text {AND-OR 3,1 Gate}
+  make_text -origin {-140 -280} -text {B Size}
+  make_text -origin {-140 -320} -text MMI_AO31B -size large
+}
+

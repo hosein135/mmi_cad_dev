@@ -1,0 +1,56 @@
+# SUE version MMI_SUE4.0p3
+
+proc SCHEMATIC_MMIG_STK_MUX2B {} {
+  make MMI_INV -origin {-10 150}
+  generate MMI_INV MMI_INVA_ -DeMorgan 1
+  make MMI_INVA_ -origin {140 90}
+  make input -name sel -origin {-180 150}
+  generate row_spanner row_spanner320 -width 320
+  make row_spanner320 -origin {230 330}
+  make name_net_s -name N1 -origin {300 90}
+  make name_net_s -orient RY -name N2 -origin {300 150}
+  make MMI_AO22 -orient RY -origin {450 140}
+  make output -name out -origin {630 140}
+  make input -name in1 -origin {-180 190}
+  make input -name in0 -origin {-180 230}
+  make MMIG_STK_MUX2B -origin {590 -140}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.2 -date 06/04/99 -origin {180 470}
+  make_wire 80 90 70 90
+  make_wire 70 90 70 150
+  make_wire 70 150 50 150
+  make_wire 550 140 630 140
+  make_wire 280 190 280 230
+  make_wire 280 190 350 190
+  make_wire 280 230 -180 230
+  make_wire 230 130 350 130
+  make_wire 230 130 230 190
+  make_wire 230 190 -180 190
+  make_wire -180 150 -70 150
+  make_wire 300 90 200 90
+  make_wire 300 90 350 90
+  make_wire 300 150 70 150
+  make_wire 300 150 350 150
+  make_text -origin {-320 -210} -text MMIG_STK_MUX2B -size large
+}
+
+proc ICON_MMIG_STK_MUX2B args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {0 50} -orient R270 -name sel
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 30} -name in1
+  icon_term -type input -origin {-60 -30} -name in0
+  icon_property -origin {-50 170} -type user -name name
+  icon_property -origin {-50 190} -type user -name M
+  icon_property -origin {-50 210} -type user -name dpc
+  icon_line -40 -70 40 -30
+  icon_line 40 -30 40 30
+  icon_line 40 30 -40 70
+  icon_line -40 -70 -40 70
+  icon_line -40 -30 -60 -30
+  icon_line -40 30 -60 30
+  icon_property -origin {-30 -30} -size small -label 0
+  icon_property -origin {0 0} -anchor center -label {STK B}
+  icon_line 60 0 40 0
+}
+

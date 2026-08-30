@@ -1,0 +1,208 @@
+# Created using mapper from:
+#"MMI_XOR2 {A {MMI_XOR2A {in0 in0} {in1 in1} {out out}} {MMI_XOR2A_ {in0 in0} {in1 in1} {out out}}} {B {MMI_XOR2B {in0 in0} {in1 in1} {out out}} {MMI_XOR2B_ {in0 in0} {in1 in1} {out out}}} {C {MMI_XOR2C {in0 in0} {in1 in1} {out out}} {MMI_XOR2C_ {in0 in0} {in1 in1} {out out}}} "
+
+proc SCHEMATIC_MMI_XOR2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    "A" {
+      if {$DeMorgan} {
+        generate MMI_XOR2 MMI_XOR2A -Size A -DeMorgan 0
+        make MMI_XOR2A -origin {0 0}
+        set terms [api_terminal_data MMI_XOR2A]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_XOR2A"
+        }
+        set data [get_assoc in0 $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name in0 -orient $orient
+        } else {
+          make $type -origin $origin -name in0
+        }
+        set data [get_assoc in1 $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name in1 -orient $orient
+        } else {
+          make $type -origin $origin -name in1
+        }
+        set data [get_assoc out $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name out -orient $orient
+        } else {
+          make $type -origin $origin -name out
+        }
+        generate MMI_XOR2 MMI_XOR2A_ -Size A -DeMorgan 1
+        make MMI_XOR2A_ -origin {300 200}
+      }
+    }
+
+    "B" {
+      if {$DeMorgan} {
+        generate MMI_XOR2 MMI_XOR2B -Size B -DeMorgan 0
+        make MMI_XOR2B -origin {0 0}
+        set terms [api_terminal_data MMI_XOR2B]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_XOR2B"
+        }
+        set data [get_assoc in0 $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name in0 -orient $orient
+        } else {
+          make $type -origin $origin -name in0
+        }
+        set data [get_assoc in1 $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name in1 -orient $orient
+        } else {
+          make $type -origin $origin -name in1
+        }
+        set data [get_assoc out $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name out -orient $orient
+        } else {
+          make $type -origin $origin -name out
+        }
+        generate MMI_XOR2 MMI_XOR2B_ -Size B -DeMorgan 1
+        make MMI_XOR2B_ -origin {300 200}
+      }
+    }
+
+    "C" {
+      if {$DeMorgan} {
+        generate MMI_XOR2 MMI_XOR2C -Size C -DeMorgan 0
+        make MMI_XOR2C -origin {0 0}
+        set terms [api_terminal_data MMI_XOR2C]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_XOR2C"
+        }
+        set data [get_assoc in0 $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name in0 -orient $orient
+        } else {
+          make $type -origin $origin -name in0
+        }
+        set data [get_assoc in1 $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name in1 -orient $orient
+        } else {
+          make $type -origin $origin -name in1
+        }
+        set data [get_assoc out $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name out -orient $orient
+        } else {
+          make $type -origin $origin -name out
+        }
+        generate MMI_XOR2 MMI_XOR2C_ -Size C -DeMorgan 1
+        make MMI_XOR2C_ -origin {300 200}
+      }
+    }
+
+  }
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+}
+
+
+proc NAME_MMI_XOR2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom [format "MMI_XOR2%s" [string toupper $Size]]
+
+  if {$DeMorgan == 1} {
+    set nom [format "%s_" $nom]
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_XOR2 args {
+  icon_generator $args {{Size "A" {radio A B C}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B") && ($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_XOR2 icon body
+  icon_arc -60 -30 50 110 -start 35 -extent 50
+  icon_arc -48 -30 -28 30 -start 270 -extent 180
+  icon_line -38 -30 0 -30
+  icon_line -38 30 0 30
+  icon_arc -60 -110 50 30 -start 275 -extent 50
+  icon_arc -58 -30 -38 30 -start 270 -extent 180
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  icon_property -origin {-27 -20} -size small -label F
+
+  if {$DeMorgan} {
+    icon_line 40 0 60 0
+    icon_arc -60 30 -40 10 -start 0 -extent 359
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_line 40 0 60 0
+    icon_line -60 20 -40 20
+    icon_line -60 -20 -40 -20
+  }
+
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 20} -name in1
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  if {!$DeMorgan} {
+    set fname [NAME_MMI_XOR2 -Size $Size]
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

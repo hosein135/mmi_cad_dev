@@ -1,0 +1,31 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	99.11.02.19.22.38;	author pat;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@puts "hello from foo.maxg"
+
+define_gcell foo [list "this that"]
+
+proc gcell_make_foo {properties} {
+    puts "hello from the foo gcell"
+    error "oops"
+}
+@

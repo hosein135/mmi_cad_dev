@@ -1,0 +1,350 @@
+DRCArrayCheck --
+----------------
+
+This procedure finds all DRC errors in a given area of
+a given cell that stem from array formation errors in
+children of that cell.  Func is called for each violation
+found.  Func should have the same form as in DRCBasicCheck.
+Note: the def passed to func is the dummy DRC definition,
+and the errors are all expressed in coordinates of celluse.
+
+Results:
+The number of errors found.
+
+Side effects:
+Whatever is done by func.
+
+DRCBasicCheck --
+----------------
+
+This is the top-level routine for basic design-rule checking.
+
+Results:
+Number of errors found.
+
+Side effects:
+Calls function for each design-rule violation in celldef
+that is triggered by an edge in rect and whose violation
+area falls withing clipRect.  This routine makes a flat check:
+it considers only information in the paint planes of celldef,
+and does not expand children.  Function should have the form:
+void
+function(def, area, rule, cdarg)
+CellDef *def;
+Rect *area;
+DRCCookie *rule;
+ClientData cdarg;
+{
+}
+
+In the call to function, def is the definition containing the
+basic area being checked, area is the actual area where a
+rule is violated, rule is the rule being violated, and cdarg
+is the client data passed through all of our routines.
+
+Note:
+If an interrupt occurs (SigInterruptPending gets set), then
+the basic will be aborted immediately.  This means the check
+may be incomplete.
+
+DRCChangedArea --
+-----------------
+
+Mark area in def for redrc.
+
+Paints check tile into the DRC_CHECK plane of the cell,
+and sets the CD_DRC_PENDING flag.
+
+DRCChangeAddDef --
+------------------
+
+Call the drc's attention to a def.  (continuous drc will check
+for TT_CHECKPAINT areas.
+
+DRCInit --
+----------
+
+This procedure initializes DRC data.  It must be called after
+the technology file has been read.
+
+Results:
+None.
+
+Side effects:
+Owns shared between the DRC modules are initialized.
+
+DRCContinuous --
+----------------
+
+Called by toplevel event loop in main(), prior to blocking to
+wait for new events.
+
+This routine checks to see if there are any areas of the layout that
+need to be design-rule-checked.  If so, it does the appropriate checks.
+This procedure will abort itself at the earliest convenient moment
+if events pending.
+
+NOTE:  Tcl_DoOneEvent called to check for new events, 
+events may be processed "inside" this procedure, but no
+"do when idle" events (such as redisplay) 
+will be processed before exiting this procedure.
+
+Results:
+Returns 0 if there was nothing to do, 1 otherwise.
+
+Side effects:
+Modifies the DRC_CHECK and DRC_ERROR planes 
+of the CellDefs on the DRCPending list.
+
+DRCPrintStats --
+----------------
+
+Prints out statistics gathered by the DRC checking routines.
+
+Results:
+None.
+
+Side effects:
+Statistics are printed.  Two values are printed for each
+statistic:  the number since statistics were last printed,
+and the total to date.	The own variables used to keep
+track of statistics are updated.
+
+DRCWhy --
+---------
+
+This procedure finds all errors within an area and prints messages
+about each distinct kind of violation found.
+
+Results:
+None.
+
+Side effects:
+None, except that error messages are printed.  The given
+area is DRC'ed for both paint and subcell violations in every
+cell of def's tree that it intersects.
+
+DRCCheck --
+-----------
+
+Marks area, to force recheck by the DRC. 
+
+Results:
+None.
+
+Side effects:
+Check tiles are painted.
+
+DRCCount --
+-----------
+
+Searches the entire hierarchy underneath the given area.
+For each cell found, counts design-rule violations in
+that cell and outputs the counts.
+
+Results:
+None.
+
+Side effects:
+None, except for the text output.
+
+DRCCatchUp--
+------------
+
+This procedure just runs the background checker, regardless
+of whether it's enabled or not, and waits for it to complete.
+
+Results:
+None.
+
+Side effects:
+Error and check tiles get painted and erased by the checker.
+
+DRCFind --
+----------
+
+Locates the next violation tile in the cell pointed to by def.
+Successive calls will located successive violations, in
+circular order.
+
+Results:
+If an error tile was found in def, returns the indx of
+the error tile (> 0).  Returns 0 if there were no error
+tiles in def, or if a specific indx was given and there
+weren't that many error tiles in def.
+
+Side effects:
+Rect is filled with the location of the tile, if one is found.
+
+DRCClean --
+-----------
+
+Called to declare a def drc correct (whether it really is or not).
+Rms all check areas, syncs up instance versions, rms all drc error
+tiles.
+
+Subsequent changes will cause areas to be checked.
+
+DRCPrintRulesTable --
+---------------------
+
+Write compiled DRC rules table and adjacency matrix to the given file.
+
+Results:
+None.
+
+Side effects:
+None.
+
+DRCFindInteractions --
+----------------------
+
+This procedure finds the bounding box of all subcell-subcell
+or subcell-paint interactions in a given area of a given cell.
+
+Results:
+Returns TRUE if there were any interactions in the given
+area, FALSE if there were none.
+
+Side effects:
+The parameter interaction is set to contain the bounding box
+of all places in area where one subcell comes within radius
+of another subcell, or where paint in def comes within radius
+of a subcell.  Interactions between elements of array are not
+considered here, but interactions between arrays and other
+things are considered.  This routine is a bit clever, in that
+it not only checks for bounding boxes interacting, but also
+makes sure the cells really contain material in the interaction
+area.
+
+DRCInteractionCheck --
+----------------------
+
+This is the top-level procedure that performs subcell interaction
+checks.  All interaction rule violations in area of def are
+found, and func is called for each one.
+
+Results:
+The number of errors found.
+
+Side effects:
+The procedure func is called for each violation found.  See
+the header for DRCBasicCheck for information about how func
+is called.  The violations passed to func are expressed in
+the coordinates of def.  Only violations stemming from
+interactions in def, as opposed to def's children, are reported.
+
+Design Note:
+This procedure is trickier than you think.  The problem is that
+DRC must be guaranteed to produce EXACTLY the same collection
+of errors in an area, no matter how the area is checked.  Checking
+it all as one big area should produce the same results as
+checking it in several smaller pieces.  Otherwise, "drc why"
+won't work correctly, and the error configuration will depend
+on how the chip was checked, which is intolerable.  This problem
+is solved here by dividing the world up into squares along a grid
+of dimension drcStepSize aligned at the origin.  Interaction areas
+are always computed by considering everything inside one grid square
+at a time.  We may have to consider several grid squares in order
+to cover the area passed in by the client.
+
+DRCFlatCheck --
+---------------
+
+This is a top-level procedure that performs a DRC of a cell by
+flattening everything.  This is useful when we have a big chip were
+everything interacts -- such as when everything is covered by wiring.
+In these cases, a flat check of the topmost cell will catch all errors
+more quickly.
+
+Results:
+The number of errors found.
+
+Side effects:
+The procedure func is called for each violation found.  See
+the header for DRCBasicCheck for information about how func
+is called.  The violations passed to func are expressed in
+the coordinates of def.  All voilations found, even those in children,
+are reported.
+
+Design Note:
+This procedure is trickier than you think, in the same way as
+DRCInteractionCheck.  See the comments there.  
+Since this is a flat check of a single cell, no DRC updates are done
+to subcells.  Also, if this is interrupted the DRC error tiles will
+be incorrect!  This a a tradeoff to gain a slight amount of speed.
+
+DRCTclInit --
+-------------
+
+Initialize drc tcl commands, and link C and tcl variables..
+
+Results:
+None.
+
+DRCTechInit --
+--------------
+
+Initialize the technology-specific variables for the DRC module.
+
+Results:
+None.
+
+Side effects:
+Clears out all the DRC tables.
+
+DRCTechAddRule --
+-----------------
+
+Add a new entry to the DRC table.
+
+Results:
+Always returns TRUE so that tech file read-in doesn't abort.
+
+Side effects:
+Updates the DRC technology variables.
+
+Organization:
+We select a procedure based on the first keyword (argv[0])
+and call it to do the work of implementing the rule.  Each
+such procedure is of the following form:
+
+int
+proc(argc, argv)
+int argc;
+char *argv[];
+{
+}
+
+It returns the distance associated with the design rule,
+or -1 in the event of a fatal error that should cause
+DRCTechAddRule() to return FALSE (currently, none of them
+do, so we always return TRUE).  If there is no distance
+associated with the design rule, 0 is returned.
+
+DRCTechFinal --
+---------------
+
+Called after all lines of the drc section in the technology file have been
+read.  The preliminary DRC Rules Table is pruned by removing rules covered
+by other (longer distance) rules, and by removing the dummy rule at the
+front of each list.  Where edges are completely illegal, the rule list is
+pruned to a single rule.
+
+Results:
+None.
+
+Side effects:
+May remove DRCCookies from the linked lists of the DRCRulesTbl.
+
+DRCTechRuleStats --
+-------------------
+
+Print out some statistics about the design rule database.
+
+Results:
+None.
+
+Side effects:
+A bunch of stuff gets printed on the terminal.
+

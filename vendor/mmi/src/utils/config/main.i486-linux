@@ -1,0 +1,17 @@
+# Configuration for linux (works at MMI and for mha)
+# NOTE: Use of this file is deprecated!
+# Use main.config of main.common instead!
+
+# ------------------------------------------------------------------------
+#       Configuration
+# Notes: the TARGET variable is used to specify which set of
+# includes/libraries are required.
+# The CONFIG variable is used for additional variations,
+# eg, to have debug and non-debug versions.
+# You can create multiple CONFIGs for the same TARGET, if needed.
+# ------------------------------------------------------------------------
+CONFIG := i486-linux
+TARGET_OS := LINUX
+TARGET := i486-linux
+
+-include $(MMI_UTILS)/config/main.common

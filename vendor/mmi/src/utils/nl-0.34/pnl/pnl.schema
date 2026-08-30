@@ -1,0 +1,207 @@
+;; -*-Emacs-Lisp-*-
+
+(define-schema pnl
+
+  (primitive int)
+  (primitive char*)
+
+  (require mem_group "mem.h")
+  (require ar "ar.h")
+  (require hashtab "hashtab.h")
+  ;; (require skip_list "skip-list.h")
+  (require nl "nl.h")
+  (require nl_design "nl.h")
+  (require nl_idesign "nl.h")
+  (require nl_design_attr "nl.h")
+  (require nl_idesign_attr "nl.h")
+  (require nl_port "nl.h")
+  (require nl_port_attr "nl.h")
+  (require nl_cell "nl.h")
+  (require nl_icell "nl.h")
+  (require nl_cell_attr "nl.h")
+  (require nl_icell_attr "nl.h")
+  (require nl_net "nl.h")
+  (require nl_inet "nl.h")
+  (require nl_net_attr "nl.h")
+  (require nl_inet_attr "nl.h")
+  (require nl_library_attr "nl.h")
+  (require nl_libcell_attr "nl.h")
+  (require nl_libpin_attr "nl.h")
+  (require nl_library "nl.h")
+  (require nl_libcell "nl.h")
+  (require nl_libpin "nl.h")
+
+  (enum kind (null design idesign port cell icell net inet
+		   dll_head library libcell libpin))
+  (enum typeclass (null scalar array))
+  (enum location_rep (null origin lowerleft))
+  (enum density (null sparse dense))
+  (enum loctype (null UNPLACED PLACED FIXED COVER))
+  (enum use (null SIGNAL POWER GROUND CLOCK TIEOFF ANALOG))
+  (enum shape (null ABUTMENT RING FEEDTHRU))
+  (enum pattern (null STEINER BALANCED WIREDLOGIC TRUNK))
+  (enum orientation (null none N S E W FN FS FE FW))
+  (enum cellclass (null COVER RING BLOCK PAD CORE ENDCAP))
+  (enum symmetry (null X Y R90))
+  (enum geometryclass (null layer via))
+
+  (type uint "unsigned int %s")
+  (type cellx "struct { pnl_uint origin:1; int x; } %s")
+  (type celly "struct { pnl_uint valid:1;  int y; } %s")
+
+  (struct units
+	  ((name char* public readable)
+	   (value int public readable)))
+
+  (struct bbox
+	  ((x0 int public readable)
+	   (y0 int public readable)
+	   (x1 int public readable)
+	   (y1 int public readable)))
+
+  (struct rectangle
+	  ((layer char* public readable)
+	   (x0 int public readable)
+	   (y0 int public readable)
+	   (x1 int public readable)
+	   (y1 int public readable)))
+
+  (struct row_site
+	  ((name char* public readable)
+	   (core char* public readable)
+	   (x0 int public readable)
+	   (y0 int public readable)
+	   (orientation orientation public readable)
+	   (count int public readable)
+	   (step int public readable)
+	   (height int public readable)))
+
+  (enum routekind (null ROUTED FIXED COVER))
+  (enum segmentkind (null via x y))
+
+  (class dll
+	 ((next dll)
+	  (prev dll))
+
+	 (struct dll_head
+		 ((num_elements int public readable)))
+
+	 (struct tracks
+		 ((start int public readable)
+		  (count int public readable)
+		  (step int public readable)
+		  (layers ar public readable)))
+		
+	 (struct route
+		 ((kind routekind public readable)
+		  (branches dll_head public readable)))
+
+	 (struct branch
+		 ((layer char* public readable)
+		  (x0 int public readable)
+		  (y0 int public readable)
+		  (width int public readable)
+		  (segments dll_head public readable)))
+
+	 (class segment
+		((kind segmentkind readable public))
+
+		(struct x_segment
+			((x int public readable)))
+
+		(struct y_segment
+			((y int public readable)))
+
+		(struct via
+			((name char* public readable)))))
+
+  (class object
+ 
+	 ((kind kind readable public))
+
+	 (struct port
+		 ((nl_rep nl_port readable public)
+		  (loctype loctype readable public)
+		  (x cellx)
+		  (y celly)
+		  (orientation orientation readable public)
+		  (use use readable public)
+		  (rectangle rectangle readable public)))
+
+	 (class cell_data
+		((loctype loctype readable public)
+		 (x cellx)
+		 (y celly)
+		 (orientation orientation readable public))
+
+		(struct cell
+			((nl_rep nl_cell readable public)))
+
+		(struct icell
+			((nl_rep nl_icell readable public))))
+
+	 (class net_data
+		((routes dll_head readable public)
+		 (use use readable public)
+		 (pattern pattern readable public)
+		 (special int readable public))
+
+		(struct net
+			((nl_rep nl_net readable public)))
+
+		(struct inet
+			((nl_rep nl_inet readable public))))
+			
+	 (struct design
+		 ((nl_rep nl_design readable public)
+		  (history ar readable public)
+		  (die_area bbox readable public)
+		  (distance_units units readable public)
+		  (x_tracks dll_head readable public)
+		  (y_tracks dll_head readable public)
+		  (row_sites ar readable public)
+		  (design_attr nl_design_attr readable public)
+		  (cell_attr nl_cell_attr readable public)
+		  (net_attr nl_net_attr readable public)
+		  (port_attr nl_port_attr readable public)
+		  (location_rep location_rep readable public)))
+
+	 (struct idesign
+		 ((nl_rep nl_idesign readable public)
+		  (icell_attr nl_icell_attr readable public)
+		  (inet_attr nl_inet_attr readable public)
+		  (idesign_attr nl_idesign_attr readable public)))
+
+	 (struct library
+		 ((nl_rep nl_library readable public)
+		  (library_attr nl_library_attr readable public)
+		  (libcell_attr nl_libcell_attr readable public)
+		  (libpin_attr nl_libpin_attr readable public)))
+
+	 (struct libcell
+		 ((nl_rep nl_libcell readable public)
+		  (library library readable public)
+		  (class cellclass readable public)
+		  (bbox bbox readable public)
+		  (symmetry int)
+		  (site char* readable public)
+		  (obstructions (ar geometry) readable public)))
+
+	 (struct libpin
+		 ((nl_rep nl_libpin readable public)
+		  (libcell libcell readable public)
+		  (use use public readable)
+		  (shape shape public readable)
+		  (ports (ar geometry) public readable)
+		  (port_area int)
+		  (x int public readable)
+		  (y int public readable)
+		  (antennadiffarea int public readable)
+		  (antennagatearea int public readable)))
+
+	 (struct geometry
+		((class geometryclass readable public)
+		 (name char* readable public)
+		 (points (ar int) readable public)))
+
+	 ))

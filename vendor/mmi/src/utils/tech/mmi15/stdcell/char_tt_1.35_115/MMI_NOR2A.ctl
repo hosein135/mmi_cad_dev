@@ -1,0 +1,1 @@
+../ctl/MMI_NOR2A.ctl

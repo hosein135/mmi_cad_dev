@@ -1,0 +1,24 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_INVA {} {
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make nmos -W 0.6 -origin {550 360}
+  make pmos -W 1.2 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 07/19/99 -origin {580 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text Inverter
+  make_text -origin {360 110} -text {A Size}
+  make_text -origin {360 70} -text MMI_INVA -size large
+}
+

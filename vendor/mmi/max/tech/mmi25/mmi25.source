@@ -1,0 +1,184 @@
+# The is the technology source file for mmi25 (0.25 um CMOS)
+
+# This command will preserve MAX port types by writing them out to
+# different datatypes.  Only valid if no datatypes are specified.
+preserve_ports
+
+# layer	gds:dt  txt:dt	type	width	space	color
+#======	======= =======	=======	=======	=======	======
+nw	2	-	-	1.2	0.6	-
+# gds layer 4 for compatilibity with previous mmi25 source file
+od	3,4	-	gdsonly	-	-	-
+odn	12	-	gdsonly	-	-	-
+odp	11	-	gdsonly	-	-	-
+ndif	derived	-	act	0.3	0.4	66,213,66
+pdif	derived	-	act	0.3	0.4	202,160,115
+nwc	derived	ndif	act	0.3	0.4	-
+pwc	derived	pdif	act	0.3	0.4	-
+poly	13	-	poly	0.24    0.36	236,67,0
+#n2v	61	-	-	0.44    0.44	-
+#n3v	5	-	-	0.44    0.44	-
+pplus	7	-	-	0.44    0.44	-
+nplus	8	-	-	0.44    0.44	-
+ct	15	-	via	0.30    0.30	-
+m1	16	40	metal	0.32    0.32	8,139,255
+v12	17	-	via	0.36    0.35	-
+m2	18	41	metal	0.40    0.40	182,134,222
+v23	27	-	via	0.36    0.35	-
+m3	28	42	metal	0.40    0.40	255,160,65
+v34	29	-	via	0.36    0.35	-
+m4	31	43	metal	0.40    0.40	61,122,188
+v45	32	-	via	0.36    0.35	-
+m5	33	44	metal	0.44    0.46	gold
+prb	65	-	-	-	-
+text	-	255	text
+bbox	62	-	bbox
+#iname	63	-	iname
+iname	propattr 102	iname
+
+device nfet from poly ndif
+device pfet from poly pdif
+
+# for butting contacts
+connect nwc pdif
+connect pwc ndif
+
+# on output
+# if you want to write out all diffusions on the same layer, use od
+#derive od from ndif,pdif,nwc,pwc
+derive odn from ndif,nwc
+derive odp from pdif,pwc
+
+# in input
+derive ndif from od and-not pplus or odn and-not nw
+derive pdif from od and pplus or odp and nw
+derive nwc from od and-not pplus or odn and nw
+derive pwc from od and pplus or odp and-not nw
+
+# automatic generation of pplus, nplus, nw
+derive pplus_poly from pfet grow 0.07 or pdif grow 0.22 or pwc grow 0.04 \
+	shrink 0.21 grow 0.43 shrink 0.22 and poly grow 0.63 shrink 0.3
+
+derive nwc_grow from nwc grow 0.14
+
+derive pplus from pfet grow 0.07 or pdif grow 0.22 or pwc grow 0.04 \
+	or pplus_poly and-not nwc_grow or pplus \
+	shrink 0.21 grow 0.43 shrink 0.22
+
+derive pplus_grow from GDS_pplus grow 0.1
+	
+derive nplus from nfet grow 0.07 or ndif grow 0.16 or poly grow 0.06 \
+	or nwc grow 0.04 and-not pplus_grow \
+	or nplus shrink 0.21 grow 0.43 shrink 0.22
+
+derive nw from pdif grow 0.44 or nwc grow 0.16 or nw grow 0.3 shrink 0.3
+
+drc nw enc nwc 0.16
+drc nw enc pdif 0.6
+drc nw space_to ndif 0.6
+drc nw space_to pwc 0.16
+
+drc nfet space 0.5
+drc pfet space 0.5
+
+derive tmp1 from nfet,pfet grow 0.14
+derive poly_not_fet from poly and-not tmp1
+derive all_diff from ndif,pdif,nwc,pwc
+drc poly_not_fet space_to all_diff 0.14
+
+# for < max3.0 must be on same plane
+drc poly ext nfet 0.36
+drc poly ext pfet 0.36
+drc ndif ext nfet 0.44
+drc pdif ext pfet 0.44
+
+drc pplus space_to ndif 0.3
+drc pplus space_to nwc 0.14
+drc pplus space_to nfet 0.33
+
+drc pplus enc pfet 0.33
+drc pplus enc pdif 0.26
+drc pplus enc pwc 0.04
+
+drc nplus space_to pdif 0.3
+drc nplus space_to pwc 0.14
+drc nplus space_to pfet 0.33
+
+drc nplus enc nfet 0.33
+drc nplus enc ndif 0.26
+drc nplus enc nwc 0.04
+
+derive implant from GDS_nplus,GDS_pplus grow 0.05 shrink 0.05
+drc implant enc poly 0.1
+drc nplus space_to pplus 0.1
+
+derive ct_ndif from ct and ndif,nwc
+derive ct_pdif from ct and pdif,pwc
+drc ct_ndif space_to nfet 0.22
+drc ct_pdif space_to pfet 0.22
+
+derive ct_poly from ct and poly
+drc ct_poly space_to pfet 0.28
+drc ct_poly space_to nfet 0.28
+
+derive all_poly_dif from ndif,pdif,nwc,pwc,poly
+drc all_poly_dif enc ct 0.14
+
+# redundant
+#drc nplus enc ct_ndif 0.18
+#drc pplus enc ct_pdif 0.18
+
+drc m1 enc ct 0.09
+
+drc m1 area 0.36
+
+drc m1 enc v12 0.09
+
+drc v12 space_to nfet,pfet 0.01
+
+drc m2 enc v12 0.09
+drc m2 area 0.36
+
+drc m2 enc v23 0.1
+drc m3 enc v23 0.09
+
+drc m3 area 0.36
+
+drc m3 enc v34 0.09
+drc m4 enc v34 0.09
+
+drc m4 area 0.36
+
+drc m4 enc v45 0.09
+
+# no m5 area rule
+
+drc m5 enc v45 0.09
+
+
+# add other tcl variable definitions with the set statement
+
+################################################################
+# USER DESIGN GRID
+# This is the initial value shown in the Grid menu.
+################################################################
+set GRID(resolution) 0.01
+set GRID(mask) 0.01
+
+
+################################################################
+# LAYER NAMES
+# Mapping from mmi canonical layer names to customer tech names.
+# Change the name on the right to be the name of the specified
+# layer in this technology file.
+# Note that contact and poly could be derived from info above.
+################################################################
+
+set LAYER_NAME(pdiff) pdif
+set LAYER_NAME(ndiff) ndif
+set LAYER_NAME(nplus) nplus
+set LAYER_NAME(pplus) pplus
+set LAYER_NAME(nwell) nw
+# The following two will be derived automatcally, if unspecified.
+set LAYER_NAME(poly) poly
+set LAYER_NAME(contact) ct

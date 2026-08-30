@@ -1,0 +1,1 @@
+../extract/MMI_NOR3A.sp

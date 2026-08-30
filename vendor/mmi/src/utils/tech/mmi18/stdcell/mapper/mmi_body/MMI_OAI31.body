@@ -1,0 +1,54 @@
+  # MMI_OAI31 icon body
+  if {$DeMorgan} {
+    # or
+    icon_line -10 -30 40 -30
+    icon_line -10 30 40 30
+    icon_arc -20 -30 90 110 -start 35 -extent 50
+    icon_arc -20 -110 90 30 -start 275 -extent 50
+    icon_arc -20 -30 0 30 -start 270 -extent 180
+    # and
+    icon_line -40 -10 -80 -10 -80 50 -40 50
+    icon_arc -80 -10 -10 50 -start 277 -extent 166
+    # bubbles and stubs
+    icon_line -100 -30 -30 -30
+    icon_arc -100 30 -80 50 -start 0 -extent 359
+    icon_arc -100 30 -80 10 -start 0 -extent 359
+    icon_arc -100 -10 -80 10 -start 0 -extent 359
+    icon_line 80 0 100 0
+    icon_arc -30 -40 -10 -20 -start 0 -extent 359
+    # properties
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {0 -22} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  } else {
+    # or
+    icon_line -88 -10 -40 -10
+    icon_line -88 50 -40 50
+    icon_arc -100 -10 10 130 -start 35 -extent 50
+    icon_arc -100 -90 10 50 -start 275 -extent 50
+    icon_arc -98 -10 -78 50 -start 270 -extent 180
+    # and
+    icon_line 50 -30 0 -30 0 30 50 30
+    icon_arc 10 -30 80 30 -start 277 -extent 166
+    # stubs
+    icon_line -100 -30 0 -30
+    icon_line -100 0 -80 0
+    icon_line -100 20 -78 20
+    icon_line -100 40 -80 40
+    icon_arc 80 -10 100 10 -start 0 -extent 359
+    # properties
+    icon_property -origin {3 -22} -size small -label F
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  }
+
+  # inputs
+  icon_term -type input -origin {-100 -30} -name in0
+  icon_term -type input -origin {-100 0} -name in1
+  icon_term -type input -origin {-100 20} -name in2
+  icon_term -type input -origin {-100 40} -name in3
+
+  # outputs
+  icon_term -type output -origin {100 0} -name out
+
+

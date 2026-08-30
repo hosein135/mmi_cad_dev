@@ -22,16 +22,11 @@
       vendorSrc =
         let
           hasSrc = p: builtins.pathExists (p + "/src/max4.3.16");
-          home = builtins.getEnv "HOME";
-          cache =
-            if home == "" then
-              null
-            else
-              /. + "${home}/.cache/mmi-cad/vendor";
-          dirCands = lib.filter (p: p != null) (
-            lib.optional (cache != null) cache
-            ++ lib.optionals (pwd != "") [ (/. + "${pwd}/vendor/mmi") ]
-          );
+          dirCands =
+            lib.filter (p: p != null) (
+              [ ./vendor/mmi ]
+              ++ lib.optionals (pwd != "") [ (/. + "${pwd}/vendor/mmi") ]
+            );
           tarCands =
             lib.filter (p: p != null) (
               [

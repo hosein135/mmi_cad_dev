@@ -1,0 +1,230 @@
+#!/bin/ksh
+
+LIBNAME=mmi18
+ROOT=/proj/tech/$LIBNAME
+CTLDIR=$ROOT/stdcell/ctl
+MAXDIR=$ROOT/stdcell/max
+SUEDIR=$ROOT/stdcell/sue
+SPICEDIR=$ROOT/stdcell/extract
+SCRIPTDIR=$ROOT/scripts
+LIBDIR=$ROOT/library
+
+# Top level script to create characterization data for a library.
+# The first argument may be:
+#	"install"  - this program installs the previously built
+#		characterization files into appropriate directories.
+#	<corner> - Specifies a corner to use, for example "ss"
+#	<empty> - If no arguments, the default corner specified
+#		in the char.setup file is calculated.
+#
+# To use this script, create the char.setup file in
+# a work directory,, where a zillion temporary files will be created.
+# The input .ctl files are read from the CTLDIR specified above.
+# The spice files must be created using the gensp.tcl program.
+#
+# If <cell>.syn is older than either <cell>.sp or <cell>.ctl then
+# the script remakes the .syn and the .v file. 
+# Then it slurps up all the .syn files into a synopsys .lib file.
+# Then it makes .tlf and .ctlf files from the .lib file.
+#
+# For example:
+#	mkdir /proj/tech/tsmc25/stdcell/ss70.extract
+#	cd /proj/tech/tsmc25/stdcell/ss70.extract
+#	<create the char.setup file>
+#	make_char
+
+
+
+# There MUST be a char.setup file in the current directory!
+if [ ! -f char.setup ];then
+    echo "Can not find file: char.setup.  exiting..."
+    exit 2
+fi
+
+# Determine the CORNER to compute.
+# Get the default CORNER from that file, if any,
+# otherwise use tt.  We look for a line that looks like:
+grep "set CORNER" char.setup | read junk1 junk2 CORNER
+if [ "$CORNER" = "" ];then
+    CORNER=tt
+    echo "No corner specified, using $CORNER"
+fi
+
+# Determine the voltage and temp from the corner.
+# Look for a line like this:
+# set DATA(corner,ss) "./header.ss 2.25V 70"
+
+grep "set DATA(corner,$CORNER)" char.setup | \
+	sed 's/"//g' | \
+	read junk1 junk2 junk3 VOLTS TEMP
+# Remove the stupid "v" from the VOLTS
+VOLTS=`echo $VOLTS | sed 's/[vV]//'`
+
+
+if [ "$1" = "install" ];then
+    echo "Installing characterization for corner $CORNER ($VOLTS, $TEMP)..."
+    FULLNAME=${LIBNAME}_${CORNER}_${VOLTS}_${TEMP}
+    set -x
+    cp ${LIBNAME}.V    ${LIBDIR}/verilog/${LIBNAME}.v
+    cp ${LIBNAME}.lib  ${LIBDIR}/synopsys/${FULLNAME}.lib
+    cp ${LIBNAME}.tlf  ${LIBDIR}/tlf/${FULLNAME}.tlf
+    cp ${LIBNAME}.ctlf ${LIBDIR}/tlf/${FULLNAME}.ctlf
+    set +x
+
+    echo "done."
+    exit
+fi
+
+{  # This brace catches the output of all enclosed commands for the log file
+
+echo "Characterizing cells using corner $CORNER ($VOLTS, $TEMP)..."
+
+
+# First look at the max files, and make sure that:
+# 1. there is a .ctl file for each max file.
+# 2. none of the spice files are out of date
+outofdate=
+
+for max_file in $MAXDIR/*.max
+do
+    cell=`basename $max_file .max`	# Get just cell name without path or ext
+    if [ ! -f ${CTLDIR}/$cell.ctl ];then
+	echo "Warning: no .ctl file for $cell.max, file is skipped"
+	continue
+    fi
+    # If the spice file does not exist or is older than the max file,
+    # then its out of date and needs to be re-extracted.
+    if [ ! -s ${SPICEDIR}/$cell.sp -o \
+    	${SPICEDIR}/$cell.sp -ot ${MAXDIR}/$cell.max ];then
+	outofdate="$outofdate $cell"
+    fi
+done
+
+#for sue_file in $SUEDIR/*.sue
+#do
+#    cell=`basename $sue_file .sue`	# Get just cell name without path or ext
+#    if [ ! -f ${CTLDIR}/$cell.ctl ];then
+#	echo "Warning: no .ctl file for $cell.sue, file is skipped"
+#	continue
+#    fi
+#    # If the spice file does not exist or is older than the sue file,
+#    # then its out of date and needs to be re-extracted.
+#    if [ ! -s ${SPICEDIR}/$cell.sp -o \
+#    	${SPICEDIR}/$cell.sp -ot ${SUEDIR}/$cell.sue ];then
+#	outofdate="$outofdate $cell"
+#    fi
+#done
+
+if [ ! "$outofdate" = "" ];then
+    echo "Warning: The following spice files are out of date:"
+    echo $outofdate
+    echo ""
+    echo "Warning: You must run gensp.tcl before continuing."
+    echo "Would you like to run gensp to update the spice files?[y] \c"
+    read reply
+    if [ "$reply" = "" -o "$reply" = "y" -o "$reply" = "yes" ];then
+	# We should modify gensp to take $outofdate as an argument...
+	echo Running: $SCRIPTDIR/gensp.tcl
+	$SCRIPTDIR/gensp.tcl
+
+	# Check to make sure gensp actually worked.
+	for f in $outofdate
+	do
+	    if [ ! -s ${SPICEDIR}/$f.sp -o \
+		${SPICEDIR}/$f.sp -ot ${MAXDIR}/$f.max ];then
+		echo "Error: $f (and maybe others) still out of date"
+		echo "exiting..."
+		exit 2
+	    fi
+	done
+    else
+	echo "exiting;  go run gensp"
+	exit 2
+    fi
+else
+    echo "All spice files are up to date."
+fi
+
+rm *.ctl > /dev/null 2>&1
+ln -s ${CTLDIR}/*.ctl .
+mv driver.sp driver.sp.BAK
+rm *.sp > /dev/null 2>&1
+mv driver.sp.BAK driver.sp
+ln -s ${SPICEDIR}/*.sp .
+
+
+# The set -e causes the script to exit if a command fails.
+set -e
+
+# walk through each .ctl file to see if synopsys needs remaking
+#for ctl_file in $CTLDIR/*.ctl
+for ctl_file in *.ctl
+do
+	cell=`basename $ctl_file .ctl`	# Get just cell name without path or ext
+	echo $cell
+
+	if [ ! -f $cell.sp ]; then
+		echo "Skipping $cell, no spice netlist."
+		continue
+	fi
+
+	# If the file exists and is not zero-length...
+	if [ -f $cell.syn -a -s $cell.syn ]; then
+
+	    # If .syn is newer than .sp and .ctl...
+	    if [ $cell.syn -nt $cell.sp -a $cell.syn -nt $ctl_file ]; then
+		continue
+	    fi
+	fi
+
+	#Old:
+	#$SCRIPTDIR/char $CORNER $cell.sp $cell $ctl_file > $cell.syn
+
+#	echo "Running: char $CORNER $cell.sp > $cell.syn ..."
+#	( $SCRIPTDIR/char $CORNER $cell.sp > $cell.syn ) 2>&1 | tee $cell.jnl
+
+	echo "Running: char $CORNER $cell.sp ..."
+	( $SCRIPTDIR/char $CORNER $cell.sp ) 2>&1 | tee $cell.jnl
+done
+
+
+echo "done characterizing."
+
+rm -f *.st0 *.pa0 *.ic *.info
+
+echo ""
+echo "Creating synopsys library $LIBNAME.lib ..."
+$SCRIPTDIR/make_synlib.tcl $CORNER > $LIBNAME.lib
+echo "done."
+
+echo ""
+echo "Adding areas to synopsys library $LIBNAME.lib ..."
+cp $LIBNAME.lib $LIBNAME.lib.no_areas
+$SCRIPTDIR/add_areas.tcl $LIBNAME.lib.no_areas > $LIBNAME.lib
+echo "done."
+
+# Note this can't be a .v in this directory or will get concatenated
+echo ""
+echo "Creating verilog library $LIBNAME.V ..."
+cat *.v > $LIBNAME.V
+echo "done."
+
+echo ""
+echo "Running syn2tlf on $LIBNAME.lib ..."
+$SCRIPTDIR/syn2tlf -s 0.2 -t 0.8 $LIBNAME.lib
+cat syn2tlf.log
+echo "done."
+
+echo ""
+echo "Compiling tlf library $LIBNAME.tlf ..."
+tlfc -f $LIBNAME.tlf
+cp $LIBNAME/timing.ctlf $LIBNAME.ctlf
+echo "done."
+
+echo ""
+echo "make done"
+
+# blow
+exit
+
+} 2>&1 | tee make`date '+%y%m%d'`.jnl

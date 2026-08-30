@@ -1,0 +1,66 @@
+VERSION  5.3 ;
+NAMESCASESENSITIVE ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS  "[]" ;
+DESIGN m ;
+UNITS DISTANCE MICRONS 1000 ;
+
+HISTORY CREATETIME 4 May 2001 14:15:00 ;
+HISTORY SAVETIME 4 May 2001 14:15:01 ;
+HISTORY DB CREATE by jka ;
+HISTORY Name: LBRARY, dir: '' ;
+HISTORY SE version: 5.3.60 MASTER, DB code version: 5.1, DB created under: 5.1 ;
+HISTORY Max mem: 25165824, mainsail: $TNT_INST_DIR/tools/dsm/lib/sys1620r.olb:
+        16.20 ;
+HISTORY System no. 19 --> SPARC UNIX, CPU id = 'Sun_Microsystems: 2157853406' ;
+HISTORY Design saved as LBRARY in directory  ;
+HISTORY DB LOAD by jka ;
+HISTORY Name: LBRARY, dir: '' ;
+HISTORY SE version: 5.3.60 MASTER, DB code version: 5.1, DB created under: 5.1 ;
+HISTORY Max mem: 25165824, mainsail: $TNT_INST_DIR/tools/dsm/lib/sys1620r.olb:
+        16.20 ;
+HISTORY System no. 19 --> SPARC UNIX, CPU id = 'Sun_Microsystems: 2157853406' ;
+HISTORY INPUT VERILOG FILENAME "/homes/jka/psyn/se/mmi25.v def-test2.v" LIB
+        "lib" DESIGN "lib.m:hdl" ;
+
+
+PROPERTYDEFINITIONS
+DESIGN  VERILOGDESIGNNAME  STRING  "lib.m:hdl"  ;
+
+END PROPERTYDEFINITIONS
+DIEAREA ( 0 0 ) ( 0 0 ) ;
+
+
+VIAS 4 ;
+- VIA12 + RECT M2 ( -280 -280 ) ( 280 280 ) + RECT VIA1 ( -180 -180 )
+  ( 180 180 ) + RECT M1 ( -280 -280 ) ( 280 280 ) ;
+- VIA23 + RECT M3 ( -280 -280 ) ( 280 280 ) + RECT VIA2 ( -180 -180 )
+  ( 180 180 ) + RECT M2 ( -280 -280 ) ( 280 280 ) ;
+- VIA34 + RECT M4 ( -280 -280 ) ( 280 280 ) + RECT VIA3 ( -180 -180 )
+  ( 180 180 ) + RECT M3 ( -280 -280 ) ( 280 280 ) ;
+- VIA45 + RECT M5 ( -270 -270 ) ( 270 270 ) + RECT VIA4 ( -180 -180 )
+  ( 180 180 ) + RECT M4 ( -270 -270 ) ( 270 270 ) ;
+END VIAS
+
+COMPONENTS 1 ;
+- u1 MMI_INVA ;
+END COMPONENTS
+
+PINS 4 ;
+- gnd! + NET gnd! + DIRECTION INPUT + USE GROUND ;
+- vdd! + NET vdd! + DIRECTION INPUT + USE POWER ;
+- z + NET z + DIRECTION OUTPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+- a + NET a + DIRECTION INPUT + USE SIGNAL + LAYER M1 ( -300 0 ) ( 300 600 ) ;
+END PINS
+
+SPECIALNETS 2 ;
+- gnd! ( u1 GND ) + USE GROUND ;
+- vdd! ( u1 VDD ) + USE POWER ;
+END SPECIALNETS
+
+NETS 2 ;
+- z ( PIN z ) ( u1 out ) ;
+- a ( PIN a ) ( u1 in ) ;
+END NETS
+
+END DESIGN

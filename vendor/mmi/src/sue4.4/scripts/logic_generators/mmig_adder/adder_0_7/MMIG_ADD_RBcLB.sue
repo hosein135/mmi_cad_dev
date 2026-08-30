@@ -1,0 +1,95 @@
+# SUE version MMI_SUE4.0p1
+
+proc SCHEMATIC_MMIG_ADD_RBcLB {} {
+  make input -orient RY -name A_H -origin {120 440}
+  make input -orient RY -name B_H -origin {120 480}
+  make output -name Sum_H -origin {1340 610}
+  make input -orient R90Y -name Cin_L -origin {880 950}
+  make output -orient R90Y -name Cout_H -origin {880 170}
+  generate name_net_s name_net -cell name_net
+  make name_net -name G_L -origin {510 460}
+  make name_net -name P_L -origin {1150 590}
+  make MMIG_ADD_RBcLB -origin {220 220}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {430 1100}
+  make row_spanner300 -origin {1080 1100}
+  make name_net -name Cin_H -origin {1150 630}
+  make name_net -name K_L -origin {510 610}
+  make name_net -name K_H -origin {510 540}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -orient RY -origin {240 460}
+  generate MMI_NOR2 MMI_NOR2B_1 -Size B -DeMorgan 1
+  make MMI_NOR2B_1 -orient RY -origin {240 540}
+  make MMI_NAND2B -orient RY -origin {630 590}
+  make MMI_INV -origin {400 610}
+  generate MMI_INV MMI_INVB_1 -Size B -DeMorgan 1
+  make MMI_INVB_1 -origin {630 690}
+  generate MMI_OAI21 MMI_OAI21C_1 -Size C -DeMorgan 1
+  make MMI_OAI21C_1 -orient R270 -origin {880 350}
+  generate MMI_XNOR2 MMI_XNOR2B_1 -Size B -DeMorgan 1
+  make MMI_XNOR2B_1 -origin {1250 610}
+  make MMI_INVB_1 -origin {630 790}
+  make output -name CinB_H -origin {1340 790}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.2 -date 03/26/99 -origin {670 1230}
+  make_wire 120 480 150 480
+  make_wire 550 460 850 460
+  make_wire 920 540 510 540
+  make_wire 170 440 170 520
+  make_wire 150 480 150 560
+  make_wire 550 690 550 740
+  make_wire 550 740 880 740
+  make_wire 150 480 180 480
+  make_wire 180 560 150 560
+  make_wire 320 540 320 610
+  make_wire 550 570 570 570
+  make_wire 550 460 550 570
+  make_wire 920 450 920 540
+  make_wire 1190 630 1150 630
+  make_wire 300 460 510 460
+  make_wire 510 460 550 460
+  make_wire 120 440 170 440
+  make_wire 170 440 180 440
+  make_wire 300 540 320 540
+  make_wire 320 540 510 540
+  make_wire 170 520 180 520
+  make_wire 460 610 510 610
+  make_wire 510 610 570 610
+  make_wire 320 610 340 610
+  make_wire 690 590 1150 590
+  make_wire 1150 590 1190 590
+  make_wire 690 690 1150 690
+  make_wire 1150 630 1150 690
+  make_wire 550 690 570 690
+  make_wire 850 450 850 460
+  make_wire 880 170 880 250
+  make_wire 1310 610 1340 610
+  make_wire 880 450 880 740
+  make_wire 880 740 880 950
+  make_wire 690 790 1340 790
+  make_wire 550 790 570 790
+  make_wire 550 740 550 790
+}
+
+proc ICON_MMIG_ADD_RBcLB args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin_L
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout_H
+  icon_term -type output -origin {140 20} -name CinB_H
+  icon_property -origin {-70 220} -type user -name name
+  icon_property -origin {-70 240} -type user -name M
+  icon_property -origin {-70 260} -type user -name pad
+  icon_property -origin {-40 100} -anchor e -rotate 1 -label Cin_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 -20} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label RBcLB
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {130 20} -rotate 1 -label CinB_H
+}
+

@@ -1,0 +1,947 @@
+
+api.tcl,45
+proc api_flip13,618
+proc api_rotate75,2316
+
+at.tcl,38
+proc at23,864
+proc at_search45,1324
+
+box.tcl,556
+proc _box_drag254,6032
+proc _box_drag_start197,4643
+proc _box_gate_keeper230,5628
+proc _box_mode_define215,5202
+proc _box_show_cursor181,4196
+proc _move_box_gate_keeper86,2281
+proc _move_box_mode_define76,1953
+proc _move_box_move107,2607
+proc _resize_box_drag47,1405
+proc _resize_box_gate_keeper26,1038
+proc _resize_box_mode_define15,640
+proc box_dim_edit271,6266
+proc box_get_nearest_side444,11128
+proc box_goto_coords401,10244
+proc box_mode_enter144,3272
+proc box_modify154,3531
+proc box_move522,13438
+proc box_set_move_cursor504,12949
+
+cct.tcl,42
+proc cct_path55,1562
+proc cct_via13,445
+
+cell.tcl,1016
+proc _cell_file_box236,6142
+proc _cell_gds_suffix_list1128,31574
+proc _cell_save_tree_internal1445,38965
+proc _cells_modified134,3685
+proc _max_gcell_init298,7711
+proc cell_array1517,40269
+proc cell_cellname170,4609
+proc cell_change_path692,19492
+proc cell_copy589,15740
+proc cell_delete1291,35095
+proc cell_empty189,5108
+proc cell_exit922,26441
+proc cell_export1053,29500
+proc cell_file206,5417
+proc cell_flags221,5772
+proc cell_gds2ascii1394,37828
+proc cell_import997,28165
+proc cell_in_memory182,4900
+proc cell_info150,4130
+proc cell_init46,1543
+proc cell_load324,8359
+proc cell_load_files418,10647
+proc cell_load_gds1147,32005
+proc cell_load_magic963,27386
+proc cell_make_instance1324,35883
+proc cell_new500,12662
+proc cell_open536,13618
+proc cell_origin1725,46254
+proc cell_path_add73,2330
+proc cell_path_find120,3394
+proc cell_rename774,22130
+proc cell_revert903,26034
+proc cell_save825,23871
+proc cell_save_tree1424,38552
+proc cell_uniq_id1718,46123
+proc saveall1485,39852
+
+clipboard.tcl,202
+proc _clipboard_filename14,625
+proc _clipboard_paste_gate_keeper248,7013
+proc _clipboard_paste_mode_define236,6663
+proc clipboard_copy57,1711
+proc clipboard_cut80,2335
+proc clipboard_paste89,2457
+
+color_editor.tcl,531
+proc _blend_color918,21780
+proc _build_color_window330,6863
+proc _change_color751,17518
+proc _change_colortype554,12790
+proc _change_stipple1145,26936
+proc _colors_revert714,16207
+proc _edit_color_button1181,27787
+proc _fill_stipple1074,25154
+proc _make_stipple_edit963,22816
+proc _make_stipple_examples996,23514
+proc _make_transparency902,21468
+proc _use_stipple1038,24381
+proc _withdraw_color_window544,12690
+proc color_layer_popup491,11105
+proc edit_color592,13433
+proc hsv2rgb1247,29376
+proc rgb2hsv1333,30419
+
+colors.tcl,217
+proc _colors_need_stipple_only133,3362
+proc _pal_cmap26,1079
+proc _pal_colors178,4304
+proc _pal_new_color39,1300
+proc _pal_set_special_color70,1861
+proc _pal_set_special_stipple100,2610
+proc _pal_style111,2873
+
+cursor.tcl,206
+proc cursor_busy128,4351
+proc cursor_mode144,4710
+proc cursor_override170,5527
+proc cursor_raise_that_window259,8685
+proc cursor_redisplay313,10486
+proc cursor_update53,1743
+proc cursor_wait180,5716
+
+db.tcl,107
+proc _db_gen_type_table64,1616
+proc db_plane50,1371
+proc dbt_long_name16,653
+proc dbt_short_name29,910
+
+dbt.tcl,438
+proc dbt_cell_clear290,7239
+proc dbt_chunk574,13696
+proc dbt_chunk2612,14698
+proc dbt_cursor_in_frame438,10110
+proc dbt_find_cell268,6711
+proc dbt_flyline16,678
+proc dbt_frame452,10449
+proc dbt_frame_pixels466,10694
+proc dbt_is_visible400,9401
+proc dbt_layers367,8812
+proc dbt_next_edge473,10888
+proc dbt_selectable_layers408,9550
+proc dbt_sort_layers303,7442
+proc dbt_touchingtypes327,7995
+proc dbt_visible_layers381,9086
+
+doc.tcl,348
+proc _doc_box_matches_select371,9304
+proc _doc_box_save_user423,10603
+proc _doc_box_toggle_user387,9837
+proc _doc_box_types_button180,4602
+proc _doc_box_types_change170,4398
+proc _doc_box_update191,4851
+proc _doc_box_variables_fill308,7624
+proc _print_doc580,14670
+proc doc_box25,917
+proc doc_cmd465,11783
+proc doc_save_to_file603,15011
+
+doc0.tcl,134
+proc _doc_doc_doc265,7594
+proc _doc_doc_tcl292,8471
+proc doc_add_var323,9029
+proc doc_at_delete257,7359
+proc init_global337,9355
+
+doc_user0.tcl,0
+
+doc_var_user0.tcl,0
+
+duplicate.tcl,105
+proc _duplicate_gate_keeper76,2348
+proc _duplicate_mode_define65,2020
+proc duplicate_mode_enter13,571
+
+edge.tcl,242
+proc _edge_drag320,8518
+proc _edge_drag_end523,13385
+proc _edge_drag_gate_keeper310,8418
+proc _edge_drag_mode_define298,8089
+proc _edge_gate_keeper35,1004
+proc _edge_mode_define23,743
+proc _find_edge64,1646
+proc edge_mode_enter15,650
+
+edit.tcl,251
+proc _find_paint_in_subcell308,7714
+proc edit_any410,10319
+proc edit_cell_props375,9353
+proc edit_pop167,4957
+proc edit_pop_direct251,6728
+proc edit_push22,826
+proc edit_push_direct219,5913
+proc edit_stack_clear266,7021
+proc lay_path279,7248
+
+flatten.tcl,106
+proc _flatten_int93,3653
+proc flatten_cells268,8463
+proc flatten_init15,622
+proc flatten_setup52,1938
+
+flyline.tcl,380
+proc _flyline_delete58,1545
+proc _flyline_delete_selected69,1742
+proc _flyline_drag207,5685
+proc _flyline_end228,6065
+proc _flyline_gate_keeper25,803
+proc _flyline_make_list136,3603
+proc _flyline_mode_define96,2482
+proc _flyline_motion216,5888
+proc _flyline_select_nearest106,2883
+proc _flyline_start189,5157
+proc _flyline_vertex174,4923
+proc flyline_mode_enter17,727
+
+foo.tcl,55
+proc foo0,0
+proc foo27,108
+proc local_routine15,220
+
+gcell.tcl,1200
+proc UNUSED_gcell_get_origin583,16300
+proc _gcell_args1121,29070
+proc _gcell_args_to_prop_list419,11652
+proc _gcell_bbox1107,28762
+proc _gcell_has_been_edited754,20230
+proc _gcell_info1128,29267
+proc _gcell_prop_list493,13914
+proc _gcell_prop_list_to_args472,13582
+proc _gcell_remake_from_props845,22751
+proc _gcell_stretch_drag1232,32442
+proc _gcell_stretch_end1193,31337
+proc _gcell_stretch_gate_keeper1328,35649
+proc _gcell_stretch_mode_define1170,30541
+proc _gcell_stretch_show_cursor1154,30045
+proc _gcell_stretch_start1203,31609
+proc _load_gcells211,6275
+proc _make_gcell_internal521,14445
+proc _pats_unused_edit_gcell_props648,17683
+proc define_gcell188,5611
+proc edit_gcell_props1002,25799
+proc gcell_edit_new1493,40013
+proc gcell_get_props791,21552
+proc gcell_group_create1574,42542
+proc gcell_group_objects1596,43102
+proc gcell_label167,5256
+proc gcell_load21,730
+proc gcell_modify1422,37822
+proc gcell_paint141,4679
+proc gcell_polygon154,5032
+proc gcell_stretch_mode_enter1373,36705
+proc gcell_typename1114,28897
+proc gcell_ungroup_objects1660,45044
+proc is_gcell303,9035
+proc is_gcell_selected322,9405
+proc make_gcell336,9764
+proc place_gcell401,11189
+
+grid.tcl,302
+proc _grid_move_define556,18630
+proc _grid_move_gate_keeper569,19013
+proc _grid_move_origin609,19951
+proc _grid_move_origin_setup600,19805
+proc grid_init146,5065
+proc grid_menu325,10775
+proc grid_move_enter545,18402
+proc grid_select305,10306
+proc grid_update255,8810
+proc toggle_grid116,4443
+
+group.tcl,79
+proc group_from_cell80,2007
+proc group_new15,652
+proc group_transfer50,1342
+
+help.tcl,87
+proc display_help_item250,7158
+proc help_about_max260,7340
+proc help_menu_add15,579
+
+help0.tcl,23
+proc help_usage15,651
+
+i_cmd.tcl,294
+proc i_cmd_between31,1276
+proc i_cmd_between_undos78,2311
+proc i_cmd_bind295,7152
+proc i_cmd_eval131,3418
+proc i_cmd_eval_box220,5320
+proc i_cmd_eval_common94,2642
+proc i_cmd_eval_last210,5146
+proc i_cmd_eval_set_last195,4869
+proc i_cmd_eval_terminal263,6497
+proc i_cmd_update50,1754
+
+keymap.tcl,511
+proc _keymap_activate116,3707
+proc _keymap_bind_edit348,9091
+proc _keymap_can_event326,8584
+proc _keymap_edit_create584,16636
+proc _keymap_edit_done727,20614
+proc _keymap_edit_update668,19126
+proc _keymap_invoke_list567,16172
+proc _keymap_load_menu264,6989
+proc _keymap_revert715,20405
+proc _keymap_save_as_default153,4454
+proc keymap_bind66,2139
+proc keymap_edit739,20824
+proc keymap_init17,708
+proc keymap_load232,6321
+proc seq_parse916,26642
+proc seq_pp982,28327
+proc seq_sort_key1047,29995
+
+label.tcl,540
+proc _label_choose_layer608,15778
+proc _label_drag297,6909
+proc _label_drag_gate_keeper280,6618
+proc _label_edit_box323,7321
+proc _label_edit_box_close311,7102
+proc _label_gate_keeper139,3512
+proc _label_update174,4160
+proc _name_labels_compare885,23075
+proc change_labels697,17538
+proc edit_label112,2786
+proc label_add21,796
+proc label_drag_mode_define271,6361
+proc label_edit72,1969
+proc label_first_non_hidden_selected595,15517
+proc label_mode_define126,3124
+proc label_unique_id911,23494
+proc sel_net_by_name618,15911
+
+list_box.tcl,634
+proc _list_box_build97,2711
+proc _list_box_execute149,4276
+proc _list_box_fill199,5415
+proc _list_box_fill_dir177,4988
+proc _listbox_resize420,10175
+proc _navigator_button841,24086
+proc _navigator_convert874,24867
+proc _navigator_drag544,13345
+proc _navigator_mark531,12927
+proc _navigator_move_view564,13789
+proc _navigator_rectangle640,16790
+proc _navigator_unconvert895,25275
+proc _navigator_zoom577,14301
+proc _new_list_box345,8660
+proc _resize_listboxes387,9412
+proc _waste_list_box320,8174
+proc list_box_update27,1020
+proc list_boxes_build54,1540
+proc navigator_build522,12648
+proc navigator_update656,17499
+
+lvs_it.tcl,45
+proc extract_it240,6415
+proc lvs_it25,1064
+
+max.tcl,424
+proc _max_periodic_update437,10791
+proc _max_prompt_main153,4431
+proc _max_prompt_partial154,4481
+proc _max_source179,5027
+proc _max_source_1maxrc351,8762
+proc _max_source_maxtcl107,3257
+proc _max_source_pref332,8441
+proc _max_source_tech288,7437
+proc exit160,4650
+proc max_local_tech_dir258,6899
+proc max_private_dir234,6254
+proc max_source_maxrc369,9188
+proc max_tcl_source96,3052
+proc max_tech_path196,5393
+
+max0.tcl,40
+proc MAXPAT102,2975
+proc _grep34,1209
+
+mc_wrapper.tcl,129
+proc _mc_load54,1512
+proc mc_build64,1688
+proc mc_cp84,2018
+proc mc_init39,1161
+proc mc_netlist74,1848
+proc mc_what94,2212
+
+menu_bar.tcl,1042
+proc _menu_add_see_cif1348,46721
+proc _menu_bar_menu201,6441
+proc _menu_bar_traverse295,10172
+proc _menu_bar_update2384,12381
+proc _menu_developer_build928,33532
+proc _menu_extend_build1271,44411
+proc _menu_flip_build1254,43853
+proc _menu_get_widget171,5610
+proc _menu_move_build1038,36865
+proc _menu_options227,7071
+proc _menu_print_setup947,34362
+proc _menu_stretch_build1065,37823
+proc _menu_user_pref_build260,8740
+proc _point_mode_define1442,49087
+proc _point_point1449,49265
+proc cif_see1356,46933
+proc drc_errors1095,38930
+proc menu_add_cmd17,761
+proc menu_add_cmd_fast154,5153
+proc menu_add_print_type966,34755
+proc menu_add_separator167,5556
+proc menu_add_widget127,4363
+proc menu_bar_build452,14292
+proc menu_bar_command355,11666
+proc menu_bar_fix_label374,12120
+proc menu_bar_get335,11146
+proc menu_bar_update424,13523
+proc menu_local_cmd1310,45696
+proc menu_repeat982,35120
+proc menu_see_cif_update1371,47240
+proc menu_tool_cmd1329,46210
+proc move_to_obs1120,39482
+proc point_mode_enter1455,49342
+
+message.tcl,42
+proc _msg_print25,551
+proc msg_init3,67
+
+misc.tcl,1203
+proc _check_sue1043,27081
+proc _create_cross_probe_correspondence875,23300
+proc _cross_probe_net950,25168
+proc _new_gds_export_setup295,7424
+proc _prop_cell_count1215,30819
+proc _relative_origin1229,31102
+proc align_objects1971,53093
+proc assert1780,47988
+proc browser_open642,17515
+proc clear_annotations1761,47592
+proc closest_edge220,5467
+proc delete56,1543
+proc drc_redisplay_hook1861,50604
+proc drc_setup_menu1803,48586
+proc drc_status_update1888,51285
+proc file_grep1403,37439
+proc find_next_error530,14924
+proc format_gds_layers1064,27353
+proc gds_export_setup386,10762
+proc gds_import_setup421,11632
+proc gds_write247,6353
+proc generate_layers1683,46111
+proc layt_box1253,31923
+proc layt_line_box1361,35616
+proc layt_point1296,33665
+proc layt_rect1341,35121
+proc make_from_feedback1640,45183
+proc max_auto_load692,18925
+proc measure68,1711
+proc measure_dist77,1904
+proc misc_save_config1420,37716
+proc misc_setup1593,43454
+proc quit39,1266
+proc quote_string1770,47746
+proc redisplay_hook45,1319
+proc redo1941,52487
+proc reload712,19332
+proc source_max_tcl666,18256
+proc sue_cross_probe_init762,20634
+proc sue_cross_probe_net979,25721
+proc undo1912,51888
+
+mode.tcl,767
+proc _mode_box_update_mode901,25723
+proc _mode_main_define737,21089
+proc _mode_max_internal_define68,1881
+proc _mode_msg_restore177,5429
+proc _mode_setup498,14610
+proc _mode_special_layout_bindings482,14147
+proc mode_abort706,20317
+proc mode_bind260,7431
+proc mode_box803,23250
+proc mode_change657,19195
+proc mode_copy395,11833
+proc mode_current421,12482
+proc mode_def242,7021
+proc mode_end696,20145
+proc mode_events967,27313
+proc mode_factory_reset412,12304
+proc mode_info430,12671
+proc mode_init18,759
+proc mode_lookup_hot_key937,26662
+proc mode_msg114,3652
+proc mode_msg_build227,6649
+proc mode_pop611,18135
+proc mode_push576,16979
+proc mode_rebind353,10618
+proc mode_stack475,14021
+proc mode_tmp_msg161,4969
+proc mode_win_init726,20886
+
+move.tcl,496
+proc _move_again_gate_keeper193,5724
+proc _move_again_mode_define176,4947
+proc _move_init37,1227
+proc _move_pasted_mode_define151,4066
+proc _move_selected_gate_keeper213,6406
+proc _move_selected_mode_define125,3040
+proc _move_selected_move306,8447
+proc _move_vec2dir287,8135
+proc _rewire_mode_define98,2517
+proc _rewire_select106,2703
+proc _select_wire477,12960
+proc move_arrow609,15979
+proc move_something19,747
+proc move_something_mode_enter66,1865
+proc rewire_mode_enter92,2440
+
+next.tcl,297
+proc _manhattan_distance215,5377
+proc _next_change225,5506
+proc _next_gate_keeper37,1137
+proc _next_mode_define16,321
+proc _next_set_box59,1607
+proc _walk_dir249,5905
+proc _walk_find_label273,6445
+proc next72,1960
+proc next_init301,7174
+proc next_mode_enter9,235
+proc next_walk111,2876
+
+paint.tcl,611
+proc _paint_change331,9893
+proc _paint_change_layer493,14471
+proc _paint_dots224,6866
+proc _paint_edit_drag442,13248
+proc _paint_edit_edit_props421,12639
+proc _paint_edit_end486,14355
+proc _paint_edit_gate_keeper502,14699
+proc _paint_edit_mode_define430,12761
+proc _paint_edit_move413,12438
+proc _paint_edit_start392,11983
+proc _rect_drag175,5761
+proc _rect_end191,6031
+proc _rect_gate_keeper131,4172
+proc _rect_mode_define108,3576
+proc _rect_move118,3980
+proc _rect_start125,4066
+proc paint_add14,621
+proc paint_edit_mode_enter247,7550
+proc paint_edit_props280,8322
+proc paint_erase69,2550
+
+pal.tcl,622
+proc _pal_build_cmd_button460,10939
+proc _pal_build_entry_layer346,7891
+proc _pal_build_framed_layout407,9489
+proc _pal_build_indicate_cursed391,9090
+proc _pal_build_palette614,14853
+proc _pal_button2248,6060
+proc _pal_button3276,6540
+proc _pal_group_toggle176,4725
+proc _pal_paint307,7054
+proc _pal_paint_entry325,7301
+proc _pal_regenerate_palette643,15376
+proc _pal_toggle119,3320
+proc _pal_toggle_selectable135,3600
+proc pal_build511,11997
+proc pal_build_init491,11665
+proc pal_layers35,1478
+proc pal_special_off485,11547
+proc pal_special_on475,11309
+proc pal_update42,1592
+proc pal_visible111,3150
+
+pal_file.tcl,324
+proc _pal_toggle_group_layers439,11820
+proc lreverse_list486,13118
+proc pal_add_group119,3476
+proc pal_compose215,6001
+proc pal_layer161,4650
+proc pal_revert_default_palette22,971
+proc pal_revert_palette50,1865
+proc pal_set86,2576
+proc pal_write_int356,9550
+proc pal_write_palette263,7130
+proc rgb_valid500,13323
+
+pan.tcl,121
+proc pan_auto63,1494
+proc pan_disable42,1120
+proc pan_enable33,949
+proc pan_gate_keeper51,1293
+proc pan_reset26,869
+
+polygon.tcl,1675
+proc _circle_choose_layer1195,26768
+proc _circle_clear_annotations1256,27735
+proc _circle_display1266,27920
+proc _circle_drag1316,29207
+proc _circle_drag_end1437,31746
+proc _circle_drag_mode_define1302,28690
+proc _circle_end1248,27682
+proc _circle_gate_keeper1154,25969
+proc _circle_menu1368,30076
+proc _circle_mode_define1132,25435
+proc _circle_mode_msg1144,25764
+proc _circle_start1228,27376
+proc _circle_toggle1358,29863
+proc _find_polygon1029,23049
+proc _find_wirepath1004,22455
+proc _make_pie_wedge1054,23610
+proc _poly_choose_layer147,3730
+proc _poly_clear_annotations258,5809
+proc _poly_compute_last369,8114
+proc _poly_display268,5978
+proc _poly_drag396,8892
+proc _poly_drag_end567,12884
+proc _poly_drag_fix553,12627
+proc _poly_draw_circle1111,25082
+proc _poly_edit_add_vertex988,22149
+proc _poly_edit_drag_vertex948,21398
+proc _poly_edit_end808,18392
+proc _poly_edit_get_vertex900,20537
+proc _poly_edit_mode_msg869,19771
+proc _poly_edit_remove_vertex968,21780
+proc _poly_end250,5757
+proc _poly_find_layer133,3369
+proc _poly_get_closest_vertex920,20990
+proc _poly_init_layer194,4754
+proc _poly_is_circle727,16579
+proc _poly_mode_msg68,1938
+proc _poly_ok313,6906
+proc _poly_remove_last611,13959
+proc _poly_start228,5458
+proc _poly_toggle_mode881,20200
+proc _polygon_drag_mode_define381,8326
+proc _polygon_edit_gate_keeper832,18991
+proc _polygon_edit_mode_define816,18454
+proc _polygon_gate_keeper78,2142
+proc _polygon_mode_define47,1291
+proc circle_edit1451,31908
+proc circle_mode_enter1123,25316
+proc intersect_lines629,14276
+proc polygon_edit755,17336
+proc polygon_edit_props749,17212
+proc polygon_mode_enter35,1083
+
+print.tcl,374
+proc _gdsplot_change_plotter1220,34813
+proc _gdsplot_setup1132,32030
+proc _get_layer_list1574,42614
+proc _hyperplot_pattern_bloat1000,27946
+proc _make_color_file1235,35177
+proc _print_plotps_setup176,4975
+proc _rgb_convert1480,41064
+proc print_cell28,972
+proc print_gdsplot1071,30617
+proc print_hyperplot423,12874
+proc print_plotps44,1278
+proc print_ps312,10280
+
+ruler.tcl,309
+proc _ruler_drag197,5852
+proc _ruler_end219,6288
+proc _ruler_gate_keeper83,2854
+proc _ruler_get_point145,4505
+proc _ruler_mode_define63,1941
+proc _ruler_start187,5570
+proc _ruler_vertex422,12057
+proc ruler_clear116,3732
+proc ruler_draw230,6490
+proc ruler_menu382,10807
+proc ruler_mode_enter51,1711
+
+select.tcl,1546
+proc UNUSED_dbt_largest_box_by_lee2398,71907
+proc UNUSED_not_quite_so_old_sel_smallest_box2762,84620
+proc _probe_clear3018,92341
+proc _probe_select2964,91037
+proc _probe_update2897,89290
+proc _sel_cell_action294,8857
+proc _sel_cell_contains_paint162,5121
+proc _sel_cell_finder738,21209
+proc _sel_cell_gate_keeper474,13938
+proc _sel_cell_mode_define494,14361
+proc _sel_cell_msg1711,49903
+proc _sel_chk_valid_cell269,8285
+proc _sel_find_paint2482,74277
+proc _sel_hier_fill564,16335
+proc _sel_hier_update422,12594
+proc _sel_list_get1556,45385
+proc _sel_list_get_next1574,45848
+proc _sel_list_paint_rects1473,43175
+proc _sel_list_reset1546,45152
+proc _sel_smallest_box2562,76715
+proc _select_drag1455,42896
+proc _select_end1947,57818
+proc _select_find_blob2492,74508
+proc _select_gate_keeper1420,41978
+proc _select_is_item_selected1621,47237
+proc _select_item1728,50450
+proc _select_list2219,66270
+proc _select_mode_define1436,42283
+proc _select_something1918,57046
+proc _select_update_cache2863,87979
+proc display_selected_labels1342,40081
+proc probe_init3024,92394
+proc restore_selection2841,87476
+proc save_selection2818,86800
+proc sel_cell2125,4161
+proc sel_cell_realid524,15260
+proc sel_clear_g114,3968
+proc sel_vias186,5803
+proc select_area675,19761
+proc select_cell_by_name686,20111
+proc select_cell_point1094,32527
+proc select_count2878,88633
+proc select_cursed_net1234,37037
+proc select_make_struc2157,64583
+proc select_mode_enter1388,40960
+proc select_net_menu1200,35806
+proc select_q154,4925
+
+stdcell.tcl,2382
+proc STDCELL_ROUTER57,2511
+proc _layinfo3085,102370
+proc _stdcell_add_wire2239,73775
+proc _stdcell_approx3799,130958
+proc _stdcell_calculate_stuff3172,104751
+proc _stdcell_check_license4078,139925
+proc _stdcell_check_val_on_grid3820,131450
+proc _stdcell_con_layer2588,86797
+proc _stdcell_count_crossings2601,87124
+proc _stdcell_count_net_uses1963,64306
+proc _stdcell_determine_orientation1807,26984
+proc _stdcell_determine_orientation21093,36002
+proc _stdcell_draw_fet179,6193
+proc _stdcell_draw_fets731,24408
+proc _stdcell_draw_m_preroute2336,77132
+proc _stdcell_draw_pads3590,123480
+proc _stdcell_draw_poly_preroute2858,94777
+proc _stdcell_draw_via1857,60804
+proc _stdcell_fet_dump3738,128568
+proc _stdcell_fet_extension1382,45387
+proc _stdcell_fet_fixnetname3763,129523
+proc _stdcell_fet_info_init3770,129731
+proc _stdcell_flip_fet764,25433
+proc _stdcell_flylines3881,133004
+proc _stdcell_fold_fets1915,62631
+proc _stdcell_get_fet3868,132584
+proc _stdcell_goto_cell3843,132161
+proc _stdcell_init3162,104489
+proc _stdcell_init_fet_route2030,66184
+proc _stdcell_init_route_option1287,41700
+proc _stdcell_is_on_grid3808,131116
+proc _stdcell_is_power789,26326
+proc _stdcell_is_single_fet779,26036
+proc _stdcell_layer70,2781
+proc _stdcell_locate_fet354,11793
+proc _stdcell_locate_fets684,22934
+proc _stdcell_mark_prerouted2294,75832
+proc _stdcell_minimize_con2667,89389
+proc _stdcell_move_fet2245,73927
+proc _stdcell_notch_fill_rect1573,51678
+proc _stdcell_notch_fill_via1628,54048
+proc _stdcell_old_place_flylines3909,134047
+proc _stdcell_original_net_name3578,123172
+proc _stdcell_paint_fet79,3072
+proc _stdcell_post_preroute2707,90384
+proc _stdcell_preroute_m2108,68820
+proc _stdcell_preroute_poly2916,96848
+proc _stdcell_remove_term2321,76716
+proc _stdcell_resize_contact2262,74552
+proc _stdcell_route_data1466,48643
+proc _stdcell_route_draw_solution1116,36575
+proc _stdcell_route_obs1235,40178
+proc _stdcell_save_layinfo4740,161171
+proc _stdcell_spread_fets548,18288
+proc _stdcell_unique_label4717,160799
+proc laygen_init5132,171501
+proc load_sim4962,168067
+proc load_spice4970,168153
+proc stdcell_load_direct4137,141805
+proc stdcell_load_sim4909,166594
+proc stdcell_reload4882,165727
+proc stdcell_route1319,42940
+proc stdcell_route_direct1684,56046
+proc stdcell_setup4772,162072
+proc stdcell_show_route1211,39535
+
+stretch.tcl,178
+proc _stretch_erase367,11528
+proc _stretch_find_edges539,15008
+proc stretch_cont379,11755
+proc stretch_end360,11398
+proc stretch_init82,3363
+proc stretch_selected511,14514
+
+techinfo.tcl,195
+proc _tech_error15,646
+proc _tech_list_sub49,1673
+proc _tech_required38,1389
+proc _techinfo_init61,1900
+proc _techinfo_translate_layer109,3478
+proc techinfo181,5891
+proc techinfo2129,4063
+
+tool_bar.tcl,645
+proc _tool_bar_Circle585,17296
+proc _tool_bar_Flyline551,16741
+proc _tool_bar_Label590,17371
+proc _tool_bar_Polygon578,17174
+proc _tool_bar_Rect600,17504
+proc _tool_bar_Rewire562,16902
+proc _tool_bar_Ruler595,17431
+proc _tool_bar_Select569,16990
+proc _tool_bar_Wire556,16818
+proc _tool_bar_checkbutton_r153,4630
+proc _tool_bar_layer_popup456,14268
+proc _tool_bar_reset144,4425
+proc _tool_bar_select_mode194,6052
+proc _tool_bar_set_angle510,15838
+proc _tool_bar_set_width503,15675
+proc _tool_bar_small_radio230,6956
+proc bind_with_kids250,7745
+proc tool_bar534,16437
+proc tool_bar_build263,8065
+proc tool_bar_set_layer96,2585
+
+utils.tcl,737
+proc button_down473,14019
+proc can_rect340,10001
+proc center_bbox232,7389
+proc center_coords177,5741
+proc db_search_l671,17753
+proc do817,21583
+proc grow_rect371,10520
+proc inside_rect185,5935
+proc max_error439,12701
+proc move_rect360,10282
+proc nearby258,7993
+proc nearby_dist244,7601
+proc nearby_line274,8334
+proc orientation486,14249
+proc rect_inside_rect193,6126
+proc rect_is_visible204,6394
+proc res17,783
+proc round_list316,9676
+proc round_list_scale330,9877
+proc sel_what_l677,17883
+proc stack_trace418,12142
+proc transform_cell537,15078
+proc transform_coords652,17103
+proc util_win_create692,18269
+proc util_win_finish704,18559
+proc util_win_onscreen744,19553
+proc uusnap70,2281
+proc warning382,10803
+
+view.tcl,327
+proc _view_text_display305,7864
+proc view_cell58,1742
+proc view_center22,833
+proc view_center_cursor43,1318
+proc view_display_options344,8966
+proc view_state_change142,3772
+proc view_state_init281,7339
+proc view_state_update174,4538
+proc view_zoom107,3179
+proc view_zoom_cursor119,3382
+proc view_zoom_region129,3546
+
+win.tcl,287
+proc _win_add_flags431,12235
+proc _win_status_box_select299,8462
+proc _win_xscroll278,8019
+proc _win_yscroll288,8225
+proc box_msg_update369,10827
+proc cursor_msg_update333,9747
+proc status_enable350,10144
+proc win_new15,660
+proc win_pack181,5224
+proc win_title_update408,11791
+
+wire.tcl,1778
+proc _wire_add_segment796,26320
+proc _wire_add_via2171,68900
+proc _wire_begin_draw1466,46632
+proc _wire_change_flylines2486,76734
+proc _wire_change_layers1894,60887
+proc _wire_clean_flylines2530,77789
+proc _wire_common_define49,2181
+proc _wire_disable115,4398
+proc _wire_drag1692,54722
+proc _wire_drag_via1858,59947
+proc _wire_draw_1layer1139,36233
+proc _wire_draw_gate_keeper395,14199
+proc _wire_draw_mode_define197,6734
+proc _wire_draw_segment1401,44601
+proc _wire_draw_update1446,46271
+proc _wire_draw_via2026,64382
+proc _wire_edit_process_parameters2902,88446
+proc _wire_enable122,4562
+proc _wire_end1053,33570
+proc _wire_end_align906,29743
+proc _wire_end_draw1523,48460
+proc _wire_find_connected_labels2378,74162
+proc _wire_find_label2328,72849
+proc _wire_find_layer724,23821
+proc _wire_gate_keeper128,4736
+proc _wire_get_ori771,25716
+proc _wire_get_width497,17091
+proc _wire_info253,9197
+proc _wire_init289,10326
+proc _wire_is_manhat1129,35859
+proc _wire_mode_define64,2772
+proc _wire_mode_msg428,15036
+proc _wire_move_label_to_closest2606,79819
+proc _wire_popup3144,97520
+proc _wire_remove_duplicate_labels2440,75644
+proc _wire_save_init86,3408
+proc _wire_set_anchor1534,48756
+proc _wire_set_snap_to_angle2885,88121
+proc _wire_set_snap_to_grid1542,48906
+proc _wire_snap1556,49391
+proc _wire_snap_to_angle1596,50795
+proc _wire_start595,20228
+proc _wire_undo2731,83302
+proc _wire_undraw_segment1084,34217
+proc _wire_undraw_via2103,66848
+proc _wire_unique_label2363,73872
+proc _wire_via_other_layer1831,59372
+proc _wire_width_popup3056,94380
+proc wire_choose_layer462,16000
+proc wire_default_layer572,19569
+proc wire_grid_menu2922,88932
+proc wire_menu2978,91052
+proc wire_mode_enter42,2035
+proc wire_paint_via1938,62097
+
+zoom.tcl,237
+proc _zoom_button181,2527
+proc _zoom_drag100,2995
+proc _zoom_drag_end121,3594
+proc _zoom_drag_mode_define89,2630
+proc _zoom_gate_keeper32,1031
+proc _zoom_mode_define23,794
+proc zoom_mode_enter15,689
+proc zoom_to_selected144,4206
+
+zoom_bar.tcl,114
+proc zoomComputeRadiusBounds23,863
+proc zoomScale36,1257
+proc zoomScaleSet74,2419
+proc zoom_bar_build103,3329

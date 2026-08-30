@@ -1,0 +1,167 @@
+# There are two main include files for "make".
+# Normally, you use "main.config" (not this file), which tests
+# what platform you are on, sets TARGET and TARGET_OS, then
+# includes main.common (this file.)
+# 
+# You might include main.common directly if you need a specialized
+# configuration for some reason, eg, debug.  In this case you would invent
+# a new TARGET or CONFIG value, set those variables in your makefile,
+# then add in some new "ifeq" statements below for your TARGET or CONFIG.
+#
+# Common Configuration for all targets.
+#
+# INPUTS: (Assumes the following were defined in the target-specific
+#	   include file)
+#	TARGET		- full name of lib/include/binary directory suffix
+#	TARGET_OS	- just the os name, ie LINUX or SOLARIS
+#
+# OUTPUTS: (Use these in your makefile)
+#	CONFIG_xxx
+#
+# where: xxx is one of: INCLUDES, LIBS, DEFINES, CFLAGS, LINK_FLAGS
+
+# ------------------------------------------------------------------------
+#       MMI Utilities (shared compile time resources for MMI tools)
+# ------------------------------------------------------------------------
+
+# MMI_UTILS := /mmi-cad/utils
+
+ifeq "$(TARGET_OS)" "LINUX"
+
+  # ------------------------------------------------------------------------
+  #       Put TARGET specific include files, libraries,
+  #	C compiler flags, and link flags in the following macros
+  # ------------------------------------------------------------------------
+
+  X_INCLUDE               :=
+  TARGET_SPECIFIC_INCLUDE :=
+
+  X_LIB               := -L/usr/X11R6/lib -lX11
+  # Note: -static goes here because most makefiles dont use CONFIG_LINK_FLAGS!
+  #TARGET_SPECIFIC_LIB   := $(X_LIB) -lieee -static
+  TARGET_SPECIFIC_LIB   := $(X_LIB) -lieee -ldl
+
+  TARGET_SPECIFIC_DEFINES = -DHAVE_UNISTD_H=1 
+
+  TARGET_SPECIFIC_CFLAGS =
+
+  # 3/9/01: Linux 2.2.16 sometimes core-dumps in the license manager
+  # if you use -static.  This only occurs on the juniper lnx1 and lnx2
+  # machines.  micromagic mmi48, which is the identical uname -a
+  # works ok.
+  #TARGET_SPECIFIC_LINK_FLAGS := -static
+  TARGET_SPECIFIC_LINK_FLAGS :=
+else
+ifeq "$(TARGET_OS)" "SOLARIS"
+
+  X_INCLUDE               := -I/usr/openwin/include
+  TARGET_SPECIFIC_INCLUDE := $(X_INCLUDE)
+
+  X_LIB               := -L/usr/openwin/lib -lX11
+  TARGET_SPECIFIC_LIB := $(X_LIB) -lsocket -lnsl -lintl -ldl
+
+  TARGET_SPECIFIC_DEFINES := 
+
+  TARGET_SPECIFIC_CFLAGS := 
+
+  TARGET_SPECIFIC_LINK_FLAGS := 
+else
+ifeq "$(TARGET_OS)" "HPUX"
+
+  X_INCLUDE               := -I/usr/openwin/include
+  TARGET_SPECIFIC_INCLUDE := $(X_INCLUDE)
+
+  X_LIB               := -L/usr/openwin/lib -lX11
+  # Note: no -lsocket or -lintl on hp.
+  TARGET_SPECIFIC_LIB := $(X_LIB) -lnsl
+
+  TARGET_SPECIFIC_DEFINES := 
+
+  TARGET_SPECIFIC_CFLAGS := 
+
+  TARGET_SPECIFIC_LINK_FLAGS := 
+else
+  MAKE ERROR TARGET_OS NOT DEFINED
+endif
+endif
+endif
+
+ifndef CONFIG
+  # Default: CONFIG is same as TARGET.  You can define multiple
+  # CONFIGs for each TARGET, eg for debug or non-debug,
+  # by setting CONFIG before including this file.
+  CONFIG := $(TARGET)
+endif
+
+
+# ------------------------------------------------------------------------
+#       Include files
+# ------------------------------------------------------------------------
+C_INCL_DIR  := $(MMI_UTILS)/include
+C_TCL_DIR   := $(MMI_UTILS)/tcltk/tcl8.0/generic
+C_TK_DIR    := $(MMI_UTILS)/tcltk/tk8.0/generic
+TCL_INCLUDE  := -I$(C_TCL_DIR)
+TK_INCLUDE   := -I$(C_TK_DIR)
+UTILS_INCLUDE := -I$(C_INCL_DIR) -I$(MMI_UTILS)
+
+CONFIG_INCLUDES := ${TCL_INCLUDE} ${TK_INCLUDE} ${UTILS_INCLUDE} \
+		   ${TARGET_SPECIFIC_INCLUDE}
+
+# ------------------------------------------------------------------------
+#       Libraries
+# ------------------------------------------------------------------------
+C_LIB_DIR      := $(MMI_UTILS)/lib.$(TARGET)
+# Note: lm_new.o is built in flex dir from our crypto keys.
+# lmgr is provided verbatim by flex.  mmilic is built by us in lmbuild dir.
+# 2/27: Flex removed from release.
+#LM_LIB	       := $(C_LIB_DIR)/lm_new.o -L$(C_LIB_DIR) -lmmilic -llmgr
+LM_LIB	       :=
+UTILS_LIB      := -L$(C_LIB_DIR) -ltclmods8.0
+# NOTE that the tk library is specially modified for SUE
+TK_LIB         := -L$(C_LIB_DIR) -ltk8.0
+TCL_LIB        := -L$(C_LIB_DIR) -ltcl8.0
+
+CONFIG_LIBS    :=  $(UTILS_LIB) $(LM_LIB) $(TK_LIB) $(TCL_LIB) \
+		   $(TARGET_SPECIFIC_LIB) -lm -lc
+
+
+# ------------------------------------------------------------------------
+#       Dependencies
+# ------------------------------------------------------------------------
+
+#LM_DEPENDENCY := $(MMI_UTILS)/include/licCheck.h \
+#	$(MMI_UTILS)/include/licCpuInfo.h \
+#	$(MMI_UTILS)/include/licEther.h \
+#	$(C_LIB_DIR)/lm_new.o \
+#	$(C_LIB_DIR)/libmmilic.a \
+#	$(C_LIB_DIR)/liblmgr.a
+
+LM_DEPENDENCY := 
+
+TK_DEPENDENCY := $(C_LIB_DIR)/libtk8.0.a $(C_TK_DIR)/tk.h
+TCL_DEPENDENCY := $(C_LIB_DIR)/libtcl8.0.a $(C_TCL_DIR)/tcl.h
+TCLMOD_DEPENDENCY := $(C_LIB_DIR)/libtclmods8.0.a
+TCLTK_DEPENDENCY := $(TK_DEPENDENCY) $(TCL_DEPENDENCY)
+
+
+# Only use this in sue/max/nst, to avoid circular dependencies.
+CONFIG_DEPENDENCY := $(LM_DEPENDENCY) $(TK_DEPENDENCY) $(TCL_DEPENDENCY) $(TCLMOD_DEPENDENCY)
+
+# ------------------------------------------------------------------------
+#       Defines for conditional compilation.
+# ------------------------------------------------------------------------
+CONFIG_DEFINES := $(TARGET_SPECIFIC_DEFINES)
+
+# ------------------------------------------------------------------------
+#       Other compiler flags
+# ------------------------------------------------------------------------
+CONFIG_CFLAGS := $(TARGET_SPECIFIC_CFLAGS)
+
+# -------------------------------------------------------------------------
+# 	Linker (ld) flags
+# -------------------------------------------------------------------------
+CONFIG_LINK_FLAGS := $(TARGET_SPECIFIC_LINK_FLAGS)
+
+
+# Pat added 7/6/00.  We always use gcc, not /usr/ucb/cc.
+CC := gcc

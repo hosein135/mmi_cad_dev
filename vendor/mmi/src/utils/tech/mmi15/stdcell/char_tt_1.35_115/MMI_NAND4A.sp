@@ -1,0 +1,1 @@
+../extract/MMI_NAND4A.sp

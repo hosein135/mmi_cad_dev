@@ -1,0 +1,63 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_NOR3B {} {
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {320 140}
+  make input -name in1 -origin {-100 -100}
+  make global -name gnd -origin {460 140}
+  make global -orient RY -name vdd -origin {0 -240}
+  make output -name out -origin {510 50}
+  make nmos -W 1.2 -origin {0 100}
+  make nmos -W 1.2 -origin {320 100}
+  make nmos -W 1.2 -origin {460 100}
+  make pmos -W 2.4 -origin {0 0}
+  make pmos -W 2.4 -origin {0 -100}
+  make pmos -W 2.4 -origin {0 -200}
+  make global -orient RY -name vdd -origin {100 -240}
+  make pmos -W 2.4 -origin {100 0}
+  make pmos -W 2.4 -origin {100 -100}
+  make pmos -W 2.4 -origin {100 -200}
+  make global -orient RY -name vdd -origin {200 -240}
+  make pmos -W 2.4 -origin {200 0}
+  make pmos -W 2.4 -origin {200 -100}
+  make pmos -W 2.4 -origin {200 -200}
+  make input -name in0 -origin {-100 0}
+  make input -name in2 -origin {-100 -200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {110 330}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire -100 0 -60 0
+  make_wire 0 -40 0 -60
+  make_wire 260 100 260 -100
+  make_wire 460 60 460 50
+  make_wire 0 -140 0 -160
+  make_wire 400 100 400 -200
+  make_wire -100 -200 -60 -200
+  make_wire -100 -100 -60 -100
+  make_wire 510 50 460 50
+  make_wire 100 40 100 50
+  make_wire 100 -40 100 -60
+  make_wire 100 -140 100 -160
+  make_wire 40 -100 -60 -100
+  make_wire 40 -200 -60 -200
+  make_wire 100 50 0 50
+  make_wire 200 40 200 50
+  make_wire 200 -40 200 -60
+  make_wire 200 -140 200 -160
+  make_wire 140 -200 40 -200
+  make_wire 140 -200 400 -200
+  make_wire 200 50 100 50
+  make_wire 320 50 320 60
+  make_wire 320 50 460 50
+  make_wire 320 50 200 50
+  make_wire 40 -100 140 -100
+  make_wire 140 -100 260 -100
+  make_wire 40 0 -60 0
+  make_wire 40 0 140 0
+  make_text -origin {-190 -340} -text {3 Input NOR}
+  make_text -origin {-190 -320} -text {B Size}
+  make_text -origin {-190 -360} -text MMI_NOR3B -size large
+}
+

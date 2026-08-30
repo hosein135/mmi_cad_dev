@@ -1,0 +1,153 @@
+AddDevice	simnet.c	/^void AddDevice(device)$/
+AllocFingerHash	fingers.c	/^void AllocFingerHash()$/
+AllocGraph	alloc.c	/^  Graph *AllocGraph()$/
+AllocHashTable	hash.c	/^void AllocHashTable(graph)$/
+AllocProperty	properties.c	/^Property *AllocProperty()$/
+AppendQueue	queue.c	/^AppendQueue(first, second)$/
+AppendUniques	hash.c	/^void AppendUniques(graph)$/
+AssignInitialValue	hash.c	/^void AssignInitialValue(node, circuit)$/
+AssignMatch	match.c	/^int AssignMatch(graph1, graph2)$/
+AssignNewValues	match.c	/^void AssignNewValues(graph)$/
+CheckChains	chains.c	/^void CheckChains(graph1, graph2)$/
+CheckEquates	equate.c	/^void CheckEquates()$/
+CleanPendingArray	match.c	/^void CleanPendingArray(graph, whichNodes, queue)$/
+ClearQueue	queue.h	/^#define ClearQueue(queue)			\\$/
+CombineDevices	fingers.c	/^static void CombineDevices(major, minor) Node *maj/
+CombineFingers	fingers.c	/^void CombineFingers(graph) Graph *graph;$/
+CompareNetProperties	properties.c	/^void CompareNetProperties(graph1, graph2)$/
+CompareProperties	properties.c	/^void CompareProperties(graph1, graph2)$/
+ComputeValue	hash.c	/^void ComputeValue(aNode)$/
+CopyString	alloc.c	/^char *CopyString(string)$/
+DeleteNet	chains.c	/^void DeleteNet(graph, net)$/
+DoneDevices	gemini.h	/^#define DoneDevices(graph)					\\$/
+DoneGraph	gemini.h	/^#define DoneGraph(graph) 						\\$/
+DoneNets	gemini.h	/^#define DoneNets(graph)						\\$/
+EnterHash	hash.c	/^void EnterHash(aNode, graph)$/
+EqPartition	match.c	/^int EqPartition(partition)$/
+EquateNets	simnet.c	/^void EquateNets(graph, net1, net2)$/
+FastAlloc	alloc.c	/^char *FastAlloc(size)$/
+FindChains	chains.c	/^void FindChains(graph)$/
+FindEqName	equate.c	/^int FindEqName(name, circuit)$/
+FindNet	simnet.c	/^Net *FindNet(name)$/
+FindOrAllocNet	simnet.c	/^Net *FindOrAllocNet(name)$/
+FinishHT	deduce.c	/^void FinishHT(graph)$/
+GetNodes	simnet.c	/^void GetNodes(devices, nets)$/
+HashAndDestroy	fingers.c	/^static void HashAndDestroy(dev) Node *dev;$/
+HashFunction	fingers.c	/^static int HashFunction(dev) Node *dev;$/
+IncrementValue	hash.c	/^void IncrementValue(aNode, value, class)$/
+IndexOfNet	simread.h	/^#define IndexOfNet(net)						\\$/
+InitCharTran	alloc.c	/^void InitCharTran()$/
+InitHash	simnet.c	/^void InitHash(size)$/
+InitHashTable	hash.c	/^void InitHashTable(graph, numberNodes)$/
+InitNets	simnet.c	/^void InitNets()$/
+InitTwoGraphs	gemini.c	/^STATIC void InitTwoGraphs(graph1, graph2)$/
+InitialDeviceValues	hash.c	/^void InitialDeviceValues(graph)$/
+InitialNetValues	hash.c	/^void InitialNetValues(graph)$/
+InserSortQ	queue.c	/^void InserSortQ(queue)$/
+InsertBadNode	match.c	/^#define InsertBadNode(node, graph)\\$/
+InsertEqName	equate.c	/^int InsertEqName(name, circuit, value)$/
+InsertHT	deduce.c	/^int InsertHT(node, class)$/
+InsertQ	queue.h	/^#define InsertQ(newNode, queue)			\\$/
+InsertQueue	queue.c	/^InsertQueue(newNode, queue)$/
+LocalMatch	deduce.c	/^void LocalMatch(graph1, node1, graph2, node2)$/
+LocalMatchUniques	match.c	/^void LocalMatchUniques(graph1, graph2)$/
+MagicOutNode	properties.c	/^void MagicOutNode(node, error)$/
+MagicOutQueue	properties.c	/^void MagicOutQueue(queue)$/
+MatchBySuffix	queue.c	/^int MatchBySuffix(queue1, queue2)$/
+MatchHT	deduce.c	/^Node *MatchHT(node, class)$/
+MatchPartitions	match.c	/^void MatchPartitions(graph1,graph2)$/
+MatchUniques	match.c	/^void MatchUniques(graph1, graph2)$/
+MatchUserDef	userdef.c	/^MatchUserDef(buf, linenum, p_index)$/
+Max	gemini.h	/^#define Max(a,b) ((a > b) ? a : b)$/
+Mgemini	gemini.c	/^void main(argc, argv)$/
+NewConnection	simalloc.c	/^SIMdevConnect *NewConnection()$/
+NewDevice	simalloc.c	/^Device *NewDevice(index, deviceType, numpins)$/
+NewNet	simalloc.c	/^Net *NewNet(name, index)$/
+NewQueue	queue.c	/^Queue *NewQueue()$/
+NumNodesLeft	gemini.h	/^#define NumNodesLeft(graph)						\\$/
+NumberOfLinks	graph.h	/^#define NumberOfLinks(aNode)	\\$/
+NumberOfLinksD	graph.h	/^#define NumberOfLinksD(dev) (DeviceDefs[(dev)->n.n/
+NumberOfLinksN	graph.h	/^#define NumberOfLinksN(net) ((net)->n.netConnects)/
+ParallelDevices	fingers.c	/^static int ParallelDevices(dev1, dev2) Node *dev1;/
+PendingDevicesAreClean	graph.h	/^#define PendingDevicesAreClean(graph)		\\$/
+PendingNetsAreClean	graph.h	/^#define PendingNetsAreClean(graph)		\\$/
+PopQueue	queue.c	/^Node *PopQueue(queue)$/
+PrintAllDevices	simnet.c	/^void PrintAllDevices(void)$/
+PrintAllNets	simnet.c	/^void PrintAllNets()$/
+PrintDevice	readgraph.c	/^PrintDevice(node)$/
+PrintGraphStats	gemini.h	/^#define PrintGraphStats(graph)		\\$/
+PrintHashTable	hash.c	/^void PrintHashTable(graph)$/
+PrintNode	readgraph.c	/^void PrintNode(node)$/
+PrintNodeNeighbors	readgraph.c	/^void PrintNodeNeighbors(node)$/
+PrintNodes	readgraph.c	/^void PrintNodes(nodes, numNodes)$/
+PrintQueue	readgraph.c	/^void PrintQueue(queue)$/
+PrintTypes	readgraph.c	/^void PrintTypes(defs, numDefs)$/
+ProcessUniques	match.c	/^void ProcessUniques(graph)$/
+QForEach	queue.h	/^#define QForEach(element, queue)	\\$/
+QueueOK	queue.c	/^int QueueOK(queue)$/
+ReadEqFile	equate.c	/^void ReadEqFile(EqFileName)$/
+ReadGemFormat	readgraph.c	/^void ReadGemFormat(infilePT, graph)$/
+ReadGraph	readgraph.c	/^void ReadGraph(graph, simFormat)$/
+ReadSimFile	simread.c	/^void ReadSimFile(infile, graph, devices, nets)$/
+ReadSimFormat	simread.c	/^void ReadSimFormat(infilePT, graph)$/
+RealNet	simnet.c	/^Net *RealNet(net)$/
+RelabelGraphs	gemini.c	/^int RelabelGraphs(graph1, graph2)$/
+RemoveConnections	fingers.c	/^static void RemoveConnections(dev) Node *dev;$/
+ResetBad	match.c	/^void ResetBad(graph)$/
+ResetSuspects	match.c	/^void ResetSuspects(graph)$/
+SIMSetDeviceDefs	simread.c	/^STATIC void SIMSetDeviceDefs(simFormat) \/* LBL 11\//
+SIMSetDevices	simread.c	/^STATIC void SIMSetDevices(graph, devices)$/
+SIMSetNets	simread.c	/^STATIC void SIMSetNets(graph, nets)$/
+SimpleHash	userdef.c	/^SimpleHash(buf)$/
+SortQueue	queue.c	/^void SortQueue(queue)$/
+StartNewHT	deduce.c	/^void StartNewHT(size)$/
+TerminalList	graph.h	/^#define TerminalList(dev) (DeviceDefs[(dev)->n.nod/
+ToggleType	gemini.h	/^#define ToggleType(type)	(type == DEVICE ? NET : D/
+UserDefLine	userdef.c	/^UserDefLine(numargs, devargs, linenum)$/
+WriteDictionary	properties.c	/^void WriteDictionary(graph1, graph2)$/
+WritePartitionFile	match.c	/^WritePartitionFile(graph1, graph2)$/
+argerror	simread.h	/^#define argerror() if (*arg == '\\0') { \\$/
+askContinue	gemini.c	/^STATIC void askContinue()$/
+assert	debug.h	/^#define assert(assertion,comment)	\\$/
+badNode	graph.h	/^#define badNode(node)		(((node)->flag)==BAD)$/
+casestreq	alloc.c	/^int casestreq(s1, s2)$/
+cmpSuffix	queue.c	/^STATIC short cmpSuffix(str1, len1, str2, len2)$/
+combineDevices	chains.c	/^STATIC void combineDevices(graph, net, newDevice, /
+comphval	userdef.c	/^int comphval(x,y)$/
+compindex	userdef.c	/^int compindex(x,y)$/
+computeEqValue	match.c	/^STATIC int computeEqValue(aNode)$/
+debug	debug.h	/^#define debug(level, remaining)			\\$/
+deleteDevice	chains.c	/^STATIC deleteDevice(graph, device)$/
+extractQueue	match.c	/^STATIC void extractQueue(inQueue, result)$/
+hash	equate.c	/^STATIC unsigned int hash(name)$/
+hash_squash	fingers.c	/^#define hash_squash(x)	((((unsigned) x) & 0x7FFFFF/
+if	simnet.c	/^      if (net1->index > net2->index) {$/
+initEqHash	equate.c	/^STATIC void initEqHash(size)$/
+newDeviceType	chains.c	/^STATIC int newDeviceType(type1, type2)$/
+newIndex	simnet.c	/^#define newIndex() NetIndex++$/
+newUniqueValue	match.c	/^#define newUniqueValue()  Random()$/
+nextarg	simread.h	/^#define nextarg() while (spaces[*line]) line++; ar/
+nocasestreq	alloc.c	/^int nocasestreq(s1, s2)$/
+nxtarg	nxtarg.c	/^unsigned char *nxtarg (q,brk)$/
+pendingNode	graph.h	/^#define pendingNode(node)	(((node)->flag)==PENDING/
+popUpIndex	simnet.c	/^STATIC void popUpIndex(net)$/
+primeFactor	hash.c	/^#define primeFactor(x) PRIMES[x]$/
+primeFactor2	hash.c	/^#define primeFactor2(x) PRIMES2[x]$/
+queueNeighbors	match.c	/^STATIC void queueNeighbors(anode, queue)$/
+random1	hash.c	/^#define random1(x) (x)$/
+random2	hash.c	/^#define random2(x) (x)$/
+readNode	readgraph.c	/^STATIC short readNode(FilePt, aNode, nodetype, gra/
+readType	readgraph.c	/^STATIC void readType(FilePt, aType)$/
+reconnectNet	chains.c	/^STATIC void reconnectNet(net, oldDevice, oldTermin/
+refinePartitions	gemini.c	/^STATIC int refinePartitions(graph1, graph2)$/
+removeFromQueue	queue.c	/^void removeFromQueue(queue, node)$/
+setBadNode	graph.h	/^#define setBadNode(node)	\\$/
+setSuspectNode	graph.h	/^#define setSuspectNode(node)	\\$/
+setSuspectQueue	match.c	/^STATIC void setSuspectQueue(newQueue, graph)$/
+simhash	simread.h	/^#define simhash(name, value) \\$/
+similarNodes	match.c	/^#define similarNodes(node1, node2)	\\$/
+skipover	skipto.c	/^unsigned char *skipover (string,charset)$/
+skipto	skipto.c	/^unsigned char *skipto (string,charset)$/
+suspectNode	graph.h	/^#define suspectNode(node) 	(((node)->flag)==SUSPEC/
+twoGraphs	gemini.c	/^STATIC void twoGraphs(graph1, graph2)$/
+uniqueNode	graph.h	/^#define uniqueNode(node)	(((node)->flag)==UNIQUE)$/

@@ -1,0 +1,27 @@
+puts "reading max.rc"
+
+cell_path_add /volume/mmi_proj/proj/tech/mmi15/stdcell/max
+
+util_load_pkg nl_shell.so
+
+nl2_log nl.log
+
+catch {nl_create_library mmi15}
+nl_read_lef mmi15.lef mmi15
+
+# Someone keeps bashing the mmi15.lef, so use our own.
+fplan_read_lef mmi15.lef
+
+set FPLAN(verilog_autoload) 1
+
+
+set VERSION_CONTROL_ENABLE 1
+
+fplan_import_verilog top
+
+proc doit {} {
+    # This fails is library was created previously.
+    nl_link mmi15 top
+    fplan_save_nl_props
+    nl_pat_walk_hier_cells top
+}

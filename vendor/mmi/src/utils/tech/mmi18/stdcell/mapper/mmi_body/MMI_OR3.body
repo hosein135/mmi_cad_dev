@@ -1,0 +1,32 @@
+  # MMI_OR3 icon body
+  if {$DeMorgan} {
+    icon_arc -30 -30 40 30 -start 277 -extent 166
+    icon_line 10 -30 -40 -30 -40 30 10 30
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+    icon_arc -60 10 -40 30 -start 0 -extent 359
+    icon_arc -60 -10 -40 10 -start 0 -extent 359
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc -60 -30 50 110 -start 35 -extent 50
+    icon_arc -60 -110 50 30 -start 275 -extent 50
+    icon_arc -58 -30 -38 30 -start 270 -extent 180
+    icon_line -48 -30 0 -30
+    icon_line -48 30 0 30
+    icon_line -40 -20 -60 -20
+    icon_line -38 0 -60 0
+    icon_line -40 20 -60 20
+    icon_line 40 0 60 0
+  }
+
+  # properties
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  icon_property -origin {-37 -22} -size small -label F
+
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 0} -name in1
+  icon_term -type input -origin {-60 20} -name in2
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+

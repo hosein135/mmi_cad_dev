@@ -1,0 +1,62 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "skip-list.h"
+#include "nl.h"
+#include "tcl.h"
+#include "ui.h"
+#include "ui_int.h"
+#include "ast2g.h"
+
+#(defcommand map_design
+  "For the specified design, map all the processes and expressions to gates."
+  &optional
+  (design current_design "map this design"))
+{
+  ast2g_map_rtl (design);
+
+  return TCL_OK;
+}
+
+
+#(defcommand apply_rewrites
+  "Apply the RTL rewrites to the specified design."
+  &optional
+  (design current_design "apply the rewrites to this design"))
+{
+  ast2g_apply_rewrites_to_design (design);
+
+  return TCL_OK;
+}
+
+
+#(defcommand dump_rtl_trees
+  "Dump out the syntax trees for all RTL objects."
+  (-widths boolean "dump the node widths")
+  (-file boolean "dump the file of each node")
+  (-line boolean "dump the line number of each node")
+  &optional
+  (design current_design "dump the trees in this design"))
+{
+  ast2g_dump_trees (design, widths, file, line);
+
+  return TCL_OK;
+}
+
+
+void
+ui_cmd_register_synthesis_commands (Tcl_Interp *interp, char *prefix, nl_context context)
+{
+#(register-all-commands)
+}

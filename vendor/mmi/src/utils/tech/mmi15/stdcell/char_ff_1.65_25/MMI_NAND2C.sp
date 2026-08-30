@@ -1,0 +1,1 @@
+../extract/MMI_NAND2C.sp

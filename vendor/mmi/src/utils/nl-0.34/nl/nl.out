@@ -1,0 +1,34 @@
+(header
+ (enum kind 7
+   null	   0
+   context 1
+   library 2
+   design  3
+   libcell 4
+   port    5
+   cell    6)
+
+ (struct cell
+  kind kind
+  id uint
+  next dll
+  prev dll
+  name char*
+  design design
+  reference reference
+  file char*
+  line int
+  inputs (ar pin)
+  outputs (ar pin)
+  inouts (ar pin)
+  bus bus
+  bus_offset int)
+
+ (struct pin
+  kind kind
+  id uint
+  next dll
+  prev dll
+  refpin refpin
+  owner cell_or_port
+  net)

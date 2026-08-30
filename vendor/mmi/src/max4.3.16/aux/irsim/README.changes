@@ -1,0 +1,9 @@
+Base version.  irsim-9.2.linux.1.tar.gz
+
+9/12/2001 irsim/mem.c
+	Solaris requires double word alignment, modified mem.c
+
+9/13/2001 irsim/ana11/event.c
+	changed execl of anXhelper to execlp (search path)
+	and no longer using "cad_bin" for prefix.
+	(Also added unistd.h header.)

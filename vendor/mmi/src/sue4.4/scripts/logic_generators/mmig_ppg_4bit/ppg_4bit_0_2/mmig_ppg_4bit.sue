@@ -1,0 +1,726 @@
+# This is a generator for 4 bits of a multiplier's partial product generation logic.
+
+proc NAME_mmig_ppg_4bit args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned"} {B "Unsigned"} {Bit 0} {Chunk "0 1 2 3"} {Box 0} {HalfHeight 0}}
+
+  # NBITS_A
+  set nom [format "mmig_ppg_4bit_%d" $NBITS_A]
+
+  # A
+  if {[string toupper $A] == "SIGNED"} {
+    set nom [format "%sSx" $nom]
+  }
+  if {[string toupper $A] == "UNSIGNED"} {
+    set nom [format "%sUx" $nom]
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set nom [format "%sBx" $nom]
+  }
+
+  # NBITS_B
+  set nom [format "%s%d" $nom $NBITS_B]
+
+  # B
+  if {[string toupper $B] == "SIGNED"} {
+    set nom [format "%sS_" $nom]
+  }
+  if {[string toupper $B] == "UNSIGNED"} {
+    set nom [format "%sU_" $nom]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set nom [format "%sB_" $nom]
+  }
+
+  # Bit
+  set nom [format "%s%d" $nom $Bit]
+
+  # Chunk
+  for {set i 0} {$i < [llength $Chunk]} {incr i} {
+    set nom [format "%s_%d" $nom [lindex $Chunk $i]]
+  }
+
+  # Box
+  set nom [format "%s_%d" $nom $Box]
+
+  # HalfHeight
+  if {$HalfHeight == 1} {
+    set nom [format "%s_Y" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_ppg_4bit args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned"} {B "Unsigned"} {Bit 0} {Chunk "0 1 2 3"} {Box 0} {HalfHeight 0}}
+
+  # make arguments more digestible
+  set A [string toupper $A]
+  set B [string toupper $B]
+
+  global DPC
+  global PPGROWSIZE
+
+  set debug 0
+  if {$debug} {
+    # init the ppg size vector
+    for {set i 0} {$i < 100} {incr i} {
+      lappend PPGROWSIZE 1
+    }
+  }
+
+  # drawing origin
+  set base_x -200
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 60
+
+  # get algorithm
+  set Algorithm [generators_mul_get_ppg_chunk "ALG" $Bit $Chunk]
+
+  # get A bit usage
+  set abits [generators_mul_get_ppg_chunk "A" $Bit $Chunk]
+  setl {naranges aranges} [generators_mul_get_range $abits]
+
+  # there should be at most 2 ranges; if there are 2 ranges, the first must contain only the msb bit
+  switch $naranges {
+    0 {
+      set nbits_a 0
+      set Amsb -1
+    }
+    1 {
+      setl {nbits_a arange} [lindex $aranges 0]
+      set Amsb -1
+    }
+    2 {
+      for {set i 0} {$i < $naranges} {incr i} {
+	setl {temp_nbits_a temp_arange} [lindex $aranges $i]
+	if {($i == 0)} {
+	  # this is the msb range
+	  set Amsb [expr $NBITS_A - 1]
+	} else {
+	  # this is the other range
+	  set nbits_a $temp_nbits_a
+	  set arange $temp_arange
+	}
+      }
+    }
+    default {error "ERROR: more than 2 A ranges found"}
+  }
+  
+
+  # get B bit usage
+  set bbits [generators_mul_get_ppg_chunk "B" $Bit $Chunk]
+  setl {nbranges branges} [generators_mul_get_range $bbits]
+  # there should be at most one range
+  switch $nbranges {
+    0 {
+      set nbits_b 0
+    }
+    1 {
+      setl {nbits_b brange} [lindex $branges 0]
+      set parsed [regexp {^\[([0-9]+).+} $brange match Bmsbidx]
+    }
+    default {error "ERROR: more than 1 B range found"}
+  }
+
+
+  # icon info
+  # MMI_NAND2
+  setl {nand2count nand2inpins nand2outpins nand2inoutpins} [generators_get_pin_info "MMI_NAND2"]
+  # in
+  set npins [get_assoc ninputs $nand2count]
+  for {set i 0} {$i < $npins} {incr i} {
+    set data [lindex $nand2inpins $i]
+    set nand2_in_x($i) [lindex $data 1]
+    set nand2_in_y($i) [lindex $data 2]
+  }
+  # out
+  setl {nand2_out_x nand2_out_y} [generators_get_pin_xy "out" $nand2outpins]
+  # dimensions
+  setl {nand2_x nand2_y junk1 junk2 junk3 junk4} [generators_get_icon_size "MMI_NAND2"]
+
+
+  # spacings between nand-invert icon groups
+  set yfudge $nand2_y
+
+  # set inflag, row spanner locations
+  set inflag_x $base_x
+  set rs_y [expr $base_y + 150]
+
+  # wire tracks for common inputs
+  set Bmsb_x [expr $inflag_x + 20]
+  set Bmsb_y ""
+  set BSigned_x [expr $inflag_x + 40]
+  set BSigned_y ""
+
+  # init the cell placement variables
+  # limit_h = bitpitch 
+  if {$HalfHeight == 1} {
+    set limit_h [expr int($DPC(PITCH)/2)]
+  } else {
+    set limit_h $DPC(PITCH)
+  }
+  set curr_h 0
+  set rswidth 0
+  set rs_x 0
+  set last_origin_x 0
+  set row_start [expr $base_x + 200]
+  set x [expr $base_x + $nand2_x/2]
+  set y $base_y
+
+
+  # how many physical rows are used in this ppg logic?
+  set ppgrowcount 0
+
+  # what circuit types were used?
+  set ckttypes ""
+
+
+  # place the gates according to the algorithm
+  for {set i 0} {$i < 4} {incr i} {
+    # A pin name
+    if {$naranges > 0} {
+      set aidx [lindex $abits $i]
+      if {$aidx == $Amsb} {
+	set aname "Amsb_H"
+      } else {
+	if {$nbits_a > 1} {
+	  set aname [format "A_H\[%s\]" $aidx]
+	} else {
+	  set aname "A_H"
+	}
+      }
+    }
+
+    # B pin name
+    if {$nbits_b > 0} {
+      set bidx [lindex $bbits $i]
+      if {$nbits_b > 1} {
+	set bname [format "B_H\[%s\]" $bidx]
+      } else {
+	set bname "B_H"
+      }
+    }
+
+    switch [string index $Algorithm $i] {
+      0 { # 0
+	setl {ppgin ppgout} [generators_mul_ppg4 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	lappend ckttypes 4
+	# hook input to gnd
+	setl {in_x in_y} $ppgin
+	make_wire $in_x $in_y $inflag_x $in_y
+	make global -origin "$inflag_x $in_y" -name gnd
+	# record output pin location
+	set outpin($i) $ppgout
+      }
+
+      b { # A . B
+	setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg1 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	lappend ckttypes 1
+	# hook up input pins
+	# in0 -- A
+	set inflag_y [lindex $ppgin0 1]
+	set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	make input -origin "$inflag_x $inflag_y" -name $aname
+	# in1 -- B
+	set inflag_y [lindex $ppgin1 1]
+	if {$bidx < $Bmsbidx} {
+	  set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin1 -1]
+	  make input -origin "$inflag_x $inflag_y" -name $bname
+	  incr bidx
+	} else {
+	  set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+	  lappend Bmsb_y $inflag_y
+	}
+	# record output pin location
+	set outpin($i) $ppgout
+      }
+
+      c {
+	switch $B {
+	  "UNSIGNED" { # 0
+	    # The circuit generated by this token is a buffer (type 4), with its input grounded.
+	    setl {ppgin ppgout} [generators_mul_ppg4 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 4
+	    # hook input to gnd
+	    setl {in_x in_y} $ppgin
+	    make_wire $in_x $in_y $inflag_x $in_y
+	    make global -origin "$inflag_x $in_y" -name gnd
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	  "SIGNED" { # A . Bmsb
+	    setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg1 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 1
+	    # hook up inputs
+	    # in0 -- A
+	    set inflag_y [lindex $ppgin0 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	    make input -origin "$inflag_x $inflag_y" -name $aname
+	    # in1 -- Bmsb
+	    set inflag_y [lindex $ppgin1 1]
+	    set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+	    lappend Bmsb_y $inflag_y
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	  "BOTH" { # A . Bmsb . BSigned
+	    setl {ppgin0 ppgin1 ppgin2 ppgout} [generators_mul_ppg2 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 2
+	    # hook up inputs
+	    # in0 -- A
+	    set inflag_y [lindex $ppgin0 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	    make input -origin "$inflag_x $inflag_y" -name $aname
+	    # in1 -- Bmsb
+	    set inflag_y [lindex $ppgin1 1]
+	    set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+	    lappend Bmsb_y $inflag_y
+	    # in2 -- BSigned
+	    set inflag_y [lindex $ppgin2 1]
+	    set ok [generators_wireup [list $BSigned_x $inflag_y] $ppgin2 -1]
+	    lappend BSigned_y $inflag_y
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	}
+      }
+
+      d {
+	switch $A {
+	  "UNSIGNED" { # A . B
+	    setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg1 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 1
+	    # hook up input pins
+	    # in0 -- A
+	    set inflag_y [lindex $ppgin0 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	    make input -origin "$inflag_x $inflag_y" -name $aname
+	    # in1 -- B
+	    set inflag_y [lindex $ppgin1 1]
+	    if {$bidx < $Bmsbidx} {	
+	      set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin1 -1]
+	      make input -origin "$inflag_x $inflag_y" -name $bname
+	      incr bidx
+	    } else {
+	      set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+	      lappend Bmsb_y $inflag_y
+	    }
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	  "SIGNED" { # A . !B
+	    setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg3 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 3
+	    # hook up input pins 
+	    # in0 -- A
+	    set inflag_y [lindex $ppgin0 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	    make input -origin "$inflag_x $inflag_y" -name $aname
+	    # in1 -- B
+	    set inflag_y [lindex $ppgin1 1]
+	    if {$bidx < $Bmsbidx} {	
+	      set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin1 -1]
+	      make input -origin "$inflag_x $inflag_y" -name $bname
+	      incr bidx
+	    } else {
+	      set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+	      lappend Bmsb_y $inflag_y
+	    }
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	  "BOTH" { # A . B . !ASigned + A . !B . ASigned
+	    setl {ppgin0 ppgin1 ppgin2 ppgout} [generators_mul_ppg5 x y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 5
+	    # hook up input pins 
+	    # in0 -- A
+	    set inflag_y [lindex $ppgin0 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	    make input -origin "$inflag_x $inflag_y" -name $aname
+	    # in1 -- B
+	    set inflag_y [lindex $ppgin1 1]
+	    if {$bidx < $Bmsbidx} {	
+	      set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin1 -1]
+	      make input -origin "$inflag_x $inflag_y" -name $bname
+	      incr bidx
+	    } else {
+	      set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+	      lappend Bmsb_y $inflag_y
+	    }
+	    # in2 -- ASigned
+	    set inflag_y [lindex $ppgin2 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin2 -1]
+	    make input -origin "$inflag_x $inflag_y" -name ASigned_H
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	}
+      }
+
+      e {
+	switch $B {
+	  "UNSIGNED" {
+	    switch $A {
+	      "UNSIGNED" {  # 0
+		setl {ppgin ppgout} [generators_mul_ppg4 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 4
+		# hook input to gnd
+		setl {in_x in_y} $ppgin
+		make_wire $in_x $in_y $inflag_x $in_y
+		make global -origin "$inflag_x $in_y" -name gnd
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	      "SIGNED" { # A
+		setl {ppgin ppgout} [generators_mul_ppg4 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 4
+		# hook input to gnd
+		setl {in_x in_y} $ppgin
+		make_wire $in_x $in_y $inflag_x $in_y
+		make input -origin "$inflag_x $in_y" -name $aname
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	      "BOTH" { # A . ASigned
+		setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg1 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 1
+		# hook up input pins 
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- ASigned
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin1 -1]
+		make input -origin "$inflag_x $inflag_y" -name ASigned_H
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	    }
+	  }
+	  "SIGNED" {
+	    switch $A {
+	      "UNSIGNED" { # A . Bmsb
+		setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg1 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 1
+		# hook up inputs
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- Bmsb
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+		lappend Bmsb_y $inflag_y
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	      "SIGNED" { # A . !Bmsb
+		setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg3 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 3
+		# hook up input pins 
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- Bmsb
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+		lappend Bmsb_y $inflag_y
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	      "BOTH" { # A . Bmsb. !ASigned + A . !Bmsb . ASigned
+		setl {ppgin0 ppgin1 ppgin2 ppgout} [generators_mul_ppg5 x y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 5
+		# hook up input pins 
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- Bmsb
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+		lappend Bmsb_y $inflag_y
+		# in2 -- ASigned
+		set inflag_y [lindex $ppgin2 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin2 -1]
+		make input -origin "$inflag_x $inflag_y" -name ASigned_H
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	    }
+	  }
+	  "BOTH" {
+	    switch $A {
+	      "UNSIGNED" { # A . Bmsb . BSigned
+		setl {ppgin0 ppgin1 ppgin2 ppgout} [generators_mul_ppg2 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 2
+		# hook up inputs
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- Bmsb
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+		lappend Bmsb_y $inflag_y
+		# in2 -- BSigned
+		set inflag_y [lindex $ppgin2 1]
+		set ok [generators_wireup [list $BSigned_x $inflag_y] $ppgin2 -1]
+		lappend BSigned_y $inflag_y
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	      "SIGNED" { # A . !(Bmsb . BSigned)
+		setl {ppgin0 ppgin1 ppgin2 ppgout} [generators_mul_ppg6 x y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 6
+		# hook up inputs
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- Bmsb
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+		lappend Bmsb_y $inflag_y
+		# in2 -- BSigned
+		set inflag_y [lindex $ppgin2 1]
+		set ok [generators_wireup [list $BSigned_x $inflag_y] $ppgin2 -1]
+		lappend BSigned_y $inflag_y
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	      "BOTH" { # A . Bmsb. BSigned . !ASigned + A . !(Bmsb . BSigned) . ASigned
+		setl {ppgin0 ppgin1 ppgin2 ppgin3 ppgout} [generators_mul_ppg7 x y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+		lappend ckttypes 7
+		# hook up inputs
+		# in0 -- A
+		set inflag_y [lindex $ppgin0 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+		make input -origin "$inflag_x $inflag_y" -name $aname
+		# in1 -- Bmsb
+		set inflag_y [lindex $ppgin1 1]
+		set ok [generators_wireup [list $Bmsb_x $inflag_y] $ppgin1 -1]
+		lappend Bmsb_y $inflag_y
+		# in2 -- ASigned
+		set inflag_y [lindex $ppgin2 1]
+		set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin2 -1]
+		make input -origin "$inflag_x $inflag_y" -name ASigned_H
+		# in3 -- BSigned
+		set inflag_y [lindex $ppgin3 1]
+		set ok [generators_wireup [list $BSigned_x $inflag_y] $ppgin3 -1]
+		lappend BSigned_y $inflag_y
+		# record output pin location
+		set outpin($i) $ppgout
+	      }
+	    }
+	  }
+	}
+      }
+      f {
+	switch $A {
+	  "UNSIGNED" { # 0
+	    setl {ppgin ppgout} [generators_mul_ppg4 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 4
+	    # hook input to gnd
+	    setl {in_x in_y} $ppgin
+	    make_wire $in_x $in_y $inflag_x $in_y
+	    make global -origin "$inflag_x $in_y" -name gnd
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	  "SIGNED" { # A
+	    setl {ppgin ppgout} [generators_mul_ppg4 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 4
+	    # hook input to gnd
+	    setl {in_x in_y} $ppgin
+	    make_wire $in_x $in_y $inflag_x $in_y
+	    make input -origin "$inflag_x $in_y" -name $aname
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	  "BOTH" { # A . ASigned
+	    setl {ppgin0 ppgin1 ppgout} [generators_mul_ppg1 x $y curr_h $limit_h rswidth rs_x $rs_y last_origin_x row_start ppgrowcount]
+	    lappend ckttypes 1
+	    # hook up input pins 
+	    # in0 -- A
+	    set inflag_y [lindex $ppgin0 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin0 -1]
+	    make input -origin "$inflag_x $inflag_y" -name $aname
+	    # in1 -- ASigned
+	    set inflag_y [lindex $ppgin1 1]
+	    set ok [generators_wireup [list $inflag_x $inflag_y] $ppgin1 -1]
+	    make input -origin "$inflag_x $inflag_y" -name ASigned_H
+	    # record output pin location
+	    set outpin($i) $ppgout
+	  }
+	}
+      }
+    }
+    set y [expr $y - 2 * $yfudge]
+  }
+
+  # drop the final row spanner
+  set rsname [format "row_spanner%d" [expr int($rswidth/2)]]
+  generate row_spanner $rsname -width [expr int($rswidth/2)]
+  make $rsname -origin "$rs_x $rs_y"
+  incr ppgrowcount
+
+  # check if we need to add row spacers to match the ppg size in another bitslice
+  if {[lindex $PPGROWSIZE $Box] > $ppgrowcount} {
+    set xtra_rows [expr [lindex $PPGROWSIZE $Box] - $ppgrowcount]
+    set rname [format "%dr" $xtra_rows]
+    make spacer -origin "[expr $inflag_x - 100] $y" -rows $rname
+  } else {
+    set PPGROWSIZE [lreplace $PPGROWSIZE $Box $Box $ppgrowcount]
+  }
+
+  # connect the common inputs, if any
+  if {$BSigned_y != ""} {
+    set BSigned_y [lsort -integer -increasing $BSigned_y]
+    set yprev [lindex $BSigned_y 0]
+    make_wire $BSigned_x $yprev $inflag_x $yprev
+    make input -origin "$inflag_x $yprev" -name BSigned_H
+    for {set i 1} {$i < [llength $BSigned_y]} {incr i} {
+      set ynow [lindex $BSigned_y $i]
+      make_wire $BSigned_x $ynow $BSigned_x $yprev
+      set yprev $ynow
+    }
+  }
+  if {$Bmsb_y != ""} {
+    # B pin name
+    if {$nbits_b > 1} {
+      set bname [format "B_H\[%s\]" $Bmsbidx]
+    } else {
+      set bname "B_H"
+    }
+    set Bmsb_y [lsort -integer -increasing $Bmsb_y]
+    set yprev [lindex $Bmsb_y 0]
+    make_wire $Bmsb_x $yprev $inflag_x $yprev
+    make input -origin "$inflag_x $yprev" -name $bname
+    for {set i 1} {$i < [llength $Bmsb_y]} {incr i} {
+      set ynow [lindex $Bmsb_y $i]
+      make_wire $Bmsb_x $ynow $Bmsb_x $yprev
+      set yprev $ynow
+    }
+  }
+    
+  # connect outputs
+  set outflag_x [expr $x + 2 * $ws1]
+  for {set i 0} {$i < 4} {incr i} {
+    set pin_x [lindex $outpin($i) 0]
+    set pin_y [lindex $outpin($i) 1]
+    make_wire $pin_x $pin_y $outflag_x $pin_y
+    set pidx [expr 3 - $i]
+    set pname [format "PP%d_H" $pidx]
+    make output -origin "$outflag_x $pin_y" -name $pname
+  }
+
+  # debug dump
+  if {$debug} {
+    puts [format "Bit=%d, Box=%d, Chunk=%s: Algorithm= %s, CktTypes= %s" $Bit $Box $Chunk $Algorithm $ckttypes]
+  }
+
+
+  # title bar
+  make sccs_title_bar -origin "[expr $inflag_x + int(($outflag_x - $inflag_x)/2)] [expr $base_y + 300]" -owner emc -version 0.2 -date 06/13/00
+}
+
+
+proc ICON_mmig_ppg_4bit args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned" {radio Signed Unsigned Both}} {B "Unsigned" {radio Signed Unsigned Both}} {Bit 0} {Chunk "0 1 2 3"} {Box 0} {HalfHeight 0 binary}}
+
+  # make arguments more digestible
+  set A [string toupper $A]
+  set B [string toupper $B]
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  set debug 0
+  if {$debug} {
+    set ok [generators_mul_compute_ppg_alg $NBITS_A $NBITS_B $A $B]
+  }
+
+  # check for acceptable response on Chunk
+  if {[llength $Chunk] > 4} {
+    error "ERROR: Chunk length ($Chunk) > 4"
+  }
+  
+  # icon body
+  icon_line -60 -120 -60 120 60 120 60 -120 -60 -120
+
+  icon_term -type output -origin {60 -90} -name PP3_H
+  icon_term -type output -origin {60 -30} -name PP2_H
+  icon_term -type output -origin {60 30} -name PP1_H
+  icon_term -type output -origin {60 90} -name PP0_H
+
+  icon_property -origin {50 -90} -size small -anchor e -label PP3_H
+  icon_property -origin {50 -30} -size small -anchor e -label PP2_H
+  icon_property -origin {50 30} -size small -anchor e -label PP1_H
+  icon_property -origin {50 90} -size small -anchor e -label PP0_H
+
+  icon_property -origin {0 -60} -size large -anchor center -label {PPG4}
+  set llabel [format "%d, %d" $Bit $Box]
+  icon_property -origin {0 60} -size large -anchor center -label $llabel
+
+  set asigned [generators_mul_get_ppg_chunk "ASIGNED" $Bit $Chunk]
+  if {$asigned != 0} {
+    icon_term -type input -origin {-60 -90} -name ASigned_H
+    icon_property -origin {-50 -90} -size small -label ASigned_H
+  }
+  
+  set bsigned [generators_mul_get_ppg_chunk "BSIGNED" $Bit $Chunk]
+  if {$bsigned != 0} {
+    icon_term -type input -origin {-60 90} -name BSigned_H
+    icon_property -origin {-50 90} -size small -label BSigned_H
+  }
+  
+  set abits [generators_mul_get_ppg_chunk "A" $Bit $Chunk]
+  setl {naranges aranges} [generators_mul_get_range $abits]
+  for {set i 0} {$i < $naranges} {incr i} {
+    setl {nbits_a arange} [lindex $aranges $i]    
+    if {($naranges == 2) && ($i == 0)} {
+      # this is the msb bit
+      set aname Amsb_H
+      icon_term -type input -origin "-60 0" -name $aname
+      icon_property -origin "-50 0" -size small -label A_H$arange
+    } else {
+      if {$nbits_a > 1} {
+	set aname A_H$arange
+      } else {
+	set aname A_H
+      }
+      icon_term -type input -origin "-60 -30" -name $aname
+      icon_property -origin "-50 -30" -size small -label A_H$arange
+    }
+  }
+
+  set bbits [generators_mul_get_ppg_chunk "B" $Bit $Chunk]
+  setl {nbranges branges} [generators_mul_get_range $bbits]
+  if {$nbranges > 0} {
+    setl {nbits_b brange} [lindex $branges 0]
+    if {$nbits_b > 1} {
+      set bname B_H$brange
+    } else {
+      set bname B_H
+    }
+    icon_term -type input -origin "-60 30" -name $bname
+    icon_property -origin "-50 30" -size small -label B_H$brange
+  }    
+  
+  # junk
+  set prop_y 120
+  icon_property -origin "-70 $prop_y" -type user -name name
+  icon_property -origin "-70 [expr $prop_y + 20]" -type user -name M
+  icon_property -origin "-70 [expr $prop_y + 40]" -type user -name dpc
+  
+  icon_special -type sccs_title_bar -origin "-70 [expr $prop_y + 140]" -owner emc -version 0.2 -date 06/13/00
+}
+
+
+ 

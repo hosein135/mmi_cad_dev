@@ -1,0 +1,150 @@
+MACRO MMI_OA31C
+	CLASS CORE ;
+	FOREIGN MMI_OA31C 0 0 ;
+	SIZE 5.58 BY 6.2 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.75 3.64 1.03 5.11 ;
+			LAYER M1 ;
+			RECT 0.12 2.93 0.5 2.98 ;
+			LAYER M1 ;
+			RECT 0.75 2.93 0.94 3.64 ;
+			LAYER M1 ;
+			RECT 0.12 2.65 0.94 2.93 ;
+			LAYER M1 ;
+			RECT 0.12 2.6 0.5 2.65 ;
+			LAYER M1 ;
+			RECT 0.75 2.395 0.94 2.65 ;
+			LAYER M1 ;
+			RECT 0.75 0.925 1.03 2.395 ;
+		END
+		AntennaDiffArea 1.2859 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 4.505 3.37 4.785 3.41 ;
+			LAYER M1 ;
+			RECT 2.72 3.18 4.785 3.37 ;
+			LAYER M1 ;
+			RECT 2.72 2.98 2.91 3.18 ;
+			LAYER M1 ;
+			RECT 4.505 3.13 4.785 3.18 ;
+			LAYER M1 ;
+			RECT 2.6 2.61 2.98 2.98 ;
+			LAYER M1 ;
+			RECT 2.565 2.6 2.98 2.61 ;
+			LAYER M1 ;
+			RECT 2.565 2.33 2.845 2.6 ;
+		END
+		AntennaGateArea 0.624 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.16 0.42 0.44 2.395 ;
+			LAYER M1 ;
+			RECT 2.53 0.42 2.81 1.07 ;
+			LAYER M1 ;
+			RECT 3.71 0.42 3.99 1.76 ;
+			LAYER M1 ;
+			RECT 0 -0.42 5.58 0.42 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.185 2.795 3.6 2.98 ;
+			LAYER M1 ;
+			RECT 4.135 2.795 4.415 2.84 ;
+			LAYER M1 ;
+			RECT 3.185 2.7 4.415 2.795 ;
+			LAYER M1 ;
+			RECT 3.22 2.6 4.415 2.7 ;
+			LAYER M1 ;
+			RECT 4.135 2.56 4.415 2.6 ;
+		END
+		AntennaGateArea 0.624 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 5.78 5.58 6.62 ;
+			LAYER M1 ;
+			RECT 0.16 3.64 0.44 5.78 ;
+			LAYER M1 ;
+			RECT 1.34 3.64 1.62 5.78 ;
+			LAYER M1 ;
+			RECT 3.365 4.055 3.645 5.78 ;
+		END
+	END VDD
+	PIN in3
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.515 2.08 4.22 2.36 ;
+			LAYER M1 ;
+			RECT 3.84 1.98 4.22 2.08 ;
+		END
+		AntennaGateArea 0.624 ;
+	END in3
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.745 2.08 2.36 2.36 ;
+			LAYER M1 ;
+			RECT 1.98 1.98 2.36 2.08 ;
+		END
+		AntennaGateArea 0.312 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 2.035 3.82 2.315 5.115 ;
+		LAYER M1 ;
+		RECT 4.7 3.82 4.98 5.115 ;
+		LAYER M1 ;
+		RECT 2.035 3.63 4.98 3.82 ;
+		LAYER M1 ;
+		RECT 2.035 3.625 2.315 3.63 ;
+		LAYER M1 ;
+		RECT 4.7 3.625 4.98 3.63 ;
+		LAYER M1 ;
+		RECT 1.155 2.93 1.435 2.97 ;
+		LAYER M1 ;
+		RECT 2.035 2.93 2.225 3.625 ;
+		LAYER M1 ;
+		RECT 1.155 2.735 2.225 2.93 ;
+		LAYER M1 ;
+		RECT 1.155 2.69 1.545 2.735 ;
+		LAYER M1 ;
+		RECT 1.35 1.76 1.545 2.69 ;
+		LAYER M1 ;
+		RECT 1.35 0.79 1.63 1.76 ;
+		LAYER M1 ;
+		RECT 1.94 1.735 2.22 1.76 ;
+		LAYER M1 ;
+		RECT 3.12 1.735 3.4 1.76 ;
+		LAYER M1 ;
+		RECT 1.94 1.54 3.4 1.735 ;
+		LAYER M1 ;
+		RECT 1.94 0.79 2.22 1.54 ;
+		LAYER M1 ;
+		RECT 3.12 0.79 3.4 1.54 ;
+	END
+END MMI_OA31C

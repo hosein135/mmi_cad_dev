@@ -1,0 +1,162 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_cs_finalpC_L {} {
+  make output -orient RY -name Sum_H -origin {1350 690}
+  make input -orient RY -name A_H -origin {-110 420}
+  make input -orient RY -name B_H -origin {-110 460}
+  make input -orient R90Y -name Cin1_L -origin {520 1250}
+  make input -orient R90Y -name Cin0_L -origin {860 1250}
+  generate row_spanner row_spanner100 -width 100
+  make row_spanner100 -origin {1310 1450}
+  make input -orient R90Y -name SelS_H -origin {1290 1250}
+  make output -orient RY -name Cout_H -origin {1350 200}
+  make input -orient R90Y -name SelCI_H -origin {1290 420}
+  generate name_net_s name_net -cell name_net
+  make name_net -name Cout1_H -origin {490 170}
+  make name_net -name Cout0_H -origin {830 230}
+  generate row_spanner row_spanner150 -width 150
+  make row_spanner150 -origin {920 1450}
+  make row_spanner150 -origin {580 1450}
+  make name_net -name Sum1_H -origin {1130 660}
+  make name_net -name Sum0_H -origin {1130 720}
+  make name_net -name G_L -origin {370 440}
+  make name_net -name K_H -origin {370 520}
+  make name_net -name P_L -origin {370 590}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {60 1450}
+  make input -name Inject_H -origin {-110 940}
+  make input -name C_H -origin {-110 1030}
+  make name_net -orient R90 -name C1_L -origin {490 860}
+  make name_net -orient R90 -name C0_L -origin {830 860}
+  make name_net -name C_L -origin {370 1030}
+  generate MMI_NAND2 MMI_NAND2C -Size C
+  make MMI_NAND2C -orient RY -origin {10 440}
+  generate MMI_NOR2 MMI_NOR2C_1 -Size C -DeMorgan 1
+  make MMI_NOR2C_1 -origin {10 520}
+  generate MMI_INAND2 MMI_INAND2B -Size B
+  make MMI_INAND2B -origin {260 590}
+  generate MMI_OAI21 MMI_OAI21B_1 -Size B -DeMorgan 1
+  make MMI_OAI21B_1 -orient R270 -origin {490 320}
+  generate MMI_INV MMI_INVA_1 -DeMorgan 1
+  make MMI_INVA_1 -origin {550 680}
+  make MMI_INVA_1 -origin {890 740}
+  make MMI_OAI21B_1 -orient R270 -origin {830 340}
+  generate MMI_MUX2 MMI_MUX2C -Size C
+  make MMI_MUX2C -orient RY -origin {1290 200}
+  make MMI_MUX2C -orient RY -origin {1290 690}
+  generate MMI_INV MMI_INVB -Size B
+  make MMI_INVB -origin {260 1030}
+  generate MMI_MUX2 MMI_MUX2B -Size B
+  make MMI_MUX2B -orient R90Y -origin {830 940}
+  make MMI_MUX2B -orient R90Y -origin {490 940}
+  make MMI_XNOR2 -orient RY -origin {670 660}
+  make MMI_XNOR2 -orient RY -origin {1020 720}
+  make MMI_MUX2C -orient RY -origin {1290 1110}
+  make MMI_INVA_1 -origin {580 1080}
+  make MMI_INVA_1 -origin {920 1140}
+  make output -orient RY -name PrevCout_H -origin {1350 1110}
+  make cs_finalpC_L -origin {170 190}
+  make name_net -name PCout1_H -origin {1140 1080}
+  make name_net -name PCout0_H -origin {1140 1140}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.9 -date 03/09/99 -origin {500 1590}
+  make_wire 460 440 460 420
+  make_wire 160 520 160 610
+  make_wire -80 460 -80 540
+  make_wire -80 540 -50 540
+  make_wire 190 440 190 570
+  make_wire -60 420 -60 500
+  make_wire 530 420 530 520
+  make_wire -110 460 -80 460
+  make_wire -80 460 -50 460
+  make_wire 200 610 160 610
+  make_wire 490 680 490 420
+  make_wire 370 440 460 440
+  make_wire 460 440 800 440
+  make_wire 870 440 870 520
+  make_wire 370 520 530 520
+  make_wire 530 520 870 520
+  make_wire 830 740 830 860
+  make_wire 830 740 830 440
+  make_wire 460 1030 800 1030
+  make_wire 70 440 190 440
+  make_wire 190 440 370 440
+  make_wire -110 420 -60 420
+  make_wire -60 420 -50 420
+  make_wire 70 520 160 520
+  make_wire 160 520 370 520
+  make_wire -60 500 -50 500
+  make_wire 190 570 200 570
+  make_wire 320 590 370 590
+  make_wire 490 170 490 220
+  make_wire 830 230 830 240
+  make_wire 730 660 1130 660
+  make_wire 1130 660 1230 660
+  make_wire 610 590 610 640
+  make_wire 1080 720 1130 720
+  make_wire 1130 720 1230 720
+  make_wire 960 590 960 700
+  make_wire 370 590 610 590
+  make_wire 610 590 960 590
+  make_wire 950 740 960 740
+  make_wire 1230 230 830 230
+  make_wire 1230 170 490 170
+  make_wire 1290 150 1290 420
+  make_wire 800 1000 800 1030
+  make_wire 830 860 830 880
+  make_wire 780 940 530 940
+  make_wire 490 680 490 860
+  make_wire 490 880 490 860
+  make_wire 460 1000 460 1030
+  make_wire 440 940 530 940
+  make_wire 440 940 -110 940
+  make_wire 200 1030 -110 1030
+  make_wire 320 1030 370 1030
+  make_wire 370 1030 460 1030
+  make_wire 520 1080 520 1000
+  make_wire 520 1080 520 1250
+  make_wire 1290 1060 1290 640
+  make_wire 1290 1060 1290 1250
+  make_wire 860 1140 860 1000
+  make_wire 860 1140 860 1250
+  make_wire 1140 1080 640 1080
+  make_wire 1140 1080 1230 1080
+  make_wire 1140 1140 980 1140
+  make_wire 1140 1140 1230 1140
+  make_text -origin {-230 1210} -text {This is the same cell as cs_finalC_L, but with the 
+carry in muxes added to allow for carry injection 
+at the end of the chain.}
+}
+
+proc ICON_cs_finalpC_L args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin1_L
+  icon_term -type input -origin {-20 120} -orient R270 -name Cin0_L
+  icon_term -type input -origin {140 100} -orient RXY -name SelS_H
+  icon_term -type output -origin {-40 -120} -orient R90Y -name Cout_H
+  icon_term -type input -origin {140 80} -orient RX -name SelCI_H
+  icon_term -type input -origin {-140 70} -name Inject_H
+  icon_term -type input -origin {-140 90} -name C_H
+  icon_term -type output -origin {140 20} -name PrevCout_H
+  icon_property -origin {-130 210} -type user -name name
+  icon_property -origin {-130 230} -type user -name M
+  icon_property -origin {-130 250} -type user -name pad
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin1_L
+  icon_property -origin {-20 110} -anchor e -rotate 1 -label Cin0_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor e -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label cs_finalpC_L
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {130 100} -anchor e -label SelS_H
+  icon_property -origin {130 80} -anchor e -label SelCI_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {-130 70} -label Inj_H
+  icon_property -origin {-130 90} -label C_H
+  icon_property -origin {130 20} -rotate 1 -label PCout_H
+}
+

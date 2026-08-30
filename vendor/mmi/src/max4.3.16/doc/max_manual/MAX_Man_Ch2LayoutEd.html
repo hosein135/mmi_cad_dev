@@ -1,0 +1,1158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 22:41:41">
+<title>The MAX Layout Editor</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout System User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MAX_ManualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MAX_Man_Ch1Overview.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="MAX_Man_Ch3Commands.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="MAX_ManualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1031094"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 2 </font>
+</h2>
+
+
+<h1>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The MAX Layout Editor</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1027467"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running MAX</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027468"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This chapter will cover information on how to run the MAX layout editor. </font>
+<p>
+<p>
+  <dt> <a name="1037155"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To start MAX you simply use the <b><code class="CodeStrong">max </code></b>command<b><code class="CodeStrong"> </code></b>as defined below. The release of MAX comes with a set of generic technology files, so you can get started entering layout using one of these technologies. The <a href="MAX_Man_Ch6TechFiles.html
+#1027575"><b><code class="CodeStrong">gds_input</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font></a><font  face="Verdana, Arial, Helvetica, sans-serif"><b> </b></font>command gives the user the ability to easily read in GDSII files without an existing technology file.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027473"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MAX Command Line Description</font>
+</h3>
+
+
+<h5>
+<align="left">
+  <a name="1027474"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Synopsis</font></i>
+</align>
+</h5>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"><b><strong class="Strong">max </strong></b>[-switch value] [[cell_name1, cell_name2,...] | [gds_file]]</font><a name="1027476"> </a>
+      </pre>
+
+<h5>
+<align="left">
+  <a name="1027477"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Description</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027478"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This will bring up the MAX layout editor. The <b><code class="CodeStrong">-tech </code></b>option is used to specify the technology which will be used. Numerous cells can be specified to load up at runtime or they can be opened after MAX is started. If a cell name is specified, MAX will start with the technology specified in the MAX file. Below is a list of the switches for the <b><code class="CodeStrong">max</code></b> command.</font>
+<p>
+</dl></dl>
+<a name="1027535"> </a><font face="ITC Franklin Gothic Book">Table 1: List Of Switch Options For MAX Command  <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr align="center" bgcolor="#CCCCCC">
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1027481"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Option</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1027483"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Description</font></font></th>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027485"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-tech tech_name</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027487"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Specify the technology which will be used. The default technology is used if <b><strong class="Strong">-tech</strong></b> is not specified. It is defined by the environment variable <b><strong class="Strong">MAX_DEFAULT_TECH</strong></b>. If a MAX cell is specified on the command line, the technology of that cell overrides <b><strong class="Strong">MAX_DEFAULT_TECH</strong></b>. If the technology specified on the command line does not match the technology of the MAX file, a warning is printed and the cell is not loaded.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027490"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-h | -help</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027493"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Prints out syntax of the max command</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027495"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-v | -version</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027497"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Print the version of MAX and exit.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027499"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-geometry XxY+T+Z</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027501"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Start MAX with the given X and Y size at the given T and Z coordinates.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027503"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-colormap new</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027505"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Start MAX with a private colormap</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027507"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-iconify 1</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027509"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Start up MAX iconified</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027511"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-batch 1</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027513"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Run MAX in "batch" mode, which means no pop-ups or confirmations required.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027515"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-new &lt;cell&gt;</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027517"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Bring up MAX with a new cell.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027519"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-command &lt;tcl_cmd&gt;</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027521"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">After the <b><strong class="Strong">.maxrc</strong></b> files have been read in, execute the Tcl command at startup.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027523"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">-set &lt;var&gt;=&lt;value&gt;</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027525"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Set a global variable at startup. Variables can also be set in a .maxrc file.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027527"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">cell_name1,...</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027529"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Specify the cells to open while loading MAX. All cells must have been laid out with the same technology.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027531"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif"><code class="Code">gds_file</code></font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1027534"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">If a GDSII file is specified, MAX will first translate the GDSII file to MAX format. If the extension of the file is anything other than .max, it is assumed that it is a GDSII file. Specifying a GDSII file on the command line requires that there is already a technology file created for this cell. </font></font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<h4>
+  <a name="1027537"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Environment Variables</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027538"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following are the environment variables which are used by MAX.</font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027541"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MMI_TOOLS </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027542"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The environment variable <b><code class="CodeStrong">MMI_TOOLS</code></b> must be set to the directory where the MMT tools were installed. All Micro Magic Tools software is installed under a single directory.</font>
+<p>
+<p>
+  <dt> <a name="1027543"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv MMI_TOOLS /tools/mmi</font><a name="1027544"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027546"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MMI_LOCAL</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027547"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The environment variable <b><code class="CodeStrong">MMI_LOCAL</code></b> can be used to specify the location of the <b><code class="CodeStrong">mmi_local</code></b> directory. If this variable is not set, MAX looks for the <b><code class="CodeStrong">mmi_local</code></b> directory in the default location <b><code class="CodeStrong">$MMI_TOOLS/../mmi_local</code></b>.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv MMI_LOCAL /tools/mmi_local</font><a name="1027548"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027551"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MAX_DEFAULT_TECH</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027552"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If <b><code class="CodeStrong">MAX_DEFAULT_TECH</code></b> is set, MAX will default to this technology. The <b><code class="CodeStrong">-tech</code></b> option overrides the environment variable.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv MAX_DEFAULT_TECH mmi25</font><a name="1027553"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027557"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DEFAULT_BROWSER</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027558"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This is the browser which will be used when bringing up documentation or submitting a bug report.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv DEFAULT_BROWSER netscape</font><a name="1027559"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027561"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MMI_LICENSE_FILE</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027562"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This specifies the location of the MMI license file. If not set, MAX looks for the license file in <b><code class="CodeStrong">$MMI_TOOLS/../mmi_local/mmi_license.lic</code></b> or <b><code class="CodeStrong">$MMI_LOCAL/mmi_license.lic</code></b>.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv MMI_LICENSE_FILE $MMI_LOCAL/mmi_license.lic</font><a name="1027563"> </a>
+      </pre>
+</dl></dl>
+
+<h3>
+  <a name="1027567"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">.maxrc File</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027568"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">.maxrc</code></b> file can contain commands to add to local or tool menus, define variables, and execute text commands. In addition, Tcl programs can be defined or sourced in the <b><code class="CodeStrong">.maxrc</code></b> file. Below is an example of a <b><code class="CodeStrong">.maxrc</code></b> which sets the variable <b><code class="CodeStrong">ZOOM_BUTTONS </code></b><a href="MAX_Man_Ch2LayoutEd.html#1027790">(See <b><code class="CodeStrong">Zoom Buttons </code></b>)</a>, sources a Tcl script, adds a command to the <b><code class="CodeStrong">Local</code></b><b><strong class="Strong"> </strong></b>menu and turns off the interactive DRC on startup.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set ZOOM_BUTTONS "green yellow purple orange blue"</font><a name="1027569"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">source $MMI_LOCAL/max/tree.tcl</font><a name="1027570"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">menu_local_cmd "Print hierarchy tree" print_tree</font><a name="1027571"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">pal_special_off drc
+</font><a name="1027572"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027574"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are a number of locations where MAX looks for a <b><code class="CodeStrong">.maxrc</code></b> file. Below are the locations in the order they are sourced. The last <b><code class="CodeStrong">.maxrc</code></b> file (usually the one in the current directory) which is found will override settings from the previous files.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">$MMI_TOOLS/max/.maxrc</font><a name="1027575"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">$MMI_TOOLS/../mmi_local/max/.maxrc</font><a name="1027576"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">~/mmi_private/max/.maxrc</font><a name="1027577"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">~/.maxrc (home directory)</font><a name="1027578"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">./.maxrc (current directory)
+</font><a name="1027579"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027581"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><strong class="Strong">MAX</strong></b> subdirectory can contain the version number to enable the ability to run different versions of the software easily. For example, if you have the following directories:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">$MMI_TOOLS/../mmi_local/max3.2/.maxrc</font><a name="1027582"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">$MMI_TOOLS/../mmi_local/max/.maxrc</font><a name="1027583"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">~/mmi_private/max/.maxrc
+</font><a name="1027584"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027586"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are running MAX version 3.2 or later, MAX will get the <b><code class="CodeStrong">.maxrc</code></b> files from <b><code class="CodeStrong">mmi_local/max3.2</code></b> and <b><code class="CodeStrong">mmi_private/max</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">.</font> If you are running a version of MAX earlier than 3.2 (for example, MAX 2.32), MAX will get the <b><code class="CodeStrong">.maxrc</code></b> files from <b><code class="CodeStrong">mmi_local/max</code></b> and <b><code class="CodeStrong">mmi_private/max</code></b>. MAX looks for a max directory with the latest version not exceeding the version of MAX which is being run. For versions before MAX 3.0, MAX only looks at the /<b><code class="CodeStrong">max</code></b> directories, no version numbers.</font>
+<p>
+<p>
+  <dt> <a name="1027587"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029229"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>You can also name your file <b><code class="CodeStrong">max.rc</code></b> as well as <b><code class="CodeStrong">.maxrc</code></b>. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027589"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Tour of MAX Window Elements </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1036265"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When MAX starts up, it creates a new main window. The main window has a large grey (default color) area for displaying layout in the center, surrounded by various other elements. <a href="MAX_Man_Ch2LayoutEd.html#1027599">(See Figure 2)</a>. The purpose and use of these other elements is described below. Most of the elements are optional and can be removed <a href="MAX_Man_Ch3Commands.html#1031666">(See <b><code class="CodeStrong">Display Options </code></b>)</a> to increase the area available for displaying layout. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1027599"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 2:   MAX Window<div align="center"><img src="images/MAX_Man_Ch2LayoutEda.gif" height="939" width="825" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+
+<h3>
+  <a name="1027629"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Title Bar </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027630"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The window title bar (displayed at the top of the window by most window managers) identifies the window as a MAX window and gives the name of the cell loaded into the window. If an edit-in-place is currently in progress, the cell being edited is also identified. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027634"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Menu Bar and Message Area </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027635"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">At the top of the window, normally just below the title bar, are the <em class="Emphasis">Menu Bar</em> (on the left) and <em class="Emphasis">Message Area</em> (on the right). The menus can be scanned, and menu items can be invoked by clicking the menu with <b><strong class="Strong">Button-1</strong></b> (left mouse button) and then clicking on the menu item. Menu options can also be selected by holding down <b><strong class="Strong">Button-1</strong></b>, dragging down until the desired item is highlighted, and releasing.</font>
+<p>
+<p>
+  <dt> <a name="1027636"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It is sometimes convenient to <em class="Emphasis">tear off </em>a menu, and place it in a permanent window of its own. To do so, just click on the dashed <em class="Emphasis">tear line</em> at the top of the menu. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027638"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Message Area</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027639"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that, while the cursor is over a menu item, a short description appears in the Message Area to the right of the menus. When the cursor is not over a menu item, the Message Area normally displays information on the current mode and function of the mouse buttons. Occasionally the Message Area is used to display other useful information such as the highlighted DRC error when stepping through DRC errors.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027642"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Palette</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027643"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The MAX palette, located along the left border of the main MAX window, displays the available layers, visibility, selection status, and cursed layers (layers under the cursor). Furthermore, layer visibility and/or selectability can be changed on a layer by layer basis, by groups of layers or by all layers. Also, the selectability of subcells and Gcells can be changed by clicking on the box labeled <b><code class="CodeStrong">-cells-</code></b>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027648"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Active Layer</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027649"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The top button in the palette specifies the active layer. The default setting is <b><code class="CodeStrong">auto</code></b> which is used for the <a href="MAX_Man_Ch2LayoutEd.html#1027968">Wire Tool</a>. The active layer controls what layer polygons and circles are drawn in. It also controls the layer wires are started with.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027652"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Layers Under Cursor</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027653"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">From left to right, for each layer, the palette contains a small rectangle that turns red when the cursor is over that layer on the Layout Window -- known as a <em class="Emphasis">cursed layer.</em> The layer does not need to be visible to be cursed. However, layers in unexpanded subcells (cells for which internals are not visible) are not cursed.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027657"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Layer Visibility</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027658"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The next rectangle displays the visibility of the layer. If this layer is visible, the rectangle will contain the fill pattern and color of the layer. To turn off the visibility of that layer, click with <b><strong class="Strong">Button-1</strong></b> (left mouse button) over this rectangle and the layer will become invisible. Click again to make it visible.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1027659"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 3:   Regions of the MAX Palette<div align="center"><img src="images/MAX_Man_Ch2LayoutEd2.gif" height="294" width="375" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+
+<h4>
+  <a name="1027689"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Layer Selectability</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027690"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The right-most rectangle contains the layer name and indicates <b><strong class="Strong">layer</strong></b> <b><strong class="Strong">selectability</strong></b> and the <b><strong class="Strong">selected layer. </strong></b>All layers start out being <em class="Emphasis">selectable</em>. If you click <b><strong class="Strong">Button-1</strong></b> (left mouse button) on this rectangle, the rectangle greys out and the layer is no longer selectable when you drag out a selection in the main MAX window - only layers both visible AND selectable will be selected. If the layer is selected anywhere in the MAX layout (it does not have to be in the visible window), the text will turn red. Otherwise it is black. Note that it is possible to be selected (displaying red text) but with the selectability off. For example, when you select a wire and trace its connectivity, you may select geometries on layers that are not selectable.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027693"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Painting and Erasing Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027694"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Furthermore, in the main mode, clicking with <b><strong class="Strong">Button-3</strong></b> (right mouse button) over either the visibility or the selectability area will paint that layer into the box on the Layout Window. Clicking with <b><strong class="Strong">Button-3</strong></b> while holding down the control key will erase that layer from inside the box in the edit cell. In other modes, both the middle (<b><strong class="Strong">Button-2</strong></b>) and right (<b><strong class="Strong">Button-3</strong></b>) mouse buttons are sometimes defined with other functions.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027696"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Groups of Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027699"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can control the <em class="Emphasis">visibility</em> and <em class="Emphasis">selectability</em> on a layer by layer basis, as described above, or <em class="Emphasis">by groups</em> or <em class="Emphasis">all layers</em>. The <b><strong class="Strong">group buttons</strong></b> control all of the layers below them until the next group button. Clicking <b><strong class="Strong">Button-1</strong></b> (left mouse button) on a group button toggles the visibility of all the layers in the group. If any of the layer visibilities are off, then all the layers will be turned on. Otherwise they will all be turned off. Clicking <b><strong class="Strong">Button-3</strong></b> (right mouse button) on the group button toggles the selectability of each of the layers in the group in the same way as with the visibility. The <b><code class="CodeStrong">-all-</code></b> button has the same functionality as the group button but handles all layers - kind of a super-group.</font>
+<p>
+<p>
+  <dt> <a name="1027700"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Groups of layers can be hidden and restored in the palette by clicking with <b><strong class="Strong">Button-2</strong></b> (middle mouse button) on the group button. This is useful if the palette is cluttered with infrequently used layers. Note that all layers are displayed on startup.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027703"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Changing Color and Fill Patterns of Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027704"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To edit the color, fill pattern, and/or outline style of any layer click with <b><strong class="Strong">Button-2</strong></b> (middle mouse button) over that layer's palette entry (on the layer name or color/fill square). This will bring up a <b><code class="CodeStrong">color/stipple editor</code></b> <a href="MAX_Man_Ch2LayoutEd.html#1037511">(See Figure 4)</a>. or, if it is already up, then change the layer to the desired layer. Note that if the editor is obscured by other windows or iconified, this will deiconify/raise it.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1037511"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 4:   MAX Color/Stipple Editor<div align="center"><img src="images/palette_stipple.gif" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1037505"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027711"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Edit Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027712"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, are a list of special layers that you can modify. These include the <em class="Emphasis">background color</em>, the <em class="Emphasis">grid color</em>, the <em class="Emphasis">label</em> or <em class="Emphasis">text color</em>, the <em class="Emphasis">highlight color and stipple</em>, the <em class="Emphasis">online DRC feedback</em> <em class="Emphasis">color and stipple</em>, and the <em class="Emphasis">bounding box color</em>. Simply click with <b><strong class="Strong">Button-1</strong></b> on the desired special layer to edit it. Note that, other than background, you will not see the current color of the special layer in the top color window. Instead you must look at the stipple window or the MAX Layout Window to see the effect. For example, turn on the grid in the MAX Layout Window before trying to change the grid color.</font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027714"> </a><b><strong class="Strong">background</strong></b> - The background color for the MAX edit window 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027716"> </a><b><strong class="Strong">grid</strong></b> - The color of the grid 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027718"> </a><b><strong class="Strong">label</strong></b> - The color of labels or text when not highlighted. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027720"> </a><b><strong class="Strong">selection</strong></b> - The color and stipple pattern for items which have been selected 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027722"> </a><b><strong class="Strong">drc</strong></b> - The color and stipple pattern for the interactive DRC errors 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027724"> </a><b><strong class="Strong">bbox</strong></b> - The color of the outline of an instance when internals are not being viewed. If the instance is selected, the highlight color is used. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027729"> </a><b><strong class="Strong">box</strong></b> - The color of the box <a href="MAX_Man_Ch2LayoutEd.html#1027917">(See <b><code class="CodeStrong">The Box </code></b>)</a>. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027733"> </a><b><strong class="Strong">flyline</strong></b> - The color of flylines used by the layout generator <a href="MAX_Man_Ch5MAX-LS.html#1026718">(See <b><code class="CodeStrong">Introduction To The MAX Layout Generator </code></b>)</a>. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027736"> </a><b><strong class="Strong">annotation</strong></b> - The color of the annotation layer used by other tools. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027738"> </a><b><strong class="Strong">feedback </strong></b>- The feedback layer is used for DRC errors from an external tool. It is also used for displaying the mask layers. <a href="MAX_Man_Ch3Commands.html#1032222">(See <b><code class="CodeStrong">See Mask </code></b>)</a> 
+</li><p>
+</font>
+</ul></ul></ul>
+</dl></dl>
+
+<h4>
+  <a name="1027744"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Layer Color</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027745"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">From top to bottom, the <em class="Emphasis">color/stipple editor</em> lets you edit the color of the current layer. Simply change the hue, saturation, and brightness (HSB) sliders or RGB (red, green, blue) sliders. The hue is essentially a color wheel. Choose the desired color with the hue slider. Next change the saturation and brightness if needed. There is also a color select list which gives you a fixed set of colors to start from. To select a predefined color, hold down <b><strong class="Strong">Button-1</strong></b> on <b><code class="CodeStrong">Colors</code></b> and select the desired color.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1030499"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Because any changes you make in the editor affect the MAX Layout Window in real time and cause MAX to repaint the screen, the editor may appear sluggish if you are viewing a large layout. If this occurs, simply zoom in on a small part of the layout and the performance will improve.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027749"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Layer Fill and Outline</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027750"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, you can select whether the layout is <em class="Emphasis">solid</em> or <em class="Emphasis">stipple</em>. <b><strong class="Strong">Solid layers</strong></b> appear solid in the layout but are also transparent to other layers. Solid layers are the easiest to see and it is suggested that all common layers be made solid, such as diffusion, poly, and metal layers (but not vias). At this time, there is a limit of nine solid layers in MAX. Solid layers do not have stipple patterns nor outlines. <b><strong class="Strong">Stippled layers</strong></b> are suggested for vias and less common layers like n-well and pplus. Stipples can either be outlined or not. You can edit the stipple pattern of a stipple by clicking with <b><strong class="Strong">Button-1</strong></b> (left mouse button) on the squares of the stipple to toggle them on or off. You can also click with <b><strong class="Strong">Button-1</strong></b> on any of the provided stipple patterns to set the current stipple.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027759"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Palette File</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027760"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The bottom of the editor window provides buttons to close the window, revert all or only the current layer colors/stipples from the last saved version (usually the same version that you started the MAX session with), and to save the current colors/stipples so that they are the default for future MAX sessions. The <b><code class="CodeStrong">Revert</code></b> button bring up the pop-up shown in <a href="MAX_Man_Ch2LayoutEd.html#1027764">Figure 5</a> which gives you the option of what to revert.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1027764"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 5:   Revert Options<div align="center"><img src="images/color_editor_revert.gif" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027769"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The palette layers, groups, and colors/stipples are saved in a file called <b><code class="CodeStrong">&lt;tech&gt;.palette</code></b> where <font  face="Verdana, Arial, Helvetica, sans-serif"><i>tech</i></font> is the name of the technology (for example, <font  face="Verdana, Arial, Helvetica, sans-serif"><i>mmi25</i></font>). When you hit <b><code class="CodeStrong">Save</code></b>, MAX will attempt to save a local copy of these for you in the file:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">~/mmi_private/max/tech/&lt;tech&gt;/&lt;tech&gt;.palette
+</font><a name="1027770"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027772"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you do not have this directory, MAX will create the appropriate directory in UNIX. If you want these palette options to affect all other users, you can UNIX move it to:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"> ${MMI_TOOLS}/../mmi_local/max/tech/&lt;tech&gt;/&lt;tech&gt;.palette</font><a name="1027773"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027775"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>The <b><code class="CodeStrong">.palette</code></b> file is an ASCII file that you can also edit directly. The order of the layers in this file determines the order of layers in the palette in MAX. You would also edit the palette file to modify the placement and names of groups. Colors are specified as RGB triplets, and stipples as 1's and 0's. If you want to rearrange layer orders or add/subtract/modify groups, you must presently do it in the palette file. You can then revert the file from the color/stipple editor and see the results in MAX or simply rerun MAX. Note: if you do edit the <b><code class="CodeStrong">.palette</code></b> file directly, be careful to preserve the syntax or else MAX won't be able to read it. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027777"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Cell Lists </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027778"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Along the right side of the window are lists containing names of cells currently loaded into memory. Each list pertains to cells in a particular UNIX directory. The top cell list is generally the <a href="MAX_Man_Ch2LayoutEd.html#1027935"><b><code class="CodeStrong">Gcells </code></b> </a> provided with MAX. The number of lists, and the directories they display, can be controlled by clicking on the directory names at the top of the lists. </font>
+<p>
+<p>
+  <dt> <a name="1027782"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Clicking on a cell name (except for Gcells) with <b><strong class="Strong">Button-1</strong></b> causes that cell to be displayed in the window. <b><strong class="Strong">Shift-Button-1</strong></b> puts an instance of that cell in the Layout Window. You can position the instance by moving the mouse using <b><strong class="Strong">Button-1</strong></b> to place the instance. Clicking with <b><strong class="Strong">Button-1</strong></b> on a Gcell brings up the Gcell <a href="MAX_Man_Ch3Commands.html#1031977"><b><code class="CodeStrong">Edit Properties </code></b></a><b><code class="CodeStrong"> </code></b>form.</font>
+<p>
+<p>
+  <dt> <a name="1027783"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">An "<b><code class="CodeStrong">M</code></b>" to the left of a cell indicates that it has been <em class="Emphasis">modified</em> since last saved to disk. An "<b><code class="CodeStrong">R</code></b>" indicates that the disk file is <em class="Emphasis">read only</em>. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027785"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Navigator Window</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027786"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have zoomed in on a portion of a cell, the Navigator Window shows you the area of the entire cell. You then see a red box which represents where in the cell you are currently zoomed in on. The white box in the Navigator Window shows the current location of <a href="MAX_Man_Ch2LayoutEd.html#1027917"><b><code class="CodeStrong">The Box </code></b> </a>. Clicking once with <b><strong class="Strong">Button-2</strong></b> or <b><strong class="Strong">Button-3 </strong></b>in the Navigator Window, moves you to that region in the edit window. Dragging <b><strong class="Strong">Button-1</strong></b> allows you to zoom to a specified region of the cell.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027790"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Zoom Buttons</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027791"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">On the right side of the navigator window, there are by default three <em class="Emphasis">zoom buttons</em>. The top zoom button (green by default) always takes you to the last view. Clicking <b><strong class="Strong">Button-1</strong></b> on this top button allows you to toggle between two views. The other zoom buttons allow you to save a specific view (for example, if you have zoomed into a specific area of the layout) and return to that view later.</font>
+<p>
+<p>
+  <dt> <a name="1027792"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To use the zoom buttons, first zoom in on a desired area of the layout. Then click on a zoom button (not the top button) with <b><strong class="Strong">Button-2</strong></b> or <b><strong class="Strong">Button-3</strong></b>. Notice that you will now see a box of the same color as the button in the navigator window showing the location of this view. To get back to a view, click on the desired zoom button with Button-1.</font>
+<p>
+<p>
+  <dt> <a name="1027793"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To add additional zoom buttons or to change their colors, use the following command.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set ZOOM_BUTTONS "yellow green purple orange blue"
+</font><a name="1027795"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027797"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The above example sets the top/last view button to yellow and adds four additional zoom buttons. This command can be typed in the command window to change the zoom buttons on the fly or can be added to a <b><code class="CodeStrong">.maxrc </code></b>file.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027799"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Bottom Bar </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027800"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The bar at the bottom of the window holds four elements: </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027803"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>DRC Status Area </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027804"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <em class="Emphasis">DRC Status Area</em> is at the left end of the bottom bar. The messages it displays and their meaning are described below. When on, the background DRC runs continuously and DRC errors are displayed as white dotted areas. For an explanation of a DRC error, draw a box around the error and select <a href="MAX_Man_Ch3Commands.html#1032587"><b><code class="CodeStrong">Explain DRC under Box </code></b> </a><b><strong class="Strong"> </strong></b>in the <b><code class="CodeStrong">Misc</code></b><b><strong class="Strong"> </strong></b>menu. The <a href="MAX_Man_Ch3Commands.html#1032568"><b><code class="CodeStrong">DRC Find Next Error </code></b> </a> command, also in the <b><code class="CodeStrong">Misc</code></b><b><strong class="Strong"> </strong></b>menu, can be used to step through all current DRC errors.</font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027811"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">drc off </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027812"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The DRC processing is turned off. When a large GDSII file is first read in, MAX will run DRC on the entire layout in the background if DRC is turned on. <b><code class="CodeStrong">drc off </code></b>means that the interactive DRC is not running.</font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027813"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">drc busy </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027814"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The background DRC is on and has unfinished business. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027815"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">drc clean </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027816"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The DRC is up-to-date and there are no MAX DRC errors. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027817"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">drc n errors</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027818"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The DRC is up-to-date and there are <b><strong class="Strong">n</strong></b> DRC errors. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1027819"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">drc &gt;10 errors</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1027820"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The DRC is up-to-date and there are more than 10 DRC errors. </font>
+<p>
+<p>
+  <dt> <a name="1027821"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The visibility of DRC errors can be toggled by clicking on the <b><code class="CodeStrong">drc</code></b> button to the left of the DRC Status Area. This also toggles the DRC on/off; in other words, making DRC errors visible automatically turns the DRC on, and making them invisible turns it off. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027823"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Zoom Bar </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027824"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <em class="Emphasis">Zoom Bar</em> is located in the middle of the bottom bar. It works like a scroll bar, except that it zooms in or out, rather than panning over. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027825"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Cursor Coordinates</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027826"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To the right of the Zoom Bar is an area displaying the <em class="Emphasis">Cursor Coordinates</em>. The coordinates are for the cell which was opened. If you do an <a href="MAX_Man_Ch3Commands.html#1032186"><b><code class="CodeStrong">Edit Cell or Object in Place </code></b> </a>, the coordinates will be for the original (top level) cell.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027831"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Box Area Display </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027832"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <em class="Emphasis">Box Area Display </em>at the right end of the bottom bar gives the current box dimensions as width (dx) height (dy) in microns. You can change what is displayed in the box area display with the <a href="MAX_Man_Ch3Commands.html#1032406"><b><code class="CodeStrong">Box Dimensions </code></b> </a><b><strong class="Strong"> </strong></b>command. The <b><code class="CodeStrong">Box Area </code></b>can be used to "measure" objects by selecting them. (When you select something the box is automatically placed around it.) The <b><code class="CodeStrong">Box Area</code></b> can also be used to measure the space between things, using the hotkey <b><strong class="Strong">m</strong></b>. The hotkey <b><strong class="Strong">m</strong></b> is for the <a href="MAX_Man_Ch3Commands.html#1032429"><b><code class="CodeStrong">Measure </code></b> </a> command in the <b><code class="CodeStrong">Misc</code></b><b><strong class="Strong"> </strong></b>menu. You really need to use the hotkey, since you need the cursor at the space you are measuring when issuing this command.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027840"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Scroll Bars </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027841"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">Scroll bars</em> for the layout area allow you to pan vertically or horizontally through the layout. There are also scroll bars for the cell lists.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027844"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Command Window </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032972"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <em class="Emphasis">shell window</em> MAX is started from is also of interest during the operation of MAX. Informational messages are posted to this window. For example, the results of the <a href="MAX_Man_Ch3Commands.html#1032587"><b><code class="CodeStrong">Explain DRC under Box </code></b> </a> command are displayed in the command window. In addition, text commands, or even entire Tcl scripts can be typed into the Command Window <a href="MAX_Man_Ch3Commands.html#1032730">(See <b><code class="CodeStrong">Text Commands </code></b>)</a>. Text commands are of use primarily to developers, but are occasionally useful to end-users who wish to access (obscure) features not available from the menus. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027852"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Reading in a GDSII File</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027853"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to read in an existing GDSII file, you must first create a basic MAX technology file which defines the layers in the GDSII input. If there is no existing technology file, use the <a href="MAX_Man_Ch6TechFiles.html#1027575"><b><code class="CodeStrong">gds_input </code></b> </a> command to create a basic technology file. This technology file will only contain the layer definitions with no DRC rules, and no definitions for Gcells. It is useful for quickly viewing a GDSII file or as a starting point for a new technology file.</font>
+<p>
+<p>
+  <dt> <a name="1027860"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Import File</code></b> (p<b><strong class="Strong">age 3-6</strong></b>) command (under the <b><code class="CodeStrong">File</code></b> menu) assumes that you have a technology file.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027862"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Creating a MAX Technology File</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027863"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX comes with generic technology files (<b><code class="CodeStrong">mmi25</code></b> and <b><code class="CodeStrong">mmi18</code></b>) for a 0.25 <font  face="Symbol">&#181;</font>m and 0.18<font  face="Symbol">&#181;</font>m process. This can be used as a starting point for creating new technologies. A technology for MAX is defined in the technology source file. The <a href="MAX_Man_Ch6TechFiles.html#1027536"><b><code class="CodeStrong">make_tech </code></b> </a> program is then used to convert the technology source file into the technology files used by MAX.</font>
+<p>
+<p>
+  <dt> <a name="1027870"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have a <em class="Emphasis">Dracula</em> DRC deck for the technology, the<b><code class="CodeStrong"> </code></b><a href="MAX_Man_Ch6TechFiles.html#1027648"><b><code class="CodeStrong">drac_convert </code></b> </a> program can be used to create a MAX technology source file.</font>
+<p>
+<p>
+  <dt> <a name="1027874"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Please refer to <a href="MAX_Man_Ch6TechFiles.html#1019269"><b><code class="CodeStrong">MAX Technology Targeting </code></b> </a> chapter for detailed information on <b><code class="CodeStrong">gds_input</code></b>, MAX technology source files, <b><code class="CodeStrong">make_tech</code></b> and <b><code class="CodeStrong">drac_convert</code></b>.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027875"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Basic MAX Usage</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027876"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This section of the manual gives a quick overview of the basic things you might want to do in MAX. Refer to the <a href="MAX_Man_Ch3Commands.html#1019269"><b><code class="CodeStrong">MAX Commands </code></b> </a> chapter for a complete description of all MAX commands. A great source of information on the basics of using MAX is the <em class="Emphasis">Micro Magic Tools MAX Tutorial</em>.</font>
+<p>
+<p>
+  <dt> <a name="1027880"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typing <b><strong class="Strong">Ctrl-c </strong></b>will abort out of the current mode undoing any changes and return to the Main Mode. An example of this is if you are in the Wire Mode,<b><strong class="Strong"> </strong></b><b><strong class="Strong">Ctrl-c </strong></b>will abort the wire you are working on and return you to the Main Mode.</font>
+<p>
+<p>
+  <dt> <a name="1027881"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typing ESC will end the current mode and return to the Main Mode. An example of this is if you are in the Wire Mode, ESC will end the wire you are working on and return you to the Main Mode.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027882"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Moving around the Layout</font>
+</h3>
+
+
+<h4>
+  <a name="1030873"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Zoom, pan, scroll bars, zoom window</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1030874"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have loaded a layout in MAX, there are many ways of moving around in the layout. To zoom in on the layout, you can use the <a href="MAX_Man_Ch3Commands.html#1032270"><b><code class="CodeStrong">Zoom to Area </code></b> </a> command (hotkey: <b><strong class="Strong">z</strong></b>) to specify the region to zoom in on or use the <a href="MAX_Man_Ch3Commands.html#1032279"><b><code class="CodeStrong">Zoom to Fit Selected </code></b> </a> command (hotkey: <b><strong class="Strong">j</strong></b>) to zoom in by a fixed amount centered around the cursor. The <a href="MAX_Man_Ch3Commands.html#1032275"><b><code class="CodeStrong">Zoom Out </code></b> </a> command (hotkey: <b><strong class="Strong">shift-z</strong></b>) allows you to zoom out by a fixed amount.</font>
+<p>
+<p>
+  <dt> <a name="1036503"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The scroll bars on the bottom and right of the Layout Window can be use to pan around the layout. In addition, the <a href="MAX_Man_Ch2LayoutEd.html#1027785"><b><code class="CodeStrong">Navigator Window </code></b> </a> can be used to move around the layout.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036507"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Viewing internals of cells</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027899"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When a cell is first loaded into MAX, only the top level of hierarchy is visible. The internals of instances are not visible. To view all internals of all cells, move the cursor outside of any layout and use the <a href="MAX_Man_Ch3Commands.html#1032622"><b><code class="CodeStrong">Select Cell </code></b> </a> command (hotkey: <b><strong class="Strong">f</strong></b>) to select the top level cell. Then use the <a href="MAX_Man_Ch3Commands.html#1032297"><b><code class="CodeStrong">Internals, View Area </code></b> </a><b><code class="CodeStrong"> </code></b>command (hotkey: <b><strong class="Strong">i</strong></b>) to view the internals.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027906"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Viewing layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027907"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The palette on the left of the layout area allows you to turn on/off the visibility of individual layers or groups of layers. Clicking once with mouse <b><strong class="Strong">Button-1</strong></b> (left mouse button) on an individual layer toggles the visibility of that layer on or off. Clicking once with mouse <b><strong class="Strong">Button-1</strong></b> on one of the group names (for example, <b><code class="CodeStrong">active</code></b>) toggles that group of layers on or off. See the <a href="MAX_Man_Ch2LayoutEd.html#1027642"><b><code class="CodeStrong">Palette </code></b> </a> section for more information.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027915"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Drawing/Painting Layout</font>
+</h3>
+
+
+<h4>
+  <a name="1027917"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>The Box </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027918"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX makes extensive use of a rectangular box, displayed in brown (by default) on the screen. <em class="Emphasis">The Box</em> is a sort of second cursor that designates an <em class="Emphasis">area</em> rather than a point. Many MAX commands work on the area defined by the Box. For example, the normal way to add a rectangle on a layer is to place the Box where the rectangle is to go, and then click with <b><strong class="Strong">Button-3</strong></b> (right mouse button) over a sample of the layer you wish to draw. </font>
+<p>
+<p>
+  <dt> <a name="1027922"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also draw polygons and circles<b><strong class="Strong"> </strong></b><a href="MAX_Man_Ch3Commands.html#1031886"><b><strong class="Strong">(See </strong></b><b><code class="CodeStrong">Add Polygon </code></b>)</a><b><strong class="Strong"> with MAX.</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1027923"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To paint a rectangle on a mask layer in MAX, move the Box to the rectangle you want to paint <a href="MAX_Man_Ch3Commands.html#1032397">(See <b><code class="CodeStrong">Make/move Box </code></b>)</a>, and then click over a sample of the layer you wish to paint with mouse <b><strong class="Strong">Button-3</strong></b> (in Main mode). If there is no sample handy in the Layout Window, you can click over a palette entry instead with mouse <b><strong class="Strong">Button-3</strong></b>. </font>
+<p>
+<p>
+  <dt> <a name="1027927"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that multiple layers can be painted at once, and that only layers that are currently visible (turned on in the palette) get painted. </font>
+<p>
+<p>
+  <dt> <a name="1027928"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also use <b><strong class="Strong">Button-3 </strong></b>to erase all mask layers under the Box, by clicking on empty space; or click <b><strong class="Strong">Ctrl-Button-3</strong></b> over a layer to erase just that layer.</font>
+<p>
+<p>
+  <dt> <a name="1027929"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To change the layer of a rectangle, first select the rectangle, erase that layer by clicking over empty space and then selecting a new layer with <b><strong class="Strong">Button-3</strong></b>. You can also use the <a href="MAX_Man_Ch3Commands.html#1031977"><b><code class="CodeStrong">Edit Properties </code></b> </a> command (hotkey: <b><strong class="Strong">p</strong></b>) to change the layer of a rectangle.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027935"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Gcells</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027936"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">Generator cells</em> or <em class="Emphasis">Gcells</em> are parameterized cells that regenerate themselves when they get different inputs. Devices (such as fets) and vias are good candidates for Gcells since a given layout may have multiple types that differ only by size or some other attribute.</font>
+<p>
+<p>
+  <dt> <a name="1027938"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Gcells are user definable using the Tcl scripting language. Presently they must be created and modified using a text editor. To discern Gcells from conventional MAX cells, Gcells are saved in <b><code class="CodeStrong">.maxg</code></b> files as opposed to <b><code class="CodeStrong">.max</code></b> files. Refer to <a href="apndxc.html#1018704"><b><code class="CodeStrong">Gcells Tcl Programs </code></b> </a> for information on creating Gcells.</font>
+<p>
+<p>
+  <dt> <a name="1027942"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To insert a Gcell into the layout, click on it with<b><strong class="Strong"> Button-1</strong></b> (left mouse button) in the cell list on the right side of the MAX window. This will bring up the Gcell<b><code class="CodeStrong"> Edit Properties </code></b>form <a href="MAX_Man_Ch2LayoutEd.html#1027955">(See Figure 6)</a>. Currently MAX comes with fet and via generators. The <b><code class="CodeStrong">Edit Properties</code></b> form for a fet allows you to change the width, length, number of fingers and location of the contacts. Once you have specified the properties, click on <b><code class="CodeStrong">Done</code></b>. Move the fet to the desired location and click with <b><strong class="Strong">Button-1</strong></b>. The Wiring Tool automatically drops via Gcells.</font>
+<p>
+<p>
+  <dt> <a name="1027949"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can edit the properties of a Gcell with the<b><code class="CodeStrong"> </code></b><a href="MAX_Man_Ch3Commands.html#1032172"><b><code class="CodeStrong">Push into Cell </code></b> </a> command in the <b><code class="CodeStrong">Edit </code></b>menu (hotkey:<b><strong class="Strong"> e</strong></b>). This will bring up the <b><code class="CodeStrong">Edit Properties</code></b> form <a href="MAX_Man_Ch2LayoutEd.html#1027955">(See Figure 6)</a> for the selected Gcell.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1027955"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 6:   FET Gcell<div align="center"><img src="images/MAX_Man_Ch2LayoutEd4.gif" height="337" width="750" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1035531"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There is also a gcell for text as show in <a href="MAX_Man_Ch2LayoutEd.html#1035466">Figure 7</a>. This can be used to add text, such as the company name or chip name, to the layout.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1035466"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 7:   Text Gcell<div align="center"><img src="images/text_gcell.gif" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+
+<h4>
+  <a name="1027963"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Stretching Gcells</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027964"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can change the size of a Gcell by either editing the properties of a Gcell (hotkey: <b><strong class="Strong">e</strong></b>) or stretching the Gcell. To stretch a Gcell, first select the Gcell and go into the Gcell edit mode (hotkey:<b><strong class="Strong"> Shift-e</strong></b>). Using the Gcell stretch capability, you can only change the width of a fet Gcell. A via Gcell can be stretched in either direction. Once in the Gcell edit mode, hold down the middle mouse button (<b><strong class="Strong">Button-2</strong></b>) near the edge of the Gcell and drag to the desired size. Additional vias will be added automatically.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027968"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wire Tool</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027969"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Wiring Tool makes it easy to lay out wires which include contacts/vias and multiple layers. Refer to <a href="MAX_Man_Ch4WireTool.html#1026718"><b><code class="CodeStrong">Introduction To The MAX Wire Tool </code></b> </a> for detailed information on how to use the Wiring Tool.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1027973"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Editing Layout</font>
+</h3>
+
+
+<h4>
+  <a name="1027975"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting Things </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027976"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Many commands in MAX operate on the selection. For example, to move, duplicate or delete something, you must first select it. The current selection is highlighted in white (by default). In addition, the names of layers currently contained in the selection are highlighted in the palette (in red). </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027978"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting by Pointing </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027979"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Mouse <b><strong class="Strong">Button-1</strong></b> (in Main mode) is used for selection. To select something, simply click on it with <b><strong class="Strong">Button-1</strong></b> (left mouse button). If there are several items under the cursor, you can cycle through them by clicking repeatedly with <b><strong class="Strong">Button-1</strong></b> at the same location. Layers and labels/text can be selected in this way. For layers, the largest rectangle containing the cursor is selected. The <a href="MAX_Man_Ch3Commands.html#1032672"><b><code class="CodeStrong">Probe </code></b> </a> command (hotkey: <b><strong class="Strong">Ctrl-Button-1</strong></b>) brings up a pop-up form listing all layers, Gcell or instances under the mouse. Instances can be selected using the <a href="MAX_Man_Ch3Commands.html#1032622"><b><code class="CodeStrong">Select Cell </code></b> </a> command (hotkey: <b><strong class="Strong">f</strong></b>). Clicking <b><strong class="Strong">Button-1</strong></b> on a space with no paint or objects will deselect everything.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027988"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting Nets </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027991"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To <em class="Emphasis">select an entire net</em>, move the mouse over a geometry and use the <a href="MAX_Man_Ch3Commands.html#1032639"><b><code class="CodeStrong">Select Net </code></b> </a> command (hotkey: <b><strong class="Strong">s)</strong></b>. In the <a href="MAX_Man_Ch3Commands.html#1032672"><b><code class="CodeStrong">Probe </code></b> </a> form, <b><strong class="Strong">Button-2 </strong></b>(middle mouse button) selects the net for the geometry.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027997"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting Areas </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027998"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To <em class="Emphasis">select everything in an area</em>, drag a box over it with mouse <b><strong class="Strong">Button-1</strong></b>. Holding down the <b><strong class="Strong">Shift</strong></b> key while dragging a box adds to the selection.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028000"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting (and Excluding) Layers </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028001"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The layers that are selectable can be controlled by clicking on the layer name with <b><strong class="Strong">Button-1</strong></b> in the palette. Only layers that are currently visible and selectable can be selected. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028003"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting (and Excluding) Labels </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028004"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Labels that are attached to a layer are selected along with the layer. Free floating labels (with no layer below) are selectable only if visible, which is controlled with <a href="MAX_Man_Ch3Commands.html#1031666"><b><code class="CodeStrong">Display Options </code></b> </a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028010"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Adding to the Selection </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028013"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To add more to the current selection, use <b><strong class="Strong">Shift-Button-1</strong></b> in place of <b><strong class="Strong">Button-1</strong></b>. The <a href="MAX_Man_Ch3Commands.html#1032628"><b><code class="CodeStrong">Select Cell (add) </code></b> </a> command (hotkey:<b><strong class="Strong"> </strong></b><b><strong class="Strong">Shift-f</strong></b>) can be used to add a cell to the selection. If the item is already selected <b><strong class="Strong">Shift-Button-1</strong></b> and the <b><strong class="Strong">Alt-f</strong></b> hotkey remove the geometry, Gcell or instance from the selection.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028016"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Moving Things Around (and Other Manipulations) </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028017"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you select something, typically with mouse <b><strong class="Strong">Button-1</strong></b>, you can move it around with <b><strong class="Strong">Button-2</strong></b>. To constrain the motion to one dimension only (horizontal or vertical) use <b><strong class="Strong">Shift-Button-2</strong></b>. The selection can also be stepped over, one design-grid at a time, using the <a href="MAX_Man_Ch3Commands.html#1032031"><b><code class="CodeStrong">Move </code></b> </a> command (hotkeys: <b><strong class="Strong">Shift-arrow-keys</strong></b>). </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028021"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Other Edit Commands</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028028"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Other operations on the selection include: <em class="Emphasis">rotations</em> <a href="MAX_Man_Ch3Commands.html#1032012">(See <b><code class="CodeStrong">Flip/Rotate </code></b>)</a>, <em class="Emphasis">flips</em> <a href="MAX_Man_Ch3Commands.html#1032017">(See <b><code class="CodeStrong">Flip Upside-Down </code></b>)</a>, <em class="Emphasis">stretching</em> <a href="MAX_Man_Ch3Commands.html#1083531">(See <b><code class="CodeStrong">Stretch </code></b>)</a>, <em class="Emphasis">duplication</em> <a href="MAX_Man_Ch3Commands.html#1032008">(See <b><code class="CodeStrong">Duplicate </code></b>)</a> and <em class="Emphasis">deletion</em> <a href="MAX_Man_Ch3Commands.html#1032002">(See <b><code class="CodeStrong">Delete </code></b>)</a>. These operations can all be found in the <a href="MAX_Man_Ch3Commands.html#1031817"><b><code class="CodeStrong">Edit Menu </code></b> </a>.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028042"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Hierarchy</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028043"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Each cell in MAX is saved as a separate ASCII file on disk. A cell contains geometries and/or instances. In order to place an instance of a cell, it must be first loaded into MAX. If you have a standard cell library where all layout cells are in one directory, you can use the <b><code class="CodeStrong">max_auto_load</code></b> text command to load all cells in a directory. This command can be put into your <b><code class="CodeStrong">.maxrc</code></b> file.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028045"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Placing instances</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028046"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To place an instance in the current edit cell, you need to have first loaded the cell into MAX. Once it is in one of the cell lists you can place the instance by holding down the <b><strong class="Strong">Shift</strong></b> key while clicking on the cell with mouse <b><strong class="Strong">Button-1</strong></b>. You then use <b><strong class="Strong">Button-1</strong></b> in the Layout Window to position the instance. You can use the <a href="MAX_Man_Ch3Commands.html#1032008"><b><code class="CodeStrong">Duplicate </code></b> </a> command (hotkey: <b><strong class="Strong">d</strong></b>) to place multiple instances of the same cell.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028051"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Editing in place</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028054"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have placed instances in a cell, you can edit the lower level cells using the <a href="MAX_Man_Ch3Commands.html#1032186"><b><code class="CodeStrong">Edit Cell or Object in Place </code></b> </a> command (hotkey: <b><strong class="Strong">Shift-e</strong></b>) to edit the cell while viewing the rest of the layout. The command <a href="MAX_Man_Ch3Commands.html#1032172"><b><code class="CodeStrong">Push into Cell </code></b> </a> (hotkey: <b><strong class="Strong">e</strong></b>) pushes you down into the cell for editing. The<b><code class="CodeStrong"> </code></b><a href="MAX_Man_Ch3Commands.html#1032181"><b><code class="CodeStrong">Pop out of </code></b> </a> command (hotkey: <b><strong class="Strong">Ctrl-e</strong></b>) pops you back up.</font>
+<p>
+<p>
+  <dt> <a name="1028068"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To use the<b><code class="CodeStrong"> Edit Cell or Object in Place</code></b> or <b><code class="CodeStrong">Push into Cell</code></b> command, you need to have first selected the instance. Use the<b><code class="CodeStrong"> </code></b><a href="MAX_Man_Ch3Commands.html#1032622"><b><code class="CodeStrong">Select Cell </code></b> </a> command (hotkey: <b><strong class="Strong">f</strong></b>) to select an instance of the cell.</font>
+<p>
+<p>
+  <dt> <a name="1028072"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="MAX_ManualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="MAX_Man_Ch1Overview.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="MAX_Man_Ch3Commands.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="MAX_ManualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

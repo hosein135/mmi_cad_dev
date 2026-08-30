@@ -1,0 +1,157 @@
+Documentation for adder
+-----------------------
+rev 0.2, 2/5/99:   Added support for HalfHeight layout
+rev 0.3, 2/19/99:  Changed from TSMC25 icons to MMI generic icons
+rev 0.4, 3/9/99:   Updated to final MMI generic icons;
+                   Partitioned adder now outputs the sub-chain carry out's
+rev 0.5, 3/26/99:  UsePrevCout property added, to allow the carry-in to the
+                   msb of a chain to be visible outside the adder.
+rev 0.6, 4/30/99:  Added netlist_level property to icon, so that it will
+                   default to "schematic" (not "icon") in sue's dpc & verilog
+                   modes.
+                   Fixed bug in hookup of final carry out for partitioned
+                   adder.
+                   Fixed error checking on Partition to catch null input.
+                   Modified cells to speed up carry propagation:
+                   cs_startp_n0C_H, cs_startp_n0C_L, cs_startp_n0B_H,
+                   cs_startp_n0B_L.  Added MMI_ADDMUX3C.
+rev 0.7, 5/10/99:  Changed names of cells to begin with MMIG_ADD_
+rev 0.8, 7/16/99:  Added NAME_adder proc, which creates adder's name
+rev 0.9, 5/18/00:  Changed name to mmig_adder
+                   Fixed bug on failed writes to behavioral verilog file
+rev 1.0, 5/23/00:  Added CustomCSAlg option
+rev 1.1, 5/31/00:  Changed drawing style to improve view/netlist speed
+
+
+The adder generator is used to derive adders of the following types:
+  - ripple carry
+  - carry select
+
+These are the input arguments:
+
+  NBITS:  
+    Definition:  
+      The number of bits in the adder.
+    Legal Values:  
+      The ripple carry adder allows 1 <= NBITS <= 128.
+      The carry select adder allows 4 <= NBITS <= 128, since a ripple adder 
+      is more efficient than a carry select adder for just a few bits.
+    Default:  
+      32
+
+  Type:
+    Definition:
+      The adder algorithm used.
+    Legal Values:
+      Carry Select ("CarrySelect") or Ripple ("Ripple")
+    Default:
+      Carry Select
+
+  CustomCSAlg:
+    Definition:
+      If Type=CarrySelect, the user may choose the default carry
+      select chain size algorithm (CustomCSAlg=N), or may input their
+      own algorithm.  The custom algorithm consists of a description
+      of the desired chain lengths, which must meet these rules: (1)
+      the first chain must have a length of 1; (2) all chains must have
+      an odd length.  For example, CustomCSAlg="1 3 5 7 9" is a legal
+      custom algorithm, describing a carry select adder with the first
+      chain having 1 bit, the next chain having 3 bits, and so on.  
+      The final number in the algorithm will be automatically repeated,
+      if necessary, to fill out the number of bits in the adder.
+      Note that this option is ignored if Type=Ripple.
+    Legal Values:
+      N (use default algorithm), or string of numbers
+    Default:
+      N
+      
+  Partition:
+    Definition:
+      Either type of adder can be partitioned into smaller adders.  When
+      you designate a bit as a partition bit, a mux is added to the carry in
+      to that bit.  If the "Inject" signal corresponding to that bit position
+      is asserted, the value of C_H is used as the carry in to that bit;
+      otherwise, the carry out of the previous bit is used.  The carry out
+      of each partition is an output of the adder.
+    Legal Values:
+      No partitioning ("N"), or a list of bit positions separated by spaces, 
+      i.e. "1 5 27".  The legal values for the bit positions are 1 to
+      (NBITS - 1), inclusive.
+    Default:
+      N
+
+  UsePrevCout:
+    Definition:
+      This argument allows the carry-in's to the msb of any chain (meaning
+      the msb of any partition, and the msb of the entire adder) to be 
+      visible outside the adder.  Useful for overflow/underflow detection.
+    Legal Values:
+      The allowed values of this argument are "Y" (make carry-in's visible)
+      and "N" (don't).
+    Default:
+      N
+      
+  OutputSize:
+    Definition:
+      This argument selects the final drive size of the adder.  
+    Legal Values:
+      The supported strengths are A, B, and C.
+    Default:
+      C
+
+  HalfHeight:
+    Definition:
+      This argument allows the user to specify that the layout be done in
+      (NBITS_A + NBITS_B)/2 bit positions, instead of (NBITS_A + NBITS_B) 
+      bit positions.  Note that if (NBITS_A + NBITS_B)/2 is an odd number of
+      bit positions, the layout will actually fit in 
+      ((NBITS_A + NBITS_B)/2 + 1) bit positions.
+      This configuration results in a slightly slower and less area 
+      efficient design.
+    Legal Values:
+      The allowed values of this argument are "Y" (half height layout)
+      and "N" (full height layout).
+    Default:
+      N
+
+  bitslice:
+    Definition:
+      This argument directs DPC to enforce bitslice layout, or not.  
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+
+------------------------------------------------------------------------
+A note on the meaning of the underlying cell names:
+
+All cells used in the adder begin with MMIG_ADD_.  The rest of the name
+is formed as four fields, as follows:
+
+1.  R  : Ripple Carry
+    C  : Carry Select
+
+2.  B  : Base Cell
+    Bc : Base + CarryIn driven as cell output
+    S  : Chain starter cell
+    S0 : Chain starter cell, optimized for bit position 0 only
+    Sp : Chain starter cell, used for partition starts
+    Sc : Chain starter cell + CarryIn driven as cell output
+    F  : Final cell
+    Fc : Final cell + CarryIn driven as cell output
+    Fp : Final cell, also a partition start
+
+3.  H  : carry input(s) are High asserted
+    L  : carry input(s) are Low asserted
+
+4.  A  : output driver size A
+    B  : output driver size B
+    C  : output driver size C
+
+Thus, the cell MMIG_ADD_RBcHB is:
+  - R: used in the ripple carry adder
+  - Bc: is a base cell, which also drives its carry in as a cell output
+  - H: has high-asserted carry in
+  - B: has output drive strength B
+

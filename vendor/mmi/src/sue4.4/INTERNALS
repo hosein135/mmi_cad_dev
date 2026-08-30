@@ -1,0 +1,486 @@
+				SUE Internals                        3/2/99
+			       ===============
+
+What is SUE?
+------------
+
+Mostly TCL/TK procedures
+	procedures are "hidden" and embedded into C executable
+
+	instances.tcl write.tcl icon_write.tcl icon.tcl
+   ~    canvas.tcl schem_canvas.tcl make_schematic.tcl
+   3    draw_wire.tcl arc.tcl lines.tcl text.tcl	- create items
+   0    sticky_move.tcl duplication.tcl edit_marker.tcl	- change
+   K    windows.tcl connect.tcl selection.tcl
+        netlist.tcl net_spice.tcl net_verilog.tcl net_flat.tcl	- netlisting
+   l    verilog_probe.tcl spice_probe.tcl sim_probe.tcl	- probing
+   i    dpc.tcl	dpc_utils.tcl timing.tcl		- dpc
+   n    prop_edit.tcl zoom.tcl help.tcl api.tcl print.tcl	- misc.
+   e    share_utils.tcl utilities.tcl prop_menu.tcl	- utils
+   s    call_by_keyword.tcl dialog.tcl FSBox.tcl	- more utils
+
+Schematics are TK Canvases:
+	Special Micro Magic version
+		rotated text (one rotation only)
+		argument to closest to exclude current
+		coordsall functions for undo
+		new tag implementation for speed
+
+Called from a shell script called "sue"
+	sets up extended fonts
+	provides command line help
+	calls C executable
+
+sueAppInit.c
+	license manager stuff
+		SUE version
+		Gets DPC license at dpc netlist
+
+	sets up special MMI procs for protection
+
+sueInitA.tcl
+	first TCL file executed
+	sets up global variables
+	reads .suerc files
+
+sueInitB.tcl
+	executed after all TCL programs loaded
+	sets up windows
+	executes command line switches
+
+Global Variables
+	almost all global variables are upper case
+	naming: foo_bar, NOT fooBar
+	no protection from user stomping on
+
+
+TK Canvases
+------------
+
+TK only updates the screen when idle or code issues an "update"
+	packing and unpacking windows is an exception
+
+Every different cell has its own canvas, one for schematic and one for icon
+	global cur_c --> name of current canvas (e.g. .win1.c_test)
+	global cur_s --> name of current cell (e.g. test or ICON_test)
+	global scale --> scale of current canvas
+
+Every element in a canvas has a unique ID associated with it
+
+Items are grouped together with tags
+	TK permits operations on an id or on every id with a given tag
+	all elements of an icon have the tags inst<id> where <id>
+	  is the id of the icon origin
+
+Example:
+
+            hello
+                           |\
+	        foo|=>-----|A)O-
+                           |/
+
+    sue> info_canvas
+    88 line origin icon icon_INVA inst88 selected
+    89 rectangle icon inst88 term {name term input in} selected
+    90 rectangle icon inst88 term {name term output out} selected
+    91 line icon inst88 selected
+    92 arc icon inst88 arc selected
+    93 text icon inst88 size_large scaletext selected
+    95 line wire
+    97 line open
+    98 line origin icon icon_input inst98
+    99 line icon inst98
+    100 rectangle icon inst98 term {name io input foo}
+    101 text icon inst98 size_standard scaletext
+    102 text draw_item size_standard scaletext
+
+    sue> info_canvas origin
+    88 line origin icon icon_INVA inst88 selected
+    98 line origin icon icon_input inst98
+
+    [id] [type] [tag] [tag] ...
+
+    Note: the inverter is selected.
+
+Canvases are infinite in extent, displaying only a window of full contents
+
+Canvases cannot be scaled (!).
+	Must scale contents of canvases instead
+	Scale text by resizing all text
+	canvases are saved at scale=10
+	scale=1 means different wires can be on adjacent pixels on screen
+
+
+Schematic and Icon Procedures
+------------------------------
+
+All schematics and icons have TCL procedures associated with them
+	SCHEMATIC_<cell>, ICON_<cell>
+	Note: cur_s is <cell> for schematic, ICON_<cell> for icon
+
+Schematic and icon procedures fill canvases
+	"SCHEMATIC_<cell>" makes a schematic
+	"make <cell>" makes an instance of the icon
+	"icon_make <cell>" makes an icon canvas (internal procedure)
+
+Build procedures from canvases and data structures (see below)
+	write_schematic --> SCHEMATIC_<cell>
+	write_icon --> ICON_<cell>
+	scale set to 10 and numbers rounded to integer
+
+Can't build procedures from generated icons since they are programs
+
+
+
+SUE's Compiler
+--------------
+
+TCL is too slow to simply execute ICON procedures every time you
+move/copy/place/change an icon.
+
+ICON procedures are compiled into much simpler code for speed.
+	ICON_<cell> --> _MAKE_<cell> and _MAKE90_<cell>
+
+Two procedures, one rotated 90 degrees, along with scaling makes 8 orientations
+	scale x=1, y=-1 --> mirror around y axis
+	scale x=-1, y=1 --> mirror around x axis
+
+Example:
+
+    proc ICON_input {args} {
+      icon_setup $args {{origin {0 0}} {orient R0} {name {}}}
+      icon_line 0 0 -10 0 -15 -5 -25 -5 -25 5 -15 05 -10 0
+      icon_term -type input -origin {0 0} -name {$name} -priority input
+      icon_property -origin {-40 50} -type user -name name
+      icon_property -origin {-35 0} -label {$name} -anchor e
+      icon_property -origin {-40 70} -type fixed -name primitive -text 1
+    }
+
+    proc _MAKE_input {orient name} {
+      global cur_c cur_s scale FONT XFORM ICON_ERROR env
+      set fscale [expr int(ceil($scale))]
+      set id [$cur_c create line 0 0 0 0 -fill black \
+	-tags "origin icon icon_input"]
+      $cur_c addtag inst$id withtag $id
+      upvar #0 ${cur_s}_inst$id i_data
+      set i_data(type) input
+      $cur_c create line 0 0 -10 0 -15 -5 -25 -5 -25 5 -15 05 -10 0 \
+    	-tags "icon inst$id" -fill black
+      $cur_c create rectangle -1.67 -1.67 1.67 1.67 =
+    	-tags "icon inst$id term {name input input $name} " -fill black -outline {}
+      set i_data(_name) $name
+      if {[catch {$cur_c create text -35 0 -text "$name" \
+    	-font $FONT(standard,$fscale) \
+    	-tags "icon inst$id size_standard scaletext" \
+    	-anchor $XFORM($orient,0,e) \
+    	-fill black -rotate 0} msg]} {lappend ICON_ERROR $msg}
+      return $id
+    }
+
+Compiler makes certain assumptions for speed.
+	Can't change structure of ICON
+	Therefore, we needed generators
+
+
+
+Data Structures
+----------------
+
+SUE's data structures are associative arrays whose array name is
+(usually) a concatenation of keywords
+
+All the canvases in SUE are in the "SUE" array
+
+    sue> parray SUE
+    SUE(ICON_test)      = ICON_test
+    SUE(no_name)        = no_name
+    SUE(test)           = test
+    SUE(test_placement) = test_placement
+
+Data about each canvas is in the "data" array
+	upvar #0 SUE_$cur_s data
+
+    sue> parray SUE_test
+    SUE_test(auto_save)           = schedule
+    SUE_test(canvas)              = .win1.c_test
+    SUE_test(dir)                 = /proj/tech/foo/
+    SUE_test(ever_modified)       = M
+    SUE_test(filename)            = /proj/tech/foo/test.sue
+    SUE_test(generator)           = 0
+    SUE_test(icon_index)          = 3
+    SUE_test(locked)              =
+    SUE_test(modified)            = M
+    SUE_test(modify_icon)         = M
+    SUE_test(netlist_icon_index)  = 2
+    SUE_test(netlist_level_index) = 0
+    SUE_test(scale)               = 8
+    SUE_test(suffix)              = .sue
+    SUE_test(type)                = S
+    SUE_test(written)             =
+
+Generic data about each icon is in the "g_data" array
+    upvar #0 icon_<cell> g_data
+
+    sue> parray icon_INVA
+    icon_INVA(_M)            = $M
+    icon_INVA(_M,choices)    =
+    icon_INVA(_M,default)    =
+    icon_INVA(_dpc)          = $dpc
+    icon_INVA(_dpc,choices)  =
+    icon_INVA(_dpc,default)  =
+    icon_INVA(_name)         = $name
+    icon_INVA(_name,choices) =
+    icon_INVA(_name,default) =
+    icon_INVA(_verilog)      = INVA [unique_name "" $name INVA]
+    (.in($in), .out($out))\;
+    icon_INVA(arglist)       = $name $M $dpc
+    icon_INVA(creator)       = INVA
+    icon_INVA(defaults)      = {origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}
+    icon_INVA(gargs)         =
+    icon_INVA(gdefaults)     = {cell INVA {radio INVA INVB INVC INVD INVE INVA_ INVB_ INVC_ INVD_ INVE_}}
+    icon_INVA(generator)     = INVA
+    icon_INVA(prop_names)    = name M dpc
+
+
+Data Structures (cont.)
+-----------------------
+
+Data about a specific instance of an icon is in the "i_data" array
+      upvar #0 ${cur_s}_inst${id} i_data
+
+    sue> parray test_inst138
+    test_inst138(_M)     =
+    test_inst138(_dpc)   =
+    test_inst138(_name)  = [2:0]
+    test_inst138(orient) = R0
+    test_inst138(type)   = INVA
+
+To change an attribute of a specific instance
+	change in "i_data"
+	remake id
+
+	For example, to change the "dpc" property to "foo" of above
+
+    sue> set test_inst138(_dpc) foo
+    foo
+    sue> remake 138 138
+    145
+
+	Note: this changes the ids of all the components of the
+	icon instance, i.e. they are deleted and recreated.
+
+Undo
+	create and save the procedure to make the old version
+	remember the new id to delete
+	forward reference the ids with an associative array
+
+
+Modes
+------
+
+SUE has modes which let you do multikey operations
+	different hotkeys in modes
+	different cursor (hand)
+
+Modes:
+	wire, line, arc, text, icon, duplication, replace, move,
+	select region, zoom, pan
+
+TK only allows one set of bindings per window.
+	  "save_bindings", "clear_bindings" to enter a mode
+	  "clear_bindings", "restore_bindings" to leave a mode
+
+Add binding with bind_add, for example:
+
+  bind_add -mode wire -hotkey Button-1 \
+      -command "set SAVE(HV) 1; begin_draw_wire $SNAP_XY" \
+      -help "Begin drawing a wire at the cursor position."
+
+When entering a mode, give an abort command, for example:
+
+  enter_mode wire abort_wire_mode
+
+	If another command is started, or something goes
+	wrong, the abort command is executed
+
+When done, use leave_mode, for example:
+
+  leave_mode wire
+
+
+
+
+Debugging:
+----------
+
+When you get a SUE error you can typically get a TCL stack trace 
+to help you debug it.  This stack trace is hidden from the user.
+To see it, go to the SUE command line and type:
+
+	set error
+
+This is different from the "errorInfo" TCL variable that usually
+gets overwritten as SUE is trying to catch the real error.
+
+
+Netlisting
+-----------
+
+Netlisting data is saved in the "TERMS" array:
+	upvar #0 TERMS_$cur_s TERMS
+
+	local to schematic (hierarchy independent)
+	used for netlisting and searching (e.g. find_by_name)
+
+Example:
+
+            hello
+                           |\
+	        foo|=>-----|A)O-
+                           |/
+
+    sue> api_generate_term_names
+    sue> parray TERMS_no_name
+    TERMS_no_name(100)           = foo
+    TERMS_no_name(100,name)      = foo
+    TERMS_no_name(100,priority)  = 5
+    TERMS_no_name(100,type)      = input
+    TERMS_no_name(89)            = foo
+    TERMS_no_name(89,name)       = in
+    TERMS_no_name(89,priority)   = 0
+    TERMS_no_name(89,type)       = input
+    TERMS_no_name(90)            = uc_net_1
+    TERMS_no_name(90,name)       = out
+    TERMS_no_name(90,priority)   = 0
+    TERMS_no_name(90,type)       = output
+    TERMS_no_name(95)            = foo
+    TERMS_no_name(internal_nets) = uc_net_1
+
+    sue> api_netlist
+    sue> parray TERMS_no_name
+    TERMS_no_name(100)           = foo
+    TERMS_no_name(100,name)      = foo
+    TERMS_no_name(100,priority)  = 5
+    TERMS_no_name(100,type)      = input
+    TERMS_no_name(88)            = INVA     <---- added
+    TERMS_no_name(89)            = foo
+    TERMS_no_name(89,name)       = in
+    TERMS_no_name(89,priority)   = 0
+    TERMS_no_name(89,type)       = input
+    TERMS_no_name(90)            = uc_net_1
+    TERMS_no_name(90,name)       = out
+    TERMS_no_name(90,priority)   = 0
+    TERMS_no_name(90,type)       = output
+    TERMS_no_name(95)            = foo
+    TERMS_no_name(internal_nets) = uc_net_1
+
+
+Netlisting (cont.)
+-------------------
+
+Terminal priorities are used for determining names
+
+    set TERM_PRIORITY(term) 0
+    set TERM_PRIORITY(input) 5
+    set TERM_PRIORITY(output) 5
+    set TERM_PRIORITY(inout) 5
+    set TERM_PRIORITY(name) 10
+    set TERM_PRIORITY(global) 20
+
+
+TERMS array is only a cache for wires (used to not include wires at
+all).  If a wire is not in TERMS, traces wire until it finds something
+that is in TERMS.  Thus you can move things (to a point) and change
+wires and still cross-probe and select entire wires.
+
+To speed up searchs, the RTERMS array (Reverse TERMS) is generated
+from the TERMS array.  It associates names with ids.
+	upvar #0 RTERMS_$cur_s RTERMS
+
+    sue> parray RTERMS_no_name
+    RTERMS_no_name(INVA)     = 88
+    RTERMS_no_name(foo)      = 89 95 100
+    RTERMS_no_name(uc_net_1) = 90
+
+Note: only generated when needed.
+
+
+Netlisting of a schematic consists of the following:
+	determine hierarchy
+	check for up-to-date cache
+	generate terminal names
+	walk thru each instance and netlist it
+
+	Note: wires/IOs only used for generate terminal names
+
+
+All netlisting information is saved to a netlist cache
+
+    sue> exec more no_name.vg.cache
+    set NETLIST_CACHE(no_name,cells) {{icon INVA has_schematic}}
+    set netlist_props verilog
+    set netlist_level 1000
+    set NETLIST_CACHE(no_name,warnings) {{NETLIST WARNING: Unconnected net on terminal "out" in icon "INVA" (1) in schematic "no_name".}}
+    set NETLIST_CACHE(no_name,version) MMI_SUE4.0
+    set NETLIST_CACHE(no_name) {{module no_name (foo);} {   input           foo;} { } {     wire            uc_net_1;} { } {        INVA INVA (.in(foo), .out(uc_net_1));} {} {endmodule            // no_name} {}}
+    set NETLIST_CACHE(no_name,names) {{450 290 {0 INVA}} {360 290 {1 foo}} {500 290 {0 uc_net_1}} {420 290 {0 foo}}}
+    set NETLIST_CACHE(no_name,wires) {{360 290 420 290 foo}}
+    set NETLIST_CACHE(no_name,dpc) {{{0 0 0 INVA INVA 10 2 {{foo 5.0 1.0} {uc_net_1 5.0 1.0}} {}}} {} {2 10 1} {}}
+
+
+The NETLIST_CACHE(<cell>,names) line is effectively the TERMS array
+except it is not referenced to ids (which can change) but to
+coordinates on the screen.  For uniqueness, it specifies the nth thing on
+the screen at those coordinates.
+
+
+Making Changes to SUE
+-----------------------
+
+You can change many of SUE's source files and then reload them either by
+	source ~/mysue/prop_edit.tcl
+		OR
+	set SOURCE_DIR ~/mysue
+	reload prop_edit
+
+Some things can't be changed and reloaded since they already affected 
+stuff at startup
+
+SUE has a patch mechanism
+	can't simple source fixed procedures in .suerc files since
+	.suerc is loaded before body of SUE
+
+	any files in the directories:
+
+		${MMI_TOOLS}/sue 
+		${MMI_TOOLS}/../mmi_local/sue 
+		${MMI_TOOLS}/patches
+		~/mmi_private/sue
+		$PATCH_DIR   (sue global variable)
+
+	with the suffix 
+
+		.sue_patch$VERSION_NUMBER
+
+	will get loaded AFTER all other SUE procedures
+
+	for example, you fix a bug in the "netlist" procedure and want
+	to get the changes.  Put the new netlist procedure into a file in
+	the appropriate place:
+
+		~cad/mmi_local/sue/fix.sue_patch4.0
+
+
+Use "mkcsue" to make a "compiled" version of SUE
+	need to copy the entire SUE source tree (currently in ~tavrow/SUE4.0)
+	to make a new version of SUE:
+
+		cd build
+		mkcsue
+
+	you need to modify the "sue" startup script to then point to
+	the correct executable to run this new version of SUE without
+	installing it:
+
+		#set cmdpath = ${MMI_TOOLS}/sue
+		set cmdpath = /home/tavrow/sue4.0/build/release

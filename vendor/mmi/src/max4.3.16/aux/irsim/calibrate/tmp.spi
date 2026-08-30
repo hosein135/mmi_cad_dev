@@ -1,0 +1,58 @@
+*MOSIS 2U CMOS MODELS
+
+.MODEL nfet NMOS LEVEL=2 LD=0.115U TOX=423E-10
++NSUB=1.0125225E+16 VTO=0.822163 KP=4.893760E-5 GAMMA=0.47
++PHI=0.6 UO=599.496 UEXP=5.324966E-3 UCRIT=12714.2
++DELTA=3.39718E-5 VMAX=65466.1 XJ=0.55U LAMBDA=1.991479e-2
++NFS=5.666758E+11 NEFF=1.0010E-2 NSS=0.0 TPG=1.00
++RSH=0 CGSO=0.9388E-10 CGDO=0.9388E-10 CJ=1.4563E-4
++MJ=0.6 CJSW=6.617E-10 MJSW=0.31
+
+.MODEL pfet PMOS LEVEL=2 LD=0.18U TOX=423E-10
++NSUB=1.421645E+15 VTO=-0.776658 KP=1.916950E-5 GAMMA=0.52
++PHI=0.6 UO=234.831 UEXP=0.142293 UCRIT=20967
++DELTA=1.0E-6 VMAX=34600.2 XJ=0.41U LAMBDA=4.921086E-2
++NFS=4.744781E+11 NEFF=1.0010E-2 NSS=0.0 TPG=-1.00
++RSH=0 CGSO=1.469E-10 CGDO=1.469E-10 CJ=2.4E-4
++MJ=0.5 CJSW=3.62E-10 MJSW=0.29
+*
+* spice test file for generating .prm files.
+*
+* out1 - Output of Inverter to measure step response.
+*
+M0 out1 in1 GND GND nfet L=2.0U W=10.0U
+M1 out1 in1 VDD VDD pfet L=2.0U W=20.0U
+*
+* out2 - Output of Inverter driven by out1 to determine slow-input effect.
+*
+M6 out2 out1 GND GND nfet L=2.0U W=10.0U
+M7 out2 out1 VDD VDD pfet L=2.0U W=20.0U
+*
+* out3 - Output of a nfet pulling up to determine dynamic-high resistance.
+*
+M2 out3 in2 VDD GND nfet L=2.0U W=10.0U
+*
+* out4 - Output of a pfet pulling down to determine dynamic-low resistance.
+*
+M3 out4 in3 GND VDD pfet L=2.0U W=20.0U
+*
+* loading capacitors
+*
+C0 out1 GND 1000FF
+C1 out2 GND 1000FF
+C2 out3 GND 1000FF
+C3 out4 GND 1000FF
+
+VDD VDD 0 DC 5
+VGnd GND 0 DC 0
+Vmid mid 0 DC 2.5
+
+Vin1 in1 0 0 pwl (0ns 0 0.1ns 5 40ns 5 40.1ns 0)
+Vin2 in2 0 0 pwl (0ns 0 0.1ns 5)
+Vin3 in3 0 5 pwl (0ns 5 0.1ns 0)
+
+.ic V(out4)=5
+
+.tran 0.01ns 80ns
+
+.end

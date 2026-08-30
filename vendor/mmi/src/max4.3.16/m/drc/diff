@@ -1,0 +1,43 @@
+57,60d56
+< static bool drcSubWithParentFound; /* set if subcell that is always checked
+< 				    * with parent is found in interaction
+< 				    * area
+< 				    */
+154,165d149
+<     TiToRect(tile, &area);
+<     GEO_EXPAND(&area, drcSubRadius, &haloArea);
+<     GeoClip(&haloArea, &drcSubLookArea);
+< 
+<     /* special case DRC_WITH_PARENTS cells */
+<     if(ctbptr->ctb_use->cu_def->cd_flags & CD_DRC_WITH_PARENT)
+<     {
+<       GeoInclude(&haloArea, &drcSubIntArea);
+<       drcSubWithParentFound = TRUE;
+<       return 0;
+<     }
+< 
+171a156,158
+>     TiToRect(tile, &area);
+>     GEO_EXPAND(&area, drcSubRadius, &haloArea);
+>     GeoClip(&haloArea, &drcSubLookArea);
+333d319
+<     drcSubWithParentFound = FALSE;
+342,343d327
+<     if(drcSubWithParentFound) goto real;
+< 
+368d351
+<  real:
+543d525
+< 	    DumpRect("DRCInteractionCheck, square = ", &square);
+547,554c529,530
+< 	    if (!DRCFindInteractions(def, 
+< 				     &square, 
+< 				     TechHalo, 
+< 				     &intArea, 
+< 				     &DBAllButSpaceAndDRCBits)) continue;
+< 
+< 
+< 	    fprintf(stderr,"DRCInteractionCheck A\n");
+---
+> 	    if (!DRCFindInteractions(def, &square, TechHalo, &intArea, &DBAllButSpaceAndDRCBits))
+> 		continue;

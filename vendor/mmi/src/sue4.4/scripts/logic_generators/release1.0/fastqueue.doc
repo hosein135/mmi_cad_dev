@@ -1,0 +1,60 @@
+Documentation for queue
+-----------------------
+rev 0.1, 10/18/99:   Initial release.  No behavioral verilog.
+
+
+The fastqueue generator is used to derive queue structures made up of
+registers.  On a "push" operation, all values in the queue are
+written to the next higher queue entry register, and the new input
+is written into queue entry 0.  On a pop, no action is performed;
+it is assumed that the "head" pointer will be decremented (pointer
+logic is not included in this generator).  The output is read from
+whichever queue entry "head" points to; it is assumed that only one
+bit of the "head" signal can be a 1.  If no bits of the "head" signal
+are a 1 (queue empty or queue overflow condition), then the queue
+output is forced to 0.
+
+This generator differs from the "queue" generator in that the 
+output read time is much faster; but only depths <= 4 are supported.
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS:
+    Definition:  
+      The width of the data stored in the queue.  
+    Legal Values:
+      1 <= NBITS <= 128
+    Default:
+      32
+
+  Depth:
+    Definition:
+      The depth of the queue (number of registers it contains)
+    Legal Values:
+      1 <= Depth <= 4
+    Default:
+      4
+
+  OutputSize:
+    Definition:
+      The drive strength of the final output driver.
+    Legal Values:
+      C, D, E
+    Default:
+      C
+
+
+Signals:
+--------
+Inputs:
+
+In_H[NBITS-1:0]      : Data input 
+Clk[Depth-1:0]       : Clock, one bit per queue entry
+Push_H[Depth-1:0]    : Push control signal, one bit per queue entry
+Reset_L[Depth-1:0]   : Queue entry reset signal, one bit per entry
+Head_H[Depth-1:0]    : Head-of-queue indicator, one bit per queue entry
+
+Outputs:
+
+Out_H[NBITS-1:0]     : Data output (value at head of queue)

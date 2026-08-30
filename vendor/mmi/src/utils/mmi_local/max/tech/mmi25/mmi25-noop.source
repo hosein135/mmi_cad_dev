@@ -1,0 +1,124 @@
+# The is the technology source file for mmi25 (0.25 um CMOS)
+# Extended for all layers
+
+# NOTE: no layer generation either
+
+# Only drc rules for m1-5
+
+# This command will preserve MAX port types by writing them out to
+# different datatypes.  Only valid if no datatypes are specified.
+#preserve_ports
+
+# layer	gds:dt  txt:dt	type	width	space	color
+#======	======= =======	=======	=======	=======	======
+nw	2	-	-	1.2	0.6	-
+od	3	-	gdsonly	-	-	-
+odn	12	-	gdsonly	-	-	-
+odp	11	-	gdsonly	-	-	-
+ndif	derived	-	act	0.3	0.4	66,213,66
+pdif	derived	-	act	0.3	0.4	202,160,115
+nwc	derived	ndif	act	0.3	0.4	-
+pwc	derived	pdif	act	0.3	0.4	-
+poly	13	-	poly	0.24    0.36	236,67,0
+n2v	61	-	-	0.44    0.44	-
+n3v	5	-	-	0.44    0.44	-
+pplus	7	-	-	0.44    0.44	-
+nplus	8	-	-	0.44    0.44	-
+ct	15	-	via	0.30    0.30	-
+m1	16	40	metal	0.32    0.32	8,139,255
+v12	17	-	via	0.36    0.35	-
+m2	18	41	metal	0.40    0.40	182,134,222
+v23	27	-	via	0.36    0.35	-
+m3	28	42	metal	0.40    0.40	255,160,65
+v34	29	-	via	0.36    0.35	-
+m4	31	43	metal	0.40    0.40	61,122,188
+v45	32	-	via	0.36    0.35	-
+m5	33	44	metal	0.44    0.46	gold
+prb	65	-	-	-	-
+text	-	255	text
+bbox	62	-	bbox
+#iname	63	-	iname
+iname	propattr 102	iname
+pass	19	-	-	-	-
+sram	20	-	-	-	-
+esd	30	-	-	-	-
+rpo	34	-	-	-	-
+cap	47	-	-	-	-
+psub2	50	-	-	-	-
+res	52	-	-	-	-
+resid	54	-	-	-	-
+excl	55	-	-	-	-
+diodeid	56	-	-	-	-
+compass	57	-	-	-	-
+io	58	-	-	-	-
+vtd	59	-	-	-	-
+drcdum	60	-	-	-	-
+mbound	66	-	-	-	-	
+
+device nfet from poly ndif
+device pfet from poly pdif
+
+# on output
+# if you want to write out all diffusions on the same layer, use od
+#derive od from ndif,pdif,nwc,pwc
+derive odn from ndif,nwc
+derive odp from pdif,pwc
+
+# in input
+derive ndif from od and-not pplus or odn
+derive pdif from od and pplus or odp
+
+
+drc m1 enc ct 0.09
+
+drc m1 area 0.36
+
+drc m1 enc v12 0.09
+
+drc v12 space_to nfet,pfet 0.01
+
+drc m2 enc v12 0.09
+drc m2 area 0.36
+
+drc m2 enc v23 0.09
+drc m3 enc v23 0.09
+
+drc m3 area 0.36
+
+drc m3 enc v34 0.09
+drc m4 enc v34 0.09
+
+drc m4 area 0.36
+
+drc m4 enc v45 0.09
+
+# no m5 area rule
+
+drc m5 enc v45 0.09
+
+
+# add other tcl variable definitions with the set statement
+
+################################################################
+# USER DESIGN GRID
+# This is the initial value shown in the Grid menu.
+################################################################
+set GRID(resolution) 0.01
+
+
+################################################################
+# LAYER NAMES
+# Mapping from mmi canonical layer names to customer tech names.
+# Change the name on the right to be the name of the specified
+# layer in this technology file.
+# Note that contact and poly could be derived from info above.
+################################################################
+
+set LAYER_NAME(pdiff) pdif
+set LAYER_NAME(ndiff) ndif
+set LAYER_NAME(nplus) nplus
+set LAYER_NAME(pplus) pplus
+set LAYER_NAME(nwell) nw
+# The following two will be derived automatcally, if unspecified.
+set LAYER_NAME(poly) poly
+set LAYER_NAME(contact) ct

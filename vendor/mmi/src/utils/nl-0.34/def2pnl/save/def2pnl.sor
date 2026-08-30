@@ -1,0 +1,100 @@
+#header <<
+#include "stdpccts.h"
+typedef AST SORAST;
+>>
+<<
+#include "errsupport.c"	/* define some default error routines */
+>>
+
+def_file	: ( header )* 
+		  #(DEF_DESIGN name:DEF_IDENT
+			<< def2pnl2_design (name->text); >>
+		   ( declaration )* ( constituent )*)
+		;
+
+header		: #(DEF_VERSION DEF_IDENT)
+	 	| #(DEF_NAMESCASESENSITIVE ( DEF_ON | DEF_OFF ))
+		| #(DEF_DIVIDERCHAR str:DEF_QUOTED)
+			<< def2pnl2_divider_char (str->text); >>
+		| #(DEF_BUSBITCHARS DEF_QUOTED)
+		;
+
+declaration	: #(DEF_UNITS DEF_DISTANCE DEF_MICRONS DEF_NUMBER)
+		| #(DEF_TRACKS ( DEF_X | DEF_Y ) DEF_NUMBER
+		    DEF_DO DEF_NUMBER DEF_STEP DEF_NUMBER DEF_LAYER ( DEF_IDENT )+)
+		| #(DEF_DIEAREA ll:coordinate ur:coordinate)
+			<< def2pnl2_die_area (ll->num, ll->down->num,
+					      ur->num, ur->down->num);
+			>>
+		| #(DEF_HISTORY DEF_IDENT)
+		| #(DEF_ROW DEF_IDENT DEF_IDENT DEF_NUMBER DEF_NUMBER orientation
+		    DEF_DO DEF_NUMBER DEF_BY DEF_NUMBER DEF_STEP DEF_NUMBER DEF_NUMBER)
+		| #(DEF_PROPERTYDEFINITIONS ( propertydefinition )*)
+		| #(DEF_GCELLGRID ( DEF_X | DEF_Y )
+		    DEF_NUMBER DEF_DO DEF_NUMBER DEF_STEP DEF_NUMBER)
+		;
+
+propertydefinition
+		: #(DEF_VERILOGDESIGNNAME DEF_DESIGN)
+		;
+
+coordinate	: #(DEF_NUMBER DEF_NUMBER)
+		;
+
+constituent	: #(DEF_VIAS DEF_NUMBER ( via )*)
+	 	| #(DEF_COMPONENTS DEF_NUMBER ( component )*)
+	 	| #(DEF_SPECIALNETS DEF_NUMBER ( net )*)
+		| #(DEF_NETS DEF_NUMBER ( net )*)
+		| #(DEF_PINS DEF_NUMBER ( pin )*)
+		;
+
+via		: #(DEF_IDENT ( via_plus )*)
+		;
+
+via_plus	: rect_clause
+		;
+
+component	: #(inst:DEF_IDENT ref:DEF_IDENT component_plus [inst->text, ref->text])
+		;
+
+component_plus [char *inst, char *ref]
+		: #(DEF_PLACED x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+			<< def2pnl2_component (inst, ref, x->num, y->num, o->text); >>
+		| #(DEF_FIXED x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+			<< def2pnl2_component (inst, ref, x->num, y->num, o->text); >>
+		| #(DEF_UNPLACED)
+		;
+
+net		: #(DEF_IDENT ( net_connection )* ( net_plus )* )
+		;
+
+net_connection	: #(DEF_IDENT DEF_IDENT)
+		| #(DEF_PIN DEF_IDENT)
+		;
+
+net_plus	: use_clause
+		;
+
+use_clause	: #(DEF_USE ( DEF_SIGNAL | DEF_POWER | DEF_GROUND ))
+		;
+
+pin		: #(name:DEF_IDENT ( pin_plus [name->text] )*)
+		;
+
+pin_plus [char *pin_name]
+		: #(DEF_PLACED x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+			<< def2pnl2_pin (pin_name, x->num, y->num, o->text); >>
+		| #(DEF_NET DEF_IDENT)
+		| #(DEF_DIRECTION ( DEF_INPUT | DEF_OUTPUT | DEF_INOUT ))
+		| use_clause
+		| #(DEF_LAYER DEF_IDENT coordinate coordinate)
+		;
+
+orientation	: DEF_N
+		| DEF_S
+		| DEF_FN
+		| DEF_FS
+		;
+
+rect_clause	: #(DEF_RECT DEF_IDENT coordinate coordinate)
+		;

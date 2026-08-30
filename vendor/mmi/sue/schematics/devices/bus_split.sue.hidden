@@ -1,0 +1,46 @@
+# Bus split generator
+
+proc ICON_bus_split args {
+  icon_generator $args {{noutputs 2}}
+
+  icon_setup $args {{origin {0 0}} {orient R0} {noutputs 2} {name ""}}
+
+  set outputs ""
+
+  # Determine whether there is an even or odd number of outputs
+  # Position of terminals is slightly different for the two cases
+  if {$noutputs == 2*(floor($noutputs/2))} {
+    # even
+    for {set i 0} {$i < $noutputs} {incr i 1} {
+      icon_term -type output \
+	  -origin "20 [expr (20 * ($i - $noutputs/2)) + 10]" -name "out$i"
+      set outputs [concat $outputs \$out$i]
+    }
+    set line_coords "20 [expr -10 * $noutputs + 10] 20 [expr 10 * $noutputs - 10]"
+    icon_property -origin "0 [expr (20 * ($i - $noutputs/2)) + 5]" -label 0
+  } else {
+    # odd
+    for {set i 0} {$i < $noutputs} {incr i 1} {
+      icon_term -type output \
+	  -origin "20 [expr 20 * ($i - ($noutputs-1)/2)]" -name "out$i"
+      set outputs [concat $outputs \$out$i]
+    }
+    set line_coords "20 [expr -10 * $noutputs + 10] 20 [expr 10 * $noutputs - 10]"
+    icon_property -origin "0 [expr 20 * ($noutputs - ($noutputs-1)/2) - 5]" \
+	-label 0
+  }
+
+  icon_term -type input -origin {-10 0} -name in
+
+  icon_property -origin {-160 90} -type fixed -name verilog \
+      -text "\\tassign \\\\\{[join $outputs ", "]\\\\\} = \$in\\;"
+
+  icon_property -origin {-160 110} -type fixed -name spice \
+      -text "\[spice_assign \$in $outputs\]"
+
+  icon_property -origin {-160 130} -type fixed -name primitive -text 1
+
+  eval icon_line $line_coords
+  icon_line -10 0 20 0 10 0 3 -1 0 -3 2 0 0 3 3 1 10 0
+}
+

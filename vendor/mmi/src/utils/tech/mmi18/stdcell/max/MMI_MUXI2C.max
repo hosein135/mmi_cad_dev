@@ -1,0 +1,265 @@
+max 2
+tech mmi18
+resolution 0.001
+vMAIN 958158465 1927
+vDRC 958158465 1927
+vBBOX 958158085 79
+
+SECTION PROPERTIES {
+} SECTION PROPERTIES
+
+SECTION PAINT {
+
+type nw
+rect -290 3700 10650 7730
+
+type nwc
+rect 0 7190 10360 7610
+
+type pwc
+rect 0 -210 10360 210
+
+type poly
+rect 680 3855 2300 4035
+rect 2840 3870 4460 4050
+rect 5000 3870 6620 4050
+rect 7160 3870 8780 4050
+rect 1480 2275 1900 3855
+rect 4035 3535 4460 3870
+rect 4035 3115 5935 3535
+rect 6300 2850 6480 3870
+rect 4265 2670 6480 2850
+rect 4265 2275 4445 2670
+rect 6900 2275 7080 3260
+rect 8585 2450 8765 3870
+rect 9360 3345 9540 4055
+rect 9330 3165 9725 3345
+rect 8585 2275 8960 2450
+rect 680 2095 2300 2275
+rect 2840 2095 4460 2275
+rect 5000 2095 7080 2275
+rect 7345 2095 8965 2275
+rect 9545 1985 9725 3165
+
+type pplus
+rect -40 3700 10400 7090
+rect -20 -230 10380 230
+
+type nplus
+rect -20 7170 10380 7630
+rect -40 310 10400 3620
+
+type ct
+rect 260 7290 480 7510
+rect 1000 7290 1220 7510
+rect 1740 7290 1960 7510
+rect 2480 7290 2700 7510
+rect 3220 7290 3440 7510
+rect 3960 7290 4180 7510
+rect 4700 7290 4920 7510
+rect 5440 7290 5660 7510
+rect 6180 7290 6400 7510
+rect 6920 7290 7140 7510
+rect 7660 7290 7880 7510
+rect 8400 7290 8620 7510
+rect 9140 7290 9360 7510
+rect 9880 7290 10100 7510
+rect 260 -110 480 110
+rect 1000 -110 1220 110
+rect 1740 -110 1960 110
+rect 2480 -110 2700 110
+rect 3220 -110 3440 110
+rect 3960 -110 4180 110
+rect 4700 -110 4920 110
+rect 5440 -110 5660 110
+rect 6180 -110 6400 110
+rect 6920 -110 7140 110
+rect 7660 -110 7880 110
+rect 8400 -110 8620 110
+rect 9140 -110 9360 110
+rect 9880 -110 10100 110
+
+type m1
+rect 0 6900 10360 7900
+rect 240 6115 580 6900
+rect 1680 6210 2020 6900
+rect 3205 6245 6180 6475
+rect 7440 6150 7780 6900
+rect 8880 6220 9220 6900
+rect 2400 4500 2740 4540
+rect 1075 4460 3885 4500
+rect 1075 4270 3915 4460
+rect 1515 3125 2060 3530
+rect 2400 2360 2740 4270
+rect 4560 3525 4900 4535
+rect 3875 3130 4900 3525
+rect 960 2130 4140 2360
+rect 960 1650 1190 2130
+rect 2400 1565 2740 2130
+rect 3910 1635 4140 2130
+rect 4560 1545 4900 3130
+rect 5130 4265 8430 4495
+rect 5130 2340 5360 4265
+rect 5600 3270 9350 3500
+rect 7280 3135 8140 3270
+rect 9870 2890 10100 4595
+rect 6290 2660 10100 2890
+rect 5130 2110 8625 2340
+rect 5520 1690 5750 2110
+rect 6910 1470 7140 2110
+rect 8395 1435 8625 2110
+rect 8915 2030 9460 2430
+rect 9035 1610 9460 2030
+rect 9870 1810 10100 2660
+rect 240 500 580 1180
+rect 1680 500 2020 1180
+rect 3235 1030 6260 1260
+rect 7625 500 7965 1205
+rect 9065 500 9405 1175
+rect 0 -500 10360 500
+
+type prb
+rect 0 0 10360 7400
+} SECTION PAINT
+
+SECTION POLYGONS {
+} SECTION POLYGONS
+
+SECTION WIREPATHS {
+} SECTION WIREPATHS
+
+SECTION LABELS {
+lab m1 9250 1850 9250 1850 3 4 in1
+lab m1 7770 3330 7770 3330 3 4 sel
+lab m1 1850 3330 1850 3330 3 4 in0
+lab m1 4070 3330 4070 3330 3 5 out
+lab m1 4070 0 4070 0 1 3 gnd
+lab m1 4070 7400 4070 7400 1 3 vdd
+} SECTION LABELS
+
+SECTION GROUPS {
+} SECTION GROUPS
+
+SECTION INSTANCES {
+def #fet!-type!pfet!-fingers!2!-contacts!all!-right_contacts!+1!-width!2.455
+vMAIN 467849412 1000
+vDRC 467849412 1000
+vBBOX 467849412 1000
+bbox -480 -250 1380 2705
+uses {
+	/#fet!-type!pfet!-fingers!5!-contacts!all!-right_contacts!-1!-width!2.455_0 1 0 680 0 1 4155
+}
+def #fet!-type!pfet!-contacts!all!-left_contacts!+1!-right_contacts!-1!-width!2.455
+vMAIN 49599557 1000
+vDRC 49599557 1000
+vBBOX 49599557 1000
+bbox -480 -250 660 2705
+uses {
+	_1 1 0 3560 0 1 4155
+}
+def #fet!-type!pfet!-fingers!2!-contacts!all!-left_contacts!-1!-right_contacts!-1!-width!2.455
+vMAIN 334379781 1000
+vDRC 334379781 1000
+vBBOX 334379781 1000
+bbox -480 -250 1380 2705
+uses {
+	/#fet!-type!pfet!-contacts!all!-left_contacts!+1!-width!2.455_1 1 0 4280 0 1 4155
+}
+def #fet!-type!pfet!-contacts!all!-left_contacts!-1!-right_contacts!+1!-width!2.455
+vMAIN 2028506704 1000
+vDRC 2028506704 1000
+vBBOX 2028506704 1000
+bbox -480 -250 660 2705
+uses {
+	/#fet!-type!pfet!-fingers!2!-contacts!all!-left_contacts!-1!-right_contacts!-1!-width!2.455_1 1 0 5720 0 1 4155
+}
+def #fet!-type!pfet!-fingers!2!-contacts!all!-left_contacts!+1!-right_contacts!+1!-width!2.455
+vMAIN 1570845265 1000
+vDRC 1570845265 1000
+vBBOX 1570845265 1000
+bbox -480 -250 1380 2705
+uses {
+	_1 1 0 2120 0 1 4155
+	_4 1 0 6440 0 1 4155
+}
+def #fet!-type!pfet!-fingers!2!-contacts!all!-left_contacts!+1!-width!2.455
+vMAIN 179223956 1000
+vDRC 179223956 1000
+vBBOX 179223956 1000
+bbox -480 -250 1380 2705
+uses {
+	/#fet!-type!pfet!-contacts!all!-right_contacts!+1!-width!2.455_0 1 0 7880 0 1 4155
+}
+def #fet!-type!pfet!-contacts!right!-width!1.84
+vMAIN 1532384599 1000
+vDRC 1532384599 1000
+vBBOX 1532384599 1000
+bbox -320 -250 660 2090
+uses {
+	/#fet!-contacts!right!-width!0.92_1 1 0 9360 0 1 4155
+}
+def #fet!-fingers!5!-contacts!all!-right_contacts!+1!-width!1.23
+vMAIN 243428937 1000
+vDRC 243428937 1000
+vBBOX 243428937 1000
+bbox -480 -250 3540 1480
+uses {
+	/#fet!-width!1.84_0 1 0 680 0 1 690
+}
+def #fet!-contacts!left!-left_contacts!+1!-width!1.23
+vMAIN 1384433801 1000
+vDRC 1384433801 1000
+vBBOX 1384433801 1000
+bbox -480 -250 500 1480
+uses {
+	/#fet!-fingers!5!-contacts!all!-right_contacts!+1!-width!1.23_2 1 0 4280 0 1 690
+}
+def #fet!-contacts!left!-width!1.23
+vMAIN 91663963 1000
+vDRC 91663963 1000
+vBBOX 91663963 1000
+bbox -480 -250 500 1480
+uses {
+	/#fet!-contacts!left!-left_contacts!+1!-width!1.23_1 1 0 5000 0 1 690
+}
+def #via!-type!ct_poly
+vMAIN 22817813 1000
+vDRC 22817813 1000
+vBBOX 22817813 1000
+bbox -210 -210 210 210
+uses {
+	_4 1 0 1690 0 1 3310
+	_3 1 0 5760 0 1 3320
+	_6 1 0 7110 0 1 3305
+	_1 1 0 9270 0 1 3375
+	_2 1 0 6430 0 1 2870
+	_5 1 0 9085 0 1 2240
+}
+def #via
+vMAIN 22817813 1000
+vDRC 22817813 1000
+vBBOX 22817813 1000
+bbox -210 -210 210 210
+uses {
+	_1 1 0 9235 0 1 975
+}
+def #fet!-contacts!right!-width!0.92
+vMAIN 579315848 1000
+vDRC 579315848 1000
+vBBOX 579315848 1000
+bbox -320 -250 660 1170
+uses {
+	_0 1 0 9545 0 1 1000
+}
+def #fet!-fingers!5!-contacts!all!-left_contacts!-2!-right_contacts!+1!-width!1.23
+vMAIN 810114169 1000
+vDRC 810114169 1000
+vBBOX 810114169 1000
+bbox -480 -250 3540 1480
+uses {
+	/#fet!-fingers!5!-contacts!all!-right_contacts!+1!-width!1.23_1 -1 0 8965 0 1 690
+}
+} SECTION INSTANCES
+
+SECTION FLYLINES {
+} SECTION FLYLINES

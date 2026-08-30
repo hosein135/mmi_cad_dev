@@ -1,0 +1,2767 @@
+Max change log (1996)
+=====================
+
+VERSION HISTORY
+---------------
+12/19/96 Max 0.31
+	implemented MN_PATH_CELL (linked C and Tcl cell paths)
+
+12/19/96 Max 0.30
+	moved "erase layers" to Shift-Button-3
+	fixed bug in edit_push
+	fixed bug in sel_labels
+	finished implementation and debugged ":select -editOnly"
+
+12/18/96 Max 0.29x
+	Cleaned up file menu functionality.
+	Implemented "File/Copy Cell" and "Edit/Delete Cell"
+	implemented db_cell_rename 
+	User given file box for renaming when saving (UNNAMED).	
+	rmed some old Magic bindings
+	cleaned up menus.
+	fixed so don't zoom out when poping edit cell.
+	feeding back coords during box drag now.
+
+12/17/96 Max 0.28x
+	fixed "sel_net space" bug
+	fixed "DBSeeTypes() bug that broke ":select -g -editOnly"
+	implemented db_cell_delete and db_copy_cell
+
+12/10/96 Max 0.27x
+	new improved palette.
+	sel_group_transfer command.
+
+12/9/96 Max 0.26x
+	bug fixes.
+	label and port kind ids now prepended to text.
+
+12/8/96 Max 0.25x
+	sel_net command.
+	label "kinds", including ports, implemented.
+	changed redisplay to display labels only when attached layers are vis.
+	sel_label enhanced to do area searches (and handle label kinds).
+	added -no_default option to lay_point to return {} when point invalid.
+
+12/5/96	Max 0.24x
+	 Sue like list boxes implemented
+	 Sue like mouse buttons implemented
+	 file menu commands improved to always set edit cell.
+	 push/pop/edit in place implemented
+	 "Improved" Menus and more hot keys.
+
+	 Better Menus
+
+12/3/96 Max 0.23x
+	 x = experimental (installed as maxx at Micromagic).
+	 Implemented group "classes" and attributes.
+	 Converted to .max format
+	 Implemented db_magic read ...
+	 Implemented reading/writing of flylines and groups and label flags.
+	 Blew away "moving label" warning.
+	 Implemented -editOnly option for "select area"
+	 Fixed group_transfer proc using above.
+	 Made palette compact.
+	 Implemented new menus and hotkeys.
+	 Coded stub for list_box stuff.
+
+11/17/96 Max 0.22
+	 Moved flyline display to highlights.
+	 Added "-more" flag to sel_labels.  (:see [no] hiddenLabels)
+	 Added "hidden" flag for labels.
+	 Fixed group bug.
+
+11/13/96 Max 0.21
+	 Implements flylines.
+	 Fixed menu scanning.
+
+10/28/96 Max 0.20
+	 Implements groups for labels.
+	 Incorporates Lee's new wiring code (using groups).
+	 wiring tech parms moved to tech_ppc4.tech
+
+10/26/96 Max 0.19
+	 Fixed group bugs.
+	 Added group_transfer func.
+	 compiling -O3
+	 stripped executable.
+
+10/23/96 Max 0.18
+	 First cross-compiled version.
+	 no -ggdb - notice a difference?
+	 Implmented groups (painting, db_group, ":select -g ...")
+	 Implemented license manager.
+
+9/23/96 Max 0.17
+	 added sel_labels command to allow selection of labels by content.
+
+9/19/96 Max 0.16
+	 now tech independent: 
+	   takes -tech or -T (magic compatible) cmd line option
+	   or takes from fileName on cmdline
+	   or scmos (default).
+	   auxilary tcl tech file in max_lib: tech_<techName>.tcl
+
+	 -geometry on command line fixed.
+
+	 palette now uses pal_group specs in tech_<techName>.tcl
+	 added "cif_layers" cmd (gives layers in current cif output style)
+	 now generating cif menu from current cif output style.
+
+	 fixed *.mag extension in file selector box
+
+	 coded up tsmc.tech 
+	 coded up aux tech files:  tech_ppc4.tcl, tech_tsmc.tcl and tech_scmos.tcl 
+
+	 maxlib tcl var name changed to max_lib
+
+9/13/96 Max 0.15
+	 fixed abort on bad file name on command line
+	 fixed bug that caused undo info to be lost when drc busy
+	 increased length of undo list from 20 to 200
+	 fixed problem with magic cmds getting input from command window
+	 modified "sel_what labels" to give label positions in English (e.g. NORTH)
+	 added "New..." to file menu
+	 converted to Lee's new file box (allows <dir> only and ext. scan)
+
+9/2/96	Max 0.14
+	 Fixed expand bug (propagating expansion state to selected cells)
+	 kludged fix to loss of focus when using file box.
+	 accurate -desc to main mode bindings
+	 new command:  "db_cell_new [-internal] cellName"
+
+8/29/96	Max 0.13
+	 busy/mode/wait/redisplay cursors
+	 drc status indicated
+	 Window menu allows palette etc to be turned off
+	 No longer updating palette on every cursor motion 
+		 (created _max_periodic_update)
+	 Enhanced ":calma read" to optionally read only specified cellName
+
+8/23/96 Max 0.12
+	 Converted to Lee's setl
+	 Moved motion binding to main (to not conflict with mode specific bindings)
+
+8/23/96 Max 0.11
+	 added command modes.
+	 fixed zoom_drag during subedit (again!)
+
+8/9/96	Max 0.10
+	 sel_what added "cells" subcommands; instance paths for "cells" and 
+	 "labels" results.  "-edit_only var_name" options on "paint", "cells"
+	 and "labels" subcommands.
+
+	 cct cif styles, changed gds types to 0.
+
+	 fixed bug in "calma read"
+
+	 fixed zoom_drag during subedit.
+
+8/2/96  Max 0.9
+	 Overhauled message handling and error handling.  Now have well 
+	 defined: info, warning, 	error, and panic messages.  
+	 See (html) manual, and "msg" and "msg_catch"
+	 command documentation for details.
+
+	 Fixed ":" command insertion cursor problem (I think).
+	 Command box can now be resized.
+
+	 Modified menu_add_cmd to delete (any) preexisting menu item of same name.
+	 Added "Resource .maxrc" to File menu.
+
+	 Augmented sel_what (now have "labels" and "paint" subcommands.)
+
+7/22/96 Max 0.8
+	 Completed input/output support for CCT tools
+	 (cif istyle CCT)
+	 Should now be able to write from Magic to CCT and read results back in.
+	 Changed default "calma" extension from .strm to .gds but allow alternate
+	 extensions to be supplied on ":calma read" and ":calma write"
+
+7/22/96	Max 0.7
+	 Support for outputting gds to CCT tools.
+	 (cif ostyle cct)
+	 enhanced ":calma write" to be able to output unrestricted char-set text,
+	 instance bounding boxes, and instance text labels.
+
+7/18/96	Max 0.6
+	 "integral" documentation (own version of proc with -desc, and -doc options)
+	 Added help menu.
+	 help/manual (html manual)
+	 help/commands (command documentation browser)
+
+6/27/96	Max 0.5
+	 File Box and Cells menu (thanks Lee)
+	 Added "drc" (turns drc error display on/off)  and allSame buttons to palette.
+	 Fixed (partially) spamming of user with error messages.
+	 Lee's drag box zoom
+	 Lee's experimental wiring tool.
+	 Switched to Lee's exit box.
+
+6/13/96	Max 0.4
+	 ppc4/:  
+		 tuned display styles
+		 debugged/verified drc rules
+		 added correct calma layers,
+		 added "foreign" drc feedback layer
+		 fixed pplus generation
+	 added .maxrc sourcing
+	 new tcl primitive:  lay_editcell tcl primitive
+	 fixed "unexpanded subcell" bug.
+
+6/6/96	Max 0.3
+	 box dimension and area display
+	 cif layer menu
+	 added labels button to palette.
+	 implemented Cntl-D (erase layer) from palette
+
+	 new tcl primitives:  "db_search labels", "lay_rootcell"
+	 enhanced tcl primitives:   "lab_box" and "lay_point"
+	 ppc4.tech:	  improved drc rules, restored cif input/output
+
+	 fixed solaris cif write bug
+	 make config (to switch between mmi and mha)
+
+5/30/96	Max 0.2
+	 Switched over to ppc4 technology.
+
+5/14/96	Max 0.1		
+	 Smart Palette.
+	 Last command repeat (.)
+	 Undo of toplevel commands.
+
+5/1/96	Max 0.0		maxbu/max0.0May1.tar.gz
+	 First real install.
+	 First version intended for real use by users.
+
+4/15/96	Max -1.0	maxbu/max.sol.mallocBug.zar
+	 First install at MMI under Solaris.
+	 Demoware.
+
+1/24/96	Magic 6.4.5.MMI	maxbu/max.base.magic.tar.gz 
+	 Base version for Max.
+
+	 Magic 6.4.5 +
+	 95jun30 (extractor enhancments) +
+	 wrl drc enhancements (integrated by mha) +
+	 mha drc additional drc enhancements +
+	 checkpoint command (mha) +
+	 "align" option on cif "squares" operation (mha) +
+	 units cmd (allows user to use either microns or database units) (mha) =
+	 MMI Magic.
+
+CHANGE LOG FOR MAX (son of Magic)
+---------------------------------
+
+DATE	MODULE/FILES
+----	------------
+	 CHANGES	
+	 -------
+
+1/26/96	READ_ME,CHANGE_LOG
+	 CHANGE_LOG -> CHANGE_LOG.magic
+	 READ_ME -> READ_ME.magic
+
+1/27/96	graphics/ grhelper/
+	 Split helper programs (e.g. X11Helper) to grhelper/ to create
+	 clean split between program and module directories.
+
+1/27/96	make/ modules/ programs/ /lib
+	 created make/  and mved :* scripts there.
+	 created modules/  and mved module dirs there.
+	 created programs/ and mved program dirs there.
+	 rm'ed lib/ - (simplify since not multi-person project).
+
+1/28/96	mha/
+	 rmed.
+
+1/31/96	make/Makefile.module,modules/*/Makefile
+	 make/Makefile.module:  created generic Makefile for modules.
+	 ln -s module/*/Makefile to make/Makefile.module
+
+1/31/96	graphics/Makefile
+	 restored Magic Makefile.  Complex, since .config
+	 controls which .c files used.
+
+1/31/96	groute/grouteName.c,grouteNet.c,groutePin.c,grouteTile.c
+	 rmed src files, not used in module!
+
+1/31/96	macros/
+	 renamed macros.c macros1.c - so src file names different from module name.
+
+1/31/96	misc/lintfix.c -> lintfix.c.hide
+
+1/31/96	netlist/netlist.c -> netlist1.c
+
+1/31/96	parser/parser.c,test.c
+	 rmed test.c
+	 parser.c -> parser1.c
+
+1/31/96	plot/vdmp.c
+	 vdmp.c standalone program!,  mved to plot/programs/
+
+1/31/96	resis/ResWrite.c
+	 rmed ResWrite.c - not part of module.
+
+1/31/96	main/
+	 main.c -> main1.c 
+
+1/31/96	signals/
+	 signals.c -> signals1.c 
+	 test.c -> signals/test/test.c
+
+1/31/96	tech/
+	 tech.c -> tech1.c
+
+1/31/96	tech/
+	 undo.c -> undo1.c
+
+2/1/96	database/DBmain.c
+	 mved DBmain.c to libsrc/DBmain.c (src file only used for database library)
+
+2/1/96	graphics/
+	 rmed non X11 src files, replaced magic Makefile with make/Makefile.module
+	 all modules now using Makefile.module!
+
+2/2/96	calma/
+	 Renamed source files to lower-case calma* - in line with module 
+	 conventions.
+
+2/2/96  mzrouter/ irouter/ garouter/ router/ grouter/ gcr/
+	 rmed routing modules.
+
+2/2/96	netmenu/ netlist/
+	 rmed routing related modules.
+
+2/2/96	plow/
+	 rmed plow module.
+
+2/2/96	modules/*/*.h
+	 Modified all headers to automatically include other needed headers,
+	 and to allow multiple inclusions of same header
+	 (only first one defines anything).
+
+2/3/96	calma/
+	 used protoize to generate function prototype declarations.
+	 made minor fixes - compiles now!
+
+2/3/96	cif/
+	 used protoize to generate funciton prototype declarations.
+	 compiles.
+	 rmed prototype for CIFReadError (varargs) - commented "DEVIATION: ..."
+
+2/3/96	cmwind/
+	 used protoize to generate funciton prototype declarations.
+	 made minor fixes - compiles now!
+
+2/3/96	programs/ doc/ doc6.6/ scmos/ scmos.mosis/
+	 Decided that beagle can depend on a Magic installation for now.
+	 Decided that currently beagle src only for creating beagle binary.
+	 Will use Magic auxilary programs, library etc. for now.
+	 So rmed programs (except kept grhelpers/).
+	 rm'ed doc/ doc6.6/ scmos/ scmos.mosis
+
+2/3/96	commands/ select/ main/ plot/ select/
+	 rmed references to router and plow headers.
+
+	 RtrMetalWidth:  used in plot/plotGremln.c and dbwind/DBWdisplay.c
+
+2/4/96	misc/misc.h,typical.c
+	 Wrote function MiscTypicalWireWidth() to return estimated typical
+	 dimension (currently just using 1 micron.)
+
+2/4/96	dbwind/DBWdisplay.c
+	 DBWredisplay():  changed to call MiscTypicalWireWidth instead
+	 of using  RtrMetalWidth.
+
+2/4/96  plot/plotGremln.c plotPixels.c plotVers.c
+	 converted from RtrMetalWidth to MiscTypicalWireWidth()
+
+
+2/7/96	textio/TxCommands txcommands.h
+	 Turned on TxDebug.
+	 txcommands.h Modified command struc to have single char *script instead
+		 of breaking into args (parsing now inside tcl).
+
+2/8/96	main/main1.c windows/windCmdSZ.c
+	 Removed file arg to TxDispatch (obsoleted by tcl source command).
+	 Commented out startup file sourcing in main1.c
+	 Commented out guts of windSourceCmd().
+
+2/8/96	main/magic.h 
+	 Made CLIENTDATA definition conditional and consistent with tcl.
+
+2/8/96	make/:config, beagle/LIBS
+	 added -ltcl
+
+2/9/96	parser/
+	 Rmed parser module.  (Parsed command-lines, obsoleted by tcl interface!)
+
+2/9/96	textio/, macros/, windows/windCmdAM.c
+	 mved macros code to textio module (renamed "macro" to "hotkey").
+	 rmed macros/ module.
+	 modified windMacroCmd() accordingly.
+
+2/9/96	Mgc/
+	 Created Mgc package for original Magic commands.
+	 Note "package" = module with tcl command procs.
+	 Packages distinguished from other modules by capitializing first letter.
+
+2/11/96	windows/
+	 global cmds to Mgc package.
+	 notion of per window command tables/dispatching, no longer exists.
+	 windCmd*.c -> wind_global*.c
+	 windClient.c - mved cmd tables etc to Mgc/MgcGlobal.c package.
+	 windMain.c - removed command table from WindAddClient
+	 windMain.c - removed text command processing code
+	 windInt.h clientRec - removed command table from struc.
+	 make protoize!
+
+2/11/96	dbwind/DBWprocs.c
+	 DBWcommands() - rmed text command dispatching.
+
+2/11/96 commands/ database/ dbwind/ debug/ drc/ extract/ graphics/ main/ misc/
+	 make protoize
+
+2/11/96	cwind/CMWmain.c
+	 CMWinit() deleted CommandNames arg from call to WindAddClient.
+	 This bug was caught due to protoizing!
+	 TODO:  Add color map commands to Mgc module?
+
+
+2/11/96 plot/ 
+	 make protoize
+	 NOTE: warnings during Make - may be real bug?
+
+2/11/96	resis/ select/
+	 make protoize
+
+2/11/96	signals/
+	 make protoize
+	 warnings for __bsd_signal - incompatible arg (passing handler).
+
+2/11/96	sim/ tech/
+	 make protoize
+
+NOTE: SKIPPING textio til end!
+
+2/11/96	tiles/ -> tile/
+	 renamed module to tile/ to correspond with .h
+	 renamed tiles.c -> tiMain.c
+		 search.c -> tiSearch.c
+		 search2.c -> tiSearch2.c
+	 In accord with module conventions.  Guess this was the first module! :-)
+
+2/11/96	tile/ undo/
+	 make protoize
+
+2/11/96	windows/ wiring/
+	 make protoize
+
+2/11/96	utils/
+	 rmed flsbuf.c
+	 rmed port.c
+	 rmed printstuff.c
+	 strdup.c -> string.c
+	 touchtypes.c -> touchingtypes.c (to match header and func names)
+	 make protoize
+
+2/11/96 commands/cmd_layoutLQ.c resis/ReadSim.c windows/wind_globalSZ.c 
+	 changed references to MagAtof back to atof and included <stdlib.h>
+
+2/15/96	cif/cifRdUtils.c
+	 Changed CIFReadError() to use Ansii C varargs (stdarg.h)
+	 rmed DEVIATION comment!
+
+2/15/96	main/magic.h textio/txCommands.c graphics/grMain.c sim/SimRsim.c
+	 fd_set etc. removed from magic.h, using <sys/time.h> (POSIX).
+
+2/15/96	textio/
+	 make protoize!
+
+2/15/96	extract/ExtLength.c
+	 function prototypes revealed bug in length extraction (used when
+	 computing shortest paths between drivers and recievers)
+	 Am fixing this in Magic as well!
+
+	 extLengthLabelsFunc():
+	 was:    GeoTransPos(&scx->scx_trans, label->lab_pos, newLab->lab_pos);
+	 new:	newLab->lab_pos = GeoTransPos(&scx->scx_trans, label->lab_pos);
+
+2/15/96	MILESTONE
+	 Protoize finished for all modules.  
+	 Tcl integrated.  
+	 Beagle compiles	from scratch with out errors.
+	 (Still a few compiler warnings!)
+	 Backing up now. (/dosc/mha/bu/beagle2.zar, and floppy disk.)
+
+2/17/96	beagle/ Makefile make/:makeall make/:makemods max/Makefile
+	 name changes:
+	 beagle/ -> max/
+	 modules/ -> m/
+	 include/ -> i/
+
+2/17/96	main/
+	 Starting with tk_main !
+
+2/17/96 misc/DFLAGS, make/:config
+	 PROBLEM: -DSYSV causing headeproblem: tk.h and stddef.h have clashing
+		  defs for wchar_t
+	 removed -DSYSV - not sure of ramifications!
+
+2/19/96	extract/ExtCell.c ExtTech.c ExtUnique.c
+	 removed SYSV conditionals around include of string.h
+	 TODO: probably need to add back SYSV conditionals around string.h in extract/*.c
+
+2/19/96	MHAHACK
+	 using MHAHACK in place of SYSV in various places.  Not defining SYSV
+	 globally because it makes tk unhappy - but looks like linux is
+	 SYSV so, real solution is to make tk happy with SYSV def?
+
+	 TODO: reinstate -DSYSV, rm -DMHAHACK, fix SYSV problem with tk headers?
+
+2/20/96	signals/signals1.c
+	 used MHAHACK to noop most routines - don't catch any signals for now,
+	 to avoid conflict with Tk.
+
+2/20/96	graphics/grMain.c, grTk.c
+	 Creating a "TK" type display.
+
+2/20/96 MILESTONE
+	 tcl/tk/magic commands in place.  
+	 Command input/output working.
+	 tk window up.
+	 TODO (next):  get back magic layout windows under tk!
+
+2/22/96	m/Layout
+	 Creating Package to implement Layout widgets.
+
+2/28/96	MILESTONE
+	 Layout widget framework in place and functional.
+	 Layout redisplay currently limited to restoring current background!
+
+2/28/96 m/main mainMain.c
+	 Changed default technology to ppc!
+
+2/29/96	cmwind/
+	 removed module.
+
+2/29/96	removed Magic source and specialopen commands.
+
+
+3/3/96	MILESTONE
+	 Layout widget "done" (displaying Layout)!
+	 No box yet?
+	 Archiving and writing floppy.
+	 (plot/ does not compile)
+
+3/3/96	plot/ main/ commands/cmd_layoutLQ.c Mgc/MgcLayout.c max/Makefile
+	 rmed plot module.  (obsolete - since does not gen postscript).
+
+3/5/96	MILESTONE
+	 Layout widget working, redisplaying properly, etc.
+	 Backup to max2.zar
+
+3/6/96	/textio
+	 Module eliminated!
+	 The few remaining funcs, for example Txprintf(),
+	 now in misc/textio.c
+	 txcommands.h in Mgc/
+
+3/6/96	CHECKPOINT
+	 Backup to max3.zar
+
+3/7/96	/windows
+	 removed obsolete window commands (such as over/under).
+
+3/7/96	CHECKPOINT
+	 Backup to max4.zar
+
+3/8/96	CHECKPOINT
+	 Backup to max5.zar
+
+3/12/96	misc/CFLAGS
+	 removed -O6 and -fomit-frame-pointer.
+	 changed -g to -ggdb
+
+	 This should make gdb debuggin work better and also speed up compilation.
+	 NOTE: setup script has not been changed.
+
+3/12/96	CHECKPOINT
+	 MagWindow merged into Layout
+	 Redisplay after paint.
+	 No redisplay after box move yet.
+
+	 Backup to max6.zar
+
+3/12/96	command/ dbwind/ debug/ graphics/ windows/ signals/
+	 The above modules have been eliminated.
+	 What remains of command/ mved to Mgc/
+	 What remains of dbwind/ graphics/ and windows/ mved to Layout/
+	 debug/, signals/ mved to misc/
+
+3/13/96	CHECKPOINT
+	 Working after module merge.
+	 Box getting redisplayed.
+
+	 Backup to max7.zar
+
+3/14/96 CHECKPOINT
+	 rmed .o's executables etc.
+	 Backup to max8.zar
+	 (copy to /dosc/mha/bu)
+	 (copy to floppy)
+
+3/15/96 CHECKPOINT
+	 Backup to max9.zar
+
+3/18/96	misc/, main/, make/Makefile.module max/Makefile
+	 mved misc/ contents to main/.
+	 eliminated misc/ module.
+
+3/19/96 sim/ 
+	 Temporarily removed sim module.
+
+3/19/96 CHECKPOINT
+	 Working again.
+	 TxCommand paired down to just argc,argv and now internal to Mgc/ module.
+	 Window still scattered about.
+	 Cur* partially implemented.
+	 Box/Point partially moved to main/
+
+	 Backup to max10.zar
+
+
+3/22/96	main/mainMain.c
+	 Implemented startup file sourceing (max_sys.tcl).
+
+
+3/22/96	Mgc/cmdSubrs.c cmdLayoutRS.c
+	 Backing out of changes.  Defer "current" context.  
+
+3/29/96	Layout/
+	 Restored functioning of Point (for "short" commands)
+	 Added LayBox and LayPoint Tcl Commands
+
+3/29/96	max/max_sys.tcl
+	 Added back Magic short commands.
+	 Added button scripts for button-1 and button-3 (box tool).
+
+3/29/96 CHECKPOINT
+	 Backup to max11.zar
+
+	 rm m/*.o
+	 Backup to max12.zar
+
+3/29/96 extract/extract.h
+	 Needed to include windows.h (fixes make force)
+
+3/29/96 Mgc/cmd_layoutLQ.c max/max_sys.tcl
+	 Modified CmdPaint to call old middle-button-command on "-button"
+	 option.
+	 Implemented middle button as "mgc_paint -button".
+
+3/30/96	Layout/layMain.c
+	 Don't null out current Layout Window on Leave event.
+
+3/30/96	max/ max_sys.tcl popups.tcl utilities.tcl  
+	 Stole utilities.tcl from sue, and part of popus.tcl
+	 First stab at ':' command-popup.
+	 Have it working - but probably better to have command bar popup at 
+	 bottom of "Layout window".
+
+3/30/96 max/max_sys.tcl
+	 Modified to permit resizable layout.
+	 Still need C-code modifications to have Layout adjust to change.
+
+4/2/96  Layout/
+	 grLock.c grSimpleLock remove "inside" arg removed 
+	 removed w_frameArea and w_allArea (consolidated to w_screenArea)
+	 added "ConfigureNotify" event processing (adjust w_screenArea).
+
+4/3/96	Layout/, Mgc/
+	 Cleaning up Layout struc.  
+	 Removing unused fields.
+	 Replace WindSearchWid with LayCurWindow().
+
+	 Doing make force.
+
+4/3/96 	CHECKPOINT
+	 max4-3.zar
+
+4/8/96  Layout/ layDisplay.c, layMain.c max/max_sys.tcl
+	 Added scrollbars.  Working proberly (finally!).
+	 Implementation of scrolling in Layout widget ugly, but will
+	 due for now - as rumor has it the scrolling implementation in newer
+	 versions of tk is different.
+
+	 CHECKPOINT max4-8.zar
+
+4/9/96	main/mainMain.c drc/drcContin.c
+	 Reimplemented background drc check.
+	 Eliminated busy waiting (most of the time).
+
+	 CHECKPOINT max4-10.zar
+
+4/11/96 Layout/layView.c layMain.c
+	 Rewrote WindMove as WindFrame() - more precise (no slop - frames
+	 requested region exactly and centers it.  Also my version much
+	 cleaner and easier to understand. 
+	 Modified layout frame subcommand to properly return current frame -
+	 (w_surfaceArea incorrect as it is oversized).
+
+	 Now ready to replace WindMove with WindFrame() globally and rewrite
+	 window view commands as tcl commands invoking the Layout frame
+	 subcommand.
+
+	 Also partially implemented zoom slider. And "File" menu commands.
+
+	 CHECKPOINT max4-12.zar
+
+4/14/96	*/*
+	 Cleaned up Layout header files.
+	 Eliminated dbwind client rec structure (incorporated into Layout).
+	 Finished zoom slider implementation.
+	 Fixed ROUND() to work for negative numbers!
+	 More or less ready for initial show and tell.
+
+	 CHECKPOINT max4-14.zar
+
+4/15/96 */* make/legalNotice make/legalNoticeTcl
+	 Added legal notices to head of all .c and .h source files.
+	 Added legal notices to .tcl files.
+
+4/15/96	max/max/Makefile */*
+
+	 Changed version to -1.0
+	 cleaned up (rmed save files)
+	 make force >& make.force.out - compiled without errors.
+	 tested briefly - looks ok.
+
+	 rmed executables and .o's
+
+	 CHECKPOINT max4-15.zar
+
+4/16/96 Makefile
+	 Added "make tar" to make tar file excluding max/max, backup files and
+	 .o's and then compress it.
+
+	 This solves problem of copying by hand, rm'ing unwanted files etc.,
+	 and potentially screwing up symbolic links in the process.
+
+4/16/96 make/config,config.mha,config.mmi,Makefile.module ./Makefile max/Makefile 
+	 make/:config max/LIBS m/main/CFLAGS,DFLAGS,CPPFLAGS
+
+	 All configuration dependent stuff gathered into make/config
+	 which is sourced by Makefiles.  Created two versions config.mmi
+	 and config.mha, idea is to: " ln -s <pick-one> config "
+
+	 Modified Makefiles to use config
+
+	 rming :config script "make config" and LIBS,CFLAGS,DFLAGS,CPPFLAGS files.
+	 They are obsolete.
+
+4/16/96 m/*.[ch]
+	 #include <tcl/tcl.h> -> #include <tcl.h>
+	 #include <tcl/tk.h> -> #include <tk.h>
+
+4/16/96	main/signals.c 
+	 sigOnStyp() 
+	 #ifndef MHAHACK out to avoid sigsetmask
+	 undefined symbol problem on Solaris 2.0 (needs -lbsd).
+
+4/16/96	extract/ExtTech.c
+	 extTechStyleNew() 
+	 Was getting bus error under
+	 solaris.  Changed mallocMagic() to malloc() at top of this routine.
+
+	 CHECKPOINT maxApr16.tar.gz
+
+4/16/96	config.mha
+	 rmed -lbsd from OTHER_LIBS
+
+4/16/96	DBio.c
+	 made access() amode symbolic (F_OK, R_OK, W_OK)
+
+4/16/96	utils/saveimage.c utils.h
+	 rmed - saveimage.c SaveImage() not working anyway, and not too
+	 useful even if it did.
+
+4/16/96	Layout/grMain.c
+	 rmed grSunFbDepth(), obsolete routine with wierd access() call in it.
+
+4/16/96	make/config.mha
+	 rmed -DF_OK and -DW_OK - these are defined in <unistd.h> in
+	 ANSI-C/POSIX.
+
+4/16/96	make/config.mha,config.mmi
+	 rmed -DX11 - no longer used (X11 assumed!)
+
+4/16/96 make/config.mha,config.mmi select/selOps.c Mgc/cmd_layoutRS.c,cmd_wizard.c 
+	 rmed -DNO_PLOW
+	 rmed code conditional on not NO_PLOW
+
+
+4/16/96	make/config.mha,config.mmi Mgc/cmd_layoutCD.c,cmd_layoutFI.c
+	 rmed -DNO_ROUTE
+	 not NO_ROUTE conditionals removed.
+
+4/16/96 make/config.mha,config.mmi,Makefile.module
+	 mved -DNO_SIM and -DMHAHACK from config* to Makefile.module since
+	 these are not configuration dependent.
+
+4/16/96	main/magic.h make/config.mha 
+	 found moncontrol() in /usr/lib/libgmon.a
+	 added -lgmon, rmed MHAHACK defining NEED_MONCONTROL in magic.h
+
+4/17/96 make/*  main/mainMain.c,main.h
+	 removed NEED_MONCONTROL stuff from main.h
+	 now including moncontrol() dummy, unless -DGMON set.
+
+	 rmed -Dlinux flag (automagically defined on linux systems).
+	 rmed -lgmon (not needed unless -DGMON set).
+
+
+4/17/96	tech/tech1.c Layout/graphics.h,grMain.c calma/calmaRead.c
+	 Changed all vararg routines to use <stdarg.h>
+	 All error message routines now call TxError()
+	 Removed GrVfprintfPtr().
+
+4/17/96	main/magsgtty.h,signals.c Layout/gr*.c
+	 rmed magsgtty.h - obsolete.
+
+4/18/96	main/mainMain.c
+	 mainMain.c main():  uncommented call to SigInit().
+
+4/18/96	main/mainMain.c Layout/grMain.c,graphics.h 
+	 rmed grDisplayTypes[] and grInitProcs[] from grmMain.c
+	 Removed arg from GrSetDisplay()
+	 We are committed to X11!
+
+4/18/96	Layout/grNull.c
+	 rmed nullSetDisplay(), not used and refed SigWatchFile
+
+4/20/96	*
+	 switching from niceAbort to MaxAbort (takes error message).
+	 changing ASSERT to ues __FILE__ and __LINE__ and NDEBUG (like
+	 POSIX assert() rather than PARANOID.
+	 Replacing PARANOID with NDEBUG throughout src code.
+
+4/20/96	main/maxAbort.c,signals.c,magic.h
+	 maxAbort() working.
+	 signal catching working.
+	 MAX_HISTORY_FILE working.
+
+4/22/96	layout/layDisplay.c main/mainMain.c,signals.c,signals.h
+	 Added volatile flag to SigInterruptPending to warn compiler it
+	 may change unexpectedly.
+
+	 ^C (SIGINT) working.
+
+	 Interrupts redisplay or other long operations.
+
+4/25/96	database/DBtcl.c max/max_sys.tcl, mhautils.tcl
+	 Implemented db_cells
+
+	 Implemented basic utils such as setl, to facilitate readable
+	 tcl code.
+
+	 Implemented menu-file-exit()
+
+	 CHECKPOINTing (make tar) (maxApr25.tar.gz)
+
+4/26/96 main/mnMain.c max/max_sys.tcl
+	 command-line arg handling cleaned up.
+	 Excepting list of cells/filename(s)
+	 .mag extension now optional.
+
+	 fixed subtle bug that caused loads inside max_sys to be improperly
+	 framed.  Replaced WindMove with LayFrame everywhere - to avoid
+	 further flakiness.
+
+4/27/96 main/mnUnits.c etc.
+	 rmed units cmd from Mgc
+	 added tcl mn_units cmd. (feeds back current units and resolution)
+	 added res and uusnap procs to mhautils.tcl
+	 zoomScale and step moves (qwer) modified to use [res]
+	 changed default user units to microns.
+
+	 CHECK POINT.
+
+4/28/96	main/mnMain.c max/Makefile max/ lib/
+
+	 added maxlib = max runtime tcl library
+	 ./max/Makefile automatically points maxlib to full path name of ./lib
+
+	 We are installable!
+
+	 CHECKPOINT.
+
+4/28/96 utils/malloc.h, malloc.c Layout/layMain.c main/mnMain.c ext/ExtTech.c
+	 Now consistently using system malloc.
+	 (Magic malloc() appears buggy under Solaris)
+
+4/28/96 Layout/layMain.c
+	 mved initial window open to after configure, so that w_screenArea is
+	 set properly.  (This bug exposed by malloc change above.)
+
+4/28/96 Makefile
+	 make tar was excluding max/ sub dir.  
+	 also assumed max root dir was "max" 
+	 Fixed to work for any root dir and to now exclude max/ sub dir.
+
+4/29/96 max/Makefile
+	 set version -0.1
+	 rename root to max-0.1 to test root dir independence.
+	 make force
+	 tested from ~/mmi/ppc !
+
+	 CHECKPOINT (make tar)
+
+	 unpacked tar file to different dir, make force, retested - Works fine!
+
+4/29/96	Makefile make/Makefile.module
+	 Added header file dependency generation.
+	 Not automatically remade when make from Module, but remade when
+	 "make" or "make force" is invoked from parent directory.
+
+4/30/96 main/mnTextio.c, mnMain.c lib/textio.c, max_sys.tcl  
+	 Added mapping from mnTextio.c funcs to tcl funcs.
+
+	 CHECKPOINT (make tar)
+
+4/30/96	main/mnAbort.c,magic.h
+	 Changed "History file" to <MaxLib>/Log
+
+4/30/96 main/mnMain.c,main.h lib/menucmds.tcl
+	 Implemented mn_exit -nobackup
+
+4/30/96 max_sys.tcl menucmds.tcl
+	 now intercepting the tk exit to query about modified buffers
+	 (only for code 0)
+	 fixed bug in modified-cells
+
+4/30/96 max_sys.tcl cmdpopup.tcl magic.tcl
+	 mgc commands aliased to : cmds.
+	 command popup starts with ":"
+	 :quit aliased to file-menu-exit
+
+	 no longer autoexecing shell commands.
+	 command popup now accepts abbreviations, and history subst.
+	 command popup now registers with history
+
+4/30/96 lib/menucmds.tcl
+	 Quickly made all entries in file menu functional.
+	 Except saveas, which has been commented out for now.
+
+4/30/96	max/Makefile version=0.0
+	 make force 
+	 304u 95s 8:10 72696pf - on mango.
+
+4/30/96 Layout/grX11su3.c DBWprocs.c
+	 hid my printf's with #ifdef MHA
+
+	 CHECKPOINT.
+
+5/1/96	Installed 0.0 @ mmi
+	 make force
+	 255u 136s 5:45 0pf - on mmi22
+
+5/3/96	Reinstall @ mha
+	 make tar @ mmi; installed @ mha; 
+
+	 Tried make force from console without X running in hope of reducing
+	 page faults.  Less page faults but took longer, presumably due
+	 to distribution of blocks on disk:
+	 209u 65s 9:50 39557pf - on mango (from sys console)
+
+	 Note actually less user and system time, but lost due to thrashing!
+	 Need more memory! 
+	 Upgraded mango from 16Mbytes to 40Mbytes:
+	 294u 89s 6:53 71547pf - on mango 
+	 ???
+
+	 B/T/W tested max after reinstall from mmi.
+	 works fine!
+
+5/3/96  README CHANGE_LOG NOTES* TODO doc/
+	 added version history to beginning of CHANGE_LOG
+	 updated README
+	 cleaned up and updated other info files.
+	 mved all info files except for README and CHANGE_LOG to doc/
+
+
+5/4/96	lib/pal.tcl max_sys.tcl
+	 Integrating palette.
+
+5/4/96	Layout/layMain.c
+	 Added "visible" subcmd to layout widget.
+
+5/4/96	database/DBtcl.c
+	 Added "db_types" tcl command.
+	 Fixed "db_cells" to not return extra newline at end.
+
+5/4/96	lib/pal.tcl
+	 layers on/off working!
+
+5/5/96	select/selTcl.c selSearch.c select.h  main/mnMain.c	
+	 Added "sel_what" Tcl command.
+
+5/5/96	lib/pal.tcl
+	 implemented selection highlighting in palette
+	 (Still need to auto-redisplay when selection changes.)
+
+5/5/96	*
+	 SelSetDisplay() -> LayDisplaySelSet()
+
+5/6/96	CHECK POINT.
+	 palette buttons working.
+	 palette selection highlighting working
+	 TODO:  
+		 update palette after :see
+		 feedback touching types.
+		 graphical samples (layout windows)
+
+5/6/96	Layout/layMain.c
+	 Tracking Motion events - keeping Point current.
+	 Allows tcl code to bind to <Motion> in Layout events
+	 and get correct point.
+
+5/6/96	database/DBtcl.c
+	 Added db_search tcl command.
+	 Currently just returns types touching a given point.
+
+5/6/96	lib/max_sys.tcl pal.tcl
+	 Implemented palette lighting up layers under point.
+
+	 CHECKPOINT.
+
+5/6/96	Layout/
+	 Implementing "-special" Layout windows - for use as Palette
+	 entries.
+	 Seems to be working!
+
+5/6/96	lib/pal.tcl	
+	 Added special layout windows to entrys.
+	 TODO:  create internal __PALETTE__ cell.
+
+
+5/7/96	layout/layMain.c
+	 Creating internal __PALETTE__ cell when first special Layout
+	 window created.
+
+5/7/96	lib/mgc_sys.tcl pal.tcl
+	 Initial tuning of palette look and feel.
+	 TODO: problem when drc on, problem with undo, pp not framed.
+
+5/8/96	
+	 make tar 
+	 - to take to MMI to demo palette.
+	 Plan to install under my account only!	
+
+	 DEMO WARE!
+
+
+5/10/96	drc/DRCContin.c
+	 DRCCheckThis() -  Modified so, internal cells not checked.
+
+5/10/96	lib/pal.tcl max_sys.tcl
+	 mved load of (UNNAMED) from pal-paint to max_sys after
+	 .l1 creation.
+
+	 Solves problems of:  1. pp not properly framed
+			      2. .l1 cell not being edited.
+
+5/10/96	Layout/caption.c layCaption.c
+	 mved caption.c to layCaption.c
+	 Modified LayCaption() to not caption LAYOUT_SPECIAL windows,
+	 and to caption other Layout windows in their own top level.
+
+
+5/13/96	CHECKPOINT
+	 make tar
+
+5/13/96	undo/undo1.c undo.h database/DBundo.c select/selUndo.c Layout/DBWundo.c wiring/wireUndo.c
+	 rmed readEvent writeEvent args from undoAddClient()  (no longer in use).	    rmed UNDOLINESIZE (no longer used).
+
+5/13/96	undo/undo1.c undo.h main/mnMain.c
+	 rmed UndoInit() - not needed.
+
+5/13/96	lib/max_sys.tcl bindings.tcl 
+	 Want to have all toplevel commands pass through one point of control
+	 so can control undo, last-command, and possibly history list.  In
+	 preparation:
+
+	 mved bindings to procs and created bind-cmd to have generic control
+	 over toplevel commands bound to keys.
+
+	 created menu-add-cmd to have generic control over top level commands
+	 issued from menus.
+
+5/13/96	undo/undo1.c undo.h main/mnMain.c Mgc/cmd_layoutLQ.c
+	 Changed named:  UndoNext() to UndoDelim()
+	 rmed UndoDelim() from cmdPaintButton()  
+		 (Delims will be handled at toplevel for ALL commands)
+
+	 Added undo_delim tcl command.
+
+5/13/96	lib/*
+	 Added undo delimiting for top-level commands 
+		 (except from controling terminal)
+	 Added lastCommand for : commands.
+
+	 TODO:  commented out undo code for cell loads?
+
+	 CHECKPOINTING
+
+5/13/96	*
+	 Replaced Layout "ClientData w_SurfaceID" with "CellUse *w_rootUse"
+	 through out, and eliminated redundant casts.
+
+	 Fixed compiler warnings.
+
+	 Changed initial window geometry, so whole palette shows.
+
+5/14/96 Layout/DBWprocs.c main/mnMain.c
+	 Revamped DBWloadWindow()
+	 Restore undo of edit cell change.
+
+	 make force
+	 error and warning free!
+	 works ok.
+
+	 CHECKPOINT 
+
+5/14/96	Installed at mmi as max0.1
+
+
+5/21/96	lib/pal.tcl
+	 Adapting Palette to ppc4
+
+5/21/96	main/mnTextio.c tech/tech1.c calma/calmaRead cif/cifRdUtils.c
+	 TechError() etc., varargs was broken.
+	 Created TxErrorV()
+	 Modified TechError() to use TxErrorV() to pass on var args.
+	 Modified CalmaReadError() to use TxErrorV() to pass on var args.
+	 Modified CIFReadError() to use TxErrorV() to pass on var args.
+
+5/25/96 drc/DRCcif.c 
+	 drcCifMaxwidth() was core dumping when first arg is nonexistant layer.
+	 Fixed (by initialing thislayer to -1)
+
+	 drcCifWidth() fixed same bug here.
+
+5/25/96 ppc4/
+	 mved ppc4 to max source tree.
+
+5/26/96	lib/pal.tcl
+	 Adapted Palette to changed in ppc4
+
+5/26/96	main/mnMain.c
+	 Change default technology to ppc4
+
+5/30/96	lib/pal.tcl
+	 Adapted Palette to more changes in ppc4 
+
+5/30/96 ppc4/ppc4.7bit.dstyle5 ppc4.7bit.cmap1 ppc4.tech ppc4.tech27
+	 Changed dstyle #s to have solid li drawn before diff/poly.
+	 Changed dstyle and cmap names from ppc.* to ppc4.* so they won't conflict with old "ppc" tech.
+	 Updated Version/Description (not using RCS yet)
+	 cped ppc4 tech files to ~cad/magic/lib/magic/sys @ mmi
+
+5/30/96	ppc4/Makefile
+	 added CPP environment variable (different location at mmi).
+
+5/30/96 max/Makefile
+	 set VERSION to 0.2
+
+5/30/96	INSTALLED as max0.2 @ MMI
+
+5/31/96	Makefile make/Makefile.module :config 
+	 Added Max configuration program.
+	 Excluding make/config when "make tar" to force reconfiguration.
+	 Automatically runs :config before compiling, if make/config does 
+	 not exist.
+
+5/31/96	ppc4/Makefile
+	 rmed hardwired cpp path.  cpp must now be in users path for 
+	 this Makefile to work.
+
+5/31/96	cif/cifWrite.c
+	 Modified output of cif preamble version info to not pass 0 length
+	 strings to fprintf()  (kills Solaris fprintf()).
+
+	 While I was at it, cleaned up and switched to POSIX compatible 
+	 ways of gathering version info.
+
+6/1/96	lib/max_sys.tcl bindings.tcl feedback.tcl
+	 Added view and box feedback areas.
+
+6/3/96	lib/max_sys.tcl feedback.tcl
+	 Refined/debugged box display.
+	 Removed view display.
+
+6/3/96	lib/max_sys.tcl menubar.tcl feedback.tcl
+	 mved feedback.tcl menubar.tcl
+	 Added ViewCif menu.
+
+6/3/96	pal.tcl
+	 Implemented cntl-D (erase layer) from palette.
+
+6/3/96  CHECKPOINT
+	 make tar
+
+6/4/96	pal.tcl
+	 kludged in labels button.
+	 (Does not actually know see labels state.)
+
+6/4/96	ppc4/ppc.tech drc_macros.i
+	 implemented CIF_COVER macro.
+	 got ppc4.tech up with all rules.
+
+6/5/96	ppc4/drc_macros.i
+	 Added CIF_EXACT_WIDTH() macro
+	 Added CIF_SQUARE() macro
+
+	 Tested/debugged rules through R502
+
+6/5/96	Layout/layCurrent.c
+	 Modified lay_box command to return old location of box (always).
+	 Added lay_rootcell command oto return name of current rootcell
+
+6/5/96	lib/menubar.tcl
+	 modified cif-see to feedback cif layer for current view (was box)
+
+6/5/96	ppc4/ppc4.tech
+	 resurrected cifoutput and cifinput styles.
+	 removed "x" from nwc and pwc styles
+
+6/5/96	database/DBtcl.c
+	 Partially implemented "db_search labels"
+
+6/5/96  CHECKPOINT
+	 make tar
+
+6/6/96	database/DBtcl.c
+	 Finished implementation of "db_search labels [glob]"
+
+	 For consistency "db_search <x> <y>" changed to 
+	 "db_search touchingtypes <x> <y>"
+
+6/6/96	lib/*
+	 Tracing down coredump when unexpanded subcell present.
+	 Seems to be in pal-update ???
+	 Some stuff currently commented out in .tcl files (marked with DEBUG).
+
+	 CHECKPOINT
+
+6/6/96	Layout/layCurrent.c
+	 Enhanced lay_point to take args and set point.
+
+6/6/96	*
+	 Installed at MMI as max0.3
+	 Upped max/Makefile version to 0.3
+	 Changed version on ppc4.tech and installed ppc4.tech27 etc into ~cad/magic/lib/magic/sys
+	 rmed DEBUG mods to lib/*.tcl
+
+6/6/96	LINUX BUG?
+	 Not able to demo unexpanded subcell problem at MMI?
+
+6/6/96  sram/
+	 cped ~tavrow/magic/sram to sram/  (sample cells!)
+
+6/6/96	mc/
+	 cped ~tavrow/mc (macro cell compiler, zoom box)
+
+6/10/96	database/database.h
+	 Changed TT_SUBCELL from TT_MAXTYPES to TT_MAXTYPES-1
+	 (Was running off end of array trashing memory causing
+	 unexpanded subcell problem noted above.)
+
+	 TODO:  incorporate L_CELL L_LABEL into database.h
+
+6/11/96	ppc4/ppc4.tech lib/menubar.tcl
+	 Fixing pplus generation bug.
+	 Reflect changes in cif layers in menubar.tcl
+
+6/11/96	ppc4/ppc4.tech ppc4/test4/*
+	 Cleaned up ppc4/ files.
+	 Finished debugging/verifying drc rules and gening test cases.
+
+6/11/96	ppc4/ppc4.tech
+	 Corrected calma layer #s (using doc/motodrc as reference)
+
+6/12/96	ppc4/ppc4.7bit.dstyle5 ppc4.7bit.std.cmap1 ppc4.tech lib/pal.tcl
+	 Tuned display styles for ppc4
+	 Added calma layer 0, cif layer DRC, magic layer drc and corresponding
+	   style to feedback drc errors from foreign drc.
+	 Updated palette to match.
+
+6/12/96	Layout/layCurrent.c
+	 Added lay_editcell tcl command.  (returns nil if editcell not
+	 in current "window".)
+
+6/12/96	lib/max_sys
+	 Added .maxrc sourcing
+
+6/13/96	max/max/Makefile
+	 version 1.4
+
+6/13/96	INSTALLED as max0.4 @ MMI
+	 ppc4/  Tuned metal system colors.
+	 lib/max_sys modified .maxrc sourcing to do so at toplevel (vars global). 
+	 mc/    Scarfed up Lee's latest.
+
+6/14/96	ppc4/ppc4.tech
+	 fixed rule R265 - was 1.20 but is supposed to be 1.25!
+
+6/20/96 lib/max_sys.tcl cellsmenu.tcl FSBox.tcl
+	 Integrated Lee's cells menu, file box and exit dialog.
+
+6/20/96	Mgc/cmdSubrs.c
+	 Modified CmdParseLayers() to use TxPrintf() instead of TxError() for
+	 listing special layers.
+
+6/21/96	lib/max_sys.tcl messages.tcl textio.tcl
+	 Fixed message handling.  Now delimiting message output by command.  One line messages
+	 put in message area of main window.  Multiline messages goto scrollable separate
+	 toplevel text window.
+
+	 TODO: tx_input!
+
+
+6/22/96	lib/pal.tcl ppc4/ppc4.tech
+	 added drc and allSame buttons.
+	 changed drc layer to fdrc (foreign drc) to avoid confusion.
+
+6/22/96	lib/*
+	 Fixed cells menu update.
+	 Cleaned up integration of Lee's file/cell stuff.
+
+6/22/96	lib/*
+	 Integrating Lee's zoom and wire stuff.
+
+6/27/96	*
+	 mved to MMI ~cad/max/max0.5
+	 changed version in max/Makefile to 0.5
+
+6/27/96	lib/max_sys.tcl textio.tcl
+	 Slow startup at MMI (seconds) -> hangs on Tx_print in .maxrc
+	 "raise" of toplevel window in .maxrc is problem.
+	 Replaced fancy Tx_print with simple one that goes to controlling terminal.
+
+6/27/96 lib/wires.tcl
+	 Replaced references to feedtext with Msg_new calls. 
+
+6/27/96	lib/menubar.tcl
+	 Added tk_menuBar call to make different menus popup as they are tickled 
+	 (with mouse button 1 down).
+
+6/27/96	lib/tcltags TAGS
+	 Copied tcltags from sue and ran: tcltags *.tcl
+
+6/27/96	*
+	 make tar
+	 mmi -> mha
+	 base version: mango.mharnold.com:~mha/import/max0.5base.tar.gz
+
+6/30/96 max/doc/max
+	 document design, etc.
+
+6/30/96	max/doc/manual.html
+	 Converted doc/max to manual.html
+
+7/3/96	lib/doc.tcl
+	 Began implementing "integral" documentation code.
+
+7/12/96	lib/menubar.tcl ppc4/ppc4.tcl
+	 change ciflayer PPLUS to PPLS  
+	 (some tools expect cifnames to be restricted to four characters)
+
+7/12/96	lib/wires.tcl
+	 fixed typo.
+
+7/12/96 lib/max_sys0.tcl doc0.tcl main/* Mgc/MgcLayout.c
+	 Source max_sys0.tcl immediately after initialializing Tcl interpeter -
+	 to define our version of proc (with documentation features).
+
+	 Defined MnCmdCreate - to document C-coded Max commands when registering
+	 with tcl.
+
+	 Modified all Max commands in Main module to use MnCmdCreate()
+
+	 Modified MgcLayout.c to pass appropriate documentation to MnCmdCreate()
+	 on old Magic commmands.
+
+7/15/96	Mgc/MgcGlobal.c
+	 Modified MgcGlobal.c to pass appropriate documentation to MnCmdCreate()
+
+7/15/96	lib/*.tcl Mgc/MgcGlobal.c MgcLocal.c
+	 Mgc commands now defined as ":" instead of "mgc_" with aliasing.
+	 C coded Magic quit removed (no longer used, emulated in magic.tcl instead).
+
+7/15/96	Database/DBtcl.c select/selTcl.c undo/undo1.c
+	 Converted remaining max builtins to use MnCmdCreate().
+
+7/15/96 main/mnCmd.c
+	 Removed DEBUG printf.
+
+7/16/96	CHECKPOINT
+	 make tar
+
+7/16/96 lib/menubar.tcl manual.html
+	 Added help menu with "commands" and "manual" entries.
+	 Added local menu.
+	 Added proc "menu_local_cmd" to let users add to local menu from .maxrc
+
+7/16/96	lib/command.tcl
+	 Added tab_through_entries (from sue prop_edit.tcl).
+
+7/16/96 lib/zoom.tcl
+	 Changed ":box" calls to "lay_box" (uses rootcell coords) so zoom works
+	 during subedits.
+
+7/16/96	CHECKPOINT
+	 make tar
+
+7/17/96	lib/*
+	 Split out main window code to win.tcl
+
+7/17/96	lib/manual.html
+	 updated manual.
+
+7/18/96	CHECKPOINT
+	 make tar
+	 taking to MMI
+
+7/18/96	max/Makefile
+	 installed at MMI as max0.6
+	 incremented version to 0.6
+
+7/18/96	lib/zoom.tcl
+	 Backed out of use of lay_box in zoom.  
+	 (Problem when dragging in negative direction)
+	 So zoom during subedit broken again - TODO debug this.
+
+7/18/96	lib/bindings.tcl
+	 Changed cmd-eval ref to cmd_eval
+
+7/18/96	*
+	 mmi -> mha	
+
+7/19/96 ppc4/ppc4.tech cif/* calma/*
+	 Added cct cif output style.
+	 New directives:  charset, bbox, iname.
+
+	 ":calma write" can now output unrestricted character set text,
+	 bounding boxes, and instance name labels.
+
+7/22/96	max/max/Makefile
+	 incremented version to 0.7
+
+	 make tar
+	 installed at MMI via ftp.
+
+7/22/96	calma/* cif/* ppc4/ppc4.tech
+	 Finished calma enhancements for read/write to CCT preserving instance
+	 names.
+
+7/22/96	utils/path.c Layout/grCMap.c Mgc/cmd_layoutCD.c
+	 Added PaHasExtension()
+	 Modified PaOpenPath() to tack on supplied (default extension) ONLY
+		 if no extension already present on supplied file name.
+	 Modified cmdCalma to use default extension of .gds (was .strm)
+
+	 NOTE:  Change to PaHasExtension() impacts loading of .save.mag files
+		TODO: address loading of .mag files.
+
+7/22/96 max/Makefile
+	 incremented version to 0.8
+
+	 make tar
+
+	 ftped to mmi and installed.
+
+7/23/96	lib/manual.html
+	 Added documentation on "changes to Magic" to the manual - including
+	 recent cif/calma enhancementes.
+
+7/23/96	ppc4/ppc4.tech	
+	 Added "labels" to pplus and li cifoutput.
+
+	 Installed at mmi (in ~cad/max0.8/ppc4/)
+
+7/24/96 lib/manual.html
+	 Documented message handling.  (Now just have to implement!)
+
+7/24/96	lib/file_box.tcl
+	 Changed fsBox(pattern) to "*.mag" 
+
+7/24/96	main/textio.c textio.h main.h Mgc/MgcGlobal.c MgcLocal.c
+	 Modified TxError to stash errors in dynamic string for commands.
+	 Added TxBegin(), TxEnd() for bracketing commands.
+	 Added macros CMD_BEGIN CMD_RETURN (use TxBegin and TxEnd).
+	 Incorporated macros into tcl commands in textio.c and Mgc/
+
+	 RESULT:  TxError calls during tcl commands collected together and gen tcl error
+	 on command termination.
+
+7/24/96	*
+	 Modified all C-coded tcl commands in max to use CMD_BEGIN, CMD_RETURN.
+
+7/24/96 lib/textio.tcl
+	 updated tx_map (TxError no longer mapable)
+
+7/24/96	CHECKPOINT
+	 make tar
+
+7/25/96 main/mnTextio.c 
+	 msg_catch implemented and fully functional!
+
+7/25/96 max/max
+	 cleaned out junk files!
+
+7/25/96	CHECKPOINT
+	 make tar
+
+7/25/96 make/namechange.tcl changes */*
+	 Enhanced namechange.tcl script to process list of changes.
+	 Prepared list of changes (make/changes) to convert tx to msg globally.
+
+	 mv mnTextio.c message.c
+	 mv textio.h message.h
+
+7/25/96	CHECKPOINT
+	 make tar
+
+7/25/96	main/message.c
+	 Made CmdBegin/CmdEnd stack based, so reentrant.
+
+7/26/96 main/message.c main/message.h extract/*.c database/DBtimestmp.c
+	 Message code completed, and debugged.
+	 Eliminated TxFlush().
+
+7/26/96 make/changes2 *
+	 cd make; namechange.tcl < changes2 	(renamed _TEXTIO _MESSAGE).
+
+7/26/96	lib/manual.html
+	 updated.
+
+7/26/96	lib/*
+	 Modified to properly use msgs.
+	 Just a bit of debugging to do!
+
+7/26/96	CHECKPOINT
+	 make tar
+	 cp foo /dosc/bu	
+
+7/29/96	lib/misc.tcl pal.tcl win.tcl
+	 coded "quiet" version of :select (select_q) using msg_catch.
+	 changed :select to select_q in pal.tcl and win.tcl to get
+	 rid of "selected cell is messages"
+
+	 Modified win_new to clear selection of "UNNAMED" after making
+	 it the edit cell.
+
+7/29/96	lib/i_cmd.tcl manual.html
+	 Modified to use "tkerror" to report errors and permit viewing of 
+	 stack trace (errorInfo).
+
+	 Slight updating/editing of manual section on messages.
+
+	 I think we are officially done with message/error handling for now!
+
+7/29/96	lib/prop_menu.tcl
+	 Modified prop_menu to allow interactive resizing.
+	 (In particular allows Lee to resize the command box.)
+
+7/29/96 lib/i_cmd.tcl
+	 modified i_cmd_eval_box to do own modal dialog (not prop_menu).
+	 Allows command entry to be resized.  
+	 Fixes "focus" problem?
+
+	 Should probably reintegrate with prop_menu (see latest sue/prop_edit.tcl).s
+
+7/30/96	mc/ sue/
+	 grabbed Lee's latest.
+	 sue src/ version 2.6
+
+7/30/96	lib/prop_edit.tcl i_cmd.tcl max_sys.tcl pergatory/i_cmd_eval_box.tcl
+	 imported prop_edit.tcl (prop_menu) from sue2.6
+	 imported new utilities.tcl from sue2.6
+
+	 stashed away version of i_cmd_eval_box that creates own modal dialog
+	 (does not use prop_menu).
+
+	 reverted i_cmd_eval_box to version using prop_menu
+
+	 NOT WORKING COMPLETELY (can't edit entry).  
+	 Also insertion cursor bug.
+	 ALSO prop_edit.tcl specialized for SUE.
+
+	 PLAN:  
+	 Revert to stand-alone version of i_cmd_eval_box (no prop_edit) for now.
+	 Eventually create generalized edit_box based on prop_menu.
+
+7/30/96 lib/i_cmd.tcl prop_edit.tcl prop_menu.tcl max_sys.tcl
+	 Reverting i_cmd_eval_box to stand alone version (does not use  prop_edit)
+
+7/30/96 lib/menu_bar.tcl max_sys.tcl
+	 Modified menu_add_cmd to delete (any) existing entry by same name.
+	 Added "Resource .maxrc" menu item to File menu.
+
+7/30/96	lib/message.tcl main/message.c
+	 fixed bug in msg_map tcl command.
+	 fixed bug in _msg_print
+
+7/30/96	select/selTcl.c lib/pal.tcl
+	 Enhancing sel_what command.
+
+8/1/96	DBtcl.c
+	 modified "db_search labels" to output instance pathnames.
+
+8/1/96	select/selEnum.c selOps.c selTcl.c
+	 Modified SelEnumLabels to pass "terminal pathnames" to call back func.
+	 Modified "sel_what labels" to give instance path names.
+
+8/2/96	max/Makefile
+	 upped version to 0.9
+	 make tar
+	 ftped to mmi
+
+8/2/96	Mgc/cmd_layoutTZ.c
+	 fixed ref to SelEnumLabels.
+	 ftped cmd_layoutTZ.c to mmi
+
+	 INSTALLED as max0.9 at mmi
+
+8/5/96	select/selEnum.c
+	 POTENTIAL PROBLEM:  Mustn't modifiy db during search.
+	 Reviewing funcs in this file for this problem.
+
+	 SelEnumLabels() - Safe since search aborted after first call
+			   to user func.
+
+	 SelEnumCells() -
+
+8/5/96  select/select.h selEnum.c, selOps.c, selTcl.c 
+	 Mgc/cmdSubrs.c, cmd_layoutE.c, cmd_layoutFI.c, cmd_layoutTZ.c 
+	 Added TerminalPath arg to SelEnumCells() and call back funcs.
+
+	 TODO:  make tpath work for SelEnumCells()!
+
+8/8/96	ppc4/ppc4.tech
+	 Changed cct cif styles to use only type=0 on all layers 
+	 (type=1) on a few "special" layers.
+
+	 (Apparently type=1 is used to map layers greater than 63, e.g.
+	 layer 5, type 1 = layer 64 + 5 = 69.)
+
+	 @ MMI, saved ppc4.tech to ppc4.tech.save and installed new
+	 ppc4.tech
+
+8/8/96  select/selEnum.c
+	 Completed tpath implementation for SelEnumCells
+
+8/8/96	select/selTcl.c
+	 Added "-edit_only var_name" option to "paint","labels" and "cells"
+	 subcommands. 
+
+8/8/96	CHECKPOINT
+	 make tar
+
+8/8/96	lib/zoom.tcl
+	 modified zoom_drag to use lay_box instead of :box.
+	 fixes zoom during subedit problem.
+
+	 TODO:  Didn't seem to work under Solaris? 
+
+8/8/96	calma/calmaRead.c
+	 in clearINameFunc() resetting use->cu_id to NULL after DBUnLinkCell(),
+	 and FREE(use->cu_id).
+
+	 Fixes "gdsbug" (segv on calma read from cct)
+
+8/9/96	INSTALL
+	 uped version to 0.10 (max/Makefile)
+
+	 installed @ mmi.
+	 (backed out of zoom.tcl change - drag only works for first quad.)
+
+8/9/96	lib/zoom.tcl Layout/layCurrent.c utils/geometry.h geometry.c
+	 Made GeoCanonicalRect a void, and added prototype to geometry.h
+
+	 Passing args to lay_box through GeoCanonicalRect 
+
+	 changed drag_box to use lay_box again.
+	 Finally should have zoom box working right in subedits!
+
+8/9/96	lib/mode.tcl
+	 Began implementing mode stuff.
+
+8/12/96	lib/mode.tcl call_by_keyword.tcl pal.tcl win.tcl max_sys.tcl
+	 call_by_keyword.tcl (cped from sue).
+	 converted calls to bind-cmd to i_cmd_bind and mode_bind
+	 rm bindings.tcl (obsolete)
+	 integrated mode.tcl 
+
+8/12/96	lib/mode.tcl menu_bar.tcl
+	 Added mode_box command.
+	 Added "common" mode, for defining bindings common to all modes.
+	 Bound mode_box to <space> in "common" (TODO: make a toggle)
+	 Added "Bindings" (mode_box) to Help menu.
+
+	 CHECKPOINT.
+	 make tar
+
+8/13/96	lib/mode.tcl zoom.tcl
+	 Added mode_def (gate keeper and msg handling)
+	 modified drag box zoom code to use modes.
+
+8/13/96	lib/wires.tcl wires.base
+	 cped latest version from ~tavrow/mc/wires.tcl (also cped to wires.base)
+	 made button 2 and 3 synonomous.
+	 began converting to use mode stuff.
+
+8/19/96	lib/at.tcl win.tcl max_sys.tcl
+	 Added general attribute database support.
+	 Used at.tcl to create win_at (to store attributes of current window).
+
+8/19/96	lib/mode.tcl 
+	 Now catching errors on "old_gate" notify during pop - so we can
+	 successfully exit from broken modes.
+
+8/19/96	Layout/layCurrent.c
+	 Fixed bug in error message that was causing core dump!
+
+	 Changed lay_point to return origin by default, rather than {}
+	 (eliminates pal_update	bug)
+
+8/19/96	lib/wires.tcl
+	 converted to mode stuff and win_at, but still slow and buggy.
+
+	 CHECKPOINT
+	 make tar
+
+8/20/96	lib/max_sys.tcl
+	 added global maxlib to proc max_source_maxrc
+	 was dieing when no .maxrc present!
+
+8/23/96	lib/wires.tcl wires.base 
+	 Backing out of wiring changes:
+	 cp wires.tcl wires.tcl wires.new
+	 cp wires.base wires.tcl
+
+	 Converted wires.tcl to mode stuff (again) but left out the win_at stuff.
+	 Looks like its working!
+
+8/23/96	max/Makefile
+	 uped version to 0.11
+
+	 installing at MMI:
+	 make tar
+
+	 installed at MMI.
+
+8/23/96	lib/*
+	 Converted to Lee's version of setl (initializes vars to "")
+
+8/23/96 lib/mode.tcl
+	 Moved <Motion> binding from special_layout_bindings to main mode.
+	 <Motion> was conflicting with <Any-Motion> in wire_draw mode.
+
+	 Note:  this is temporary as will change to update palette priodically
+	 instead of on every cursor motion.
+
+8/23/96	max/Makefile
+	 uped version to 0.12
+
+	 install at MMI.
+	 make tar
+
+8/23/96	lib/mode.tcl
+	 mode_bind main <motion> ... 
+		 added -cmd 0 !!!
+
+8/23/96	lib/i_cmd.tcl Layout/grX11su1.c grX11su5.c 
+	 implementing busy cursor.
+
+8/26/96 lib/cursor.tcl max_sys.tcl i_cmd.tcl Layout/layDisplay.c
+	 implemented cursor package with normal/busy/mode/wait/redisplay indications.
+
+8/27/96	CHECKPOINT
+	 make tar
+
+8/27/96	lib/dialog.tcl max_sys.tcl
+	 customized tk_dialog to call cursor_wait
+
+
+8/27/96	lib/win.tcl win_msg.tcl *.tcl
+	 mved win_msg.tcl functionality to mode.tcl (Msg_new -> mode_msg)
+	 rmed win_msg.tcl
+
+	 mved packing of components of main window to win.tcl (so we can
+	 control final assembly of widgets in one place!)
+
+
+8/28/96	lib/*.tcl
+	 Made main windows "repackable"
+	 Moved box_area to bottom_bar
+	 Added drc_status area to bottom_bar
+	 Split off Help menu as right most button.
+
+	 Added Window menu to give control over which components of main window
+	 are displayed.
+
+	 Created _max_periodic_update
+	 moved pal_update to _max_periodic_update
+
+	 CHECKPOINT
+	 make tar
+	 cped to /dosc/bu
+
+8/29/96	drc/DRCtcl.c drc.h main/mnMain.c lib/win.tcl max_sys.tcl
+	 Created DRCTclInit() to provide tcl access to drc status:
+	   DRCBackGround -> drc(on)         (bool)
+	   DRCPendingRoot -> drc(pending)   (bool, read only)
+
+	 coded drc_status_update and added to _max_periodic_update
+
+8/29/96 Mgc/cmd_layoutCD.c calma/calmaRead.c calmaRdcl.c calma.h calmaInt.h
+	 Added optional cellName arg to ":calma read", now:
+		 :calma read file [cellName]
+		 If cellName is present only that cell is read from file.
+
+8/29/96	lib/manual.html
+	 documented the ":calma read" enhancement.
+
+8/29/96	max/Makefile
+	 uped version to 0.13	
+
+	 CHECKPOINT
+	 make tar
+
+8/30/96	max/sram.mag wld.mag
+	 mved sram.mag wld.mag from ~tavrow/magic/sram
+	 tried to recreate problem with selection and move.
+	 no problem under Linux?!
+
+8/30/96	lib/win.tcl
+	 rmed DEBUG puts.
+
+8/30/96	Mgc/cmd_layoutE.c Mgc/cmd_layoutTZ.c
+	 Fixed bugs in CmdExpand() and CmdUnexpand().
+	 Now propagating expansion mode changes to uses in selection.
+
+9/2/96	lib/max_sys.tcl
+	 Making $max_sys.layout the default focus to kludge around problem 
+	 that when file_box is destroyed we may teleport into layout window
+	 without generating an "enter" event.
+
+9/2/96	lib/mode.tcl
+	 Added accurate -desc to bindings for main mode.
+
+9/2/96	database/DBtcl.c
+	 added "db_cell_new [-internal] cellName" command.
+
+9/2/96	max/Makefile
+	 upped version to 0.14
+
+	 = ~mha/maxbu/max.base.group.tar.gz
+	 = BASE VERSION FOR GROUP FORK.
+
+------> MAIN MAX FORK BELOW.
++ = change incorporated in both versions (maxg AND max).
+
++ 9/13/96 (9/4/96)	lib/max_sys.tcl
+	 changed _max_load_cells to use msg_catch so we don't abort if
+	 command line fileName not found.
+
++ 9/13/96	main/mnMain.c drc/DRCcontin.c
+	 Fix bug that causes undo info to be lost when drc is busy.
+
+	 Bracketed call to Tk_DoOneEvent in DRCContinuous() with:
+	 UndoEnable(), UndoDisable().
+
++ 9/13/96	undo/undo1.c
+	 upped MAXCOMMANDS/LOWCOMMANDS (length of undo in commands) from 20
+	 to 200
+
++ 9/13/96	lib/message.tcl
+	 fixed mapping of TxGetLine  (_msg_input)
+
++ 9/13/96	Layout/DBWprocs.c Mgc/cmdSubrs.c commands.h
+	 removed DBWexit() (obsolete).
+	 removed CmdWarnWrite() (obsolete).
+
++ 9/13/96	select/selTcl.c database/DBtcl.c
+	 modified "sel_what labels" and "db_search labels" 
+	 to output label pos by name instead of number.
+
++ 9/13/96	utils/utils.h
+	 rmed duplicate prototype for StrDup()
+
++ 9/13/96	lib/max_sys.tcl cell.tcl database/DBtcl.c
+	 added optional fileName arg to db_cell_new
+	 added "New..." to file menu.
+
++ 9/13/96	lib/max_sys.tcl file_box.tcl FSBox.tcl
+	 Convert from file_box.tcl to Lee's latest and greatest FSBox.tcl	
+	 To keep FSBox.tcl generic, setting SUFFIX(default) in max_sys.tcl
+
+9/13/96	max/Makefile
+	 incremented verison to 0.15
+
+9/13/96 CHECKPOINT
+	 make tar
+
+	 installing at mmi.
+
+9/14/96	main/mnMain.c main.h lib/max_sys.tcl max_sys0.tcl menu_bar.tcl
+	 rmed CurUse, CurDef, etc. defs and decls (not used).
+	 changed tech option from -t to -tech
+	 changed maxlib to max_lib
+	 fixed divining of technology from cells specified on command line.
+	 export tech name to tcl.
+
+9/14/96	lib/max_sys.tcl 
+	 added sourcing of tech dependent tcl code. (e.g. tech_ppc4.tcl)
+
+9/14/96	lib/win.tcl
+	 fixed so command line geometry requests used.
+
+9/16/96	lib/pal.tcl tech_ppc4.tcl db.tcl
+	 cleaned up palette code a bit (changed names to conform with our
+	 coding style).
+
+	 split out db_long_name to db.tcl
+
+	 fixed palette to use pal_group info in tech_*.tcl
+
+	 SCMOS now loads!
+
+9/16/96	lib/tech_scmos.tech
+	 defined palette for scmos.
+
+9/16/96	cif/cifTcl.c main/mnMain.c
+	 created cifTcl.c 
+	 added "cif_layers" command.
+
+9/16/96	lib/cell.tcl menu_bar.tcl i_cmd.tcl
+	 generating cif menu on the fly.
+
+9/16/96	lib/win.tcl
+	 rmed debugging puts.
+
+9/16/96	CHECKPOINT
+	 make tar
+	 cp maxSep16.tar.gz /dosc/mha/bu/maxsep16.zar
+
+9/19/96	tsmc/*
+	 coded up tsmc.tech
+	 fixed bugs and extended drc_macros.i
+	 built test cases (*.mag)
+	 got and tested Lee's tsmc version of 6t
+	 see tsmc/README for more details
+
+9/19/96	lib/max_sys.tcl
+	 fixed file-selector-box extension.
+
+9/19/96 main/mnMain.c mnTech.c mainInt.h tech/tech1.c tech.h
+	 cleaned up techName selection.
+	 default is now scmos 
+	 -tech and -T options now OK on cmd-line
+	 techName taken from last cmdline filename in absence of cmdline switch.
+
+9/19/96	* max/Makefile
+	 uping version to 0.16
+
+	 make tar
+
+	 INSTALLING at MMI
+
+9/20/96	select/selTcl.c
+	 Implemented sel_labels cmd.	
+
+9/23/96 select/selTcl.c
+	 Debugged sel_labels cmd.
+	 Made work with subedit.
+
+9/23/96	max/Makefile
+	 uped version to 0.17
+
+	 make tar
+
+	 INSTALLING at MMI
+
+9/25/96	make/mha.config Makefile.module max/Makefile
+	 upgraded to gcc 2.7.2 (elf binarys)
+	 messed with above, files but no change needed in the end?!
+
+	 linking statically (as before) - need to build shared tcl and tk libraries
+	 before I can link shared.
+
+9/25/96	main/mnMain.c
+	 augmented error messages on error exits.
+	 No more quiet fatal errors!
+
+9/28/96 *
+	 CHECKPOINT
+	 make tar
+
+9/28/96	make/Makefile.module config.mha max/Makefile o/*
+	 modified Makefiles/config to allow for cross compiles.
+	 mved .o's to o/config_name/* (to allow for coexisting configs)
+
+	 Successfully making max using config.mha
+
+9/28/96	make/config.mmi
+	 Got cross compile working!
+
+10/1/96	lm/
+	 Began coding license manager.
+
+10/4/96	Makefile
+	 modified "make tar" to compress on the fly.
+
+10/4/96	CHECKPOINT
+	 make tar
+
+10/13/96 tile/tile.h tiMain.c
+	 merged in group code:
+	 added ti_groups field.
+	 changed MALLOCs to CALLOCs and removed explict ti_body clears
+	    (so ti_body and ti_groups zeroed on tile creation).
+
+	 Group versions of macros:
+	 TiSetBody() -> TiCopyContent()
+
+10/13/96 database/database.h databaseInt.h DBpaint.c DBtcl.c 
+	 Modified DBPaint code to work with groups.
+	 painting/merging/undo working fine for group 0.
+
+	 Group versions of macros:
+	 TiGetType -> dbGetTypeG
+	 new: dbSetTypeG
+
+10/13/96 Makefile
+	 modified make tar to exclude 'o' tree.
+
+10/13/96 CHECKPOINT
+	 make tar
+
+10/14/96 tile/tile.h database/database.h */*
+	 TiGetType -> DBgetTileType
+	 TiSetType -> DBsetTileType
+	 Modified above to use only right byte of ti_body, 
+	 so we can add flags.
+
+10/14/96 database/DBtcontact.c
+	 added prototypes for dtTechSetImage() and dbTechMatchResidues()
+	 (necessary since I changed Tiletype to unsigned int! - to make
+	 sure no sign extension problems will screw up flags in ti_body)
+
+10/14/96 Layout/layDisplay.c
+	 changed direct ref to ti_body in selRedisplayFunc to DBgetTileType macro.
+
+10/14/96 resis/ResFract.c
+	 changed ref to TiSetBody() to DBsetTileType()
+
+10/14/96 database/DBpaint.c
+	 implemented full dbGetTypeG()
+	 next: dbSetTypeG()!
+
+10/15/96 database/database.h databaseInt.h DBpaint.c tile/tile.h
+	 implemented dbSetTypeG()
+	 tiCopyContent -> dbCopyBodyandGroups
+
+	 working for group 0, ready for testing with paint to other groups!
+
+10/15/96 CHECKPOINT
+	 make tar
+
+10/16/96 Mgc/cmd_wizard.c MgcLayout.c Layout/layout.h layDisplay.c 
+	 added "groups" option to *watch command.
+	 added DBW_SEEGROUPS flag
+
+10/16/96 Layout/layDisplay.c database/database.h DBpaint.c
+	 wrote DBGroupTileTypes2S() to provide content for "*watch plane groups"
+
+10/16/96 database/DBpaint.c
+	 wrote dbSameTypesInAllGroups()
+	 debugged group painting.
+
+	 working!
+	 NEXT:  make undo of paint work again.
+		Q. highlighting of space tiles after select?
+
+10/16/96 CHECKPOINT
+	 make tar
+
+10/17/96 Layout/layDisplay.c
+	 fixed selection highlighting bug (introduced when converting
+	 from ti_body to DBgetTileType).
+
+10/17/96 database/DBpaint.c DBundo.c
+	 made paint undo work with groups.
+
+	 works!
+	 Looks like we are really done with group painting code!
+
+10/17/96 CHECKPOINT 
+	 make tar
+
+10/17/96 database/DBgroup.c database.h DBtcl.c utils/ihash.h, ihash.c
+	 Implementing groups at cell level.
+	 db_new_group working.
+	 Todo (deferred):  improve hashfunc, hashtable growth, delete, hash enum,
+			   etc.
+
+10/17/96  database/database.h DBtcl.c DBcellname.c DBgroup.c 
+	 Implemented db_paint_group
+	 Works!
+
+10/18/96 Mgc/
+	 changed file names layout_cmdAB.c -> MgcCmdAB.c 
+	 Added "-g" option to selection command.
+
+10/21/96 select/selCreate.c select.h Mgc/MgcCmdRS.c wiring/wireOps.c
+	 adding group option to SelectChunk()
+
+10/21/96 select/selCreate.c database/DBcellcopy.c
+	  added DBCellCopyAllPaintG() (to allow copying of active group only)
+	  implemented activeGroupOnly in SelectChunk()
+
+10/21/96 database/DBcellsrch.c database.h Mgc/*.c wiring/wireOps.c
+	  Added group arg to DBSeeTypesAll()
+	  Using in search command to determine if anything of appropriate
+	  type is below the cursor.
+
+	  select of chunks working correctly now!
+
+10/22/96 CHECKPOINT
+	 make tar
+
+10/22/96 MgcCmdRS.c selCreate.c selUnselect.c wireOps.c
+	 made select area group aware.
+
+10/23/96 MgcCmdRS.c selCreate.c selUnselect.c select.h
+	 "select -g less area" now works.
+
+10/23/96 DBtcl.c DBgroup.c DBcellname.c database.h
+	 db_new_group, db_paint_group consolidated into db_group
+	 removed uniquify stuff.
+	 removed DEBUGs
+	 cd_paintGroup -> cd_activeGroup
+	 modified DBsetTypeG to always put new groups on top (head of GroupList -
+	 instead of preserving null group on top.  Seems more natural?)
+	 Updated and cleaned up ":select help" message.
+
+10/23/96 CHECKPOINT
+	 status: GROUP stuff done!  - for now :)	
+	 make tar
+
+10/23/96 lm/* main/fingerprint.h mnLicense.c mnMain.c lib/license
+	 Implemented license manager.
+
+10/23/96 make/config.mha config.mmi max/Makefile
+	 Added CONFIG_MAX_LIB.
+
+10/23/96 INSTALLED max0.18 at MMI
+
+10/24/96 CHECKPOINT
+	 make tar
+
+10/25/96 make/config.atmmi :config
+	 added atmmi configuration for compiling on solaris.
+
+10/25/96 make/utils/ihash.c
+	 Fixed IHashInit to return a value!
+
+10/26/96 database/DBgroup.c 
+	 Fixed bug in DBsetTypeG_multiGroup()
+
+10/26/96 lib/group.tcl max_sys.tcl
+	 implemented group_transfer
+
+10/26/96 Mgc/MgcCmdRS.c select/select.h selOps.c
+	 adding -g option to :stretch
+	 by way of making SelectStretch() group aware.
+	 Works!
+
+10/26/96 max/Makefile
+	 uped version to max0.19
+	 installing at mmi
+
+	 xfered changes back to mango
+	 make tar
+
+10/27/96 database/database.h DBlabel.c selTcl.c
+	 adding groups to labels.
+	 DBputLabel() now puts into active group.
+	 "sel_what labels" modified to spit out groups.
+	 "sel_labels" can specify group.
+
+10/28/96 database/databaseInt.h DBlabel.c DBundo.c
+	 made label undo/redo group aware.
+
+10/28/96 database/ DBlabel.c
+	 made DBPickLabelLayer() and hence DBAdjustLabels() group aware.
+
+10/28/96 select/selCreate.c
+	 SelectArea() modified to select on labels in active group (if passed
+	 TRUE group are).
+
+10/28/96 database/DBlabel.c
+	 Modified DBEraseLabel() to only erase from activeGroup.
+
+10/28/96 lib/wires.tcl
+	 Integrated Lee's latest wires.tcl (uses groups).
+	 Mved tech info from wires.tcl tech_ppc4.tcl
+
+10/28/96 max/Makefile
+	 uped version to max0.20
+	 installing at mmi.
+
+10/29/96 CHECKPOINT
+	 make tar
+	 cped to ~mha (disk 3) )/b_bu/ (disk 2)  and /dosc/mha/bu (disk 1)
+
+10/29/96 database/database.h DBcellname.c DBflyline.c DBtcl.c
+	 Start implementing flylines.
+
+10/29/96 lib/menu_bar.tcl
+	 fixed "scanning" across menu bar with button 1 down.	
+
+10/29/96 Layout/layDisplay.c
+	 implementing display of flylines.
+
+11/4/96 Layout/layDisplay.c database/database.h DBflyline.c DBcellsrch.c DBtcl.c utils/geometry.h geometry.c
+	 Finally have fly line clipping and redisplay under control!
+
+
+11/5/96  CHECKPOINT
+	 make tar
+
+11/7/96  database/*
+	 flylines now working.
+	 Todo:  arrays, update on use translate.
+
+11/7/96	CHECKPOINT
+	 make tar
+
+11/12/96 database/DBlabel2.c DBflyline.c extract/ExtLength.c
+	 modified DBSrlabelLoc to provide scx to client funcs.
+
+11/12/96 database/* 
+	 Changed Flyline notify to work per def rather than instance.
+	 Now works for arrays, instance motions etc.
+
+11/12/96 Mgc/MgcCmdRS.c MgcCmdSubrs.c commands.h database/database.h
+	 added special layer "flyline"
+	 extended ":see" to turn flylines on/off
+
+11/12/96 lib/pal.tcl
+	 added flyLine button.
+
+11/13/96 max/Makefile
+	 upped version to 0.21
+
+11/13/96 CHECKPOINT
+	 make tar
+
+11/14/96 Layout/layDisplay.c database/DBflylines.c
+	 moved flyline display to "high lights"
+
+11/15/96 Layout/layDisplay.c
+	 fixed flyline redisplay bug.
+
+11/15/96 select/selTcl.c
+	 added -more flag to sel_labels
+
+11/15/96 *
+	 Added flags to labels, propagated to DBPutLabel and all its calls!
+	 Added "-hidden" to :label
+	 TODO: respect LAB_HIDDEN in redisplay
+	 TODO: ":see" (see hidden labels?)
+	 TODO: undo, save, "db_search labels", "db_what ?"
+
+11/15/96 Layout/layDisplay.c	
+	 Don't display labels with LAY_HIDDEN set.
+	 TODO: allow display for debugging.
+	 TODO: size of largest label ... exclude hidden labels?
+
+11/17/96 select/selOps.c
+	 fixed selStretchFillFunc3() so it doesn't prematurely abandon
+	 search on ":stretch -g"
+
+11/17/96 database/DBundo.c DBlabel.c
+	 added lab_flags to label undo funcs.
+
+11/17/96 database/DBtcl.c select/selTcl.c
+	 updated "sel_what labels" and "db_search labels" to give hidden flag.
+
+11/17/96 Layout/layDisplay.c Mgc/MgcCmdRS.c etc.
+	 added "hiddenLabels" to ":see"
+
+11/17/96 CHECKPOINT
+	 make tar
+
+11/17/96 database/DBundo.c DBflyline.c databaseInt.h
+	 added flyline undo.
+
+11/17/96 max/Makefile
+	 uped version to 0.22
+	 installed at mmi
+
+
+11/17/96 CHECKPOINT
+	 make tar
+
+11/18/96 database/DBgroup.c database.h databaseInt.h DBtcl.c
+	 implementing group "types" and attributes.
+
+11/19/96 database/DBio.c DBread.c DBwrite.c DBgroup.c database.h databaseInt.h
+	 split DBio.c to DBread.c and DBwrite.c
+	 converting to "max" file format.
+	 r/w of group attributes.
+
+11/23/96 database/* lib/* 
+	 Completed conversion from ".mag" to ".max" files.	
+	 Except not reading "SECTION GROUPS" yet.
+
+11/23/96 database/DBmagicio.c DBtcl.c
+	 Implemented "db_magic read ..."
+
+11/25/96 database/DBgroups.c DBtcl.c database.h databaseInt.h
+	 group "type" -> group "class"
+
+11/25/96 database/DBgroup.c
+	 Implemented group reading.
+
+11/25/96 CHECKPOINT
+	 make tar
+
+11/25/96 database/DBgroup.c
+	 Added free() to attribute reading and changing code.	
+
+11/25/96 database/DBlabel.c
+	 Blew away "Moving label" warning message in DBAdjustLabels().
+
+11/26/96 Mgc/MgcCmdRS.c database/database.h DBcellcopy.c select/select.h selCreate.c selUnselect.c 
+	 Implemented -editOnly option for ":select area"
+
+11/26/96 lib/group_transfer
+	 changed group_transfer proc to not select instances, and to use
+	 -editOnly on selection (efficiency).
+
+11/26/96 database/DBread.c DBwrite.c
+	 read/write label flags.
+
+11/26/96 database/DBread.c DBwrite.c DBflylines.c databaseInt.h
+	 read/write flylines.
+	 bug in reading - flylines not displayed?
+
+11/27/96 MOVE TO MMI
+	  make tar
+	  untared at mmi
+
+11/27/96 max/Makefile
+	 Incremented version to 0.23 (but not installing yet)
+
+11/27/96 database/DBflyline.c DBread.c
+	 Fixed flyline update problem on DBread.
+
+11/27/96 database/DBwrite.c
+	 moved SECTION FLYLINE to end, so that flylines to instances
+	 will be handled correctly.
+
+11/27/96 lib/ tech_*.tcl fets.tcl prop_menu.tcl
+	 From Lee.
+
+11/27/96 lib/cell.tcl menu_bar.tcl
+	 Added "Load Magic ..."
+
+11/27/96 database/DBread.c
+	 Fixed DBGetTech()
+
+11/28/96 MOVE TO MHA
+
+11/28/96 lib/menu_bar.tcl
+	 rmed "Menu Bar" option from window menu.
+
+11/28/96 lib/win.tcl
+	 rmed area from box display.
+
+11/28/96 lib/max_sys.tcl
+	 cleaned up ".max" extension stripping code.
+
+11/28/96 lib/zoom_bar.tcl
+	 made zoom buttons move in/out by factor of 2.
+
+11/28/96 lib/win.tcl menu_bar.tcl pal.tcl
+	 Modified palette to be more compact.
+	 Added right sidebar for cell box etc.
+
+11/29/96 select/selCreate.c
+	 rmed debugging.
+
+11/29/96 MOVE TO MMI
+	 make tar
+
+11/30/96 lib/menu_bar.tcl mode.tcl cells.tcl ...
+	 USER INTERFACE:  Implemented extensive menus and some hotkyes
+	 partly "mock up"
+
+12/2/96  make tar
+	 and cped to mmi
+
+12/2/96  lib/menu_bar.tcl mode.tcl
+	 Mved hot key definitions to menu_bar.tcl
+	 Fixed menu build performance bug
+	 Modified menus based on comments @ mmi
+
+12/2/96	lib/pal.tcl
+	 Another attempt at a small palette.
+
+12/3/96 MOVE TO MMI
+	 make tar
+
+12/3/96 lib/list_box.tcl max_sys.tcl menu_bar.tcl win.tcl
+	 Started coding placement list boxes
+
+12/3/96 max/Makefile
+	 Changing version to 0.23x
+	 lib "maxx/lib"
+
+	 installing at MMI as maxx (experimental max).
+
+12/4/96 cp -pr lib/ lib.base
+	 Keep base version since Lee and I will both be making changes.
+
+12/4/96 database/DBlabel2.c
+	 Modified DBTreeFindUse to recognize "." as top level use.
+
+12/5/96 ppc4/ppc4.7bit.dstyle5 tsmc/tsmc.tech
+	 changed fdrc color to yellow.
+	 Fixed #ifndef conditonals (contacts were not being squared).
+	 Installed changes at MMI
+
+12/5/96 database/DBcellsrch.c database.h 
+	 Added DBEnumUsePath()
+
+12/5/96  Layout/layCurrent.c
+	 Added "-path" option to lay_edit command.
+
+12/5/96 database/DBread.c DBwrite.c
+	 fixed "array" reading bug.
+	 fixed "array" writing bug.
+
+12/5/96 lib/*
+	 Integrated Lees changes (Sue like list boxes and button functions).
+
+12/5/96 max/Makefile
+	 version to 0.24x
+
+12/5/96 INSTALLING at mmi as maxx
+	 make tar
+
+12/7/96 select/selTcl.c
+	 Revamped and enhanced sel_labels
+	 Implemented sel_net
+
+12/8/96	Layout/layCurrent.c
+	 added -no_default option to lay_point
+	 renamed "ToolGetPoint" to "LayCurGetPoint"
+
+12/8/96 CHECKPOINT
+	 make tar
+
+12/8/96 Layout/layDisplay.c
+	 Modified DBWredisplay() to not display labels attached to invisible
+	 layers.
+
+12/8/96 database/DBtcl.c DBlabel.c select/selTcl.c Mgc/MgcCmdLQ.c Mgc/MgcCmd.c etc.
+	 Implementing label "kinds" (lab_flags -> lab_kind)
+	 changed -hidden to "-kind kind: option on ":label" cmd.
+	 modified "db_search labels" and "sel_what labels" to output label kinds.
+
+12/8/96 Layout/layDisplay.c
+	 modified dbwBBoxFunc to output port bounding boxes.
+
+12/8/96 Select/selTcl.c
+	Implemented "-kind" option on sel_labels
+
+12/8/96 max/Makefile
+        kicked version to 0.25x
+
+12/8/96 mving to MMI and installing as maxx (0.25x)
+	make tar
+
+12/9/96 database/DBlabel.c
+	DBLabelKindName()  DBLabelKindParse() changed port names to 
+	input,output,inout
+	
+12/9/96	database/database.h DBlabel.c DBtcl.c  Layout/layDisplay.c
+	LAB_IN_OUT -> LAB_INOUT
+	LAB_IN -> LAB_INPUT
+	LAB_OUT -> LAB_OUTPUT
+
+12/9/96 Mgc/MgcLQ.c
+	CmdLabel() - fixed arg checking bug.
+
+12/9/96 Layout/layCurrent.c
+	fixed lay_point so negative first coord not mistaken for bad 
+	command-line switch!
+	
+12/9/96 updated max0.25x
+
+12/9/96 mving back to mha
+	make tar
+
+12/9/96 Layout/layCurrent.c
+	Fixed lay_point again (checking for '.' as well as digit after '-')
+
+12/9/96 Layout/layDisplay.c database/DBlabel.c
+        Adjust port text start point based on pos.
+	Prepend type to ports and labels.
+
+12/9/96 utils/geometry.c
+	GeoPostToName Corrected spelling of "SOUTHEAST"
+
+12/9/96 max/Makefile
+	version 0.26x
+
+	Making mmi executable @mha, and installing at mmi as maxx.
+ 
+12/9/96 lib/*
+	Interpolated Lee's lib/ ( = ~cad/max0.26x/lib.tgz)
+
+12/10/96 lib/pal.tcl win.tcl
+	Cleaned up and improved palette, again.
+
+12/10/96 select/selOps.c selTcl.c
+	Created SelectGroupTransfer() operation and
+	"sel_group_transfer" command to move selection between groups.
+
+12/10/96 max/Makefile
+	uped version to 0.27x
+
+	installing at mmi as maxx
+
+12/11/96 DBtcl.c
+	Implementing db_cell_delete
+
+12/11/96 lib/* lib.old lib.tgz
+	Sucked over Lee's version of lib from ~cad/max0.27x/lib (lib.tgz)
+	saved my current version under lib.old/ and untared lib.tgz into lib/
+	Mine is now the "LIVE" version, except for wires.tcl
+
+12/12/96 TODO
+	created master TODO list.
+
+12/12/96 database/DBcellsubr.c  DBtcl.c Mgc/MgcCmdSubrs.c MgcCmdFI.c 
+	Created DBCellClearDefUp() wrapper around DBCellClearDef() to handle
+	all updates.
+	Useing in :flush code and db_cell_delete
+
+12/12/96 database/DBtcl.c
+	completed db_cell_delete
+
+12/14/96 select/selCreate.c database/DBconnect.c
+	special cased "sel_net space"  (was core dumping because connects
+	out to infinity)
+
+	DBTreeCopyConnect(), added ASSERT to catch TT_SPACE in mask.
+
+12/14/96 layout/DBWundo.c DBWprocs.c
+	Made DBWloadWindow() undoable.
+	Needed this since "undo edit" was breaking when no appropriate
+	rootuse was available!
+
+12/14/96 main/mnMain.c
+	removed creation of UNNAMED, and editcell.
+
+	was redundant, and forced  UNNAMED buffer even when loading cells
+	from commandline, and created use of UNNAMED that precluded its deletion!
+
+12/14/96 Layout/*
+	DBWprocs.c -> layLoad.c
+	DBWundo.c -> layUndo.c
+
+12/14/96 database/DBinit.c database.h databaseInt.h Layout/layLoad.c main/mnMain.c
+	*/*
+	untangled database initialization from old DBW stuff.
+	renamed:  DBW -> Lay, dbw -> lay
+
+12/14/96 CHECKPOINT
+	make tar
+
+12/14/96 database/DBcellname.c
+	rmed DEBUG stuff
+
+12/14/96 database/databaseInt.h DBcellname.c DBgroup.c
+	Added flyline deletion and group freeing stub to DBCellDeleteDef().
+
+12/15/96 CHECKPOINT
+	make tar
+
+12/15/96 database/DBtcl.c DBcellcopy.c
+	began implementing db_copy_cell and DBCellCopyDef()
+
+12/16/96 database/DBtcl.c DBcellcopy.c database.h databaseInt.h
+	finished implementing db_copy_cell and DBCellCopyDef()
+
+12/16/96 database/database.h databaseInt.h DBtpaint.c 
+	Layrite -> DBWrite
+
+12/16/96 lib/wires.tcl 
+	:box -> lay_box
+	(but not "live" version of this file!)
+
+12/17/96 lib/ lib2.tgz
+	Sucked over Lee's latest lib/ from maxx install.
+
+12/17/96 max/Makefile 
+	uped version to 0.28x
+	max tar
+	mved live version to mmi
+	
+12/17/96 database/DBcellsrc.c
+	fixed bug in DBSeeTypes() that was coredumping ":select -g -editOnly"
+
+12/17/96 *
+	installed as maxx 0.28x at mmi
+	(cping lib from maxx 0.27x)
+	
+12/17/96 lib/ lib.tgz
+	sucking up Lee's latest and greatest (again)
+
+12/17/96 lib/cell.tcl max_sys.tcl edit_box.tcl
+	cleaning up.
+
+	modified-cells -> _cells_modified
+	added check for existing file to cell_new
+	Fixed ".mag" sticking problem.
+	Added edit stack clear on loads.
+
+12/17/96 tsmc/tsmc.tech
+	removed borders from squares ops for vias.
+	installed at mmi.
+
+12/17/96 lib/list_box.tcl
+	Inverted sense of button-1 and shift-button-1
+	replaced :load with cell_load (clears edit stack).
+
+12/17/96 lib/cell.tcl menu_bar.tcl
+	File/Copy Cell and Edit/Delete Cell
+
+12/17/96 lib/select.tcl
+	modified _box_drag to update box message.
+
+12/17/96 database/dbTcl.c
+	implemented db_cell_rename
+
+12/17/96 database/DBcellcopy.c DBcellsrch.c
+	rmed DEBUG fprintf's
+
+12/17/96 lib/mode.tcl
+	rmed some obsolete bindings from main mode (still a few left).
+
+12/17/96 lib/list_box.tcl
+	changed puts to error!
+
+12/17/96 lib/menu_bar.tcl
+	cleaned up menus
+
+12/17/96 lib/edit.tcl
+	fixed so don't lose context when poping.
+
+12/17/96 lib/mode.tcl
+	fixed main mode message.
+
+12/17/96 Mgc/MgcCmdSubrs.c
+	changed cmdWindSet() to caption windows "max: foo EDITING bar" only
+	when foo and bar are different.
+
+12/18/96 lib/wires.tcl
+	snarfed Lee's latest.
+
+12/18/96 lib/wires.tcl  
+	:select -g -editOnly still broken.
+	so comment out for now.
+
+12/18/96 max/Makefile
+	uped version to Max0.29x
+	installing as maxx at MMI
+	
+12/18/96 *
+	make tar	
+	mved back to mha
+
+12/18/96 lib/select.tcl move.tcl box.tcl max_sys.tcl
+	split out code in select.tcl to four files, according to function.
+	renamed routines to conform to coding convention.
+
+12/18/96 lib/mode.tcl pal.tcl
+	moved "erase layers" to Shift-Button-3
+
+12/18/96 lib/edit.tcl cells.tcl
+	fixed bug in edit_push
+
+12/18/96 select/selTcl.c
+	fixed sel_labels (wasn't transforming label pos from edit to root).	
+
+12/18/96 select/selCreate.c Mgc/MgcCmdRS.c
+	Implementing debugging ":select -editOnly"
+	NOT QUITE DONE! 
+
+12/18/96 mv back to mmi
+	make tar
+	NOTE: not selCreate.c not compiling (see above).
+
+12/19/96 select/selCreate.c
+       fixed SelectArea() handling of noTreeRootUse case.
+       rmed DEBUGs.
+
+12/19/96 lib/zoom.tcl wires.tcl
+	sucked over Lee's latest and greatest.
+
+12/19/96 max/Makefile
+	uped version to Max0.30
+
+12/19/96 lib/wires.tcl
+	switched back to ":select -editOnly"
+
+12/19/96 INSTALL
+	Installed as maxx (max0.30) at mmi.
+	max -> max0.29
+        maxold -> max0.22
+	Lee immediately found bug (selecting metal in subcell! coredumps.
+
+12/19/96 Mgc/MgcCmdRS.c
+	fixed bug in CmdSelect()
+
+12/19/96 lib/pal.tcl
+	Control-Button-* erases.
+
+12/19/96 Reinstalled ontop of (max0.30)
+
+12/19/96 lib/select.tcl
+	sucked Lee's change over.
+
+12/19/96 main/mnMain.c
+	linked Path to Tcl variable MN_PATH_CELL
+
+12/19/96 lib/cell.tcl
+	replaced MAX_CELL_PATH and :path cmd with MN_PATH_CELL
+	fixed FILE/COPY_CELL and FILE/IMPORT/MAGIC bugs.
+
+12/19/96 max/Makefile
+	version max0.31
+	installed as maxx
+
+12/20/96 lib/license
+	gened new license file, good thru 4/1/97
+
+12/20/96 lib/cell.tcl misc.tcl mhautils.tcl
+	Coded cell_path_add, l_remove_name, split_file_name

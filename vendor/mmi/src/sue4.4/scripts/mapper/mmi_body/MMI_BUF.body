@@ -1,0 +1,23 @@
+  # MMI_BUF icon body
+    icon_line -30 -30 -30 30 30 0 -30 -30
+
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+  } else {
+    icon_line 30 0 60 0
+    icon_line -30 0 -60 0
+  }
+
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+

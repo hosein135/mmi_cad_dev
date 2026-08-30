@@ -1,0 +1,163 @@
+mkdir -p ../../o/solaris/def
+rm -f ../../o/solaris/def/SPsearch.o
+gcc   -I. -I../../i -I/volume/mmi/utils/tcltk/tcl8.0/generic -I/volume/mmi/utils/tcltk/tk8.0/generic -I/volume/mmi/utils/include -I/volume/mmi/utils -I/usr/openwin/include   -DSYSV -DSYS_V -O3 -Wreturn-type -Wuninitialized -Werror -c SPsearch.c -o ../../o/solaris/def/SPsearch.o
+SPsearch.c: In function `SPsxInstPath':
+SPsearch.c:39: request for member `spx_parent' in something not a structure or union
+SPsearch.c:40: request for member `spx_parent' in something not a structure or union
+SPsearch.c:44: parse error before `buf'
+SPsearch.c: In function `SPsxTrans':
+SPsearch.c:60: request for member `scx_use' in something not a structure or union
+SPsearch.c:61: request for member `spx_atrans' in something not a structure or union
+SPsearch.c:63: request for member `spx_use' in something not a structure or union
+cc1: warnings being treated as errors
+SPsearch.c:65: warning: control reaches end of non-void function
+SPsearch.c: In function `SPTileEnumInit':
+SPsearch.c:102: request for member `spe_mask' in something not a structure or union
+SPsearch.c:103: request for member `spe_area' in something not a structure or union
+SPsearch.c:104: request for member `spe_tile' in something not a structure or union
+SPsearch.c:105: request for member `firstime' in something not a structure or union
+SPsearch.c: In function `SPTileEnumNext':
+SPsearch.c:111: request for member `spe_tile' in something not a structure or union
+SPsearch.c:113: request for member `spe_area' in something not a structure or union
+SPsearch.c:116: request for member `firsttime' in something not a structure or union
+SPsearch.c:117: request for member `firstime' in something not a structure or union
+SPsearch.c:123: request for member `r_ll' in something not a structure or union
+SPsearch.c:128: request for member `mask' in something not a structure or union
+SPsearch.c:128: request for member `mask' in something not a structure or union
+SPsearch.c:129: request for member `plane' in something not a structure or union
+SPsearch.c:130: request for member `tp' in something not a structure or union
+SPsearch.c:136: request for member `r_ur' in something not a structure or union
+SPsearch.c:138: request for member `r_ur' in something not a structure or union
+SPsearch.c:139: request for member `r_ll' in something not a structure or union
+SPsearch.c:147: request for member `r_ll' in something not a structure or union
+SPsearch.c:149: request for member `r_ll' in something not a structure or union
+SPsearch.c:153: request for member `r_ll' in something not a structure or union
+SPsearch.c:161: request for member `r_ll' in something not a structure or union
+SPsearch.c: At top level:
+SPsearch.c:169: warning: return-type defaults to `int'
+SPsearch.c: In function `SPTileEnumTerm':
+SPsearch.c:171: warning: control reaches end of non-void function
+SPsearch.c: In function `SPPlanesEnumInit':
+SPsearch.c:181: parse error before `;'
+SPsearch.c:184: request for member `planelist' in something not a structure or union
+SPsearch.c:186: request for member `pll' in something not a structure or union
+SPsearch.c:187: request for member `rect' in something not a structure or union
+SPsearch.c:188: request for member `flags' in something not a structure or union
+SPsearch.c:190: request for member `tpe' in something not a structure or union
+SPsearch.c:190: request for member `pll' in something not a structure or union
+SPsearch.c:190: too few arguments to function `SPTileEnumInit'
+SPsearch.c:194: request for member `dfp' in something not a structure or union
+SPsearch.c: At top level:
+SPsearch.c:199: warning: return-type defaults to `int'
+SPsearch.c: In function `SPsxPlanesEnumInit':
+SPsearch.c:200: request for member `spx_use' in something not a structure or union
+SPsearch.c:200: request for member `spx_area' in something not a structure or union
+SPsearch.c:200: request for member `spx_mask' in something not a structure or union
+SPsearch.c:200: request for member `spx_flags' in something not a structure or union
+SPsearch.c:201: warning: control reaches end of non-void function
+SPsearch.c: In function `SPPlanesEnumNext':
+SPsearch.c:207: request for member `tpe' in something not a structure or union
+SPsearch.c:209: warning: passing arg 1 of `SPTileEnumNext' from incompatible pointer type
+SPsearch.c:210: warning: passing arg 1 of `SPTileEnumTerm' from incompatible pointer type
+SPsearch.c:213: structure has no member named `pll'
+SPsearch.c:213: structure has no member named `pll'
+SPsearch.c:213: structure has no member named `pll'
+SPsearch.c:213: structure has no member named `pll'
+SPsearch.c:213: structure has no member named `pll_next'
+SPsearch.c:214: parse error before `...'
+SPsearch.c:216: warning: passing arg 1 of `SPTileEnumTerm' from incompatible pointer type
+SPsearch.c:217: warning: control reaches end of non-void function
+SPsearch.c: At top level:
+SPsearch.c:219: parse error before `return'
+SPsearch.c:224: warning: return-type defaults to `int'
+SPsearch.c: In function `SPPlanesEnumTerm':
+SPsearch.c:225: request for member `spp_pll' in something not a structure or union
+SPsearch.c:227: request for member `spp_spt' in something not a structure or union
+SPsearch.c:230: request for member `spp_planelist' in something not a structure or union
+SPsearch.c:232: `tpe' undeclared (first use in this function)
+SPsearch.c:232: (Each undeclared identifier is reported only once
+SPsearch.c:232: for each function it appears in.)
+SPsearch.c:239: warning: control reaches end of non-void function
+SPsearch.c: In function `spNewSearchContext':
+SPsearch.c:245: `spx' undeclared (first use in this function)
+SPsearch.c:252: warning: control reaches end of non-void function
+SPsearch.c: In function `spFreeSearchContext':
+SPsearch.c:256: request for member `spx_parent' in something not a structure or union
+SPsearch.c: In function `SPInstEnumInit':
+SPsearch.c:275: request for member `spx_def' in something not a structure or union
+SPsearch.c:276: request for member `spx_transform' in something not a structure or union
+SPsearch.c:276: invalid type argument of `unary *'
+SPsearch.c:277: request for member `spx_area' in something not a structure or union
+SPsearch.c:278: request for member `spx_dokids' in something not a structure or union
+SPsearch.c:279: request for member `spx_anchor' in something not a structure or union
+SPsearch.c:280: request for member `spx_parent' in something not a structure or union
+SPsearch.c:281: request for member `bpe' in something not a structure or union
+SPsearch.c:281: request for member `spx_area' in something not a structure or union
+SPsearch.c:282: warning: control reaches end of non-void function
+SPsearch.c: In function `SPsxInstEnumInit':
+SPsearch.c:287: request for member `spx_def' in something not a structure or union
+SPsearch.c:287: request for member `spx_area' in something not a structure or union
+SPsearch.c:287: request for member `spx_trans' in something not a structure or union
+SPsearch.c: In function `SPInstEnumNext':
+SPsearch.c:326: request for member `spx_dokids' in something not a structure or union
+SPsearch.c:328: request for member `spx_dokids' in something not a structure or union
+SPsearch.c:330: request for member `spx_parent' in something not a structure or union
+SPsearch.c:331: request for member `spx_def' in something not a structure or union
+SPsearch.c:331: request for member `spx_use' in something not a structure or union
+SPsearch.c:331: `def' undeclared (first use in this function)
+SPsearch.c:332: request for member `spx_bpe' in something not a structure or union
+SPsearch.c:332: request for member `spx_def' in something not a structure or union
+SPsearch.c:333: request for member `spx_area' in something not a structure or union
+SPsearch.c:338: request for member `spx_inarray' in something not a structure or union
+SPsearch.c:341: request for member `spx_x' in something not a structure or union
+SPsearch.c:341: request for member `spx_ar' in something not a structure or union
+SPsearch.c:342: request for member `spx_y' in something not a structure or union
+SPsearch.c:342: request for member `spx_ar' in something not a structure or union
+SPsearch.c:344: request for member `spx_inarray' in something not a structure or union
+SPsearch.c:347: request for member `spx_x' in something not a structure or union
+SPsearch.c:347: `spx_ar' undeclared (first use in this function)
+SPsearch.c:353: request for member `spx_parent' in something not a structure or union
+SPsearch.c:354: `xsep' undeclared (first use in this function)
+SPsearch.c:355: `ysep' undeclared (first use in this function)
+SPsearch.c:357: request for member `spx_use' in something not a structure or union
+SPsearch.c:357: request for member `spx_atrans' in something not a structure or union
+SPsearch.c:358: request for member `spx_atrans' in something not a structure or union
+SPsearch.c:359: request for member `spx_atrans' in something not a structure or union
+SPsearch.c:359: request for member `spx_trans' in something not a structure or union
+SPsearch.c:359: request for member `scx_trans' in something not a structure or union
+SPsearch.c:360: request for member `spx_area' in something not a structure or union
+SPsearch.c:360: request for member `scx_area' in something not a structure or union
+SPsearch.c:362: request for member `spx_dokids' in something not a structure or union
+SPsearch.c:362: request for member `spx_flags' in something not a structure or union
+SPsearch.c:364: request for member `bpe' in something not a structure or union
+SPsearch.c:365: request for member `spx_use' in something not a structure or union
+SPsearch.c:367: `Arrayinfo' undeclared (first use in this function)
+SPsearch.c:367: `ap' undeclared (first use in this function)
+SPsearch.c:367: request for member `spx_ar' in something not a structure or union
+SPsearch.c:370: request for member `spx_area' in something not a structure or union
+SPsearch.c:374: request for member `spx_y' in something not a structure or union
+SPsearch.c:375: request for member `spx_x' in something not a structure or union
+SPsearch.c:376: request for member `spx_inarray' in something not a structure or union
+SPsearch.c:379: request for member `spx_x' in something not a structure or union
+SPsearch.c:380: request for member `spx_y' in something not a structure or union
+SPsearch.c:385: request for member `spx_parent' in something not a structure or union
+SPsearch.c:388: request for member `spx_trans' in something not a structure or union
+SPsearch.c:388: request for member `spx_trans' in something not a structure or union
+SPsearch.c:389: request for member `spx_insttrans' in something not a structure or union
+SPsearch.c:390: request for member `spx_area' in something not a structure or union
+SPsearch.c:390: request for member `spx_area' in something not a structure or union
+SPsearch.c:393: request for member `spx_dokids' in something not a structure or union
+SPsearch.c:393: request for member `spx_flags' in something not a structure or union
+SPsearch.c:399: request for member `spx_anchor' in something not a structure or union
+SPsearch.c:400: request for member `spx_parent' in something not a structure or union
+SPsearch.c:401: request for member `spx_bpe' in something not a structure or union
+SPsearch.c:327: warning: `new' might be used uninitialized in this function
+SPsearch.c: In function `SPInstEnumTerm':
+SPsearch.c:421: request for member `spx_parent' in something not a structure or union
+SPsearch.c:422: request for member `spx_bpe' in something not a structure or union
+SPsearch.c: In function `SPAnyEnumInit':
+SPsearch.c:435: warning: passing arg 4 of `SPInstEnumInit' makes pointer from integer without a cast
+SPsearch.c:435: warning: passing arg 5 of `SPInstEnumInit' makes integer from pointer without a cast
+SPsearch.c:435: too few arguments to function `SPInstEnumInit'
+SPsearch.c:436: warning: control reaches end of non-void function
+make: *** [../../o/solaris/def/SPsearch.o] Error 1

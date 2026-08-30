@@ -1,0 +1,205 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_SFFHB {} {
+  make input -name clk -origin {40 -830}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {270 -830}
+  make name_net -orient RX -name clk -origin {280 -1240}
+  make name_net -orient RX -name clk_L -origin {280 -1320}
+  make global -name gnd -origin {220 -1120}
+  make global -orient RY -name vdd -origin {220 -1440}
+  make global -name gnd -origin {670 -1110}
+  make global -orient RY -name vdd -origin {670 -1430}
+  make name_net -orient RX -name clk -origin {730 -1310}
+  make name_net -orient RX -name clk_L -origin {730 -1230}
+  make name_net -orient RXY -name clk_L -origin {40 -1030}
+  make name_net -orient RX -name clk -origin {40 -1100}
+  make name_net -name clk_L -origin {450 -1100}
+  make name_net -orient RY -name clk -origin {450 -1010}
+  make global -name gnd -origin {-790 -780}
+  make global -name gnd -origin {-250 -860}
+  make global -orient RY -name vdd -origin {-790 -1360}
+  make global -orient RY -name vdd -origin {-250 -1260}
+  make name_net -name N1 -origin {-200 -1060}
+  make name_net -name N2 -origin {140 -1280}
+  make name_net -name N3 -origin {370 -1060}
+  make name_net -name N4 -origin {590 -1270}
+  make name_net -name N5 -origin {760 -1390}
+  make inverter -WP 1.84 -WN 0.92 -origin {840 -1060}
+  make pmos -W 1.84 -origin {-790 -1120}
+  make nmos -W 0.92 -origin {-790 -1000}
+  make inverter -WP 0.92 -WN 0.46 -origin {150 -830}
+  make pmos -W 0.92 -origin {-250 -1120}
+  make nmos -W 0.46 -origin {-250 -1000}
+  make nmos -W 0.46 -origin {-250 -900}
+  make pmos -W 0.92 -origin {-250 -1220}
+  make nmos -orient RX -W 0.42 -origin {670 -1150}
+  make pmos -orient RX -W 0.42 -origin {670 -1310}
+  make nmos -orient RX -W 0.42 -origin {670 -1230}
+  make pmos -orient RX -W 0.42 -origin {670 -1390}
+  make pmos -orient RX -W 0.42 -origin {220 -1400}
+  make pmos -orient RX -W 0.42 -origin {220 -1320}
+  make nmos -orient RX -W 0.42 -origin {220 -1240}
+  make nmos -orient RX -W 0.42 -origin {220 -1160}
+  make xgate -orient RY -WP 0.92 -WN 0.42 -origin {450 -1060}
+  make xgate -orient RXY -WP 0.92 -WN 0.42 -origin {40 -1060}
+  make input -name s_en -origin {-1200 -820}
+  make input -name s_in -origin {-400 -900}
+  make output -name s_out -origin {920 -910}
+  make nand2 -WP 0.84 -WN 0.84 -origin {830 -910}
+  make name_net_s -name s_en -origin {740 -890}
+  make inverter -WP 0.92 -WN 0.62 -origin {660 -1040}
+  make inverter -WP 0.92 -WN 0.46 -origin {220 -1040}
+  make input -name hold -origin {-1150 -660}
+  make pmos -W 1.84 -origin {-790 -1200}
+  make pmos -orient RX -W 1.84 -origin {-670 -1120}
+  make pmos -orient RX -W 1.84 -origin {-670 -1200}
+  make nmos -W 0.92 -origin {-790 -920}
+  make nmos -orient RX -W 0.92 -origin {-680 -920}
+  make nmos -orient RX -W 0.92 -origin {-680 -1000}
+  make name_net -name s_en_L -origin {-970 -820}
+  make name_net_s -name s_en -origin {-340 -1000}
+  make name_net_s -name s_en_L -origin {-340 -1120}
+  make name_net_s -name hold -origin {-880 -1200}
+  make name_net_s -name hold -origin {-590 -920}
+  make name_net_s -name hold_L -origin {-580 -1120}
+  make name_net_s -name hold_L -origin {-960 -660}
+  make inverter -orient RX -WP 0.92 -WN 0.46 -origin {460 -1550}
+  make name_net_s -name q_fb -origin {-430 -1550}
+  make pmos -W 3.68 -origin {-790 -1320}
+  make nmos -W 1.84 -origin {-790 -820}
+  make inverter -WP 0.92 -WN 0.46 -origin {-1100 -820}
+  make inverter -WP 0.92 -WN 0.46 -origin {-1070 -660}
+  make input -name d -origin {-900 -1120}
+  make output -name q -origin {910 -1060}
+  make MMI_SFFHB -origin {970 -1560}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 01/05/00 -origin {-390 -490}
+  make_wire 120 -830 40 -830
+  make_wire 270 -1040 320 -1040
+  make_wire 200 -830 270 -830
+  make_wire 280 -1160 320 -1160
+  make_wire 320 -1400 320 -1160
+  make_wire 280 -1400 320 -1400
+  make_wire 730 -1150 770 -1150
+  make_wire 770 -1390 770 -1150
+  make_wire 450 -1030 450 -1010
+  make_wire 480 -1060 570 -1060
+  make_wire 70 -1060 120 -1060
+  make_wire 770 -1060 810 -1060
+  make_wire 890 -1060 910 -1060
+  make_wire -790 -1080 -790 -1060
+  make_wire -250 -940 -250 -960
+  make_wire -250 -1180 -250 -1160
+  make_wire -250 -1060 -250 -1040
+  make_wire -250 -1080 -250 -1060
+  make_wire -1200 -820 -1170 -820
+  make_wire -1170 -820 -1130 -820
+  make_wire -970 -820 -1050 -820
+  make_wire -200 -1060 10 -1060
+  make_wire 140 -1280 120 -1280
+  make_wire 140 -1280 220 -1280
+  make_wire 370 -1060 420 -1060
+  make_wire 370 -1060 320 -1060
+  make_wire 590 -1270 570 -1270
+  make_wire 590 -1270 670 -1270
+  make_wire 760 -1390 730 -1390
+  make_wire 760 -1390 770 -1390
+  make_wire -790 -1060 -790 -1040
+  make_wire -880 -1120 -880 -1000
+  make_wire -880 -1000 -850 -1000
+  make_wire -880 -1120 -850 -1120
+  make_wire -880 -1120 -900 -1120
+  make_wire 710 -1040 770 -1040
+  make_wire 770 -1150 770 -1060
+  make_wire 900 -910 920 -910
+  make_wire 770 -930 810 -930
+  make_wire 740 -890 810 -890
+  make_wire 740 -890 670 -890
+  make_wire 770 -1060 770 -1040
+  make_wire 770 -1040 770 -930
+  make_wire 570 -1040 630 -1040
+  make_wire 570 -1270 570 -1060
+  make_wire 570 -1060 570 -1040
+  make_wire 320 -1160 320 -1060
+  make_wire 320 -1060 320 -1040
+  make_wire 120 -1040 190 -1040
+  make_wire 120 -1280 120 -1060
+  make_wire 120 -1060 120 -1040
+  make_wire -250 -1060 -200 -1060
+  make_wire -390 -1220 -390 -900
+  make_wire -790 -1260 -670 -1260
+  make_wire -670 -1260 -670 -1240
+  make_wire -790 -1260 -790 -1240
+  make_wire -790 -1260 -790 -1280
+  make_wire -670 -1080 -670 -1060
+  make_wire -670 -1060 -250 -1060
+  make_wire -970 -820 -850 -820
+  make_wire -1170 -1320 -1170 -820
+  make_wire -1170 -1320 -850 -1320
+  make_wire -680 -1040 -680 -1060
+  make_wire -680 -1060 -670 -1060
+  make_wire -680 -1060 -790 -1060
+  make_wire -790 -870 -680 -870
+  make_wire -680 -870 -680 -880
+  make_wire -790 -870 -790 -860
+  make_wire -790 -870 -790 -880
+  make_wire -340 -1120 -310 -1120
+  make_wire -340 -1000 -310 -1000
+  make_wire -370 -1000 -340 -1000
+  make_wire -370 -1120 -340 -1120
+  make_wire -390 -1220 -310 -1220
+  make_wire -400 -900 -390 -900
+  make_wire -390 -900 -310 -900
+  make_wire -880 -1200 -850 -1200
+  make_wire -910 -1200 -880 -1200
+  make_wire -590 -920 -560 -920
+  make_wire -620 -920 -590 -920
+  make_wire -580 -1120 -550 -1120
+  make_wire -610 -1120 -580 -1120
+  make_wire -620 -1000 -510 -1000
+  make_wire -510 -1000 -510 -1200
+  make_wire -510 -1200 -610 -1200
+  make_wire 770 -1390 770 -1550
+  make_wire 770 -1550 490 -1550
+  make_wire -510 -1550 -510 -1200
+  make_wire -430 -1550 410 -1550
+  make_wire -430 -1550 -510 -1550
+  make_wire -1150 -660 -1100 -660
+  make_wire -910 -660 -910 -920
+  make_wire -1020 -660 -960 -660
+  make_wire -960 -660 -910 -660
+  make_wire -910 -920 -850 -920
+  make_text -origin {-1320 -1520} -text {Flipflop (with hold mux on input)}
+  make_text -origin {-1320 -1490} -text {B Size}
+  make_text -origin {-1320 -1550} -text MMI_SFFHB -size large
+  make_text -origin {270 -700} -text {^.ic N4=0V}
+}
+
+proc ICON_MMI_SFFHB args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {30 80} -orient R270 -name s_in
+  icon_term -type input -origin {10 80} -orient R270 -name s_en
+  icon_term -type output -origin {60 20} -name s_out
+  icon_term -type input -origin {-60 30} -name hold
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_property -origin {0 -50} -size large -anchor center -label SFFH
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+  icon_property -origin {10 70} -anchor e -rotate 1 -label s_en
+  icon_property -origin {30 70} -anchor e -rotate 1 -label s_in
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  icon_property -origin {50 20} -anchor e -label s_out
+  icon_property -origin {-50 30} -label hold
+  icon_property -origin {-40 360} -type auto -name verilog -text {MMI_SFFHB [unique_name "" $name MMI_SFFHB]
+(.clk($clk), .s_in($s_in), .s_en($s_en), .hold($hold), 
+.d($d), .s_out($s_out), .q($q))\;}
+}
+

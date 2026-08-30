@@ -1,0 +1,22 @@
+# SUE version MMI_SUE4.2.7
+
+proc SCHEMATIC_example3 {} {
+  generate MMI_AND2 MMI_AND2B 
+  make MMI_AND2B -origin {140 360}
+  generate MMI_OR2 MMI_OR2B 
+  make MMI_OR2B -origin {140 130}
+  make spacer -columns 1p -origin {130 250}
+  generate MMI_AO31 MMI_AO31B 
+  make MMI_AO31B -origin {170 460}
+  generate MMI_AND3 MMI_AND3B 
+  make MMI_AND3B -dpc +2 -origin {160 570}
+  generate MMI_AO21 MMI_AO21B 
+  make MMI_AO21B -dpc -1 -origin {160 680}
+  generate MMI_XOR2 MMI_XOR2A 
+  make MMI_XOR2A -name {[2:0]} -origin {420 170}
+  make MMI_AND2B -name {[2:0]} -dpc +4 -origin {410 350}
+  make dpc_control -pitch 16 -origin {310 600}
+  make_text -origin {60 -10} -text {Tutorial Example to illustrate adding
+spaces to a design.}
+}
+

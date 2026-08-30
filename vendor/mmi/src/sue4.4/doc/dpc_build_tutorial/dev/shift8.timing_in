@@ -1,0 +1,28 @@
+readtechnology /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/pearl/pearl.tech
+readctlf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/tlf/mmi25.ctlf
+readverilog /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.vg
+toplevelcell shift8
+readspf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.est_dspf
+setmaxpossibilities 5
+clock -domain _WAVE_ -cycle_time 3ns -create_node _input_ 0 1.5n
+input in[7:0] _input_ ^ 0 0 0 0
+inputslew in[7:0] 200ps 200ps 200ps 200ps
+input shift[2:0] _input_ ^ 0 0 0 0
+inputslew shift[2:0] 200ps 200ps 200ps 200ps
+setnodecapacitance out[7:0] +20fF
+setpathfilter -same_path -similar_path -node_suffix [#]
+idealclocks yes
+findpathsfrom _input_
+setdelaypathformat out_delay delta_delay load_cap fanout out_rise_fall out_node device cell
+showpossibility 1 5
+# done
+# done
+findmincycletime
+# done
+# done
+shownodematches * > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_in
+system sed -e 's/^ /showdelays/' -e 's/^Found/#/' /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_in > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out
+include /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out
+system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_in
+system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out
+findslownodes -limit 0.6ns > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.slow_nodes

@@ -1,0 +1,50 @@
+set mmi_tech mmi15
+set mmi_tech_dir /volume/mmi_proj/proj/tech/$mmi_tech
+
+# Default lef file for stdcells to get sizes and maybe later, pins.
+set FPLAN(DEFAULT_LEF_FILE) $mmi_tech_dir/library/lef/$mmi_tech.lef
+set FPLAN(DEFAULT_LEF_HEADER_FILE) $mmi_tech_dir/library/lef/${mmi_tech}_header.lef
+
+# Stuff for pearl.
+set TIMING_DATA(tech_file) $mmi_tech_dir/library/pearl/pearl.tech
+set TIMING_DATA(ctlf_file) $mmi_tech_dir/library/tlf/${mmi_tech}.ctlf
+set TIMING_DATA(syn_libdb) $mmi_tech_dir/library/synopsys/${mmi_tech}.db
+
+set TIMING_DATA(clk_name) clk
+set TIMING_DATA(clk_period) 5.0ns
+set TIMING_DATA(out_cap) 20fF
+set TIMING_DATA(arrival_time) \
+    [pp_number [expr [parse_pp_number $TIMING_DATA(clk_period)] / 2.0]]
+set TIMING_DATA(departure_time) \
+    [pp_number [expr [parse_pp_number $TIMING_DATA(clk_period)]/2.0]]
+# once we start compiling our own db files, I don't think we'll need driver_lib.
+
+set TIMING_DATA(output_driver) MMI_BUFD:out
+set TIMING_DATA(input_register) MMI_FFB:d
+
+set TIMING_DATA(see_output) 0
+
+# used by primetime
+set TIMING_DATA(db_file) $TIMING_DATA(syn_libdb)
+
+# Stuff for speedy
+set TIMING_DATA(lib_file) $mmi_tech_dir/library/synopsys/${mmi_tech}.lib
+
+if {$TOOL == "MAX"} {
+
+    # This communicates the technology to max.
+    set MAX_TECHNOLOGY mmi15
+
+    if {[info commands fplan_init] == "fplan_init"} {fplan_init}
+
+    # Load MMI stdcell directory for max.
+    catch {cell_path_add $mmi_tech_dir/stdcell/max}
+
+    # Floor-planner cell grid - used for cell movement.
+    catch {grid_set -number 4 -rename fplan-block \
+	-user "6.2 1.24" -coarse "6.2 1.24" -fine "0.62 0.62" \
+	-coarse_visibility lines -fine_visibility dots}
+}
+
+
+set SUE_PROJECT mmi15

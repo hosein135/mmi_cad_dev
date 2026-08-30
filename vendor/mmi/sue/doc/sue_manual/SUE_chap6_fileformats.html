@@ -1,0 +1,259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:42:06">
+<title>SUE File Formats</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_chapt5_commands.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_chap7_interface.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 6 </font>
+</h2>
+
+
+<h1>
+  <a name="1027023"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SUE File Formats</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1028098"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028101"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The SUE file format consists of an ASCII file consisting of one or more <b><strong class="Strong">Tcl</strong></b> procedures. SUE recognizes <i><strong class="StrongItalic">icons</strong></i> and <i><strong class="StrongItalic">schematics</strong></i> by the procedure names<font  face="Verdana, Arial, Helvetica, sans-serif"><i> </i></font><b><code class="CodeStrong">ICON_&lt;name&gt;</code></b><b><strong class="Strong"> </strong></b>and<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">SCHEMATIC_&lt;name&gt;</code></b><b><strong class="Strong">. </strong></b>All other procedure declarations and expressions will be defined and executed when SUE autoloads the cell, but will not be schematics or icons. If you manually create these files, make sure you don't step on any previously defined SUE procedures or variables. Because of SUE's use of autoloading, files containing<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">SCHEMATIC_&lt;name&gt;</code></b><b><strong class="Strong"> </strong></b>and<b><strong class="Strong">/</strong></b>or<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">ICON_&lt;name&gt;</code></b><b><strong class="Strong"> </strong></b>should only be in a file named<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">&lt;name&gt;.sue</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">.</font><b><strong class="Strong"> </strong></b></font>
+<p>
+<p>
+  <dt> <a name="1028102"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE schematic and icon procedures are different than general purpose <b><strong class="Strong">Tcl </strong></b>procedures because SUE translates them into simpler syntax to improve drawing performance when they are first executed. Hence, SUE only recognizes a small set of function calls. Generators, on the other hand, allow more programming freedom. In either case, <b><strong class="Strong">Tcl</strong></b> syntax and semantics must be followed. </font>
+<p>
+<p>
+  <dt> <a name="1028103"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE Schematics can call any of the following commands: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">make &lt;icon_name&gt; &lt;keyword_arguments&gt;</font><a name="1028104"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">make_wire x1 y1 x2 y2</font><a name="1028105"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028106"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">make_line &lt;list_of_x_y_pairs&gt;</font><a name="1028107"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028108"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">make_text &lt;text_keyword_arguments&gt; {origin {0 0}} {text {}} {size standard} {anchor w} {rotate 0}</font><a name="1028109"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028110"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">make_arc x1 y1 x2 y2 &lt;arc_keyword_arguments&gt; {-start 0} {-extent 270}</font><a name="1028111"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028112"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">generate &lt;generator_name&gt; &lt;icon_name&gt; &lt;keyword_arguments&gt;</font><a name="1028113"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028114"> </a>
+      </pre>
+  <dl>
+<p> <dt> <a name="1028557"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Where <b><code class="CodeStrong">&lt;keyword_arguments&gt;</code></b> are distinct for each icon and generator and are defined in those objects<b><strong class="Strong">. </strong></b><b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1028604"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">generate</code></b> call creates the icon with<b><code class="CodeStrong"> &lt;icon_name&gt;</code></b> from the given generator with the given arguments. This call must precede the first use of the icon from a <b><code class="CodeStrong">make</code></b> call.<b><strong class="Strong"> </strong></b></font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>  </dl>
+<p>
+  <dt> <a name="1028117"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE icons can call any of the following commands, which are distinct from the schematics commands: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_setup $args &lt;keyword_arguments&gt; [must included at least "origin" and "orient"]</font><a name="1028118"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028119"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_term &lt;term_keyword_arguments&gt; {origin {0 0}} {type inout} {name ""} {orient R0} {priority term | io | global | name}</font><a name="1028120"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028121"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">proc icon_property &lt;property_keyword_arguments&gt; {origin {0 0}} {type text} {name ""} {label ""} {text ""} {default ""} {anchor w} {size standard} {rotate 0}</font><a name="1028122"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028123"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_line &lt;list_of_x_y_pairs&gt;</font><a name="1028124"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028125"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_arc x1 y1 x2 y2 &lt;arc_keyword_arguments&gt; {-start 0} {-extent 270}</font><a name="1028126"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028127"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_special -type &lt;icon_name&gt; &lt;keyword_arguments&gt;</font><a name="1028128"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028129"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_generator $args &lt;keyword_arguments&gt; [must include at least one argument]</font><a name="1028130"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028131"> </a>
+      </pre>
+  <dl>
+<p> <dt> <a name="1028132"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">icon_setup</code></b> call must be the first call in an icon procedure, unless the icon is a generator in which case an <b><code class="CodeStrong">icon_generator</code></b> call must precede the <b><code class="CodeStrong">icon_setup</code></b> call. The <b><code class="CodeStrong">icon_special</code></b> call allows icons to be placed in icons. Presently, this is only guaranteed to work with title bars.<b><strong class="Strong"> </strong></b><b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1028698"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">priority</code></b> keyword in the <b><code class="CodeStrong">icon_term</code></b> call is <b><strong class="Strong">special</strong></b>. It tells the netlister that these terminals have special meanings and are used in <b><strong class="Strong">I/O icons </strong></b>(for example, <i><strong class="StrongItalic">input</strong></i>, <i><strong class="StrongItalic">output</strong></i>, and <i><strong class="StrongItalic">inout</strong></i>), <b><strong class="Strong">globals</strong></b>, and <b><strong class="Strong">name_nets</strong></b>. SUE does not save these priorities so they have to be entered manually with an editor. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>  </dl>
+</dl></dl>
+
+<h4>
+  <a name="1028134"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Coordinates</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028136"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All coordinates used in the above formats should be integers and should be divisible by 10. The basic grid in SUE is 10 units, and hence two parallel wires spaced apart by 10 units in a schematic procedure in a .sue file will end up on adjacent grids in SUE. If wire endpoints are closer than 10 units apart, there is a possibility that SUE will consider them to be connected. </font>
+<p>
+<p>
+  <dt> <a name="1028137"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The grid spacing is 10 units, instead of 1 unit, to allow for sub-grid pictures. For example, a nice looking XOR gate icon probably needs coordinates that are on subgrids. Only lines, arcs, and text should ever have values that aren't divisible by 10.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1028744"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "y" coordinate in SUE increases downwards from the top of the page. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b> </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028141"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Making Connections</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028142"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE will connect any terminals and wire endpoints that are `near' each other which typically means that they are less than 3 units away. However, you should make every effort to make them exactly overlap. </font>
+<p>
+<p>
+  <dt> <a name="1028143"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When reading .sue files, SUE will NOT break wires. For example, if you want to make a "T" connection such as <a href="SUE_chap6_fileformats.html#1028147">Figure 49</a>, you need to specify all three segments of wire (shown as <b><strong class="Strong">a</strong></b>, <b><strong class="Strong">b</strong></b>, and <b><strong class="Strong">c</strong></b> above), NOT two. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028147"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 49:   T Connection<div align="center"><img src="images/t-connect.gif" border="1">
+</div></font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1013693"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+ </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_chapt5_commands.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_chap7_interface.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

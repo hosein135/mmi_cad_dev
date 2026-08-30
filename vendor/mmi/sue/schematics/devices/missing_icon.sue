@@ -1,0 +1,11 @@
+# SUE version MMI_SUE3.5
+
+proc ICON_missing_icon args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}}}
+  icon_property -origin {-120 70} -type user -name name
+  icon_arc -40 -40 40 40 -start 0 -extent 359
+  icon_line -30 -30 30 30
+  icon_property -origin {0 0} -anchor center -label {$name}
+  icon_property -origin {-160 110} -type fixed -name primitive -text 1
+}
+

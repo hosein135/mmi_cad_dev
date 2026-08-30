@@ -1,0 +1,2434 @@
+AR_ADDR_OF	../utility/ar.c	/^#define AR_ADDR_OF(a, idx, elt_size) &((a)->data[(/
+AR_NEW	../include/ar.h	/^#define AR_NEW(size, type)    ( ar_alloc (size, si/
+AR_REF	../include/ar.h	/^#define AR_REF(a, type, idx)  ( ((type **) (a))[0]/
+ASSERT	../include/assert.h	/^#define ASSERT(c)      if (!(c)) assertion_failure/
+BUCKET_MASK	../utility/hashtab.c	/^#  define BUCKET_MASK(ht)      (ar_size (ht->bucke/
+BUCKET_REF	../utility/hashtab.c	/^#  define BUCKET_REF(ht, idx)  AR_REF (ht->buckets/
+CALLOC	../include/mem.h	/^#  define CALLOC(x, y)	mem_calloc_traced ((x), (y)/
+FREE	../include/mem.h	/^#  define FREE(x)	mem_free_traced (x)$/
+GCALLOC	../include/mem.h	/^#  define GCALLOC(x, g)	mem_calloc_from_group_trac/
+GET_ENTRY	../utility/hashtab.c	/^#  define GET_ENTRY(ht, ent)   AR_REF (ht->entries/
+GMALLOC	../include/mem.h	/^#  define GMALLOC(x, g)	mem_malloc_from_group_trac/
+GSTRDUP	../include/mem.h	/^#  define GSTRDUP(x, g)	mem_strdup_from_group_trac/
+MALLOC	../include/mem.h	/^#  define MALLOC(x)	mem_malloc_traced ((x), __FILE/
+Mar	../utility/ar.c	/^main()$/
+Mhashtab	../utility/hashtab.c	/^main ()$/
+Mmain	../lef2pnl/main.c	/^main ()$/
+Mmake-words	../namegen/make-words.c	/^main ()$/
+Mmemtest	../mem/memtest.c	/^main (void)$/
+Mnlsh	../nlsh/nlsh.c	/^main (int argc, char *argv[])$/
+Mscript_cat	../tcl/script_cat.c	/^main (int argc, char *argv[])$/
+Mskip-list	../utility/skip-list.c	/^main()$/
+Mssa	../ssa/ssa.c	/^main ()$/
+Mtest	../mem/test.c	/^main ()$/
+NEXT_ENTRY	../utility/hashtab.c	/^#  define NEXT_ENTRY(ht)       (ar_grow (ht->entri/
+NUM_ENTRIES	../utility/hashtab.c	/^#  define NUM_ENTRIES(ht)      ar_size (ht->entrie/
+Nl_shell_Init	../nlsh/nlpkg.c	/^Nl_shell_Init (Tcl_Interp *interp)$/
+PURIFY	../def2pnl/def.c	/^#define PURIFY(r,s) memset((char *) &(r),'\\0',(s))/
+REALLOC	../include/mem.h	/^#  define REALLOC(x, y)	mem_realloc_traced ((x), (/
+SET_TRANSFORM	../pat/pat_trans.c	/^#define SET_TRANSFORM(xform,a,b,c,d,e,f) { \\$/
+STRDUP	../include/mem.h	/^#  define STRDUP(x)	mem_strdup_traced ((x), __FILE/
+STRDUPA	../include/mem.h	/^#define STRDUPA(x)      strcpy (alloca (1 + strlen/
+TRANSMULT	../pat/pat_trans.c	/^#define TRANSMULT(val,ab) (ab>0 ? (val) : ab<0 ? -/
+TRANS_INIT	../pat/pat_trans.c	/^#define TRANS_INIT(ori,a,b,d,e) \\$/
+UI_CMD_WRAPPER	../pat/ui_cmd.h	/^UI_CMD_WRAPPER (ClientData __data, Tcl_Interp *int/
+ZZSHIFT	../def2pnl/def2pnl_parser.c	/^#define ZZSHIFT(c) (b_class_no[zzauto][1+c])$/
+__ast2g_eliminate_logical_ops_postwalker	../ast2g/ast2g_rewrites.c	/^__ast2g_eliminate_logical_ops_postwalker (nl_ast */
+__ast2g_explicit_case_prewalker	../ast2g/ast2g_rewrites.c	/^__ast2g_explicit_case_prewalker (nl_ast *__root_p,/
+__ast2g_flatten_concats_postwalker	../ast2g/ast2g_rewrites.c	/^__ast2g_flatten_concats_postwalker (nl_ast *__root/
+__ast2g_flip_cases_postwalker	../ast2g/ast2g_rewrites.c	/^__ast2g_flip_cases_postwalker (nl_ast *__root_p, v/
+__ast2g_infer_inverting_ops_postwalker	../ast2g/ast2g_rewrites.c	/^__ast2g_infer_inverting_ops_postwalker (nl_ast *__/
+__ast2g_rewrite_clocks_postwalker	../ast2g/ast2g_rewrites.c	/^__ast2g_rewrite_clocks_postwalker (nl_ast *__root_/
+__ast2g_simplify_reduce_ops_postwalker	../ast2g/ast2g_rewrites.c	/^__ast2g_simplify_reduce_ops_postwalker (nl_ast *__/
+__ref_to_lref_postwalker	../v2nl/v2nl_rewrites.c	/^__ref_to_lref_postwalker (nl_ast *__root_p, void */
+__v2nl_if_to_case_postwalker	../v2nl/v2nl_rewrites.c	/^__v2nl_if_to_case_postwalker (nl_ast *__root_p, vo/
+__v2nl_lhs_ref_to_lref_prewalker	../v2nl/v2nl_rewrites.c	/^__v2nl_lhs_ref_to_lref_prewalker (nl_ast *__root_p/
+__v2nl_rewrite_var_shift_postwalker	../v2nl/v2nl_rewrites.c	/^__v2nl_rewrite_var_shift_postwalker (nl_ast *__roo/
+_pat_hier_walk_cells_int	../pat/pat_loc.c	/^static int _pat_hier_walk_cells_int(nl_design des,/
+_refvar_inits	../ast2g/ast2g_infer_reg.c	/^_refvar_inits(STreeParser *p)$/
+_walk_tcl_func	../pat/pat_loc.c	/^int _walk_tcl_func(nl_cell cell,char * path, Pat_t/
+act1	../def2pnl/def2pnl_parser.c	/^static void act1(void)$/
+act10	../def2pnl/def2pnl_parser.c	/^static void act10(void)$/
+act100	../def2pnl/def2pnl_parser.c	/^static void act100(void)$/
+act101	../def2pnl/def2pnl_parser.c	/^static void act101(void)$/
+act102	../def2pnl/def2pnl_parser.c	/^static void act102(void)$/
+act103	../def2pnl/def2pnl_parser.c	/^static void act103(void)$/
+act104	../def2pnl/def2pnl_parser.c	/^static void act104(void)$/
+act105	../def2pnl/def2pnl_parser.c	/^static void act105(void)$/
+act106	../def2pnl/def2pnl_parser.c	/^static void act106(void)$/
+act107	../def2pnl/def2pnl_parser.c	/^static void act107(void)$/
+act108	../def2pnl/def2pnl_parser.c	/^static void act108(void)$/
+act109	../def2pnl/def2pnl_parser.c	/^static void act109(void)$/
+act11	../def2pnl/def2pnl_parser.c	/^static void act11(void)$/
+act110	../def2pnl/def2pnl_parser.c	/^static void act110(void)$/
+act111	../def2pnl/def2pnl_parser.c	/^static void act111(void)$/
+act112	../def2pnl/def2pnl_parser.c	/^static void act112(void)$/
+act113	../def2pnl/def2pnl_parser.c	/^static void act113(void)$/
+act114	../def2pnl/def2pnl_parser.c	/^static void act114(void)$/
+act115	../def2pnl/def2pnl_parser.c	/^static void act115(void)$/
+act116	../def2pnl/def2pnl_parser.c	/^static void act116(void)$/
+act117	../def2pnl/def2pnl_parser.c	/^static void act117(void)$/
+act118	../def2pnl/def2pnl_parser.c	/^static void act118(void)$/
+act119	../def2pnl/def2pnl_parser.c	/^static void act119(void)$/
+act12	../def2pnl/def2pnl_parser.c	/^static void act12(void)$/
+act120	../snps-lib/parser.c	/^static void act120()$/
+act121	../snps-lib/parser.c	/^static void act121()$/
+act122	../snps-lib/parser.c	/^static void act122()$/
+act123	../snps-lib/parser.c	/^static void act123()$/
+act124	../snps-lib/parser.c	/^static void act124()$/
+act125	../snps-lib/parser.c	/^static void act125()$/
+act126	../snps-lib/parser.c	/^static void act126()$/
+act127	../snps-lib/parser.c	/^static void act127()$/
+act128	../snps-lib/parser.c	/^static void act128()$/
+act129	../snps-lib/parser.c	/^static void act129()$/
+act13	../def2pnl/def2pnl_parser.c	/^static void act13(void)$/
+act130	../snps-lib/parser.c	/^static void act130()$/
+act131	../snps-lib/parser.c	/^static void act131()$/
+act132	../snps-lib/parser.c	/^static void act132()$/
+act133	../snps-lib/parser.c	/^static void act133()$/
+act134	../snps-lib/parser.c	/^static void act134()$/
+act135	../snps-lib/parser.c	/^static void act135()$/
+act136	../snps-lib/parser.c	/^static void act136()$/
+act137	../snps-lib/parser.c	/^static void act137()$/
+act138	../snps-lib/parser.c	/^static void act138()$/
+act139	../snps-lib/parser.c	/^static void act139()$/
+act14	../def2pnl/def2pnl_parser.c	/^static void act14(void)$/
+act140	../snps-lib/parser.c	/^static void act140()$/
+act141	../snps-lib/parser.c	/^static void act141()$/
+act142	../snps-lib/parser.c	/^static void act142()$/
+act143	../snps-lib/parser.c	/^static void act143()$/
+act144	../snps-lib/parser.c	/^static void act144()$/
+act145	../snps-lib/parser.c	/^static void act145()$/
+act146	../snps-lib/parser.c	/^static void act146()$/
+act147	../snps-lib/parser.c	/^static void act147()$/
+act148	../snps-lib/parser.c	/^static void act148()$/
+act149	../snps-lib/parser.c	/^static void act149()$/
+act15	../def2pnl/def2pnl_parser.c	/^static void act15(void)$/
+act150	../snps-lib/parser.c	/^static void act150()$/
+act151	../snps-lib/parser.c	/^static void act151()$/
+act152	../snps-lib/parser.c	/^static void act152()$/
+act153	../snps-lib/parser.c	/^static void act153()$/
+act154	../snps-lib/parser.c	/^static void act154()$/
+act155	../snps-lib/parser.c	/^static void act155()$/
+act156	../snps-lib/parser.c	/^static void act156()$/
+act157	../snps-lib/parser.c	/^static void act157()$/
+act158	../snps-lib/parser.c	/^static void act158()$/
+act159	../snps-lib/parser.c	/^static void act159()$/
+act16	../def2pnl/def2pnl_parser.c	/^static void act16(void)$/
+act160	../snps-lib/parser.c	/^static void act160()$/
+act161	../snps-lib/parser.c	/^static void act161()$/
+act162	../snps-lib/parser.c	/^static void act162()$/
+act163	../snps-lib/parser.c	/^static void act163()$/
+act164	../snps-lib/parser.c	/^static void act164()$/
+act165	../snps-lib/parser.c	/^static void act165()$/
+act166	../snps-lib/parser.c	/^static void act166()$/
+act167	../snps-lib/parser.c	/^static void act167()$/
+act168	../snps-lib/parser.c	/^static void act168()$/
+act169	../snps-lib/parser.c	/^static void act169()$/
+act17	../def2pnl/def2pnl_parser.c	/^static void act17(void)$/
+act170	../snps-lib/parser.c	/^static void act170()$/
+act171	../snps-lib/parser.c	/^static void act171()$/
+act172	../snps-lib/parser.c	/^static void act172()$/
+act173	../snps-lib/parser.c	/^static void act173()$/
+act174	../snps-lib/parser.c	/^static void act174()$/
+act175	../snps-lib/parser.c	/^static void act175()$/
+act176	../snps-lib/parser.c	/^static void act176()$/
+act177	../snps-lib/parser.c	/^static void act177()$/
+act178	../snps-lib/parser.c	/^static void act178()$/
+act179	../snps-lib/parser.c	/^static void act179()$/
+act18	../def2pnl/def2pnl_parser.c	/^static void act18(void)$/
+act180	../snps-lib/parser.c	/^static void act180()$/
+act181	../snps-lib/parser.c	/^static void act181()$/
+act182	../snps-lib/parser.c	/^static void act182()$/
+act183	../snps-lib/parser.c	/^static void act183()$/
+act184	../snps-lib/parser.c	/^static void act184()$/
+act185	../snps-lib/parser.c	/^static void act185()$/
+act186	../snps-lib/parser.c	/^static void act186()$/
+act187	../snps-lib/parser.c	/^static void act187()$/
+act188	../snps-lib/parser.c	/^static void act188()$/
+act189	../snps-lib/parser.c	/^static void act189()$/
+act19	../def2pnl/def2pnl_parser.c	/^static void act19(void)$/
+act190	../snps-lib/parser.c	/^static void act190()$/
+act191	../snps-lib/parser.c	/^static void act191()$/
+act192	../snps-lib/parser.c	/^static void act192()$/
+act193	../snps-lib/parser.c	/^static void act193()$/
+act194	../snps-lib/parser.c	/^static void act194()$/
+act195	../snps-lib/parser.c	/^static void act195()$/
+act196	../snps-lib/parser.c	/^static void act196()$/
+act2	../def2pnl/def2pnl_parser.c	/^static void act2(void)$/
+act20	../def2pnl/def2pnl_parser.c	/^static void act20(void)$/
+act21	../def2pnl/def2pnl_parser.c	/^static void act21(void)$/
+act22	../def2pnl/def2pnl_parser.c	/^static void act22(void)$/
+act23	../def2pnl/def2pnl_parser.c	/^static void act23(void)$/
+act24	../def2pnl/def2pnl_parser.c	/^static void act24(void)$/
+act25	../def2pnl/def2pnl_parser.c	/^static void act25(void)$/
+act26	../def2pnl/def2pnl_parser.c	/^static void act26(void)$/
+act27	../def2pnl/def2pnl_parser.c	/^static void act27(void)$/
+act28	../def2pnl/def2pnl_parser.c	/^static void act28(void)$/
+act29	../def2pnl/def2pnl_parser.c	/^static void act29(void)$/
+act3	../def2pnl/def2pnl_parser.c	/^static void act3(void)$/
+act30	../def2pnl/def2pnl_parser.c	/^static void act30(void)$/
+act31	../def2pnl/def2pnl_parser.c	/^static void act31(void)$/
+act32	../def2pnl/def2pnl_parser.c	/^static void act32(void)$/
+act33	../def2pnl/def2pnl_parser.c	/^static void act33(void)$/
+act34	../def2pnl/def2pnl_parser.c	/^static void act34(void)$/
+act35	../def2pnl/def2pnl_parser.c	/^static void act35(void)$/
+act36	../def2pnl/def2pnl_parser.c	/^static void act36(void)$/
+act37	../def2pnl/def2pnl_parser.c	/^static void act37(void)$/
+act38	../def2pnl/def2pnl_parser.c	/^static void act38(void)$/
+act39	../def2pnl/def2pnl_parser.c	/^static void act39(void)$/
+act4	../def2pnl/def2pnl_parser.c	/^static void act4(void)$/
+act40	../def2pnl/def2pnl_parser.c	/^static void act40(void)$/
+act41	../def2pnl/def2pnl_parser.c	/^static void act41(void)$/
+act42	../def2pnl/def2pnl_parser.c	/^static void act42(void)$/
+act43	../def2pnl/def2pnl_parser.c	/^static void act43(void)$/
+act44	../def2pnl/def2pnl_parser.c	/^static void act44(void)$/
+act45	../def2pnl/def2pnl_parser.c	/^static void act45(void)$/
+act46	../def2pnl/def2pnl_parser.c	/^static void act46(void)$/
+act47	../def2pnl/def2pnl_parser.c	/^static void act47(void)$/
+act48	../def2pnl/def2pnl_parser.c	/^static void act48(void)$/
+act49	../def2pnl/def2pnl_parser.c	/^static void act49(void)$/
+act5	../def2pnl/def2pnl_parser.c	/^static void act5(void)$/
+act50	../def2pnl/def2pnl_parser.c	/^static void act50(void)$/
+act51	../def2pnl/def2pnl_parser.c	/^static void act51(void)$/
+act52	../def2pnl/def2pnl_parser.c	/^static void act52(void)$/
+act53	../def2pnl/def2pnl_parser.c	/^static void act53(void)$/
+act54	../def2pnl/def2pnl_parser.c	/^static void act54(void)$/
+act55	../def2pnl/def2pnl_parser.c	/^static void act55(void)$/
+act56	../def2pnl/def2pnl_parser.c	/^static void act56(void)$/
+act57	../def2pnl/def2pnl_parser.c	/^static void act57(void)$/
+act58	../def2pnl/def2pnl_parser.c	/^static void act58(void)$/
+act59	../def2pnl/def2pnl_parser.c	/^static void act59(void)$/
+act6	../def2pnl/def2pnl_parser.c	/^static void act6(void)$/
+act60	../def2pnl/def2pnl_parser.c	/^static void act60(void)$/
+act61	../def2pnl/def2pnl_parser.c	/^static void act61(void)$/
+act62	../def2pnl/def2pnl_parser.c	/^static void act62(void)$/
+act63	../def2pnl/def2pnl_parser.c	/^static void act63(void)$/
+act64	../def2pnl/def2pnl_parser.c	/^static void act64(void)$/
+act65	../def2pnl/def2pnl_parser.c	/^static void act65(void)$/
+act66	../def2pnl/def2pnl_parser.c	/^static void act66(void)$/
+act67	../def2pnl/def2pnl_parser.c	/^static void act67(void)$/
+act68	../def2pnl/def2pnl_parser.c	/^static void act68(void)$/
+act69	../def2pnl/def2pnl_parser.c	/^static void act69(void)$/
+act7	../def2pnl/def2pnl_parser.c	/^static void act7(void)$/
+act70	../def2pnl/def2pnl_parser.c	/^static void act70(void)$/
+act71	../def2pnl/def2pnl_parser.c	/^static void act71(void)$/
+act72	../def2pnl/def2pnl_parser.c	/^static void act72(void)$/
+act73	../def2pnl/def2pnl_parser.c	/^static void act73(void)$/
+act74	../def2pnl/def2pnl_parser.c	/^static void act74(void)$/
+act75	../def2pnl/def2pnl_parser.c	/^static void act75(void)$/
+act76	../def2pnl/def2pnl_parser.c	/^static void act76(void)$/
+act77	../def2pnl/def2pnl_parser.c	/^static void act77(void)$/
+act78	../def2pnl/def2pnl_parser.c	/^static void act78(void)$/
+act79	../def2pnl/def2pnl_parser.c	/^static void act79(void)$/
+act8	../def2pnl/def2pnl_parser.c	/^static void act8(void)$/
+act80	../def2pnl/def2pnl_parser.c	/^static void act80(void)$/
+act81	../def2pnl/def2pnl_parser.c	/^static void act81(void)$/
+act82	../def2pnl/def2pnl_parser.c	/^static void act82(void)$/
+act83	../def2pnl/def2pnl_parser.c	/^static void act83(void)$/
+act84	../def2pnl/def2pnl_parser.c	/^static void act84(void)$/
+act85	../def2pnl/def2pnl_parser.c	/^static void act85(void)$/
+act86	../def2pnl/def2pnl_parser.c	/^static void act86(void)$/
+act87	../def2pnl/def2pnl_parser.c	/^static void act87(void)$/
+act88	../def2pnl/def2pnl_parser.c	/^static void act88(void)$/
+act89	../def2pnl/def2pnl_parser.c	/^static void act89(void)$/
+act9	../def2pnl/def2pnl_parser.c	/^static void act9(void)$/
+act90	../def2pnl/def2pnl_parser.c	/^static void act90(void)$/
+act91	../def2pnl/def2pnl_parser.c	/^static void act91(void)$/
+act92	../def2pnl/def2pnl_parser.c	/^static void act92(void)$/
+act93	../def2pnl/def2pnl_parser.c	/^static void act93(void)$/
+act94	../def2pnl/def2pnl_parser.c	/^static void act94(void)$/
+act95	../def2pnl/def2pnl_parser.c	/^static void act95(void)$/
+act96	../def2pnl/def2pnl_parser.c	/^static void act96(void)$/
+act97	../def2pnl/def2pnl_parser.c	/^static void act97(void)$/
+act98	../def2pnl/def2pnl_parser.c	/^static void act98(void)$/
+act99	../def2pnl/def2pnl_parser.c	/^static void act99(void)$/
+add_def_history	../ui/ui_cmd_physical.ee	/^#(defcommand add_def_history/
+add_net_route	../ui/ui_cmd_physical.ee	/^#(defcommand add_net_route/
+add_row_site	../ui/ui_cmd_physical.ee	/^#(defcommand add_row_site/
+add_x_tracks	../ui/ui_cmd_physical.ee	/^#(defcommand add_x_tracks/
+add_y_tracks	../ui/ui_cmd_physical.ee	/^#(defcommand add_y_tracks/
+apply_rewrites	../ui/ui_cmd_synthesis.ee	/^#(defcommand apply_rewrites/
+ar_add	../utility/ar.c	/^ar_add (ar a, void *elt)$/
+ar_addr_of	../utility/ar.c	/^ar_addr_of (ar a, int idx)$/
+ar_alloc	../utility/ar.c	/^ar_alloc (size_t num_elem, size_t elt_size)$/
+ar_alloc_from_group	../utility/ar.c	/^ar_alloc_from_group (size_t num_elem, size_t elt_s/
+ar_alloc_with_offset	../utility/ar.c	/^ar_alloc_with_offset (size_t num_elem, size_t elt_/
+ar_alloc_with_offset_from_group	../utility/ar.c	/^ar_alloc_with_offset_from_group (size_t num_elem, /
+ar_append	../utility/ar.c	/^ar_append (ar a1, ar a2)$/
+ar_compare_int	../utility/ar.c	/^ar_compare_int (void *p, void *q)$/
+ar_compare_string	../utility/ar.c	/^ar_compare_string (void *p, void *q)$/
+ar_copy	../utility/ar.c	/^ar_copy (ar a)$/
+ar_data	../utility/ar.c	/^ar_data (ar a)$/
+ar_elt_size	../utility/ar.c	/^ar_elt_size (ar a)$/
+ar_for_all	../include/ar.h	/^#define ar_for_all(a, type, elt) \\$/
+ar_for_all_common_internal	../include/ar.h	/^#define ar_for_all_common_internal(a, type, elt, i/
+ar_for_all_indexed	../include/ar.h	/^#define ar_for_all_indexed(a, type, elt, index) \\$/
+ar_for_all_internal	../include/ar.h	/^#define ar_for_all_internal(a, type, elt, index) \\/
+ar_for_all_pointers	../include/ar.h	/^#define ar_for_all_pointers(a, elt_ptr) \\$/
+ar_for_all_reverse	../include/ar.h	/^#define ar_for_all_reverse(a, type, elt) \\$/
+ar_for_all_reverse_indexed	../include/ar.h	/^#define ar_for_all_reverse_indexed(a, type, elt, i/
+ar_for_all_reverse_internal	../include/ar.h	/^#define ar_for_all_reverse_internal(a, type, elt, /
+ar_free	../utility/ar.c	/^ar_free (ar a)$/
+ar_grow	../utility/ar.c	/^ar_grow (ar a, int amount)$/
+ar_init	../utility/ar.c	/^ar_init (ar a, void *init)$/
+ar_make_size	../utility/ar.c	/^ar_make_size (ar a, size_t size)$/
+ar_offset	../utility/ar.c	/^ar_offset (ar a)$/
+ar_ref	../utility/ar.c	/^ar_ref (ar a, int idx, void *elt)$/
+ar_remove_element	../utility/ar.c	/^ar_remove_element (ar a, void *elt)$/
+ar_remove_indexed_element	../utility/ar.c	/^ar_remove_indexed_element (ar a, int index)$/
+ar_reverse	../utility/ar.c	/^ar_reverse (ar a)$/
+ar_set	../utility/ar.c	/^ar_set (ar a, int idx, void *elt)$/
+ar_size	../utility/ar.c	/^ar_size (ar a)$/
+ar_sort	../utility/ar.c	/^ar_sort (ar a, ar_compare_fn_t compare_fn)$/
+area_number	../lef2pnl/lef.c	/^area_number(void)$/
+assertion_failure	../include/assert.h	/^void assertion_failure (char *, int) __attribute__/
+assign_stmt	../v2nl/verilog.c	/^assign_stmt(AST**_root)$/
+assignment	../v2nl/verilog.c	/^assignment(AST**_root)$/
+ast2g_addsub_op	../ast2g/ast2g_expression.c	/^ast2g_addsub_op (char *op_name, ssa_context contex/
+ast2g_apply_rewrites_to_design	../ast2g/ast2g.c	/^ast2g_apply_rewrites_to_design (nl_design design)$/
+ast2g_apply_rewrites_to_tree	../ast2g/ast2g.c	/^ast2g_apply_rewrites_to_tree (nl_ast tree)$/
+ast2g_assign	../ast2g/ast2g.c	/^ast2g_assign (nl_design design, ar lhs, ar rhs, ch/
+ast2g_assignment	../ast2g/ast2g_infer_reg.c	/^void ast2g_assignment(STreeParser *_parser, SORAST/
+ast2g_assignments	../ast2g/ast2g_infer_reg.c	/^void ast2g_assignments(STreeParser *_parser, SORAS/
+ast2g_ast_error	../ast2g/ast2g_error.c	/^ast2g_ast_error (nl_ast node, const char *format, /
+ast2g_ast_warning	../ast2g/ast2g_error.c	/^ast2g_ast_warning (nl_ast node, const char *format/
+ast2g_balance_assignment	../ast2g/ast2g_typebal.c	/^ast2g_balance_assignment (nl_ast lhs, nl_ast *rhs_/
+ast2g_begin_name	../ast2g/ast2g_infer_reg.c	/^void ast2g_begin_name(STreeParser *_parser, SORAST/
+ast2g_binary_op	../ast2g/ast2g_expression.c	/^ast2g_binary_op (char *op_name, ssa_context contex/
+ast2g_body	../ast2g/ast2g_infer_reg.c	/^void ast2g_body(STreeParser *_parser, SORAST **_ro/
+ast2g_build_mux	../ast2g/ast2g_util.c	/^ast2g_build_mux (nl_design design, int width, ar c/
+ast2g_build_mux2	../ast2g/ast2g_util.c	/^ast2g_build_mux2 (nl_net sel_net, ar in0_nets, ar /
+ast2g_concat	../ast2g/ast2g_expression.c	/^ast2g_concat (ssa_context context, nl_design desig/
+ast2g_cond_op	../ast2g/ast2g_expression.c	/^ast2g_cond_op (ssa_context context, nl_design desi/
+ast2g_connect_nets	../ast2g/ast2g_util.c	/^ast2g_connect_nets (nl_net out_net, nl_net in_net,/
+ast2g_connect_pin_bus	../ast2g/ast2g_util.c	/^ast2g_connect_pin_bus (nl_cell cell, nl_bus refpin/
+ast2g_constant	../ast2g/ast2g_infer_reg.c	/^void ast2g_constant(STreeParser *_parser, SORAST */
+ast2g_create_new_bus	../ast2g/ast2g_util.c	/^ast2g_create_new_bus (nl_design design, int width)/
+ast2g_create_new_cell	../ast2g/ast2g_util.c	/^ast2g_create_new_cell (char *name, nl_reference re/
+ast2g_create_new_net	../ast2g/ast2g_util.c	/^ast2g_create_new_net (nl_design design)$/
+ast2g_define	../ast2g/ast2g.c	/^ast2g_define (ssa_context context, nl_object var, /
+ast2g_define_future	../ast2g/ast2g.c	/^ast2g_define_future (ssa_context context, nl_objec/
+ast2g_do_assign	../ast2g/ast2g_sequential.c	/^ast2g_do_assign (ssa_context context, nl_design de/
+ast2g_do_begin	../ast2g/ast2g_sequential.c	/^ast2g_do_begin (ssa_context context, nl_design des/
+ast2g_do_case	../ast2g/ast2g_sequential.c	/^ast2g_do_case (ssa_context context, nl_design desi/
+ast2g_dump_trees	../ast2g/ast2g.c	/^ast2g_dump_trees (nl_design design, int widths, in/
+ast2g_eliminate_logical_ops	../ast2g/ast2g_rewrites.c	/^ast2g_eliminate_logical_ops (nl_ast tree)$/
+ast2g_error	../ast2g/ast2g_error.c	/^ast2g_error (const char *format, ...)$/
+ast2g_eval_constant	../ast2g/ast2g_util.c	/^ast2g_eval_constant (nl_ast const_ast)$/
+ast2g_explicit_case	../ast2g/ast2g_rewrites.c	/^ast2g_explicit_case (nl_ast tree)$/
+ast2g_expr_to_nets	../ast2g/ast2g_infer_reg.old.c	/^ast2g_expr_to_nets (nl_ast tree, ar nets, ar input/
+ast2g_expression	../ast2g/ast2g_expression.c	/^ast2g_expression (ssa_context context, nl_design d/
+ast2g_expression_width	../ast2g/ast2g_typebal.c	/^ast2g_expression_width (nl_ast tree)$/
+ast2g_fill_refpin_bus	../ast2g/ast2g_util.c	/^ast2g_fill_refpin_bus (nl_bus bus)$/
+ast2g_find_reset_preset	../ast2g/ast2g_util.c	/^ast2g_find_reset_preset (nl_design design, ar d_ne/
+ast2g_flatten_concats	../ast2g/ast2g_rewrites.c	/^ast2g_flatten_concats (nl_ast tree)$/
+ast2g_flip_cases	../ast2g/ast2g_rewrites.c	/^ast2g_flip_cases (nl_ast tree)$/
+ast2g_function_call	../ast2g/ast2g_expression.c	/^ast2g_function_call (ssa_context context, nl_desig/
+ast2g_get_arith_reference	../ast2g/ast2g_expression.c	/^ast2g_get_arith_reference (nl_design design, char /
+ast2g_get_assignment_nets	../ast2g/ast2g_infer_reg.old.c	/^ast2g_get_assignment_nets (nl_ast tree, ar lhs_net/
+ast2g_get_branch_indexes	../ast2g/ast2g_sequential.c	/^ast2g_get_branch_indexes (nl_ast list_ast, int wid/
+ast2g_get_clocks	../ast2g/ast2g_util.c	/^ast2g_get_clocks (nl_ast sens_list, nl_net *clks, /
+ast2g_get_constant_ins	../ast2g/ast2g_util.c	/^ast2g_get_constant_ins (int width, char radix, cha/
+ast2g_get_constant_ins_walker	../ast2g/ast2g_util.c	/^ast2g_get_constant_ins_walker (void *ptr, int idx)/
+ast2g_get_constant_nets	../ast2g/ast2g_expression.c	/^ast2g_get_constant_nets (nl_design design, int wid/
+ast2g_get_constant_nets_walker	../ast2g/ast2g_expression.c	/^ast2g_get_constant_nets_walker (void *ptr, int idx/
+ast2g_get_constant_value	../ast2g/ast2g_util.c	/^ast2g_get_constant_value (int width, char radix, c/
+ast2g_get_constant_value_for_verilog_number	../ast2g/ast2g_util.c	/^ast2g_get_constant_value_for_verilog_number (nl_as/
+ast2g_get_constant_value_walker	../ast2g/ast2g_util.c	/^ast2g_get_constant_value_walker (void *ptr, int id/
+ast2g_get_input_and_polarity	../ast2g/ast2g_infer_reg.old.c	/^ast2g_get_input_and_polarity (nl_ast tree, int *in/
+ast2g_get_net	../ast2g/ast2g_util.c	/^ast2g_get_net (ssa_context context, nl_design desi/
+ast2g_get_parameterized_ref	../ast2g/ast2g_util.c	/^ast2g_get_parameterized_ref (nl_design design, cha/
+ast2g_get_reduction_reference	../ast2g/ast2g_expression.c	/^ast2g_get_reduction_reference (nl_design design, c/
+ast2g_get_reference	../ast2g/ast2g_util.c	/^ast2g_get_reference (nl_design design, char *ref_n/
+ast2g_get_reg_info	../ast2g/ast2g_infer_reg.old.c	/^ast2g_get_reg_info (nl_cell cell, nl_net *clk, nl_/
+ast2g_get_reg_ref	../ast2g/ast2g_register.c	/^ast2g_get_reg_ref (nl_design design, char clock_se/
+ast2g_get_unique_net_name	../ast2g/ast2g_util.c	/^ast2g_get_unique_net_name (nl_design design)$/
+ast2g_hex_char_to_decimal	../ast2g/ast2g_util.c	/^ast2g_hex_char_to_decimal (char c)$/
+ast2g_in	../ast2g/ast2g_infer_reg.c	/^ int   ast2g_in(STreeParser *_parser, SORAST **_ro/
+ast2g_infer_inverting_ops	../ast2g/ast2g_rewrites.c	/^ast2g_infer_inverting_ops (nl_ast tree)$/
+ast2g_infer_registers	../ast2g/ast2g_reginf.c	/^ast2g_infer_registers (nl_design design)$/
+ast2g_infer_registers_for_reference	../ast2g/ast2g_register.c	/^ast2g_infer_registers_for_reference (nl_reference /
+ast2g_integer	../ast2g/ast2g_expression.c	/^ast2g_integer (nl_design design, int n)$/
+ast2g_invert_net	../ast2g/ast2g_expression.c	/^ast2g_invert_net (nl_net in_net, nl_net out_net,$/
+ast2g_invert_nets	../ast2g/ast2g_expression.c	/^ast2g_invert_nets (nl_design design, ar in_nets, c/
+ast2g_lhs	../ast2g/ast2g_infer_reg.c	/^void ast2g_lhs(STreeParser *_parser, SORAST **_roo/
+ast2g_map_rtl	../ast2g/ast2g.c	/^ast2g_map_rtl (nl_design design)$/
+ast2g_map_to_module	../ast2g/ast2g_expression.c	/^ast2g_map_to_module (nl_subprogram fun, ar actual_/
+ast2g_mismatched_token	../ast2g/ast2g_infer_reg.c	/^ast2g_mismatched_token (STreeParser *parser, nl_to/
+ast2g_no_viable_alt	../ast2g/ast2g_infer_reg.c	/^ast2g_no_viable_alt (STreeParser *parser, char *ru/
+ast2g_number	../ast2g/ast2g_infer_reg.c	/^ int   ast2g_number(STreeParser *_parser, SORAST */
+ast2g_out	../ast2g/ast2g_infer_reg.c	/^ int   ast2g_out(STreeParser *_parser, SORAST **_r/
+ast2g_propagate_width	../ast2g/ast2g_typebal.c	/^ast2g_propagate_width (nl_ast *tree_p, int context/
+ast2g_read	../ast2g/ast2g.c	/^ast2g_read (ssa_context context, nl_object var)$/
+ast2g_read_final	../ast2g/ast2g.c	/^ast2g_read_final (ssa_context context, nl_object v/
+ast2g_reduction_op	../ast2g/ast2g_expression.c	/^ast2g_reduction_op (char *op_name, ssa_context con/
+ast2g_register	../ast2g/ast2g_infer_reg.c	/^void ast2g_register(STreeParser *_parser, SORAST */
+ast2g_register_net	../ast2g/ast2g_util.c	/^ast2g_register_net (nl_net q_net, nl_net d_net, nl/
+ast2g_relational_op	../ast2g/ast2g_expression.c	/^ast2g_relational_op (char *op_name, ssa_context co/
+ast2g_remove_underbars	../ast2g/ast2g_util.c	/^ast2g_remove_underbars (char *str)$/
+ast2g_repeat_concat	../ast2g/ast2g_expression.c	/^ast2g_repeat_concat (ssa_context context, nl_desig/
+ast2g_rewrite_clocks	../ast2g/ast2g_rewrites.c	/^ast2g_rewrite_clocks (nl_ast tree)$/
+ast2g_rhs	../ast2g/ast2g_infer_reg.c	/^void ast2g_rhs(STreeParser *_parser, SORAST **_roo/
+ast2g_sens_item	../ast2g/ast2g_infer_reg.c	/^void ast2g_sens_item(STreeParser *_parser, SORAST /
+ast2g_shift_op	../ast2g/ast2g_expression.c	/^ast2g_shift_op (char *op_name, ssa_context context/
+ast2g_simplify_reduce_ops	../ast2g/ast2g_rewrites.c	/^ast2g_simplify_reduce_ops (nl_ast tree)$/
+ast2g_statement	../ast2g/ast2g_sequential.c	/^ast2g_statement (ssa_context context, nl_design de/
+ast2g_test	../ast2g/ast2g_infer_reg.c	/^ int   ast2g_test(STreeParser *_parser, SORAST **_/
+ast2g_translate_expression	../ast2g/ast2g.c	/^ast2g_translate_expression (nl_design design, nl_a/
+ast2g_translate_process	../ast2g/ast2g.c	/^ast2g_translate_process (nl_design design, nl_ast /
+ast2g_trim_bits	../ast2g/ast2g_typebal.c	/^ast2g_trim_bits (char *bits, int bits_per_char, in/
+ast2g_trim_concat	../ast2g/ast2g_typebal.c	/^ast2g_trim_concat (nl_ast tree, int width)$/
+ast2g_trim_msb	../ast2g/ast2g_typebal.c	/^ast2g_trim_msb (char digit, int mod)$/
+ast2g_trim_number	../ast2g/ast2g_typebal.c	/^ast2g_trim_number (nl_ast tree, int width)$/
+ast2g_trim_or_pad_verilog_number	../ast2g/ast2g_typebal.c	/^ast2g_trim_or_pad_verilog_number (nl_ast tree, int/
+ast2g_trim_repeat_concat	../ast2g/ast2g_typebal.c	/^ast2g_trim_repeat_concat (nl_ast tree, int width)$/
+ast2g_type_balance	../ast2g/ast2g_typebal.c	/^ast2g_type_balance (nl_ast tree)$/
+ast2g_type_balance_case_jka	../ast2g/ast2g_typebal.c	/^ast2g_type_balance_case_jka (nl_ast tree)$/
+ast2g_type_balance_case_vcs	../ast2g/ast2g_typebal.c	/^static void ast2g_type_balance_case_vcs (nl_ast tr/
+ast2g_type_balance_expression	../ast2g/ast2g_typebal.c	/^ast2g_type_balance_expression (int lhs_width, nl_a/
+ast2g_type_balance_walker	../ast2g/ast2g_typebal.c	/^ast2g_type_balance_walker (nl_ast *tree_p, void *p/
+ast2g_unary_op	../ast2g/ast2g_expression.c	/^ast2g_unary_op (char *op_name, ssa_context context/
+ast2g_update_widths	../ast2g/ast2g_typebal.c	/^ast2g_update_widths (nl_ast tree)$/
+ast2g_update_widths_walker	../ast2g/ast2g_typebal.c	/^ast2g_update_widths_walker (nl_ast *tree_p, void */
+ast2g_var_get	../ast2g/ast2g.c	/^ast2g_var_get (void *var, void *ptr)$/
+ast2g_var_set	../ast2g/ast2g.c	/^ast2g_var_set (void *var, ssa_binding binding, voi/
+ast2g_verilog_number	../ast2g/ast2g_expression.c	/^ast2g_verilog_number (nl_design design, char radix/
+ast2g_vnum	../ast2g/ast2g_infer_reg.c	/^ char *  ast2g_vnum(STreeParser *_parser, SORAST */
+ast2g_walk_constant	../ast2g/ast2g_util.c	/^ast2g_walk_constant (int width, char radix, char */
+ast2g_warning	../ast2g/ast2g_error.c	/^ast2g_warning (const char *format, ...)$/
+ast2g_zero_pad	../ast2g/ast2g_typebal.c	/^ast2g_zero_pad (nl_ast tree, int width)$/
+attribute_begin	../v2nl/verilog.c	/^attribute_begin(AST**_root)$/
+attribute_decl	../v2nl/verilog.c	/^attribute_decl(AST**_root)$/
+attribute_end	../v2nl/verilog.c	/^attribute_end(AST**_root)$/
+attribute_kind	../ui/ui_cmd_basic.ee	/^#(defcommand attribute_kind/
+attribute_stmt	../v2nl/verilog.c	/^attribute_stmt(AST**_root)$/
+busbitchars	../def2pnl/def.c	/^busbitchars(void)$/
+cell	../snps-lib/lib.c	/^cell(AST**_root)$/
+cell_rise_fall	../snps-lib/lib.c	/^cell_rise_fall(AST**_root)$/
+cell_statement	../snps-lib/lib.c	/^cell_statement(AST**_root)$/
+cellclass	../lef2pnl/lef.c	/^cellclass(void)$/
+clear_row_sites	../ui/ui_cmd_physical.ee	/^#(defcommand clear_row_sites/
+component	../def2pnl/def.c	/^component(void)$/
+component_plus	../def2pnl/def.c	/^component_plus( char *inst_name, char *mod_name )$/
+components	../def2pnl/def.c	/^components(void)$/
+concat_expr	../v2nl/verilog.c	/^concat_expr(AST**_root)$/
+connect_pin	../ui/ui_cmd_basic.ee	/^#(defcommand connect_pin/
+constant	../v2nl/verilog.c	/^constant(AST**_root)$/
+constituent	../def2pnl/def.c	/^constituent(void)$/
+coordinate	../def2pnl/def.c	/^coordinate(void)$/
+cr_ast	../lef2pnl/main.c	/^cr_ast (AST *tree, Attrib *attr, int tok, char *tx/
+create_array_type	../ui/ui_cmd_bus.ee	/^#(defcommand create_array_type/
+create_bus	../ui/ui_cmd_bus.ee	/^#(defcommand create_bus/
+create_cell	../ui/ui_cmd_basic.ee	/^#(defcommand create_cell/
+create_cell_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand create_cell_attribute/
+create_design	../ui/ui_cmd_basic.ee	/^#(defcommand create_design/
+create_design_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand create_design_attribute/
+create_idesign	../ui/ui_cmd_basic.ee	/^#(defcommand create_idesign/
+create_libcell	../ui/ui_cmd_basic.ee	/^#(defcommand create_libcell/
+create_libpin	../ui/ui_cmd_basic.ee	/^#(defcommand create_libpin/
+create_library	../ui/ui_cmd_basic.ee	/^#(defcommand create_library/
+create_net	../ui/ui_cmd_basic.ee	/^#(defcommand create_net/
+create_net_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand create_net_attribute/
+create_net_bus	../ui/ui_cmd_basic.ee	/^#(defcommand create_net_bus/
+create_pdesign	../ui/ui_cmd_physical.ee	/^#(defcommand create_pdesign/
+create_port	../ui/ui_cmd_basic.ee	/^#(defcommand create_port/
+create_port_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand create_port_attribute/
+create_port_bus	../ui/ui_cmd_basic.ee	/^#(defcommand create_port_bus/
+create_reference	../ui/ui_cmd_basic.ee	/^#(defcommand create_reference/
+create_refpin	../ui/ui_cmd_basic.ee	/^#(defcommand create_refpin/
+decl_assignment	../v2nl/verilog.c	/^decl_assignment(AST**_root, char *name )$/
+declaration	../def2pnl/def.c	/^declaration(void)$/
+def2pnl_component	../def2pnl/def2pnl.c	/^def2pnl_component (char *inst_name, char *libcell_/
+def2pnl_design	../def2pnl/def2pnl.c	/^def2pnl_design (char *name)$/
+def2pnl_die_area	../def2pnl/def2pnl.c	/^def2pnl_die_area (int x0, int y0, int x1, int y1)$/
+def2pnl_distance_units	../def2pnl/def2pnl.c	/^def2pnl_distance_units (char *unit_name, int numbe/
+def2pnl_divider_char	../def2pnl/def2pnl.c	/^def2pnl_divider_char (char *str)$/
+def2pnl_error	../def2pnl/def2pnl_error.c	/^def2pnl_error (const char *format, ...)$/
+def2pnl_get_history_string	../def2pnl/def2pnl.c	/^def2pnl_get_history_string (char *text)$/
+def2pnl_history	../def2pnl/def2pnl.c	/^def2pnl_history (char *str)$/
+def2pnl_lex_error	../def2pnl/def2pnl_error.c	/^def2pnl_lex_error (const char *msg)$/
+def2pnl_net	../def2pnl/def2pnl.c	/^def2pnl_net (char *name, int special)$/
+def2pnl_pin	../def2pnl/def2pnl.c	/^def2pnl_pin (char *pin_name)$/
+def2pnl_read_def	../def2pnl/def2pnl.c	/^def2pnl_read_def (FILE *ifp, nl_context context, n/
+def2pnl_row_site	../def2pnl/def2pnl.c	/^def2pnl_row_site (char *name, char *core_name, int/
+def2pnl_tracks	../def2pnl/def2pnl.c	/^def2pnl_tracks (int is_x, int start, int count, in/
+def_design	../def2pnl/def.c	/^def_design(void)$/
+def_file	../def2pnl/def.c	/^def_file(void)$/
+def_zzerr	../snps-lib/main.c	/^def_zzerr (const char *str)$/
+def_zzsyn	../def2pnl/def2pnl_error.c	/^def_zzsyn (char *text, int tok, char *egroup, SetW/
+delay	../v2nl/verilog.c	/^delay(AST**_root)$/
+diearea_decl	../def2pnl/def.c	/^diearea_decl(void)$/
+dir_clause	../def2pnl/def.c	/^dir_clause(void)$/
+direction	../lef2pnl/lef.c	/^direction(void)$/
+disconnect_pin	../ui/ui_cmd_basic.ee	/^#(defcommand disconnect_pin/
+dividerchar	../def2pnl/def.c	/^dividerchar(void)$/
+drive_strength	../v2nl/verilog.c	/^drive_strength(AST**_root)$/
+dump	../lef2pnl/main.c	/^dump (AST *tree, int indent)$/
+dump_rtl_trees	../ui/ui_cmd_synthesis.ee	/^#(defcommand dump_rtl_trees/
+dump_string	../lef2pnl/main.c	/^dump_string (char *str)$/
+dump_token	../lef2pnl/main.c	/^dump_token (char *str)$/
+dump_top	../lef2pnl/main.c	/^dump_top (AST *tree)$/
+duple	../snps-lib/lib.c	/^duple(AST**_root)$/
+error	../error/error.c	/^error (const char *format, ...)$/
+error_dont_continue	../error/error.h	/^#define error_dont_continue()  (__continue = 0)$/
+error_on_tag	../error/error.h	/^#define error_on_tag(t) \\$/
+error_set_tag	../error/error.c	/^error_set_tag (void *buf)$/
+error_tagged	../error/error.c	/^error_tagged (int tag, const char *format, ...)$/
+error_throw	../error/error.c	/^error_throw (int val)$/
+error_va_list	../error/error.c	/^error_va_list (const char *format, void *ap_arg)$/
+error_va_list_tagged	../error/error.c	/^error_va_list_tagged (int tag, const char *format,/
+explicit_case_walker	../ssa/rewrite.c	/^explicit_case_walker (nl_ast *tree_p, void *ptr)$/
+expr	../snps-lib/lib.c	/^expr(AST**_root)$/
+expr_list	../v2nl/verilog.c	/^expr_list(AST**_root)$/
+ff	../snps-lib/lib.c	/^ff(AST**_root)$/
+ff_statement	../snps-lib/lib.c	/^ff_statement(AST**_root)$/
+file	../lef2pnl/lef.c	/^file( pnl_library plibrary )$/
+find_attributes	../ui/ui_cmd_find.ee	/^#(defcommand find_attributes/
+find_cells	../ui/ui_cmd_find.ee	/^#(defcommand find_cells/
+find_designs	../ui/ui_cmd_find.ee	/^#(defcommand find_designs/
+find_icells	../ui/ui_cmd_find.ee	/^#(defcommand find_icells/
+find_inets	../ui/ui_cmd_find.ee	/^#(defcommand find_inets/
+find_ipins	../ui/ui_cmd_find.ee	/^#(defcommand find_ipins/
+find_iports	../ui/ui_cmd_find.ee	/^#(defcommand find_iports/
+find_nets	../ui/ui_cmd_find.ee	/^#(defcommand find_nets/
+find_pins	../ui/ui_cmd_find.ee	/^#(defcommand find_pins/
+find_ports	../ui/ui_cmd_find.ee	/^#(defcommand find_ports/
+find_references	../ui/ui_cmd_find.ee	/^#(defcommand find_references/
+find_refpins	../ui/ui_cmd_find.ee	/^#(defcommand find_refpins/
+find_types	../ui/ui_cmd_find.ee	/^#(defcommand find_types/
+gcellgrid_decl	../def2pnl/def.c	/^gcellgrid_decl(void)$/
+get_array_type	../ui/ui_cmd_basic.ee	/^#(defcommand get_array_type/
+get_bus_members	../ui/ui_cmd_basic.ee	/^#(defcommand get_bus_members/
+get_bus_type	../ui/ui_cmd_basic.ee	/^#(defcommand get_bus_type/
+get_cell_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_attribute/
+get_cell_bus	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_bus/
+get_cell_design	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_design/
+get_cell_icells	../ui/ui_cmd_misc.ee	/^#(defcommand get_cell_icells/
+get_cell_line	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_line/
+get_cell_location	../ui/ui_cmd_physical.ee	/^#(defcommand get_cell_location/
+get_cell_loctype	../ui/ui_cmd_physical.ee	/^#(defcommand get_cell_loctype/
+get_cell_name	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_name /
+get_cell_or_port_pins	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_or_port_pins/
+get_cell_orientation	../ui/ui_cmd_physical.ee	/^#(defcommand get_cell_orientation/
+get_cell_parent	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_parent/
+get_cell_pin	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_pin/
+get_cell_pins	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_pins/
+get_cell_reference	../ui/ui_cmd_basic.ee	/^#(defcommand get_cell_reference/
+get_def_history	../ui/ui_cmd_physical.ee	/^#(defcommand get_def_history/
+get_design_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand get_design_attribute/
+get_die_area	../ui/ui_cmd_physical.ee	/^#(defcommand get_die_area/
+get_distance_units	../ui/ui_cmd_physical.ee	/^#(defcommand get_distance_units/
+get_history_string	../lef2pnl/lef.c	/^get_history_string (char *text)$/
+get_idesign_cell	../ui/ui_cmd_basic.ee	/^#(defcommand get_idesign_cell/
+get_integer_type	../ui/ui_cmd_basic.ee	/^#(defcommand get_integer_type/
+get_libcell_class	../ui/ui_cmd_physical.ee	/^#(defcommand get_libcell_class/
+get_libcell_library	../ui/ui_cmd_basic.ee	/^#(defcommand get_libcell_library/
+get_libcell_obstructions	../ui/ui_cmd_physical.ee	/^#(defcommand get_libcell_obstructions/
+get_libcell_pins	../ui/ui_cmd_basic.ee	/^#(defcommand get_libcell_pins/
+get_libcell_site	../ui/ui_cmd_physical.ee	/^#(defcommand get_libcell_site/
+get_libcell_size	../ui/ui_cmd_physical.ee	/^#(defcommand get_libcell_size/
+get_libcell_symmetry	../ui/ui_cmd_physical.ee	/^#(defcommand get_libcell_symmetry/
+get_libpin_antennadiffarea	../ui/ui_cmd_physical.ee	/^#(defcommand get_libpin_antennadiffarea/
+get_libpin_antennagatearea	../ui/ui_cmd_physical.ee	/^#(defcommand get_libpin_antennagatearea/
+get_libpin_cell	../ui/ui_cmd_basic.ee	/^#(defcommand get_libpin_cell/
+get_libpin_direction	../ui/ui_cmd_basic.ee	/^#(defcommand get_libpin_direction/
+get_libpin_location	../ui/ui_cmd_physical.ee	/^#(defcommand get_libpin_location/
+get_libpin_port	../ui/ui_cmd_physical.ee	/^#(defcommand get_libpin_port /
+get_libpin_use	../ui/ui_cmd_basic.ee	/^#(defcommand get_libpin_use/
+get_net_and_idesign	../ui/ui_cmd_basic.c	/^get_net_and_idesign (nl_object net_or_inet, ar pat/
+get_net_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand get_net_attribute/
+get_net_bus	../ui/ui_cmd_basic.ee	/^#(defcommand get_net_bus/
+get_net_design	../ui/ui_cmd_basic.ee	/^#(defcommand get_net_design/
+get_net_inets	../ui/ui_cmd_misc.ee	/^#(defcommand get_net_inets/
+get_net_name	../ui/ui_cmd_basic.ee	/^#(defcommand get_net_name /
+get_net_nets	../ui/ui_cmd_basic.ee	/^#(defcommand get_net_nets/
+get_net_pattern	../ui/ui_cmd_physical.ee	/^#(defcommand get_net_pattern/
+get_net_pins	../ui/ui_cmd_basic.ee	/^#(defcommand get_net_pins/
+get_net_routes	../ui/ui_cmd_physical.ee	/^#(defcommand get_net_routes/
+get_net_use	../ui/ui_cmd_physical.ee	/^#(defcommand get_net_use/
+get_pin_direction	../ui/ui_cmd_basic.ee	/^#(defcommand get_pin_direction/
+get_pin_location	../ui/ui_cmd_physical.ee	/^#(defcommand get_pin_location/
+get_pin_name	../ui/ui_cmd_basic.ee	/^#(defcommand get_pin_name/
+get_pin_net	../ui/ui_cmd_basic.ee	/^#(defcommand get_pin_net/
+get_pin_owner	../ui/ui_cmd_basic.ee	/^#(defcommand get_pin_owner/
+get_pin_refpin	../ui/ui_cmd_basic.ee	/^#(defcommand get_pin_refpin/
+get_port_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand get_port_attribute/
+get_port_bus	../ui/ui_cmd_basic.ee	/^#(defcommand get_port_bus/
+get_port_design	../ui/ui_cmd_basic.ee	/^#(defcommand get_port_design/
+get_port_direction	../ui/ui_cmd_basic.ee	/^#(defcommand get_port_direction/
+get_port_geometry	../ui/ui_cmd_physical.ee	/^#(defcommand get_port_geometry/
+get_port_location	../ui/ui_cmd_physical.ee	/^#(defcommand get_port_location/
+get_port_loctype	../ui/ui_cmd_physical.ee	/^#(defcommand get_port_loctype/
+get_port_orientation	../ui/ui_cmd_physical.ee	/^#(defcommand get_port_orientation/
+get_port_pin	../ui/ui_cmd_basic.ee	/^#(defcommand get_port_pin/
+get_port_use	../ui/ui_cmd_physical.ee	/^#(defcommand get_port_use/
+get_reference_cells	../ui/ui_cmd_basic.ee	/^#(defcommand get_reference_cells/
+get_reference_design	../ui/ui_cmd_basic.ee	/^#(defcommand get_reference_design/
+get_reference_name	../ui/ui_cmd_basic.ee	/^#(defcommand get_reference_name/
+get_refpin_direction	../ui/ui_cmd_basic.ee	/^#(defcommand get_refpin_direction/
+get_refpin_down_port	../ui/ui_cmd_basic.ee	/^#(defcommand get_refpin_down_port/
+get_refpin_name	../ui/ui_cmd_basic.ee	/^#(defcommand get_refpin_name/
+get_refpin_owner	../ui/ui_cmd_basic.ee	/^#(defcommand get_refpin_owner/
+get_scalar_type	../ui/ui_cmd_basic.ee	/^#(defcommand get_scalar_type/
+get_type_left	../ui/ui_cmd_basic.ee	/^#(defcommand get_type_left/
+get_type_right	../ui/ui_cmd_basic.ee	/^#(defcommand get_type_right/
+get_x_tracks	../ui/ui_cmd_physical.ee	/^#(defcommand get_x_tracks/
+get_y_tracks	../ui/ui_cmd_physical.ee	/^#(defcommand get_y_tracks/
+group	../ui/ui_cmd_misc.ee	/^#(defcommand group/
+header	../def2pnl/def.c	/^header(void)$/
+hier_copy_ast	../hier/hier_copy.c	/^hier_copy_ast (nl_ast from_tree, nl_design to_desi/
+hier_copy_bus	../hier/hier_copy.c	/^hier_copy_bus (nl_bus from_bus, nl_object to_owner/
+hier_copy_cell	../hier/hier_copy.c	/^hier_copy_cell (nl_cell from_cell, nl_reference_at/
+hier_copy_cells_to_design	../hier/hier_group.c	/^hier_copy_cells_to_design (ar cells, nl_design fro/
+hier_copy_design	../hier/hier_copy.c	/^hier_copy_design (nl_design design, char *copy_nam/
+hier_copy_net	../hier/hier_copy.c	/^hier_copy_net (nl_net from_net, nl_design to_desig/
+hier_copy_nets_to_design	../hier/hier_group.c	/^hier_copy_nets_to_design (ar internal_nets, nl_des/
+hier_copy_pin_connection	../hier/hier_copy.c	/^hier_copy_pin_connection (nl_pin from_pin, nl_cell/
+hier_copy_port	../hier/hier_copy.c	/^hier_copy_port (nl_port port, nl_design to_design,/
+hier_copy_reference	../hier/hier_copy.c	/^hier_copy_reference (nl_reference from_ref, nl_des/
+hier_copy_reference_pins	../hier/hier_copy.c	/^hier_copy_reference_pins (nl_reference from_ref, n/
+hier_copy_refpin	../hier/hier_copy.c	/^hier_copy_refpin (nl_refpin from_refpin, nl_refere/
+hier_copy_refpin_to_reference	../hier/hier_copy.c	/^hier_copy_refpin_to_reference (nl_reference from_r/
+hier_copy_type	../hier/hier_copy.c	/^hier_copy_type (nl_type type, nl_design into_desig/
+hier_create_in_group_attr	../hier/hier_group.c	/^hier_create_in_group_attr (nl_design design, ar ce/
+hier_create_ports	../hier/hier_group.c	/^hier_create_ports (nl_net_attr net_forward, nl_des/
+hier_figure_port_direction	../hier/hier_group.c	/^hier_figure_port_direction (nl_direction inside_di/
+hier_find_external_nets	../hier/hier_group.c	/^hier_find_external_nets (nl_design design, ar cell/
+hier_get_cell_location	../pat/pat_loc.ee	/^#(defcommand hier_get_cell_location/
+hier_get_promoted_nets	../hier/hier_promote.c	/^hier_get_promoted_nets (ar cell_array, nl_design d/
+hier_group	../hier/hier_group.c	/^hier_group (ar cells, char *name)$/
+hier_group_make_subdesign	../hier/hier_group.c	/^hier_group_make_subdesign (char *name, nl_design d/
+hier_link_check_port	../hier/hier_link.c	/^hier_link_check_port (nl_reference reference, nl_o/
+hier_link_check_reference	../hier/hier_link.c	/^hier_link_check_reference (nl_reference reference,/
+hier_link_check_refpin	../hier/hier_link.c	/^hier_link_check_refpin (nl_reference reference, ch/
+hier_link_design	../hier/hier_link.c	/^hier_link_design (nl_design design, int silent, ar/
+hier_net_connects_to_other_cells	../hier/hier_promote.c	/^hier_net_connects_to_other_cells (nl_net net, nl_c/
+hier_promote	../hier/hier_promote.c	/^hier_promote (ar cell_array, nl_design to_design)$/
+hier_promote_cell	../hier/hier_promote.c	/^hier_promote_cell (nl_cell cell, nl_cell inst_cell/
+hier_remove_cells_from_design	../hier/hier_group.c	/^hier_remove_cells_from_design (ar cells, nl_design/
+hier_replace_cell	../hier/hier_cell.c	/^hier_replace_cell (nl_cell cell, nl_reference new_/
+hier_set_cell_location	../pat/pat_loc.ee	/^#(defcommand hier_set_cell_location/
+hier_ungroup	../hier/hier_ungroup.c	/^hier_ungroup (nl_cell cell, char *hierarchy_separa/
+hier_ungroup_all	../hier/hier_ungroup.c	/^hier_ungroup_all (nl_design design, char *hierarch/
+hier_ungroup_cell_array	../hier/hier_ungroup.c	/^hier_ungroup_cell_array (ar cells, char *hierarchy/
+hier_ungroup_promote_net	../hier/hier_ungroup.c	/^hier_ungroup_promote_net (nl_net down_net, nl_desi/
+hier_ungroup_promote_nets	../hier/hier_ungroup.c	/^hier_ungroup_promote_nets (nl_design down_design, /
+hier_update_direction	../hier/hier_group.c	/^hier_update_direction (nl_direction old, nl_direct/
+history_decl	../def2pnl/def.c	/^history_decl(void)$/
+ht_access	../utility/hashtab.c	/^ht_access (hashtab ht, void *key, int insert, int /
+ht_alloc	../utility/hashtab.c	/^ht_alloc (int size, ht_hash_fn_t hash_fn, ht_compa/
+ht_alloc2	../utility/hashtab.c	/^ht_alloc2 (int size, ht_hash_fn_t *hash_fn, ht_com/
+ht_alloc_entry	../utility/hashtab.c	/^ht_alloc_entry (hashtab ht)$/
+ht_compare_string	../utility/hashtab.c	/^ht_compare_string (void *s1, void *s2)$/
+ht_copy_string	../utility/hashtab.c	/^ht_copy_string (void *str)$/
+ht_delete	../utility/hashtab.c	/^ht_delete (hashtab ht, void *key)$/
+ht_do_insert	../utility/hashtab.c	/^ht_do_insert (hashtab ht, ht_entry ent, void *key,/
+ht_dump	../utility/hashtab.c	/^ht_dump (hashtab ht)$/
+ht_first_entry	../utility/hashtab.c	/^ht_first_entry (hashtab ht)$/
+ht_for_all_entries	../include/hashtab.h	/^#define ht_for_all_entries(table, ent) \\$/
+ht_free	../utility/hashtab.c	/^ht_free (hashtab ht)$/
+ht_free_attribute	../utility/hashtab.c	/^ht_free_attribute (ht_attr attr)$/
+ht_free_entry	../utility/hashtab.c	/^ht_free_entry (hashtab ht, ht_entry e)$/
+ht_free_string	../utility/hashtab.c	/^ht_free_string (void *str)$/
+ht_get_attribute	../utility/hashtab.c	/^ht_get_attribute (ht_attr attr, void *key, void *v/
+ht_get_attribute_for_entry	../utility/hashtab.c	/^ht_get_attribute_for_entry (ht_attr attr, ht_entry/
+ht_get_key	../utility/hashtab.c	/^ht_get_key (hashtab ht, ht_entry hte)$/
+ht_hash_int	../utility/hashtab.c	/^ht_hash_int (int n)$/
+ht_hash_ptr	../utility/hashtab.c	/^ht_hash_ptr (void *ptr)$/
+ht_hash_string	../utility/hashtab.c	/^ht_hash_string (void *k)$/
+ht_insert	../utility/hashtab.c	/^ht_insert (hashtab ht, void *key)$/
+ht_lookup	../utility/hashtab.c	/^ht_lookup (hashtab ht, void *key)$/
+ht_new_attribute	../utility/hashtab.c	/^ht_new_attribute (hashtab ht, int elt_size, void */
+ht_next_entry	../utility/hashtab.c	/^ht_next_entry (hashtab ht, ht_entry ent)$/
+ht_remove_attribute	../utility/hashtab.c	/^ht_remove_attribute (ht_attr attr, void *key)$/
+ht_replace	../utility/hashtab.c	/^ht_replace (hashtab ht, void *old_key, void *new_k/
+ht_resize	../utility/hashtab.c	/^ht_resize (hashtab ht)$/
+ht_set_attribute	../utility/hashtab.c	/^ht_set_attribute (ht_attr attr, void *key, void *v/
+ht_set_attribute_for_entry	../utility/hashtab.c	/^ht_set_attribute_for_entry (ht_attr attr, ht_entry/
+ht_size	../utility/hashtab.c	/^ht_size (hashtab ht)$/
+id_decl	../v2nl/verilog.c	/^id_decl(AST**_root, nl_wireclass class, nl_directi/
+id_decl_assignment	../v2nl/verilog.c	/^id_decl_assignment(AST**_root, char *name )$/
+id_list	../v2nl/verilog.c	/^id_list(AST**_root, nl_wireclass class, nl_directi/
+id_or_string	../snps-lib/lib.c	/^id_or_string(AST**_root)$/
+identifier	../snps-lib/lib.c	/^identifier(AST**_root)$/
+identifier_list	../snps-lib/lib.c	/^identifier_list(AST**_root)$/
+if	../pat/pat_loc.c	/^  if ((err=pat_set_cell_location(cell,x,y,iori,ori/
+if_to_case	../ssa/rewrite.c	/^if_to_case (nl_ast tree)$/
+infer_buses	../ui/ui_cmd_misc.ee	/^#(defcommand infer_buses/
+infer_registers	../ui/ui_cmd_synthesis.ee	/^#(defcommand infer_registers/
+input_voltage	../snps-lib/lib.c	/^input_voltage(AST**_root)$/
+input_voltage_statement	../snps-lib/lib.c	/^input_voltage_statement(AST**_root)$/
+instance	../v2nl/verilog.c	/^instance(AST**_root, nl_reference ref )$/
+instance_list	../v2nl/verilog.c	/^instance_list(AST**_root, nl_reference ref )$/
+integer_decl	../v2nl/verilog.c	/^integer_decl(AST**_root)$/
+integer_expr	../v2nl/verilog.c	/^integer_expr(AST**_root)$/
+integer_expr2	../v2nl/verilog.c	/^integer_expr2(AST**_root)$/
+io_decl	../v2nl/verilog.c	/^io_decl(AST**_root)$/
+is_constant	../nl2v/nl2v.c	/^is_constant (char *name)$/
+is_libcell	../ui/ui_cmd_basic.ee	/^#(defcommand is_libcell/
+is_port	../nl2v/nl2v.c	/^is_port (char *name, nl_design design)$/
+is_special	../ui/ui_cmd_physical.ee	/^#(defcommand is_special/
+lambda	../ui/ui_tcl.ee	/^#(defcommand lambda/
+latch	../snps-lib/lib.c	/^latch(AST**_root)$/
+latch_statement	../snps-lib/lib.c	/^latch_statement(AST**_root)$/
+layer_capacitance	../lef2pnl/lef.c	/^layer_capacitance(void)$/
+layer_clause	../def2pnl/def.c	/^layer_clause( pnl_port pport )$/
+layer_pitch	../lef2pnl/lef.c	/^layer_pitch(void)$/
+layer_resistance	../lef2pnl/lef.c	/^layer_resistance(void)$/
+layer_spacing	../lef2pnl/lef.c	/^layer_spacing(void)$/
+layer_width	../lef2pnl/lef.c	/^layer_width(void)$/
+lef2pnl_error	../lef2pnl/lef2pnl.c	/^lef2pnl_error (const char *format, ...)$/
+lef2pnl_get_libcell	../lef2pnl/lef2pnl.c	/^lef2pnl_get_libcell (char *name, pnl_library plibr/
+lef2pnl_get_libpin	../lef2pnl/lef2pnl.c	/^lef2pnl_get_libpin (char *name, pnl_libcell plibce/
+lef2pnl_read_lef	../lef2pnl/lef2pnl.c	/^lef2pnl_read_lef (FILE *ifp, nl_context context, n/
+lef2pnl_translate_number	../lef2pnl/lef2pnl.c	/^lef2pnl_translate_number (char *str, int precision/
+lef_zzerr	../lef2pnl/main.c	/^lef_zzerr (const char *str)$/
+library	../snps-lib/lib.c	/^library(AST**_root)$/
+library_statement	../snps-lib/lib.c	/^library_statement(AST**_root)$/
+link	../ui/ui_cmd_misc.ee	/^#(defcommand link/
+list_cells	../ui/ui_cmd_find.ee	/^#(defcommand list_cells/
+list_commands	../ui/ui_cmd_misc.ee	/^#(defcommand list_commands/
+list_designs	../ui/ui_cmd_find.ee	/^#(defcommand list_designs/
+list_libcells	../ui/ui_cmd_basic.ee	/^#(defcommand list_libcells/
+list_nets	../ui/ui_cmd_find.ee	/^#(defcommand list_nets/
+list_ports	../ui/ui_cmd_find.ee	/^#(defcommand list_ports/
+list_references	../ui/ui_cmd_find.ee	/^#(defcommand list_references/
+list_row_sites	../ui/ui_cmd_physical.ee	/^#(defcommand list_row_sites /
+list_types	../ui/ui_cmd_find.ee	/^#(defcommand list_types/
+logexpr	../snps-lib/lib.c	/^logexpr(AST**_root)$/
+logexpr1	../snps-lib/lib.c	/^logexpr1(AST**_root)$/
+logexpr2	../snps-lib/lib.c	/^logexpr2(AST**_root)$/
+logexpr3	../snps-lib/lib.c	/^logexpr3(AST**_root)$/
+lu_table_statement	../snps-lib/lib.c	/^lu_table_statement(AST**_root)$/
+lu_table_template	../snps-lib/lib.c	/^lu_table_template(AST**_root)$/
+lu_table_template_statement	../snps-lib/lib.c	/^lu_table_template_statement(AST**_root)$/
+lvalue	../v2nl/verilog.c	/^lvalue(AST**_root)$/
+lvalue_concat	../v2nl/verilog.c	/^lvalue_concat(AST**_root)$/
+lvalue_list	../v2nl/verilog.c	/^lvalue_list(AST**_root)$/
+macro	../lef2pnl/lef.c	/^macro( pnl_library plibrary )$/
+macro_class	../lef2pnl/lef.c	/^macro_class( pnl_libcell plibcell )$/
+macro_foreign	../lef2pnl/lef.c	/^macro_foreign( pnl_libcell plibcell )$/
+macro_obs	../lef2pnl/lef.c	/^macro_obs( pnl_libcell plibcell )$/
+macro_pin	../lef2pnl/lef.c	/^macro_pin( pnl_libcell plibcell )$/
+macro_site	../lef2pnl/lef.c	/^macro_site( pnl_libcell plibcell )$/
+macro_size	../lef2pnl/lef.c	/^macro_size( pnl_libcell plibcell )$/
+macro_stmt	../lef2pnl/lef.c	/^macro_stmt( pnl_libcell plibcell )$/
+macro_symmetry	../lef2pnl/lef.c	/^macro_symmetry( pnl_libcell plibcell )$/
+map_design	../ui/ui_cmd_synthesis.ee	/^#(defcommand map_design/
+max	../ast2g/ast2g_typebal.c	/^#define	max(x, y)  ((x) > (y) ? (x) : (y))$/
+mem_alloc_items	../mem/mem.c	/^mem_alloc_items (mem_group group, int num_words)$/
+mem_alloca	../mem/mem_alloca.c	/^mem_alloca (size_t size)$/
+mem_block_of_pointer	../mem/mem.c	/^mem_block_of_pointer (void *ptr)$/
+mem_calloc	../mem-purify/mem-purify.c	/^mem_calloc (size_t num_elem, size_t elt_size)$/
+mem_calloc_from_group	../mem-purify/mem-purify.c	/^mem_calloc_from_group (size_t num_elem, size_t elt/
+mem_calloc_from_group_traced	../mem-purify/mem-purify.c	/^mem_calloc_from_group_traced (size_t num_elem, siz/
+mem_calloc_traced	../mem-purify/mem-purify.c	/^mem_calloc_traced (size_t num_elem, size_t elt_siz/
+mem_dll_delete	../mem/mem.c	/^mem_dll_delete (mem_block block)$/
+mem_dll_insert	../mem/mem.c	/^mem_dll_insert (mem_group group, mem_block block)$/
+mem_figure_stack_direction	../mem/mem_alloca.c	/^mem_figure_stack_direction (void *ptr)$/
+mem_free	../mem-purify/mem-purify.c	/^mem_free (void *ptr)$/
+mem_free_aligned_block	../mem/mem.c	/^mem_free_aligned_block (mem_block block)$/
+mem_free_internal	../mem/mem.c	/^mem_free_internal (void *ptr, mem_block block)$/
+mem_free_string_attr	../mem/mem_old.c	/^mem_free_string_attr (void *ptr)$/
+mem_free_traced	../mem-purify/mem-purify.c	/^mem_free_traced (void *ptr)$/
+mem_group_create	../mem-purify/mem-purify.c	/^mem_group_create (char *name, int alignment)$/
+mem_group_free	../mem-purify/mem-purify.c	/^mem_group_free (mem_group group)$/
+mem_group_free_contents	../mem-purify/mem-purify.c	/^mem_group_free_contents (mem_group group)$/
+mem_group_of_pointer	../mem-purify/mem-purify.c	/^mem_group_of_pointer (void *ptr)$/
+mem_group_set	../mem-purify/mem-purify.c	/^mem_group_set (mem_group group)$/
+mem_init	../mem-purify/mem-purify.c	/^mem_init (void)$/
+mem_init_alloca	../mem/mem_alloca.c	/^mem_init_alloca (void)$/
+mem_malloc	../mem-purify/mem-purify.c	/^mem_malloc (size_t size)$/
+mem_malloc_from_group	../mem-purify/mem-purify.c	/^mem_malloc_from_group (size_t size, mem_group grou/
+mem_malloc_from_group_traced	../mem-purify/mem-purify.c	/^mem_malloc_from_group_traced (size_t size, mem_gro/
+mem_malloc_traced	../mem-purify/mem-purify.c	/^mem_malloc_traced (size_t size, const char *file, /
+mem_out_of_memory	../mem/mem.c	/^mem_out_of_memory (void)$/
+mem_realloc	../mem-purify/mem-purify.c	/^mem_realloc (void *ptr, size_t size)$/
+mem_realloc_traced	../mem-purify/mem-purify.c	/^mem_realloc_traced (void *ptr, size_t size, const /
+mem_register_block	../mem/mem.c	/^mem_register_block (mem_block block, int flag)$/
+mem_show_active	../mem-purify/mem-purify.c	/^mem_show_active (void)$/
+mem_show_active	../ui/ui_cmd_misc.ee	/^#(defcommand mem_show_active/
+mem_show_allocation	../mem-purify/mem-purify.c	/^mem_show_allocation (char *ptr, int size, mem_trac/
+mem_show_pool_active	../mem-purify/mem-purify.c	/^mem_show_pool_active (int id)$/
+mem_show_usage	../mem-purify/mem-purify.c	/^mem_show_usage (void)$/
+mem_show_usage	../ui/ui_cmd_misc.ee	/^#(defcommand mem_show_usage/
+mem_size_of_allocation	../mem-purify/mem-purify.c	/^mem_size_of_allocation (void *ptr)$/
+mem_strdup	../mem-purify/mem-purify.c	/^mem_strdup (char *s)$/
+mem_strdup_from_group	../mem-purify/mem-purify.c	/^mem_strdup_from_group (char *s, mem_group group)$/
+mem_strdup_from_group_traced	../mem-purify/mem-purify.c	/^mem_strdup_from_group_traced (char *s, mem_group g/
+mem_strdup_traced	../mem-purify/mem-purify.c	/^mem_strdup_traced (char *s, const char *file, int /
+mem_trace_alloc	../mem/mem_old.c	/^mem_trace_alloc (void *ptr, int size, char *file, /
+mem_trace_free	../mem/mem_old.c	/^mem_trace_free (void *ptr, int trash_it)$/
+mem_trash_block	../mem/mem_old.c	/^mem_trash_block (void *ptr, int size, int is_free)/
+memalign	../mem/mem.c	/^memalign (size_t alignment, size_t size)$/
+mk_ast	../lef2pnl/main.c	/^mk_ast (AST *t, int tok, char *txt)$/
+module	../v2nl/verilog.c	/^module(AST**_root)$/
+module_inst	../v2nl/verilog.c	/^module_inst(AST**_root)$/
+module_parameters	../v2nl/verilog.c	/^module_parameters(AST**_root)$/
+named_inst_port	../v2nl/verilog.c	/^named_inst_port(AST**_root, nl_cell cell )$/
+named_inst_ports	../v2nl/verilog.c	/^named_inst_ports(AST**_root, nl_cell cell )$/
+namegen_random_name	../namegen/namegen.c	/^namegen_random_name (void)$/
+namegen_randomize	../namegen/namegen.c	/^namegen_randomize (int seed)$/
+namescasesensitive	../def2pnl/def.c	/^namescasesensitive(void)$/
+net	../def2pnl/def.c	/^net( int special )$/
+net_clause	../def2pnl/def.c	/^net_clause(void)$/
+net_connection	../def2pnl/def.c	/^net_connection(void)$/
+net_connects_to_port	../nl2v/nl2v.c	/^net_connects_to_port (nl_net net)$/
+net_plus	../def2pnl/def.c	/^net_plus( pnl_net pnet, int special )$/
+nets	../def2pnl/def.c	/^nets(void)$/
+nl2sim_write_cells	../nl2sim/nl2sim.c	/^nl2sim_write_cells (unparse_fp ufp, nl_design desi/
+nl2sim_write_design	../nl2sim/nl2sim.c	/^nl2sim_write_design (unparse_fp ufp, nl_design des/
+nl2sim_write_pin_equates	../nl2sim/nl2sim.c	/^nl2sim_write_pin_equates (unparse_fp ufp, nl_cell /
+nl2sim_write_pins	../nl2sim/nl2sim.c	/^nl2sim_write_pins (unparse_fp ufp, nl_cell cell, n/
+nl2sim_write_ports	../nl2sim/nl2sim.c	/^nl2sim_write_ports (unparse_fp ufp, nl_design desi/
+nl2sim_write_references	../nl2sim/nl2sim.c	/^nl2sim_write_references (unparse_fp ufp, nl_design/
+nl2sim_write_sim	../nl2sim/nl2sim.c	/^nl2sim_write_sim (FILE *ofp, nl_design design, int/
+nl2v_dump_binary_op	../nl2v/nl2v.c	/^nl2v_dump_binary_op (unparse_fp ufp, char *op, nl_/
+nl2v_dump_concat	../nl2v/nl2v.c	/^nl2v_dump_concat (unparse_fp ufp, nl_ast tree, nl_/
+nl2v_dump_sensitivity_list	../nl2v/nl2v.c	/^nl2v_dump_sensitivity_list (unparse_fp ufp, nl_ast/
+nl2v_dump_unary_op	../nl2v/nl2v.c	/^nl2v_dump_unary_op (unparse_fp ufp, char *op, nl_a/
+nl2v_dump_verilog	../nl2v/nl2v.c	/^nl2v_dump_verilog (unparse_fp ufp, nl_ast root, nl/
+nl2v_dump_verilog_always	../nl2v/nl2v.c	/^nl2v_dump_verilog_always (unparse_fp ufp, nl_ast t/
+nl2v_dump_verilog_assignment	../nl2v/nl2v.c	/^nl2v_dump_verilog_assignment (unparse_fp ufp, nl_a/
+nl2v_dump_verilog_begin	../nl2v/nl2v.c	/^nl2v_dump_verilog_begin (unparse_fp ufp, nl_ast tr/
+nl2v_dump_verilog_bit_and_slice	../nl2v/nl2v.c	/^nl2v_dump_verilog_bit_and_slice (unparse_fp ufp, n/
+nl2v_dump_verilog_case	../nl2v/nl2v.c	/^nl2v_dump_verilog_case (unparse_fp ufp, nl_ast tre/
+nl2v_dump_verilog_declaration	../nl2v/nl2v.c	/^nl2v_dump_verilog_declaration (unparse_fp ufp, nl_/
+nl2v_dump_verilog_expression_list	../nl2v/nl2v.c	/^nl2v_dump_verilog_expression_list (unparse_fp ufp,/
+nl2v_dump_verilog_for	../nl2v/nl2v.c	/^nl2v_dump_verilog_for (unparse_fp ufp, nl_ast tree/
+nl2v_dump_verilog_if	../nl2v/nl2v.c	/^nl2v_dump_verilog_if (unparse_fp ufp, nl_ast tree,/
+nl2v_dump_verilog_number	../nl2v/nl2v.c	/^nl2v_dump_verilog_number (unparse_fp ufp, char *ra/
+nl2v_dump_verilog_range	../nl2v/nl2v.c	/^nl2v_dump_verilog_range (unparse_fp ufp, nl_ast tr/
+nl2v_dump_verilog_subprogram	../nl2v/nl2v.c	/^nl2v_dump_verilog_subprogram (unparse_fp ufp, nl_a/
+nl2v_unparse_verilog_expression	../nl2v/nl2v.c	/^nl2v_unparse_verilog_expression (unparse_fp ufp, n/
+nl2v_unparse_verilog_process	../nl2v/nl2v.c	/^nl2v_unparse_verilog_process (unparse_fp ufp, nl_r/
+nl2v_write_assignment	../nl2v/nl2v.c	/^nl2v_write_assignment (unparse_fp ufp, nl_cell cel/
+nl2v_write_bus_range	../nl2v/nl2v.c	/^nl2v_write_bus_range (unparse_fp ufp, nl_bus bus, /
+nl2v_write_buses	../nl2v/nl2v.c	/^nl2v_write_buses (unparse_fp ufp, nl_design design/
+nl2v_write_cells	../nl2v/nl2v.c	/^nl2v_write_cells (unparse_fp ufp, nl_design design/
+nl2v_write_design	../nl2v/nl2v.c	/^nl2v_write_design (unparse_fp ufp, nl_design desig/
+nl2v_write_direction	../nl2v/nl2v.c	/^nl2v_write_direction (unparse_fp ufp, nl_direction/
+nl2v_write_expression	../nl2v/nl2v.c	/^nl2v_write_expression (unparse_fp ufp, nl_cell cel/
+nl2v_write_identifier	../nl2v/nl2v.c	/^nl2v_write_identifier (unparse_fp ufp, char *ident/
+nl2v_write_net_bundle	../nl2v/nl2v.c	/^nl2v_write_net_bundle (unparse_fp ufp, ar nets, in/
+nl2v_write_net_ref	../nl2v/nl2v.c	/^nl2v_write_net_ref (unparse_fp ufp, nl_net net, in/
+nl2v_write_nets	../nl2v/nl2v.c	/^nl2v_write_nets (unparse_fp ufp, nl_design design,/
+nl2v_write_pins	../nl2v/nl2v.c	/^nl2v_write_pins (unparse_fp ufp, nl_cell cell, nl_/
+nl2v_write_port_bus_members	../nl2v/nl2v.c	/^nl2v_write_port_bus_members (unparse_fp ufp, nl_bu/
+nl2v_write_port_list	../nl2v/nl2v.c	/^nl2v_write_port_list (unparse_fp ufp, nl_design de/
+nl2v_write_ports	../nl2v/nl2v.c	/^nl2v_write_ports (unparse_fp ufp, nl_design design/
+nl2v_write_process	../nl2v/nl2v.c	/^nl2v_write_process (unparse_fp ufp, nl_cell cell)$/
+nl2v_write_reference	../nl2v/nl2v.c	/^nl2v_write_reference (unparse_fp ufp, nl_reference/
+nl2v_write_single_bus	../nl2v/nl2v.c	/^nl2v_write_single_bus (unparse_fp ufp, nl_bus bus,/
+nl2v_write_single_net	../nl2v/nl2v.c	/^nl2v_write_single_net (unparse_fp ufp, nl_net net,/
+nl2v_write_subprograms	../nl2v/nl2v.c	/^nl2v_write_subprograms (unparse_fp ufp, nl_design /
+nl2v_write_supplies	../nl2v/nl2v.c	/^nl2v_write_supplies (unparse_fp ufp, nl_design des/
+nl2v_write_type	../nl2v/nl2v.c	/^nl2v_write_type (unparse_fp ufp, nl_type type)$/
+nl2v_write_verilog	../nl2v/nl2v.c	/^nl2v_write_verilog (FILE *ofp, nl_design design, i/
+nl_ast_child	../nl/nl_gen.c	/^nl_ast_child (nl_ast ast)$/
+nl_ast_child_addr	../nl/nl_ast.c	/^nl_ast_child_addr (nl_ast root)$/
+nl_ast_copy	../nl/nl_ast.c	/^nl_ast_copy (nl_ast node)$/
+nl_ast_copy_tree	../nl/nl_ast.c	/^nl_ast_copy_tree (nl_ast root)$/
+nl_ast_create	../nl/nl_ast.c	/^nl_ast_create (nl_token token)$/
+nl_ast_dump	../nl/nl_ast.c	/^nl_ast_dump (nl_ast tree)$/
+nl_ast_dump_fl	../nl/nl_ast.c	/^nl_ast_dump_fl (nl_ast tree)$/
+nl_ast_dump_l	../nl/nl_ast.c	/^nl_ast_dump_l (nl_ast tree)$/
+nl_ast_dump_tree	../nl/nl_ast.c	/^nl_ast_dump_tree (nl_ast tree, int indent,$/
+nl_ast_dump_w	../nl/nl_ast.c	/^nl_ast_dump_w (nl_ast tree)$/
+nl_ast_dup	../nl/nl_ast.c	/^nl_ast_dup (nl_ast root)$/
+nl_ast_file	../nl/nl_gen.c	/^nl_ast_file (nl_ast ast)$/
+nl_ast_free	../nl/nl_ast.c	/^nl_ast_free (nl_ast tree)$/
+nl_ast_free_tree	../nl/nl_ast.c	/^nl_ast_free_tree (nl_ast root)$/
+nl_ast_get_args	../nl/nl_ast.c	/^nl_ast_get_args (nl_ast tree, int n, nl_ast *args)/
+nl_ast_id	../nl/nl_gen.c	/^nl_ast_id (nl_ast ast)$/
+nl_ast_inherit_file_line	../nl/nl_ast.c	/^nl_ast_inherit_file_line (nl_ast to, nl_ast from)$/
+nl_ast_is_expr	../nl/nl_ast.c	/^nl_ast_is_expr (nl_ast tree)$/
+nl_ast_kind	../nl/nl_gen.c	/^nl_ast_kind (nl_ast ast)$/
+nl_ast_line	../nl/nl_gen.c	/^nl_ast_line (nl_ast ast)$/
+nl_ast_link	../nl/nl_ast.c	/^nl_ast_link (nl_ast *root_p, nl_ast *sibling_p, nl/
+nl_ast_make	../nl/nl_ast.c	/^nl_ast_make (nl_ast root, ...)$/
+nl_ast_prewalk	../nl/nl_ast.c	/^nl_ast_prewalk (nl_ast root, nl_ast_prewalk_fun fu/
+nl_ast_set_child	../nl/nl_ast.c	/^nl_ast_set_child (nl_ast root, nl_ast child)$/
+nl_ast_set_file_line	../nl/nl_ast.c	/^nl_ast_set_file_line (nl_ast tree, char *file, int/
+nl_ast_set_sibling	../nl/nl_ast.c	/^nl_ast_set_sibling (nl_ast child, nl_ast sib)$/
+nl_ast_set_token	../nl/nl_ast.c	/^nl_ast_set_token (nl_ast root, int token)$/
+nl_ast_set_width	../nl/nl_ast.c	/^nl_ast_set_width (nl_ast root, int width)$/
+nl_ast_sibling	../nl/nl_gen.c	/^nl_ast_sibling (nl_ast ast)$/
+nl_ast_sibling_addr	../nl/nl_ast.c	/^nl_ast_sibling_addr (nl_ast root)$/
+nl_ast_token	../nl/nl_gen.c	/^nl_ast_token (nl_ast ast)$/
+nl_ast_walk	../nl/nl_ast.c	/^nl_ast_walk (nl_ast *root_p, nl_ast_walk_fun pre, /
+nl_ast_width	../nl/nl_gen.c	/^nl_ast_width (nl_ast ast)$/
+nl_attr_access	../nl/nl_attr.c	/^nl_attr_access (nl_attr attr, nl_object obj, int s/
+nl_attr_attr_of	../nl/nl_gen.c	/^nl_attr_attr_of (nl_attr attr)$/
+nl_attr_create	../nl/nl_attr.c	/^nl_attr_create (char *name, nl_object owner, nl_ki/
+nl_attr_density	../nl/nl_gen.c	/^nl_attr_density (nl_attr attr)$/
+nl_attr_free	../nl/nl_attr.c	/^nl_attr_free (nl_attr attr)$/
+nl_attr_get	../nl/nl_attr.c	/^nl_attr_get (nl_attr attr, nl_object obj, void *de/
+nl_attr_id	../nl/nl_gen.c	/^nl_attr_id (nl_attr attr)$/
+nl_attr_initialize	../nl/nl_attr.c	/^nl_attr_initialize (nl_attr attr, nl_object obj)$/
+nl_attr_kind	../nl/nl_gen.c	/^nl_attr_kind (nl_attr attr)$/
+nl_attr_name	../nl/nl_gen.c	/^nl_attr_name (nl_attr attr)$/
+nl_attr_owner	../nl/nl_gen.c	/^nl_attr_owner (nl_attr attr)$/
+nl_attr_set	../nl/nl_attr.c	/^nl_attr_set (nl_attr attr, nl_object obj, void *sr/
+nl_bus_add_cell	../nl/nl_bus.c	/^nl_bus_add_cell (nl_bus bus, nl_cell cell)$/
+nl_bus_add_net	../nl/nl_bus.c	/^nl_bus_add_net (nl_bus bus, nl_net net)$/
+nl_bus_add_port	../nl/nl_bus.c	/^nl_bus_add_port (nl_bus bus, nl_port port)$/
+nl_bus_add_refpin	../nl/nl_bus.c	/^nl_bus_add_refpin (nl_bus bus, nl_refpin refpin)$/
+nl_bus_attr_attr_of	../nl/nl_gen.c	/^nl_bus_attr_attr_of (nl_bus_attr bus_attr)$/
+nl_bus_attr_create	../nl/nl_attr.c	/^nl_bus_attr_create (char *name, nl_object owner, n/
+nl_bus_attr_density	../nl/nl_gen.c	/^nl_bus_attr_density (nl_bus_attr bus_attr)$/
+nl_bus_attr_get	../nl/nl_attr.c	/^nl_bus_attr_get (nl_bus_attr attr, nl_bus bus, voi/
+nl_bus_attr_id	../nl/nl_gen.c	/^nl_bus_attr_id (nl_bus_attr bus_attr)$/
+nl_bus_attr_kind	../nl/nl_gen.c	/^nl_bus_attr_kind (nl_bus_attr bus_attr)$/
+nl_bus_attr_name	../nl/nl_gen.c	/^nl_bus_attr_name (nl_bus_attr bus_attr)$/
+nl_bus_attr_owner	../nl/nl_gen.c	/^nl_bus_attr_owner (nl_bus_attr bus_attr)$/
+nl_bus_attr_set	../nl/nl_attr.c	/^nl_bus_attr_set (nl_bus_attr attr, nl_bus bus, voi/
+nl_bus_create	../nl/nl_bus.c	/^nl_bus_create (char *name, nl_type type, nl_kind m/
+nl_bus_for_all_cell_members	../include/nl_iterators.h	/^#define nl_bus_for_all_cell_members(bus, var) \\$/
+nl_bus_for_all_members	../include/nl_iterators.h	/^#define nl_bus_for_all_members(bus, var) \\$/
+nl_bus_for_all_net_members	../include/nl_iterators.h	/^#define nl_bus_for_all_net_members(bus, var) \\$/
+nl_bus_for_all_net_members_reverse	../include/nl_iterators.h	/^#define nl_bus_for_all_net_members_reverse(bus, va/
+nl_bus_for_all_port_members	../include/nl_iterators.h	/^#define nl_bus_for_all_port_members(bus, var) \\$/
+nl_bus_for_all_refpin_members	../include/nl_iterators.h	/^#define nl_bus_for_all_refpin_members(bus, var) \\$/
+nl_bus_for_all_refpin_members_reverse	../include/nl_iterators.h	/^#define nl_bus_for_all_refpin_members_reverse(bus,/
+nl_bus_free	../nl/nl_bus.c	/^nl_bus_free (nl_bus bus)$/
+nl_bus_get_member	../nl/nl_bus.c	/^nl_bus_get_member (nl_bus bus, int index)$/
+nl_bus_id	../nl/nl_gen.c	/^nl_bus_id (nl_bus bus)$/
+nl_bus_kind	../nl/nl_gen.c	/^nl_bus_kind (nl_bus bus)$/
+nl_bus_member_kind	../nl/nl_gen.c	/^nl_bus_member_kind (nl_bus bus)$/
+nl_bus_members	../nl/nl_gen.c	/^nl_bus_members (nl_bus bus)$/
+nl_bus_name	../nl/nl_gen.c	/^nl_bus_name (nl_bus bus)$/
+nl_bus_owner	../nl/nl_gen.c	/^nl_bus_owner (nl_bus bus)$/
+nl_bus_remove_member	../nl/nl_bus.c	/^nl_bus_remove_member (nl_bus bus, int index)$/
+nl_bus_set_type	../nl/nl_bus.c	/^nl_bus_set_type (nl_bus bus, nl_type type)$/
+nl_bus_type	../nl/nl_gen.c	/^nl_bus_type (nl_bus bus)$/
+nl_bus_width	../nl/nl_bus.c	/^nl_bus_width (nl_bus bus)$/
+nl_cell_add_pin	../nl/nl_cell.c	/^nl_cell_add_pin (nl_cell cell, nl_pin pin)$/
+nl_cell_attr_attr_of	../nl/nl_gen.c	/^nl_cell_attr_attr_of (nl_cell_attr cell_attr)$/
+nl_cell_attr_create	../nl/nl_attr.c	/^nl_cell_attr_create (char *name, nl_design design,/
+nl_cell_attr_density	../nl/nl_gen.c	/^nl_cell_attr_density (nl_cell_attr cell_attr)$/
+nl_cell_attr_get	../nl/nl_attr.c	/^nl_cell_attr_get (nl_cell_attr attr, nl_cell cell,/
+nl_cell_attr_get_by_name	../nl/nl_attr.c	/^nl_cell_attr_get_by_name (char *name, nl_cell cell/
+nl_cell_attr_id	../nl/nl_gen.c	/^nl_cell_attr_id (nl_cell_attr cell_attr)$/
+nl_cell_attr_kind	../nl/nl_gen.c	/^nl_cell_attr_kind (nl_cell_attr cell_attr)$/
+nl_cell_attr_name	../nl/nl_gen.c	/^nl_cell_attr_name (nl_cell_attr cell_attr)$/
+nl_cell_attr_owner	../nl/nl_gen.c	/^nl_cell_attr_owner (nl_cell_attr cell_attr)$/
+nl_cell_attr_set	../nl/nl_attr.c	/^nl_cell_attr_set (nl_cell_attr attr, nl_cell cell,/
+nl_cell_attr_set_by_name	../nl/nl_attr.c	/^nl_cell_attr_set_by_name (char *name, nl_cell cell/
+nl_cell_bus	../nl/nl_gen.c	/^nl_cell_bus (nl_cell cell)$/
+nl_cell_bus_offset	../nl/nl_gen.c	/^nl_cell_bus_offset (nl_cell cell)$/
+nl_cell_create	../nl/nl_cell.c	/^nl_cell_create (char *name, nl_reference reference/
+nl_cell_design	../nl/nl_gen.c	/^nl_cell_design (nl_cell cell)$/
+nl_cell_disconnect	../nl/nl_cell.c	/^nl_cell_disconnect (nl_cell cell)$/
+nl_cell_file	../nl/nl_gen.c	/^nl_cell_file (nl_cell cell)$/
+nl_cell_for_all_icells	../include/nl_iterators.h	/^#define nl_cell_for_all_icells(cell, var) \\$/
+nl_cell_for_all_inouts	../include/nl_iterators.h	/^#define nl_cell_for_all_inouts(bus, var) \\$/
+nl_cell_for_all_inputs	../include/nl_iterators.h	/^#define nl_cell_for_all_inputs(bus, var) \\$/
+nl_cell_for_all_outputs	../include/nl_iterators.h	/^#define nl_cell_for_all_outputs(bus, var) \\$/
+nl_cell_for_all_pins	../include/nl_iterators.h	/^#define nl_cell_for_all_pins(cell, var) \\$/
+nl_cell_free	../nl/nl_cell.c	/^nl_cell_free (nl_cell cell)$/
+nl_cell_free_insides	../nl/nl_cell.c	/^nl_cell_free_insides (nl_cell cell)$/
+nl_cell_get_pin_by_name	../nl/nl_cell.c	/^nl_cell_get_pin_by_name (nl_cell cell, char *name)/
+nl_cell_get_pin_by_refpin	../nl/nl_cell.c	/^nl_cell_get_pin_by_refpin (nl_cell cell, nl_refpin/
+nl_cell_half_disconnect	../nl/nl_cell.c	/^nl_cell_half_disconnect (nl_cell cell)$/
+nl_cell_half_reconnect	../nl/nl_cell.c	/^nl_cell_half_reconnect (nl_cell cell)$/
+nl_cell_id	../nl/nl_gen.c	/^nl_cell_id (nl_cell cell)$/
+nl_cell_inouts	../nl/nl_gen.c	/^nl_cell_inouts (nl_cell cell)$/
+nl_cell_inputs	../nl/nl_gen.c	/^nl_cell_inputs (nl_cell cell)$/
+nl_cell_kind	../nl/nl_gen.c	/^nl_cell_kind (nl_cell cell)$/
+nl_cell_line	../nl/nl_gen.c	/^nl_cell_line (nl_cell cell)$/
+nl_cell_name	../nl/nl_gen.c	/^nl_cell_name (nl_cell cell)$/
+nl_cell_or_port_design	../nl/nl_gen.c	/^nl_cell_or_port_design (nl_cell_or_port cell_or_po/
+nl_cell_or_port_id	../nl/nl_gen.c	/^nl_cell_or_port_id (nl_cell_or_port cell_or_port)$/
+nl_cell_or_port_kind	../nl/nl_gen.c	/^nl_cell_or_port_kind (nl_cell_or_port cell_or_port/
+nl_cell_or_port_name	../nl/nl_gen.c	/^nl_cell_or_port_name (nl_cell_or_port cell_or_port/
+nl_cell_outputs	../nl/nl_gen.c	/^nl_cell_outputs (nl_cell cell)$/
+nl_cell_reference	../nl/nl_gen.c	/^nl_cell_reference (nl_cell cell)$/
+nl_cell_rename	../nl/nl_cell.c	/^nl_cell_rename (nl_cell cell, char *new_name)$/
+nl_cell_set_bus_and_offset	../nl/nl_cell.c	/^nl_cell_set_bus_and_offset (nl_cell cell, nl_bus b/
+nl_cell_set_file_line	../nl/nl_cell.c	/^nl_cell_set_file_line (nl_cell cell, char *file, i/
+nl_cell_set_reference	../nl/nl_cell.c	/^nl_cell_set_reference (nl_cell cell, nl_reference /
+nl_cell_update_pins	../nl/nl_cell.c	/^nl_cell_update_pins (nl_cell cell)$/
+nl_context_advance_inet_timestamp	../nl/nl_context.c	/^nl_context_advance_inet_timestamp (nl_context cont/
+nl_context_alloc_design	../nl/nl_context.c	/^nl_context_alloc_design (nl_context context, char /
+nl_context_alloc_library	../nl/nl_context.c	/^nl_context_alloc_library (nl_context context, char/
+nl_context_create	../nl/nl_context.c	/^nl_context_create (void)$/
+nl_context_current_design	../nl/nl_gen.c	/^nl_context_current_design (nl_context context)$/
+nl_context_designs	../nl/nl_gen.c	/^nl_context_designs (nl_context context)$/
+nl_context_for_all_designs	../include/nl_iterators.h	/^#define nl_context_for_all_designs(context, var) \\/
+nl_context_free	../nl/nl_context.c	/^nl_context_free (nl_context context)$/
+nl_context_get_design_by_name	../nl/nl_context.c	/^nl_context_get_design_by_name (nl_context context,/
+nl_context_get_library_by_name	../nl/nl_context.c	/^nl_context_get_library_by_name (nl_context context/
+nl_context_id	../nl/nl_gen.c	/^nl_context_id (nl_context context)$/
+nl_context_inet_timestamp	../nl/nl_gen.c	/^nl_context_inet_timestamp (nl_context context)$/
+nl_context_kind	../nl/nl_gen.c	/^nl_context_kind (nl_context context)$/
+nl_context_libraries	../nl/nl_gen.c	/^nl_context_libraries (nl_context context)$/
+nl_context_next_dll_id	../nl/nl_context.c	/^nl_context_next_dll_id (nl_context context)$/
+nl_context_remove_design	../nl/nl_context.c	/^nl_context_remove_design (nl_context context, nl_d/
+nl_context_rename_design	../nl/nl_context.c	/^nl_context_rename_design (nl_context context, nl_d/
+nl_context_set_current_design	../nl/nl_context.c	/^nl_context_set_current_design (nl_context context,/
+nl_dense_attr_attr_of	../nl/nl_gen.c	/^nl_dense_attr_attr_of (nl_dense_attr dense_attr)$/
+nl_dense_attr_density	../nl/nl_gen.c	/^nl_dense_attr_density (nl_dense_attr dense_attr)$/
+nl_dense_attr_id	../nl/nl_gen.c	/^nl_dense_attr_id (nl_dense_attr dense_attr)$/
+nl_dense_attr_kind	../nl/nl_gen.c	/^nl_dense_attr_kind (nl_dense_attr dense_attr)$/
+nl_dense_attr_name	../nl/nl_gen.c	/^nl_dense_attr_name (nl_dense_attr dense_attr)$/
+nl_dense_attr_owner	../nl/nl_gen.c	/^nl_dense_attr_owner (nl_dense_attr dense_attr)$/
+nl_density_to_string	../nl/nl_gen.c	/^nl_density_to_string (enum nl_density e)$/
+nl_design_add_supply0	../nl/nl_design.c	/^nl_design_add_supply0 (nl_design design, nl_object/
+nl_design_add_supply1	../nl/nl_design.c	/^nl_design_add_supply1 (nl_design design, nl_object/
+nl_design_add_symbol	../nl/nl_design.c	/^nl_design_add_symbol (nl_design design, nl_symbol /
+nl_design_alloc_attr	../nl/nl_design.c	/^nl_design_alloc_attr (nl_design design, char *name/
+nl_design_alloc_bus	../nl/nl_design.c	/^nl_design_alloc_bus (nl_design design, char *name,/
+nl_design_alloc_cell	../nl/nl_design.c	/^nl_design_alloc_cell (nl_design design, char *name/
+nl_design_alloc_idesign	../nl/nl_design.c	/^nl_design_alloc_idesign (nl_design design)$/
+nl_design_alloc_net	../nl/nl_design.c	/^nl_design_alloc_net (nl_design design, char *name)/
+nl_design_alloc_object	../nl/nl_design.c	/^nl_design_alloc_object (nl_design design, char *na/
+nl_design_alloc_pin	../nl/nl_design.c	/^nl_design_alloc_pin (nl_design design)$/
+nl_design_alloc_port	../nl/nl_design.c	/^nl_design_alloc_port (nl_design design, char *name/
+nl_design_alloc_reference	../nl/nl_design.c	/^nl_design_alloc_reference (nl_design design, char /
+nl_design_alloc_refpin	../nl/nl_design.c	/^nl_design_alloc_refpin (nl_design design, char *na/
+nl_design_alloc_subprogram	../nl/nl_design.c	/^nl_design_alloc_subprogram (nl_design design, char/
+nl_design_alloc_symbol	../nl/nl_design.c	/^nl_design_alloc_symbol (nl_design design, char *na/
+nl_design_alloc_type	../nl/nl_design.c	/^nl_design_alloc_type (nl_design design, char *name/
+nl_design_attr_attr_of	../nl/nl_gen.c	/^nl_design_attr_attr_of (nl_design_attr design_attr/
+nl_design_attr_create	../nl/nl_attr.c	/^nl_design_attr_create (char *name, nl_design desig/
+nl_design_attr_density	../nl/nl_gen.c	/^nl_design_attr_density (nl_design_attr design_attr/
+nl_design_attr_get	../nl/nl_attr.c	/^nl_design_attr_get (nl_design_attr attr, nl_design/
+nl_design_attr_get_by_name	../nl/nl_attr.c	/^nl_design_attr_get_by_name (char *name, nl_design /
+nl_design_attr_id	../nl/nl_gen.c	/^nl_design_attr_id (nl_design_attr design_attr)$/
+nl_design_attr_kind	../nl/nl_gen.c	/^nl_design_attr_kind (nl_design_attr design_attr)$/
+nl_design_attr_name	../nl/nl_gen.c	/^nl_design_attr_name (nl_design_attr design_attr)$/
+nl_design_attr_owner	../nl/nl_gen.c	/^nl_design_attr_owner (nl_design_attr design_attr)$/
+nl_design_attr_set	../nl/nl_attr.c	/^nl_design_attr_set (nl_design_attr attr, nl_design/
+nl_design_attr_set_by_name	../nl/nl_attr.c	/^nl_design_attr_set_by_name (char *name, nl_design /
+nl_design_attrs	../nl/nl_gen.c	/^nl_design_attrs (nl_design design)$/
+nl_design_bus_naming_style	../nl/nl_gen.c	/^nl_design_bus_naming_style (nl_design design)$/
+nl_design_cell_buses	../nl/nl_gen.c	/^nl_design_cell_buses (nl_design design)$/
+nl_design_cells	../nl/nl_gen.c	/^nl_design_cells (nl_design design)$/
+nl_design_context	../nl/nl_gen.c	/^nl_design_context (nl_design design)$/
+nl_design_create	../nl/nl_design.c	/^nl_design_create (char *name, nl_context context)$/
+nl_design_first_idesign	../nl/nl_design.c	/^nl_design_first_idesign (nl_design design)$/
+nl_design_for_all_attributes	../include/nl_iterators.h	/^#define nl_design_for_all_attributes(design, var) /
+nl_design_for_all_cell_buses	../include/nl_iterators.h	/^#define nl_design_for_all_cell_buses(design, var) /
+nl_design_for_all_cells	../include/nl_iterators.h	/^#define nl_design_for_all_cells(design, var) \\$/
+nl_design_for_all_idesigns	../include/nl_iterators.h	/^#define nl_design_for_all_idesigns(design, var) \\$/
+nl_design_for_all_net_buses	../include/nl_iterators.h	/^#define nl_design_for_all_net_buses(design, var) \\/
+nl_design_for_all_nets	../include/nl_iterators.h	/^#define nl_design_for_all_nets(design, var) \\$/
+nl_design_for_all_port_buses	../include/nl_iterators.h	/^#define nl_design_for_all_port_buses(design, var) /
+nl_design_for_all_ports	../include/nl_iterators.h	/^#define nl_design_for_all_ports(design, var) \\$/
+nl_design_for_all_references	../include/nl_iterators.h	/^#define nl_design_for_all_references(design, var) /
+nl_design_for_all_subprograms	../include/nl_iterators.h	/^#define nl_design_for_all_subprograms(design, var)/
+nl_design_for_all_types	../include/nl_iterators.h	/^#define nl_design_for_all_types(design, var) \\$/
+nl_design_free	../nl/nl_design.c	/^nl_design_free (nl_design design)$/
+nl_design_free_freelist	../nl/nl_design.c	/^nl_design_free_freelist (nl_free_object obj)$/
+nl_design_free_object	../nl/nl_design.c	/^nl_design_free_object (nl_design design, nl_object/
+nl_design_get_attr_by_name	../nl/nl_design.c	/^nl_design_get_attr_by_name (nl_design design, char/
+nl_design_get_cell_by_name	../nl/nl_design.c	/^nl_design_get_cell_by_name (nl_design design, char/
+nl_design_get_net_by_name	../nl/nl_design.c	/^nl_design_get_net_by_name (nl_design design, char /
+nl_design_get_net_or_bus_by_name	../nl/nl_design.c	/^nl_design_get_net_or_bus_by_name (nl_design design/
+nl_design_get_object_by_name	../nl/nl_design.c	/^nl_design_get_object_by_name (nl_design design, ch/
+nl_design_get_port_by_name	../nl/nl_design.c	/^nl_design_get_port_by_name (nl_design design, char/
+nl_design_get_reference_by_name	../nl/nl_design.c	/^nl_design_get_reference_by_name (nl_design design,/
+nl_design_get_subprogram_by_name	../nl/nl_design.c	/^nl_design_get_subprogram_by_name (nl_design design/
+nl_design_get_symbol_by_name	../nl/nl_design.c	/^nl_design_get_symbol_by_name (nl_design design, ch/
+nl_design_get_type_by_name	../nl/nl_design.c	/^nl_design_get_type_by_name (nl_design design, char/
+nl_design_id	../nl/nl_gen.c	/^nl_design_id (nl_design design)$/
+nl_design_idesigns	../nl/nl_gen.c	/^nl_design_idesigns (nl_design design)$/
+nl_design_kind	../nl/nl_gen.c	/^nl_design_kind (nl_design design)$/
+nl_design_libcell	../nl/nl_gen.c	/^nl_design_libcell (nl_design design)$/
+nl_design_max_id	../nl/nl_design.c	/^nl_design_max_id (nl_design design, nl_kind kind)$/
+nl_design_mem_group	../nl/nl_gen.c	/^nl_design_mem_group (nl_design design)$/
+nl_design_name	../nl/nl_gen.c	/^nl_design_name (nl_design design)$/
+nl_design_net_buses	../nl/nl_gen.c	/^nl_design_net_buses (nl_design design)$/
+nl_design_nets	../nl/nl_gen.c	/^nl_design_nets (nl_design design)$/
+nl_design_num_attrs	../nl/nl_design.c	/^nl_design_num_attrs (nl_design design)$/
+nl_design_num_cell_buses	../nl/nl_design.c	/^nl_design_num_cell_buses (nl_design design)$/
+nl_design_num_cells	../nl/nl_design.c	/^nl_design_num_cells (nl_design design)$/
+nl_design_num_idesigns	../nl/nl_design.c	/^nl_design_num_idesigns (nl_design design)$/
+nl_design_num_net_buses	../nl/nl_design.c	/^nl_design_num_net_buses (nl_design design)$/
+nl_design_num_nets	../nl/nl_design.c	/^nl_design_num_nets (nl_design design)$/
+nl_design_num_port_buses	../nl/nl_design.c	/^nl_design_num_port_buses (nl_design design)$/
+nl_design_num_ports	../nl/nl_design.c	/^nl_design_num_ports (nl_design design)$/
+nl_design_num_references	../nl/nl_design.c	/^nl_design_num_references (nl_design design)$/
+nl_design_num_types	../nl/nl_design.c	/^nl_design_num_types (nl_design design)$/
+nl_design_object_design	../nl/nl_gen.c	/^nl_design_object_design (nl_design_object design_o/
+nl_design_object_id	../nl/nl_gen.c	/^nl_design_object_id (nl_design_object design_objec/
+nl_design_object_kind	../nl/nl_gen.c	/^nl_design_object_kind (nl_design_object design_obj/
+nl_design_object_name	../nl/nl_gen.c	/^nl_design_object_name (nl_design_object design_obj/
+nl_design_port_buses	../nl/nl_gen.c	/^nl_design_port_buses (nl_design design)$/
+nl_design_ports	../nl/nl_gen.c	/^nl_design_ports (nl_design design)$/
+nl_design_references	../nl/nl_gen.c	/^nl_design_references (nl_design design)$/
+nl_design_remove_attr	../nl/nl_design.c	/^nl_design_remove_attr (nl_design design, nl_attr a/
+nl_design_remove_cell	../nl/nl_design.c	/^nl_design_remove_cell (nl_design design, nl_cell c/
+nl_design_remove_cell_bus	../nl/nl_design.c	/^nl_design_remove_cell_bus (nl_design design, nl_bu/
+nl_design_remove_idesign	../nl/nl_design.c	/^nl_design_remove_idesign (nl_design design, nl_ide/
+nl_design_remove_net	../nl/nl_design.c	/^nl_design_remove_net (nl_design design, nl_net net/
+nl_design_remove_net_bus	../nl/nl_design.c	/^nl_design_remove_net_bus (nl_design design, nl_bus/
+nl_design_remove_port	../nl/nl_design.c	/^nl_design_remove_port (nl_design design, nl_port p/
+nl_design_remove_port_bus	../nl/nl_design.c	/^nl_design_remove_port_bus (nl_design design, nl_bu/
+nl_design_remove_reference	../nl/nl_design.c	/^nl_design_remove_reference (nl_design design, nl_r/
+nl_design_remove_subprogram	../nl/nl_design.c	/^nl_design_remove_subprogram (nl_design design, nl_/
+nl_design_rename	../nl/nl_design.c	/^nl_design_rename (nl_design design, char *new_name/
+nl_design_rename_object	../nl/nl_design.c	/^nl_design_rename_object (nl_design design, nl_name/
+nl_design_set_bus_naming_style	../nl/nl_design.c	/^nl_design_set_bus_naming_style (nl_design design, /
+nl_design_set_libcell	../nl/nl_design.c	/^nl_design_set_libcell (nl_design design, int flag)/
+nl_design_subprograms	../nl/nl_gen.c	/^nl_design_subprograms (nl_design design)$/
+nl_design_supply0s	../nl/nl_gen.c	/^nl_design_supply0s (nl_design design)$/
+nl_design_supply1s	../nl/nl_gen.c	/^nl_design_supply1s (nl_design design)$/
+nl_design_symbols	../nl/nl_gen.c	/^nl_design_symbols (nl_design design)$/
+nl_design_types	../nl/nl_gen.c	/^nl_design_types (nl_design design)$/
+nl_direction_reverse	../nl/nl_misc.c	/^nl_direction_reverse (nl_direction direction)$/
+nl_direction_to_string	../nl/nl_gen.c	/^nl_direction_to_string (enum nl_direction e)$/
+nl_dll_add	../nl/nl_dll.c	/^nl_dll_add (nl_dll_head dll, nl_dll element)$/
+nl_dll_create	../nl/nl_dll.c	/^nl_dll_create (nl_context context, nl_kind element/
+nl_dll_for_all	../include/nl_iterators.h	/^#define nl_dll_for_all(dll, type, var) \\$/
+nl_dll_for_all_internal	../include/nl_iterators.h	/^#define nl_dll_for_all_internal(dll, type, var) \\$/
+nl_dll_free	../nl/nl_dll.c	/^nl_dll_free (nl_dll_head dll)$/
+nl_dll_gen_first	../nl/nl_dll.c	/^nl_dll_gen_first (nl_dll_head dll)$/
+nl_dll_gen_next	../nl/nl_dll.c	/^nl_dll_gen_next (nl_dll dll)$/
+nl_dll_head_element_kind	../nl/nl_gen.c	/^nl_dll_head_element_kind (nl_dll_head dll_head)$/
+nl_dll_head_id	../nl/nl_gen.c	/^nl_dll_head_id (nl_dll_head dll_head)$/
+nl_dll_head_kind	../nl/nl_gen.c	/^nl_dll_head_kind (nl_dll_head dll_head)$/
+nl_dll_head_num_elements	../nl/nl_gen.c	/^nl_dll_head_num_elements (nl_dll_head dll_head)$/
+nl_dll_id	../nl/nl_gen.c	/^nl_dll_id (nl_dll dll)$/
+nl_dll_insert_after	../nl/nl_dll.c	/^nl_dll_insert_after (nl_dll_head dll, nl_dll elt, /
+nl_dll_kind	../nl/nl_gen.c	/^nl_dll_kind (nl_dll dll)$/
+nl_dll_remove	../nl/nl_dll.c	/^nl_dll_remove (nl_dll_head dll, nl_dll element)$/
+nl_file_init	../pat/attr_rw.c	/^nl_file_init(FILE *pf)$/
+nl_file_write_design	../pat/attr_rw.c	/^nl_file_write_design(FILE *pf, nl_design mod)$/
+nl_free_object_id	../nl/nl_gen.c	/^nl_free_object_id (nl_free_object free_object)$/
+nl_free_object_kind	../nl/nl_gen.c	/^nl_free_object_kind (nl_free_object free_object)$/
+nl_icell_attr_attr_of	../nl/nl_gen.c	/^nl_icell_attr_attr_of (nl_icell_attr icell_attr)$/
+nl_icell_attr_create	../nl/nl_attr.c	/^nl_icell_attr_create (char *name, nl_idesign idesi/
+nl_icell_attr_density	../nl/nl_gen.c	/^nl_icell_attr_density (nl_icell_attr icell_attr)$/
+nl_icell_attr_get	../nl/nl_attr.c	/^nl_icell_attr_get (nl_icell_attr attr, nl_icell ic/
+nl_icell_attr_get_by_name	../nl/nl_attr.c	/^nl_icell_attr_get_by_name (char *name, nl_icell ic/
+nl_icell_attr_id	../nl/nl_gen.c	/^nl_icell_attr_id (nl_icell_attr icell_attr)$/
+nl_icell_attr_kind	../nl/nl_gen.c	/^nl_icell_attr_kind (nl_icell_attr icell_attr)$/
+nl_icell_attr_name	../nl/nl_gen.c	/^nl_icell_attr_name (nl_icell_attr icell_attr)$/
+nl_icell_attr_owner	../nl/nl_gen.c	/^nl_icell_attr_owner (nl_icell_attr icell_attr)$/
+nl_icell_attr_set	../nl/nl_attr.c	/^nl_icell_attr_set (nl_icell_attr attr, nl_icell ic/
+nl_icell_attr_set_by_name	../nl/nl_attr.c	/^nl_icell_attr_set_by_name (char *name, nl_icell ic/
+nl_icell_cell	../nl/nl_gen.c	/^nl_icell_cell (nl_icell icell)$/
+nl_icell_create	../nl/nl_icell.c	/^nl_icell_create (nl_cell cell, nl_idesign idesign)/
+nl_icell_down_design	../nl/nl_gen.c	/^nl_icell_down_design (nl_icell icell)$/
+nl_icell_for_all_inouts	../include/nl_iterators.h	/^#define nl_icell_for_all_inouts(icell, var) \\$/
+nl_icell_for_all_inputs	../include/nl_iterators.h	/^#define nl_icell_for_all_inputs(icell, var) \\$/
+nl_icell_for_all_ipins	../include/nl_iterators.h	/^#define nl_icell_for_all_ipins(icell, var) \\$/
+nl_icell_for_all_outputs	../include/nl_iterators.h	/^#define nl_icell_for_all_outputs(icell, var) \\$/
+nl_icell_free	../nl/nl_icell.c	/^nl_icell_free (nl_icell icell)$/
+nl_icell_get_ipin_by_refpin	../nl/nl_icell.c	/^nl_icell_get_ipin_by_refpin (nl_icell icell, nl_re/
+nl_icell_id	../nl/nl_gen.c	/^nl_icell_id (nl_icell icell)$/
+nl_icell_idesign	../nl/nl_gen.c	/^nl_icell_idesign (nl_icell icell)$/
+nl_icell_kind	../nl/nl_gen.c	/^nl_icell_kind (nl_icell icell)$/
+nl_icell_link	../nl/nl_icell.c	/^nl_icell_link (nl_icell icell)$/
+nl_icell_name	../nl/nl_icell.c	/^nl_icell_name (nl_icell icell)$/
+nl_icell_reference	../nl/nl_icell.c	/^nl_icell_reference (nl_icell icell)$/
+nl_icell_root_idesign	../nl/nl_icell.c	/^nl_icell_root_idesign (nl_icell icell)$/
+nl_icell_unlink	../nl/nl_icell.c	/^nl_icell_unlink (nl_icell icell)$/
+nl_id_ast_child	../nl/nl_gen.c	/^nl_id_ast_child (nl_id_ast id_ast)$/
+nl_id_ast_create	../nl/nl_ast.c	/^nl_id_ast_create (char *name)$/
+nl_id_ast_file	../nl/nl_gen.c	/^nl_id_ast_file (nl_id_ast id_ast)$/
+nl_id_ast_id	../nl/nl_gen.c	/^nl_id_ast_id (nl_id_ast id_ast)$/
+nl_id_ast_kind	../nl/nl_gen.c	/^nl_id_ast_kind (nl_id_ast id_ast)$/
+nl_id_ast_line	../nl/nl_gen.c	/^nl_id_ast_line (nl_id_ast id_ast)$/
+nl_id_ast_name	../nl/nl_gen.c	/^nl_id_ast_name (nl_id_ast id_ast)$/
+nl_id_ast_set_name	../nl/nl_ast.c	/^nl_id_ast_set_name (nl_id_ast id, char *name)$/
+nl_id_ast_sibling	../nl/nl_gen.c	/^nl_id_ast_sibling (nl_id_ast id_ast)$/
+nl_id_ast_token	../nl/nl_gen.c	/^nl_id_ast_token (nl_id_ast id_ast)$/
+nl_id_ast_width	../nl/nl_gen.c	/^nl_id_ast_width (nl_id_ast id_ast)$/
+nl_idesign_alloc_attr	../nl/nl_idesign.c	/^nl_idesign_alloc_attr (nl_idesign idesign, char *n/
+nl_idesign_alloc_icell	../nl/nl_idesign.c	/^nl_idesign_alloc_icell (nl_idesign idesign, nl_cel/
+nl_idesign_alloc_inet	../nl/nl_idesign.c	/^nl_idesign_alloc_inet (nl_idesign idesign, nl_net /
+nl_idesign_alloc_ipin	../nl/nl_idesign.c	/^nl_idesign_alloc_ipin (nl_idesign idesign, nl_pin /
+nl_idesign_alloc_iport	../nl/nl_idesign.c	/^nl_idesign_alloc_iport (nl_idesign idesign, nl_por/
+nl_idesign_alloc_object	../nl/nl_idesign.c	/^nl_idesign_alloc_object (nl_idesign idesign, nl_ki/
+nl_idesign_attr_attr_of	../nl/nl_gen.c	/^nl_idesign_attr_attr_of (nl_idesign_attr idesign_a/
+nl_idesign_attr_create	../nl/nl_attr.c	/^nl_idesign_attr_create (char *name, nl_idesign ide/
+nl_idesign_attr_density	../nl/nl_gen.c	/^nl_idesign_attr_density (nl_idesign_attr idesign_a/
+nl_idesign_attr_get	../nl/nl_attr.c	/^nl_idesign_attr_get (nl_idesign_attr attr, nl_ides/
+nl_idesign_attr_get_by_name	../nl/nl_attr.c	/^nl_idesign_attr_get_by_name (char *name, nl_idesig/
+nl_idesign_attr_id	../nl/nl_gen.c	/^nl_idesign_attr_id (nl_idesign_attr idesign_attr)$/
+nl_idesign_attr_kind	../nl/nl_gen.c	/^nl_idesign_attr_kind (nl_idesign_attr idesign_attr/
+nl_idesign_attr_name	../nl/nl_gen.c	/^nl_idesign_attr_name (nl_idesign_attr idesign_attr/
+nl_idesign_attr_owner	../nl/nl_gen.c	/^nl_idesign_attr_owner (nl_idesign_attr idesign_att/
+nl_idesign_attr_set	../nl/nl_attr.c	/^nl_idesign_attr_set (nl_idesign_attr attr, nl_ides/
+nl_idesign_create	../nl/nl_idesign.c	/^nl_idesign_create (nl_design design, nl_icell icel/
+nl_idesign_design	../nl/nl_gen.c	/^nl_idesign_design (nl_idesign idesign)$/
+nl_idesign_for_all_icells	../include/nl_iterators.h	/^#define nl_idesign_for_all_icells(idesign, var) \\$/
+nl_idesign_for_all_inets	../include/nl_iterators.h	/^#define nl_idesign_for_all_inets(idesign, var) \\$/
+nl_idesign_for_all_iports	../include/nl_iterators.h	/^#define nl_idesign_for_all_iports(idesign, var) \\$/
+nl_idesign_free	../nl/nl_idesign.c	/^nl_idesign_free (nl_idesign idesign)$/
+nl_idesign_free_icell_attr	../nl/nl_idesign.c	/^nl_idesign_free_icell_attr (void *ptr)$/
+nl_idesign_free_inet_attr	../nl/nl_idesign.c	/^nl_idesign_free_inet_attr (void *ptr)$/
+nl_idesign_free_ipin_attr	../nl/nl_idesign.c	/^nl_idesign_free_ipin_attr (void *ptr)$/
+nl_idesign_free_iport_attr	../nl/nl_idesign.c	/^nl_idesign_free_iport_attr (void *ptr)$/
+nl_idesign_free_object	../nl/nl_idesign.c	/^nl_idesign_free_object (nl_idesign idesign, nl_ide/
+nl_idesign_get_attr_by_name	../nl/nl_idesign.c	/^nl_idesign_get_attr_by_name (nl_idesign idesign, c/
+nl_idesign_get_icell	../nl/nl_idesign.c	/^nl_idesign_get_icell (nl_idesign idesign, nl_cell /
+nl_idesign_get_icell_by_name	../nl/nl_idesign.c	/^nl_idesign_get_icell_by_name (nl_idesign idesign, /
+nl_idesign_get_inet	../nl/nl_idesign.c	/^nl_idesign_get_inet (nl_idesign idesign, nl_net ne/
+nl_idesign_get_inet_by_name	../nl/nl_idesign.c	/^nl_idesign_get_inet_by_name (nl_idesign idesign, c/
+nl_idesign_get_iobject	../nl/nl_idesign.c	/^nl_idesign_get_iobject (nl_idesign idesign, nl_obj/
+nl_idesign_get_ipin	../nl/nl_idesign.c	/^nl_idesign_get_ipin (nl_idesign idesign, nl_pin pi/
+nl_idesign_get_iport	../nl/nl_idesign.c	/^nl_idesign_get_iport (nl_idesign idesign, nl_port /
+nl_idesign_get_iport_by_name	../nl/nl_idesign.c	/^nl_idesign_get_iport_by_name (nl_idesign idesign, /
+nl_idesign_get_or_create	../nl/nl_idesign.c	/^nl_idesign_get_or_create (nl_design design, nl_ice/
+nl_idesign_icell	../nl/nl_gen.c	/^nl_idesign_icell (nl_idesign idesign)$/
+nl_idesign_id	../nl/nl_gen.c	/^nl_idesign_id (nl_idesign idesign)$/
+nl_idesign_kind	../nl/nl_gen.c	/^nl_idesign_kind (nl_idesign idesign)$/
+nl_idesign_max_id	../nl/nl_idesign.c	/^nl_idesign_max_id (nl_idesign idesign, nl_kind kin/
+nl_idesign_name	../nl/nl_idesign.c	/^nl_idesign_name (nl_idesign idesign)$/
+nl_idesign_object_id	../nl/nl_gen.c	/^nl_idesign_object_id (nl_idesign_object idesign_ob/
+nl_idesign_object_idesign	../nl/nl_gen.c	/^nl_idesign_object_idesign (nl_idesign_object idesi/
+nl_idesign_object_kind	../nl/nl_gen.c	/^nl_idesign_object_kind (nl_idesign_object idesign_/
+nl_in_ast_child	../nl/nl_gen.c	/^nl_in_ast_child (nl_in_ast in_ast)$/
+nl_in_ast_create	../nl/nl_ast.c	/^nl_in_ast_create (int index)$/
+nl_in_ast_file	../nl/nl_gen.c	/^nl_in_ast_file (nl_in_ast in_ast)$/
+nl_in_ast_id	../nl/nl_gen.c	/^nl_in_ast_id (nl_in_ast in_ast)$/
+nl_in_ast_index	../nl/nl_gen.c	/^nl_in_ast_index (nl_in_ast in_ast)$/
+nl_in_ast_kind	../nl/nl_gen.c	/^nl_in_ast_kind (nl_in_ast in_ast)$/
+nl_in_ast_line	../nl/nl_gen.c	/^nl_in_ast_line (nl_in_ast in_ast)$/
+nl_in_ast_set_index	../nl/nl_ast.c	/^nl_in_ast_set_index (nl_in_ast in, int index)$/
+nl_in_ast_sibling	../nl/nl_gen.c	/^nl_in_ast_sibling (nl_in_ast in_ast)$/
+nl_in_ast_token	../nl/nl_gen.c	/^nl_in_ast_token (nl_in_ast in_ast)$/
+nl_in_ast_width	../nl/nl_gen.c	/^nl_in_ast_width (nl_in_ast in_ast)$/
+nl_inet_attr_attr_of	../nl/nl_gen.c	/^nl_inet_attr_attr_of (nl_inet_attr inet_attr)$/
+nl_inet_attr_create	../nl/nl_attr.c	/^nl_inet_attr_create (char *name, nl_idesign idesig/
+nl_inet_attr_density	../nl/nl_gen.c	/^nl_inet_attr_density (nl_inet_attr inet_attr)$/
+nl_inet_attr_get	../nl/nl_attr.c	/^nl_inet_attr_get (nl_inet_attr attr, nl_inet inet,/
+nl_inet_attr_get_by_name	../nl/nl_attr.c	/^nl_inet_attr_get_by_name (char *name, nl_inet inet/
+nl_inet_attr_id	../nl/nl_gen.c	/^nl_inet_attr_id (nl_inet_attr inet_attr)$/
+nl_inet_attr_kind	../nl/nl_gen.c	/^nl_inet_attr_kind (nl_inet_attr inet_attr)$/
+nl_inet_attr_name	../nl/nl_gen.c	/^nl_inet_attr_name (nl_inet_attr inet_attr)$/
+nl_inet_attr_owner	../nl/nl_gen.c	/^nl_inet_attr_owner (nl_inet_attr inet_attr)$/
+nl_inet_attr_set	../nl/nl_attr.c	/^nl_inet_attr_set (nl_inet_attr attr, nl_inet inet,/
+nl_inet_attr_set_by_name	../nl/nl_attr.c	/^nl_inet_attr_set_by_name (char *name, nl_inet inet/
+nl_inet_create	../nl/nl_inet.c	/^nl_inet_create (nl_net net, nl_idesign idesign)$/
+nl_inet_for_all_fanins	../include/nl_iterators.h	/^#define nl_inet_for_all_fanins(inet, var) \\$/
+nl_inet_for_all_fanios	../include/nl_iterators.h	/^#define nl_inet_for_all_fanios(inet, var) \\$/
+nl_inet_for_all_fanouts	../include/nl_iterators.h	/^#define nl_inet_for_all_fanouts(inet, var) \\$/
+nl_inet_for_all_ipins	../include/nl_iterators.h	/^#define nl_inet_for_all_ipins(inet, var) \\$/
+nl_inet_free	../nl/nl_inet.c	/^nl_inet_free (nl_inet inet)$/
+nl_inet_id	../nl/nl_gen.c	/^nl_inet_id (nl_inet inet)$/
+nl_inet_idesign	../nl/nl_gen.c	/^nl_inet_idesign (nl_inet inet)$/
+nl_inet_kind	../nl/nl_gen.c	/^nl_inet_kind (nl_inet inet)$/
+nl_inet_name	../nl/nl_inet.c	/^nl_inet_name (nl_inet inet)$/
+nl_inet_net	../nl/nl_gen.c	/^nl_inet_net (nl_inet inet)$/
+nl_inet_set_timestamp	../nl/nl_inet.c	/^nl_inet_set_timestamp (nl_inet inet, int val)$/
+nl_inet_timestamp	../nl/nl_gen.c	/^nl_inet_timestamp (nl_inet inet)$/
+nl_ipin_attr_attr_of	../nl/nl_gen.c	/^nl_ipin_attr_attr_of (nl_ipin_attr ipin_attr)$/
+nl_ipin_attr_create	../nl/nl_attr.c	/^nl_ipin_attr_create (char *name, nl_idesign idesig/
+nl_ipin_attr_density	../nl/nl_gen.c	/^nl_ipin_attr_density (nl_ipin_attr ipin_attr)$/
+nl_ipin_attr_get	../nl/nl_attr.c	/^nl_ipin_attr_get (nl_ipin_attr attr, nl_ipin ipin,/
+nl_ipin_attr_id	../nl/nl_gen.c	/^nl_ipin_attr_id (nl_ipin_attr ipin_attr)$/
+nl_ipin_attr_kind	../nl/nl_gen.c	/^nl_ipin_attr_kind (nl_ipin_attr ipin_attr)$/
+nl_ipin_attr_name	../nl/nl_gen.c	/^nl_ipin_attr_name (nl_ipin_attr ipin_attr)$/
+nl_ipin_attr_owner	../nl/nl_gen.c	/^nl_ipin_attr_owner (nl_ipin_attr ipin_attr)$/
+nl_ipin_attr_set	../nl/nl_attr.c	/^nl_ipin_attr_set (nl_ipin_attr attr, nl_ipin ipin,/
+nl_ipin_create	../nl/nl_ipin.c	/^nl_ipin_create (nl_pin pin, nl_idesign idesign)$/
+nl_ipin_direction	../nl/nl_ipin.c	/^nl_ipin_direction (nl_ipin ipin)$/
+nl_ipin_down_iport	../nl/nl_ipin.c	/^nl_ipin_down_iport (nl_ipin ipin)$/
+nl_ipin_free	../nl/nl_ipin.c	/^nl_ipin_free (nl_ipin ipin)$/
+nl_ipin_id	../nl/nl_gen.c	/^nl_ipin_id (nl_ipin ipin)$/
+nl_ipin_idesign	../nl/nl_gen.c	/^nl_ipin_idesign (nl_ipin ipin)$/
+nl_ipin_inet	../nl/nl_ipin.c	/^nl_ipin_inet (nl_ipin ipin)$/
+nl_ipin_kind	../nl/nl_gen.c	/^nl_ipin_kind (nl_ipin ipin)$/
+nl_ipin_name	../nl/nl_ipin.c	/^nl_ipin_name (nl_ipin ipin)$/
+nl_ipin_owner	../nl/nl_ipin.c	/^nl_ipin_owner (nl_ipin ipin)$/
+nl_ipin_pin	../nl/nl_gen.c	/^nl_ipin_pin (nl_ipin ipin)$/
+nl_iport_attr_attr_of	../nl/nl_gen.c	/^nl_iport_attr_attr_of (nl_iport_attr iport_attr)$/
+nl_iport_attr_create	../nl/nl_attr.c	/^nl_iport_attr_create (char *name, nl_idesign idesi/
+nl_iport_attr_density	../nl/nl_gen.c	/^nl_iport_attr_density (nl_iport_attr iport_attr)$/
+nl_iport_attr_get	../nl/nl_attr.c	/^nl_iport_attr_get (nl_iport_attr attr, nl_iport ip/
+nl_iport_attr_get_by_name	../nl/nl_attr.c	/^nl_iport_attr_get_by_name (char *name, nl_iport ip/
+nl_iport_attr_id	../nl/nl_gen.c	/^nl_iport_attr_id (nl_iport_attr iport_attr)$/
+nl_iport_attr_kind	../nl/nl_gen.c	/^nl_iport_attr_kind (nl_iport_attr iport_attr)$/
+nl_iport_attr_name	../nl/nl_gen.c	/^nl_iport_attr_name (nl_iport_attr iport_attr)$/
+nl_iport_attr_owner	../nl/nl_gen.c	/^nl_iport_attr_owner (nl_iport_attr iport_attr)$/
+nl_iport_attr_set	../nl/nl_attr.c	/^nl_iport_attr_set (nl_iport_attr attr, nl_iport ip/
+nl_iport_create	../nl/nl_iport.c	/^nl_iport_create (nl_port port, nl_ipin up_ipin, nl/
+nl_iport_direction	../nl/nl_iport.c	/^nl_iport_direction (nl_iport iport)$/
+nl_iport_free	../nl/nl_iport.c	/^nl_iport_free (nl_iport iport)$/
+nl_iport_id	../nl/nl_gen.c	/^nl_iport_id (nl_iport iport)$/
+nl_iport_idesign	../nl/nl_gen.c	/^nl_iport_idesign (nl_iport iport)$/
+nl_iport_ipin	../nl/nl_iport.c	/^nl_iport_ipin (nl_iport iport)$/
+nl_iport_kind	../nl/nl_gen.c	/^nl_iport_kind (nl_iport iport)$/
+nl_iport_name	../nl/nl_iport.c	/^nl_iport_name (nl_iport iport)$/
+nl_iport_port	../nl/nl_gen.c	/^nl_iport_port (nl_iport iport)$/
+nl_iport_up_pin	../nl/nl_gen.c	/^nl_iport_up_pin (nl_iport iport)$/
+nl_kind_to_string	../nl/nl_gen.c	/^nl_kind_to_string (enum nl_kind e)$/
+nl_libcell_add_libpin	../nl/nl_libcell.c	/^nl_libcell_add_libpin (nl_libcell libcell, nl_libp/
+nl_libcell_attr_attr_of	../nl/nl_gen.c	/^nl_libcell_attr_attr_of (nl_libcell_attr libcell_a/
+nl_libcell_attr_create	../nl/nl_attr.c	/^nl_libcell_attr_create (char *name, nl_library lib/
+nl_libcell_attr_density	../nl/nl_gen.c	/^nl_libcell_attr_density (nl_libcell_attr libcell_a/
+nl_libcell_attr_get	../nl/nl_attr.c	/^nl_libcell_attr_get (nl_libcell_attr attr, nl_libc/
+nl_libcell_attr_id	../nl/nl_gen.c	/^nl_libcell_attr_id (nl_libcell_attr libcell_attr)$/
+nl_libcell_attr_kind	../nl/nl_gen.c	/^nl_libcell_attr_kind (nl_libcell_attr libcell_attr/
+nl_libcell_attr_name	../nl/nl_gen.c	/^nl_libcell_attr_name (nl_libcell_attr libcell_attr/
+nl_libcell_attr_owner	../nl/nl_gen.c	/^nl_libcell_attr_owner (nl_libcell_attr libcell_att/
+nl_libcell_attr_set	../nl/nl_attr.c	/^nl_libcell_attr_set (nl_libcell_attr attr, nl_libc/
+nl_libcell_create	../nl/nl_libcell.c	/^nl_libcell_create (char *name, nl_library library)/
+nl_libcell_for_all_libpins	../include/nl_iterators.h	/^#define nl_libcell_for_all_libpins(libcell, var) \\/
+nl_libcell_get_libpin_by_name	../nl/nl_libcell.c	/^nl_libcell_get_libpin_by_name (nl_libcell libcell,/
+nl_libcell_id	../nl/nl_gen.c	/^nl_libcell_id (nl_libcell libcell)$/
+nl_libcell_kind	../nl/nl_gen.c	/^nl_libcell_kind (nl_libcell libcell)$/
+nl_libcell_libpins	../nl/nl_gen.c	/^nl_libcell_libpins (nl_libcell libcell)$/
+nl_libcell_library	../nl/nl_gen.c	/^nl_libcell_library (nl_libcell libcell)$/
+nl_libcell_name	../nl/nl_gen.c	/^nl_libcell_name (nl_libcell libcell)$/
+nl_libpin_attr_attr_of	../nl/nl_gen.c	/^nl_libpin_attr_attr_of (nl_libpin_attr libpin_attr/
+nl_libpin_attr_create	../nl/nl_attr.c	/^nl_libpin_attr_create (char *name, nl_library libr/
+nl_libpin_attr_density	../nl/nl_gen.c	/^nl_libpin_attr_density (nl_libpin_attr libpin_attr/
+nl_libpin_attr_get	../nl/nl_attr.c	/^nl_libpin_attr_get (nl_libpin_attr attr, nl_libpin/
+nl_libpin_attr_id	../nl/nl_gen.c	/^nl_libpin_attr_id (nl_libpin_attr libpin_attr)$/
+nl_libpin_attr_kind	../nl/nl_gen.c	/^nl_libpin_attr_kind (nl_libpin_attr libpin_attr)$/
+nl_libpin_attr_name	../nl/nl_gen.c	/^nl_libpin_attr_name (nl_libpin_attr libpin_attr)$/
+nl_libpin_attr_owner	../nl/nl_gen.c	/^nl_libpin_attr_owner (nl_libpin_attr libpin_attr)$/
+nl_libpin_attr_set	../nl/nl_attr.c	/^nl_libpin_attr_set (nl_libpin_attr attr, nl_libpin/
+nl_libpin_bus	../nl/nl_gen.c	/^nl_libpin_bus (nl_libpin libpin)$/
+nl_libpin_create	../nl/nl_libpin.c	/^nl_libpin_create (char *name, nl_direction directi/
+nl_libpin_direction	../nl/nl_gen.c	/^nl_libpin_direction (nl_libpin libpin)$/
+nl_libpin_id	../nl/nl_gen.c	/^nl_libpin_id (nl_libpin libpin)$/
+nl_libpin_kind	../nl/nl_gen.c	/^nl_libpin_kind (nl_libpin libpin)$/
+nl_libpin_libcell	../nl/nl_gen.c	/^nl_libpin_libcell (nl_libpin libpin)$/
+nl_libpin_name	../nl/nl_gen.c	/^nl_libpin_name (nl_libpin libpin)$/
+nl_libpin_set_direction	../nl/nl_libpin.c	/^nl_libpin_set_direction (nl_libpin libpin, nl_dire/
+nl_libpin_set_use	../nl/nl_libpin.c	/^nl_libpin_set_use (nl_libpin libpin, nl_use use)$/
+nl_libpin_use	../nl/nl_gen.c	/^nl_libpin_use (nl_libpin libpin)$/
+nl_library_alloc_attr	../nl/nl_library.c	/^nl_library_alloc_attr (nl_library library, char *n/
+nl_library_alloc_libcell	../nl/nl_library.c	/^nl_library_alloc_libcell (nl_library library, char/
+nl_library_alloc_libpin	../nl/nl_library.c	/^nl_library_alloc_libpin (nl_library library, char /
+nl_library_attr_attr_of	../nl/nl_gen.c	/^nl_library_attr_attr_of (nl_library_attr library_a/
+nl_library_attr_create	../nl/nl_attr.c	/^nl_library_attr_create (char *name, nl_library lib/
+nl_library_attr_density	../nl/nl_gen.c	/^nl_library_attr_density (nl_library_attr library_a/
+nl_library_attr_get	../nl/nl_attr.c	/^nl_library_attr_get (nl_library_attr attr, nl_libr/
+nl_library_attr_get_by_name	../nl/nl_attr.c	/^nl_library_attr_get_by_name (char *name, nl_librar/
+nl_library_attr_id	../nl/nl_gen.c	/^nl_library_attr_id (nl_library_attr library_attr)$/
+nl_library_attr_kind	../nl/nl_gen.c	/^nl_library_attr_kind (nl_library_attr library_attr/
+nl_library_attr_name	../nl/nl_gen.c	/^nl_library_attr_name (nl_library_attr library_attr/
+nl_library_attr_owner	../nl/nl_gen.c	/^nl_library_attr_owner (nl_library_attr library_att/
+nl_library_attr_set	../nl/nl_attr.c	/^nl_library_attr_set (nl_library_attr attr, nl_libr/
+nl_library_context	../nl/nl_gen.c	/^nl_library_context (nl_library library)$/
+nl_library_create	../nl/nl_library.c	/^nl_library_create (char *name, nl_context context)/
+nl_library_for_all_libcells	../include/nl_iterators.h	/^#define nl_library_for_all_libcells(library, var) /
+nl_library_get_attr_by_name	../nl/nl_library.c	/^nl_library_get_attr_by_name (nl_library library, c/
+nl_library_get_libcell_by_name	../nl/nl_library.c	/^nl_library_get_libcell_by_name (nl_library library/
+nl_library_id	../nl/nl_gen.c	/^nl_library_id (nl_library library)$/
+nl_library_kind	../nl/nl_gen.c	/^nl_library_kind (nl_library library)$/
+nl_library_libcells	../nl/nl_gen.c	/^nl_library_libcells (nl_library library)$/
+nl_library_mem_group	../nl/nl_gen.c	/^nl_library_mem_group (nl_library library)$/
+nl_library_name	../nl/nl_gen.c	/^nl_library_name (nl_library library)$/
+nl_library_remove_attr	../nl/nl_library.c	/^nl_library_remove_attr (nl_library library, nl_att/
+nl_mark_inets_walker	../nl/nl_walk.c	/^nl_mark_inets_walker (nl_object obj, void *ptr)$/
+nl_mark_nets_walker	../nl/nl_walk.c	/^nl_mark_nets_walker (nl_object obj, void *ptr)$/
+nl_mark_pins_walker	../nl/nl_walk.c	/^nl_mark_pins_walker (nl_object obj, void *ptr)$/
+nl_named_object_id	../nl/nl_gen.c	/^nl_named_object_id (nl_named_object named_object)$/
+nl_named_object_kind	../nl/nl_gen.c	/^nl_named_object_kind (nl_named_object named_object/
+nl_named_object_name	../nl/nl_gen.c	/^nl_named_object_name (nl_named_object named_object/
+nl_net_add_pin	../nl/nl_net.c	/^nl_net_add_pin (nl_net net, nl_pin pin)$/
+nl_net_all_hierarchy_pins	../nl/nl_net.c	/^nl_net_all_hierarchy_pins (nl_net net, int fanins,/
+nl_net_all_hierarchy_pins1	../nl/nl_net.c	/^nl_net_all_hierarchy_pins1 (nl_dll_head pin_dll, i/
+nl_net_attr_attr_of	../nl/nl_gen.c	/^nl_net_attr_attr_of (nl_net_attr net_attr)$/
+nl_net_attr_create	../nl/nl_attr.c	/^nl_net_attr_create (char *name, nl_design design, /
+nl_net_attr_density	../nl/nl_gen.c	/^nl_net_attr_density (nl_net_attr net_attr)$/
+nl_net_attr_get	../nl/nl_attr.c	/^nl_net_attr_get (nl_net_attr attr, nl_net net, voi/
+nl_net_attr_get_by_name	../nl/nl_attr.c	/^nl_net_attr_get_by_name (char *name, nl_net net, v/
+nl_net_attr_id	../nl/nl_gen.c	/^nl_net_attr_id (nl_net_attr net_attr)$/
+nl_net_attr_kind	../nl/nl_gen.c	/^nl_net_attr_kind (nl_net_attr net_attr)$/
+nl_net_attr_name	../nl/nl_gen.c	/^nl_net_attr_name (nl_net_attr net_attr)$/
+nl_net_attr_owner	../nl/nl_gen.c	/^nl_net_attr_owner (nl_net_attr net_attr)$/
+nl_net_attr_set	../nl/nl_attr.c	/^nl_net_attr_set (nl_net_attr attr, nl_net net, voi/
+nl_net_attr_set_by_name	../nl/nl_attr.c	/^nl_net_attr_set_by_name (char *name, nl_net net, v/
+nl_net_bus	../nl/nl_gen.c	/^nl_net_bus (nl_net net)$/
+nl_net_bus_offset	../nl/nl_gen.c	/^nl_net_bus_offset (nl_net net)$/
+nl_net_class	../nl/nl_gen.c	/^nl_net_class (nl_net net)$/
+nl_net_create	../nl/nl_net.c	/^nl_net_create (char *name, nl_wireclass class, nl_/
+nl_net_design	../nl/nl_gen.c	/^nl_net_design (nl_net net)$/
+nl_net_fanins	../nl/nl_gen.c	/^nl_net_fanins (nl_net net)$/
+nl_net_fanios	../nl/nl_gen.c	/^nl_net_fanios (nl_net net)$/
+nl_net_fanouts	../nl/nl_gen.c	/^nl_net_fanouts (nl_net net)$/
+nl_net_for_all_fanins	../include/nl_iterators.h	/^#define nl_net_for_all_fanins(net, var) \\$/
+nl_net_for_all_fanios	../include/nl_iterators.h	/^#define nl_net_for_all_fanios(net, var) \\$/
+nl_net_for_all_fanouts	../include/nl_iterators.h	/^#define nl_net_for_all_fanouts(net, var) \\$/
+nl_net_for_all_inets	../include/nl_iterators.h	/^#define nl_net_for_all_inets(net, var) \\$/
+nl_net_for_all_pins	../include/nl_iterators.h	/^#define nl_net_for_all_pins(net, var) \\$/
+nl_net_free	../nl/nl_net.c	/^nl_net_free (nl_net net)$/
+nl_net_free_insides	../nl/nl_net.c	/^nl_net_free_insides (nl_net net)$/
+nl_net_id	../nl/nl_gen.c	/^nl_net_id (nl_net net)$/
+nl_net_kind	../nl/nl_gen.c	/^nl_net_kind (nl_net net)$/
+nl_net_name	../nl/nl_gen.c	/^nl_net_name (nl_net net)$/
+nl_net_num_pins	../nl/nl_net.c	/^nl_net_num_pins (nl_net net)$/
+nl_net_remove_pin	../nl/nl_net.c	/^nl_net_remove_pin (nl_net net, nl_pin pin)$/
+nl_net_rename	../nl/nl_net.c	/^nl_net_rename (nl_net net, char *new_name)$/
+nl_net_set_bus_and_offset	../nl/nl_net.c	/^nl_net_set_bus_and_offset (nl_net net, nl_bus bus,/
+nl_net_set_class	../nl/nl_net.c	/^nl_net_set_class (nl_net net, nl_wireclass class)$/
+nl_number_ast_child	../nl/nl_gen.c	/^nl_number_ast_child (nl_number_ast number_ast)$/
+nl_number_ast_create	../nl/nl_ast.c	/^nl_number_ast_create (int value)$/
+nl_number_ast_file	../nl/nl_gen.c	/^nl_number_ast_file (nl_number_ast number_ast)$/
+nl_number_ast_id	../nl/nl_gen.c	/^nl_number_ast_id (nl_number_ast number_ast)$/
+nl_number_ast_kind	../nl/nl_gen.c	/^nl_number_ast_kind (nl_number_ast number_ast)$/
+nl_number_ast_line	../nl/nl_gen.c	/^nl_number_ast_line (nl_number_ast number_ast)$/
+nl_number_ast_set_value	../nl/nl_ast.c	/^nl_number_ast_set_value (nl_number_ast number, int/
+nl_number_ast_sibling	../nl/nl_gen.c	/^nl_number_ast_sibling (nl_number_ast number_ast)$/
+nl_number_ast_token	../nl/nl_gen.c	/^nl_number_ast_token (nl_number_ast number_ast)$/
+nl_number_ast_value	../nl/nl_gen.c	/^nl_number_ast_value (nl_number_ast number_ast)$/
+nl_number_ast_width	../nl/nl_gen.c	/^nl_number_ast_width (nl_number_ast number_ast)$/
+nl_object_id	../nl/nl_gen.c	/^nl_object_id (nl_object object)$/
+nl_object_kind	../nl/nl_gen.c	/^nl_object_kind (nl_object object)$/
+nl_out_ast_child	../nl/nl_gen.c	/^nl_out_ast_child (nl_out_ast out_ast)$/
+nl_out_ast_create	../nl/nl_ast.c	/^nl_out_ast_create (int index)$/
+nl_out_ast_file	../nl/nl_gen.c	/^nl_out_ast_file (nl_out_ast out_ast)$/
+nl_out_ast_id	../nl/nl_gen.c	/^nl_out_ast_id (nl_out_ast out_ast)$/
+nl_out_ast_index	../nl/nl_gen.c	/^nl_out_ast_index (nl_out_ast out_ast)$/
+nl_out_ast_kind	../nl/nl_gen.c	/^nl_out_ast_kind (nl_out_ast out_ast)$/
+nl_out_ast_line	../nl/nl_gen.c	/^nl_out_ast_line (nl_out_ast out_ast)$/
+nl_out_ast_set_index	../nl/nl_ast.c	/^nl_out_ast_set_index (nl_out_ast out, int index)$/
+nl_out_ast_sibling	../nl/nl_gen.c	/^nl_out_ast_sibling (nl_out_ast out_ast)$/
+nl_out_ast_token	../nl/nl_gen.c	/^nl_out_ast_token (nl_out_ast out_ast)$/
+nl_out_ast_width	../nl/nl_gen.c	/^nl_out_ast_width (nl_out_ast out_ast)$/
+nl_pin_attr_attr_of	../nl/nl_gen.c	/^nl_pin_attr_attr_of (nl_pin_attr pin_attr)$/
+nl_pin_attr_create	../nl/nl_attr.c	/^nl_pin_attr_create (char *name, nl_design design, /
+nl_pin_attr_density	../nl/nl_gen.c	/^nl_pin_attr_density (nl_pin_attr pin_attr)$/
+nl_pin_attr_get	../nl/nl_attr.c	/^nl_pin_attr_get (nl_pin_attr attr, nl_pin pin, voi/
+nl_pin_attr_get_by_name	../nl/nl_attr.c	/^nl_pin_attr_get_by_name (char *name, nl_pin pin, v/
+nl_pin_attr_id	../nl/nl_gen.c	/^nl_pin_attr_id (nl_pin_attr pin_attr)$/
+nl_pin_attr_kind	../nl/nl_gen.c	/^nl_pin_attr_kind (nl_pin_attr pin_attr)$/
+nl_pin_attr_name	../nl/nl_gen.c	/^nl_pin_attr_name (nl_pin_attr pin_attr)$/
+nl_pin_attr_owner	../nl/nl_gen.c	/^nl_pin_attr_owner (nl_pin_attr pin_attr)$/
+nl_pin_attr_set	../nl/nl_attr.c	/^nl_pin_attr_set (nl_pin_attr attr, nl_pin pin, voi/
+nl_pin_attr_set_by_name	../nl/nl_attr.c	/^nl_pin_attr_set_by_name (char *name, nl_pin pin, v/
+nl_pin_connect_net	../nl/nl_pin.c	/^nl_pin_connect_net (nl_pin pin, nl_net net)$/
+nl_pin_create	../nl/nl_pin.c	/^nl_pin_create (nl_refpin refpin, nl_cell_or_port c/
+nl_pin_direction	../nl/nl_pin.c	/^nl_pin_direction (nl_pin pin)$/
+nl_pin_disconnect	../nl/nl_pin.c	/^nl_pin_disconnect (nl_pin pin)$/
+nl_pin_free	../nl/nl_pin.c	/^nl_pin_free (nl_pin pin)$/
+nl_pin_half_disconnect	../nl/nl_pin.c	/^nl_pin_half_disconnect (nl_pin pin)$/
+nl_pin_half_reconnect	../nl/nl_pin.c	/^nl_pin_half_reconnect (nl_pin pin)$/
+nl_pin_id	../nl/nl_gen.c	/^nl_pin_id (nl_pin pin)$/
+nl_pin_kind	../nl/nl_gen.c	/^nl_pin_kind (nl_pin pin)$/
+nl_pin_name	../nl/nl_pin.c	/^nl_pin_name (nl_pin pin)$/
+nl_pin_net	../nl/nl_gen.c	/^nl_pin_net (nl_pin pin)$/
+nl_pin_owner	../nl/nl_gen.c	/^nl_pin_owner (nl_pin pin)$/
+nl_pin_refpin	../nl/nl_gen.c	/^nl_pin_refpin (nl_pin pin)$/
+nl_pin_set_refpin	../nl/nl_gen.c	/^nl_pin_set_refpin (nl_pin pin, struct nl_refpin_s /
+nl_port_attr_attr_of	../nl/nl_gen.c	/^nl_port_attr_attr_of (nl_port_attr port_attr)$/
+nl_port_attr_create	../nl/nl_attr.c	/^nl_port_attr_create (char *name, nl_design design,/
+nl_port_attr_density	../nl/nl_gen.c	/^nl_port_attr_density (nl_port_attr port_attr)$/
+nl_port_attr_get	../nl/nl_attr.c	/^nl_port_attr_get (nl_port_attr attr, nl_port port,/
+nl_port_attr_get_by_name	../nl/nl_attr.c	/^nl_port_attr_get_by_name (char *name, nl_port port/
+nl_port_attr_id	../nl/nl_gen.c	/^nl_port_attr_id (nl_port_attr port_attr)$/
+nl_port_attr_kind	../nl/nl_gen.c	/^nl_port_attr_kind (nl_port_attr port_attr)$/
+nl_port_attr_name	../nl/nl_gen.c	/^nl_port_attr_name (nl_port_attr port_attr)$/
+nl_port_attr_owner	../nl/nl_gen.c	/^nl_port_attr_owner (nl_port_attr port_attr)$/
+nl_port_attr_set	../nl/nl_attr.c	/^nl_port_attr_set (nl_port_attr attr, nl_port port,/
+nl_port_attr_set_by_name	../nl/nl_attr.c	/^nl_port_attr_set_by_name (char *name, nl_port port/
+nl_port_bus	../nl/nl_gen.c	/^nl_port_bus (nl_port port)$/
+nl_port_bus_offset	../nl/nl_gen.c	/^nl_port_bus_offset (nl_port port)$/
+nl_port_connect_net	../nl/nl_port.c	/^nl_port_connect_net (nl_port port, nl_net net)$/
+nl_port_create	../nl/nl_port.c	/^nl_port_create (char *name, nl_design design, nl_d/
+nl_port_design	../nl/nl_gen.c	/^nl_port_design (nl_port port)$/
+nl_port_direction	../nl/nl_gen.c	/^nl_port_direction (nl_port port)$/
+nl_port_free	../nl/nl_port.c	/^nl_port_free (nl_port port)$/
+nl_port_free_insides	../nl/nl_port.c	/^nl_port_free_insides (nl_port port)$/
+nl_port_id	../nl/nl_gen.c	/^nl_port_id (nl_port port)$/
+nl_port_kind	../nl/nl_gen.c	/^nl_port_kind (nl_port port)$/
+nl_port_name	../nl/nl_gen.c	/^nl_port_name (nl_port port)$/
+nl_port_pin	../nl/nl_gen.c	/^nl_port_pin (nl_port port)$/
+nl_port_rename	../nl/nl_port.c	/^nl_port_rename (nl_port port, char *new_name)$/
+nl_port_set_bus_and_offset	../nl/nl_port.c	/^nl_port_set_bus_and_offset (nl_port port, nl_bus b/
+nl_port_set_direction	../nl/nl_gen.c	/^nl_port_set_direction (nl_port port, nl_direction /
+nl_ref_ast_child	../nl/nl_gen.c	/^nl_ref_ast_child (nl_ref_ast ref_ast)$/
+nl_ref_ast_create	../nl/nl_ast.c	/^nl_ref_ast_create (nl_token token, nl_object objec/
+nl_ref_ast_file	../nl/nl_gen.c	/^nl_ref_ast_file (nl_ref_ast ref_ast)$/
+nl_ref_ast_id	../nl/nl_gen.c	/^nl_ref_ast_id (nl_ref_ast ref_ast)$/
+nl_ref_ast_kind	../nl/nl_gen.c	/^nl_ref_ast_kind (nl_ref_ast ref_ast)$/
+nl_ref_ast_line	../nl/nl_gen.c	/^nl_ref_ast_line (nl_ref_ast ref_ast)$/
+nl_ref_ast_object	../nl/nl_gen.c	/^nl_ref_ast_object (nl_ref_ast ref_ast)$/
+nl_ref_ast_set_object	../nl/nl_ast.c	/^nl_ref_ast_set_object (nl_ref_ast ref, nl_object o/
+nl_ref_ast_sibling	../nl/nl_gen.c	/^nl_ref_ast_sibling (nl_ref_ast ref_ast)$/
+nl_ref_ast_token	../nl/nl_gen.c	/^nl_ref_ast_token (nl_ref_ast ref_ast)$/
+nl_ref_ast_width	../nl/nl_gen.c	/^nl_ref_ast_width (nl_ref_ast ref_ast)$/
+nl_reference_add_bus	../nl/nl_reference.c	/^nl_reference_add_bus (nl_reference reference, nl_b/
+nl_reference_add_instance	../nl/nl_reference.c	/^nl_reference_add_instance (nl_reference reference,/
+nl_reference_add_parameter	../nl/nl_reference.c	/^nl_reference_add_parameter (nl_reference reference/
+nl_reference_add_refpin	../nl/nl_reference.c	/^nl_reference_add_refpin (nl_reference reference, n/
+nl_reference_attr_attr_of	../nl/nl_gen.c	/^nl_reference_attr_attr_of (nl_reference_attr refer/
+nl_reference_attr_create	../nl/nl_attr.c	/^nl_reference_attr_create (char *name, nl_design de/
+nl_reference_attr_density	../nl/nl_gen.c	/^nl_reference_attr_density (nl_reference_attr refer/
+nl_reference_attr_get	../nl/nl_attr.c	/^nl_reference_attr_get (nl_reference_attr attr, nl_/
+nl_reference_attr_get_by_name	../nl/nl_attr.c	/^nl_reference_attr_get_by_name (char *name, nl_refe/
+nl_reference_attr_id	../nl/nl_gen.c	/^nl_reference_attr_id (nl_reference_attr reference_/
+nl_reference_attr_kind	../nl/nl_gen.c	/^nl_reference_attr_kind (nl_reference_attr referenc/
+nl_reference_attr_name	../nl/nl_gen.c	/^nl_reference_attr_name (nl_reference_attr referenc/
+nl_reference_attr_owner	../nl/nl_gen.c	/^nl_reference_attr_owner (nl_reference_attr referen/
+nl_reference_attr_set	../nl/nl_attr.c	/^nl_reference_attr_set (nl_reference_attr attr, nl_/
+nl_reference_attr_set_by_name	../nl/nl_attr.c	/^nl_reference_attr_set_by_name (char *name, nl_refe/
+nl_reference_buses	../nl/nl_gen.c	/^nl_reference_buses (nl_reference reference)$/
+nl_reference_create	../nl/nl_reference.c	/^nl_reference_create (char *name, nl_design design,/
+nl_reference_design	../nl/nl_gen.c	/^nl_reference_design (nl_reference reference)$/
+nl_reference_down_design	../nl/nl_gen.c	/^nl_reference_down_design (nl_reference reference)$/
+nl_reference_finish_linking	../nl/nl_reference.c	/^nl_reference_finish_linking (nl_reference referenc/
+nl_reference_for_all_buses	../include/nl_iterators.h	/^#define nl_reference_for_all_buses(reference, var)/
+nl_reference_for_all_inouts	../include/nl_iterators.h	/^#define nl_reference_for_all_inouts(reference, var/
+nl_reference_for_all_inputs	../include/nl_iterators.h	/^#define nl_reference_for_all_inputs(reference, var/
+nl_reference_for_all_instances	../include/nl_iterators.h	/^#define nl_reference_for_all_instances(reference, /
+nl_reference_for_all_outputs	../include/nl_iterators.h	/^#define nl_reference_for_all_outputs(reference, va/
+nl_reference_for_all_refpins	../include/nl_iterators.h	/^#define nl_reference_for_all_refpins(reference, va/
+nl_reference_free	../nl/nl_reference.c	/^nl_reference_free (nl_reference reference)$/
+nl_reference_free_object	../nl/nl_reference.c	/^nl_reference_free_object (nl_reference reference, /
+nl_reference_get_refpin_array	../nl/nl_reference.c	/^nl_reference_get_refpin_array (nl_reference refere/
+nl_reference_get_refpin_by_name	../nl/nl_reference.c	/^nl_reference_get_refpin_by_name (nl_reference refe/
+nl_reference_id	../nl/nl_gen.c	/^nl_reference_id (nl_reference reference)$/
+nl_reference_inout_width	../nl/nl_reference.c	/^nl_reference_inout_width (nl_reference reference)$/
+nl_reference_inouts	../nl/nl_gen.c	/^nl_reference_inouts (nl_reference reference)$/
+nl_reference_input_width	../nl/nl_reference.c	/^nl_reference_input_width (nl_reference reference)$/
+nl_reference_inputs	../nl/nl_gen.c	/^nl_reference_inputs (nl_reference reference)$/
+nl_reference_instances	../nl/nl_gen.c	/^nl_reference_instances (nl_reference reference)$/
+nl_reference_kind	../nl/nl_gen.c	/^nl_reference_kind (nl_reference reference)$/
+nl_reference_link	../nl/nl_reference.c	/^nl_reference_link (nl_reference reference, nl_obje/
+nl_reference_link_design	../nl/nl_reference.c	/^nl_reference_link_design (nl_reference reference, /
+nl_reference_link_libcell	../nl/nl_reference.c	/^nl_reference_link_libcell (nl_reference reference,/
+nl_reference_name	../nl/nl_gen.c	/^nl_reference_name (nl_reference reference)$/
+nl_reference_num_instances	../nl/nl_reference.c	/^nl_reference_num_instances (nl_reference reference/
+nl_reference_output_width	../nl/nl_reference.c	/^nl_reference_output_width (nl_reference reference)/
+nl_reference_outputs	../nl/nl_gen.c	/^nl_reference_outputs (nl_reference reference)$/
+nl_reference_parameters	../nl/nl_gen.c	/^nl_reference_parameters (nl_reference reference)$/
+nl_reference_place_refpin_after	../nl/nl_reference.c	/^nl_reference_place_refpin_after (nl_reference refe/
+nl_reference_refpins	../nl/nl_gen.c	/^nl_reference_refpins (nl_reference reference)$/
+nl_reference_remove_instance	../nl/nl_reference.c	/^nl_reference_remove_instance (nl_reference referen/
+nl_reference_rename_refpin	../nl/nl_reference.c	/^nl_reference_rename_refpin (nl_reference reference/
+nl_reference_set_refpin_type	../nl/nl_reference.c	/^nl_reference_set_refpin_type (nl_reference referen/
+nl_reference_set_tree	../nl/nl_reference.c	/^nl_reference_set_tree (nl_reference reference, nl_/
+nl_reference_tree	../nl/nl_gen.c	/^nl_reference_tree (nl_reference reference)$/
+nl_reference_unlink	../nl/nl_reference.c	/^nl_reference_unlink (nl_reference reference)$/
+nl_reference_update_refpin_direction	../nl/nl_reference.c	/^nl_reference_update_refpin_direction (nl_reference/
+nl_reference_zero_unconnected_bus_inputs	../nl/nl_reference.c	/^nl_reference_zero_unconnected_bus_inputs (nl_cell /
+nl_refpin_attr_attr_of	../nl/nl_gen.c	/^nl_refpin_attr_attr_of (nl_refpin_attr refpin_attr/
+nl_refpin_attr_create	../nl/nl_attr.c	/^nl_refpin_attr_create (char *name, nl_design desig/
+nl_refpin_attr_density	../nl/nl_gen.c	/^nl_refpin_attr_density (nl_refpin_attr refpin_attr/
+nl_refpin_attr_get	../nl/nl_attr.c	/^nl_refpin_attr_get (nl_refpin_attr attr, nl_refpin/
+nl_refpin_attr_get_by_name	../nl/nl_attr.c	/^nl_refpin_attr_get_by_name (char *name, nl_refpin /
+nl_refpin_attr_id	../nl/nl_gen.c	/^nl_refpin_attr_id (nl_refpin_attr refpin_attr)$/
+nl_refpin_attr_kind	../nl/nl_gen.c	/^nl_refpin_attr_kind (nl_refpin_attr refpin_attr)$/
+nl_refpin_attr_name	../nl/nl_gen.c	/^nl_refpin_attr_name (nl_refpin_attr refpin_attr)$/
+nl_refpin_attr_owner	../nl/nl_gen.c	/^nl_refpin_attr_owner (nl_refpin_attr refpin_attr)$/
+nl_refpin_attr_set	../nl/nl_attr.c	/^nl_refpin_attr_set (nl_refpin_attr attr, nl_refpin/
+nl_refpin_attr_set_by_name	../nl/nl_attr.c	/^nl_refpin_attr_set_by_name (char *name, nl_refpin /
+nl_refpin_bus	../nl/nl_gen.c	/^nl_refpin_bus (nl_refpin refpin)$/
+nl_refpin_bus_offset	../nl/nl_gen.c	/^nl_refpin_bus_offset (nl_refpin refpin)$/
+nl_refpin_create	../nl/nl_refpin.c	/^nl_refpin_create (char *name, nl_object down_port,/
+nl_refpin_direction	../nl/nl_gen.c	/^nl_refpin_direction (nl_refpin refpin)$/
+nl_refpin_down_port	../nl/nl_gen.c	/^nl_refpin_down_port (nl_refpin refpin)$/
+nl_refpin_free	../nl/nl_refpin.c	/^nl_refpin_free (nl_refpin refpin)$/
+nl_refpin_id	../nl/nl_gen.c	/^nl_refpin_id (nl_refpin refpin)$/
+nl_refpin_kind	../nl/nl_gen.c	/^nl_refpin_kind (nl_refpin refpin)$/
+nl_refpin_name	../nl/nl_gen.c	/^nl_refpin_name (nl_refpin refpin)$/
+nl_refpin_position	../nl/nl_gen.c	/^nl_refpin_position (nl_refpin refpin)$/
+nl_refpin_reference	../nl/nl_gen.c	/^nl_refpin_reference (nl_refpin refpin)$/
+nl_refpin_rename	../nl/nl_refpin.c	/^nl_refpin_rename (nl_refpin refpin, char *new_name/
+nl_refpin_set_bus_and_offset	../nl/nl_refpin.c	/^nl_refpin_set_bus_and_offset (nl_refpin refpin, nl/
+nl_refpin_set_bus_offset	../nl/nl_gen.c	/^nl_refpin_set_bus_offset (nl_refpin refpin, int bu/
+nl_refpin_set_direction	../nl/nl_refpin.c	/^nl_refpin_set_direction (nl_refpin refpin, nl_dire/
+nl_refpin_set_direction_no_update	../nl/nl_refpin.c	/^nl_refpin_set_direction_no_update (nl_refpin refpi/
+nl_refpin_set_down_port	../nl/nl_gen.c	/^nl_refpin_set_down_port (nl_refpin refpin, struct /
+nl_refpin_set_position	../nl/nl_gen.c	/^nl_refpin_set_position (nl_refpin refpin, int posi/
+nl_sparse_attr_attr_of	../nl/nl_gen.c	/^nl_sparse_attr_attr_of (nl_sparse_attr sparse_attr/
+nl_sparse_attr_density	../nl/nl_gen.c	/^nl_sparse_attr_density (nl_sparse_attr sparse_attr/
+nl_sparse_attr_id	../nl/nl_gen.c	/^nl_sparse_attr_id (nl_sparse_attr sparse_attr)$/
+nl_sparse_attr_kind	../nl/nl_gen.c	/^nl_sparse_attr_kind (nl_sparse_attr sparse_attr)$/
+nl_sparse_attr_name	../nl/nl_gen.c	/^nl_sparse_attr_name (nl_sparse_attr sparse_attr)$/
+nl_sparse_attr_owner	../nl/nl_gen.c	/^nl_sparse_attr_owner (nl_sparse_attr sparse_attr)$/
+nl_string_to_density	../nl/nl_gen.c	/^nl_string_to_density (char *str)$/
+nl_string_to_direction	../nl/nl_gen.c	/^nl_string_to_direction (char *str)$/
+nl_string_to_kind	../nl/nl_gen.c	/^nl_string_to_kind (char *str)$/
+nl_string_to_token	../nl/nl_gen.c	/^nl_string_to_token (char *str)$/
+nl_string_to_typeclass	../nl/nl_gen.c	/^nl_string_to_typeclass (char *str)$/
+nl_string_to_use	../nl/nl_gen.c	/^nl_string_to_use (char *str)$/
+nl_string_to_walk_status	../nl/nl_gen.c	/^nl_string_to_walk_status (char *str)$/
+nl_string_to_wireclass	../nl/nl_gen.c	/^nl_string_to_wireclass (char *str)$/
+nl_subprogram_add_formal	../nl/nl_subprogram.c	/^nl_subprogram_add_formal (nl_subprogram subprogram/
+nl_subprogram_add_local	../nl/nl_subprogram.c	/^nl_subprogram_add_local (nl_subprogram subprogram,/
+nl_subprogram_add_symbol	../nl/nl_subprogram.c	/^nl_subprogram_add_symbol (nl_subprogram subprogram/
+nl_subprogram_body	../nl/nl_gen.c	/^nl_subprogram_body (nl_subprogram subprogram)$/
+nl_subprogram_create	../nl/nl_subprogram.c	/^nl_subprogram_create (char *name, nl_type type, nl/
+nl_subprogram_design	../nl/nl_gen.c	/^nl_subprogram_design (nl_subprogram subprogram)$/
+nl_subprogram_for_all_formals	../include/nl_iterators.h	/^#define nl_subprogram_for_all_formals(subr, var) \\/
+nl_subprogram_for_all_locals	../include/nl_iterators.h	/^#define nl_subprogram_for_all_locals(subr, var) \\$/
+nl_subprogram_formals	../nl/nl_gen.c	/^nl_subprogram_formals (nl_subprogram subprogram)$/
+nl_subprogram_free	../nl/nl_subprogram.c	/^nl_subprogram_free (nl_subprogram subr)$/
+nl_subprogram_get_symbol_by_name	../nl/nl_subprogram.c	/^nl_subprogram_get_symbol_by_name (nl_subprogram su/
+nl_subprogram_id	../nl/nl_gen.c	/^nl_subprogram_id (nl_subprogram subprogram)$/
+nl_subprogram_kind	../nl/nl_gen.c	/^nl_subprogram_kind (nl_subprogram subprogram)$/
+nl_subprogram_locals	../nl/nl_gen.c	/^nl_subprogram_locals (nl_subprogram subprogram)$/
+nl_subprogram_name	../nl/nl_gen.c	/^nl_subprogram_name (nl_subprogram subprogram)$/
+nl_subprogram_num_formals	../nl/nl_subprogram.c	/^nl_subprogram_num_formals (nl_subprogram subprogra/
+nl_subprogram_pragmas	../nl/nl_gen.c	/^nl_subprogram_pragmas (nl_subprogram subprogram)$/
+nl_subprogram_set_body	../nl/nl_subprogram.c	/^nl_subprogram_set_body (nl_subprogram subprogram, /
+nl_subprogram_set_pragmas	../nl/nl_subprogram.c	/^nl_subprogram_set_pragmas (nl_subprogram subprogra/
+nl_subprogram_type	../nl/nl_gen.c	/^nl_subprogram_type (nl_subprogram subprogram)$/
+nl_symbol_add_constituent	../nl/nl_symbol.c	/^nl_symbol_add_constituent (nl_symbol symbol, nl_sy/
+nl_symbol_attr_attr_of	../nl/nl_gen.c	/^nl_symbol_attr_attr_of (nl_symbol_attr symbol_attr/
+nl_symbol_attr_create	../nl/nl_attr.c	/^nl_symbol_attr_create (char *name, nl_design desig/
+nl_symbol_attr_density	../nl/nl_gen.c	/^nl_symbol_attr_density (nl_symbol_attr symbol_attr/
+nl_symbol_attr_get	../nl/nl_attr.c	/^nl_symbol_attr_get (nl_symbol_attr attr, nl_symbol/
+nl_symbol_attr_id	../nl/nl_gen.c	/^nl_symbol_attr_id (nl_symbol_attr symbol_attr)$/
+nl_symbol_attr_kind	../nl/nl_gen.c	/^nl_symbol_attr_kind (nl_symbol_attr symbol_attr)$/
+nl_symbol_attr_name	../nl/nl_gen.c	/^nl_symbol_attr_name (nl_symbol_attr symbol_attr)$/
+nl_symbol_attr_owner	../nl/nl_gen.c	/^nl_symbol_attr_owner (nl_symbol_attr symbol_attr)$/
+nl_symbol_attr_set	../nl/nl_attr.c	/^nl_symbol_attr_set (nl_symbol_attr attr, nl_symbol/
+nl_symbol_binding	../nl/nl_gen.c	/^nl_symbol_binding (nl_symbol symbol)$/
+nl_symbol_class	../nl/nl_gen.c	/^nl_symbol_class (nl_symbol symbol)$/
+nl_symbol_constituents	../nl/nl_gen.c	/^nl_symbol_constituents (nl_symbol symbol)$/
+nl_symbol_create	../nl/nl_symbol.c	/^nl_symbol_create (char *name, nl_type type, nl_wir/
+nl_symbol_free	../nl/nl_symbol.c	/^nl_symbol_free (nl_symbol sym)$/
+nl_symbol_get_constituent	../nl/nl_symbol.c	/^nl_symbol_get_constituent (nl_symbol symbol, int o/
+nl_symbol_id	../nl/nl_gen.c	/^nl_symbol_id (nl_symbol symbol)$/
+nl_symbol_kind	../nl/nl_gen.c	/^nl_symbol_kind (nl_symbol symbol)$/
+nl_symbol_name	../nl/nl_gen.c	/^nl_symbol_name (nl_symbol symbol)$/
+nl_symbol_owner	../nl/nl_gen.c	/^nl_symbol_owner (nl_symbol symbol)$/
+nl_symbol_set_binding	../nl/nl_symbol.c	/^nl_symbol_set_binding (nl_symbol symbol, void *bin/
+nl_symbol_type	../nl/nl_gen.c	/^nl_symbol_type (nl_symbol symbol)$/
+nl_token_to_string	../nl/nl_gen.c	/^nl_token_to_string (enum nl_token e)$/
+nl_type_array_depth	../nl/nl_type.c	/^nl_type_array_depth (nl_type type)$/
+nl_type_base_type	../nl/nl_gen.c	/^nl_type_base_type (nl_type type)$/
+nl_type_class	../nl/nl_gen.c	/^nl_type_class (nl_type type)$/
+nl_type_copy	../nl/nl_type.c	/^nl_type_copy (nl_type type, nl_design design)$/
+nl_type_create	../nl/nl_type.c	/^nl_type_create (char *name, nl_design design, nl_t/
+nl_type_design	../nl/nl_gen.c	/^nl_type_design (nl_type type)$/
+nl_type_for_all_indexes	../include/nl_iterators.h	/^#define nl_type_for_all_indexes(type, var) \\$/
+nl_type_free	../nl/nl_type.c	/^nl_type_free (nl_type type)$/
+nl_type_get_array	../nl/nl_type.c	/^nl_type_get_array (nl_type base, int lb, int rb)$/
+nl_type_get_index_for_offset	../nl/nl_type.c	/^nl_type_get_index_for_offset (nl_type type, int of/
+nl_type_get_integer	../nl/nl_type.c	/^nl_type_get_integer (nl_design design)$/
+nl_type_get_offset_for_index	../nl/nl_type.c	/^nl_type_get_offset_for_index (nl_type type, int in/
+nl_type_get_scalar	../nl/nl_type.c	/^nl_type_get_scalar (nl_design design)$/
+nl_type_id	../nl/nl_gen.c	/^nl_type_id (nl_type type)$/
+nl_type_kind	../nl/nl_gen.c	/^nl_type_kind (nl_type type)$/
+nl_type_left	../nl/nl_gen.c	/^nl_type_left (nl_type type)$/
+nl_type_name	../nl/nl_gen.c	/^nl_type_name (nl_type type)$/
+nl_type_right	../nl/nl_gen.c	/^nl_type_right (nl_type type)$/
+nl_type_width	../nl/nl_type.c	/^nl_type_width (nl_type type)$/
+nl_typeclass_to_string	../nl/nl_gen.c	/^nl_typeclass_to_string (enum nl_typeclass e)$/
+nl_use_to_string	../nl/nl_gen.c	/^nl_use_to_string (enum nl_use e)$/
+nl_vnum_ast_bits	../nl/nl_gen.c	/^nl_vnum_ast_bits (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_child	../nl/nl_gen.c	/^nl_vnum_ast_child (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_create	../nl/nl_ast.c	/^nl_vnum_ast_create (char *bits)$/
+nl_vnum_ast_file	../nl/nl_gen.c	/^nl_vnum_ast_file (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_id	../nl/nl_gen.c	/^nl_vnum_ast_id (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_kind	../nl/nl_gen.c	/^nl_vnum_ast_kind (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_line	../nl/nl_gen.c	/^nl_vnum_ast_line (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_set_bits	../nl/nl_ast.c	/^nl_vnum_ast_set_bits (nl_vnum_ast vnum, char *bits/
+nl_vnum_ast_sibling	../nl/nl_gen.c	/^nl_vnum_ast_sibling (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_token	../nl/nl_gen.c	/^nl_vnum_ast_token (nl_vnum_ast vnum_ast)$/
+nl_vnum_ast_width	../nl/nl_gen.c	/^nl_vnum_ast_width (nl_vnum_ast vnum_ast)$/
+nl_walk_cells	../nl/nl_walk.c	/^nl_walk_cells (nl_design design, nl_idesign idesig/
+nl_walk_cells_1	../nl/nl_walk.c	/^nl_walk_cells_1 (nl_design design, nl_idesign ides/
+nl_walk_connected_1	../nl/nl_walk.c	/^nl_walk_connected_1 (nl_net net, nl_pin exclude_pi/
+nl_walk_connected_2	../nl/nl_walk.c	/^nl_walk_connected_2 (nl_pin pin, nl_idesign idesig/
+nl_walk_connected_nets	../nl/nl_walk.c	/^nl_walk_connected_nets (nl_net net, nl_idesign ide/
+nl_walk_connected_nets_and_pins	../nl/nl_walk.c	/^nl_walk_connected_nets_and_pins (nl_net net, nl_id/
+nl_walk_connected_pins	../nl/nl_walk.c	/^nl_walk_connected_pins (nl_net net, nl_idesign ide/
+nl_walk_dummy_walker	../nl/nl_walk.c	/^nl_walk_dummy_walker (nl_object obj, void *ptr)$/
+nl_walk_hierarchy	../nl/nl_walk.c	/^nl_walk_hierarchy (nl_design top_design, int walk_/
+nl_walk_hierarchy_1	../nl/nl_walk.c	/^nl_walk_hierarchy_1 (nl_design design, int walk_li/
+nl_walk_idesigns	../nl/nl_walk.c	/^nl_walk_idesigns (nl_idesign top_idesign, int walk/
+nl_walk_idesigns_1	../nl/nl_walk.c	/^nl_walk_idesigns_1 (nl_idesign idesign, int walk_l/
+nl_walk_nets	../nl/nl_walk.c	/^nl_walk_nets (nl_design design, nl_idesign idesign/
+nl_walk_nets_1	../nl/nl_walk.c	/^nl_walk_nets_1 (nl_design design, nl_idesign idesi/
+nl_walk_status_to_string	../nl/nl_gen.c	/^nl_walk_status_to_string (enum nl_walk_status e)$/
+nl_wireclass_to_string	../nl/nl_gen.c	/^nl_wireclass_to_string (enum nl_wireclass e)$/
+nlsh_app_init	../nlsh/nlsh.c	/^nlsh_app_init (Tcl_Interp *interp)$/
+number	../def2pnl/def.c	/^number(void)$/
+object_type	../ui/ui_cmd_misc.ee	/^#(defcommand object_type/
+operating_condition_statement	../snps-lib/lib.c	/^operating_condition_statement(AST**_root)$/
+operating_conditions	../snps-lib/lib.c	/^operating_conditions(AST**_root)$/
+orientation	../def2pnl/def.c	/^orientation(void)$/
+output_voltage	../snps-lib/lib.c	/^output_voltage(AST**_root)$/
+output_voltage_statement	../snps-lib/lib.c	/^output_voltage_statement(AST**_root)$/
+parameter_assignment	../v2nl/verilog.c	/^parameter_assignment(AST**_root)$/
+parameter_decl	../v2nl/verilog.c	/^parameter_decl(AST**_root)$/
+pat_attr_get	../pat/pat_loc.c	/^static int pat_attr_get(nl_design des, nl_object o/
+pat_attr_set	../pat/pat_loc.c	/^static void pat_attr_set(nl_design des, nl_object /
+pat_cmd_register_commands	../pat/pat_loc.c	/^pat_cmd_register_commands (Tcl_Interp *interp, cha/
+pat_get_cell_location	../pat/pat_loc.c	/^char * pat_get_cell_location(nl_cell cell, Pat_loc/
+pat_get_cell_size	../pat/pat_loc.c	/^int pat_get_cell_size(nl_object obj, int *psizex, /
+pat_hier_walk_cells	../pat/pat_loc.c	/^int pat_hier_walk_cells(nl_design des,hier_walk_ce/
+pat_location2transform	../pat/pat_trans.c	/^int pat_location2transform(int x, int y, int iori,/
+pat_nop	../pat/pat_loc.c	/^void pat_nop() {}$/
+pat_set_cell_location	../pat/pat_loc.c	/^char *pat_set_cell_location(nl_cell cell, int x, i/
+pat_set_cell_size	../pat/pat_loc.c	/^int pat_set_cell_size(nl_object obj, int sizex, in/
+pat_string_to_ori	../pat/pat_trans.c	/^int pat_string_to_ori(char *ori) {$/
+pat_trans_init	../pat/pat_trans.c	/^static void pat_trans_init()$/
+pat_trans_invert	../pat/pat_trans.c	/^void pat_trans_invert(Pat_transform *in, Pat_trans/
+pat_trans_trans	../pat/pat_trans.c	/^void pat_trans_trans(Pat_transform *t1, Pat_transf/
+pat_walk_hier_cells	../pat/pat_loc.ee	/^#(defcommand pat_walk_hier_cells/
+pattern_clause	../def2pnl/def.c	/^pattern_clause(void)$/
+pin	../def2pnl/def.c	/^pin(void)$/
+pin_antennadiffarea	../lef2pnl/lef.c	/^pin_antennadiffarea( pnl_libpin plibpin )$/
+pin_antennagatearea	../lef2pnl/lef.c	/^pin_antennagatearea( pnl_libpin plibpin )$/
+pin_direction	../lef2pnl/lef.c	/^pin_direction( pnl_libpin plibpin )$/
+pin_plus	../def2pnl/def.c	/^pin_plus( pnl_port pport )$/
+pin_port	../lef2pnl/lef.c	/^pin_port( pnl_libpin plibpin )$/
+pin_statement	../snps-lib/lib.c	/^pin_statement(AST**_root)$/
+pin_stmt	../lef2pnl/lef.c	/^pin_stmt( pnl_libpin plibpin )$/
+pin_use	../lef2pnl/lef.c	/^pin_use( pnl_libpin plibpin )$/
+pins	../def2pnl/def.c	/^pins(void)$/
+placed_clause	../def2pnl/def.c	/^placed_clause(void)$/
+pnl2def_num_components	../pnl2def/pnl2def.c	/^pnl2def_num_components (pnl_design pdesign)$/
+pnl2def_num_nets_with_routes	../pnl2def/pnl2def.c	/^pnl2def_num_nets_with_routes (pnl_design pdesign)$/
+pnl2def_num_pins	../pnl2def/pnl2def.c	/^pnl2def_num_pins (pnl_design pdesign)$/
+pnl2def_write_components	../pnl2def/pnl2def.c	/^pnl2def_write_components (unparse_fp ufp, pnl_desi/
+pnl2def_write_def	../pnl2def/pnl2def.c	/^pnl2def_write_def (FILE *ofp, pnl_design pdesign, /
+pnl2def_write_die_area	../pnl2def/pnl2def.c	/^pnl2def_write_die_area (unparse_fp ufp, pnl_design/
+pnl2def_write_direction	../pnl2def/pnl2def.c	/^pnl2def_write_direction (unparse_fp ufp, nl_direct/
+pnl2def_write_geometry	../pnl2def/pnl2def.c	/^pnl2def_write_geometry (unparse_fp ufp, char *laye/
+pnl2def_write_location	../pnl2def/pnl2def.c	/^pnl2def_write_location (unparse_fp ufp, pnl_loctyp/
+pnl2def_write_nets_with_routes	../pnl2def/pnl2def.c	/^pnl2def_write_nets_with_routes (unparse_fp ufp, pn/
+pnl2def_write_pdesign	../pnl2def/pnl2def.c	/^pnl2def_write_pdesign (unparse_fp ufp, pnl_design /
+pnl2def_write_pins	../pnl2def/pnl2def.c	/^pnl2def_write_pins (unparse_fp ufp, pnl_design pde/
+pnl2def_write_tracks	../pnl2def/pnl2def.c	/^pnl2def_write_tracks (unparse_fp ufp, pnl_design p/
+pnl2def_write_units	../pnl2def/pnl2def.c	/^pnl2def_write_units (unparse_fp ufp, pnl_design pd/
+pnl_bbox_x0	../pnl/pnl_gen.c	/^pnl_bbox_x0 (pnl_bbox bbox)$/
+pnl_bbox_x1	../pnl/pnl_gen.c	/^pnl_bbox_x1 (pnl_bbox bbox)$/
+pnl_bbox_y0	../pnl/pnl_gen.c	/^pnl_bbox_y0 (pnl_bbox bbox)$/
+pnl_bbox_y1	../pnl/pnl_gen.c	/^pnl_bbox_y1 (pnl_bbox bbox)$/
+pnl_branch_add_segment	../pnl/pnl_route.c	/^pnl_branch_add_segment (pnl_branch branch, pnl_seg/
+pnl_branch_create	../pnl/pnl_route.c	/^pnl_branch_create (char *layer, int x0, int y0, in/
+pnl_branch_for_all_segments	../include/pnl_iterators.h	/^#define pnl_branch_for_all_segments(branch, var) \\/
+pnl_branch_free	../pnl/pnl_route.c	/^pnl_branch_free (pnl_branch branch)$/
+pnl_branch_layer	../pnl/pnl_gen.c	/^pnl_branch_layer (pnl_branch branch)$/
+pnl_branch_segments	../pnl/pnl_gen.c	/^pnl_branch_segments (pnl_branch branch)$/
+pnl_branch_width	../pnl/pnl_gen.c	/^pnl_branch_width (pnl_branch branch)$/
+pnl_branch_x0	../pnl/pnl_gen.c	/^pnl_branch_x0 (pnl_branch branch)$/
+pnl_branch_y0	../pnl/pnl_gen.c	/^pnl_branch_y0 (pnl_branch branch)$/
+pnl_cell_create	../pnl/pnl_cell.c	/^pnl_cell_create (nl_icell icell)$/
+pnl_cell_free	../pnl/pnl_cell.c	/^pnl_cell_free (pnl_cell cell)$/
+pnl_cell_get_location	../pnl/pnl_cell.c	/^pnl_cell_get_location (pnl_cell cell, int *x_p, in/
+pnl_cell_get_pin_location	../pnl/pnl_cell.c	/^pnl_cell_get_pin_location (pnl_cell pcell, nl_ipin/
+pnl_cell_id	../pnl/pnl_gen.c	/^pnl_cell_id (pnl_cell cell)$/
+pnl_cell_kind	../pnl/pnl_gen.c	/^pnl_cell_kind (pnl_cell cell)$/
+pnl_cell_loctype	../pnl/pnl_gen.c	/^pnl_cell_loctype (pnl_cell cell)$/
+pnl_cell_name	../pnl/pnl_cell.c	/^pnl_cell_name (pnl_cell pcell)$/
+pnl_cell_nl_rep	../pnl/pnl_gen.c	/^pnl_cell_nl_rep (pnl_cell cell)$/
+pnl_cell_orientation	../pnl/pnl_gen.c	/^pnl_cell_orientation (pnl_cell cell)$/
+pnl_cell_pdesign	../pnl/pnl_cell.c	/^pnl_cell_pdesign (pnl_cell pcell)$/
+pnl_cell_root_pdesign	../pnl/pnl_cell.c	/^pnl_cell_root_pdesign (pnl_cell pcell)$/
+pnl_cell_set_location	../pnl/pnl_cell.c	/^pnl_cell_set_location (pnl_cell pcell, int x, int /
+pnl_cell_set_loctype	../pnl/pnl_cell.c	/^pnl_cell_set_loctype (pnl_cell pcell, pnl_loctype /
+pnl_cell_set_orientation	../pnl/pnl_cell.c	/^pnl_cell_set_orientation (pnl_cell cell, pnl_orien/
+pnl_cell_x	../pnl/pnl_gen.c	/^pnl_cell_x (pnl_cell cell)$/
+pnl_cell_y	../pnl/pnl_gen.c	/^pnl_cell_y (pnl_cell cell)$/
+pnl_cellclass_to_string	../pnl/pnl_gen.c	/^pnl_cellclass_to_string (enum pnl_cellclass e)$/
+pnl_density_to_string	../pnl/pnl_gen.c	/^pnl_density_to_string (enum pnl_density e)$/
+pnl_design_add_cell_to_rows	../pnl/pnl_design.c	/^pnl_design_add_cell_to_rows (pnl_design pdesign, p/
+pnl_design_add_history	../pnl/pnl_design.c	/^pnl_design_add_history (pnl_design pdesign, char */
+pnl_design_add_row_site	../pnl/pnl_design.c	/^pnl_design_add_row_site (pnl_design pdesign, char /
+pnl_design_add_tracks	../pnl/pnl_design.c	/^pnl_design_add_tracks (pnl_design pdesign, pnl_dll/
+pnl_design_add_x_tracks	../pnl/pnl_design.c	/^pnl_design_add_x_tracks (pnl_design pdesign, int s/
+pnl_design_add_y_tracks	../pnl/pnl_design.c	/^pnl_design_add_y_tracks (pnl_design pdesign, int s/
+pnl_design_clear_die_area	../pnl/pnl_design.c	/^pnl_design_clear_die_area (pnl_design pdesign)$/
+pnl_design_create	../pnl/pnl_design.c	/^pnl_design_create (nl_idesign idesign)$/
+pnl_design_die_area	../pnl/pnl_gen.c	/^pnl_design_die_area (pnl_design design)$/
+pnl_design_distance_units	../pnl/pnl_gen.c	/^pnl_design_distance_units (pnl_design design)$/
+pnl_design_fill	../pnl/pnl_design.c	/^pnl_design_fill (nl_idesign idesign)$/
+pnl_design_for_all_cells	../include/pnl_iterators.h	/^#define pnl_design_for_all_cells(pdesign, var) \\$/
+pnl_design_for_all_nets	../include/pnl_iterators.h	/^#define pnl_design_for_all_nets(pdesign, var) \\$/
+pnl_design_for_all_x_tracks	../include/pnl_iterators.h	/^#define pnl_design_for_all_x_tracks(pdesign, var) /
+pnl_design_for_all_y_tracks	../include/pnl_iterators.h	/^#define pnl_design_for_all_y_tracks(pdesign, var) /
+pnl_design_free	../pnl/pnl_design.c	/^pnl_design_free (pnl_design pdesign)$/
+pnl_design_free_cell_attr	../pnl/pnl_design.c	/^pnl_design_free_cell_attr (void *ptr)$/
+pnl_design_free_design_attr	../pnl/pnl_design.c	/^pnl_design_free_design_attr (void *ptr)$/
+pnl_design_free_net_attr	../pnl/pnl_design.c	/^pnl_design_free_net_attr (void *ptr)$/
+pnl_design_free_port_attr	../pnl/pnl_design.c	/^pnl_design_free_port_attr (void *ptr)$/
+pnl_design_free_row_sites	../pnl/pnl_design.c	/^pnl_design_free_row_sites (pnl_design pdesign)$/
+pnl_design_get_cell	../pnl/pnl_design.c	/^pnl_design_get_cell (pnl_design pdesign, nl_icell /
+pnl_design_get_cell_by_name	../pnl/pnl_design.c	/^pnl_design_get_cell_by_name (pnl_design pdesign, c/
+pnl_design_get_die_area	../pnl/pnl_design.c	/^pnl_design_get_die_area (pnl_design pdesign,$/
+pnl_design_get_distance_units	../pnl/pnl_design.c	/^pnl_design_get_distance_units (pnl_design pdesign,/
+pnl_design_get_net	../pnl/pnl_design.c	/^pnl_design_get_net (pnl_design pdesign, nl_inet in/
+pnl_design_get_port	../pnl/pnl_design.c	/^pnl_design_get_port (pnl_design pdesign, nl_iport /
+pnl_design_get_tracks	../pnl/pnl_design.c	/^pnl_design_get_tracks (pnl_design pdesign, pnl_tra/
+pnl_design_get_x_tracks	../pnl/pnl_design.c	/^pnl_design_get_x_tracks (pnl_design pdesign, int */
+pnl_design_get_y_tracks	../pnl/pnl_design.c	/^pnl_design_get_y_tracks (pnl_design pdesign, int */
+pnl_design_history	../pnl/pnl_gen.c	/^pnl_design_history (pnl_design design)$/
+pnl_design_icell_attr	../pnl/pnl_gen.c	/^pnl_design_icell_attr (pnl_design design)$/
+pnl_design_id	../pnl/pnl_gen.c	/^pnl_design_id (pnl_design design)$/
+pnl_design_idesign_attr	../pnl/pnl_gen.c	/^pnl_design_idesign_attr (pnl_design design)$/
+pnl_design_inet_attr	../pnl/pnl_gen.c	/^pnl_design_inet_attr (pnl_design design)$/
+pnl_design_iport_attr	../pnl/pnl_gen.c	/^pnl_design_iport_attr (pnl_design design)$/
+pnl_design_kind	../pnl/pnl_gen.c	/^pnl_design_kind (pnl_design design)$/
+pnl_design_nl_rep	../pnl/pnl_gen.c	/^pnl_design_nl_rep (pnl_design design)$/
+pnl_design_remove_cell_from_rows	../pnl/pnl_design.c	/^pnl_design_remove_cell_from_rows (pnl_design pdesi/
+pnl_design_row_sites	../pnl/pnl_gen.c	/^pnl_design_row_sites (pnl_design design)$/
+pnl_design_rows	../pnl/pnl_gen.c	/^pnl_design_rows (pnl_design design)$/
+pnl_design_set_die_area	../pnl/pnl_design.c	/^pnl_design_set_die_area (pnl_design pdesign, int x/
+pnl_design_set_distance_units	../pnl/pnl_design.c	/^pnl_design_set_distance_units (pnl_design pdesign,/
+pnl_design_x_tracks	../pnl/pnl_gen.c	/^pnl_design_x_tracks (pnl_design design)$/
+pnl_design_y_tracks	../pnl/pnl_gen.c	/^pnl_design_y_tracks (pnl_design design)$/
+pnl_dll_add	../pnl/pnl_dll.c	/^pnl_dll_add (pnl_dll_head head, pnl_dll dll)$/
+pnl_dll_create	../pnl/pnl_dll.c	/^pnl_dll_create (void)$/
+pnl_dll_for_all	../include/pnl_iterators.h	/^#define pnl_dll_for_all(dll, type, var) \\$/
+pnl_dll_for_all_internal	../include/pnl_iterators.h	/^#define pnl_dll_for_all_internal(dll, type, var) \\/
+pnl_dll_free	../pnl/pnl_dll.c	/^pnl_dll_free (pnl_dll_head head)$/
+pnl_dll_gen_first	../pnl/pnl_dll.c	/^pnl_dll_gen_first (pnl_dll_head head)$/
+pnl_dll_gen_next	../pnl/pnl_dll.c	/^pnl_dll_gen_next (pnl_dll_head head, pnl_dll dll)$/
+pnl_dll_head_num_elements	../pnl/pnl_gen.c	/^pnl_dll_head_num_elements (pnl_dll_head dll_head)$/
+pnl_dll_remove	../pnl/pnl_dll.c	/^pnl_dll_remove (pnl_dll_head head, pnl_dll dll)$/
+pnl_kind_to_string	../pnl/pnl_gen.c	/^pnl_kind_to_string (enum pnl_kind e)$/
+pnl_libcell_add_obs_rectangle	../pnl/pnl_library.c	/^pnl_libcell_add_obs_rectangle (pnl_libcell plibcel/
+pnl_libcell_class	../pnl/pnl_gen.c	/^pnl_libcell_class (pnl_libcell libcell)$/
+pnl_libcell_create	../pnl/pnl_library.c	/^pnl_libcell_create (nl_libcell libcell, pnl_librar/
+pnl_libcell_free	../pnl/pnl_library.c	/^pnl_libcell_free (pnl_libcell plibcell)$/
+pnl_libcell_id	../pnl/pnl_gen.c	/^pnl_libcell_id (pnl_libcell libcell)$/
+pnl_libcell_kind	../pnl/pnl_gen.c	/^pnl_libcell_kind (pnl_libcell libcell)$/
+pnl_libcell_library	../pnl/pnl_gen.c	/^pnl_libcell_library (pnl_libcell libcell)$/
+pnl_libcell_name	../pnl/pnl_library.c	/^pnl_libcell_name (pnl_libcell plibcell)$/
+pnl_libcell_nl_rep	../pnl/pnl_gen.c	/^pnl_libcell_nl_rep (pnl_libcell libcell)$/
+pnl_libcell_obstructions	../pnl/pnl_gen.c	/^pnl_libcell_obstructions (pnl_libcell libcell)$/
+pnl_libcell_set_class	../pnl/pnl_library.c	/^pnl_libcell_set_class (pnl_libcell plibcell, pnl_c/
+pnl_libcell_set_site	../pnl/pnl_library.c	/^pnl_libcell_set_site (pnl_libcell plibcell, char */
+pnl_libcell_set_size	../pnl/pnl_library.c	/^pnl_libcell_set_size (pnl_libcell plibcell, int x,/
+pnl_libcell_set_xsymmetry	../pnl/pnl_library.c	/^pnl_libcell_set_xsymmetry (pnl_libcell plibcell, i/
+pnl_libcell_set_ysymmetry	../pnl/pnl_library.c	/^pnl_libcell_set_ysymmetry (pnl_libcell plibcell, i/
+pnl_libcell_site	../pnl/pnl_gen.c	/^pnl_libcell_site (pnl_libcell libcell)$/
+pnl_libcell_sizex	../pnl/pnl_gen.c	/^pnl_libcell_sizex (pnl_libcell libcell)$/
+pnl_libcell_sizey	../pnl/pnl_gen.c	/^pnl_libcell_sizey (pnl_libcell libcell)$/
+pnl_libcell_xsymmetry	../pnl/pnl_gen.c	/^pnl_libcell_xsymmetry (pnl_libcell libcell)$/
+pnl_libcell_ysymmetry	../pnl/pnl_gen.c	/^pnl_libcell_ysymmetry (pnl_libcell libcell)$/
+pnl_libpin_add_port_rectangle	../pnl/pnl_library.c	/^pnl_libpin_add_port_rectangle (pnl_libpin plibpin,/
+pnl_libpin_antennadiffarea	../pnl/pnl_gen.c	/^pnl_libpin_antennadiffarea (pnl_libpin libpin)$/
+pnl_libpin_antennagatearea	../pnl/pnl_gen.c	/^pnl_libpin_antennagatearea (pnl_libpin libpin)$/
+pnl_libpin_centerx	../pnl/pnl_gen.c	/^pnl_libpin_centerx (pnl_libpin libpin)$/
+pnl_libpin_centery	../pnl/pnl_gen.c	/^pnl_libpin_centery (pnl_libpin libpin)$/
+pnl_libpin_create	../pnl/pnl_library.c	/^pnl_libpin_create (nl_libpin libpin, pnl_libcell p/
+pnl_libpin_free	../pnl/pnl_library.c	/^pnl_libpin_free (pnl_libpin plibpin)$/
+pnl_libpin_id	../pnl/pnl_gen.c	/^pnl_libpin_id (pnl_libpin libpin)$/
+pnl_libpin_kind	../pnl/pnl_gen.c	/^pnl_libpin_kind (pnl_libpin libpin)$/
+pnl_libpin_libcell	../pnl/pnl_gen.c	/^pnl_libpin_libcell (pnl_libpin libpin)$/
+pnl_libpin_name	../pnl/pnl_library.c	/^pnl_libpin_name (pnl_libpin plibpin)$/
+pnl_libpin_nl_rep	../pnl/pnl_gen.c	/^pnl_libpin_nl_rep (pnl_libpin libpin)$/
+pnl_libpin_ports	../pnl/pnl_gen.c	/^pnl_libpin_ports (pnl_libpin libpin)$/
+pnl_libpin_set_antennadiffarea	../pnl/pnl_library.c	/^pnl_libpin_set_antennadiffarea (pnl_libpin plibpin/
+pnl_libpin_set_antennagatearea	../pnl/pnl_library.c	/^pnl_libpin_set_antennagatearea (pnl_libpin plibpin/
+pnl_libpin_set_or_check_direction	../pnl/pnl_library.c	/^pnl_libpin_set_or_check_direction (pnl_libpin plib/
+pnl_libpin_set_or_check_use	../pnl/pnl_library.c	/^pnl_libpin_set_or_check_use (pnl_libpin plibpin, n/
+pnl_libpin_use	../pnl/pnl_gen.c	/^pnl_libpin_use (pnl_libpin libpin)$/
+pnl_library_add_libcell	../pnl/pnl_library.c	/^pnl_library_add_libcell (pnl_library plibrary, pnl/
+pnl_library_add_libpin	../pnl/pnl_library.c	/^pnl_library_add_libpin (pnl_library plibrary, pnl_/
+pnl_library_create	../pnl/pnl_library.c	/^pnl_library_create (nl_library library)$/
+pnl_library_free	../pnl/pnl_library.c	/^pnl_library_free (pnl_library plibrary)$/
+pnl_library_free_libcell_attr	../pnl/pnl_library.c	/^pnl_library_free_libcell_attr (void *ptr)$/
+pnl_library_free_libpin_attr	../pnl/pnl_library.c	/^pnl_library_free_libpin_attr (void *ptr)$/
+pnl_library_free_library_attr	../pnl/pnl_library.c	/^pnl_library_free_library_attr (void *ptr)$/
+pnl_library_get_libcell	../pnl/pnl_library.c	/^pnl_library_get_libcell (pnl_library plibrary, nl_/
+pnl_library_get_libpin	../pnl/pnl_library.c	/^pnl_library_get_libpin (pnl_library plibrary, nl_l/
+pnl_library_id	../pnl/pnl_gen.c	/^pnl_library_id (pnl_library library)$/
+pnl_library_kind	../pnl/pnl_gen.c	/^pnl_library_kind (pnl_library library)$/
+pnl_library_libcell_attr	../pnl/pnl_gen.c	/^pnl_library_libcell_attr (pnl_library library)$/
+pnl_library_libpin_attr	../pnl/pnl_gen.c	/^pnl_library_libpin_attr (pnl_library library)$/
+pnl_library_library_attr	../pnl/pnl_gen.c	/^pnl_library_library_attr (pnl_library library)$/
+pnl_library_nl_rep	../pnl/pnl_gen.c	/^pnl_library_nl_rep (pnl_library library)$/
+pnl_loctype_to_string	../pnl/pnl_gen.c	/^pnl_loctype_to_string (enum pnl_loctype e)$/
+pnl_net_add_route	../pnl/pnl_net.c	/^pnl_net_add_route (pnl_net pnet, pnl_route route)$/
+pnl_net_create	../pnl/pnl_net.c	/^pnl_net_create (nl_inet inet)$/
+pnl_net_for_all_routes	../include/pnl_iterators.h	/^#define pnl_net_for_all_routes(net, var) \\$/
+pnl_net_free	../pnl/pnl_net.c	/^pnl_net_free (pnl_net net)$/
+pnl_net_id	../pnl/pnl_gen.c	/^pnl_net_id (pnl_net net)$/
+pnl_net_kind	../pnl/pnl_gen.c	/^pnl_net_kind (pnl_net net)$/
+pnl_net_name	../pnl/pnl_net.c	/^pnl_net_name (pnl_net pnet)$/
+pnl_net_nl_rep	../pnl/pnl_gen.c	/^pnl_net_nl_rep (pnl_net net)$/
+pnl_net_pattern	../pnl/pnl_gen.c	/^pnl_net_pattern (pnl_net net)$/
+pnl_net_pdesign	../pnl/pnl_net.c	/^pnl_net_pdesign (pnl_net pnet)$/
+pnl_net_routes	../pnl/pnl_gen.c	/^pnl_net_routes (pnl_net net)$/
+pnl_net_set_pattern	../pnl/pnl_net.c	/^pnl_net_set_pattern (pnl_net pnet, pnl_pattern pat/
+pnl_net_set_special	../pnl/pnl_net.c	/^pnl_net_set_special (pnl_net pnet, int special)$/
+pnl_net_set_use	../pnl/pnl_net.c	/^pnl_net_set_use (pnl_net pnet, pnl_use use)$/
+pnl_net_special	../pnl/pnl_gen.c	/^pnl_net_special (pnl_net net)$/
+pnl_net_use	../pnl/pnl_gen.c	/^pnl_net_use (pnl_net net)$/
+pnl_object_id	../pnl/pnl_gen.c	/^pnl_object_id (pnl_object object)$/
+pnl_object_kind	../pnl/pnl_gen.c	/^pnl_object_kind (pnl_object object)$/
+pnl_orientation_to_string	../pnl/pnl_gen.c	/^pnl_orientation_to_string (enum pnl_orientation e)/
+pnl_pattern_to_string	../pnl/pnl_gen.c	/^pnl_pattern_to_string (enum pnl_pattern e)$/
+pnl_port_clear_geometry	../pnl/pnl_port.c	/^pnl_port_clear_geometry (pnl_port pport)$/
+pnl_port_create	../pnl/pnl_port.c	/^pnl_port_create (nl_iport iport)$/
+pnl_port_free	../pnl/pnl_port.c	/^pnl_port_free (pnl_port port)$/
+pnl_port_get_geometry	../pnl/pnl_port.c	/^pnl_port_get_geometry (pnl_port pport, char **laye/
+pnl_port_get_location	../pnl/pnl_port.c	/^pnl_port_get_location (pnl_port port, int *x_p, in/
+pnl_port_id	../pnl/pnl_gen.c	/^pnl_port_id (pnl_port port)$/
+pnl_port_kind	../pnl/pnl_gen.c	/^pnl_port_kind (pnl_port port)$/
+pnl_port_loctype	../pnl/pnl_gen.c	/^pnl_port_loctype (pnl_port port)$/
+pnl_port_name	../pnl/pnl_port.c	/^pnl_port_name (pnl_port pport)$/
+pnl_port_nl_rep	../pnl/pnl_gen.c	/^pnl_port_nl_rep (pnl_port port)$/
+pnl_port_orientation	../pnl/pnl_gen.c	/^pnl_port_orientation (pnl_port port)$/
+pnl_port_pdesign	../pnl/pnl_port.c	/^pnl_port_pdesign (pnl_port pport)$/
+pnl_port_rectangle	../pnl/pnl_gen.c	/^pnl_port_rectangle (pnl_port port)$/
+pnl_port_set_geometry	../pnl/pnl_port.c	/^pnl_port_set_geometry (pnl_port pport, char *layer/
+pnl_port_set_location	../pnl/pnl_port.c	/^pnl_port_set_location (pnl_port pport, int x, int /
+pnl_port_set_loctype	../pnl/pnl_port.c	/^pnl_port_set_loctype (pnl_port pport, pnl_loctype /
+pnl_port_set_orientation	../pnl/pnl_port.c	/^pnl_port_set_orientation (pnl_port port, pnl_orien/
+pnl_port_set_use	../pnl/pnl_port.c	/^pnl_port_set_use (pnl_port pport, pnl_use use)$/
+pnl_port_use	../pnl/pnl_gen.c	/^pnl_port_use (pnl_port port)$/
+pnl_port_x	../pnl/pnl_gen.c	/^pnl_port_x (pnl_port port)$/
+pnl_port_y	../pnl/pnl_gen.c	/^pnl_port_y (pnl_port port)$/
+pnl_rectangle_create	../pnl/pnl_rectangle.c	/^pnl_rectangle_create (char *layer, int x0, int y0,/
+pnl_rectangle_free	../pnl/pnl_rectangle.c	/^pnl_rectangle_free (pnl_rectangle rect)$/
+pnl_rectangle_get_center	../pnl/pnl_rectangle.c	/^pnl_rectangle_get_center (pnl_rectangle rect, int /
+pnl_rectangle_layer	../pnl/pnl_gen.c	/^pnl_rectangle_layer (pnl_rectangle rectangle)$/
+pnl_rectangle_x0	../pnl/pnl_gen.c	/^pnl_rectangle_x0 (pnl_rectangle rectangle)$/
+pnl_rectangle_x1	../pnl/pnl_gen.c	/^pnl_rectangle_x1 (pnl_rectangle rectangle)$/
+pnl_rectangle_y0	../pnl/pnl_gen.c	/^pnl_rectangle_y0 (pnl_rectangle rectangle)$/
+pnl_rectangle_y1	../pnl/pnl_gen.c	/^pnl_rectangle_y1 (pnl_rectangle rectangle)$/
+pnl_route_add_branch	../pnl/pnl_route.c	/^pnl_route_add_branch (pnl_route route, pnl_branch /
+pnl_route_branches	../pnl/pnl_gen.c	/^pnl_route_branches (pnl_route route)$/
+pnl_route_create	../pnl/pnl_route.c	/^pnl_route_create (pnl_routekind kind)$/
+pnl_route_for_all_branches	../include/pnl_iterators.h	/^#define pnl_route_for_all_branches(route, var) \\$/
+pnl_route_free	../pnl/pnl_route.c	/^pnl_route_free (pnl_route route)$/
+pnl_route_kind	../pnl/pnl_gen.c	/^pnl_route_kind (pnl_route route)$/
+pnl_routekind_to_string	../pnl/pnl_gen.c	/^pnl_routekind_to_string (enum pnl_routekind e)$/
+pnl_row_site_core	../pnl/pnl_gen.c	/^pnl_row_site_core (pnl_row_site row_site)$/
+pnl_row_site_count	../pnl/pnl_gen.c	/^pnl_row_site_count (pnl_row_site row_site)$/
+pnl_row_site_height	../pnl/pnl_gen.c	/^pnl_row_site_height (pnl_row_site row_site)$/
+pnl_row_site_name	../pnl/pnl_gen.c	/^pnl_row_site_name (pnl_row_site row_site)$/
+pnl_row_site_orientation	../pnl/pnl_gen.c	/^pnl_row_site_orientation (pnl_row_site row_site)$/
+pnl_row_site_step	../pnl/pnl_gen.c	/^pnl_row_site_step (pnl_row_site row_site)$/
+pnl_row_site_x0	../pnl/pnl_gen.c	/^pnl_row_site_x0 (pnl_row_site row_site)$/
+pnl_row_site_y0	../pnl/pnl_gen.c	/^pnl_row_site_y0 (pnl_row_site row_site)$/
+pnl_segment_create_via	../pnl/pnl_route.c	/^pnl_segment_create_via (char *via_name)$/
+pnl_segment_create_x_segment	../pnl/pnl_route.c	/^pnl_segment_create_x_segment (int x)$/
+pnl_segment_create_y_segment	../pnl/pnl_route.c	/^pnl_segment_create_y_segment (int y)$/
+pnl_segment_free	../pnl/pnl_route.c	/^pnl_segment_free (pnl_segment segment)$/
+pnl_segment_kind	../pnl/pnl_gen.c	/^pnl_segment_kind (pnl_segment segment)$/
+pnl_segmentkind_to_string	../pnl/pnl_gen.c	/^pnl_segmentkind_to_string (enum pnl_segmentkind e)/
+pnl_string_to_cellclass	../pnl/pnl_gen.c	/^pnl_string_to_cellclass (char *str)$/
+pnl_string_to_density	../pnl/pnl_gen.c	/^pnl_string_to_density (char *str)$/
+pnl_string_to_kind	../pnl/pnl_gen.c	/^pnl_string_to_kind (char *str)$/
+pnl_string_to_loctype	../pnl/pnl_gen.c	/^pnl_string_to_loctype (char *str)$/
+pnl_string_to_orientation	../pnl/pnl_gen.c	/^pnl_string_to_orientation (char *str)$/
+pnl_string_to_pattern	../pnl/pnl_gen.c	/^pnl_string_to_pattern (char *str)$/
+pnl_string_to_routekind	../pnl/pnl_gen.c	/^pnl_string_to_routekind (char *str)$/
+pnl_string_to_segmentkind	../pnl/pnl_gen.c	/^pnl_string_to_segmentkind (char *str)$/
+pnl_string_to_typeclass	../pnl/pnl_gen.c	/^pnl_string_to_typeclass (char *str)$/
+pnl_string_to_use	../pnl/pnl_gen.c	/^pnl_string_to_use (char *str)$/
+pnl_tracks_count	../pnl/pnl_gen.c	/^pnl_tracks_count (pnl_tracks tracks)$/
+pnl_tracks_layers	../pnl/pnl_gen.c	/^pnl_tracks_layers (pnl_tracks tracks)$/
+pnl_tracks_start	../pnl/pnl_gen.c	/^pnl_tracks_start (pnl_tracks tracks)$/
+pnl_tracks_step	../pnl/pnl_gen.c	/^pnl_tracks_step (pnl_tracks tracks)$/
+pnl_translate_coordinates	../pnl/pnl_misc.c	/^pnl_translate_coordinates (pnl_orientation orienta/
+pnl_translate_orientation	../pnl/pnl_misc.c	/^pnl_translate_orientation (pnl_orientation orient,/
+pnl_typeclass_to_string	../pnl/pnl_gen.c	/^pnl_typeclass_to_string (enum pnl_typeclass e)$/
+pnl_units_name	../pnl/pnl_gen.c	/^pnl_units_name (pnl_units units)$/
+pnl_units_value	../pnl/pnl_gen.c	/^pnl_units_value (pnl_units units)$/
+pnl_use_to_string	../pnl/pnl_gen.c	/^pnl_use_to_string (enum pnl_use e)$/
+pnl_via_kind	../pnl/pnl_gen.c	/^pnl_via_kind (pnl_via via)$/
+pnl_via_name	../pnl/pnl_gen.c	/^pnl_via_name (pnl_via via)$/
+pnl_x_segment_kind	../pnl/pnl_gen.c	/^pnl_x_segment_kind (pnl_x_segment x_segment)$/
+pnl_x_segment_x	../pnl/pnl_gen.c	/^pnl_x_segment_x (pnl_x_segment x_segment)$/
+pnl_y_segment_kind	../pnl/pnl_gen.c	/^pnl_y_segment_kind (pnl_y_segment y_segment)$/
+pnl_y_segment_y	../pnl/pnl_gen.c	/^pnl_y_segment_y (pnl_y_segment y_segment)$/
+port_list	../v2nl/verilog.c	/^port_list(AST**_root)$/
+positional_inst_port	../v2nl/verilog.c	/^positional_inst_port(AST**_root, int index )$/
+positional_inst_ports	../v2nl/verilog.c	/^positional_inst_ports(AST**_root, nl_cell cell )$/
+power_2_roundup	../mem/mem.c	/^power_2_roundup (unsigned int n)$/
+pragma_stmt	../v2nl/verilog.c	/^pragma_stmt(AST**_root)$/
+propertydefinition	../def2pnl/def.c	/^propertydefinition(void)$/
+propertydefinitions_decl	../def2pnl/def.c	/^propertydefinitions_decl(void)$/
+query_cell_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand query_cell_attribute/
+query_design_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand query_design_attribute/
+range	../v2nl/verilog.c	/^range(AST**_root)$/
+range_type	../v2nl/verilog.c	/^range_type(AST**_root)$/
+read_def	../ui/ui_cmd_io.ee	/^#(defcommand read_def/
+read_lef	../ui/ui_cmd_io.ee	/^#(defcommand read_lef/
+read_verilog	../ui/ui_cmd_io.ee	/^#(defcommand read_verilog/
+rect_clause	../def2pnl/def.c	/^rect_clause(void)$/
+rectangle	../lef2pnl/lef.c	/^rectangle(void)$/
+ref_to_lref	../v2nl/v2nl_rewrites.c	/^ref_to_lref (nl_ast tree)$/
+register_command	../ui/ui_cmd_misc.ee	/^#(defcommand register_command/
+remove_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand remove_attribute /
+remove_buffers	../ui/ui_cmd_misc.ee	/^#(defcommand remove_buffers/
+remove_cell	../ui/ui_cmd_basic.ee	/^#(defcommand remove_cell/
+remove_design	../ui/ui_cmd_basic.ee	/^#(defcommand remove_design/
+remove_net	../ui/ui_cmd_basic.ee	/^#(defcommand remove_net/
+remove_port	../ui/ui_cmd_basic.ee	/^#(defcommand remove_port/
+rename_cell	../ui/ui_cmd_basic.ee	/^#(defcommand rename_cell/
+rename_net	../ui/ui_cmd_basic.ee	/^#(defcommand rename_net/
+rename_port	../ui/ui_cmd_basic.ee	/^#(defcommand rename_port/
+replace_cell	../ui/ui_cmd_misc.ee	/^#(defcommand replace_cell/
+report_hierarchy	../report/report_hierarchy.c	/^report_hierarchy (nl_design design)$/
+report_hierarchy	../ui/ui_cmd_misc.ee	/^#(defcommand report_hierarchy/
+report_hierarchy_internal	../report/report_hierarchy.c	/^report_hierarchy_internal (nl_design design, int i/
+report_rows	../ui/ui_cmd_physical.ee	/^#(defcommand report_rows/
+rise_fall_constraint	../snps-lib/lib.c	/^rise_fall_constraint(AST**_root)$/
+rise_fall_transition	../snps-lib/lib.c	/^rise_fall_transition(AST**_root)$/
+route_branch	../def2pnl/def.c	/^route_branch( int special )$/
+route_clause	../def2pnl/def.c	/^route_clause( int special )$/
+route_segment	../def2pnl/def.c	/^route_segment(void)$/
+row_decl	../def2pnl/def.c	/^row_decl(void)$/
+rtl2dpc_infer_buses	../rtl2dpc/rtl2dpc_bus.c	/^rtl2dpc_infer_buses (nl_design design)$/
+rtl2dpc_make_bus	../rtl2dpc/rtl2dpc_bus.c	/^rtl2dpc_make_bus (char *name, int left, int right,/
+rtl2dpc_parse_netname	../rtl2dpc/rtl2dpc_bus.c	/^rtl2dpc_parse_netname (char *name, char **bus_name/
+rtl_assign_stmt	../v2nl/verilog.c	/^rtl_assign_stmt(AST**_root)$/
+rtl_assignment_statement	../v2nl/verilog.c	/^rtl_assignment_statement(AST**_root)$/
+rtl_begin_name	../v2nl/verilog.c	/^rtl_begin_name(AST**_root)$/
+rtl_case_item	../v2nl/verilog.c	/^rtl_case_item(AST**_root)$/
+rtl_case_pragma	../v2nl/verilog.c	/^rtl_case_pragma(AST**_root)$/
+rtl_case_pragma_list	../v2nl/verilog.c	/^rtl_case_pragma_list(AST**_root)$/
+rtl_case_statement	../v2nl/verilog.c	/^rtl_case_statement(AST**_root)$/
+rtl_concat_expr	../v2nl/verilog.c	/^rtl_concat_expr(AST**_root)$/
+rtl_constant	../v2nl/verilog.c	/^rtl_constant(AST**_root)$/
+rtl_cont_assignment	../v2nl/verilog.c	/^rtl_cont_assignment(AST**_root)$/
+rtl_decl	../v2nl/verilog.c	/^rtl_decl(AST**_root, nl_subprogram subr )$/
+rtl_decl_assignment	../v2nl/verilog.c	/^rtl_decl_assignment(AST**_root, char *name )$/
+rtl_decls	../v2nl/verilog.c	/^rtl_decls(AST**_root, nl_subprogram subr )$/
+rtl_delay	../v2nl/verilog.c	/^rtl_delay(AST**_root)$/
+rtl_expr	../v2nl/verilog.c	/^rtl_expr(AST**_root)$/
+rtl_expr0	../v2nl/verilog.c	/^rtl_expr0(AST**_root)$/
+rtl_expr1	../v2nl/verilog.c	/^rtl_expr1(AST**_root)$/
+rtl_expr10	../v2nl/verilog.c	/^rtl_expr10(AST**_root)$/
+rtl_expr11	../v2nl/verilog.c	/^rtl_expr11(AST**_root)$/
+rtl_expr2	../v2nl/verilog.c	/^rtl_expr2(AST**_root)$/
+rtl_expr3	../v2nl/verilog.c	/^rtl_expr3(AST**_root)$/
+rtl_expr4	../v2nl/verilog.c	/^rtl_expr4(AST**_root)$/
+rtl_expr5	../v2nl/verilog.c	/^rtl_expr5(AST**_root)$/
+rtl_expr6	../v2nl/verilog.c	/^rtl_expr6(AST**_root)$/
+rtl_expr7	../v2nl/verilog.c	/^rtl_expr7(AST**_root)$/
+rtl_expr8	../v2nl/verilog.c	/^rtl_expr8(AST**_root)$/
+rtl_expr9	../v2nl/verilog.c	/^rtl_expr9(AST**_root)$/
+rtl_expr_list	../v2nl/verilog.c	/^rtl_expr_list(AST**_root)$/
+rtl_for_assignment	../v2nl/verilog.c	/^rtl_for_assignment(AST**_root)$/
+rtl_for_statement	../v2nl/verilog.c	/^rtl_for_statement(AST**_root)$/
+rtl_function	../v2nl/verilog.c	/^rtl_function(AST**_root)$/
+rtl_function_call	../v2nl/verilog.c	/^rtl_function_call(AST**_root)$/
+rtl_function_pragma	../v2nl/verilog.c	/^rtl_function_pragma(AST**_root)$/
+rtl_function_pragmas	../v2nl/verilog.c	/^rtl_function_pragmas(AST**_root)$/
+rtl_id_decl	../v2nl/verilog.c	/^rtl_id_decl(AST**_root, nl_subprogram subr, nl_wir/
+rtl_id_list	../v2nl/verilog.c	/^rtl_id_list(AST**_root, nl_subprogram subr, nl_wir/
+rtl_if_statement	../v2nl/verilog.c	/^rtl_if_statement(AST**_root)$/
+rtl_integer	../v2nl/verilog.c	/^rtl_integer(AST**_root)$/
+rtl_integer_expr	../v2nl/verilog.c	/^rtl_integer_expr(AST**_root)$/
+rtl_lvalue	../v2nl/verilog.c	/^rtl_lvalue(AST**_root)$/
+rtl_lvalue_concat	../v2nl/verilog.c	/^rtl_lvalue_concat(AST**_root)$/
+rtl_lvalue_list	../v2nl/verilog.c	/^rtl_lvalue_list(AST**_root)$/
+rtl_named_inst_port	../v2nl/verilog.c	/^rtl_named_inst_port(AST**_root, nl_cell cell )$/
+rtl_process	../v2nl/verilog.c	/^rtl_process(AST**_root)$/
+rtl_range	../v2nl/verilog.c	/^rtl_range(AST**_root)$/
+rtl_sens_item	../v2nl/verilog.c	/^rtl_sens_item(AST**_root)$/
+rtl_sens_items	../v2nl/verilog.c	/^rtl_sens_items(AST**_root)$/
+rtl_sens_list	../v2nl/verilog.c	/^rtl_sens_list(AST**_root)$/
+rtl_seq_statement	../v2nl/verilog.c	/^rtl_seq_statement(AST**_root)$/
+rtl_seq_statement_or_null	../v2nl/verilog.c	/^rtl_seq_statement_or_null(AST**_root)$/
+rtl_task_enable	../v2nl/verilog.c	/^rtl_task_enable(AST**_root)$/
+rtl_variable	../v2nl/verilog.c	/^rtl_variable(AST**_root)$/
+rtl_variable_ref	../v2nl/verilog.c	/^rtl_variable_ref(AST**_root)$/
+rtl_wire_class	../v2nl/verilog.c	/^rtl_wire_class(AST**_root)$/
+semi	../snps-lib/lib.c	/^semi(AST**_root)$/
+set_cell_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand set_cell_attribute/
+set_cell_location	../ui/ui_cmd_physical.ee	/^#(defcommand set_cell_location/
+set_cell_loctype	../ui/ui_cmd_physical.ee	/^#(defcommand set_cell_loctype/
+set_cell_orientation	../ui/ui_cmd_physical.ee	/^#(defcommand set_cell_orientation/
+set_design_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand set_design_attribute/
+set_design_size	../pat/pat_loc.ee	/^#(defcommand set_design_size/
+set_die_area	../ui/ui_cmd_physical.ee	/^#(defcommand set_die_area/
+set_distance_units	../ui/ui_cmd_physical.ee	/^#(defcommand set_distance_units/
+set_libcell	../ui/ui_cmd_basic.ee	/^#(defcommand set_libcell/
+set_net_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand set_net_attribute/
+set_net_pattern	../ui/ui_cmd_physical.ee	/^#(defcommand set_net_pattern/
+set_net_use	../ui/ui_cmd_physical.ee	/^#(defcommand set_net_use/
+set_port_attribute	../ui/ui_cmd_basic.ee	/^#(defcommand set_port_attribute/
+set_port_geometry	../ui/ui_cmd_physical.ee	/^#(defcommand set_port_geometry/
+set_port_location	../ui/ui_cmd_physical.ee	/^#(defcommand set_port_location/
+set_port_loctype	../ui/ui_cmd_physical.ee	/^#(defcommand set_port_loctype/
+set_port_orientation	../ui/ui_cmd_physical.ee	/^#(defcommand set_port_orientation/
+set_port_use	../ui/ui_cmd_physical.ee	/^#(defcommand set_port_use/
+set_reference	../ui/ui_cmd_misc.ee	/^#(defcommand set_reference/
+set_special	../ui/ui_cmd_physical.ee	/^#(defcommand set_special/
+sl_add	../utility/skip-list.c	/^sl_add( skip_list sl, unsigned int key, void *data/
+sl_create	../utility/skip-list.c	/^sl_create( void )$/
+sl_diagram	../utility/skip-list.c	/^sl_diagram( skip_list sl )$/
+sl_exchange	../utility/skip-list.c	/^sl_exchange( skip_list sl, unsigned int key, void /
+sl_extract	../utility/skip-list.c	/^sl_extract( skip_list sl, unsigned int key, void */
+sl_find	../utility/skip-list.c	/^sl_find( skip_list sl, unsigned int key)$/
+sl_first_node	../utility/skip-list.c	/^sl_first_node (skip_list sl)$/
+sl_for_all_entries	../include/skip-list.h	/^#define sl_for_all_entries(sl, key_var, data_type,/
+sl_free	../utility/skip-list.c	/^sl_free( skip_list sl )$/
+sl_get	../utility/skip-list.c	/^sl_get( skip_list sl, unsigned int key, void **dat/
+sl_insert	../utility/skip-list.c	/^sl_insert( skip_list sl, unsigned int key, void *d/
+sl_intern	../utility/skip-list.c	/^sl_intern( skip_list sl, unsigned int key, void **/
+sl_member	../utility/skip-list.c	/^sl_member( skip_list sl, unsigned int key )$/
+sl_next_node	../utility/skip-list.c	/^sl_next_node (sl_node n)$/
+sl_node_create	../utility/skip-list.c	/^sl_node_create( int level, unsigned int key, void /
+sl_node_key_data	../utility/skip-list.c	/^sl_node_key_data (sl_node sln, unsigned int *key_p/
+sl_op	../utility/skip-list.c	/^sl_op( skip_list sl, unsigned int key, void **data/
+sl_print	../utility/skip-list.c	/^sl_print( skip_list sl )$/
+sl_put	../utility/skip-list.c	/^sl_put( skip_list sl, unsigned int key, void **dat/
+sl_random_level	../utility/skip-list.c	/^sl_random_level( int current_max )$/
+sl_remove	../utility/skip-list.c	/^sl_remove( skip_list sl, unsigned int key )$/
+sl_toggle	../utility/skip-list.c	/^sl_toggle( skip_list sl, unsigned int key, void *d/
+specialnets	../def2pnl/def.c	/^specialnets(void)$/
+ssa_bind	../ssa/ssa.c	/^ssa_bind (ssa_context context, void *var, ssa_bind/
+ssa_binding_create	../ssa/ssa.c	/^ssa_binding_create (ssa_context context, void *var/
+ssa_binding_current_value	../ssa/ssa.c	/^ssa_binding_current_value (ssa_binding binding)$/
+ssa_binding_free	../ssa/ssa.c	/^ssa_binding_free (ssa_binding binding)$/
+ssa_binding_future_value	../ssa/ssa.c	/^ssa_binding_future_value (ssa_binding binding)$/
+ssa_binding_var	../ssa/ssa.c	/^ssa_binding_var (ssa_binding binding)$/
+ssa_context_bindings	../ssa/ssa.c	/^ssa_context_bindings (ssa_context context)$/
+ssa_context_branch	../ssa/ssa.c	/^ssa_context_branch (ssa_context context)$/
+ssa_context_clear_children	../ssa/ssa.c	/^ssa_context_clear_children (ssa_context context)$/
+ssa_context_create	../ssa/ssa.c	/^ssa_context_create (ssa_context up, ssa_context pr/
+ssa_context_first_child	../ssa/ssa.c	/^ssa_context_first_child (ssa_context context)$/
+ssa_context_for_all_children	../include/ssa.h	/^#define ssa_context_for_all_children(context, var)/
+ssa_context_free	../ssa/ssa.c	/^ssa_context_free (ssa_context context)$/
+ssa_context_next	../ssa/ssa.c	/^ssa_context_next (ssa_context context)$/
+ssa_context_up	../ssa/ssa.c	/^ssa_context_up (ssa_context context)$/
+ssa_define	../ssa/ssa.c	/^ssa_define (ssa_context context, void *var, ssa_va/
+ssa_define_future	../ssa/ssa.c	/^ssa_define_future (ssa_context context, void *var,/
+ssa_global_create	../ssa/ssa.c	/^ssa_global_create (ssa_var_get_fun get_fun, ssa_va/
+ssa_global_free	../ssa/ssa.c	/^ssa_global_free (ssa_global global)$/
+ssa_lookup	../ssa/ssa.c	/^ssa_lookup (ssa_context context, void *var)$/
+ssa_read	../ssa/ssa.c	/^ssa_read (ssa_context context, void *var)$/
+ssa_read_final	../ssa/ssa.c	/^ssa_read_final (ssa_context context, void *var)$/
+ssa_read_future	../ssa/ssa.c	/^ssa_read_future (ssa_context context, void *var)$/
+ssa_string_var_get	../ssa/ssa.c	/^ssa_string_var_get (void *var, void *ptr)$/
+ssa_string_var_set	../ssa/ssa.c	/^ssa_string_var_set (void *var, ssa_binding binding/
+ssa_unbind	../ssa/ssa.c	/^ssa_unbind (ssa_context context, void *var)$/
+ssa_value_create	../ssa/ssa.c	/^ssa_value_create (ssa_value_kind kind, char *name,/
+statement	../lef2pnl/lef.c	/^statement( pnl_library plibrary )$/
+statetable	../snps-lib/lib.c	/^statetable(AST**_root)$/
+statetable_statement	../snps-lib/lib.c	/^statetable_statement(AST**_root)$/
+str_append	../utility/str.c	/^str_append (char *str1, ...)$/
+str_concat	../utility/str.c	/^str_concat (str_buf buf, ...)$/
+str_concat_begin	../utility/str.c	/^str_concat_begin (void)$/
+str_concat_end	../utility/str.c	/^str_concat_end (str_buf buf)$/
+str_match	../utility/str.c	/^str_match (char *substring, char *str, char escape/
+str_remove_escape	../utility/str.c	/^str_remove_escape (char *str, char escape)$/
+str_tolower	../utility/str.c	/^str_tolower (char *str)$/
+str_toupper	../utility/str.c	/^str_toupper (char *str)$/
+strength0	../v2nl/verilog.c	/^strength0(AST**_root)$/
+strength1	../v2nl/verilog.c	/^strength1(AST**_root)$/
+string_list	../snps-lib/lib.c	/^string_list(AST**_root)$/
+tcl_init	../tcl/tcl_init.c	/^tcl_init (Tcl_Interp *interp)$/
+test_cell	../snps-lib/lib.c	/^test_cell(AST**_root)$/
+timing	../snps-lib/lib.c	/^timing(AST**_root)$/
+timing_range	../snps-lib/lib.c	/^timing_range(AST**_root)$/
+timing_range_statement	../snps-lib/lib.c	/^timing_range_statement(AST**_root)$/
+timing_statement	../snps-lib/lib.c	/^timing_statement(AST**_root)$/
+timing_type	../snps-lib/lib.c	/^timing_type(AST**_root)$/
+tracks_decl	../def2pnl/def.c	/^tracks_decl(void)$/
+ui_alias_init	../ui/ui_app.c	/^ui_alias_init (Tcl_Interp *interp, char *prefix, v/
+ui_app_init	../ui/ui_app.c	/^ui_app_init (Tcl_Interp *interp, char *prefix, voi/
+ui_cmd_append_object_list	../ui/ui_cmd_util.c	/^ui_cmd_append_object_list (Tcl_Interp *interp, Tcl/
+ui_cmd_append_result_walker	../ui/ui_cmd_util.c	/^ui_cmd_append_result_walker (nl_object nl_obj, voi/
+ui_cmd_free_attribute	../ui/ui_cmd_basic.c	/^ui_cmd_free_attribute (void *ptr)$/
+ui_cmd_getopt	../ui/ui_tcl.c	/^ui_cmd_getopt (ClientData client_data, Tcl_Interp /
+ui_cmd_getopt_build_tables	../ui/ui_tcl.c	/^ui_cmd_getopt_build_tables (Tcl_Interp *interp, Tc/
+ui_cmd_object_list_result	../ui/ui_cmd_util.c	/^ui_cmd_object_list_result (Tcl_Interp *interp, ar /
+ui_cmd_object_result	../ui/ui_cmd_util.c	/^ui_cmd_object_result (Tcl_Interp *interp, nl_objec/
+ui_cmd_register	../ui/ui_cmd_util.c	/^ui_cmd_register (Tcl_Interp *interp, char *name, c/
+ui_cmd_register_basic_commands	../ui/ui_cmd_basic.c	/^ui_cmd_register_basic_commands (Tcl_Interp *interp/
+ui_cmd_register_commands	../ui/ui_cmd_util.c	/^ui_cmd_register_commands (Tcl_Interp *interp, char/
+ui_cmd_register_synthesis_commands	../ui/ui_cmd_synthesis.c	/^ui_cmd_register_synthesis_commands (Tcl_Interp *in/
+ui_cmd_sort_commands	../ui/ui_cmd_util.c	/^ui_cmd_sort_commands (void)$/
+ui_compare_procedure	../ui/ui_procedure.c	/^ui_compare_procedure (void *ptr1, void *ptr2)$/
+ui_copy_procedure	../ui/ui_procedure.c	/^ui_copy_procedure (void *ptr)$/
+ui_find_iobject	../ui/ui_find.c	/^ui_find_iobject (Tcl_Interp *interp, char *path, c/
+ui_find_iobject_in_design	../ui/ui_find.c	/^ui_find_iobject_in_design (nl_idesign idesign, nl_/
+ui_find_iobject_path	../ui/ui_find.c	/^ui_find_iobject_path (Tcl_Interp *interp, ar path,/
+ui_find_iobjects_in_design	../ui/ui_find.c	/^ui_find_iobjects_in_design (Tcl_Interp *interp, nl/
+ui_find_iobjects_in_dll	../ui/ui_find.c	/^ui_find_iobjects_in_dll (Tcl_Interp *interp, char /
+ui_find_object_in_context	../ui/ui_find.c	/^ui_find_object_in_context (nl_context context, nl_/
+ui_find_object_in_design	../ui/ui_find.c	/^ui_find_object_in_design (nl_design design, nl_kin/
+ui_find_object_in_libcell	../ui/ui_find.c	/^ui_find_object_in_libcell (nl_libcell libcell, nl_/
+ui_find_object_in_library	../ui/ui_find.c	/^ui_find_object_in_library (nl_library library, nl_/
+ui_find_object_path	../ui/ui_find.c	/^ui_find_object_path (Tcl_Interp *interp, nl_contex/
+ui_find_objects_in_context	../ui/ui_find.c	/^ui_find_objects_in_context (Tcl_Interp *interp, nl/
+ui_find_objects_in_design	../ui/ui_find.c	/^ui_find_objects_in_design (Tcl_Interp *interp, nl_/
+ui_find_objects_in_dll	../ui/ui_find.c	/^ui_find_objects_in_dll (Tcl_Interp *interp, char */
+ui_find_objects_in_libcell	../ui/ui_find.c	/^ui_find_objects_in_libcell (Tcl_Interp *interp, nl/
+ui_find_objects_in_library	../ui/ui_find.c	/^ui_find_objects_in_library (Tcl_Interp *interp, nl/
+ui_find_path	../ui/ui_find.c	/^ui_find_path (Tcl_Interp *interp, nl_context conte/
+ui_find_path_array	../ui/ui_find.c	/^ui_find_path_array (Tcl_Interp *interp, nl_context/
+ui_find_path_array_i	../ui/ui_find.c	/^ui_find_path_array_i (Tcl_Interp *interp, ar path,/
+ui_free_procedure	../ui/ui_procedure.c	/^ui_free_procedure (void *ptr)$/
+ui_get_current_design	../ui/ui_getopt.c	/^ui_get_current_design (nl_context context)$/
+ui_get_current_idesign	../ui/ui_getopt.c	/^ui_get_current_idesign (nl_context context)$/
+ui_get_idesign_for_path	../ui/ui_cmd_util.c	/^ui_get_idesign_for_path (ar path, nl_context conte/
+ui_get_or_create_getopt_tables	../ui/ui_tcl.c	/^ui_get_or_create_getopt_tables (char *proc_name, T/
+ui_get_tcl_fd	../ui/ui_getopt.c	/^ui_get_tcl_fd (char *str, int *fd_p)$/
+ui_getopt	../ui/ui_getopt.c	/^ui_getopt (nl_context context, struct ui_option *o/
+ui_hash_procedure	../ui/ui_procedure.c	/^ui_hash_procedure (void *ptr)$/
+ui_iobject_to_object_kind	../ui/ui_getopt.c	/^ui_iobject_to_object_kind (nl_kind kind)$/
+ui_is_glob	../ui/ui_find.c	/^ui_is_glob (char *str)$/
+ui_is_regexp	../ui/ui_find.c	/^ui_is_regexp (char *str)$/
+ui_obj_create	../ui/ui_obj.c	/^ui_obj_create (nl_object nl_obj, ar path)$/
+ui_obj_dup	../ui/ui_obj.c	/^ui_obj_dup (Tcl_Obj *src, Tcl_Obj *dest)$/
+ui_obj_escape_hierarchy_separator	../ui/ui_obj.c	/^ui_obj_escape_hierarchy_separator (char *name)$/
+ui_obj_format_icell_path	../ui/ui_obj.c	/^ui_obj_format_icell_path (char **str_p, nl_icell i/
+ui_obj_format_inet_path	../ui/ui_obj.c	/^ui_obj_format_inet_path (char **str_p, nl_inet ine/
+ui_obj_format_ipin_path	../ui/ui_obj.c	/^ui_obj_format_ipin_path (char **str_p, nl_ipin ipi/
+ui_obj_format_iport_path	../ui/ui_obj.c	/^ui_obj_format_iport_path (char **str_p, nl_iport i/
+ui_obj_format_libcell_path	../ui/ui_obj.c	/^ui_obj_format_libcell_path (char **str_p, nl_libce/
+ui_obj_format_libpin_path	../ui/ui_obj.c	/^ui_obj_format_libpin_path (char **str_p, nl_libpin/
+ui_obj_format_library_path	../ui/ui_obj.c	/^ui_obj_format_library_path (char **str_p, nl_libra/
+ui_obj_format_path	../ui/ui_obj.c	/^ui_obj_format_path (char **result_p, int *len_p, a/
+ui_obj_format_pin_path	../ui/ui_obj.c	/^ui_obj_format_pin_path (Tcl_Obj *tcl_obj, ar path,/
+ui_obj_free	../ui/ui_obj.c	/^ui_obj_free (Tcl_Obj *obj)$/
+ui_obj_get_nl_object	../ui/ui_obj.c	/^ui_obj_get_nl_object (Tcl_Obj *obj)$/
+ui_obj_get_nl_path	../ui/ui_obj.c	/^ui_obj_get_nl_path (Tcl_Obj *obj)$/
+ui_obj_get_type	../ui/ui_obj.c	/^ui_obj_get_type (void)$/
+ui_obj_register_type	../ui/ui_obj.c	/^ui_obj_register_type (void)$/
+ui_obj_set_from_any	../ui/ui_obj.c	/^ui_obj_set_from_any (Tcl_Interp *interp, Tcl_Obj */
+ui_obj_update_string	../ui/ui_obj.c	/^ui_obj_update_string (Tcl_Obj *tcl_obj)$/
+ui_object_to_iobject_kind	../ui/ui_getopt.c	/^ui_object_to_iobject_kind (nl_kind kind)$/
+ui_opt_type_string	../ui/ui_getopt.c	/^ui_opt_type_string (enum ui_arg_type type)$/
+ui_path_to_iobject	../ui/ui_find.c	/^ui_path_to_iobject (ar path, nl_idesign top_idesig/
+ui_procedure_create	../ui/ui_procedure.c	/^ui_procedure_create (Tcl_Interp *interp, Tcl_Obj */
+ui_procedure_dup	../ui/ui_procedure.c	/^ui_procedure_dup (Tcl_Obj *src, Tcl_Obj *dest)$/
+ui_procedure_free	../ui/ui_procedure.c	/^ui_procedure_free (Tcl_Obj *obj)$/
+ui_procedure_free_tcl_obj	../ui/ui_procedure.c	/^ui_procedure_free_tcl_obj (void *ptr)$/
+ui_procedure_register_type	../ui/ui_procedure.c	/^ui_procedure_register_type (void)$/
+ui_procedure_set_from_any	../ui/ui_procedure.c	/^ui_procedure_set_from_any (Tcl_Interp *interp, Tcl/
+ui_procedure_update_string	../ui/ui_procedure.c	/^ui_procedure_update_string (Tcl_Obj *tcl_obj)$/
+ui_return_help	../ui/ui_getopt.c	/^ui_return_help (Tcl_Interp *interp, Tcl_Obj *cmd, /
+ui_set_current_design	../ui/ui_getopt.c	/^ui_set_current_design (Tcl_Interp *interp, nl_cont/
+ui_set_string_variable	../ui/ui_app.c	/^ui_set_string_variable (char **var_p, char *val)$/
+ui_string_to_arg_type	../ui/ui_tcl.c	/^ui_string_to_arg_type (Tcl_Interp *interp, char *s/
+ui_tcl_register_commands	../ui/ui_tcl.c	/^ui_tcl_register_commands (Tcl_Interp *interp, char/
+ui_tokenize_hierarchy_path	../ui/ui_find.c	/^ui_tokenize_hierarchy_path (char *path, char **str/
+ui_translate_argument	../ui/ui_getopt.c	/^ui_translate_argument (Tcl_Interp *interp, nl_cont/
+ui_translate_attr_arg	../ui/ui_getopt.c	/^ui_translate_attr_arg (Tcl_Interp *interp, Tcl_Obj/
+ui_translate_bus_arg	../ui/ui_getopt.c	/^ui_translate_bus_arg (Tcl_Interp *interp, Tcl_Obj /
+ui_translate_cell_arg	../ui/ui_getopt.c	/^ui_translate_cell_arg (Tcl_Interp *interp, Tcl_Obj/
+ui_translate_cell_list_arg	../ui/ui_getopt.c	/^ui_translate_cell_list_arg (Tcl_Obj *arg, nl_conte/
+ui_translate_cell_or_icell_arg	../ui/ui_getopt.c	/^ui_translate_cell_or_icell_arg (Tcl_Interp *interp/
+ui_translate_cell_or_port_arg	../ui/ui_getopt.c	/^ui_translate_cell_or_port_arg (Tcl_Interp *interp,/
+ui_translate_cell_port_icell_or_iport_arg	../ui/ui_getopt.c	/^ui_translate_cell_port_icell_or_iport_arg (Tcl_Int/
+ui_translate_channel_arg	../ui/ui_getopt.c	/^ui_translate_channel_arg (Tcl_Interp *interp, Tcl_/
+ui_translate_design_arg	../ui/ui_getopt.c	/^ui_translate_design_arg (Tcl_Interp *interp, Tcl_O/
+ui_translate_file_arg	../ui/ui_getopt.c	/^ui_translate_file_arg (Tcl_Obj *arg, char *access,/
+ui_translate_icell_arg	../ui/ui_getopt.c	/^ui_translate_icell_arg (Tcl_Interp *interp, Tcl_Ob/
+ui_translate_idesign_arg	../ui/ui_getopt.c	/^ui_translate_idesign_arg (Tcl_Interp *interp, Tcl_/
+ui_translate_inet_arg	../ui/ui_getopt.c	/^ui_translate_inet_arg (Tcl_Interp *interp, Tcl_Obj/
+ui_translate_integer_arg	../ui/ui_getopt.c	/^ui_translate_integer_arg (Tcl_Obj *arg, int *val)$/
+ui_translate_integer_list_arg	../ui/ui_getopt.c	/^ui_translate_integer_list_arg (Tcl_Obj *arg, nl_co/
+ui_translate_iobject_arg	../ui/ui_getopt.c	/^ui_translate_iobject_arg (Tcl_Interp *interp, Tcl_/
+ui_translate_ipin_arg	../ui/ui_getopt.c	/^ui_translate_ipin_arg (Tcl_Interp *interp, Tcl_Obj/
+ui_translate_iport_arg	../ui/ui_getopt.c	/^ui_translate_iport_arg (Tcl_Interp *interp, Tcl_Ob/
+ui_translate_libcell_arg	../ui/ui_getopt.c	/^ui_translate_libcell_arg (Tcl_Interp *interp, Tcl_/
+ui_translate_libpin_arg	../ui/ui_getopt.c	/^ui_translate_libpin_arg (Tcl_Interp *interp, Tcl_O/
+ui_translate_library_arg	../ui/ui_getopt.c	/^ui_translate_library_arg (Tcl_Interp *interp, Tcl_/
+ui_translate_net_arg	../ui/ui_getopt.c	/^ui_translate_net_arg (Tcl_Interp *interp, Tcl_Obj /
+ui_translate_net_or_inet_arg	../ui/ui_getopt.c	/^ui_translate_net_or_inet_arg (Tcl_Interp *interp, /
+ui_translate_object_arg	../ui/ui_getopt.c	/^ui_translate_object_arg (Tcl_Interp *interp, Tcl_O/
+ui_translate_object_or_iobject_arg	../ui/ui_getopt.c	/^ui_translate_object_or_iobject_arg (Tcl_Interp *in/
+ui_translate_path	../ui/ui_getopt.c	/^ui_translate_path (Tcl_Interp *interp, char *patte/
+ui_translate_pdesign_arg	../ui/ui_getopt.c	/^ui_translate_pdesign_arg (Tcl_Interp *interp, Tcl_/
+ui_translate_pin_arg	../ui/ui_getopt.c	/^ui_translate_pin_arg (Tcl_Interp *interp, Tcl_Obj /
+ui_translate_pin_or_ipin_arg	../ui/ui_getopt.c	/^ui_translate_pin_or_ipin_arg (Tcl_Interp *interp, /
+ui_translate_port_arg	../ui/ui_getopt.c	/^ui_translate_port_arg (Tcl_Interp *interp, Tcl_Obj/
+ui_translate_port_or_iport_arg	../ui/ui_getopt.c	/^ui_translate_port_or_iport_arg (Tcl_Interp *interp/
+ui_translate_reference_arg	../ui/ui_getopt.c	/^ui_translate_reference_arg (Tcl_Interp *interp, Tc/
+ui_translate_refpin_arg	../ui/ui_getopt.c	/^ui_translate_refpin_arg (Tcl_Interp *interp, Tcl_O/
+ui_translate_string_arg	../ui/ui_getopt.c	/^ui_translate_string_arg (Tcl_Obj *arg, char **val)/
+ui_translate_string_list_arg	../ui/ui_getopt.c	/^ui_translate_string_list_arg (Tcl_Obj *arg, nl_con/
+ui_translate_type_arg	../ui/ui_getopt.c	/^ui_translate_type_arg (Tcl_Interp *interp, Tcl_Obj/
+ui_update_current_design	../ui/ui_getopt.c	/^ui_update_current_design (ClientData data, Tcl_Int/
+ui_usage	../ui/ui_getopt.c	/^ui_usage (Tcl_Obj *cmd, struct ui_option *opts, st/
+ui_usage_string	../ui/ui_getopt.c	/^ui_usage_string (Tcl_Obj *cmd, struct ui_option *o/
+ui_wrong_arg_type_error	../ui/ui_getopt.c	/^static void ui_wrong_arg_type_error (const char *,/
+ungroup	../ui/ui_cmd_misc.ee	/^#(defcommand ungroup/
+units	../lef2pnl/lef.c	/^units(void)$/
+units_decl	../def2pnl/def.c	/^units_decl(void)$/
+unparse_append_to_buffer	../utility/unparse.c	/^unparse_append_to_buffer (unparse_fp ufp, char *st/
+unparse_close	../utility/unparse.c	/^unparse_close (unparse_fp ufp)$/
+unparse_column	../utility/unparse.c	/^unparse_column (unparse_fp ufp)$/
+unparse_double	../utility/unparse.c	/^unparse_double (unparse_fp ufp, double d, int spac/
+unparse_float	../utility/unparse.c	/^unparse_float (unparse_fp ufp, float f, int space_/
+unparse_flush	../utility/unparse.c	/^unparse_flush (unparse_fp ufp)$/
+unparse_flush_buffer	../utility/unparse.c	/^unparse_flush_buffer (unparse_fp ufp, int force_ne/
+unparse_indent	../utility/unparse.c	/^unparse_indent (unparse_fp ufp)$/
+unparse_int	../utility/unparse.c	/^unparse_int (unparse_fp ufp, int x, int space_befo/
+unparse_line_limit	../utility/unparse.c	/^unparse_line_limit (unparse_fp ufp)$/
+unparse_newline	../utility/unparse.c	/^unparse_newline (unparse_fp ufp)$/
+unparse_open	../utility/unparse.c	/^unparse_open (FILE *fp)$/
+unparse_set_indent	../utility/unparse.c	/^unparse_set_indent (unparse_fp ufp, int indent)$/
+unparse_set_line_limit	../utility/unparse.c	/^unparse_set_line_limit (unparse_fp ufp, int n)$/
+unparse_space	../utility/unparse.c	/^unparse_space (unparse_fp ufp, int n)$/
+unparse_token	../utility/unparse.c	/^unparse_token (unparse_fp ufp, char *str, int spac/
+unset_libcell	../ui/ui_cmd_basic.ee	/^#(defcommand unset_libcell/
+use	../lef2pnl/lef.c	/^use(void)$/
+use_clause	../def2pnl/def.c	/^use_clause(void)$/
+v2nl_add_function_body	../v2nl/v2nl_ast.c	/^v2nl_add_function_body (nl_subprogram subr, nl_ast/
+v2nl_add_function_pragmas	../v2nl/v2nl_ast.c	/^v2nl_add_function_pragmas (nl_subprogram subr, nl_/
+v2nl_apply_rewrites	../v2nl/v2nl_ast.c	/^v2nl_apply_rewrites (nl_ast tree, nl_subprogram su/
+v2nl_array	../v2nl/v2nl.c	/^v2nl_array (int lb, int rb)$/
+v2nl_assign	../v2nl/v2nl.c	/^v2nl_assign (ar lhs, ar rhs, Attrib *attr)$/
+v2nl_ast_error	../v2nl/v2nl_error.c	/^v2nl_ast_error (nl_ast node, const char *format, ./
+v2nl_ast_get_input_index	../v2nl/v2nl_ast.c	/^v2nl_ast_get_input_index (ssa_context context, nl_/
+v2nl_ast_warning	../v2nl/v2nl_error.c	/^v2nl_ast_warning (nl_ast node, const char *format,/
+v2nl_begin_boolean_attribute	../v2nl/v2nl.c	/^v2nl_begin_boolean_attribute (char *name)$/
+v2nl_begin_integer_attribute	../v2nl/v2nl.c	/^v2nl_begin_integer_attribute (char *name, int valu/
+v2nl_begin_string_attribute	../v2nl/v2nl.c	/^v2nl_begin_string_attribute (char *name, char *val/
+v2nl_build_concat_ast_for_bus	../v2nl/v2nl_ast.c	/^v2nl_build_concat_ast_for_bus (nl_bus bus, int lef/
+v2nl_build_concat_ast_for_sym	../v2nl/v2nl_ast.c	/^v2nl_build_concat_ast_for_sym (nl_symbol sym, int /
+v2nl_build_expression_cell	../v2nl/v2nl_ast.c	/^v2nl_build_expression_cell (ar inputs, ar outputs,/
+v2nl_cell	../v2nl/v2nl.c	/^v2nl_cell (nl_reference reference, Attrib *name)$/
+v2nl_check_cell_net_port_name	../v2nl/v2nl.c	/^v2nl_check_cell_net_port_name (char *name)$/
+v2nl_check_refpins	../v2nl/v2nl.c	/^v2nl_check_refpins (nl_reference ref, char *name, /
+v2nl_collect_inputs	../v2nl/v2nl_ast.c	/^v2nl_collect_inputs (nl_ast tree, ar inputs)$/
+v2nl_collect_ios	../v2nl/v2nl_ast.c	/^v2nl_collect_ios (nl_ast tree, ar inputs, ar outpu/
+v2nl_collect_ios_walker	../v2nl/v2nl_ast.c	/^v2nl_collect_ios_walker (nl_ast *tree_p, void *ptr/
+v2nl_collect_nets	../v2nl/v2nl_ast.c	/^v2nl_collect_nets (nl_ast root, nl_net_attr net_at/
+v2nl_cr_ast	../v2nl/v2nl_ast.c	/^v2nl_cr_ast (nl_ast tree, Attrib *attr, int token)/
+v2nl_create_function	../v2nl/v2nl_ast.c	/^v2nl_create_function (char *name, nl_type type)$/
+v2nl_create_indexed_port	../v2nl/v2nl.c	/^v2nl_create_indexed_port (char *name, int index, n/
+v2nl_create_ports	../v2nl/v2nl.c	/^v2nl_create_ports (void)$/
+v2nl_create_process	../v2nl/v2nl_ast.c	/^v2nl_create_process (nl_ast tree)$/
+v2nl_declare_net	../v2nl/v2nl.c	/^v2nl_declare_net (char *name, nl_wireclass class)$/
+v2nl_declare_port	../v2nl/v2nl.c	/^v2nl_declare_port (char *name, nl_direction direct/
+v2nl_declare_refpins	../v2nl/v2nl.c	/^v2nl_declare_refpins (nl_reference ref, char *name/
+v2nl_declare_rtl_var	../v2nl/v2nl.c	/^v2nl_declare_rtl_var (nl_subprogram subr, nl_wirec/
+v2nl_declare_supply0	../v2nl/v2nl.c	/^v2nl_declare_supply0 (nl_object net_or_bus)$/
+v2nl_declare_supply1	../v2nl/v2nl.c	/^v2nl_declare_supply1 (nl_object net_or_bus)$/
+v2nl_define_macro	../v2nl/v2nl_lex.c	/^v2nl_define_macro (char *name, char *text, int har/
+v2nl_do_else	../v2nl/v2nl_lex.c	/^v2nl_do_else (char *text)$/
+v2nl_do_endif	../v2nl/v2nl_lex.c	/^v2nl_do_endif (char *text)$/
+v2nl_do_ifdef	../v2nl/v2nl_lex.c	/^v2nl_do_ifdef (char *text)$/
+v2nl_do_include_file	../v2nl/v2nl_lex.c	/^v2nl_do_include_file (char *text)$/
+v2nl_do_macro_definition	../v2nl/v2nl_lex.c	/^v2nl_do_macro_definition (char *text)$/
+v2nl_do_macro_expansion	../v2nl/v2nl_lex.c	/^v2nl_do_macro_expansion (char *text)$/
+v2nl_do_macro_undef	../v2nl/v2nl_lex.c	/^v2nl_do_macro_undef (char *text)$/
+v2nl_do_rtl_assign	../v2nl/v2nl_ast.c	/^v2nl_do_rtl_assign (ar lhs, nl_ast rhs_ast, Attrib/
+v2nl_else	../v2nl/v2nl_lex.c	/^v2nl_else (void)$/
+v2nl_end_attribute	../v2nl/v2nl.c	/^v2nl_end_attribute (char *name)$/
+v2nl_endif	../v2nl/v2nl_lex.c	/^v2nl_endif (void)$/
+v2nl_endmod	../v2nl/v2nl.c	/^v2nl_endmod (void)$/
+v2nl_error	../v2nl/v2nl_error.c	/^v2nl_error (const char *format, ...)$/
+v2nl_eval	../v2nl/v2nl_ast.c	/^v2nl_eval (nl_ast tree, int *val_p)$/
+v2nl_eval_expr	../v2nl/v2nl_ast.c	/^v2nl_eval_expr (nl_ast tree, int *val_p)$/
+v2nl_eval_integer_expr	../v2nl/v2nl_ast.c	/^v2nl_eval_integer_expr (nl_ast tree)$/
+v2nl_expand_macro	../v2nl/v2nl_lex.c	/^v2nl_expand_macro (char *name)$/
+v2nl_expr_to_nets	../v2nl/v2nl_ast.c	/^v2nl_expr_to_nets (void *ptr)$/
+v2nl_expression	../v2nl/v2nl_ast.c	/^v2nl_expression (ar outputs, nl_ast tree, char *fi/
+v2nl_failed_predicate	../v2nl/v2nl_error.c	/^v2nl_failed_predicate (char *text)$/
+v2nl_fill_refpin_bus	../v2nl/v2nl.c	/^v2nl_fill_refpin_bus (nl_reference ref, char *name/
+v2nl_free_array	../v2nl/v2nl.c	/^v2nl_free_array (void *ar_p)$/
+v2nl_free_ast_attr	../v2nl/v2nl_ast.c	/^v2nl_free_ast_attr (void *ptr)$/
+v2nl_free_macro_def	../v2nl/v2nl_lex.c	/^v2nl_free_macro_def (void *ptr)$/
+v2nl_free_macro_table	../v2nl/v2nl_lex.c	/^v2nl_free_macro_table (void)$/
+v2nl_free_parameter_value	../v2nl/v2nl.c	/^v2nl_free_parameter_value (void *value_p)$/
+v2nl_free_string_attr	../v2nl/v2nl.c	/^v2nl_free_string_attr (void *ptr)$/
+v2nl_function_call	../v2nl/v2nl.c	/^v2nl_function_call (nl_ast tree)$/
+v2nl_get_assignment_reference	../v2nl/v2nl.c	/^v2nl_get_assignment_reference (void)$/
+v2nl_get_attribute	../v2nl/v2nl.c	/^v2nl_get_attribute (char *name, char type) __attri/
+v2nl_get_bus_slice	../v2nl/v2nl.c	/^v2nl_get_bus_slice (nl_object obj, int l, int r)$/
+v2nl_get_constant_nets	../v2nl/v2nl.c	/^v2nl_get_constant_nets (int width, char radix, cha/
+v2nl_get_else_mode	../v2nl/v2nl_lex.c	/^v2nl_get_else_mode (void)$/
+v2nl_get_expression_attribute	../v2nl/v2nl_ast.c	/^v2nl_get_expression_attribute (void)$/
+v2nl_get_ifdef_mode	../v2nl/v2nl_lex.c	/^v2nl_get_ifdef_mode (void)$/
+v2nl_get_integer	../v2nl/v2nl.c	/^v2nl_get_integer (int n)$/
+v2nl_get_net	../v2nl/v2nl.c	/^v2nl_get_net (char *name)$/
+v2nl_get_net_for_bit_ref	../v2nl/v2nl_ast.c	/^v2nl_get_net_for_bit_ref (nl_bus bus, int index, n/
+v2nl_get_net_or_bus_nets	../v2nl/v2nl.c	/^v2nl_get_net_or_bus_nets (nl_object obj)$/
+v2nl_get_parameter	../v2nl/v2nl.c	/^v2nl_get_parameter (char *name, nl_ast *value_p)$/
+v2nl_get_refpin	../v2nl/v2nl.c	/^v2nl_get_refpin (nl_reference reference, char *nam/
+v2nl_get_symbol_for_bit_ref	../v2nl/v2nl_ast.c	/^v2nl_get_symbol_for_bit_ref (nl_symbol symbol, int/
+v2nl_get_synthetic_reference	../v2nl/v2nl_ast.c	/^v2nl_get_synthetic_reference (char *name, int num_/
+v2nl_get_token	../v2nl/v2nl_lex.c	/^v2nl_get_token (char *str, int *len_p)$/
+v2nl_if_to_case	../v2nl/v2nl_rewrites.c	/^v2nl_if_to_case (nl_ast tree)$/
+v2nl_ifdef	../v2nl/v2nl_lex.c	/^v2nl_ifdef (char *name)$/
+v2nl_include_file	../v2nl/v2nl_lex.c	/^v2nl_include_file (char *file)$/
+v2nl_init_macro_table	../v2nl/v2nl_lex.c	/^v2nl_init_macro_table (void)$/
+v2nl_integer	../v2nl/v2nl.c	/^v2nl_integer (void)$/
+v2nl_is_expr_trivial	../v2nl/v2nl_ast.c	/^v2nl_is_expr_trivial (nl_ast tree)$/
+v2nl_is_pragma_begin	../v2nl/v2nl_lex.c	/^v2nl_is_pragma_begin (char *text)$/
+v2nl_lex_cleanup	../v2nl/v2nl_lex.c	/^v2nl_lex_cleanup (void)$/
+v2nl_lhs_ref_to_lref	../v2nl/v2nl_rewrites.c	/^v2nl_lhs_ref_to_lref (nl_ast tree)$/
+v2nl_make_bus_nets	../v2nl/v2nl.c	/^v2nl_make_bus_nets (char *name, nl_wireclass class/
+v2nl_make_integer_ast	../v2nl/v2nl_ast.c	/^v2nl_make_integer_ast (int n)$/
+v2nl_make_shift	../v2nl/v2nl.c	/^v2nl_make_shift (nl_ast op, nl_ast l, nl_ast r)$/
+v2nl_maybe_end_comment	../v2nl/v2nl_lex.c	/^v2nl_maybe_end_comment (char *text)$/
+v2nl_mod	../v2nl/v2nl.c	/^v2nl_mod (char *name)$/
+v2nl_new_attribute	../v2nl/v2nl.c	/^v2nl_new_attribute (char *name, nl_density density/
+v2nl_parameter	../v2nl/v2nl.c	/^v2nl_parameter (char *name, nl_ast value)$/
+v2nl_pins	../v2nl/v2nl.c	/^v2nl_pins (nl_cell cell, char *refpin_name, ar net/
+v2nl_pop_ifdef_mode	../v2nl/v2nl_lex.c	/^v2nl_pop_ifdef_mode (void)$/
+v2nl_pop_lexer_state	../v2nl/v2nl_lex.c	/^v2nl_pop_lexer_state (void)$/
+v2nl_port	../v2nl/v2nl.c	/^v2nl_port (char *name)$/
+v2nl_ports_only_gettok	../v2nl/v2nl_lex.c	/^v2nl_ports_only_gettok (void)$/
+v2nl_push_ifdef_mode	../v2nl/v2nl_lex.c	/^v2nl_push_ifdef_mode (int line, int if_mode, int e/
+v2nl_push_lexer_state	../v2nl/v2nl_lex.c	/^v2nl_push_lexer_state (void)$/
+v2nl_random_expr	../v2nl/v2nl_ast.c	/^v2nl_random_expr (nl_ast tree)$/
+v2nl_range_ast_to_type	../v2nl/v2nl_ast.c	/^v2nl_range_ast_to_type (nl_ast range_ast)$/
+v2nl_read_verilog	../v2nl/v2nl.c	/^v2nl_read_verilog (nl_context context, FILE *ifp, /
+v2nl_read_verilog_files	../v2nl/v2nl.c	/^v2nl_read_verilog_files (nl_context context, ar fi/
+v2nl_reference	../v2nl/v2nl.c	/^v2nl_reference (char *base_name, ar params)$/
+v2nl_remove_underbars	../v2nl/v2nl.c	/^v2nl_remove_underbars (char *str)$/
+v2nl_rename_outputs_walker	../v2nl/v2nl_ast.c	/^v2nl_rename_outputs_walker (nl_ast *tree_p, void */
+v2nl_repeat_concat	../v2nl/v2nl.c	/^v2nl_repeat_concat (int n, ar nets)$/
+v2nl_rewrite_case	../v2nl/v2nl_ast.c	/^v2nl_rewrite_case (nl_ast tree)$/
+v2nl_rewrite_case_walker_1	../v2nl/v2nl_ast.c	/^v2nl_rewrite_case_walker_1 (nl_ast *tree_p, void */
+v2nl_rewrite_lhs_ref	../v2nl/v2nl_ast.c	/^v2nl_rewrite_lhs_ref (nl_ast tree)$/
+v2nl_rewrite_lhs_ref_prewalker	../v2nl/v2nl_ast.c	/^v2nl_rewrite_lhs_ref_prewalker (nl_ast *tree_p, vo/
+v2nl_rewrite_ref_slice	../v2nl/v2nl_ast.c	/^v2nl_rewrite_ref_slice (nl_ast root, nl_subprogram/
+v2nl_rewrite_var_shift	../v2nl/v2nl_rewrites.c	/^v2nl_rewrite_var_shift (nl_ast tree)$/
+v2nl_rtl_var_ref	../v2nl/v2nl.c	/^v2nl_rtl_var_ref (Attrib *attr, int *es_parameter_/
+v2nl_scalar	../v2nl/v2nl.c	/^v2nl_scalar (void)$/
+v2nl_set_attributes	../v2nl/v2nl.c	/^v2nl_set_attributes (nl_object obj)$/
+v2nl_set_ifdef_mode	../v2nl/v2nl_lex.c	/^v2nl_set_ifdef_mode (int new_if_mode)$/
+v2nl_shift_left	../v2nl/v2nl.c	/^v2nl_shift_left (ar nets, int amt)$/
+v2nl_shift_right	../v2nl/v2nl.c	/^v2nl_shift_right (ar nets, int amt)$/
+v2nl_skip_whitespace	../v2nl/v2nl_lex.c	/^v2nl_skip_whitespace (char *str)$/
+v2nl_temp_id	../v2nl/v2nl_ast.c	/^v2nl_temp_id (void)$/
+v2nl_token_to_string	../v2nl/v2nl_ast.c	/^static char *v2nl_token_to_string (int, const char/
+v2nl_translate_integer	../v2nl/v2nl_ast.c	/^v2nl_translate_integer (char *str)$/
+v2nl_trivial_expr_to_nets	../v2nl/v2nl_ast.c	/^v2nl_trivial_expr_to_nets (nl_ast tree)$/
+v2nl_undef_macro	../v2nl/v2nl_lex.c	/^v2nl_undef_macro (char *name)$/
+v2nl_var_bit	../v2nl/v2nl.c	/^v2nl_var_bit (char *name, int index)$/
+v2nl_var_get	../v2nl/v2nl_ast.c	/^v2nl_var_get (void *var, void *ptr)$/
+v2nl_var_ref	../v2nl/v2nl.c	/^v2nl_var_ref (char *name)$/
+v2nl_var_set	../v2nl/v2nl_ast.c	/^v2nl_var_set (void *var, ssa_binding binding, void/
+v2nl_var_slice	../v2nl/v2nl.c	/^v2nl_var_slice (char *name, int l, int r)$/
+v2nl_variable	../v2nl/v2nl.c	/^v2nl_variable (nl_wireclass class, nl_direction di/
+v2nl_walk_constant	../v2nl/v2nl_walks.c	/^ ar   v2nl_walk_constant(STreeParser *_parser, SOR/
+v2nl_walk_expr	../v2nl/v2nl_walks.c	/^ ar   v2nl_walk_expr(STreeParser *_parser, SORAST /
+v2nl_walk_id	../v2nl/v2nl_walks.c	/^ char *  v2nl_walk_id(STreeParser *_parser, SORAST/
+v2nl_walk_number	../v2nl/v2nl_walks.c	/^ int   v2nl_walk_number(STreeParser *_parser, SORA/
+v2nl_walk_static_variable_ref	../v2nl/v2nl_walks.c	/^ ar   v2nl_walk_static_variable_ref(STreeParser *_/
+v2nl_walk_trivial_concat	../v2nl/v2nl_walks.c	/^ ar   v2nl_walk_trivial_concat(STreeParser *_parse/
+v2nl_walk_trivial_expr	../v2nl/v2nl_walks.c	/^ ar   v2nl_walk_trivial_expr(STreeParser *_parser,/
+v2nl_walk_trivial_repeat_concat	../v2nl/v2nl_walks.c	/^ ar   v2nl_walk_trivial_repeat_concat(STreeParser /
+v2nl_walk_vnum	../v2nl/v2nl_walks.c	/^ char *  v2nl_walk_vnum(STreeParser *_parser, SORA/
+v2nl_warning	../v2nl/v2nl_error.c	/^v2nl_warning (const char *format, ...)$/
+v2nl_wrap	../v2nl/v2nl_lex.c	/^v2nl_wrap (void)$/
+v2nl_zzsyn	../v2nl/v2nl_error.c	/^v2nl_zzsyn (char *text, int tok, char *egroup, Set/
+value	../snps-lib/lib2.c	/^value(AST**_root)$/
+value_list	../snps-lib/lib2.c	/^value_list(AST**_root)$/
+variable_ref	../v2nl/verilog.c	/^variable_ref(AST**_root)$/
+verilog_file	../v2nl/verilog.c	/^verilog_file(AST**_root)$/
+version	../def2pnl/def.c	/^version(void)$/
+via	../def2pnl/def.c	/^via(void)$/
+via_plus	../def2pnl/def.c	/^via_plus(void)$/
+vias	../def2pnl/def.c	/^vias(void)$/
+while	../nl/nl_design.c	/^    while ( block != NULL ) {$/
+wire_class	../v2nl/verilog.c	/^wire_class(AST**_root)$/
+wire_decl	../v2nl/verilog.c	/^wire_decl(AST**_root)$/
+wire_load	../snps-lib/lib.c	/^wire_load(AST**_root)$/
+wire_load_statement	../snps-lib/lib.c	/^wire_load_statement(AST**_root)$/
+write_sim	../ui/ui_cmd_io.ee	/^#(defcommand write_sim/
+write_verilog	../ui/ui_cmd_io.ee	/^#(defcommand write_verilog/
+zzASTdown	../ast2g/ast2g_infer_reg.c	/^#define zzASTdown(x)          nl_ast_child (x)$/
+zzASTright	../ast2g/ast2g_infer_reg.c	/^#define zzASTright(x)         nl_ast_sibling (x)$/
+zzASTright_addr	../ast2g/ast2g_infer_reg.c	/^#define zzASTright_addr(x)    nl_ast_sibling_addr /
+zzASTset_down	../ast2g/ast2g_infer_reg.c	/^#define zzASTset_down(x, y)   nl_ast_set_child (x,/
+zzASTset_right	../ast2g/ast2g_infer_reg.c	/^#define zzASTset_right(x, y)  nl_ast_set_sibling (/
+zzASTset_token	../ast2g/ast2g_infer_reg.c	/^#define zzASTset_token(x, y)  nl_ast_set_token (x,/
+zzASTtoken	../ast2g/ast2g_infer_reg.c	/^#define zzASTtoken(x)	      nl_ast_token (x)$/
+zzastnew	../v2nl/ast.c	/^#define zzastnew() nl_ast_create (nl_token_null)$/
+zzcr_ast	../def2pnl/def.c	/^#  define zzcr_ast(tr, attr, tok, txt) { cr_ast (t/
+zzcr_attr	../def2pnl/def.c	/^#define zzcr_attr(attr, tok, text)	(*(attr) = (tex/
+zzd_ast	../v2nl/stdpccts.h	/^#define zzd_ast(tr)			v2nl_d_ast (tr)$/
+zzerraction	../def2pnl/def2pnl_parser.c	/^zzerraction(void)$/
+zzfailed_pred	../v2nl/stdpccts.h	/^#define zzfailed_pred(_p)     v2nl_failed_predicat/
+zzmk_ast	../def2pnl/def.c	/^#  define zzmk_ast(tr, tok, txt)	     (AST *) mk_a/
+zzsubchild	../v2nl/ast.c	/^zzsubchild (AST **_root, AST **_sibling, AST **_ta/
+zzsubroot	../v2nl/ast.c	/^zzsubroot (AST **_root, AST **_sibling, AST **_tai/

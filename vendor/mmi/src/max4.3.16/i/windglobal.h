@@ -1,0 +1,1 @@
+../m/mgc/windglobal.h

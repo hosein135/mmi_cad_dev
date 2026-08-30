@@ -1,0 +1,69 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_OAI21C {} {
+  make global -orient RY -name vdd -origin {0 -100}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -name gnd -origin {0 200}
+  make output -name out -origin {610 0}
+  make pmos -W 2.4 -origin {250 -160}
+  make pmos -W 2.4 -origin {250 -60}
+  make global -orient RY -name vdd -origin {350 -200}
+  make pmos -W 2.4 -origin {350 -160}
+  make pmos -W 2.4 -origin {350 -60}
+  make global -orient RY -name vdd -origin {450 -200}
+  make pmos -W 2.4 -origin {450 -160}
+  make pmos -W 2.4 -origin {450 -60}
+  make global -orient RY -name vdd -origin {550 -200}
+  make pmos -W 2.4 -origin {550 -160}
+  make pmos -W 2.4 -origin {550 -60}
+  make pmos -W 4.8 -origin {0 -60}
+  make nmos -W 4.8 -origin {0 60}
+  make nmos -W 4.8 -origin {0 160}
+  make nmos -W 4.8 -origin {250 160}
+  make input -name in0 -origin {-100 60}
+  make input -name in1 -origin {-100 160}
+  make input -name in2 -origin {150 160}
+  make global -name gnd -origin {250 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 07/19/99 -origin {170 370}
+  make_wire 0 -20 0 0
+  make_wire 0 20 0 0
+  make_wire 0 0 250 0
+  make_wire 250 -20 250 0
+  make_wire 0 120 0 100
+  make_wire 250 -120 250 -100
+  make_wire 250 120 250 100
+  make_wire 0 100 250 100
+  make_wire 350 -20 350 0
+  make_wire 350 -120 350 -100
+  make_wire 350 0 250 0
+  make_wire 450 -120 450 -100
+  make_wire 450 0 350 0
+  make_wire 550 -120 550 -100
+  make_wire 550 0 450 0
+  make_wire 550 0 610 0
+  make_wire 450 -20 450 0
+  make_wire 550 -20 550 0
+  make_wire 390 -160 490 -160
+  make_wire 290 -160 390 -160
+  make_wire 290 -60 190 -60
+  make_wire 390 -60 290 -60
+  make_wire 390 -60 490 -60
+  make_wire -80 60 -80 -60
+  make_wire -80 -60 -60 -60
+  make_wire -80 60 -60 60
+  make_wire -80 60 -100 60
+  make_wire -60 160 -100 160
+  make_wire -60 160 60 160
+  make_wire 60 160 60 -60
+  make_wire 60 -60 190 -60
+  make_wire 170 160 170 -160
+  make_wire 170 -160 190 -160
+  make_wire 190 -160 290 -160
+  make_wire 170 160 190 160
+  make_wire 170 160 150 160
+  make_text -origin {-140 -240} -text {C Size}
+  make_text -origin {-140 -280} -text MMI_OAI21C -size large
+  make_text -origin {-140 -260} -text {Inverting OR-AND 2,1 Gate}
+}
+

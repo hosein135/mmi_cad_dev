@@ -1,0 +1,966 @@
+*|DSPF 1.5
+*|DESIGN "alu8"
+*|DATE "Wed Feb 13 17:46:54 PST 2002"
+*|VENDOR "Micro Magic Tools, Juniper Networks, Inc."
+*|PROGRAM "MMI_SUE4.3.6 DPC"
+*|DIVIDER /
+*|DELIMITER :
+*|BUSBIT []
+
+.SUBCKT alu8
+
+*|GROUND_NET VSS
+
+*|NET clk 116.16FF
+*|I (MMI_FFCB_5:clk MMI_FFCB_5 clk I 0 187 5)
+*|I (MMI_FFCB_4:clk MMI_FFCB_4 clk I 0 187 15)
+*|I (MMI_FFCB_1$0$:clk MMI_FFCB_1$0$ clk I 0 165 5)
+*|I (MMI_FFCB_2$0$:clk MMI_FFCB_2$0$ clk I 0 165 15)
+*|I (MMI_FFCB_1$1$:clk MMI_FFCB_1$1$ clk I 0 143 5)
+*|I (MMI_FFCB_2$1$:clk MMI_FFCB_2$1$ clk I 0 143 15)
+*|I (MMI_FFCB_1$2$:clk MMI_FFCB_1$2$ clk I 0 121 5)
+*|I (MMI_FFCB_2$2$:clk MMI_FFCB_2$2$ clk I 0 121 15)
+*|I (MMI_FFCB_1$3$:clk MMI_FFCB_1$3$ clk I 0 99 5)
+*|I (MMI_FFCB$0$:clk MMI_FFCB$0$ clk I 0 187 95)
+*|I (MMI_FFCB_2$3$:clk MMI_FFCB_2$3$ clk I 0 99 15)
+*|I (MMI_FFCB_1$4$:clk MMI_FFCB_1$4$ clk I 0 77 5)
+*|I (MMI_FFCB$1$:clk MMI_FFCB$1$ clk I 0 165 95)
+*|I (MMI_FFCB_2$4$:clk MMI_FFCB_2$4$ clk I 0 77 15)
+*|I (MMI_FFCB_1$5$:clk MMI_FFCB_1$5$ clk I 0 55 5)
+*|I (MMI_FFCB$2$:clk MMI_FFCB$2$ clk I 0 143 95)
+*|I (MMI_FFCB_2$5$:clk MMI_FFCB_2$5$ clk I 0 55 15)
+*|I (MMI_FFCB_1$6$:clk MMI_FFCB_1$6$ clk I 0 33 5)
+*|I (MMI_FFCB$3$:clk MMI_FFCB$3$ clk I 0 121 95)
+*|I (MMI_FFCB_2$6$:clk MMI_FFCB_2$6$ clk I 0 33 15)
+*|I (MMI_FFCB_1$7$:clk MMI_FFCB_1$7$ clk I 0 11 5)
+*|I (MMI_FFCB$4$:clk MMI_FFCB$4$ clk I 0 99 95)
+*|I (MMI_FFCB_2$7$:clk MMI_FFCB_2$7$ clk I 0 11 15)
+*|I (MMI_FFCB$5$:clk MMI_FFCB$5$ clk I 0 77 95)
+*|I (MMI_FFCB$6$:clk MMI_FFCB$6$ clk I 0 55 95)
+*|I (MMI_FFCB$7$:clk MMI_FFCB$7$ clk I 0 33 95)
+*|I (MMI_FFCB_3:clk MMI_FFCB_3 clk I 0 11 95)
+C1 MMI_FFCB_5:clk VSS 4.84FF
+C2 MMI_FFCB_4:clk VSS 9.9FF
+C3 MMI_FFCB_1$0$:clk VSS 5.94FF
+C4 MMI_FFCB_2$0$:clk VSS 1.1FF
+C5 MMI_FFCB_1$1$:clk VSS 5.94FF
+C6 MMI_FFCB_2$1$:clk VSS 1.1FF
+C7 MMI_FFCB_1$2$:clk VSS 5.94FF
+C8 MMI_FFCB_2$2$:clk VSS 1.1FF
+C9 MMI_FFCB_1$3$:clk VSS 5.94FF
+C10 MMI_FFCB$0$:clk VSS 11.22FF
+C11 MMI_FFCB_2$3$:clk VSS 1.1FF
+C12 MMI_FFCB_1$4$:clk VSS 5.94FF
+C13 MMI_FFCB$1$:clk VSS 4.84FF
+C14 MMI_FFCB_2$4$:clk VSS 1.1FF
+C15 MMI_FFCB_1$5$:clk VSS 5.94FF
+C16 MMI_FFCB$2$:clk VSS 4.84FF
+C17 MMI_FFCB_2$5$:clk VSS 1.1FF
+C18 MMI_FFCB_1$6$:clk VSS 5.94FF
+C19 MMI_FFCB$3$:clk VSS 4.84FF
+C20 MMI_FFCB_2$6$:clk VSS 1.1FF
+C21 MMI_FFCB_1$7$:clk VSS 3.52FF
+C22 MMI_FFCB$4$:clk VSS 4.84FF
+C23 MMI_FFCB_2$7$:clk VSS 1.1FF
+C24 MMI_FFCB$5$:clk VSS 4.84FF
+C25 MMI_FFCB$6$:clk VSS 4.84FF
+C26 MMI_FFCB$7$:clk VSS 4.84FF
+C27 MMI_FFCB_3:clk VSS 2.42FF
+R28 MMI_FFCB_5:clk MMI_FFCB_4:clk 1.83333
+R29 MMI_FFCB_4:clk MMI_FFCB$0$:clk 14.6667
+R30 MMI_FFCB$0$:clk MMI_FFCB$1$:clk 4.03333
+R31 MMI_FFCB$1$:clk MMI_FFCB$2$:clk 4.03333
+R32 MMI_FFCB$2$:clk MMI_FFCB$3$:clk 4.03333
+R33 MMI_FFCB$3$:clk MMI_FFCB$4$:clk 4.03333
+R34 MMI_FFCB$4$:clk MMI_FFCB$5$:clk 4.03333
+R35 MMI_FFCB$5$:clk MMI_FFCB$6$:clk 4.03333
+R36 MMI_FFCB$6$:clk MMI_FFCB$7$:clk 4.03333
+R37 MMI_FFCB$7$:clk MMI_FFCB_3:clk 4.03333
+R38 MMI_FFCB_5:clk MMI_FFCB_1$0$:clk 4.03333
+R39 MMI_FFCB_1$0$:clk MMI_FFCB_1$1$:clk 4.03333
+R40 MMI_FFCB_1$1$:clk MMI_FFCB_1$2$:clk 4.03333
+R41 MMI_FFCB_1$2$:clk MMI_FFCB_1$3$:clk 4.03333
+R42 MMI_FFCB_1$3$:clk MMI_FFCB_1$4$:clk 4.03333
+R43 MMI_FFCB_1$4$:clk MMI_FFCB_1$5$:clk 4.03333
+R44 MMI_FFCB_1$5$:clk MMI_FFCB_1$6$:clk 4.03333
+R45 MMI_FFCB_1$6$:clk MMI_FFCB_1$7$:clk 4.03333
+R46 MMI_FFCB_1$7$:clk MMI_FFCB_2$7$:clk 1.83333
+R47 MMI_FFCB_1$6$:clk MMI_FFCB_2$6$:clk 1.83333
+R48 MMI_FFCB_1$5$:clk MMI_FFCB_2$5$:clk 1.83333
+R49 MMI_FFCB_1$4$:clk MMI_FFCB_2$4$:clk 1.83333
+R50 MMI_FFCB_1$3$:clk MMI_FFCB_2$3$:clk 1.83333
+R51 MMI_FFCB_1$2$:clk MMI_FFCB_2$2$:clk 1.83333
+R52 MMI_FFCB_1$1$:clk MMI_FFCB_2$1$:clk 1.83333
+R53 MMI_FFCB_1$0$:clk MMI_FFCB_2$0$:clk 1.83333
+
+*|NET net_11[0] 5.5FF
+*|I (MMI_FFCB_2$0$:Q MMI_FFCB_2$0$ Q O 0 165 15)
+*|I (MMI_BUFD$0$:in MMI_BUFD$0$ in I 0 156 25)
+C54 MMI_FFCB_2$0$:Q VSS 5.5FF
+
+*|NET net_11[1] 5.5FF
+*|I (MMI_FFCB_2$1$:Q MMI_FFCB_2$1$ Q O 0 143 15)
+*|I (MMI_BUFD$1$:in MMI_BUFD$1$ in I 0 134 25)
+C55 MMI_FFCB_2$1$:Q VSS 5.5FF
+
+*|NET net_11[2] 5.5FF
+*|I (MMI_FFCB_2$2$:Q MMI_FFCB_2$2$ Q O 0 121 15)
+*|I (MMI_BUFD$2$:in MMI_BUFD$2$ in I 0 112 25)
+C56 MMI_FFCB_2$2$:Q VSS 5.5FF
+
+*|NET net_11[3] 5.5FF
+*|I (MMI_FFCB_2$3$:Q MMI_FFCB_2$3$ Q O 0 99 15)
+*|I (MMI_BUFD$3$:in MMI_BUFD$3$ in I 0 90 25)
+C57 MMI_FFCB_2$3$:Q VSS 5.5FF
+
+*|NET net_11[4] 5.5FF
+*|I (MMI_FFCB_2$4$:Q MMI_FFCB_2$4$ Q O 0 77 15)
+*|I (MMI_BUFD$4$:in MMI_BUFD$4$ in I 0 68 25)
+C58 MMI_FFCB_2$4$:Q VSS 5.5FF
+
+*|NET net_11[5] 5.5FF
+*|I (MMI_FFCB_2$5$:Q MMI_FFCB_2$5$ Q O 0 55 15)
+*|I (MMI_BUFD$5$:in MMI_BUFD$5$ in I 0 46 25)
+C59 MMI_FFCB_2$5$:Q VSS 5.5FF
+
+*|NET net_11[6] 5.5FF
+*|I (MMI_FFCB_2$6$:Q MMI_FFCB_2$6$ Q O 0 33 15)
+*|I (MMI_BUFD$6$:in MMI_BUFD$6$ in I 0 24 25)
+C60 MMI_FFCB_2$6$:Q VSS 5.5FF
+
+*|NET net_11[7] 5.5FF
+*|I (MMI_FFCB_2$7$:Q MMI_FFCB_2$7$ Q O 0 11 15)
+*|I (MMI_BUFD$7$:in MMI_BUFD$7$ in I 0 2 25)
+C61 MMI_FFCB_2$7$:Q VSS 5.5FF
+
+*|NET net_12 11FF
+*|I (MMI_XOR2B_1:out MMI_XOR2B_1 out O 0 179 25)
+*|I (adder8/MMI_INVB_:in adder8/MMI_INVB_ in I 0 175 65)
+C62 MMI_XOR2B_1:out VSS 11FF
+
+*|NET net_13[0] 12.54FF
+*|I (MMI_XOR2B$0$:out MMI_XOR2B$0$ out O 0 169 25)
+*|I (adder8/MMI_XOR2A_7:in1 adder8/MMI_XOR2A_7 in1 I 0 168 65)
+*|I (adder8/MMI_NOR2B_3:in0 adder8/MMI_NOR2B_3 in0 I 0 162 65)
+*|I (adder8/MMI_NAND2B_7:in1 adder8/MMI_NAND2B_7 in1 I 0 158 65)
+C63 MMI_XOR2B$0$:out VSS 12.54FF
+
+*|NET net_13[1] 13.2FF
+*|I (MMI_XOR2B$1$:out MMI_XOR2B$1$ out O 0 147 25)
+*|I (adder8/MMI_XOR2A_6:in1 adder8/MMI_XOR2A_6 in1 I 0 147 65)
+*|I (adder8/MMI_NOR2B_4:in0 adder8/MMI_NOR2B_4 in0 I 0 139 65)
+*|I (adder8/MMI_NAND2B_6:in1 adder8/MMI_NAND2B_6 in1 I 0 133 65)
+C64 MMI_XOR2B$1$:out VSS 13.2FF
+
+*|NET net_13[2] 13.2FF
+*|I (MMI_XOR2B$2$:out MMI_XOR2B$2$ out O 0 125 25)
+*|I (adder8/MMI_XOR2A_5:in1 adder8/MMI_XOR2A_5 in1 I 0 121 65)
+*|I (adder8/MMI_NOR2B_5:in0 adder8/MMI_NOR2B_5 in0 I 0 115 65)
+*|I (adder8/MMI_NAND2B_5:in1 adder8/MMI_NAND2B_5 in1 I 0 111 65)
+C65 MMI_XOR2B$2$:out VSS 13.2FF
+
+*|NET net_13[3] 13.2FF
+*|I (MMI_XOR2B$3$:out MMI_XOR2B$3$ out O 0 103 25)
+*|I (adder8/MMI_XOR2A_1:in1 adder8/MMI_XOR2A_1 in1 I 0 99 65)
+*|I (adder8/MMI_NOR2B_1:in0 adder8/MMI_NOR2B_1 in0 I 0 93 65)
+*|I (adder8/MMI_NAND2B_4:in1 adder8/MMI_NAND2B_4 in1 I 0 89 65)
+C66 MMI_XOR2B$3$:out VSS 13.2FF
+
+*|NET net_13[4] 13.2FF
+*|I (MMI_XOR2B$4$:out MMI_XOR2B$4$ out O 0 81 25)
+*|I (adder8/MMI_XOR2A_4:in1 adder8/MMI_XOR2A_4 in1 I 0 77 65)
+*|I (adder8/MMI_NOR2B_7:in0 adder8/MMI_NOR2B_7 in0 I 0 71 65)
+*|I (adder8/MMI_NAND2B_3:in1 adder8/MMI_NAND2B_3 in1 I 0 67 65)
+C67 MMI_XOR2B$4$:out VSS 13.2FF
+
+*|NET net_13[5] 13.2FF
+*|I (MMI_XOR2B$5$:out MMI_XOR2B$5$ out O 0 59 25)
+*|I (adder8/MMI_XOR2A_3:in1 adder8/MMI_XOR2A_3 in1 I 0 55 65)
+*|I (adder8/MMI_NOR2B_2:in0 adder8/MMI_NOR2B_2 in0 I 0 49 65)
+*|I (adder8/MMI_NAND2B_2:in1 adder8/MMI_NAND2B_2 in1 I 0 45 65)
+C68 MMI_XOR2B$5$:out VSS 13.2FF
+
+*|NET net_13[6] 13.2FF
+*|I (MMI_XOR2B$6$:out MMI_XOR2B$6$ out O 0 37 25)
+*|I (adder8/MMI_XOR2A_2:in1 adder8/MMI_XOR2A_2 in1 I 0 33 65)
+*|I (adder8/MMI_NOR2B_6:in0 adder8/MMI_NOR2B_6 in0 I 0 27 65)
+*|I (adder8/MMI_NAND2B_1:in1 adder8/MMI_NAND2B_1 in1 I 0 23 65)
+C69 MMI_XOR2B$6$:out VSS 13.2FF
+
+*|NET net_13[7] 13.2FF
+*|I (MMI_XOR2B$7$:out MMI_XOR2B$7$ out O 0 15 25)
+*|I (adder8/MMI_XOR2A:in1 adder8/MMI_XOR2A in1 I 0 11 65)
+*|I (adder8/MMI_NOR2B:in0 adder8/MMI_NOR2B in0 I 0 5 65)
+*|I (adder8/MMI_NAND2B:in1 adder8/MMI_NAND2B in1 I 0 1 65)
+C70 MMI_XOR2B$7$:out VSS 13.2FF
+
+*|NET net_14[0] 6.6FF
+*|I (MMI_FFCB_1$0$:Q MMI_FFCB_1$0$ Q O 0 165 5)
+*|I (MMI_BUFD_1$0$:in MMI_BUFD_1$0$ in I 0 161 25)
+C71 MMI_FFCB_1$0$:Q VSS 6.6FF
+
+*|NET net_14[1] 6.6FF
+*|I (MMI_FFCB_1$1$:Q MMI_FFCB_1$1$ Q O 0 143 5)
+*|I (MMI_BUFD_1$1$:in MMI_BUFD_1$1$ in I 0 139 25)
+C72 MMI_FFCB_1$1$:Q VSS 6.6FF
+
+*|NET net_14[2] 6.6FF
+*|I (MMI_FFCB_1$2$:Q MMI_FFCB_1$2$ Q O 0 121 5)
+*|I (MMI_BUFD_1$2$:in MMI_BUFD_1$2$ in I 0 117 25)
+C73 MMI_FFCB_1$2$:Q VSS 6.6FF
+
+*|NET net_14[3] 6.6FF
+*|I (MMI_FFCB_1$3$:Q MMI_FFCB_1$3$ Q O 0 99 5)
+*|I (MMI_BUFD_1$3$:in MMI_BUFD_1$3$ in I 0 95 25)
+C74 MMI_FFCB_1$3$:Q VSS 6.6FF
+
+*|NET net_14[4] 6.6FF
+*|I (MMI_FFCB_1$4$:Q MMI_FFCB_1$4$ Q O 0 77 5)
+*|I (MMI_BUFD_1$4$:in MMI_BUFD_1$4$ in I 0 73 25)
+C75 MMI_FFCB_1$4$:Q VSS 6.6FF
+
+*|NET net_14[5] 6.6FF
+*|I (MMI_FFCB_1$5$:Q MMI_FFCB_1$5$ Q O 0 55 5)
+*|I (MMI_BUFD_1$5$:in MMI_BUFD_1$5$ in I 0 51 25)
+C76 MMI_FFCB_1$5$:Q VSS 6.6FF
+
+*|NET net_14[6] 6.6FF
+*|I (MMI_FFCB_1$6$:Q MMI_FFCB_1$6$ Q O 0 33 5)
+*|I (MMI_BUFD_1$6$:in MMI_BUFD_1$6$ in I 0 29 25)
+C77 MMI_FFCB_1$6$:Q VSS 6.6FF
+
+*|NET net_14[7] 6.6FF
+*|I (MMI_FFCB_1$7$:Q MMI_FFCB_1$7$ Q O 0 11 5)
+*|I (MMI_BUFD_1$7$:in MMI_BUFD_1$7$ in I 0 7 25)
+C78 MMI_FFCB_1$7$:Q VSS 6.6FF
+
+*|NET net_15 3.74FF
+*|I (MMI_FFCB_4:Q MMI_FFCB_4 Q O 0 187 15)
+*|I (MMI_BUFE:in MMI_BUFE in I 0 188 25)
+C79 MMI_FFCB_4:Q VSS 3.74FF
+
+*|NET net_1[0] 13.64FF
+*|I (MMI_BUFD$0$:out MMI_BUFD$0$ out O 0 156 25)
+*|I (shift8/MMI_MUX4B$0$:in3 shift8/MMI_MUX4B$0$ in3 I 0 162 35)
+*|I (adder8/MMI_NAND2B_7:in0 adder8/MMI_NAND2B_7 in0 I 0 158 65)
+*|I (adder8/MMI_NOR2B_3:in1 adder8/MMI_NOR2B_3 in1 I 0 162 65)
+*|I (adder8/MMI_XOR2A_7:in0 adder8/MMI_XOR2A_7 in0 I 0 168 65)
+C80 MMI_BUFD$0$:out VSS 13.64FF
+
+*|NET net_1[1] 19.36FF
+*|I (MMI_BUFD$1$:out MMI_BUFD$1$ out O 0 134 25)
+*|I (shift8/MMI_MUX4B$1$:in3 shift8/MMI_MUX4B$1$ in3 I 0 140 35)
+*|I (shift8/MMI_MUX4B$0$:in2 shift8/MMI_MUX4B$0$ in2 I 0 162 35)
+*|I (adder8/MMI_NAND2B_6:in0 adder8/MMI_NAND2B_6 in0 I 0 133 65)
+*|I (adder8/MMI_NOR2B_4:in1 adder8/MMI_NOR2B_4 in1 I 0 139 65)
+*|I (adder8/MMI_XOR2A_6:in0 adder8/MMI_XOR2A_6 in0 I 0 147 65)
+C81 MMI_BUFD$1$:out VSS 19.36FF
+
+*|NET net_1[2] 23.32FF
+*|I (MMI_BUFD$2$:out MMI_BUFD$2$ out O 0 112 25)
+*|I (shift8/MMI_MUX4B$2$:in3 shift8/MMI_MUX4B$2$ in3 I 0 118 35)
+*|I (shift8/MMI_MUX4B$1$:in2 shift8/MMI_MUX4B$1$ in2 I 0 140 35)
+*|I (adder8/MMI_NAND2B_5:in0 adder8/MMI_NAND2B_5 in0 I 0 111 65)
+*|I (adder8/MMI_NOR2B_5:in1 adder8/MMI_NOR2B_5 in1 I 0 115 65)
+*|I (adder8/MMI_XOR2A_5:in0 adder8/MMI_XOR2A_5 in0 I 0 121 65)
+*|I (shift8/MMI_MUX4B$0$:in1 shift8/MMI_MUX4B$0$ in1 I 0 162 35)
+C82 MMI_BUFD$2$:out VSS 23.32FF
+
+*|NET net_1[3] 28.16FF
+*|I (MMI_BUFD$3$:out MMI_BUFD$3$ out O 0 90 25)
+*|I (shift8/MMI_MUX4B$3$:in3 shift8/MMI_MUX4B$3$ in3 I 0 96 35)
+*|I (shift8/MMI_MUX4B$2$:in2 shift8/MMI_MUX4B$2$ in2 I 0 118 35)
+*|I (adder8/MMI_NAND2B_4:in0 adder8/MMI_NAND2B_4 in0 I 0 89 65)
+*|I (adder8/MMI_NOR2B_1:in1 adder8/MMI_NOR2B_1 in1 I 0 93 65)
+*|I (adder8/MMI_XOR2A_1:in0 adder8/MMI_XOR2A_1 in0 I 0 99 65)
+*|I (shift8/MMI_MUX4B$1$:in1 shift8/MMI_MUX4B$1$ in1 I 0 140 35)
+*|I (shift8/MMI_MUX4B$0$:in0 shift8/MMI_MUX4B$0$ in0 I 0 162 35)
+C83 MMI_BUFD$3$:out VSS 28.16FF
+
+*|NET net_1[4] 28.16FF
+*|I (MMI_BUFD$4$:out MMI_BUFD$4$ out O 0 68 25)
+*|I (shift8/MMI_MUX4B$4$:in3 shift8/MMI_MUX4B$4$ in3 I 0 74 35)
+*|I (shift8/MMI_MUX4B$3$:in2 shift8/MMI_MUX4B$3$ in2 I 0 96 35)
+*|I (adder8/MMI_NAND2B_3:in0 adder8/MMI_NAND2B_3 in0 I 0 67 65)
+*|I (adder8/MMI_NOR2B_7:in1 adder8/MMI_NOR2B_7 in1 I 0 71 65)
+*|I (adder8/MMI_XOR2A_4:in0 adder8/MMI_XOR2A_4 in0 I 0 77 65)
+*|I (shift8/MMI_MUX4B$2$:in1 shift8/MMI_MUX4B$2$ in1 I 0 118 35)
+*|I (shift8/MMI_MUX4B$1$:in0 shift8/MMI_MUX4B$1$ in0 I 0 140 35)
+C84 MMI_BUFD$4$:out VSS 28.16FF
+
+*|NET net_1[5] 28.16FF
+*|I (MMI_BUFD$5$:out MMI_BUFD$5$ out O 0 46 25)
+*|I (shift8/MMI_MUX4B$5$:in3 shift8/MMI_MUX4B$5$ in3 I 0 52 35)
+*|I (shift8/MMI_MUX4B$4$:in2 shift8/MMI_MUX4B$4$ in2 I 0 74 35)
+*|I (adder8/MMI_NAND2B_2:in0 adder8/MMI_NAND2B_2 in0 I 0 45 65)
+*|I (adder8/MMI_NOR2B_2:in1 adder8/MMI_NOR2B_2 in1 I 0 49 65)
+*|I (adder8/MMI_XOR2A_3:in0 adder8/MMI_XOR2A_3 in0 I 0 55 65)
+*|I (shift8/MMI_MUX4B$3$:in1 shift8/MMI_MUX4B$3$ in1 I 0 96 35)
+*|I (shift8/MMI_MUX4B$2$:in0 shift8/MMI_MUX4B$2$ in0 I 0 118 35)
+C85 MMI_BUFD$5$:out VSS 28.16FF
+
+*|NET net_1[6] 28.16FF
+*|I (MMI_BUFD$6$:out MMI_BUFD$6$ out O 0 24 25)
+*|I (shift8/MMI_MUX4B$6$:in3 shift8/MMI_MUX4B$6$ in3 I 0 30 35)
+*|I (shift8/MMI_MUX4B$5$:in2 shift8/MMI_MUX4B$5$ in2 I 0 52 35)
+*|I (adder8/MMI_NAND2B_1:in0 adder8/MMI_NAND2B_1 in0 I 0 23 65)
+*|I (adder8/MMI_NOR2B_6:in1 adder8/MMI_NOR2B_6 in1 I 0 27 65)
+*|I (adder8/MMI_XOR2A_2:in0 adder8/MMI_XOR2A_2 in0 I 0 33 65)
+*|I (shift8/MMI_MUX4B$4$:in1 shift8/MMI_MUX4B$4$ in1 I 0 74 35)
+*|I (shift8/MMI_MUX4B$3$:in0 shift8/MMI_MUX4B$3$ in0 I 0 96 35)
+C86 MMI_BUFD$6$:out VSS 28.16FF
+
+*|NET net_1[7] 28.16FF
+*|I (MMI_BUFD$7$:out MMI_BUFD$7$ out O 0 2 25)
+*|I (shift8/MMI_MUX4B$7$:in3 shift8/MMI_MUX4B$7$ in3 I 0 8 35)
+*|I (shift8/MMI_MUX4B$6$:in2 shift8/MMI_MUX4B$6$ in2 I 0 30 35)
+*|I (adder8/MMI_NAND2B:in0 adder8/MMI_NAND2B in0 I 0 1 65)
+*|I (adder8/MMI_NOR2B:in1 adder8/MMI_NOR2B in1 I 0 5 65)
+*|I (adder8/MMI_XOR2A:in0 adder8/MMI_XOR2A in0 I 0 11 65)
+*|I (shift8/MMI_MUX4B$5$:in1 shift8/MMI_MUX4B$5$ in1 I 0 52 35)
+*|I (shift8/MMI_MUX4B$4$:in0 shift8/MMI_MUX4B$4$ in0 I 0 74 35)
+C87 MMI_BUFD$7$:out VSS 28.16FF
+
+*|NET net_2[0] 9.68FF
+*|I (shift8/MMI_BUFD_1$0$:out shift8/MMI_BUFD_1$0$ out O 0 170 55)
+*|I (MMI_MUX4B$0$:in0 MMI_MUX4B$0$ in0 I 0 162 85)
+C88 shift8/MMI_BUFD_1$0$:out VSS 9.68FF
+
+*|NET net_2[1] 9.68FF
+*|I (shift8/MMI_BUFD_1$1$:out shift8/MMI_BUFD_1$1$ out O 0 148 55)
+*|I (MMI_MUX4B$1$:in0 MMI_MUX4B$1$ in0 I 0 140 85)
+C89 shift8/MMI_BUFD_1$1$:out VSS 9.68FF
+
+*|NET net_2[2] 9.68FF
+*|I (shift8/MMI_BUFD_1$2$:out shift8/MMI_BUFD_1$2$ out O 0 126 55)
+*|I (MMI_MUX4B$2$:in0 MMI_MUX4B$2$ in0 I 0 118 85)
+C90 shift8/MMI_BUFD_1$2$:out VSS 9.68FF
+
+*|NET net_2[3] 9.68FF
+*|I (shift8/MMI_BUFD_1$3$:out shift8/MMI_BUFD_1$3$ out O 0 104 55)
+*|I (MMI_MUX4B$3$:in0 MMI_MUX4B$3$ in0 I 0 96 85)
+C91 shift8/MMI_BUFD_1$3$:out VSS 9.68FF
+
+*|NET net_2[4] 9.68FF
+*|I (shift8/MMI_BUFD_1$4$:out shift8/MMI_BUFD_1$4$ out O 0 82 55)
+*|I (MMI_MUX4B$4$:in0 MMI_MUX4B$4$ in0 I 0 74 85)
+C92 shift8/MMI_BUFD_1$4$:out VSS 9.68FF
+
+*|NET net_2[5] 9.68FF
+*|I (shift8/MMI_BUFD_1$5$:out shift8/MMI_BUFD_1$5$ out O 0 60 55)
+*|I (MMI_MUX4B$5$:in0 MMI_MUX4B$5$ in0 I 0 52 85)
+C93 shift8/MMI_BUFD_1$5$:out VSS 9.68FF
+
+*|NET net_2[6] 9.68FF
+*|I (shift8/MMI_BUFD_1$6$:out shift8/MMI_BUFD_1$6$ out O 0 38 55)
+*|I (MMI_MUX4B$6$:in0 MMI_MUX4B$6$ in0 I 0 30 85)
+C94 shift8/MMI_BUFD_1$6$:out VSS 9.68FF
+
+*|NET net_2[7] 9.68FF
+*|I (shift8/MMI_BUFD_1$7$:out shift8/MMI_BUFD_1$7$ out O 0 16 55)
+*|I (MMI_MUX4B$7$:in0 MMI_MUX4B$7$ in0 I 0 8 85)
+C95 shift8/MMI_BUFD_1$7$:out VSS 9.68FF
+
+*|NET net_3 39.38FF
+*|I (MMI_BUFE:out MMI_BUFE out O 0 188 25)
+*|I (MMI_XOR2B_1:in1 MMI_XOR2B_1 in1 I 0 179 25)
+*|I (MMI_XOR2B$0$:in1 MMI_XOR2B$0$ in1 I 0 169 25)
+*|I (MMI_XOR2B$1$:in1 MMI_XOR2B$1$ in1 I 0 147 25)
+*|I (MMI_XOR2B$2$:in1 MMI_XOR2B$2$ in1 I 0 125 25)
+*|I (MMI_XOR2B$3$:in1 MMI_XOR2B$3$ in1 I 0 103 25)
+*|I (MMI_XOR2B$4$:in1 MMI_XOR2B$4$ in1 I 0 81 25)
+*|I (MMI_XOR2B$5$:in1 MMI_XOR2B$5$ in1 I 0 59 25)
+*|I (MMI_XOR2B$6$:in1 MMI_XOR2B$6$ in1 I 0 37 25)
+*|I (MMI_XOR2B$7$:in1 MMI_XOR2B$7$ in1 I 0 15 25)
+C96 MMI_BUFE:out VSS 39.38FF
+
+*|NET net_4 7.48FF
+*|I (MMI_FFCB_5:Q MMI_FFCB_5 Q O 0 187 5)
+*|I (MMI_XOR2B_1:in0 MMI_XOR2B_1 in0 I 0 179 25)
+C97 MMI_FFCB_5:Q VSS 7.48FF
+
+*|NET net_5[0] 9.02FF
+*|I (MMI_MUX4B$0$:out MMI_MUX4B$0$ out O 0 162 85)
+*|I (MMI_FFCB$0$:D MMI_FFCB$0$ D I 0 187 95)
+C98 MMI_MUX4B$0$:out VSS 9.02FF
+
+*|NET net_5[1] 9.02FF
+*|I (MMI_MUX4B$1$:out MMI_MUX4B$1$ out O 0 140 85)
+*|I (MMI_FFCB$1$:D MMI_FFCB$1$ D I 0 165 95)
+C99 MMI_MUX4B$1$:out VSS 9.02FF
+
+*|NET net_5[2] 9.02FF
+*|I (MMI_MUX4B$2$:out MMI_MUX4B$2$ out O 0 118 85)
+*|I (MMI_FFCB$2$:D MMI_FFCB$2$ D I 0 143 95)
+C100 MMI_MUX4B$2$:out VSS 9.02FF
+
+*|NET net_5[3] 9.02FF
+*|I (MMI_MUX4B$3$:out MMI_MUX4B$3$ out O 0 96 85)
+*|I (MMI_FFCB$3$:D MMI_FFCB$3$ D I 0 121 95)
+C101 MMI_MUX4B$3$:out VSS 9.02FF
+
+*|NET net_5[4] 9.02FF
+*|I (MMI_MUX4B$4$:out MMI_MUX4B$4$ out O 0 74 85)
+*|I (MMI_FFCB$4$:D MMI_FFCB$4$ D I 0 99 95)
+C102 MMI_MUX4B$4$:out VSS 9.02FF
+
+*|NET net_5[5] 9.02FF
+*|I (MMI_MUX4B$5$:out MMI_MUX4B$5$ out O 0 52 85)
+*|I (MMI_FFCB$5$:D MMI_FFCB$5$ D I 0 77 95)
+C103 MMI_MUX4B$5$:out VSS 9.02FF
+
+*|NET net_5[6] 9.02FF
+*|I (MMI_MUX4B$6$:out MMI_MUX4B$6$ out O 0 30 85)
+*|I (MMI_FFCB$6$:D MMI_FFCB$6$ D I 0 55 95)
+C104 MMI_MUX4B$6$:out VSS 9.02FF
+
+*|NET net_5[7] 9.02FF
+*|I (MMI_MUX4B$7$:out MMI_MUX4B$7$ out O 0 8 85)
+*|I (MMI_FFCB$7$:D MMI_FFCB$7$ D I 0 33 95)
+C105 MMI_MUX4B$7$:out VSS 9.02FF
+
+*|NET net_6[0] 4.18FF
+*|I (adder8/MMI_XOR2B_4:out adder8/MMI_XOR2B_4 out O 0 159 75)
+*|I (MMI_MUX4B$0$:in1 MMI_MUX4B$0$ in1 I 0 162 85)
+C106 adder8/MMI_XOR2B_4:out VSS 4.18FF
+
+*|NET net_6[1] 4.62FF
+*|I (adder8/MMI_XOR2B_3:out adder8/MMI_XOR2B_3 out O 0 145 75)
+*|I (MMI_MUX4B$1$:in1 MMI_MUX4B$1$ in1 I 0 140 85)
+C107 adder8/MMI_XOR2B_3:out VSS 4.62FF
+
+*|NET net_6[2] 5.72FF
+*|I (adder8/MMI_XNOR2B__1:out adder8/MMI_XNOR2B__1 out O 0 128 75)
+*|I (MMI_MUX4B$2$:in1 MMI_MUX4B$2$ in1 I 0 118 85)
+C108 adder8/MMI_XNOR2B__1:out VSS 5.72FF
+
+*|NET net_6[3] 5.5FF
+*|I (adder8/MMI_XNOR2B_:out adder8/MMI_XNOR2B_ out O 0 105 75)
+*|I (MMI_MUX4B$3$:in1 MMI_MUX4B$3$ in1 I 0 96 85)
+C109 adder8/MMI_XNOR2B_:out VSS 5.5FF
+
+*|NET net_6[4] 6.82FF
+*|I (adder8/MMI_XOR2B_2:out adder8/MMI_XOR2B_2 out O 0 89 75)
+*|I (MMI_MUX4B$4$:in1 MMI_MUX4B$4$ in1 I 0 74 85)
+C110 adder8/MMI_XOR2B_2:out VSS 6.82FF
+
+*|NET net_6[5] 7.26FF
+*|I (adder8/MMI_XOR2B_1:out adder8/MMI_XOR2B_1 out O 0 69 75)
+*|I (MMI_MUX4B$5$:in1 MMI_MUX4B$5$ in1 I 0 52 85)
+C111 adder8/MMI_XOR2B_1:out VSS 7.26FF
+
+*|NET net_6[6] 5.28FF
+*|I (adder8/MMI_XOR2B:out adder8/MMI_XOR2B out O 0 38 75)
+*|I (MMI_MUX4B$6$:in1 MMI_MUX4B$6$ in1 I 0 30 85)
+C112 adder8/MMI_XOR2B:out VSS 5.28FF
+
+*|NET net_6[7] 5.06FF
+*|I (adder8/MMI_XOR2B_5:out adder8/MMI_XOR2B_5 out O 0 15 75)
+*|I (MMI_MUX4B$7$:in1 MMI_MUX4B$7$ in1 I 0 8 85)
+C113 adder8/MMI_XOR2B_5:out VSS 5.06FF
+
+*|NET net_7 37.84FF
+*|I (MMI_BUFE_1:out MMI_BUFE_1 out O 0 174 85)
+*|I (MMI_MUX4B$0$:sel0 MMI_MUX4B$0$ sel0 I 0 162 85)
+*|I (MMI_MUX4B$1$:sel0 MMI_MUX4B$1$ sel0 I 0 140 85)
+*|I (MMI_MUX4B$2$:sel0 MMI_MUX4B$2$ sel0 I 0 118 85)
+*|I (MMI_MUX4B$3$:sel0 MMI_MUX4B$3$ sel0 I 0 96 85)
+*|I (MMI_MUX4B$4$:sel0 MMI_MUX4B$4$ sel0 I 0 74 85)
+*|I (MMI_MUX4B$5$:sel0 MMI_MUX4B$5$ sel0 I 0 52 85)
+*|I (MMI_MUX4B$6$:sel0 MMI_MUX4B$6$ sel0 I 0 30 85)
+*|I (MMI_MUX4B$7$:sel0 MMI_MUX4B$7$ sel0 I 0 8 85)
+C114 MMI_BUFE_1:out VSS 37.84FF
+
+*|NET net_8 39.82FF
+*|I (MMI_BUFE_2:out MMI_BUFE_2 out O 0 183 85)
+*|I (MMI_MUX4B$0$:sel1 MMI_MUX4B$0$ sel1 I 0 162 85)
+*|I (MMI_MUX4B$1$:sel1 MMI_MUX4B$1$ sel1 I 0 140 85)
+*|I (MMI_MUX4B$2$:sel1 MMI_MUX4B$2$ sel1 I 0 118 85)
+*|I (MMI_MUX4B$3$:sel1 MMI_MUX4B$3$ sel1 I 0 96 85)
+*|I (MMI_MUX4B$4$:sel1 MMI_MUX4B$4$ sel1 I 0 74 85)
+*|I (MMI_MUX4B$5$:sel1 MMI_MUX4B$5$ sel1 I 0 52 85)
+*|I (MMI_MUX4B$6$:sel1 MMI_MUX4B$6$ sel1 I 0 30 85)
+*|I (MMI_MUX4B$7$:sel1 MMI_MUX4B$7$ sel1 I 0 8 85)
+C115 MMI_BUFE_2:out VSS 39.82FF
+
+*|NET net_10 7.04FF
+*|I (adder8/MMI_AO21B:out adder8/MMI_AO21B out O 0 5 75)
+*|I (MMI_FFCB_3:D MMI_FFCB_3 D I 0 11 95)
+C116 adder8/MMI_AO21B:out VSS 7.04FF
+
+*|NET net_9[0] 3.08FF
+*|I (MMI_BUFD_1$0$:out MMI_BUFD_1$0$ out O 0 161 25)
+*|I (MMI_XOR2B$0$:in0 MMI_XOR2B$0$ in0 I 0 169 25)
+C117 MMI_BUFD_1$0$:out VSS 3.08FF
+
+*|NET net_9[1] 3.08FF
+*|I (MMI_BUFD_1$1$:out MMI_BUFD_1$1$ out O 0 139 25)
+*|I (MMI_XOR2B$1$:in0 MMI_XOR2B$1$ in0 I 0 147 25)
+C118 MMI_BUFD_1$1$:out VSS 3.08FF
+
+*|NET net_9[2] 3.08FF
+*|I (MMI_BUFD_1$2$:out MMI_BUFD_1$2$ out O 0 117 25)
+*|I (MMI_XOR2B$2$:in0 MMI_XOR2B$2$ in0 I 0 125 25)
+C119 MMI_BUFD_1$2$:out VSS 3.08FF
+
+*|NET net_9[3] 3.08FF
+*|I (MMI_BUFD_1$3$:out MMI_BUFD_1$3$ out O 0 95 25)
+*|I (MMI_XOR2B$3$:in0 MMI_XOR2B$3$ in0 I 0 103 25)
+C120 MMI_BUFD_1$3$:out VSS 3.08FF
+
+*|NET net_9[4] 3.08FF
+*|I (MMI_BUFD_1$4$:out MMI_BUFD_1$4$ out O 0 73 25)
+*|I (MMI_XOR2B$4$:in0 MMI_XOR2B$4$ in0 I 0 81 25)
+C121 MMI_BUFD_1$4$:out VSS 3.08FF
+
+*|NET net_9[5] 3.08FF
+*|I (MMI_BUFD_1$5$:out MMI_BUFD_1$5$ out O 0 51 25)
+*|I (MMI_XOR2B$5$:in0 MMI_XOR2B$5$ in0 I 0 59 25)
+C122 MMI_BUFD_1$5$:out VSS 3.08FF
+
+*|NET net_9[6] 3.08FF
+*|I (MMI_BUFD_1$6$:out MMI_BUFD_1$6$ out O 0 29 25)
+*|I (MMI_XOR2B$6$:in0 MMI_XOR2B$6$ in0 I 0 37 25)
+C123 MMI_BUFD_1$6$:out VSS 3.08FF
+
+*|NET net_9[7] 3.08FF
+*|I (MMI_BUFD_1$7$:out MMI_BUFD_1$7$ out O 0 7 25)
+*|I (MMI_XOR2B$7$:in0 MMI_XOR2B$7$ in0 I 0 15 25)
+C124 MMI_BUFD_1$7$:out VSS 3.08FF
+
+*|NET adder8/net_28 3.52FF
+*|I (adder8/MMI_NAND2B:out adder8/MMI_NAND2B out O 0 1 65)
+*|I (adder8/MMI_INVA__5:in adder8/MMI_INVA__5 in I 0 1 75)
+C125 adder8/MMI_NAND2B:out VSS 3.52FF
+
+*|NET adder8/net_29 5.06FF
+*|I (adder8/MMI_INVA__3:out adder8/MMI_INVA__3 out O 0 143 65)
+*|I (adder8/MMI_AOI21B:in1 adder8/MMI_AOI21B in1 I 0 136 75)
+C126 adder8/MMI_INVA__3:out VSS 5.06FF
+
+*|NET adder8/net_30 2.86FF
+*|I (adder8/MMI_AOI21B_2:out adder8/MMI_AOI21B_2 out O 0 49 75)
+*|I (adder8/MMI_OAI21B__5:in0 adder8/MMI_OAI21B__5 in0 I 0 56 75)
+C127 adder8/MMI_AOI21B_2:out VSS 2.86FF
+
+*|NET adder8/net_31 2.42FF
+*|I (adder8/MMI_NAND2B_3:out adder8/MMI_NAND2B_3 out O 0 67 65)
+*|I (adder8/MMI_OAI21B__2:in0 adder8/MMI_OAI21B__2 in0 I 0 62 65)
+C128 adder8/MMI_NAND2B_3:out VSS 2.42FF
+
+*|NET adder8/net_32 3.52FF
+*|I (adder8/MMI_INVA__2:out adder8/MMI_INVA__2 out O 0 136 65)
+*|I (adder8/MMI_AOI21B:in0 adder8/MMI_AOI21B in0 I 0 136 75)
+C129 adder8/MMI_INVA__2:out VSS 3.52FF
+
+*|NET adder8/net_33 3.96FF
+*|I (adder8/MMI_XOR2A_6:out adder8/MMI_XOR2A_6 out O 0 147 65)
+*|I (adder8/MMI_XOR2B_3:in1 adder8/MMI_XOR2B_3 in1 I 0 145 75)
+C130 adder8/MMI_XOR2A_6:out VSS 3.96FF
+
+*|NET adder8/net_34 3.08FF
+*|I (adder8/MMI_OAI21B_:out adder8/MMI_OAI21B_ out O 0 97 75)
+*|I (adder8/MMI_XOR2B_2:in0 adder8/MMI_XOR2B_2 in0 I 0 89 75)
+C131 adder8/MMI_OAI21B_:out VSS 3.08FF
+
+*|NET adder8/net_35 4.62FF
+*|I (adder8/MMI_XOR2A_2:out adder8/MMI_XOR2A_2 out O 0 33 65)
+*|I (adder8/MMI_XOR2B:in1 adder8/MMI_XOR2B in1 I 0 38 75)
+C132 adder8/MMI_XOR2A_2:out VSS 4.62FF
+
+*|NET adder8/net_1 12.1FF
+*|I (adder8/MMI_NOR2B__2:out adder8/MMI_NOR2B__2 out O 0 83 65)
+*|I (adder8/MMI_INVA_1:in adder8/MMI_INVA_1 in I 0 83 75)
+*|I (adder8/MMI_NAND2B_8:in1 adder8/MMI_NAND2B_8 in1 I 0 60 75)
+*|I (adder8/MMI_NAND2B_9:in1 adder8/MMI_NAND2B_9 in1 I 0 44 75)
+C133 adder8/MMI_NOR2B__2:out VSS 12.1FF
+
+*|NET adder8/net_36 11.22FF
+*|I (adder8/MMI_NAND2B_4:out adder8/MMI_NAND2B_4 out O 0 89 65)
+*|I (adder8/MMI_OAI21B_:in0 adder8/MMI_OAI21B_ in0 I 0 97 75)
+*|I (adder8/MMI_OAI21B__2:in2 adder8/MMI_OAI21B__2 in2 I 0 62 65)
+C134 adder8/MMI_NAND2B_4:out VSS 11.22FF
+
+*|NET adder8/net_2 20.24FF
+*|I (adder8/MMI_AOI21C:out adder8/MMI_AOI21C out O 0 116 75)
+*|I (adder8/MMI_XNOR2B_:in0 adder8/MMI_XNOR2B_ in0 I 0 105 75)
+*|I (adder8/MMI_OAI21B_:in2 adder8/MMI_OAI21B_ in2 I 0 97 75)
+*|I (adder8/MMI_OAI21B__4:in2 adder8/MMI_OAI21B__4 in2 I 0 79 75)
+*|I (adder8/MMI_OAI21B__5:in2 adder8/MMI_OAI21B__5 in2 I 0 56 75)
+*|I (adder8/MMI_OAI21B__3:in2 adder8/MMI_OAI21B__3 in2 I 0 30 75)
+C135 adder8/MMI_AOI21C:out VSS 20.24FF
+
+*|NET adder8/net_37 3.08FF
+*|I (adder8/MMI_AOI21B:out adder8/MMI_AOI21B out O 0 136 75)
+*|I (adder8/MMI_XNOR2B__1:in0 adder8/MMI_XNOR2B__1 in0 I 0 128 75)
+C136 adder8/MMI_AOI21B:out VSS 3.08FF
+
+*|NET adder8/net_3 14.96FF
+*|I (adder8/MMI_OAI21B__2:out adder8/MMI_OAI21B__2 out O 0 62 65)
+*|I (adder8/MMI_INVA:in adder8/MMI_INVA in I 0 75 75)
+*|I (adder8/MMI_AOI21B_2:in2 adder8/MMI_AOI21B_2 in2 I 0 49 75)
+*|I (adder8/MMI_AOI21B_1:in2 adder8/MMI_AOI21B_1 in2 I 0 23 75)
+C137 adder8/MMI_OAI21B__2:out VSS 14.96FF
+
+*|NET adder8/net_38 2.86FF
+*|I (adder8/MMI_AOI21B_1:out adder8/MMI_AOI21B_1 out O 0 23 75)
+*|I (adder8/MMI_OAI21B__3:in0 adder8/MMI_OAI21B__3 in0 I 0 30 75)
+C138 adder8/MMI_AOI21B_1:out VSS 2.86FF
+
+*|NET adder8/net_4 4.4FF
+*|I (adder8/MMI_NOR2B:out adder8/MMI_NOR2B out O 0 5 65)
+*|I (adder8/MMI_INVA__1:in adder8/MMI_INVA__1 in I 0 9 75)
+C139 adder8/MMI_NOR2B:out VSS 4.4FF
+
+*|NET adder8/net_39 6.6FF
+*|I (adder8/MMI_XOR2A_3:out adder8/MMI_XOR2A_3 out O 0 55 65)
+*|I (adder8/MMI_XOR2B_1:in1 adder8/MMI_XOR2B_1 in1 I 0 69 75)
+C140 adder8/MMI_XOR2A_3:out VSS 6.6FF
+
+*|NET adder8/net_40 3.08FF
+*|I (adder8/MMI_NOR2B_3:out adder8/MMI_NOR2B_3 out O 0 162 65)
+*|I (adder8/MMI_OAI21B__6:in1 adder8/MMI_OAI21B__6 in1 I 0 154 65)
+C141 adder8/MMI_NOR2B_3:out VSS 3.08FF
+
+*|NET adder8/net_5 1.98FF
+*|I (adder8/MMI_INVA__4:out adder8/MMI_INVA__4 out O 0 63 75)
+*|I (adder8/MMI_NAND2B_8:in0 adder8/MMI_NAND2B_8 in0 I 0 60 75)
+C142 adder8/MMI_INVA__4:out VSS 1.98FF
+
+*|NET adder8/net_41 5.94FF
+*|I (adder8/MMI_NOR2B_7:out adder8/MMI_NOR2B_7 out O 0 71 65)
+*|I (adder8/MMI_OAI21B__2:in1 adder8/MMI_OAI21B__2 in1 I 0 62 65)
+*|I (adder8/MMI_NOR2B__2:in1 adder8/MMI_NOR2B__2 in1 I 0 83 65)
+C143 adder8/MMI_NOR2B_7:out VSS 5.94FF
+
+*|NET adder8/net_6 8.8FF
+*|I (adder8/MMI_NOR2B_2:out adder8/MMI_NOR2B_2 out O 0 49 65)
+*|I (adder8/MMI_NOR2B_:in0 adder8/MMI_NOR2B_ in0 I 0 39 65)
+*|I (adder8/MMI_AOI21B_2:in1 adder8/MMI_AOI21B_2 in1 I 0 49 75)
+*|I (adder8/MMI_INVA__4:in adder8/MMI_INVA__4 in I 0 63 75)
+C144 adder8/MMI_NOR2B_2:out VSS 8.8FF
+
+*|NET adder8/net_42 2.2FF
+*|I (adder8/MMI_INVA__5:out adder8/MMI_INVA__5 out O 0 1 75)
+*|I (adder8/MMI_AO21B:in0 adder8/MMI_AO21B in0 I 0 5 75)
+C145 adder8/MMI_INVA__5:out VSS 2.2FF
+
+*|NET adder8/net_43 2.2FF
+*|I (adder8/MMI_INVA_1:out adder8/MMI_INVA_1 out O 0 83 75)
+*|I (adder8/MMI_OAI21B__4:in1 adder8/MMI_OAI21B__4 in1 I 0 79 75)
+C146 adder8/MMI_INVA_1:out VSS 2.2FF
+
+*|NET adder8/net_7 5.06FF
+*|I (adder8/MMI_XOR2A_5:out adder8/MMI_XOR2A_5 out O 0 121 65)
+*|I (adder8/MMI_XNOR2B__1:in1 adder8/MMI_XNOR2B__1 in1 I 0 128 75)
+C147 adder8/MMI_XOR2A_5:out VSS 5.06FF
+
+*|NET adder8/net_44 6.16FF
+*|I (adder8/MMI_XOR2A_4:out adder8/MMI_XOR2A_4 out O 0 77 65)
+*|I (adder8/MMI_XOR2B_2:in1 adder8/MMI_XOR2B_2 in1 I 0 89 75)
+C148 adder8/MMI_XOR2A_4:out VSS 6.16FF
+
+*|NET adder8/net_8 6.82FF
+*|I (adder8/MMI_OAI21B__3:out adder8/MMI_OAI21B__3 out O 0 30 75)
+*|I (adder8/MMI_XOR2B_5:in0 adder8/MMI_XOR2B_5 in0 I 0 15 75)
+*|I (adder8/MMI_AO21B:in1 adder8/MMI_AO21B in1 I 0 5 75)
+C149 adder8/MMI_OAI21B__3:out VSS 6.82FF
+
+*|NET adder8/net_45 2.2FF
+*|I (adder8/MMI_INVA:out adder8/MMI_INVA out O 0 75 75)
+*|I (adder8/MMI_OAI21B__4:in0 adder8/MMI_OAI21B__4 in0 I 0 79 75)
+C150 adder8/MMI_INVA:out VSS 2.2FF
+
+*|NET adder8/net_9 5.94FF
+*|I (adder8/MMI_NOR2B_5:out adder8/MMI_NOR2B_5 out O 0 115 65)
+*|I (adder8/MMI_OAI21B__7:in1 adder8/MMI_OAI21B__7 in1 I 0 106 65)
+*|I (adder8/MMI_NOR2B__1:in1 adder8/MMI_NOR2B__1 in1 I 0 127 65)
+C151 adder8/MMI_NOR2B_5:out VSS 5.94FF
+
+*|NET adder8/net_46 2.42FF
+*|I (adder8/MMI_NAND2B_5:out adder8/MMI_NAND2B_5 out O 0 111 65)
+*|I (adder8/MMI_OAI21B__7:in0 adder8/MMI_OAI21B__7 in0 I 0 106 65)
+C152 adder8/MMI_NAND2B_5:out VSS 2.42FF
+
+*|NET adder8/net_47 2.2FF
+*|I (adder8/MMI_NAND2B_7:out adder8/MMI_NAND2B_7 out O 0 158 65)
+*|I (adder8/MMI_OAI21B__6:in0 adder8/MMI_OAI21B__6 in0 I 0 154 65)
+C153 adder8/MMI_NAND2B_7:out VSS 2.2FF
+
+*|NET adder8/net_48 7.92FF
+*|I (adder8/MMI_NAND2B_6:out adder8/MMI_NAND2B_6 out O 0 133 65)
+*|I (adder8/MMI_INVA__2:in adder8/MMI_INVA__2 in I 0 136 65)
+*|I (adder8/MMI_OAI21B__7:in2 adder8/MMI_OAI21B__7 in2 I 0 106 65)
+C154 adder8/MMI_NAND2B_6:out VSS 7.92FF
+
+*|NET adder8/net_50 5.72FF
+*|I (adder8/MMI_OAI21B__7:out adder8/MMI_OAI21B__7 out O 0 106 65)
+*|I (adder8/MMI_AOI21C:in0 adder8/MMI_AOI21C in0 I 0 116 75)
+C155 adder8/MMI_OAI21B__7:out VSS 5.72FF
+
+*|NET adder8/net_49 4.84FF
+*|I (adder8/MMI_XOR2A_1:out adder8/MMI_XOR2A_1 out O 0 99 65)
+*|I (adder8/MMI_XNOR2B_:in1 adder8/MMI_XNOR2B_ in1 I 0 105 75)
+C156 adder8/MMI_XOR2A_1:out VSS 4.84FF
+
+*|NET adder8/net_10 4.84FF
+*|I (adder8/MMI_NOR2B_4:out adder8/MMI_NOR2B_4 out O 0 139 65)
+*|I (adder8/MMI_INVA__3:in adder8/MMI_INVA__3 in I 0 143 65)
+*|I (adder8/MMI_NOR2B__1:in0 adder8/MMI_NOR2B__1 in0 I 0 127 65)
+C157 adder8/MMI_NOR2B_4:out VSS 4.84FF
+
+*|NET adder8/net_11 4.62FF
+*|I (adder8/MMI_OAI21B__1:out adder8/MMI_OAI21B__1 out O 0 18 65)
+*|I (adder8/MMI_AOI21B_1:in0 adder8/MMI_AOI21B_1 in0 I 0 23 75)
+C158 adder8/MMI_OAI21B__1:out VSS 4.62FF
+
+*|NET adder8/net_12 4.4FF
+*|I (adder8/MMI_NAND2B_9:out adder8/MMI_NAND2B_9 out O 0 44 75)
+*|I (adder8/MMI_OAI21B__3:in1 adder8/MMI_OAI21B__3 in1 I 0 30 75)
+C159 adder8/MMI_NAND2B_9:out VSS 4.4FF
+
+*|NET adder8/net_13 5.94FF
+*|I (adder8/MMI_NOR2B__1:out adder8/MMI_NOR2B__1 out O 0 127 65)
+*|I (adder8/MMI_AOI21C:in1 adder8/MMI_AOI21C in1 I 0 116 75)
+C160 adder8/MMI_NOR2B__1:out VSS 5.94FF
+
+*|NET adder8/net_14 6.6FF
+*|I (adder8/MMI_INVA_:out adder8/MMI_INVA_ out O 0 173 65)
+*|I (adder8/MMI_XOR2B_4:in0 adder8/MMI_XOR2B_4 in0 I 0 159 75)
+C161 adder8/MMI_INVA_:out VSS 6.6FF
+
+*|NET adder8/net_15 2.42FF
+*|I (adder8/MMI_NAND2B_1:out adder8/MMI_NAND2B_1 out O 0 23 65)
+*|I (adder8/MMI_OAI21B__1:in0 adder8/MMI_OAI21B__1 in0 I 0 18 65)
+C162 adder8/MMI_NAND2B_1:out VSS 2.42FF
+
+*|NET adder8/net_16 6.6FF
+*|I (adder8/MMI_NOR2B_1:out adder8/MMI_NOR2B_1 out O 0 93 65)
+*|I (adder8/MMI_NOR2B__2:in0 adder8/MMI_NOR2B__2 in0 I 0 83 65)
+*|I (adder8/MMI_OAI21B_:in1 adder8/MMI_OAI21B_ in1 I 0 97 75)
+C163 adder8/MMI_NOR2B_1:out VSS 6.6FF
+
+*|NET adder8/net_17 2.2FF
+*|I (adder8/MMI_NAND2B_8:out adder8/MMI_NAND2B_8 out O 0 60 75)
+*|I (adder8/MMI_OAI21B__5:in1 adder8/MMI_OAI21B__5 in1 I 0 56 75)
+C164 adder8/MMI_NAND2B_8:out VSS 2.2FF
+
+*|NET adder8/net_18 5.5FF
+*|I (adder8/MMI_XOR2A_7:out adder8/MMI_XOR2A_7 out O 0 168 65)
+*|I (adder8/MMI_XOR2B_4:in1 adder8/MMI_XOR2B_4 in1 I 0 159 75)
+C165 adder8/MMI_XOR2A_7:out VSS 5.5FF
+
+*|NET adder8/net_19 5.94FF
+*|I (adder8/MMI_INVB_:out adder8/MMI_INVB_ out O 0 175 65)
+*|I (adder8/MMI_INVA_:in adder8/MMI_INVA_ in I 0 173 65)
+*|I (adder8/MMI_OAI21B__6:in2 adder8/MMI_OAI21B__6 in2 I 0 154 65)
+C166 adder8/MMI_INVB_:out VSS 5.94FF
+
+*|NET adder8/net_20 3.52FF
+*|I (adder8/MMI_OAI21B__4:out adder8/MMI_OAI21B__4 out O 0 79 75)
+*|I (adder8/MMI_XOR2B_1:in0 adder8/MMI_XOR2B_1 in0 I 0 69 75)
+C167 adder8/MMI_OAI21B__4:out VSS 3.52FF
+
+*|NET adder8/net_21 5.94FF
+*|I (adder8/MMI_NOR2B_6:out adder8/MMI_NOR2B_6 out O 0 27 65)
+*|I (adder8/MMI_OAI21B__1:in1 adder8/MMI_OAI21B__1 in1 I 0 18 65)
+*|I (adder8/MMI_NOR2B_:in1 adder8/MMI_NOR2B_ in1 I 0 39 65)
+C168 adder8/MMI_NOR2B_6:out VSS 5.94FF
+
+*|NET adder8/net_22 10.34FF
+*|I (adder8/MMI_NAND2B_2:out adder8/MMI_NAND2B_2 out O 0 45 65)
+*|I (adder8/MMI_AOI21B_2:in0 adder8/MMI_AOI21B_2 in0 I 0 49 75)
+*|I (adder8/MMI_OAI21B__1:in2 adder8/MMI_OAI21B__1 in2 I 0 18 65)
+C169 adder8/MMI_NAND2B_2:out VSS 10.34FF
+
+*|NET adder8/net_23 4.4FF
+*|I (adder8/MMI_XOR2A:out adder8/MMI_XOR2A out O 0 11 65)
+*|I (adder8/MMI_XOR2B_5:in1 adder8/MMI_XOR2B_5 in1 I 0 15 75)
+C170 adder8/MMI_XOR2A:out VSS 4.4FF
+
+*|NET adder8/net_24 8.14FF
+*|I (adder8/MMI_NOR2B_:out adder8/MMI_NOR2B_ out O 0 39 65)
+*|I (adder8/MMI_NAND2B_9:in0 adder8/MMI_NAND2B_9 in0 I 0 44 75)
+*|I (adder8/MMI_AOI21B_1:in1 adder8/MMI_AOI21B_1 in1 I 0 23 75)
+C171 adder8/MMI_NOR2B_:out VSS 8.14FF
+
+*|NET adder8/net_25 5.28FF
+*|I (adder8/MMI_OAI21B__5:out adder8/MMI_OAI21B__5 out O 0 56 75)
+*|I (adder8/MMI_XOR2B:in0 adder8/MMI_XOR2B in0 I 0 38 75)
+C172 adder8/MMI_OAI21B__5:out VSS 5.28FF
+
+*|NET adder8/net_26 2.2FF
+*|I (adder8/MMI_INVA__1:out adder8/MMI_INVA__1 out O 0 9 75)
+*|I (adder8/MMI_AO21B:in2 adder8/MMI_AO21B in2 I 0 5 75)
+C173 adder8/MMI_INVA__1:out VSS 2.2FF
+
+*|NET adder8/net_27 11.88FF
+*|I (adder8/MMI_OAI21B__6:out adder8/MMI_OAI21B__6 out O 0 154 65)
+*|I (adder8/MMI_XOR2B_3:in0 adder8/MMI_XOR2B_3 in0 I 0 145 75)
+*|I (adder8/MMI_AOI21B:in2 adder8/MMI_AOI21B in2 I 0 136 75)
+*|I (adder8/MMI_AOI21C:in2 adder8/MMI_AOI21C in2 I 0 116 75)
+C174 adder8/MMI_OAI21B__6:out VSS 11.88FF
+
+*|NET shift8/net_1 40.92FF
+*|I (shift8/MMI_BUFE:out shift8/MMI_BUFE out O 0 188 35)
+*|I (shift8/MMI_MUX4B$0$:sel0 shift8/MMI_MUX4B$0$ sel0 I 0 162 35)
+*|I (shift8/MMI_MUX4B$1$:sel0 shift8/MMI_MUX4B$1$ sel0 I 0 140 35)
+*|I (shift8/MMI_MUX4B$2$:sel0 shift8/MMI_MUX4B$2$ sel0 I 0 118 35)
+*|I (shift8/MMI_MUX4B$3$:sel0 shift8/MMI_MUX4B$3$ sel0 I 0 96 35)
+*|I (shift8/MMI_MUX4B$4$:sel0 shift8/MMI_MUX4B$4$ sel0 I 0 74 35)
+*|I (shift8/MMI_MUX4B$5$:sel0 shift8/MMI_MUX4B$5$ sel0 I 0 52 35)
+*|I (shift8/MMI_MUX4B$6$:sel0 shift8/MMI_MUX4B$6$ sel0 I 0 30 35)
+*|I (shift8/MMI_MUX4B$7$:sel0 shift8/MMI_MUX4B$7$ sel0 I 0 8 35)
+C175 shift8/MMI_BUFE:out VSS 40.92FF
+
+*|NET shift8/net_2 38.72FF
+*|I (shift8/MMI_BUFE_2:out shift8/MMI_BUFE_2 out O 0 177 55)
+*|I (shift8/MMI_MUX2D$0$:sel shift8/MMI_MUX2D$0$ sel I 0 161 55)
+*|I (shift8/MMI_MUX2D$1$:sel shift8/MMI_MUX2D$1$ sel I 0 139 55)
+*|I (shift8/MMI_MUX2D$2$:sel shift8/MMI_MUX2D$2$ sel I 0 117 55)
+*|I (shift8/MMI_MUX2D$3$:sel shift8/MMI_MUX2D$3$ sel I 0 95 55)
+*|I (shift8/MMI_MUX2D$4$:sel shift8/MMI_MUX2D$4$ sel I 0 73 55)
+*|I (shift8/MMI_MUX2D$5$:sel shift8/MMI_MUX2D$5$ sel I 0 51 55)
+*|I (shift8/MMI_MUX2D$6$:sel shift8/MMI_MUX2D$6$ sel I 0 29 55)
+*|I (shift8/MMI_MUX2D$7$:sel shift8/MMI_MUX2D$7$ sel I 0 7 55)
+C176 shift8/MMI_BUFE_2:out VSS 38.72FF
+
+*|NET shift8/i[0] 8.14FF
+*|I (shift8/MMI_BUFD$0$:out shift8/MMI_BUFD$0$ out O 0 172 35)
+*|I (shift8/MMI_MUX2D$0$:in1 shift8/MMI_MUX2D$0$ in1 I 0 161 55)
+C177 shift8/MMI_BUFD$0$:out VSS 8.14FF
+
+*|NET shift8/i[1] 8.14FF
+*|I (shift8/MMI_BUFD$1$:out shift8/MMI_BUFD$1$ out O 0 150 35)
+*|I (shift8/MMI_MUX2D$1$:in1 shift8/MMI_MUX2D$1$ in1 I 0 139 55)
+C178 shift8/MMI_BUFD$1$:out VSS 8.14FF
+
+*|NET shift8/i[2] 8.14FF
+*|I (shift8/MMI_BUFD$2$:out shift8/MMI_BUFD$2$ out O 0 128 35)
+*|I (shift8/MMI_MUX2D$2$:in1 shift8/MMI_MUX2D$2$ in1 I 0 117 55)
+C179 shift8/MMI_BUFD$2$:out VSS 8.14FF
+
+*|NET shift8/i[3] 8.14FF
+*|I (shift8/MMI_BUFD$3$:out shift8/MMI_BUFD$3$ out O 0 106 35)
+*|I (shift8/MMI_MUX2D$3$:in1 shift8/MMI_MUX2D$3$ in1 I 0 95 55)
+C180 shift8/MMI_BUFD$3$:out VSS 8.14FF
+
+*|NET shift8/i[4] 25.08FF
+*|I (shift8/MMI_BUFD$4$:out shift8/MMI_BUFD$4$ out O 0 84 35)
+*|I (shift8/MMI_MUX2D$4$:in1 shift8/MMI_MUX2D$4$ in1 I 0 73 55)
+*|I (shift8/MMI_MUX2D$0$:in0 shift8/MMI_MUX2D$0$ in0 I 0 161 55)
+C181 shift8/MMI_BUFD$4$:out VSS 25.08FF
+
+*|NET shift8/i[5] 25.08FF
+*|I (shift8/MMI_BUFD$5$:out shift8/MMI_BUFD$5$ out O 0 62 35)
+*|I (shift8/MMI_MUX2D$5$:in1 shift8/MMI_MUX2D$5$ in1 I 0 51 55)
+*|I (shift8/MMI_MUX2D$1$:in0 shift8/MMI_MUX2D$1$ in0 I 0 139 55)
+C182 shift8/MMI_BUFD$5$:out VSS 25.08FF
+
+*|NET shift8/i[6] 25.08FF
+*|I (shift8/MMI_BUFD$6$:out shift8/MMI_BUFD$6$ out O 0 40 35)
+*|I (shift8/MMI_MUX2D$6$:in1 shift8/MMI_MUX2D$6$ in1 I 0 29 55)
+*|I (shift8/MMI_MUX2D$2$:in0 shift8/MMI_MUX2D$2$ in0 I 0 117 55)
+C183 shift8/MMI_BUFD$6$:out VSS 25.08FF
+
+*|NET shift8/i[7] 25.08FF
+*|I (shift8/MMI_BUFD$7$:out shift8/MMI_BUFD$7$ out O 0 18 35)
+*|I (shift8/MMI_MUX2D$7$:in1 shift8/MMI_MUX2D$7$ in1 I 0 7 55)
+*|I (shift8/MMI_MUX2D$3$:in0 shift8/MMI_MUX2D$3$ in0 I 0 95 55)
+C184 shift8/MMI_BUFD$7$:out VSS 25.08FF
+
+*|NET shift8/net_3[0] 3.3FF
+*|I (shift8/MMI_MUX2D$0$:out shift8/MMI_MUX2D$0$ out O 0 161 55)
+*|I (shift8/MMI_BUFD_1$0$:in shift8/MMI_BUFD_1$0$ in I 0 170 55)
+C185 shift8/MMI_MUX2D$0$:out VSS 3.3FF
+
+*|NET shift8/net_3[1] 3.3FF
+*|I (shift8/MMI_MUX2D$1$:out shift8/MMI_MUX2D$1$ out O 0 139 55)
+*|I (shift8/MMI_BUFD_1$1$:in shift8/MMI_BUFD_1$1$ in I 0 148 55)
+C186 shift8/MMI_MUX2D$1$:out VSS 3.3FF
+
+*|NET shift8/net_3[2] 3.3FF
+*|I (shift8/MMI_MUX2D$2$:out shift8/MMI_MUX2D$2$ out O 0 117 55)
+*|I (shift8/MMI_BUFD_1$2$:in shift8/MMI_BUFD_1$2$ in I 0 126 55)
+C187 shift8/MMI_MUX2D$2$:out VSS 3.3FF
+
+*|NET shift8/net_3[3] 3.3FF
+*|I (shift8/MMI_MUX2D$3$:out shift8/MMI_MUX2D$3$ out O 0 95 55)
+*|I (shift8/MMI_BUFD_1$3$:in shift8/MMI_BUFD_1$3$ in I 0 104 55)
+C188 shift8/MMI_MUX2D$3$:out VSS 3.3FF
+
+*|NET shift8/net_3[4] 3.3FF
+*|I (shift8/MMI_MUX2D$4$:out shift8/MMI_MUX2D$4$ out O 0 73 55)
+*|I (shift8/MMI_BUFD_1$4$:in shift8/MMI_BUFD_1$4$ in I 0 82 55)
+C189 shift8/MMI_MUX2D$4$:out VSS 3.3FF
+
+*|NET shift8/net_3[5] 3.3FF
+*|I (shift8/MMI_MUX2D$5$:out shift8/MMI_MUX2D$5$ out O 0 51 55)
+*|I (shift8/MMI_BUFD_1$5$:in shift8/MMI_BUFD_1$5$ in I 0 60 55)
+C190 shift8/MMI_MUX2D$5$:out VSS 3.3FF
+
+*|NET shift8/net_3[6] 3.3FF
+*|I (shift8/MMI_MUX2D$6$:out shift8/MMI_MUX2D$6$ out O 0 29 55)
+*|I (shift8/MMI_BUFD_1$6$:in shift8/MMI_BUFD_1$6$ in I 0 38 55)
+C191 shift8/MMI_MUX2D$6$:out VSS 3.3FF
+
+*|NET shift8/net_3[7] 3.3FF
+*|I (shift8/MMI_MUX2D$7$:out shift8/MMI_MUX2D$7$ out O 0 7 55)
+*|I (shift8/MMI_BUFD_1$7$:in shift8/MMI_BUFD_1$7$ in I 0 16 55)
+C192 shift8/MMI_MUX2D$7$:out VSS 3.3FF
+
+*|NET shift8/net_4[0] 3.52FF
+*|I (shift8/MMI_MUX4B$0$:out shift8/MMI_MUX4B$0$ out O 0 162 35)
+*|I (shift8/MMI_BUFD$0$:in shift8/MMI_BUFD$0$ in I 0 172 35)
+C193 shift8/MMI_MUX4B$0$:out VSS 3.52FF
+
+*|NET shift8/net_4[1] 3.52FF
+*|I (shift8/MMI_MUX4B$1$:out shift8/MMI_MUX4B$1$ out O 0 140 35)
+*|I (shift8/MMI_BUFD$1$:in shift8/MMI_BUFD$1$ in I 0 150 35)
+C194 shift8/MMI_MUX4B$1$:out VSS 3.52FF
+
+*|NET shift8/net_4[2] 3.52FF
+*|I (shift8/MMI_MUX4B$2$:out shift8/MMI_MUX4B$2$ out O 0 118 35)
+*|I (shift8/MMI_BUFD$2$:in shift8/MMI_BUFD$2$ in I 0 128 35)
+C195 shift8/MMI_MUX4B$2$:out VSS 3.52FF
+
+*|NET shift8/net_4[3] 3.52FF
+*|I (shift8/MMI_MUX4B$3$:out shift8/MMI_MUX4B$3$ out O 0 96 35)
+*|I (shift8/MMI_BUFD$3$:in shift8/MMI_BUFD$3$ in I 0 106 35)
+C196 shift8/MMI_MUX4B$3$:out VSS 3.52FF
+
+*|NET shift8/net_4[4] 3.52FF
+*|I (shift8/MMI_MUX4B$4$:out shift8/MMI_MUX4B$4$ out O 0 74 35)
+*|I (shift8/MMI_BUFD$4$:in shift8/MMI_BUFD$4$ in I 0 84 35)
+C197 shift8/MMI_MUX4B$4$:out VSS 3.52FF
+
+*|NET shift8/net_4[5] 3.52FF
+*|I (shift8/MMI_MUX4B$5$:out shift8/MMI_MUX4B$5$ out O 0 52 35)
+*|I (shift8/MMI_BUFD$5$:in shift8/MMI_BUFD$5$ in I 0 62 35)
+C198 shift8/MMI_MUX4B$5$:out VSS 3.52FF
+
+*|NET shift8/net_4[6] 3.52FF
+*|I (shift8/MMI_MUX4B$6$:out shift8/MMI_MUX4B$6$ out O 0 30 35)
+*|I (shift8/MMI_BUFD$6$:in shift8/MMI_BUFD$6$ in I 0 40 35)
+C199 shift8/MMI_MUX4B$6$:out VSS 3.52FF
+
+*|NET shift8/net_4[7] 3.52FF
+*|I (shift8/MMI_MUX4B$7$:out shift8/MMI_MUX4B$7$ out O 0 8 35)
+*|I (shift8/MMI_BUFD$7$:in shift8/MMI_BUFD$7$ in I 0 18 35)
+C200 shift8/MMI_MUX4B$7$:out VSS 3.52FF
+
+*|NET shift8/net_5 38.94FF
+*|I (shift8/MMI_BUFE_1:out shift8/MMI_BUFE_1 out O 0 179 35)
+*|I (shift8/MMI_MUX4B$0$:sel1 shift8/MMI_MUX4B$0$ sel1 I 0 162 35)
+*|I (shift8/MMI_MUX4B$1$:sel1 shift8/MMI_MUX4B$1$ sel1 I 0 140 35)
+*|I (shift8/MMI_MUX4B$2$:sel1 shift8/MMI_MUX4B$2$ sel1 I 0 118 35)
+*|I (shift8/MMI_MUX4B$3$:sel1 shift8/MMI_MUX4B$3$ sel1 I 0 96 35)
+*|I (shift8/MMI_MUX4B$4$:sel1 shift8/MMI_MUX4B$4$ sel1 I 0 74 35)
+*|I (shift8/MMI_MUX4B$5$:sel1 shift8/MMI_MUX4B$5$ sel1 I 0 52 35)
+*|I (shift8/MMI_MUX4B$6$:sel1 shift8/MMI_MUX4B$6$ sel1 I 0 30 35)
+*|I (shift8/MMI_MUX4B$7$:sel1 shift8/MMI_MUX4B$7$ sel1 I 0 8 35)
+C201 shift8/MMI_BUFE_1:out VSS 38.94FF
+
+.ENDS
+
+.END

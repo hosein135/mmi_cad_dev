@@ -1,0 +1,15 @@
+#!/usr/local/bin/perl
+
+die "usage: $0 file\n" unless @ARGV == 1;
+$file = shift(@ARGV);
+
+open(TEE, ">$file") || die "can't write $file\n";
+select(STDOUT); $| = 1;
+select(TEE); $| = 1;
+
+while (<>) {
+	print TEE $_;
+	print $_;
+	next unless /^Exiting Micro Magic SUE\.  Have a nice day\.$/;
+}
+exit(0);

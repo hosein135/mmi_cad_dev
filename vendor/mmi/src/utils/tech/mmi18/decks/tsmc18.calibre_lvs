@@ -1,0 +1,417 @@
+TITLE "Calibre DRC Version 1.3a for TSMC 0.18um Logic Salicide 1.8V/3.3V 1P6M"
+//
+// @(#) TA-10A5-4001.lvs.rules Version 1.3a 04/01/99 Grade 1
+// @(#) TSMC 0.18 um Logic Salicide 1.8V/3.3V 1P6M
+// @(#) SPICE Doc. T-018-LO-SP-001 Rev. 1.3 01-22-99 F990316
+// @(#) DRC   Doc. T-018-LO-DR-001 Rev. 1.2 03/23/99 F991129
+//
+// @(#) TA-10A5-4001.lvs.rules MGC Version 1.3 04/01/99
+//
+// DISCLAIMER OF WARRANTY: Mentor Graphics software and associated files are 
+// provided "as is" and without warranty.  Mentor Graphics has no obligation 
+// to support or otherwise maintain software.  Mentor Graphics makes no 
+// warranties, express or implied with respect to software including any 
+// warranty of merchantability or fitness for a particular purpose. 
+//
+// LIMITATION OF LIABILITY: Mentor Graphics is not liable for any property 
+// damage, personal injury, loss of profits, interruption of business, or for 
+// any other special, consequential or incidental damages, however caused, 
+// whether for breach of warranty, contract, tort (including negligence), 
+// strict liability or otherwise.
+//
+////////////////////////////////////////////////////////////////////////////////
+// 
+//                             CHANGE HISTORY
+//
+// Version   Date      Who                      Description
+// ------- -------- --------- --------------------------------------------------
+// 1.1	   03/31/99 Frazier   Created sccs file.
+// 1.2	   03/31/99 Frazier   Changed to generic file names and cells.
+// 1.3     03/31/99 Moore     LVS IGNORE PORTS YES, USER NOTES
+//
+////////////////////////////////////////////////////////////////////////////////
+
+// USER NOTES :
+//
+// 1) mnpg49 mppg49 are obtained in a DRC run, not in an LVS run
+//
+// 2) Metal sheet resistance 0.078 except for top metal (0.036)
+//
+// 3) For Calibre "EDTEXT" file, use .INCLUDE strings.txt
+//        [text string] [x] [y] (layer name)
+
+
+  //////////////////////////////////////////////
+  // SPECIFICATION STATEMENTS
+  //////////////////////////////////////////////
+
+//LAYOUT PRIMARY "top"
+//LAYOUT PATH "layout.gds"
+//LAYOUT SYSTEM GDSII
+
+//SOURCE PRIMARY "top"
+//SOURCE PATH "source.spi"
+//SOURCE SYSTEM SPICE
+
+DRC RESULTS DATABASE "drc.db" ASCII
+DRC SUMMARY REPORT "drc.sum" 
+
+//LVS REPORT "lvs.rep"
+//MASK RESULTS DATABASE "lvs.maskdb"
+MASK RESULTS DATABASE NONE
+// MASK SVDB DIRECTORY "svbd" QUERY
+
+LVS POWER NAME "vdd" "VDD" "AVDD" "VD33" "VDDSA" "VDDPST" "VDD5V"
+LVS GROUND NAME "gnd" "GND" "AGND" "VSS" "AVSS" "VSSPST"
+
+PRECISION 1000
+RESOLUTION 1
+UNIT LENGTH U
+
+TEXT DEPTH PRIMARY
+
+PORT LAYER TEXT 40 41 42 43 44 45
+
+FLAG SKEW YES
+FLAG OFFGRID YES
+
+  //////////////////////////////////////////////
+  // INPUT LAYER STATEMENTS
+  //////////////////////////////////////////////
+
+DRC:1 = EXTENT
+BULK = SIZE DRC:1 BY 1.0
+
+LAYER NWELL	  2  // N-Well
+LAYER OD2	  4  // Thick Oxide Definition
+LAYER N3V	  5  // 3.3V_NLDD Implantation
+LAYER PIMP	  7  //	P+ S/D Implantation
+LAYER NIMP	  8  //	N+ S/D Implantation
+LAYER POD	  11
+LAYER NOD	  12 // Thin Oxide Definition
+LAYER POLY1	  13 // Poly Si
+LAYER POLY2	  14 // Poly2 for caps and res
+LAYER CONT	  15 // Contact
+LAYER M1	  16 // Metal-1
+LAYER VIA	  17 // Via1 Hole
+LAYER M2	  18 // Metal-2
+LAYER VIA2	  27 // Via2 Hole
+LAYER M3	  28 // Metal-3
+LAYER VIA3	  29 // Via3 Hole
+LAYER M4	  31 // Metal-4
+LAYER VIA4	  32 // Via4 Hole
+LAYER M5	  33 // Metal-5
+LAYER VIA5	  39 // Via5 Hole
+LAYER M6	  38 // Metal-6
+LAYER RPO	  34 // Non-salicide OD Area Definition
+LAYER ESD	  30 // ESD inplant
+LAYER PAD	  19 // Passivation Window
+LAYER BJTDUMY	  49 // BJT dummy layer to form BJT
+LAYER PSUB2	  50 // apply for subtract2 ground
+LAYER VCDUMMY	  53 // dummy layer to avoid form poly1&2 cap
+LAYER RWDUMMY	  52 // N-Well resistor dummy mask
+LAYER RODUMMY	  75 // dummy layer to remove OD
+LAYER RPDUMMY	  54 // dummy layer to form OD/POLY resistor
+LAYER RMDUMMY	  69 // dummy layer to form METAL resistor
+LAYER DIODE	  56 // dummy layer to form diode
+LAYER PTDIODE	  37 // dummy layer to form protection diode
+LAYER CDUMMY	  70 // dummy layer to form poly/m1/m2 cap
+
+LABEL ORDER  mt6  mt5  mt4  mt3  mt2  mt1  c2poly  cpoly  tiod  tndiff  tpdiff  PSUB  NXWELL 
+
+LAYOUT TOP LAYER M1 VIA M2 VIA2 M3 VIA3 M4 VIA4 M5 VIA5 M6 PAD
+
+TEXT LAYER 40 ATTACH 40 MT1 // Metal-1 text
+TEXT LAYER 41 ATTACH 41 MT2 // Metal-2 text
+TEXT LAYER 42 ATTACH 42 MT3 // Metal-3 text
+TEXT LAYER 43 ATTACH 43 MT4 // Metal-4 text
+TEXT LAYER 44 ATTACH 44 MT5 // Metal-5 text
+TEXT LAYER 45 ATTACH 45 MT6 // Metal-6 text
+
+VIRTUAL CONNECT COLON YES
+
+
+  //////////////////////////////////////////////
+  // LAYER DERIVATIONS AND OPERATIONS
+  //////////////////////////////////////////////
+// PODNOD-RODUMMY-->DIFF 
+tdiff = POD OR NOD
+diff = tdiff NOT RODUMMY
+// diff - POLY1 - RPO --> TIOD 
+tiod1 = diff NOT POLY1 
+tiod = tiod1 NOT RPO      // RPO cut ti-od
+podcon = tiod AND PIMP
+nodcon = tiod AND NIMP    // to implement OD as connector
+
+//     Define DIFF/POLY1/POLY2/Metal Resistor 
+//
+drdum = RPDUMMY INTERACT diff     // diff resistor dummy
+rp1 = RPDUMMY NOT INTERACT diff	  
+p1rdum = rp1 INTERACT POLY1       // poly1 resistor dummy
+rp2 = rp1 NOT INTERACT POLY1 
+p2rdum = rp2 INTERACT POLY2       // poly2 resistor dummy
+drpo = diff AND RPO		  // DIFF  RPO ->DRPO
+resd = drpo AND drdum		  // diff resistor layer
+mdiff = diff NOT resd		  // diff region
+resp = POLY1 AND p1rdum
+respp = resp AND PIMP		  // to form p+po resistor
+respn = resp AND NIMP		  // to form n+po resistor
+cpoly = POLY1 NOT resp		  // cpoly is for connection
+resp2 = POLY2 AND p2rdum	  // poly2 resistor layer
+c2poly = POLY2 NOT resp2	  // poly2 for connection
+mt1res = M1 AND RMDUMMY		  // metal1 resistor
+mt1 = M1 NOT mt1res		  // define metal1 for connect.
+mt2res = M2 AND RMDUMMY		  // metal2 resistor
+mt2 = M2 NOT mt2res		  // define metal2 for connect.
+mt3res = M3 AND RMDUMMY		  // metal3 resistor
+mt3 = M3 NOT mt3res		  // define metal3 for connect.
+mt4res = M4 AND RMDUMMY		  // metal4 resistor
+mt4 = M4 NOT mt4res		  // define metal4 for connect.
+mt5res = M5 AND RMDUMMY		  // metal5 resistor
+mt5 = M5 NOT mt5res		  // define metal5 for connect.
+mt6res = M6 AND RMDUMMY		  // metal6 resistor
+mt6 = M6 NOT mt6res		  // define metal6 for connect.
+
+//     Define POLY1/POLY2 Capacitor 
+//
+tcappl = POLY1 AND POLY2
+cappl = tcappl NOT VCDUMMY	// POLY1*POLY2-VCDUMMY --> cappl
+
+//     Define NWELL Resistor 
+//
+trwell = RWDUMMY AND NWELL	// N-well resistor layer
+nwsti = trwell NOT drpo		// RWDUMMY*NWELL -RPO -diff --> nwsti
+nwod = trwell AND drpo		// RWDUMMY*NWELLRPOdiff --> nwod
+nxwell = NWELL NOT RWDUMMY	// define N_well region
+
+//     Apart P_SUB by PSUB2 and NWELL 
+//
+ppsub = BULK NOT NWELL	       // define total p_sub region
+psub2s = SIZE PSUB2 BY 0.03
+psub1 = ppsub NOT psub2s	// p_sub connect to GND
+psub2a = ppsub AND psub2
+psub = psub1 OR psub2a		// psub= [(bulk-nwell) - size(psub2)] + [( bulk-nwell)*psub2]
+
+//     Define MOS Gate-Type 
+//
+odn = OD2 AND N3V
+odp = OD2 NOT N3V
+odall = OD2 OR N3V
+gate = cpoly AND mdiff		// define poly gate
+tpgate = gate AND PIMP
+tngate = gate AND NIMP
+pgate = tpgate NOT odall	// pure-P gate -- pgate=gate*PIMP-OD2-N3V
+ngate = tngate NOT odall	// pure-N gate -- ngate=gate*NIMP-OD2-N3V
+bpgate = tpgate AND odp		// PD gate -- bpgate = gate*PIMP*OD2-N3V
+bngate = tngate AND odn		// ND gate -- bngate = gate*NIMP*OD2*N3V
+
+//      Define MOS Global Source/Drain Region 
+//
+pthin = mdiff AND PIMP	     // define P+ thin oxide
+nthin = mdiff AND NIMP	     // define N+ thin oxide
+tpdiff = pthin NOT gate	     // define P+ diffusion region
+tndiff = nthin NOT gate	     // define N+ diffusion region
+
+//       Define BJT 
+//
+ttdiff = BJTDUMY AND tpdiff	      // to define BJT p+ region
+notplu = BJTDUMY NOT ttdiff	      // define non_P+ region
+DRC:2 = HOLES tpdiff
+DRC:3 = notplu INSIDE DRC:2
+DRC:4 = DRC:2 NOT DRC:3
+pnptr = DRC:3 NOT INTERACT DRC:4      // define BJT active device
+emit = ttdiff INSIDE nxwell	      // define BJT emitter
+coll = ttdiff NOT INSIDE nxwell	      // define pnp bipolar device
+
+//     Define Substrate Contacts
+//
+pplug = tpdiff AND psub               // define p_sub contact//define p_sub contact
+nplug = tndiff AND nxwell	      // define N_well contact//define N_well contact
+
+//     Define 2-poly contacts  
+//
+pl2co = POLY2 AND CONT	      // define POLY2 contact
+pl1co = CONT NOT pl2co	      // define POLY1 contact
+dcont = pl1co NOT POLY1	      // define diffusion contact
+
+//     Define connect 
+//
+CONNECT mt1 c2poly BY pl2co	       // link poly2 & metal1
+CONNECT mt1 cpoly BY pl1co	       // link poly1 & metal1
+CONNECT mt1 tndiff tpdiff BY dcont     // link pdiff, ndiff & metal1
+CONNECT tiod tndiff BY nodcon	       // link ndiff & tiod
+CONNECT tiod tpdiff BY podcon	       // link pdiff & tiod
+CONNECT mt2 mt1 BY VIA		       // link metal2 & metal1
+CONNECT mt3 mt2 BY VIA2		       // link metal3 & metal2
+CONNECT mt4 mt3 BY VIA3		       // link metal4 & metal3
+CONNECT mt5 mt4 BY VIA4		       // link metal5 & metal4
+CONNECT mt6 mt5 BY VIA5		       // link metal6 & metal5
+
+// CHANGED BY LEE
+//SCONNECT tpdiff psub BY pplug	       // link p_sub  & P+diff
+//SCONNECT tndiff nxwell BY nplug	       // link N_well & N_diff
+CONNECT tpdiff psub BY pplug	       // link p_sub  & P+diff
+CONNECT tndiff nxwell BY nplug	       // link N_well & N_diff
+
+coll:1 = STAMP coll BY tpdiff	       // link pdiff & collector
+emit:1 = STAMP emit BY tpdiff	       // link pdiff & emitter
+
+//     Define difference MOS D/S Region 
+//
+pdiff = tpdiff NOT odall     // define pure P-MOS S/D
+ndiff = tndiff NOT odall     // define pure N-MOS S/D
+bpdiff = tpdiff AND odp	     // define PD-MOS S/D
+bndiff = tndiff AND odn	     // define ND-MOS S/D
+
+//      Define Diode P/N Region 
+//
+pdio = pdiff AND DIODE
+ndio = ndiff AND DIODE
+ptndio = ndiff AND PTDIODE
+
+//      Define Device MOS,BJT AND CAP/RES.  
+//
+DEVICE MN ngate cpoly ndiff ndiff psub [0]	      // define N-MOS
+  TRACE PROPERTY MN L L 2
+  TRACE PROPERTY MN W W 2
+
+DEVICE MP pgate cpoly pdiff pdiff nxwell [0]	      // define P-MOS
+  TRACE PROPERTY MP L L 2
+  TRACE PROPERTY MP W W 2
+
+DEVICE MN(ND) bngate cpoly (G) bndiff (S)  bndiff (D) psub (B)    // define ND-MOS
+DEVICE MP(PD) bpgate cpoly (G) bpdiff (S)  bpdiff (D) nxwell (B)  // define PD-MOS
+DEVICE D(DP) DIODE pdio ndio			      // define diode
+DEVICE D(DN) ptndio psub ndiff			      // define protect diode
+DEVICE Q(PV) pnptr coll:1 ndiff emit:1		      // define pnp BJT
+
+//     Define Resistor 
+//
+DEVICE R(M1) mt1res mt1 mt1 [0.078]   // define metal1 resistor
+  TRACE PROPERTY R(M1) R R 10
+
+DEVICE R(M2) mt2res mt2 mt2 [0.078]   // define metal2 resistor
+  TRACE PROPERTY R(M2) R R 10
+
+DEVICE R(M3) mt3res mt3 mt3 [0.078]   // define metal3 resistor
+  TRACE PROPERTY R(M3) R R 10
+
+DEVICE R(M4) mt4res mt4 mt4 [0.078]   // define metal4 resistor
+  TRACE PROPERTY R(M4) R R 10
+
+DEVICE R(M5) mt5res mt5 mt5 [0.078]   // define metal5 resistor
+  TRACE PROPERTY R(M5) R R 10
+
+DEVICE R(M6) mt6res mt6 mt6 [0.036]   // define metal6 resistor
+  TRACE PROPERTY R(M6) R R 10
+
+DEVICE R(WR) nwsti nxwell nxwell [911] // define n_well resistor
+  TRACE PROPERTY R(WR) R R 10	       // wr :nwell resistor under sti
+
+DEVICE R(WO) nwod nxwell nxwell [500]  // wo :nwell resistor under od
+  TRACE PROPERTY R(WO) R R 10
+
+DEVICE R(PR) respp cpoly cpoly [284]   // define pimp-ploy1 resistor
+  TRACE PROPERTY R(PR) R R 10	       // Rs_N+PO 190, Rs_P+PO 157
+
+DEVICE R(NR) respn cpoly cpoly [287]   // define nimp-ploy1 resistor
+  TRACE PROPERTY R(NR) R R 10	       // Rs_N+PO 190, Rs_P+PO 157
+  
+DEVICE R(ND) resd tndiff tndiff [64]   // n-DIFF w/o silicide resistor
+  TRACE PROPERTY R(ND) R R 10
+
+DEVICE R(PD) resd tpdiff tpdiff [135]  // p-DIFF w/o silicide resistor
+  TRACE PROPERTY R(PD) R R 10
+
+//     Define Capacitor 
+//
+DEVICE C(PC) cappl cpoly c2poly [0 0]   // define poly cap.
+  TRACE PROPERTY C(PC) C C 10
+
+mcap1 = CDUMMY AND M1
+mcap2 = mcap1 AND M2
+mcap3 = mcap2 AND POLY1			// define cap. region
+
+DEVICE C(MC) mcap3 mt1 mt2 [1.239e-16 5.35e-17]   // define metal cap.
+  TRACE PROPERTY C(MC) C C 10
+
+//    
+//     ERC CHECK 
+//    
+//    1. Check sbustrate soft-connect short
+//    2. Check same label at different net and different label at same net
+//    3. Check path
+//    4. Check mos pin connect to power, ground
+//	 Substract soft-connect short check 
+// Outputs error geometry into <svdb-dir>/top.cell.softchk
+
+// LEE COMMENTED OUT
+    // Reports regions on a psub layer that connect to more than one node.
+//LVS SOFTCHK psub CONTACT
+    // Reports regions on a nxwell layer that connect to more than one node.
+//LVS SOFTCHK nxwell CONTACT
+
+// LEE COMMENTED OUT
+// Outputs error geometry into <svbd-dir>/top.cell.pathchk.erc
+   //    Nodes with a path to ground but not to power
+//ERC PATHCHK GROUND && NOT POWER
+   //    Nodes with a path to power but not to ground
+//ERC PATHCHK POWER && NOT GROUND
+   //    Nodes without a path niether power nor ground
+//ERC PATHCHK NOT POWER && NOT GROUND
+   //    Nodes without a path to power, ground, or pads, where pads are labeled
+//ERC PATHCHK NOT LABELED
+
+
+//     Check mos connect to power or ground 
+//
+econ1 = NET ndiff "?:P"
+mnp = ngate TOUCH econ1    // nmos S/D Power
+
+econ2 = NET ndiff "?:G"
+mng = ngate TOUCH econ2    // nmos S/D Ground
+
+econ3 = NET pdiff "?:G"
+mpg = ngate TOUCH econ3    // pmos S/D Ground
+
+econ4 = NET pdiff "?:P"
+mpp = ngate TOUCH econ4    // pmos S/D Power
+
+mnpg49 { @ NMOS connected to both power and ground
+  mnp AND mng
+}
+mnpg = mnp AND mng         // nmos S/D P&G
+mppg49 { @ PMOS connected to both power and ground
+  mpg AND mpp
+}
+mppg = mpg AND mpp         // pmos S/D P&G
+xwell = NWELL OUTSIDE RWDUMMY
+ptap = tpdiff AND psub
+ntap = tndiff AND xwell
+ppvdd49 { @ PTAP connected to power
+  NET ptap "?:P"
+}
+ppvdd = NET ptap "?:P"
+npvss49 { @ NTAP connected to ground
+  NET ntap "?:G"
+}
+npvss = NET ntap "?:G"
+
+// **************************************************************************
+// *  LVS Check OPTION ******************************************************
+// **************************************************************************
+LVS ABORT ON SUPPLY ERROR      NO
+LVS ALL CAPACITOR PINS SWAPPABLE NO
+LVS RECOGNIZE GATES            ALL
+LVS IGNORE PORTS               YES
+LVS REDUCE PARALLEL BIPOLAR    YES
+LVS REDUCE PARALLEL MOS        YES
+LVS REDUCE PARALLEL DIODES     YES
+LVS REDUCE PARALLEL CAPACITORS YES
+LVS REDUCE PARALLEL RESISTORS  YES
+LVS REDUCE SERIES RESISTORS    YES      //Smashes series resistors
+LVS REDUCE SERIES CAPACITORS   YES      //Smashes series capacitors
+LVS REDUCE SPLIT GATES         YES      //Smashes MOS split-gates.
+LVS FILTER UNUSED OPTION B D E O
+LVS FILTER UNUSED OPTION AB RC RE RG
+

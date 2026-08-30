@@ -1,0 +1,567 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:42:07">
+<title>The SUE Programming Interface</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_chap6_fileformats.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_ApdxA-hotkeys.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 7 </font>
+</h2>
+
+
+<h1>
+  <a name="1027023"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The SUE Programming Interface</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1028993"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The SUE Programming Interface </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028780"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE provides a simple programming interface or API for changing cells, modifying cells, accessing cell contents, printing cells, adding menu commands, etc. from <b><strong class="Strong">Tcl</strong></b>. This interface consists of <b><strong class="Strong">Tcl-</strong></b>accessible procedures which complement the list of SUE global variables listed in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> files and in the <b><code class="CodeStrong">Text commands/variables</code></b> menu item in the <b><code class="CodeStrong">Help</code></b> menu. Simple applications, like netlisting all SUE schematics in a given directory, should be very easy to accomplish through this interface. This is a new interface, so it is probably incomplete. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029403"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE uses certain <b><strong class="Strong">Tcl</strong></b> global variables and procedures. If you write <b><strong class="Strong">Tcl</strong></b> programs that stomp on these variables or procedures, you are likely to cause unexpected problems. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1029354"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029421"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Do not use any undocumented SUE <b><strong class="Strong">Tcl</strong></b> procedures that you may find or have heard about. These procedures are likely to leave SUE in an inconsistent state. Furthermore, they are likely to change in future versions of SUE. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1028785"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE commands and variables are further documented online under <b><code class="CodeStrong">Text commands/variables</code></b> in the <b><code class="CodeStrong">Help</code></b> menu. This command creates a popup window to display documentation about specific commands and global variables. The list of commands and variables can further be filtered by keyword and printed. The online documentation is more complete than this manual. </font>
+<p>
+<p>
+  <dt> <a name="1028786"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Tcl</strong></b> procedures can be executed from SUE by typing them into the window from which SUE was started (i.e., the SUE command window), which is a <b><strong class="Strong">Tcl</strong></b> interpreter. All top-level <b><strong class="Strong">Tcl</strong></b> procedures that execute SUE API calls should be wrapped with the <b><code class="CodeStrong">launch</code></b> procedure instead of being executed directly. While commands will still work otherwise, they will be slower, especially if they switch the current cell using <b><code class="CodeStrong">api_goto_cell</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">, </font><b><code class="CodeStrong">api_push</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">, </font><b><code class="CodeStrong">api_pop</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">, </font><b><code class="CodeStrong">api_load_cell</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">,</font> or <b><code class="CodeStrong">api_new_cell</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1028787"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Procedures called from the menu or hotkeys and added using the <b><code class="CodeStrong">menu_add</code></b> command automatically get wrapped with the <b><code class="CodeStrong">launch</code></b> procedure. </font>
+<p>
+<p>
+  <dt> <a name="1028788"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">launch</code></b> command also adds error catching. If a <b><strong class="Strong">Tcl</strong></b> error occurs in a user procedure, the stack trace is placed in the <b><code class="CodeStrong">error</code></b> global variable. </font>
+<p>
+<p>
+  <dt> <a name="1028789"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Alternatively, procedures can be called from UNIX by placing them in the SUE command line using the syntax described earlier. For example, the following line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue foo.sue -CMD api_netlist -CMD exit -ICONIFY 1 -BATCH 1</font><a name="1028790"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028791"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028792"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">will load the schematic<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">foo.sue</code></b>, netlist it, and then exit. By setting <b><code class="CodeStrong">-BATCH 1, </code></b>SUE<b><code class="CodeStrong"> </code></b>will bypass asking for confirmation on any operations. These commands are automatically wrapped with <b><code class="CodeStrong">launch</code></b>. Lastly, commands can be added to the SUE menus with the <b><code class="CodeStrong">menu_add</code></b><b><strong class="Strong"> </strong></b>command as described below. </font>
+<p>
+<p>
+  <dt> <a name="1028794"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Only simple SUE procedures can be called from the command line interface, i.e. you cannot send a list to <b><code class="CodeStrong">-CMD</code></b> or<b><code class="CodeStrong"> -SET</code></b>. This is a shell limitation. If you want to execute a procedure at startup that requires arguments, you need to define a wrapper procedure that takes no arguments and calls the desired procedure with the appropriate arguments, possibly using global variables that can be set on the command line. </font>
+<p>
+<p>
+  <dt> <a name="1028795"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">User-defined procedures can either be added to the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file or placed in a file with the suffix <b><strong class="Strong">.</strong></b><b><strong class="Strong">tcl</strong></b>. All procedures in the auto-search path in <b><strong class="Strong">.</strong></b><b><strong class="Strong">tcl</strong></b> files will be automatically loaded when needed. </font>
+<p>
+<p>
+  <dt> <a name="1028796"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to execute a command, such as a SUE API call, at startup, you can either specify it on the SUE startup line as described above or add it to the <b><strong class="Strong">SUE_EXECUTE</strong></b> variable in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file. API commands cannot be executed directly from <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> files sinces SUE is not yet initialized at that point. Any commands contained in <b><strong class="Strong">SUE_EXECUTE</strong></b> will get executed after SUE comes up but before any command-line commands get executed. </font>
+<p>
+<p>
+  <dt> <a name="1028798"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For simplicity, you should use the <b><code class="CodeStrong">TCL lappend</code></b> command to add commands to <b><strong class="Strong">SUE_EXECUTE</strong></b>. To set the listboxes at startup, add the following lines to your local <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">lappend SUE_EXECUTE \ 
+"api_icon_listbox -command change -dir $SUE_DIR/schematics/devices -index 1"</font><a name="1028801"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028802"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">lappend SUE_EXECUTE \ 
+"api_icon_listbox -command change -dir $SUE_DIR/schematics/mspice -index 2"</font><a name="1028803"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029602"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029671"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE cannot execute without an X window, even if you never want to see it (this is a <b><strong class="Strong">TK</strong></b> thing). The best you can do is iconify the window with "<b><code class="CodeStrong">-ICONIFY 1</code></b>". However, you still need to run on a system that has X running on it. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1028805"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following sections describe all of the additional <b><strong class="Strong">Tcl</strong></b> procedures that are available for use in programming. These procedures and variables can also be found in <b><code class="CodeStrong">Text Commands/Variables</code></b> in the <b><code class="CodeStrong">Help</code></b> menu in SUE.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028808"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SUE API Procedures</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028809"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the SUE API procedures are described in the <a href="api_manual.html">Micro Magic Tools SUE API Reference Manual</a><em class="Emphasis">.</em></font>
+<p>
+<p>
+  <dt> <a name="1028810"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition, the most current documentation of the SUE API commands and varaibles can be viewed with the <a href="SUE_chapt5_commands.html#1031256">Text Commands/Variables</a> command in the <b><code class="CodeStrong">Help</code></b> menu.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028813"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Generic Procedures</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028814"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to all of the standard <b><strong class="Strong">Tcl</strong></b> built-in procedures, SUE provides the following generic procedures that you can use when programming inside of SUE: </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028816"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">get_assoc &lt;name&gt; &lt;list&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028817"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Returns the value associated with <b><code class="CodeStrong">&lt;name&gt;</code></b> in the given associative list, or <b><code class="CodeStrong">nil</code></b> if no value exists. </font>
+<p>
+<p>
+  <dt> <a name="1028818"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; get_assoc foo {{bar 3} {foo 5}}</font><a name="1028819"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">5</font><a name="1028820"> </a>
+      </pre>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028822"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">min &lt;num&gt; [&lt;num&gt; ...]<br>max &lt;num&gt; [&lt;num&gt; ...]</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028824"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Returns the min/max number of the list of numbers. </font>
+<p>
+<p>
+  <dt> <a name="1028825"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; min 23.4 65.5 12.3</font><a name="1028826"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">12.3</font><a name="1028827"> </a>
+      </pre>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028829"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">pp_number &lt;num&gt; [&lt;format "%g%s"&gt;]</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028830"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Pretty prints a number using the spice metric suffixes (metric prefixes), for example: G=10<b><strong class="Strong">9</strong></b> (giga), M=10<b><strong class="Strong">6</strong></b> (mega), K=10<b><strong class="Strong">3</strong></b> (kilo), m=10<b><strong class="Strong">-3</strong></b> (milli), u=10<b><strong class="Strong">-6</strong></b> (micro), n=10<b><strong class="Strong">-9</strong></b> (nano), p=10<b><strong class="Strong">-12</strong></b> (pico), f=10<b><strong class="Strong">-15</strong></b> (femto), a=10<b><strong class="Strong">-18</strong></b> (atto). </font>
+<p>
+<p>
+  <dt> <a name="1028831"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; pp_number 23.4e-7</font><a name="1028832"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">2.34u</font><a name="1028833"> </a>
+      </pre>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028835"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">parse_pp_number &lt;string&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028836"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Parses a string with spice notation (see <b><strong class="Strong">pp_number</strong></b>, above) into a computer-readable number. Trailing units are ignored. Examples of valid input strings are: 3.2e-4, 32.4fF, 23 Ohms. </font>
+<p>
+<p>
+  <dt> <a name="1028837"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; parse_pp_number 32.4fF</font><a name="1028838"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">3.24e-14</font><a name="1028839"> </a>
+      </pre>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028841"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">setl &lt;var_list&gt; &amp;ltlist&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028842"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sets each variable in <b><code class="CodeStrong">&lt;var_list&gt;</code></b> in the current context to the <b><strong class="Strong">n</strong></b>th argument in <b><code class="CodeStrong">&lt;list&gt;</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1028843"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">setl {x y} $foo</font><a name="1028844"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028845"> </a>
+      </pre>
+  <dl>
+<p> <dt> <a name="1028846"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">is equivalent to, but syntactically nicer than: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set x [lindex $foo 0]</font><a name="1028847"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set y [lindex $foo 1]</font><a name="1028848"> </a>
+      </pre>
+  </dl>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028850"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">use_first &lt;var_list&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028851"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Evaluates variables in <b><code class="CodeStrong">&lt;var_list&gt;</code></b> in the current context in order. If the variable is defined and non-nil, returns its value. If none are defined, returns nil (""). Constants can be added using the syntax <b><code class="CodeStrong">&lt;constant&gt;</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1028852"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; set b 23</font><a name="1028853"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; use_first a b c</font><a name="1028854"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">23</font><a name="1028855"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; use_first aa bb cc '58</font><a name="1028856"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">58</font><a name="1028857"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1028859"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>SUE-Specific Procedures</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028860"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE also provides certain SUE-specific procedures. These procedures are not API procedures; in other words, they do not query or change the SUE database, but are specific to SUE as explained: </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028862"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">bus_expand &lt;name&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028863"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Expands <b><code class="CodeStrong">&lt;name&gt;</code></b> into a list of all of its bits and returns it if it is a bus, otherwise just returns it. Only understands SUE bus notation. </font>
+<p>
+<p>
+  <dt> <a name="1028864"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; bus_expand {foo[3:0]}</font><a name="1028865"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">foo[0] foo[1] foo[2] foo[3]</font><a name="1028866"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; bus_expand bar</font><a name="1028867"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">bar</font><a name="1028868"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028870"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">bus_width &lt;name&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028871"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Returns the bus width of<b><code class="CodeStrong"> &lt;name&gt;</code></b>. Only understands SUE bus notation. </font>
+<p>
+<p>
+  <dt> <a name="1028872"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; bus_width {foo[3:0]}</font><a name="1028873"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">4</font><a name="1028874"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; bus_width bar</font><a name="1028875"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">1</font><a name="1028876"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028878"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">exit [-force]</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028879"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Exits SUE. Like the standard <b><strong class="Strong">Tcl</strong></b> exit procedure but queries the user if there are modified cells before actually exiting. The<b><code class="CodeStrong"> -force</code></b> argument bypasses the query as does setting <b><code class="CodeStrong">BATCH</code></b> to 1. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028881"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">menu_add -menu (file|edit|view|sim|help) -label &lt;name&gt; <br>		-command &lt;command&gt; -hotkey &lt;hotkey&gt; -help &lt;string&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028882"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Adds the menu item <b><code class="CodeStrong">&lt;name&gt;</code></b> to the bottom of the given SUE menus. <b><code class="CodeStrong">&lt;command&gt;</code></b> is executed when the user hits this menu option. The <b><code class="CodeStrong">&lt;string&gt;</code></b> help line will be displayed in the message window when the user has the cursor over the menu option. If the label <b><code class="CodeStrong">&lt;name&gt;</code></b> is "<b><code class="CodeStrong">separator</code></b>", then a separator line will be added to the menu. </font>
+<p>
+<p>
+  <dt> <a name="1028883"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">menu_add -menu file -label <b><code class="CodeStrong">separator</code></b></font><a name="1028885"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">menu_add -menu file -label foo -command "puts foo" -help "yippee!"</font><a name="1028886"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029834"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028888"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE will not permit multiple menu entries with the same name. If the menu item has the same name as one on the same menu, it will be replaced, otherwise you will get an error. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1028890"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">unique_name &lt;prefix&gt; &lt;primary_name&gt; &lt;secondary_name&gt;</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1028891"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Returns a unique name that is guaranteed to be shorter than the size set by the global variable <b><strong class="Strong">NETLIST_MAX_NAME_LENGTH</strong></b>. Note that SUE will reset <b><strong class="Strong">NETLIST_MAX_NAME_LENGTH</strong></b> when netlisting depending on the netlisting mode. The name will start with the character<b><code class="CodeStrong"> &lt;prefix&gt;</code></b>. The root of the name will be formed from <b><code class="CodeStrong">&lt;primary_name&gt; </code></b>if it is non-nil. Otherwise it will be formed from <b><code class="CodeStrong">&lt;secondary_name&gt;</code></b>. This procedure uses the global variable <b><strong class="Strong">NAMES</strong></b>. During netlisting, <b><strong class="Strong">NAMES</strong></b> will be reset for each schematic. </font>
+<p>
+<p>
+  <dt> <a name="1028893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; unique_name "" foo bar</font><a name="1028894"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">foo</font><a name="1028895"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue&gt; unique_name "" foo bar</font><a name="1028896"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">foo_1</font><a name="1028897"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1028900"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>An API Example</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028901"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Below is a short procedure called <b><code class="CodeStrong">what</code></b> that displays connectivity and net information about the current schematic. To use this procedure, you must either netlist (for instance, <b><code class="CodeStrong">api_netlist</code></b>) the schematic or generate terminal names (such as <b><code class="CodeStrong">api_generate_term_names</code></b>) first. You can add <b><code class="CodeStrong">api_generate_term_names</code></b> to the beginning of the procedure if you want but it may be redundant (or slow) if you have already netlisted. </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">proc <b><code class="CodeStrong">what</code></b> {} {</font><a name="1028902"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">  # first walk thru all of the instances</font><a name="1028903"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">  foreach id [api_types instance] {</font><a name="1028904"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028905"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# figure out the type of this instance</font><a name="1028906"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set data [api_instance_data $id]</font><a name="1028907"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set type [get_assoc type $data]</font><a name="1028908"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028909"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# get all of the ports on this instance</font><a name="1028910"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	foreach port_list [api_terminal_data $type] {</font><a name="1028911"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		set port [lindex $port_list 0]</font><a name="1028912"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		# could get the direction, too</font><a name="1028913"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028914"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		set net [api_netlist_data $id $port]</font><a name="1028915"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028916"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		if {$net == 0} {</font><a name="1028917"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			# can't find terminal, probably $name, need to lookup</font><a name="1028918"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			# clean up name.</font><a name="1028919"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			regsub -all {\{|\}|\$} $port "" port</font><a name="1028920"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			set port [get_assoc _$port $data]</font><a name="1028921"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028922"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			set net [api_netlist_data $id $port]</font><a name="1028923"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			if {$net == 0} {
+			 puts "WARNING: can't determine net on port $port of type 
+			 $type."</font><a name="1028924"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">				 continue</font><a name="1028925"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">			}</font><a name="1028926"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		}</font><a name="1028927"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		# save away in an associative array</font><a name="1028928"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		lappend nets($net) [list $type $port]</font><a name="1028929"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	}</font><a name="1028930"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">}</font><a name="1028931"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028932"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"># now walk thru all of the wires and get nets</font><a name="1028933"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">foreach id [api_types wire] {</font><a name="1028934"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028935"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set data [api_get_data $id]</font><a name="1028936"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set net [get_assoc net $data]</font><a name="1028937"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028938"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# save away in an associative array</font><a name="1028939"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	lappend nets($net) [list wire [get_assoc coords $data]]</font><a name="1028940"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">}</font><a name="1028941"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028942"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"># now show the user </font><a name="1028943"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">foreach net [lsort -dictionary [array names nets]] {</font><a name="1028944"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	puts "$net: $nets($net)"</font><a name="1028945"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	}</font><a name="1028946"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028947"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	puts done</font><a name="1028948"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">}</font><a name="1028949"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1028950"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028951"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To try out this example, cut and paste it into either a <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file or a file with the suffix <b><strong class="Strong">.</strong></b><b><strong class="Strong">tcl</strong></b>. Bring up a schematic and netlist it. then type "<b><code class="CodeStrong">what</code></b>" on the SUE command line. </font>
+<p>
+<p>
+  <dt> <a name="1028953"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Additional API examples are found in the sample <b><code class="CodeStrong">mmi_local (mmi_local.sample) </code></b>directory included with each software release. Look in <b><code class="CodeStrong">mmi_local.sample/sue/.suerc</code></b> to see how to use these. </font>
+<p>
+<p>
+  <dt> <a name="1028965"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_chap6_fileformats.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_ApdxA-hotkeys.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

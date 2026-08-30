@@ -1,0 +1,78 @@
+MACRO MMI_NAND2A
+	CLASS CORE ;
+	FOREIGN MMI_NAND2A 0 0 ;
+	SIZE 1.86 BY 6.2 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.765 3.505 1.045 4.205 ;
+			LAYER M1 ;
+			RECT 0.765 2.385 0.955 3.505 ;
+			LAYER M1 ;
+			RECT 0.645 2.38 0.955 2.385 ;
+			LAYER M1 ;
+			RECT 0.395 2.36 0.955 2.38 ;
+			LAYER M1 ;
+			RECT 0.12 2.19 0.955 2.36 ;
+			LAYER M1 ;
+			RECT 0.12 1.98 0.675 2.19 ;
+			LAYER M1 ;
+			RECT 0.395 1.68 0.675 1.98 ;
+		END
+		AntennaDiffArea 0.64295 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.36 2.93 1.74 2.98 ;
+			LAYER M1 ;
+			RECT 1.27 2.65 1.74 2.93 ;
+			LAYER M1 ;
+			RECT 1.36 2.6 1.74 2.65 ;
+		END
+		AntennaGateArea 0.231 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 1.355 0.42 1.635 2.38 ;
+			LAYER M1 ;
+			RECT 0 -0.42 1.86 0.42 ;
+		END
+	END GND
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 5.78 1.86 6.62 ;
+			LAYER M1 ;
+			RECT 0.175 3.505 0.455 5.78 ;
+			LAYER M1 ;
+			RECT 1.355 3.505 1.635 5.78 ;
+		END
+	END VDD
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.12 2.94 0.51 2.98 ;
+			LAYER M1 ;
+			RECT 0.12 2.66 0.545 2.94 ;
+			LAYER M1 ;
+			RECT 0.12 2.6 0.5 2.66 ;
+		END
+		AntennaGateArea 0.231 ;
+	END in0
+	OBS
+	END
+END MMI_NAND2A

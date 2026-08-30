@@ -1,0 +1,93 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_XNOR3B {} {
+  make MMI_NAND2B -origin {580 440}
+  generate aoi aoi3_3 -inputs {3 3}
+  make aoi3_3 -WP 1.6 -WN 1.2 -origin {280 300}
+  make aoi3_3 -WP 1.6 -WN 1.2 -origin {280 460}
+  make inverter -orient R90 -origin {180 220}
+  make inverter -orient R90 -origin {80 220}
+  make inverter -orient R90 -origin {-20 220}
+  make output -name out -origin {720 440}
+  make input -orient R90 -name in0 -origin {-20 110}
+  make input -orient R90 -name in1 -origin {80 110}
+  make input -orient R90 -name in2 -origin {180 110}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {500 360}
+  make name_net -name N2 -origin {490 520}
+  make name_net -name in0_L -origin {30 540}
+  make name_net -name in2_L -origin {210 420}
+  make name_net -name in1_L -origin {110 400}
+  make title_bar -owner dweisner -origin {260 690}
+  make MMI_XNOR3B -origin {550 110}
+  make_wire 520 360 520 420
+  make_wire 520 520 520 460
+  make_wire 640 440 720 440
+  make_wire 180 150 230 150
+  make_wire 180 150 180 190
+  make_wire 180 150 180 110
+  make_wire 80 150 130 150
+  make_wire 80 150 80 190
+  make_wire 80 150 80 110
+  make_wire -20 150 30 150
+  make_wire -20 150 -20 190
+  make_wire -20 150 -20 110
+  make_wire 280 310 30 310
+  make_wire 30 310 30 150
+  make_wire 280 330 130 330
+  make_wire 130 330 130 150
+  make_wire 280 350 230 350
+  make_wire 230 350 230 150
+  make_wire 280 380 30 380
+  make_wire 30 380 30 310
+  make_wire 280 470 -20 470
+  make_wire -20 470 -20 270
+  make_wire -20 540 -20 470
+  make_wire 280 490 130 490
+  make_wire 130 490 130 330
+  make_wire 80 400 80 270
+  make_wire 280 560 80 560
+  make_wire 80 560 80 400
+  make_wire 280 580 230 580
+  make_wire 230 580 230 350
+  make_wire 280 510 180 510
+  make_wire 180 420 180 510
+  make_wire 180 420 180 270
+  make_wire 500 360 450 360
+  make_wire 500 360 520 360
+  make_wire 490 520 450 520
+  make_wire 490 520 520 520
+  make_wire 30 540 280 540
+  make_wire 30 540 -20 540
+  make_wire 110 400 280 400
+  make_wire 110 400 80 400
+  make_wire 210 420 280 420
+  make_wire 210 420 180 420
+  make_text -origin {-100 -20} -text {3 input Exclusive NOR}
+  make_text -origin {-100 0} -text {B Size}
+  make_text -origin {-100 -40} -text MMI_XNOR3B -size large
+}
+
+proc ICON_MMI_XNOR3B args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-20 -100} -name in0
+  icon_term -type input -origin {-20 -80} -name in1
+  icon_term -type input -origin {-20 -60} -name in2
+  icon_term -type output -origin {100 -80} -name out
+  icon_property -origin {-50 70} -type user -name name
+  icon_property -origin {-50 90} -type user -name M
+  icon_property -origin {-50 110} -type user -name dpc
+  icon_arc -20 -110 90 30 -start 35 -extent 50
+  icon_arc -8 -110 12 -50 -start 270 -extent 180
+  icon_line 2 -110 40 -110
+  icon_line 2 -50 40 -50
+  icon_arc -20 -190 90 -50 -start 275 -extent 50
+  icon_arc -18 -110 2 -50 -start 270 -extent 180
+  icon_property -origin {40 -80} -size large -anchor center -label B
+  icon_property -origin {13 -100} -size small -label F
+  icon_arc 80 -90 100 -70 -start 0 -extent 359
+  icon_line -20 -60 0 -60
+  icon_line -20 -100 0 -100
+  icon_line -20 -80 0 -80
+}
+

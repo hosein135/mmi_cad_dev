@@ -1,0 +1,139 @@
+# This generator makes either a "title_bar", "sccs_title_bar", or a
+# "cvs_title_bar".
+
+# Note: hack in icon_setup where the default in the icon_property
+# for owner is missing -- this forces the user's name to be saved.
+
+# Heeeeerrrrreee's the generator
+
+proc ICON_title_bar args {
+
+  global env TITLE_BAR_STRING
+
+  icon_generator $args {{cell title_bar {radio title_bar sccs_title_bar cvs_title_bar}}}
+
+  switch $cell {
+
+    title_bar {
+
+      icon_setup $args "{origin {0 0}} {orient R0} \{owner $env(USER)\} {last_modified_by {}}"
+
+      # happy little SUE logo
+      icon_line -320 -10 -320 -20 -350 -20 -350 -10 -320 10 \
+	  -320 20 -350 20 -350 10
+      icon_line -310 -20 -310 -10 -300 -10 -300 -20
+      icon_line -300 0 -310 0 -310 20 -300 20
+      icon_line -310 10 -300 10
+
+      icon_property -origin {-280 -30} -label $TITLE_BAR_STRING
+      icon_line -290 -20 700 -20 700 20 -290 20 -290 -20
+      icon_property -origin {-240 60} -type user -name owner
+      icon_property -origin {-240 80} -type user -name last_modified_by
+      icon_property -origin {-280 -10} -text {cell: [api_current_cell]}
+      icon_property -origin {-30 -10} -text {file: [filename_of]}
+
+      icon_property -origin {-280 10} -label {owner: $owner}
+      icon_property -origin {-30 10} -label {last modified by: $last_modified_by}
+      icon_property -origin {300 10} -text {[file_mod_time]}
+   }
+
+    sccs_title_bar {
+   
+      icon_setup $args "{origin {0 0}} {orient R0} \{owner $env(USER)\} {comment {}} {version {}} {date {}} {last_modified_by {}}"
+
+      # happy little SUE logo
+      icon_line -320 -10 -320 -20 -350 -20 -350 -10 -320 10 \
+	  -320 20 -350 20 -350 10
+      icon_line -310 -20 -310 -10 -300 -10 -300 -20
+      icon_line -300 0 -310 0 -310 20 -300 20
+      icon_line -310 10 -300 10
+
+      icon_property -origin {-280 -30} -label $TITLE_BAR_STRING
+      icon_line -290 -20 700 -20 700 20 -290 20 -290 -20
+      icon_property -origin {-240 60} -type user -name owner
+      icon_property -origin {-240 90} -type user -name comment
+      icon_property -origin {-240 120} -type user -name version
+      icon_property -origin {-240 150} -type user -name date
+      icon_property -origin {-240 180} -type user -name last_modified_by
+      icon_property -origin {-280 -10} -text {cell: [api_current_cell]}
+      icon_property -origin {-30 -10} -text {file: [filename_of]}
+      icon_property -origin {-280 10} -label {owner: $owner}
+      icon_property -origin {-30 10} -label {last modified by: $last_modified_by}
+      icon_property -origin {300 10} -label {$date}
+      icon_property -origin {530 10} -text {version: $version}
+    }
+
+    cvs_title_bar {
+
+      icon_setup $args "{origin {0 0}} {orient R0} \{owner $env(USER)\} {last_modified_by {\$Author\$}} {version {\$Revision\$}} {date {\$Date\$}} {rcs_file {\$Source\$}}"
+
+      # happy little SUE logo
+      icon_line -320 -10 -320 -20 -350 -20 -350 -10 -320 10 \
+	  -320 20 -350 20 -350 10
+      icon_line -310 -20 -310 -10 -300 -10 -300 -20
+      icon_line -300 0 -310 0 -310 20 -300 20
+      icon_line -310 10 -300 10
+
+      icon_property -origin {-280 -30} -label $TITLE_BAR_STRING
+      icon_line -290 -20 700 -20 700 20 -290 20 -290 -20
+      icon_property -origin {-240 60} -type user -name owner
+      icon_property -origin {-240 90} -type user -name last_modified_by
+      icon_property -origin {-240 120} -type user -name version
+      icon_property -origin {-240 150} -type user -name date
+      icon_property -origin {-240 180} -type user -name rcs_file
+      icon_property -origin {-280 -10} -label {cell: $cur_s}
+      icon_property -origin {-30 -10} -text {rcs file: [rcs_name $rcs_file]}
+      icon_property -origin {-280 10} -label {owner: $owner}
+      icon_property -origin {-30 10} \
+	  -text {last modified by: [rcs_name $last_modified_by]}
+      icon_property -origin {300 10} -text {[rcs_name $date]}
+      icon_property -origin {530 10} -text {version: [rcs_name $version]}
+    }
+  }
+}
+
+
+# used in the title_bar
+
+proc filename_of {} {
+
+  global auto_index
+
+  if {[api_cell_info "" generator] == 1} {
+    # special case for generators
+    regsub {^ICON_} [api_current_cell] "" cell
+
+    set genname [api_instance_type_data $cell generator]
+    if {[info exists auto_index(SCHEMATIC_$genname)]} {
+      set filename [lindex $auto_index(SCHEMATIC_$genname) 1]
+    } elseif {[info exists auto_index(ICON_$genname)]} {
+      set filename [lindex $auto_index(ICON_$genname) 1]
+    }
+
+    return $filename
+
+  } else {
+    return [api_cell_info "" filename]
+  }
+}
+
+
+proc file_mod_time {} {
+
+  set filename [filename_of]
+
+  if {[file exists $filename]} {
+    return [clock format [file mtime $filename]]
+  } else {
+    return "doesn't exist"
+  }
+}
+
+
+# used in cvs_title_bar
+# converts a RCS like string into a readable string
+
+proc rcs_name {name} {
+
+  return [lrange $name 1 [expr [llength $name] - 2]]
+}

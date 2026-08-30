@@ -1,0 +1,255 @@
+8/12/99
+emc
+
+
+The icon mapper script is used to create a complete .sue file for the 
+specified icon(s).  There are 3 types of .sue files which can be created:
+
+(1) MMI icons only
+
+(2) MMI icons mapped to the user's icons
+
+(3) MMI icons with real schematics
+
+
+The Three Modes
+===============
+The following is a full description of the three modes:
+
+(1) MMI icons only
+
+    In this mode, the .sue file created by the mapper contains only an ICON_
+    proc, there is no SCHEMATIC_ proc.  These .sue files can be used for drawing,
+    but not timing simulation or placement.
+
+    This mode allows the user to draw "generic" schematics using the MMI icons,
+    which can be mapped to a schematic library at a future date, as described
+    for mode (2) and (3).
+
+    Invocation:  mapper.tcl -icononly ...
+
+(2) MMI icons mapped to the user's icons
+
+    This mode is useful when you wish to draw a schematic using the MMI icons
+    but in truth you are designing with another pre-existing library.  This
+    mode is primarily useful in allowing the designer to draw "generic"
+    schematics using the MMI icons, which can then be mapped to any available
+    library, even re-mapped to another library, without requiring changes to
+    the schematics.
+
+    In this mode, the .sue file created by the mapper script contains an ICON_
+    proc as for option (1), and a SCHEMATIC_ proc which consists of a placement
+    of the user's icon, with pins correctly named to match the MMI icon.
+
+    Invocation:  mapper.tcl ...
+
+    Note that the <library-directory>'s contain the user's icon+schematic .sue files
+
+(3) MMI icons with real schematics
+
+    This mode is used to create normal .sue files which contain an ICON_ proc
+    as well as a SCHEMATIC_ proc.  The user must first draw the complete set of
+    sue schematics for the desired library.  Then the mapper script is run to
+    create the final complete .sue files, which include the user's schematic
+    and the MMI icons.
+
+    As in mode (2), this method allows a user to draw "generic" schematics
+    and potentially re-map the MMI icons to another library at a future date.
+    However this method avoids the level of indirection found in mode (2),
+    and eliminates the need for a user to create their own library's icons.
+
+    Note that the pin names in the user's schematics must match the pin names
+    in the MMI icons.
+
+    Invocation:  mapper.tcl -realschematics -verilog ...
+
+    Note that the <library-directory>'s contain the schematic .sue files.
+
+
+Mapper Script Invocation
+========================
+The mapper is invoked as follows:
+
+mapper.tcl <mapfile> <to-directory> <mmi-body-directory> \
+   <library-directory> <library-directory> ...
+
+For example, the TSMC25 files were created using this command:
+
+mapper.tcl maptsmc25 tsmc25 mmi_body /proj/tech/tsmc25/stdcell/sue \
+   /proj/tech/tsmc25/stdcell/demorgan
+
+Note in this example, the schematic files were found in multiple library-directories.
+
+
+The mapper script takes the following optional switches:
+
+-icononly:        Generates .sue files that contain only ICON procs.
+-verilog:         Includes verilog property in ICON proc.  This should 
+		  only be used if the SCHEMATIC proc contains a real
+                  schematic; it should not be used if the
+                  SCHEMATIC proc contains the placement of a user's icon.
+-date:            Allows the user to specify a date to be used in the 
+		  SCCS title bar.
+-version:         Allows the user to specify a version to be used in 
+		  the SCCS title bar.
+-realschematics:  Generates .sue files that contain ICON procs, and SCHEMATIC
+                  procs which consist of the actual circuits.
+
+-nonhierdemorgan  Doesn't add the additional hierarchy for demorgans but
+		  duplicates the schematic instead. Requires -realschematics.
+
+
+
+Some Notes on the MMI Icons
+===========================
+The generic MMI icons are generators.  The options on the generators are Size 
+(choices are taken from the mapfile) and DeMorgan.  The MMI icons have the 
+following characteristics:
+
+- If there is more than one input, the inputs are always named "in0", "in1",
+  "in2", etc.  If there is only one input, its name is "in".
+- In0 always connects to the fast node.
+- The fast node is always indicated on the icon by the marker "F".
+- The default rotation of the icon always draws the fast node at the top
+  of the body, with the data flowing from left to right.
+- Most icons have the same x and y dimensions to allow for easy substitution.
+- DeMorganned symbols always have the same origin and pin locations as their
+  non-DeMorganned counterparts.
+
+
+Mapfile Examples
+================
+The general format for a single mapping is
+
+{MMI_iconname
+{Size Description 0}
+{Size Description 1}
+...
+{Size Description n}
+}
+
+Size Description:
+{Size {Non-DeMorganInfo} {DeMorgan-Info}}
+
+Non-DeMorganInfo:
+{schematicname {MMI_icon_pin0 schematic_pin0} {MMI_icon_pin1 schematic_pin1} ...} 
+
+DeMorganInfo:
+{schematicname {MMI_icon_pin0 schematic_pin0} {MMI_icon_pin1 schematic_pin1} ...} 
+
+
+Line breaks and {} placements are important; follow the example exactly.  There must
+be a line break after MMI_iconname; a line break after each Size description; no line
+breaks within a Size description; and a final } on a line by itself.
+
+
+Some notes:
+- The user's schematic names can be arbitrary.
+- Size descriptions can be in arbitrary order.  Note that the icon's default
+  size is taken from the first Size description.
+- Size can be indicated by any means the user likes, such as 0-4 or B-F.  The
+  sizes need not be contiguous.
+- If there is no DeMorgan version of the icon desired, omit the {DeMorgan-Info}
+  from the Size Description.
+
+
+Example 1
+---------
+The following is an example of a mode (1) mapfile, in which the user desires
+icon-only .sue files.
+
+---
+# Map file for icon-only
+
+{MMI_INV 
+{A {MMI_INVA {in in} {out out}} {MMI_INVA_ {in in} {out out}}}
+{B {MMI_INVB {in in} {out out}} {MMI_INVB_ {in in} {out out}}}
+{C {MMI_INVC {in in} {out out}} {MMI_INVC_ {in in} {out out}}}
+{D {MMI_INVD {in in} {out out}} {MMI_INVD_ {in in} {out out}}}
+{E {MMI_INVE {in in} {out out}} {MMI_INVE_ {in in} {out out}}}
+}
+
+{MMI_AND2
+{B {MMI_AND2B {in0 in0} {in1 in1} {out out}} {MMI_AND2B_ {in0 in0} {in1 in1} {out out}}}
+{C {MMI_AND2C {in0 in0} {in1 in1} {out out}} {MMI_AND2C_ {in0 in0} {in1 in1} {out out}}}
+}
+---
+
+This mapfile describes the mapping between the MMI_INV icon and 5 different
+schematic sizes (A-E), as well as the mapping between MMI_AND2 and 2 schematic
+sizes (B-C).  
+
+Note that the user's "schematic" files do not actually need to exist; they
+will not be used.  The pin "mapping" is also irrelevant, but needs to be
+included in order to allow the mapper script to know the icon's pin names.
+The icon will be generated with the size choices as described in the mapfile,
+and will allow DeMorganning if the user has specified {DeMorgan-Info} in
+the mapfile.
+
+
+Example 2
+---------
+The following is an example of a mode (2) mapfile, in which the user describes
+the mapping between the MMI icons and a pre-existing library:
+
+---
+# Map file for icons w/ user's library
+
+{MMI_INV 
+{A {INV0 {in in} {out out}} {INV0B {in in} {out out}}}
+{B {INV1 {in in} {out out}} {INV1B {in in} {out out}}}
+{C {INV2 {in in} {out out}} {INV2B {in in} {out out}}}
+{D {INV3 {in in} {out out}} {INV3B {in in} {out out}}}
+{H {INV7 {in in} {out out}} {INV7B {in in} {out out}}}
+}
+
+{MMI_AND2
+{B {AND2B {in0 fred} {in1 ginger} {out swing}}}
+{C {AND2C {in0 mary} {in1 johnny} {out hop}}}
+}
+---
+
+This example illustrates the following features:
+- The MMI icon and user icon pin names may be different.
+- The user icon pin names need not be the same for all sizes,
+  or even for DeMorgan vs. non-DeMorgan within a single size.
+- The user's icon names may be unrelated to the MMI icon
+  names; in this example, the user's icons are named INV0,
+  INV0B, etc.
+- The user must have separate icons for their own DeMorgan
+  and non-DeMorganned versions.
+- In this example, no DeMorganned version of MMI_AND2 will
+  be created since no {DeMorgan-Info} is included for MMI_AND2.
+
+
+Example 3
+---------
+The following is an example of a mode (3) mapfile, in which the user has drawn
+schematic .sue files, and wishes to connect them to the MMI icons:
+
+---
+# Map file between MMI generic symbols and TSMC25 library
+
+{MMI_INV 
+{A {MMI_INVA {in in} {out out}} {MMI_INVA_ {in in} {out out}}}
+{B {MMI_INVB {in in} {out out}} {MMI_INVB_ {in in} {out out}}}
+{C {MMI_INVC {in in} {out out}} {MMI_INVC_ {in in} {out out}}}
+{D {MMI_INVD {in in} {out out}} {MMI_INVD_ {in in} {out out}}}
+{E {MMI_INVE {in in} {out out}} {MMI_INVE_ {in in} {out out}}}
+}
+
+{MMI_AND2
+{0 {AND2B {in0 in0} {in1 in1} {out out}} {AND2BB {in0 in0} {in1 in1} {out out}}}
+{1 {AND2C {in0 in0} {in1 in1} {out out}} {AND2CB {in0 in0} {in1 in1} {out out}}}
+}
+---
+
+Some notes:
+- In this mode, the icon_pin and schematic_pin names must match exactly.  
+- The user's schematic names can be arbitrary.
+- The user should NOT draw demorgan schematics; the {DeMorgan-Info} portion
+  of a map description is not used in this mode (but must be present in
+  the mapfile in order to indicate to the mapper that a demorganned version
+  is desired.)
+
+

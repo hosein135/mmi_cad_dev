@@ -1,0 +1,193 @@
+## ************************************************************************
+## 
+## Copyright (c) 1995-2002 Juniper Networks, Inc. All rights reserved.
+## 
+## Permission is hereby granted, without written agreement and without
+## license or royalty fees, to use, copy, modify, and distribute this
+## software and its documentation for any purpose, provided that the
+## above copyright notice and the following three paragraphs appear in
+## all copies of this software.
+## 
+## IN NO EVENT SHALL JUNIPER NETWORKS, INC. BE LIABLE TO ANY PARTY FOR
+## DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+## ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+## JUNIPER NETWORKS, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+## DAMAGE.
+## 
+## JUNIPER NETWORKS, INC. SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+## INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+## MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+## NON-INFRINGEMENT.
+## 
+## THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND JUNIPER
+## NETWORKS, INC. HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
+## UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+## 
+## ************************************************************************
+
+# Makefile for all of Max (assumes gnu make program)
+
+# build directory
+INSTALL_DIR := $(MMI_CAD)/build
+
+# dir containing proto (starting point for max 'library', includes gcells/ tech/ etc.) 
+# also starting point for doc/
+PROTO_PARENT := $(MMI_CAD)/src/max
+
+#include appropriate config file 
+MAKE_DIR := make
+include $(MAKE_DIR)/config
+  
+#max version
+include max/max_version
+
+#aux programs (relative to o/$(CONFIG)/)
+EXT2SPICE := aux/ext/ext2spice/ext2spice
+EXT2SIM := aux/ext/ext2sim/ext2sim
+GEMINI := aux/gemini/gemini
+IRSIM := aux/irsim/irsim/irsim
+ANXHELPER := aux/irsim/anXhelper/anXhelper
+
+#binary extensions
+BIN_SOLARIS := bin.sparc-solaris2
+BIN_LINUX := bin.i486-linux
+BIN_HP := bin.hppa
+
+# install dirs
+INSTALL_DIR := $(MMI_CAD)/build
+INSTALL_SOLARIS := $(INSTALL_DIR)/max$(MAX_VERSION)/$(BIN_SOLARIS)
+INSTALL_LINUX := $(INSTALL_DIR)/max$(MAX_VERSION)/$(BIN_LINUX)
+INSTALL_HP := $(INSTALL_DIR)/max$(MAX_VERSION)/$(BIN_HP)
+
+# 
+# MODULES are Max C-code source directories (not including max/)  
+export MODULES	= $(notdir $(shell echo m/*))
+
+# datetag = monthday
+DATE		= $(shell date)
+DATETAG	= $(word 2,${DATE})$(word 3,${DATE})
+
+# max path and root dir
+MAX_PATH = $(shell pwd)
+MAX_ROOT_DIR = $(notdir $(MAX_PATH))
+MRD = $(MAX_ROOT_DIR)
+
+# update max and auxilary programs
+.PHONY: all
+all: max aux
+
+# update auxilary programs
+.PHONY: aux
+aux:
+	cd aux; make
+
+# update all modules, then remake max
+.PHONY: max
+max:	
+	cd maxtcl; make
+	cd mc; make
+	make/:makemods ${MODULES}
+	cd max; make
+
+# remake from scratch
+.PHONY: force
+force: include clean 
+	make all
+
+# rebuild include dir 
+.PHONY: include
+include: 
+	cd i; rm -f *.h; ln -s ../m/*/*.h .
+
+# interpolate latest and greatest maxtcl and mc src
+.PHONY: update
+update:
+	cd maxtcl; make update
+	rm -rf mc2.0
+	$(GCP) -a $(MMI_CAD)/src/mc2.0 .
+
+# install in build directory
+.PHONY: install 
+install:
+	make install_proto
+	make install_doc
+	make install_solaris
+	make install_linux
+	make install_hp
+
+.PHONY: install_proto 
+install_proto:
+	-cd $(INSTALL_DIR); rm -rf max$(MAX_VERSION) max.temp
+	cd $(INSTALL_DIR); mkdir max.temp
+	rm -rf make/tar.exclude
+	-cd $(PROTO_PARENT); echo "RCS" >> $(MAX_PATH)/make/tar.exclude
+	-cd $(PROTO_PARENT); echo "bin.i486-linux" >> $(MAX_PATH)/make/tar.exclude
+	-cd $(PROTO_PARENT); echo "bin.sparc-solaris2" >> $(MAX_PATH)/make/tar.exclude
+	-cd $(PROTO_PARENT); ls proto/*~ proto/*/*~ proto/*/*/*~ >> $(MAX_PATH)/make/tar.exclude
+	-cd $(PROTO_PARENT); ls proto/#* proto/*/#* proto/*/*/#* >> $(MAX_PATH)/make/tar.exclude
+	cd $(PROTO_PARENT); tar -c -X $(MAX_PATH)/make/tar.exclude -f - proto | tar -x -C $(INSTALL_DIR)/max.temp
+	cd $(INSTALL_DIR); mv max.temp/proto max$(MAX_VERSION); rmdir max.temp
+
+.PHONY: install_doc
+install_doc:
+	rm -rf make/tar.exclude
+	-cd $(PROTO_PARENT); echo "RCS" >> $(MAX_PATH)/make/tar.exclude
+	-cd $(PROTO_PARENT); ls doc/*~ doc/*/*~ doc/*/*/*~ >> $(MAX_PATH)/make/tar.exclude
+	-cd $(PROTO_PARENT); ls doc/#* doc/*/#* doc/*/*/#* >> $(MAX_PATH)/make/tar.exclude
+	cd $(PROTO_PARENT); tar -c -X $(MAX_PATH)/make/tar.exclude -f - doc | tar -x -C $(INSTALL_DIR)/max$(MAX_VERSION)
+
+#solaris binarys
+.PHONY: install_solaris
+install_solaris:
+	-mkdir $(INSTALL_SOLARIS)
+	-cp -p o/solaris/max $(INSTALL_SOLARIS)
+	-cp -p o/solaris/$(EXT2SPICE) $(INSTALL_SOLARIS)
+	-cp -p o/solaris/$(EXT2SIM) $(INSTALL_SOLARIS)
+	-cp -p o/solaris/$(GEMINI) $(INSTALL_SOLARIS)
+	-cp -p o/solaris/$(IRSIM) $(INSTALL_SOLARIS)
+	-cp -p o/solaris/$(ANXHELPER) $(INSTALL_SOLARIS)
+
+#linux binarys
+.PHONY: install_linux
+install_linux:
+	-mkdir $(INSTALL_LINUX)
+	-cp -p o/linux/max $(INSTALL_LINUX)
+	-cp -p o/linux/$(EXT2SPICE) $(INSTALL_LINUX)
+	-cp -p o/linux/$(EXT2SIM) $(INSTALL_LINUX)
+	-cp -p o/linux/$(GEMINI) $(INSTALL_LINUX)
+	-cp -p o/linux/$(IRSIM) $(INSTALL_LINUX)
+	-cp -p o/linux/$(ANXHELPER) $(INSTALL_LINUX)
+
+#hp binarys
+.PHONY: install_hp
+install_hp:
+	-mkdir $(INSTALL_HP)
+	-cp -p o/hp/max $(INSTALL_HP)
+	-cp -p o/hp/$(EXT2SPICE) $(INSTALL_HP)
+	-cp -p o/hp/$(EXT2SIM) $(INSTALL_HP)
+	-cp -p o/hp/$(GEMINI) $(INSTALL_HP)
+	-cp -p o/hp/$(IRSIM) $(INSTALL_HP)
+	-cp -p o/hp/$(ANXHELPER) $(INSTALL_HP)
+
+# remove all binaries for this configuration
+.PHONY: clean
+clean: 
+	rm -rf o/${CONFIG} 
+
+# tar up entire max source (excluding .o files, core files etc!) 
+.PHONY: tar
+tar: 
+	rm -f make/tar.exclude
+	-cd ..; echo "o" >> ${MRD}/make/tar.exclude
+	-cd ..; ls ${MRD}/*.tgz >> ${MRD}/make/tar.exclude
+	-cd ..; ls ${MRD}/max/max ${MRD}/max/core >> ${MRD}/make/tar.exclude
+	-cd ..; ls ${MRD}/max/*.o ${MRD}/max/*~ ${MRD}/max/#* >> ${MRD}/make/tar.exclude
+	-cd ..; ls ${MRD}/m/*/*~ ${MRD}/m/*/#* >> ${MRD}/make/tar.exclude
+	-cd ..; ls ${MRD}/maxtcl/*.prep_h >> ${MRD}/make/tar.exclude
+	-cd ..; ls ${MRD}/mc*/*.prep_h >> ${MRD}/make/tar.exclude
+	-mkdir ../max_versions
+	cd ..;  tar -czf max_versions/${MRD}${DATETAG}.tgz -X ${MRD}/make/tar.exclude ${MRD}
+
+
+
+

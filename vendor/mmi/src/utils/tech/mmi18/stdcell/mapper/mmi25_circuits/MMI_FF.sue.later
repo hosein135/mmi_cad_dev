@@ -1,0 +1,70 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_MMI_FF {} {
+  make input -name scan_en -origin {-240 180}
+  make input -name D -origin {-240 300}
+  make input -name scan_in -origin {-240 360}
+  make input -name clk -origin {-240 540}
+  make name_net -name clk_L -origin {-10 540}
+  make inverter -WP 2.4 -WN 1.2 -origin {1050 330}
+  make output -name Q -origin {1200 330}
+  make name_net -orient RX -name clk -origin {400 150}
+  make name_net -orient RX -name clk_L -origin {400 70}
+  make global -name gnd -origin {340 270}
+  make global -orient RY -name vdd -origin {340 -50}
+  make inverter -WP 1.2 -WN 0.6 -origin {-130 540}
+  make MUX2IB -origin {-140 330}
+  make global -name gnd -origin {790 280}
+  make global -orient RY -name vdd -origin {790 -40}
+  make nmos -orient RX -W 0.36 -origin {790 240}
+  make pmos -orient RX -W 0.36 -origin {790 0}
+  make name_net -orient RX -name clk -origin {850 80}
+  make name_net -orient RX -name clk_L -origin {850 160}
+  make pmos -orient RX -W 0.6 -origin {340 -10}
+  make pmos -orient RX -W 0.6 -origin {340 70}
+  make nmos -orient RX -W 0.36 -origin {340 150}
+  make nmos -orient RX -W 0.36 -origin {340 230}
+  make pmos -orient RX -W 0.36 -origin {790 80}
+  make nmos -orient RX -W 0.36 -origin {790 160}
+  make name_net -name clk_L -origin {570 290}
+  make name_net -orient RY -name clk -origin {570 380}
+  make xgate -orient RY -WP 0.36 -WN 0.36 -origin {570 330}
+  make name_net -orient RY -name clk_L -origin {10 360}
+  make name_net -name clk -origin {10 290}
+  make xgate -orient RY -WP 0.6 -WN 0.6 -origin {10 330}
+  make inverter -WP 2.0 -WN 1.0 -origin {310 330}
+  make inverter -WP 3.6 -WN 1.8 -origin {740 330}
+  make sccs_title_bar -owner MMI -version 1.2 -date 03/04/99 -origin {350 960}
+  make_wire -240 180 -140 180
+  make_wire -140 180 -140 290
+  make_wire -160 360 -240 360
+  make_wire -160 540 -240 540
+  make_wire -100 330 -20 330
+  make_wire 1100 330 1200 330
+  make_wire -80 540 -10 540
+  make_wire 400 230 440 230
+  make_wire 440 230 440 330
+  make_wire 440 -10 440 230
+  make_wire 400 -10 440 -10
+  make_wire 240 110 340 110
+  make_wire 240 110 240 330
+  make_wire -240 300 -160 300
+  make_wire 850 240 890 240
+  make_wire 850 0 890 0
+  make_wire 690 120 790 120
+  make_wire 890 0 890 240
+  make_wire 690 120 690 330
+  make_wire 690 330 600 330
+  make_wire 570 380 570 360
+  make_wire 40 330 240 330
+  make_wire 890 240 890 330
+  make_wire 360 330 440 330
+  make_wire 440 330 540 330
+  make_wire 280 330 240 330
+  make_wire 790 330 890 330
+  make_wire 890 330 1020 330
+  make_wire 690 330 710 330
+  make_text -origin {-460 -210} -text Flipflop -size large
+  make_text -origin {-460 -150} -text {B Size} -size large
+}
+

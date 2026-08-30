@@ -1,0 +1,242 @@
+# SUE version MMI_SUE3.5
+
+proc SCHEMATIC_m42adder {} {
+  make row_spanner -origin {-1210 1570}
+  generate row_spanner row_spanner250 -width 250
+  make row_spanner250 -origin {-710 1570}
+  make row_spanner250 -origin {-150 1570}
+  make row_spanner250 -origin {1570 1560}
+  make AOI22B -orient RY -origin {-540 330}
+  make AOI22B -orient RY -origin {-540 510}
+  make AOI22B -orient RY -origin {20 820}
+  make AOI22B -orient RY -origin {20 1000}
+  make input -orient RY -name in1 -origin {-1710 280}
+  make input -orient RY -name in2 -origin {-1710 380}
+  make input -orient RY -name in3 -origin {-1710 780}
+  make input -orient RY -name in4 -origin {-1710 880}
+  make OAI22B_ -orient RY -origin {640 520}
+  make OAI22B_ -orient RY -origin {640 820}
+  make AOI22B -orient RY -origin {1440 810}
+  make AOI22B -orient RY -origin {1440 510}
+  make output -orient RY -name Carry_H -origin {1820 510}
+  make AOI22B -orient RY -origin {-1300 -250}
+  make OAI22B -orient RY -origin {-1290 -40}
+  make output -orient R90Y -name Cout_L -origin {-1070 -290}
+  make name_net -orient R90Y -name in1_L -origin {-830 240}
+  make name_net -orient R90Y -name in3_XAND_in4_L -origin {500 1100}
+  make name_net -orient R90Y -name in3_XOR_in4_L -origin {460 1100}
+  make name_net -orient R90Y -name in1_XAND_in2_L -origin {420 1100}
+  make name_net -orient R90Y -name Cin_H -origin {920 1100}
+  make name_net -orient R90Y -name odd_H -origin {880 1100}
+  make name_net -orient R90Y -name even_H -origin {840 1100}
+  make name_net -orient R90Y -name in4 -origin {-1580 1110}
+  make name_net -orient R90Y -name in3 -origin {-1610 1110}
+  make name_net -orient R90Y -name in2 -origin {-1640 1110}
+  make name_net -orient R90Y -name in1 -origin {-1670 1110}
+  make name_net -orient R90Y -name in2_L -origin {-900 240}
+  make name_net -orient R90Y -name in3_L -origin {-270 730}
+  make name_net -orient R90Y -name in4_L -origin {-340 730}
+  make name_net -orient RX -name in3_XAND_in4_L -origin {280 1000}
+  make name_net -orient RX -name in3_XOR_in4_L -origin {280 820}
+  make name_net -orient RX -name in1_XAND_in2_L -origin {280 510}
+  make name_net -orient RX -name in1_XOR_in2_L -origin {280 330}
+  make name_net -orient R90Y -name in1_XOR_in2_L -origin {380 1100}
+  make name_net -orient RX -name odd_H -origin {780 820}
+  make name_net -orient RX -name even_H -origin {780 520}
+  make name_net -orient RX -name Sum_L -origin {1600 810}
+  make name_net -orient RX -name Carry_L -origin {1600 510}
+  make name_net -orient RX -name X_L -origin {-1180 -40}
+  make name_net -orient RX -name X_H -origin {-980 -40}
+  make m42adder -origin {1360 -410}
+  make INVD_ -origin {1720 510}
+  make INVC -orient R90 -origin {-270 660}
+  make INVC -orient R90 -origin {-340 660}
+  make INVC -orient R90 -origin {-830 160}
+  make INVC -orient R90 -origin {-900 160}
+  make INVC_ -origin {-1090 -40}
+  make output -orient RY -name Sum_H -origin {1830 1090}
+  make INVD_ -origin {1130 1090}
+  generate row_spanner row_spanner350 -width 350
+  make row_spanner350 -origin {880 1560}
+  make input -orient R90Y -name Cin_L -origin {-1070 1350}
+  make INVC_ -orient R270 -origin {-1070 1280}
+  make sccs_title_bar -owner emc -version 1.4 -date 01/07/99 -origin {460 1780}
+  make_wire 710 820 780 820
+  make_wire 380 770 540 770
+  make_wire 500 810 540 810
+  make_wire 460 870 540 870
+  make_wire 460 870 460 1100
+  make_wire 1600 810 1520 810
+  make_wire 1600 510 1520 510
+  make_wire 1690 810 1600 810
+  make_wire 1690 510 1600 510
+  make_wire 1770 510 1820 510
+  make_wire -630 340 -830 340
+  make_wire -630 320 -900 320
+  make_wire -900 560 -630 560
+  make_wire -630 520 -830 520
+  make_wire -1670 460 -1670 280
+  make_wire 380 1100 380 770
+  make_wire -1640 1110 -1640 500
+  make_wire -1670 1110 -1670 460
+  make_wire -270 730 -270 830
+  make_wire -270 730 -270 710
+  make_wire -340 730 -340 710
+  make_wire -340 810 -70 810
+  make_wire -340 810 -340 730
+  make_wire -70 830 -270 830
+  make_wire -270 1010 -270 830
+  make_wire -270 1010 -70 1010
+  make_wire -340 1050 -70 1050
+  make_wire -340 1050 -340 810
+  make_wire -340 630 -340 610
+  make_wire -270 630 -270 590
+  make_wire -900 560 -900 320
+  make_wire -900 320 -900 240
+  make_wire -900 240 -900 210
+  make_wire -830 520 -830 340
+  make_wire -830 340 -830 240
+  make_wire -830 240 -830 210
+  make_wire -900 130 -900 110
+  make_wire -1670 280 -1670 90
+  make_wire -830 130 -830 90
+  make_wire -1710 280 -1670 280
+  make_wire -1640 500 -1640 380
+  make_wire -1640 380 -1640 110
+  make_wire -1710 780 -1610 780
+  make_wire 420 510 420 240
+  make_wire 380 330 380 240
+  make_wire -1640 500 -630 500
+  make_wire -1710 380 -1640 380
+  make_wire -1640 380 -630 380
+  make_wire -1640 110 -900 110
+  make_wire -1670 90 -830 90
+  make_wire -1670 460 -630 460
+  make_wire -1670 280 -630 280
+  make_wire -1580 10 -1390 10
+  make_wire -1670 -300 -1390 -300
+  make_wire -1670 -300 -1670 -350
+  make_wire -1610 -240 -1390 -240
+  make_wire -1610 -240 -1610 -350
+  make_wire -1640 -260 -1390 -260
+  make_wire -1640 -260 -1640 -350
+  make_wire -1580 -200 -1390 -200
+  make_wire -1580 -200 -1580 10
+  make_wire -1580 -200 -1580 -350
+  make_wire -1640 -50 -1390 -50
+  make_wire -1640 -50 -1640 110
+  make_wire -1640 -50 -1640 -260
+  make_wire -1670 -90 -1390 -90
+  make_wire -1670 -90 -1670 90
+  make_wire -1670 -90 -1670 -300
+  make_wire -1610 -30 -1390 -30
+  make_wire -1610 -30 -1610 -240
+  make_wire -1710 880 -1580 880
+  make_wire -1180 -40 -1220 -40
+  make_wire -1180 -40 -1120 -40
+  make_wire -980 -40 -1040 -40
+  make_wire -980 -40 960 -40
+  make_wire -1070 -250 -1070 -290
+  make_wire 460 510 540 510
+  make_wire 460 510 460 240
+  make_wire 500 570 540 570
+  make_wire 500 570 500 810
+  make_wire 500 570 500 240
+  make_wire 380 470 540 470
+  make_wire 380 470 380 770
+  make_wire 380 470 380 330
+  make_wire 420 530 540 530
+  make_wire 420 530 420 510
+  make_wire 710 520 780 520
+  make_wire 780 520 840 520
+  make_wire -1580 990 -1580 880
+  make_wire -1580 990 -1580 1110
+  make_wire -1610 950 -1610 780
+  make_wire -1610 950 -1610 1110
+  make_wire -1610 780 -1610 770
+  make_wire -1610 590 -1610 -30
+  make_wire -1610 590 -1610 770
+  make_wire -1580 610 -1580 10
+  make_wire 500 1000 500 810
+  make_wire 500 1000 500 1100
+  make_wire -1580 870 -1580 610
+  make_wire -1580 880 -1580 870
+  make_wire 540 830 420 830
+  make_wire 420 830 420 1100
+  make_wire 420 830 420 530
+  make_wire 460 820 460 870
+  make_wire 460 820 460 510
+  make_wire 280 510 -460 510
+  make_wire 280 510 420 510
+  make_wire 280 330 -460 330
+  make_wire 280 330 380 330
+  make_wire -1580 870 -70 870
+  make_wire -1610 770 -70 770
+  make_wire -1610 950 -70 950
+  make_wire -1580 610 -340 610
+  make_wire -1610 590 -270 590
+  make_wire -1580 990 -70 990
+  make_wire 100 820 280 820
+  make_wire 280 820 460 820
+  make_wire 100 1000 280 1000
+  make_wire 280 1000 500 1000
+  make_wire 840 760 1350 760
+  make_wire 840 760 840 520
+  make_wire 840 760 840 1100
+  make_wire 840 460 1350 460
+  make_wire 840 460 840 240
+  make_wire 840 460 840 520
+  make_wire 880 520 1350 520
+  make_wire 880 520 880 240
+  make_wire 880 520 880 820
+  make_wire 780 820 880 820
+  make_wire 880 820 1350 820
+  make_wire 880 820 880 1100
+  make_wire 960 500 1350 500
+  make_wire 960 -40 960 500
+  make_wire 920 560 1350 560
+  make_wire 920 800 1350 800
+  make_wire 1180 1090 1830 1090
+  make_wire 1690 810 1690 960
+  make_wire 1690 960 1050 960
+  make_wire 1050 960 1050 1090
+  make_wire 1050 1090 1100 1090
+  make_wire -1220 -250 -1070 -250
+  make_wire -1070 1230 -1070 1190
+  make_wire 920 1100 920 1190
+  make_wire 920 560 920 800
+  make_wire 920 800 920 1100
+  make_wire -1070 1190 920 1190
+  make_wire -1070 1330 -1070 1350
+  make_wire -1070 1330 -1070 1310
+  make_wire 960 860 960 1330
+  make_wire 960 860 1350 860
+  make_wire 960 1330 -1070 1330
+}
+
+proc ICON_m42adder args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 -90} -name in1
+  icon_term -type input -origin {-60 -30} -name in2
+  icon_term -type input -origin {-60 30} -name in3
+  icon_term -type input -origin {-60 90} -name in4
+  icon_term -type output -origin {60 30} -name Sum_H
+  icon_term -type output -origin {60 -30} -name Carry_H
+  icon_term -type input -origin {0 120} -orient R270 -name Cin_L
+  icon_term -type output -origin {0 -120} -orient R270 -name Cout_L
+  icon_special -type sccs_title_bar -origin {-60 440} -owner emc -version 1.4 -date 01/07/99
+  icon_property -origin {-50 280} -type user -name name
+  icon_property -origin {-50 300} -type user -name M
+  icon_property -origin {-50 320} -type user -name dpc
+  icon_property -origin {0 -60} -size large -anchor center -label {4:2 Adder}
+  icon_property -origin {0 -110} -size small -anchor center -label Cout_L
+  icon_property -origin {0 110} -size small -anchor center -label Cin_L
+  icon_property -origin {50 30} -size small -anchor e -label S_H
+  icon_property -origin {50 -30} -size small -anchor e -label C_H
+  icon_property -origin {-50 -90} -size small -label In1_H
+  icon_property -origin {-50 -30} -size small -label In2_H
+  icon_property -origin {-50 30} -size small -label In3_H
+  icon_property -origin {-50 90} -size small -label In4_H
+  icon_line -60 -120 -60 120 60 120 60 -120 -60 -120
+}
+

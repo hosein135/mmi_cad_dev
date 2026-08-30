@@ -1,0 +1,294 @@
+# WARNING:
+#
+# The .max file format continues to evolve.
+#
+# Micro Magic recommends you do not write or parse .max files directly.
+# Instead use the Max API (e.g. 'db_search' and 'db_paint' commands).
+# The API is also easier to interface to.  See 'Text Commands' under
+# the Max 'Help' menu for full documentation on the API.
+
+max 3
+tech mmi15
+resolution 0.001
+
+
+DEF #fet!-contacts!right!-width!1.155!-_version!719280169 "fet (S)" "1.155/0.15"
+
+SECTION RECTS {
+layer ndif
+-270 0 0 1155
+150 0 545 1155
+layer poly
+0 1155 150 1375
+0 -220 150 0
+layer ct
+280 875 460 1055
+280 485 460 665
+280 95 460 275
+layer m1
+230 35 510 1120
+layer nfet
+0 0 150 1155
+} SECTION RECTS
+
+SECTION LABELS {
+lab poly 75 -110 75 -110 3 1 gs
+lab poly 75 1265 75 1265 3 1 gn
+lab ndif -270 580 -270 580 3 1 s
+lab ndif 370 580 370 580 3 1 d
+} SECTION LABELS
+
+
+DEF #fet!-contacts!none!-width!1.155!-_version!1654748346 "fet (S)" "1.155/0.15"
+
+SECTION RECTS {
+layer ndif
+-270 0 0 1155
+150 0 420 1155
+layer poly
+0 1155 150 1375
+0 -220 150 0
+layer nfet
+0 0 150 1155
+} SECTION RECTS
+
+SECTION LABELS {
+lab poly 75 -110 75 -110 3 1 gs
+lab poly 75 1265 75 1265 3 1 gn
+lab ndif -270 580 -270 580 3 1 s
+lab ndif 420 580 420 580 3 1 d
+} SECTION LABELS
+
+
+DEF #fet!-contacts!left!-width!1.155!-_version!1809028905 "fet (S)" "1.155/0.15"
+
+SECTION RECTS {
+layer ndif
+-395 0 0 1155
+150 0 420 1155
+layer poly
+0 1155 150 1375
+0 -220 150 0
+layer ct
+-310 875 -130 1055
+-310 485 -130 665
+-310 95 -130 275
+layer m1
+-360 35 -80 1120
+layer nfet
+0 0 150 1155
+} SECTION RECTS
+
+SECTION LABELS {
+lab poly 75 -110 75 -110 3 1 gs
+lab poly 75 1265 75 1265 3 1 gn
+lab ndif -220 580 -220 580 3 1 s
+lab ndif 420 580 420 580 3 1 d
+} SECTION LABELS
+
+
+DEF #fet!-type!pfet!-width!0.77!-_version!616072886 "fet (S)" "0.77/0.15"
+
+SECTION RECTS {
+layer pdif
+-395 0 0 770
+150 0 545 770
+layer poly
+0 770 150 990
+0 -220 150 0
+layer ct
+-310 490 -130 670
+280 490 460 670
+-310 100 -130 280
+280 100 460 280
+layer m1
+-360 35 -80 735
+230 35 510 735
+layer pfet
+0 0 150 770
+} SECTION RECTS
+
+SECTION LABELS {
+lab poly 75 -110 75 -110 3 1 gs
+lab poly 75 880 75 880 3 1 gn
+lab pdif -220 385 -220 385 3 1 s
+lab pdif 370 385 370 385 3 1 d
+} SECTION LABELS
+
+
+DEF #fet!-type!pfet!-left_contacts!+1!-width!0.77!-_version!1843105216 "fet (S)" "0.77/0.15"
+
+SECTION RECTS {
+layer pdif
+-395 0 0 770
+150 0 545 770
+layer poly
+0 770 150 990
+0 -220 150 0
+layer ct
+-310 505 -130 685
+280 490 460 670
+280 100 460 280
+layer m1
+-360 455 -80 735
+230 35 510 735
+layer pfet
+0 0 150 770
+} SECTION RECTS
+
+SECTION LABELS {
+lab poly 75 -110 75 -110 3 1 gs
+lab poly 75 880 75 880 3 1 gn
+lab pdif -220 385 -220 385 3 1 s
+lab pdif 370 385 370 385 3 1 d
+} SECTION LABELS
+
+
+DEF #fet!-type!pfet!-right_contacts!+1!-width!0.77!-_version!1842102464 "fet (S)" "0.77/0.15"
+
+SECTION RECTS {
+layer pdif
+-395 0 0 770
+150 0 545 770
+layer poly
+0 770 150 990
+0 -220 150 0
+layer ct
+-310 490 -130 670
+280 505 460 685
+-310 100 -130 280
+layer m1
+-360 35 -80 735
+230 455 510 735
+layer pfet
+0 0 150 770
+} SECTION RECTS
+
+SECTION LABELS {
+lab poly 75 -110 75 -110 3 1 gs
+lab poly 75 880 75 880 3 1 gn
+lab pdif -220 385 -220 385 3 1 s
+lab pdif 370 385 370 385 3 1 d
+} SECTION LABELS
+
+
+DEF #via!-type!ct_poly!-_version!2109196518 "via" "ct_poly"
+
+SECTION RECTS {
+layer poly
+-175 -175 175 175
+layer ct
+-90 -90 90 90
+layer m1
+-140 -140 140 140
+} SECTION RECTS
+
+
+DEF
+
+SECTION VERSIONS {
+vMAIN 971480475 299
+vDRC 971480475 299
+vBBOX 971480475 174
+} SECTION VERSIONS
+
+SECTION RECTS {
+layer nw
+-360 3100 2840 6740
+layer nwc
+0 6025 2480 6375
+layer pwc
+0 -175 2480 175
+layer poly
+520 4065 670 4260
+520 3915 755 4065
+520 2860 670 3915
+1110 3385 1260 4310
+890 3235 1260 3385
+890 2860 1040 3235
+1700 2960 1850 4310
+1260 2805 1850 2960
+layer pplus
+-90 3100 2570 5980
+-90 -220 2570 220
+layer nplus
+-90 5980 2570 6420
+-90 220 2570 3100
+layer ct
+220 6110 400 6290
+840 6110 1020 6290
+1460 6110 1640 6290
+2080 6110 2260 6290
+220 -90 400 90
+840 -90 1020 90
+1460 -90 1640 90
+2080 -90 2260 90
+layer m1
+0 5780 2480 6620
+750 5055 1030 5780
+1930 5040 2210 5780
+160 4430 1640 4620
+160 3600 355 4430
+740 4085 1120 4220
+675 3895 1120 4085
+740 3840 1120 3895
+1980 3840 2360 4220
+120 3220 500 3600
+1360 3520 1740 3600
+1100 3325 1740 3520
+1360 3220 1740 3325
+160 2595 355 3220
+1490 420 1770 1600
+0 -420 2480 420
+layer prb
+0 0 2480 6200
+} SECTION RECTS
+
+SECTION LABELS {
+lab m1 930 4030 930 4030 0 4 in0
+lab m1 1550 3410 1550 3410 0 4 in1
+lab m1 2170 4030 2170 4030 0 4 in2
+lab m1 930 0 930 0 0 3 gnd
+lab m1 310 3410 310 3410 0 5 out
+lab m1 930 6200 930 6200 0 3 vdd
+} SECTION LABELS
+
+SECTION INSTANCES {
+gcell 719280169 #fet!-contacts!right!-width!1.155
+bbox -270 -220 545 1375
+uses {
+	/#fet!-contacts!right!-width!1.38_0 1 0 1260 0 1 1565
+}
+gcell 1654748346 #fet!-contacts!none!-width!1.155
+bbox -270 -220 420 1375
+uses {
+	/#fet!-contacts!none!-width!1.38_0 1 0 890 0 1 1565
+}
+gcell 1809028905 #fet!-contacts!left!-width!1.155
+bbox -395 -220 420 1375
+uses {
+	/#fet!-contacts!left!-width!1.38_0 1 0 520 0 1 1565
+}
+gcell 616072886 #fet!-type!pfet!-width!0.77
+bbox -395 -220 545 990
+uses {
+	/#fet!-type!pfet!-width!0.92_0 1 0 1700 0 1 4395
+}
+gcell 1843105216 #fet!-type!pfet!-left_contacts!+1!-width!0.77
+bbox -395 -220 545 990
+uses {
+	/#fet!-type!pfet!-left_contacts!+1!-width!0.92_0 1 0 1110 0 1 4395
+}
+gcell 1842102464 #fet!-type!pfet!-right_contacts!+1!-width!0.77
+bbox -395 -220 545 990
+uses {
+	/#fet!-type!pfet!-right_contacts!+1!-width!0.92_0 1 0 520 0 1 4395
+}
+gcell 732117674 #via!-type!ct_poly!-_version!2109196518
+bbox -175 -175 175 175
+uses {
+	/#via!-type!ct_poly_1 1 0 1220 0 1 3410
+	/#via!-type!ct_poly_0 1 0 1850 0 1 4025
+	/#via!-type!ct_poly_2 1 0 715 0 1 3990
+}
+} SECTION INSTANCES

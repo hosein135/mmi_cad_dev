@@ -1,0 +1,52 @@
+GDSTechInit --
+--------------
+
+Do some checks one time checks at startup time (during technology
+file read in)
+
+Results:
+None.
+
+Side effects:
+Error checking.
+
+GDSTclInit --
+-------------
+
+Initialize tcl commands for this module
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+
+GDSWriteFile --
+---------------
+
+Write out the entire tree rooted at the supplied CellDef in Calma
+GDS-II stream format, to the specified file.
+
+Results:
+TRUE if the cell could be written successfully, FALSE otherwise.
+
+Side effects:
+Writes a file to disk.
+In the event of an error while writing out the cell,
+the external integer errno is set to the UNIX error
+encountered.
+
+Algorithm:
+
+Calma names can be strings of up to CALMANAMELENGTH characters.
+Because general names won't map into Calma names, we use the
+original cell name only if it is legal Calma, and otherwise
+generate a unique numeric name for the cell.
+
+We make a depth-first traversal of the entire design tree, outputting
+each cell to the Calma file.  If a given cell has not been read in
+when we visit it, we read it in ourselves.
+
+No hierarchical design rule checking or bounding box computation
+occur during this traversal -- both are explicitly avoided.
+

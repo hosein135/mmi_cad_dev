@@ -1,0 +1,633 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "nl.h"
+#include "tcl.h"
+#include "ui.h"
+#include "ui_int.h"
+
+#include "report.h"
+#include "rtl2dpc.h"
+#include "hier.h"
+#include "namegen.h"
+#include "unexec.h"
+
+
+#(defcommand list_commands
+   "List all the nl commands."
+   (-dont_print boolean "return the list of commands as a TCL list, rather than printing it"))
+{
+  if ( dont_print ) {
+    Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+    ar_for_all (ui_all_commands, char *, cmd_name) {
+      Tcl_Obj *obj = Tcl_NewStringObj (cmd_name, -1);
+      
+      Tcl_ListObjAppendElement (interp, result, obj);
+    } ar_end_for;
+
+    Tcl_SetObjResult (interp, result);
+  }
+  else {
+    ar_for_all (ui_all_commands, char *, cmd_name) {
+      printf ("%s\n", cmd_name);
+    } ar_end_for;
+  }
+
+  return TCL_OK;
+}
+
+
+static
+int
+ui_cmd_net_is_connected_to_port (nl_net net)
+{
+  nl_design design = nl_net_design (net);
+  char *net_name = nl_net_name (net);
+  nl_object port = nl_design_get_port_by_name (design, net_name);
+
+  if ( port == NULL ) {
+    return 0;
+  }
+  else {
+    nl_pin port_pin;
+    nl_net port_net;
+
+    ASSERT (nl_object_kind (port) == nl_kind_port);
+
+    port_pin = nl_port_pin ((nl_port) port);
+    port_net = nl_pin_net (port_pin);
+
+    ASSERT (port_net == net);
+
+    return 1;
+  }
+}  
+
+
+static
+void
+ui_cmd_remove_buffers_from_design (nl_design design, int allow_feedthroughs,
+				   char *buf_name, int silent)
+{
+  nl_reference assign_ref = nl_design_get_reference_by_name (design, buf_name);
+
+  if ( assign_ref != NULL ) {
+    nl_object in_refpin = nl_reference_get_refpin_by_name (assign_ref, "in");
+    nl_object out_refpin = nl_reference_get_refpin_by_name (assign_ref, "out");
+    ar instances = nl_reference_instances (assign_ref);
+    ar cells = ar_copy (instances);
+
+    ASSERT (in_refpin != NULL);
+    ASSERT (out_refpin != NULL);
+    ASSERT (nl_object_kind (in_refpin) == nl_kind_refpin);
+    ASSERT (nl_object_kind (out_refpin) == nl_kind_refpin);
+
+    /* Can't use nl_reference_for_all_instances here because the
+       instance array of the reference is modified when cells are
+       removed. */
+    ar_for_all (cells, nl_cell, cell) {
+      nl_pin in_pin
+	= nl_cell_get_pin_by_refpin (cell, (nl_refpin) in_refpin);
+      nl_pin out_pin
+	= nl_cell_get_pin_by_refpin (cell, (nl_refpin) out_refpin);
+      nl_net in_net = nl_pin_net (in_pin);
+      nl_net out_net = nl_pin_net (out_pin);
+
+      if ( in_net != NULL && out_net != NULL ) {
+	int in_is_port = ui_cmd_net_is_connected_to_port (in_net);
+	int out_is_port = ui_cmd_net_is_connected_to_port (out_net);
+	char *in_net_name = nl_net_name (in_net);
+	char *out_net_name = nl_net_name (out_net);
+	int in_is_const = ( strcmp (in_net_name, "1'b0") == 0 ||
+			    strcmp (in_net_name, "1'b1") == 0 );
+	int out_is_const = ( strcmp (out_net_name, "1'b0") == 0 ||
+			     strcmp (out_net_name, "1'b1") == 0 );
+
+	if ( in_net != out_net && out_is_const ) {
+	  if ( !silent ) {
+	    fprintf (stderr, "Buffer %s in design %s drives "
+		     "a constant net (%s from %s).\n"
+		     "\tThis buffer will not be removed.\n",
+		     nl_cell_name (cell), nl_design_name (design),
+		     nl_net_name (out_net), nl_net_name (in_net));
+	  }
+	}
+	else if ( !allow_feedthroughs &&
+		  in_net != out_net &&
+		  in_is_port && out_is_port ) {
+	  if ( !silent ) {
+	    fprintf (stderr, "Buffer %s in design %s connects two "
+		     "ports (%s and %s).\n"
+		     "\tThis buffer will not be removed.\n",
+		     nl_cell_name (cell), nl_design_name (design),
+		     nl_net_name (in_net), nl_net_name (out_net));
+	  }
+	}
+	else if ( !allow_feedthroughs &&
+		  in_net != out_net &&
+		  in_is_const && out_is_port ) {
+	  if ( !silent ) {
+	    fprintf (stderr, "Buffer %s in design %s connects a port "
+		     "and a constant (%s and %s).\n"
+		     "\tThis buffer will not be removed.\n",
+		     nl_cell_name (cell), nl_design_name (design),
+		     nl_net_name (in_net), nl_net_name (out_net));
+	  }
+	}
+	else {
+	  nl_design_remove_cell (design, cell);
+
+	  if ( in_net != out_net ) {
+	    int use_in_net;
+
+	    if      ( in_is_const )
+	      use_in_net = 1;
+	    else if ( out_is_port )
+	      use_in_net = 0;
+	    else if ( in_is_port )
+	      use_in_net = 1;
+	    else if ( nl_net_bus (in_net) != NULL )
+	      use_in_net = 1;
+	    else if ( nl_net_bus (out_net) != NULL )
+	      use_in_net = 0;
+	    else
+	      use_in_net = 1;
+
+	    if ( use_in_net ) {
+	      nl_net_for_all_pins (out_net, pin) {
+		nl_pin_connect_net (pin, in_net);
+	      } nl_end_for;
+
+	      nl_design_remove_net (design, out_net);
+	    }
+	    else {
+	      nl_net_for_all_pins (in_net, pin) {
+		nl_pin_connect_net (pin, out_net);
+	      } nl_end_for;
+
+	      nl_design_remove_net (design, in_net);
+	    }
+	  }
+	}
+      }
+      else {
+	/* either in_net or out_net is NULL, just toast the buffer */
+	nl_design_remove_cell (design, cell);
+      }
+    } ar_end_for;
+
+    ar_free (cells);
+
+    /* Remove any empty nets or buses. */
+
+    nl_design_for_all_net_buses (design, net_bus) {
+      int any_pins = 0;
+
+      nl_bus_for_all_net_members (net_bus, net) {
+	nl_net_for_all_pins (net, pin) {
+	  any_pins = 1;
+	  goto next_bus;
+	} nl_end_for;
+      } nl_end_for;
+
+      /* The bus had no pins.  Remove it. */
+      nl_design_remove_net_bus (design, net_bus, 1);
+    next_bus:
+      ;
+    } nl_end_for;
+
+    nl_design_for_all_nets (design, net) {
+      int any_pins = 0;
+
+      nl_net_for_all_pins (net, pin) {
+	any_pins = 1;
+	goto next_net;
+      } nl_end_for;
+
+      /* The net had no pins.  Remove it. */
+      nl_design_remove_net (design, net);
+    next_net:
+      ;
+    } nl_end_for;
+  }
+}
+
+
+static
+void
+ui_cmd_do_remove_buffers (nl_design design, int recursive,
+			  int allow_feedthroughs, char *buf_name, int silent)
+{
+  ui_cmd_remove_buffers_from_design (design, allow_feedthroughs, buf_name, silent);
+  
+  if ( recursive ) {
+    nl_design_for_all_references (design, reference) {
+      nl_object down_object = nl_reference_down_design (reference);
+
+      if ( down_object != NULL &&
+	   nl_object_kind (down_object) == nl_kind_design ) {
+	ui_cmd_do_remove_buffers ((nl_design) down_object, recursive,
+				  allow_feedthroughs, buf_name, silent);
+      }
+    } nl_end_for;
+  }
+}
+
+
+#(defcommand remove_buffers
+   "Remove all assignment buffers by merging the assigned nets."
+   (-silent boolean "don't issue warnings")
+   (-recursive boolean "do the entire hierarchy")
+   (-feedthroughs boolean "allow assignments connecting ports to be removed, which creates feedthroughs")
+   (buf_ref string "reference name of buffers to remove")
+   &optional
+   (design current_design "remove the assignment buffers from this design"))
+{
+  ui_cmd_do_remove_buffers (design, recursive, feedthroughs, buf_ref, silent);
+
+  return TCL_OK;
+}
+
+
+static
+void
+ui_get_library_list (Tcl_Interp *interp, nl_context context, Tcl_Obj *obj,
+		     ar libraries)
+{
+  int objc;
+  Tcl_Obj **objv;
+  int i;
+
+  Tcl_ListObjGetElements (interp, obj, &objc, &objv);
+
+  for ( i = 0; i < objc; i++ ) {
+    char *lib_name = Tcl_GetStringFromObj (objv[0], NULL);
+    nl_library library = nl_context_get_library_by_name (context, lib_name);
+
+    if ( library == NULL ) {
+      error ("cannot find a library named %s", lib_name);
+    }
+
+    ar_add (libraries, &library);
+  }
+}
+
+
+#(defcommand link
+  ("Link the specified design.  All cells will be linked to the appropriate"
+   "subdesign or library cell.")
+  (-nohierarchy boolean "don't recursively link all subdesigns")
+  (-silent boolean "don't print messages about unresolved references")
+  (-libraries tcl_object "list of libraries to search")
+  &optional
+  (design current_design "design to link"))
+{
+  volatile ar libraries_ar = NULL;
+
+  error_unwind_protect {
+    if ( libraries != NULL ) {
+      libraries_ar = ar_alloc (1, sizeof (nl_library));
+
+      ui_get_library_list (interp, context, libraries, libraries_ar);
+    }
+
+    hier_link_design (design, silent, !nohierarchy, libraries_ar);
+  }
+  error_on_exit {
+    if ( libraries_ar != NULL )
+      ar_free (libraries_ar);
+  }
+  error_end;
+
+  return TCL_OK;
+}
+
+
+#(defcommand unlink_reference
+  "Unlink the specified reference."
+  (reference reference "unlink this reference"))
+{
+  nl_reference_unlink (reference);
+
+  return TCL_OK;
+}
+
+
+#(defcommand link_reference
+  "Link the specified reference."
+  (-nohierarchy boolean "don't recursively link all subdesigns")
+  (-silent boolean "don't print messages about unresolved references")
+  (-libraries tcl_object "list of libraries to search")
+  (reference reference "link this reference"))
+{
+  volatile ar libraries_ar = NULL;
+
+  error_unwind_protect {
+    if ( libraries != NULL ) {
+      libraries_ar = ar_alloc (1, sizeof (nl_library));
+
+      ui_get_library_list (interp, context, libraries, libraries_ar);
+    }
+
+    hier_link_reference (reference, silent, !nohierarchy, libraries_ar);
+  }
+  error_on_exit {
+    if ( libraries_ar != NULL )
+      ar_free (libraries_ar);
+  }
+  error_end;
+
+  return TCL_OK;
+}
+
+
+#(defcommand report_hierarchy
+   "Print out a report of the hierarchy of the specified design."
+   &optional
+   (design current_design "design to report"))
+{
+  report_hierarchy (design);
+
+  return TCL_OK;
+}
+
+
+#(defcommand infer_buses
+   "Remove the specified designs from memory."
+   &optional
+   (design current_design "design in which to infer buses"))
+{
+  rtl2dpc_infer_buses (design);
+
+  return TCL_OK;
+}
+
+
+#(defcommand replace_cell
+   "Replace the specified cell with a cell of the specified reference."
+   (cell cell "replace this cell")
+   (reference reference "replace it with a cell with this reference"))
+{
+  int flag = hier_replace_cell (cell, reference);
+
+  if ( flag ) {
+    return TCL_OK;
+  }
+  else {
+    error ("reference %s is not compatible with the existing "
+	   "cell reference, %s", nl_reference_name (reference),
+	   nl_reference_name (nl_cell_reference (cell)));
+  }
+}
+
+
+#(defcommand set_reference
+   "Set the reference of the specified cell to the specified reference."
+   (cell cell "set the reference of this cell")
+   (reference reference "set the reference to this"))
+{
+  nl_cell_set_reference (cell, reference);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_icells
+    "Return a list of all the icells that correspond to the specified cell."
+    (cell cell "get the icells of this cell"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  nl_cell_for_all_icells (cell, icell) {
+    ui_cmd_append_object_list (interp, result, (nl_object) icell, NULL);
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_inets
+    "Return a list of all the inets that correspond to the specified net."
+    (net net "get the inets of this net"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  nl_net_for_all_inets (net, inet) {
+    ui_cmd_append_object_list (interp, result, (nl_object) inet, NULL);
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand ungroup
+  ("Ungroup the specified cell.  The cell must be linked.  All the contents"
+   "of the linked design are moved into the design containing the cell.  The"
+   "cell is removed.")
+  (-all boolean "ungroup all cells in the current design")
+  (-recursive boolean "recursively ungroup the cell")
+  (-silent boolean "don't print the name of each cell as it is ungrouped")
+  (-prefix string "use this as the prefix when creating new cell and net names")
+  &optional
+  (cell cell "cell to ungroup"))
+{
+  if ( cell == NULL && all == 0 ) {
+    error ("either a cell or -all must be specified.");
+  }
+  else if ( cell != NULL && all != 0 ) {
+    error ("-all and a cell cannot both be specified.");
+  }
+
+  if ( all == 0 ) {
+    hier_ungroup (cell, ui_hierarchy_separator, prefix, recursive, silent);
+  }
+  else {
+    nl_design design = ui_get_current_design (context);
+
+    if ( design == NULL ) {
+      error ("the current design is not set to a valid design.");
+    }
+
+    hier_ungroup_all (design, ui_hierarchy_separator, prefix,
+		      recursive, silent);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand group
+  "Group the specified cells into a subdesign."
+  (cells cell_list "cells to ungroup")
+  (design_name string "name of subdesign to create")
+  &optional
+  (cell_name string "name of subdesign instance (default is subdesign name)"))
+{
+  nl_design design = NULL;
+
+  if ( cell_name == NULL ) {
+    cell_name = design_name;
+  }
+
+  ar_for_all (cells, nl_cell, cell) {
+    nl_design cell_design = nl_cell_design (cell);
+    
+    if ( design == NULL ) {
+      design = cell_design;
+    }
+    else if ( design != cell_design ) {
+      error ("cell list contains cells from different designs.\n"
+	     "some are from design %s, others (e.g. %s) are from design %s",
+	     nl_design_name (design), nl_cell_name (cell),
+	     nl_design_name (cell_design));
+    }
+  } ar_end_for;
+
+  {
+    nl_cell existing_cell = nl_design_get_cell_by_name (design, cell_name);
+
+    if ( existing_cell != NULL ) {
+      error ("design %s already contains a cell named %s",
+	     nl_design_name (design), cell_name);
+    }
+  }
+  
+  if ( ar_size (cells) > 0 ) {
+    Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+    nl_design new_design = hier_group (cells, design_name, cell_name);
+    ar_free (cells);
+
+    ui_cmd_append_object_list (interp, result, (nl_object) new_design, NULL);
+
+    Tcl_SetObjResult (interp, result);
+    
+    return TCL_OK;
+  }
+  else {
+    ar_free (cells);
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand mem_show_active
+  "Show all active memory allocations.")
+{
+  mem_show_active ();
+
+  return TCL_OK;
+}
+
+
+#(defcommand mem_show_usage
+  "Show memory usage by group.")
+{
+  mem_show_usage ();
+
+  return TCL_OK;
+}
+
+
+#(defcommand object_type
+  "Show the type of a TCL object."
+  (-realtype boolean "don't convert instance types to basic types")
+  (obj tcl_object))
+{
+  Tcl_ObjType *type = obj->typePtr;
+
+  if ( type != NULL ) {
+    if ( strcmp (type->name, "nl_object") == 0 ) {
+      nl_object nl_obj = (nl_object) obj->internalRep.otherValuePtr;
+      nl_kind kind = nl_object_kind (nl_obj);
+
+      if ( !realtype ) {
+	switch ( kind ) {
+	case nl_kind_icell:
+	  kind = nl_kind_cell;
+	  break;
+	case nl_kind_iport:
+	  kind = nl_kind_port;
+	  break;
+	case nl_kind_inet:
+	  kind = nl_kind_net;
+	  break;
+	case nl_kind_ipin:
+	  kind = nl_kind_pin;
+	  break;
+	case nl_kind_idesign:
+	  kind = nl_kind_design;
+	  break;
+	default:
+	  ;
+	}
+      }
+
+      {
+	char *kind_name = (char *) nl_kind_to_string (kind);
+	Tcl_SetResult (interp, kind_name, TCL_STATIC);
+      }
+    }
+    else {
+      Tcl_SetResult (interp, type->name, TCL_VOLATILE);
+    }
+  }
+  else {
+    Tcl_SetResult (interp, "string", TCL_STATIC);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand register_command
+   "Register the specified command as an nl command."
+   (cmd_name string "the name of the command to register"))
+{
+  char *name_copy = STRDUP (cmd_name);
+
+  ar_add (ui_all_commands, &name_copy);
+
+  return TCL_OK;
+}
+
+
+#(defcommand new_object_name
+   "Return the name of a new object (cell or net)."
+   &optional
+   (design current_design "return the name of a new object in this design"))
+{
+  do {
+    char *name = (char *) namegen_random_name ();
+    nl_named_object existing_obj = nl_design_get_object_by_name (design, name);
+
+    if ( existing_obj == NULL ) {
+      Tcl_SetResult (interp, name, TCL_STATIC);
+
+      return TCL_OK;
+    }
+  } while (1);
+}
+
+
+void
+ui_cmd_register_misc_commands (Tcl_Interp *interp, char *prefix, nl_context context)
+{
+#(register-all-commands)
+}

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Unpack vendor/mmi_pd_040526.tar.gz, flatten it, keep the Unix source tree on
-# the Linux filesystem (NTFS cannot store irsim's file+directory named "export"),
-# copy the runtime slice to vendor/mmi, then delete the tarball.
+# Unpack vendor/mmi_pd_040526.tar.gz into vendor/mmi (Windows path), flatten
+# dirs, drop NTFS-unsafe leftovers, delete the tarball. Full tree including src/.
 set -euo pipefail
 REPO="${1:-}"
 if [ -z "$REPO" ]; then
@@ -17,28 +16,72 @@ for p in vendor/mmi_pd_040526.tar.gz vendor/mmi_pd_040526.tar mmi_pd_040526.tar.
   fi
 done
 
-CACHE="${MMI_VENDOR_CACHE:-${HOME}/.cache/mmi-cad/vendor}"
 DEST="${REPO}/vendor/mmi"
 LAYOUT="${REPO}/nix/rebuild/layout.sh"
-POINTER="${REPO}/vendor/SOURCE.txt"
+OLD_CACHE="${HOME}/.cache/mmi-cad/vendor"
 
-if [ -d "${CACHE}/src/max4.3.16" ]; then
+enable_case_sensitive() {
+  local linux="$1"
+  mkdir -p "$linux"
+  if command -v wslpath >/dev/null 2>&1 && command -v fsutil.exe >/dev/null 2>&1; then
+    local win
+    win="$(wslpath -w "$linux")"
+    fsutil.exe file setCaseSensitiveInfo "$win" enable >/dev/null || \
+      echo "extract: WARN could not enable NTFS case sensitivity on ${win}" >&2
+  fi
+}
+
+# 32-bit helper named "export" collides with directory Export/ on NTFS.
+strip_ntfs_clashes() {
+  local root="$1"
+  rm -f \
+    "$root/src/max4.2.11/aux/irsim/src/utils/export" \
+    "$root/src/max4.3.16/aux/irsim/src/utils/export"
+}
+
+copy_tree() {
+  local from="$1" to="$2"
+  rm -rf "$to"
+  enable_case_sensitive "$to"
+  tar -C "$from" -cf - . | tar -C "$to" -xf -
+}
+
+if [ -d "${DEST}/src/max4.3.16" ]; then
   if [ -n "$TAR" ]; then
-    echo "extract: cache already at ${CACHE} — removing ${TAR}"
+    echo "extract: ${DEST} already complete — removing ${TAR}"
     rm -f "$TAR"
   fi
-  if [ ! -d "${DEST}/lib" ]; then
-    echo "extract: refreshing runtime tree at ${DEST}"
-    rm -rf "$DEST"
-    mkdir -p "$DEST"
-    tar -C "$CACHE" -cf - --exclude='./src' . | tar -C "$DEST" -xf -
+  exit 0
+fi
+
+# Prefer migrating the existing WSL cache onto the Windows tree.
+if [ -d "${OLD_CACHE}/src/max4.3.16" ]; then
+  echo "extract: moving WSL cache → ${DEST}"
+  BIN_SAVE=""
+  if [ -d "${DEST}/bin" ] && ls "${DEST}/bin/max" >/dev/null 2>&1; then
+    BIN_SAVE=$(mktemp -d /tmp/mmi-bin.XXXXXX)
+    cp -a "${DEST}/bin/." "$BIN_SAVE/"
   fi
-  printf '%s\n' "$CACHE" > "$POINTER"
+  strip_ntfs_clashes "$OLD_CACHE"
+  copy_tree "$OLD_CACHE" "$DEST"
+  if [ -n "$BIN_SAVE" ]; then
+    mkdir -p "${DEST}/bin"
+    cp -a "$BIN_SAVE/." "${DEST}/bin/"
+    rm -rf "$BIN_SAVE"
+  fi
+  rm -rf "$OLD_CACHE" "${HOME}/mmi-vendor"
+  rmdir "${HOME}/.cache/mmi-cad" 2>/dev/null || true
+  rm -f "${REPO}/vendor/SOURCE.txt"
+  echo "extract: Windows tree ${DEST}"
+  if [ -n "$TAR" ]; then
+    rm -f "$TAR"
+    echo "extract: removed ${TAR}"
+  fi
   exit 0
 fi
 
 if [ -z "$TAR" ]; then
-  echo "extract: need vendor/mmi_pd_040526.tar.gz (or a cached tree at ${CACHE})" >&2
+  echo "extract: need vendor/mmi_pd_040526.tar.gz (or ${DEST} with src/)" >&2
   exit 1
 fi
 
@@ -64,21 +107,11 @@ fi
 
 echo "extract: flattening directories"
 bash "$LAYOUT" "$SRC"
+strip_ntfs_clashes "$SRC"
 
-echo "extract: Linux source cache → ${CACHE}"
-mkdir -p "$(dirname "$CACHE")"
-rm -rf "$CACHE"
-mkdir -p "$CACHE"
-tar -C "$SRC" -cf - . | tar -C "$CACHE" -xf -
+echo "extract: Windows tree → ${DEST}"
+copy_tree "$SRC" "$DEST"
 
-echo "extract: runtime tree (no src/) → ${DEST}"
-rm -rf "$DEST"
-mkdir -p "$DEST"
-tar -C "$CACHE" -cf - --exclude='./src' . | tar -C "$DEST" -xf -
-
-printf '%s\n' "$CACHE" > "$POINTER"
-
-rm -f "$TAR"
+rm -f "$TAR" "${REPO}/vendor/SOURCE.txt"
 echo "extract: removed ${TAR}"
-echo "extract: source ${CACHE}"
-echo "extract: runtime ${DEST}"
+echo "extract: ready at ${DEST}"

@@ -1,0 +1,90 @@
+# setup file for autocharacterization program
+#set DATA(user,setup) 100ps
+#set DATA(user,hold) 100ps
+
+# Units for numbers without units (eventually all numbers will
+# have units).
+set TIMES(units) ns
+
+# Rise/fall times of input pulses.  Note that these pulses are always
+# buffered by the driver cell before reaching the inputs of the
+# device under test so you should never have to change this.
+set TIMES(rise_time) 0.2
+
+# static signals will be setup this soon before dynamic signals
+set TIMES(setup_time) 2.0
+
+# Cycle time of simulation
+set TIMES(step) 5.0
+
+# Makes an nxm matrix for the table driven lookup of delays based on
+# the following inputs.  Note that the output slew is used to calculate
+# a load capacitance that is scaled by output loads.
+# these are the slews used for clocks and inputs (20-80%)
+#set TIMES(input_slopes) "75ps 150ps 300ps 600ps"
+## For cells that don't work with the above slews
+set TIMES(input_slopes) "50ps 100ps 200ps 400ps"
+set TIMES(clock_slopes) "110ps 220ps"
+# this is the output slew (20-80) for max characterization load
+set TIMES(output_slew) 500ps
+# these are multiplied by the cap it takes to get the output_slew 
+set DATA(output_loads) "0.0625 0.125 0.25 0.5 1.0"
+set DATA(fanout_load) 10ff
+set TIMES(max_slew) 1ns
+# no longer used...
+set TIMES(output_slopes) "150ps 300ps 600ps"
+
+# Used for measuring the rise/fall slopes.  Setup up for 10-90 
+# or 20-80, etc.
+set TIMES(slope_low_percent) 0.2
+set TIMES(slope_high_percent) 0.8
+
+# These are the initial guesses for the setup times.  If none of these
+# values is large enough it will expand.  Note that you need to
+# have at least three values in this list and more is better.
+#set TIMES(setup) "0.6 0.5 0.4 0.3 0.2 0.1"
+#set TIMES(setup) "1.0 .8 .6 .4 .2"
+set TIMES(setup) "0.7 0.6 0.5 0.4 0.3 0.2 0.1 0.0 -0.1 -0.2"
+## set TIMES(hold) "0.1 0.0 -0.1 -0.2 -0.3 -0.4 -0.5 -0.6 -0.7 -0.8"
+set TIMES(hold) "0.0 -0.1 -0.2 -0.3 -0.4 -0.5 -0.6 -0.7 -0.8 -0.9"
+
+# This is the input slope used when calculating the setup times.
+set TIMES(setup_slope) 200ps
+
+# The program will continue to iterate until the setup time is found
+# to within this tolerance.
+#set TIMES(setup_tol) 25ps
+set TIMES(setup_tol) 60ps
+
+# Default hold time inserted unless overriden in control file.  Note
+# that program doesn't currently calculate hold times.
+set DATA(default,hold) 0.0
+
+# Capacitance (and 2x this number) placed on inputs and outputs to compute
+# relation between capacitance and slope.  This ratio is then used to
+# automatically scale loads for desired slopes.
+set DATA(nominal_cap) 50fF
+
+# transient step value used in the ".TRAN" statement.
+set TIMES(tran_step) 10p
+
+# This is the driver cell spice netlist used to drive the inputs
+# of the device under test
+set DATA(driver_file) ./driver.sp
+
+# Specifies spice header, voltage, and temperature (C) for all
+# corners of interest.  The desired corner is specified from the
+# command line.
+set DATA(corner,tt) "./header.tt 1.62V 105"
+
+# Synopsys header information added to output file.
+set DATA(synopsys_header_file) ./synopsys.header
+
+# This is the name of the spice file that gets created to be run
+# through spice/adm to actually measure parameters
+set DATA(spice_file) tmp.sp
+
+# Choose your simulator.  Currently either spice or adm.
+set DATA(simulator) spice
+#set DATA(simulator) adm
+

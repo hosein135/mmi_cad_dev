@@ -1,0 +1,44 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_INAND2C {} {
+  make output -name out -origin {610 -70}
+  make input -name in1 -origin {-60 -20}
+  make input -name in0 -origin {-60 80}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in1_L -origin {160 -20}
+  make inverter -WP 2.4 -WN 1.2 -origin {40 -20}
+  make global -orient RY -name vdd -origin {330 -160}
+  make global -orient RY -name vdd -origin {580 -160}
+  make global -name gnd -origin {330 120}
+  make pmos -W 4.8 -origin {330 -120}
+  make pmos -W 4.8 -origin {580 -120}
+  make global -name gnd -origin {440 120}
+  make nmos -W 2.4 -origin {440 -20}
+  make nmos -W 2.4 -origin {440 80}
+  make nmos -W 2.4 -origin {330 -20}
+  make nmos -W 2.4 -origin {330 80}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {170 280}
+  make_wire 580 -70 610 -70
+  make_wire -60 -20 10 -20
+  make_wire 160 -20 90 -20
+  make_wire 330 -80 330 -70
+  make_wire 330 -60 330 -70
+  make_wire 270 -120 270 -20
+  make_wire 580 -80 580 -70
+  make_wire 330 20 330 40
+  make_wire 520 -120 520 80
+  make_wire 440 -60 440 -70
+  make_wire 440 20 440 40
+  make_wire 380 80 270 80
+  make_wire 380 80 520 80
+  make_wire 440 -70 330 -70
+  make_wire 440 -70 580 -70
+  make_wire 380 -20 270 -20
+  make_wire 270 80 -60 80
+  make_wire 270 -20 160 -20
+  make_text -origin {-110 -240} -text {2 input NAND with one inverted input}
+  make_text -origin {-110 -220} -text {C Size}
+  make_text -origin {-110 -260} -text MMI_INAND2C -size large
+}
+

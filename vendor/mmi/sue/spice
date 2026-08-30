@@ -1,0 +1,158 @@
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# wish script to run spice on this machine and optionally call back
+# when spice is finished.  Call back is used by SUE in the "spice_it"
+# command.
+
+# Copyright (c) 1995-9 Micro Magic, Inc. All rights reserved.
+
+###########################################################################
+
+# READ AND MODIFY THIS AREA FOR INSTALLATION
+
+# This is the command that gets run to run spice.  It can be as short as
+# just "hspice".
+set spice_command "hspice"
+
+# Set the hostname to run spice on.  Either specify a hostname here 
+# or put [exec uname -n] for the local host (i.e. a floating license).
+set hostname [exec uname -n]
+#set hostname mmics1
+
+set hostname [use_first env(SPICE_HOST) hostname]
+
+# this is optional.  If you need to setup any variables, do it here.
+# separate commands with semicolons (;).
+set other_commands ""
+#set other_commands \
+    "setenv LM_LICENSE_FILE /home/cad/etc/license/hspice/license.file"
+
+# set automounter prefix
+# Optional automounter prefix to remove.
+set auto_prefix "tmp_mnt"
+
+###########################################################################
+
+
+# First define some useful procedures.
+
+# send a message back to the caller using the CALLBACK variable.  CALLBACK
+# should be of the form "send <interp> <proc>"  where <interp> can be 
+# found from [winfo name .]
+
+proc call_back code {
+
+  global CALLBACK
+
+  if {$CALLBACK == ""} {
+    exit $code
+  }
+
+  # hide wish window just in case this takes a while
+  wm withdraw .
+
+  # more choking
+  regsub " \#" $CALLBACK {\ \#} CALLBACK 
+
+  # send the code to the callback
+  set error [catch "$CALLBACK $code" error_msg]
+
+  # error usually have to do with xauth.  Must do an "xhost -" and have
+  # no host shown during xhost.
+  if {$error != 0} {
+    puts $error_msg
+  }
+
+  exit $code
+}
+
+###########################################################################
+
+# Now execute
+
+# read in the arguments
+
+# Special case of csh choking on quotes.  If CALLBACK option then group
+# together all next arguments.  Requires CALLBACK to be last argument
+set index [lsearch $argv -CALLBACK]
+if {$index != -1 && [expr $index + 2] != [llength $argv]} {
+  set argv "[lrange $argv 0 $index] \"[lrange $argv [expr $index + 1] end]\""
+}
+
+setl {in_file out_file} [call_with_keyword $argv {{CALLBACK ""}}]
+
+# one or two filenames should be supplied in the command line, if not...
+if {$in_file == "" || [string range $in_file 0 1] == "-h"} {
+  puts "Usage: spice <in_file> [<out_file>]"
+  puts "\t<out_file> defaults to <in_file> with suffix replaced with .out"
+  exit
+}
+
+
+
+if {$out_file == ""} {
+  # default output filename
+  set out_file "[file rootname $in_file].out"
+}
+
+# get the directory
+set dir [pwd]
+
+# get rid of any bogus prefixes from the automounter
+set bogus [lindex [split $dir /] 1]
+if {$bogus == [use_first auto_prefix]} {
+  set dir /[join [lrange [split $dir /] 2 end] /]
+}
+
+set errfile tmp[pid]
+
+# if you want to use a specific hspice server, just set the
+# unix environment variable HSPICE_SERVER.  This is usefull if you
+# are running SUE on linux, for example.
+set hostname [use_first env(HSPICE_SERVER) hostname]
+
+
+if {![info exists other_commands] || [string trim $other_commands] == ""} {
+  set other_commands ""
+} else {
+  set other_commands "$other_commands ; "
+}
+
+# start up hspice
+# Note: uses rsh even for local host.  Otherwise if other_commands includes
+# a source command, tcl exec barfs.
+puts "Starting hspice on $hostname at [exec date]:"
+catch "exec mv -f $out_file $out_file.BAK"
+
+# If you want to see the command, uncomment out the next line.
+#puts "\trsh $hostname \"${other_commands}cd $dir ; $spice_command $in_file > $out_file\""
+
+catch "exec rsh $hostname \"${other_commands}cd $dir ; $spice_command $in_file > $out_file\"" error_output
+
+
+###############################################################################
+#	Check for errors in hspice 
+###############################################################################
+
+puts $error_output
+
+if {![catch "exec grep \"job concluded\" $out_file" result]} {
+  # successful completion
+  call_back 1
+}
+
+# this usually gives us an idea of the error without emacs'ing the out file
+if {[catch "exec grep *error* $out_file" result] == 0} {
+  puts $result
+  call_back 0
+}
+
+# other errors (usually licensing problems)
+puts "HSPICE ERROR:"
+catch {puts [exec cat $out_file]}
+call_back 0
+
+# call_back include an exit statement

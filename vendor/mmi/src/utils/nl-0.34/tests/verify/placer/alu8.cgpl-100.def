@@ -1,0 +1,1074 @@
+DIVIDERCHAR "/" ;
+DESIGN alu8 ;
+UNITS DISTANCE MICRONS 1000 ;
+TRACKS X 310 DO 194 STEP 620 LAYER    M1 M2 M3 M4 M5 M6 ;
+TRACKS Y 310 DO 100 STEP 620 LAYER    M1 M2 M3 M4 M5 M6 ;
+DIEAREA ( 0 0 ) ( 120280 62000 ) ;
+ROW ROW0 CORE1 0 0 N DO 194 BY 1 STEP 620 6200 ;
+ROW ROW1 CORE1 0 6200 S DO 194 BY 1 STEP 620 6200 ;
+ROW ROW2 CORE1 0 12400 N DO 194 BY 1 STEP 620 6200 ;
+ROW ROW3 CORE1 0 18600 S DO 194 BY 1 STEP 620 6200 ;
+ROW ROW4 CORE1 0 24800 N DO 194 BY 1 STEP 620 6200 ;
+ROW ROW5 CORE1 0 31000 S DO 194 BY 1 STEP 620 6200 ;
+ROW ROW6 CORE1 0 37200 N DO 194 BY 1 STEP 620 6200 ;
+ROW ROW7 CORE1 0 43400 N DO 194 BY 1 STEP 620 6200 ;
+ROW ROW8 CORE1 0 49600 N DO 194 BY 1 STEP 620 6200 ;
+ROW ROW9 CORE1 0 55800 N DO 194 BY 1 STEP 620 6200 ;
+VIAS 5 ;
+  - via1
+  ;
+  - via2
+  ;
+  - via3
+  ;
+  - via4
+  ;
+  - via5
+  ;
+END VIAS
+COMPONENTS 157 ;     
+  - MMI_FFCB$7$ MMI_FFCB	+ PLACED ( 5552 55796 ) FS ;
+  - MMI_FFCB$6$ MMI_FFCB	+ PLACED ( 17116 55796 ) FS ;
+  - MMI_FFCB$5$ MMI_FFCB	+ PLACED ( 29441 55796 ) FS ;
+  - MMI_FFCB$4$ MMI_FFCB	+ PLACED ( 45328 55796 ) FS ;
+  - MMI_FFCB$3$ MMI_FFCB	+ PLACED ( 60672 55796 ) FS ;
+  - MMI_FFCB$2$ MMI_FFCB	+ PLACED ( 72239 55796 ) FS ;
+  - MMI_FFCB$1$ MMI_FFCB	+ PLACED ( 97141 55796 ) FS ;
+  - MMI_FFCB$0$ MMI_FFCB	+ PLACED ( 108739 55796 ) FS ;
+  - MMI_FFCB_1$7$ MMI_FFCB	+ PLACED ( 221 5796 ) N ;
+  - MMI_FFCB_1$6$ MMI_FFCB	+ PLACED ( 744 3 ) N ;
+  - MMI_FFCB_1$5$ MMI_FFCB	+ PLACED ( 14067 3 ) N ;
+  - MMI_FFCB_1$4$ MMI_FFCB	+ PLACED ( 27431 3 ) N ;
+  - MMI_FFCB_1$3$ MMI_FFCB	+ PLACED ( 50564 3 ) N ;
+  - MMI_FFCB_1$2$ MMI_FFCB	+ PLACED ( 62487 209 ) N ;
+  - MMI_FFCB_1$1$ MMI_FFCB	+ PLACED ( 86485 3 ) N ;
+  - MMI_FFCB_1$0$ MMI_FFCB	+ PLACED ( 98377 3 ) N ;
+  - MMI_XOR2B$7$ MMI_XOR2B	+ PLACED ( 341 16658 ) N ;
+  - MMI_XOR2B$6$ MMI_XOR2B	+ PLACED ( 6857 16593 ) N ;
+  - MMI_XOR2B$5$ MMI_XOR2B	+ PLACED ( 19224 15685 ) N ;
+  - MMI_XOR2B$4$ MMI_XOR2B	+ PLACED ( 31386 9736 ) N ;
+  - MMI_XOR2B$3$ MMI_XOR2B	+ PLACED ( 56467 10685 ) N ;
+  - MMI_XOR2B$2$ MMI_XOR2B	+ PLACED ( 74398 6274 ) N ;
+  - MMI_XOR2B$1$ MMI_XOR2B	+ PLACED ( 92939 6006 ) N ;
+  - MMI_XOR2B$0$ MMI_XOR2B	+ PLACED ( 104704 20162 ) N ;
+  - MMI_FFCB_2$7$ MMI_FFCB	+ PLACED ( 172 22636 ) FS ;
+  - MMI_FFCB_2$6$ MMI_FFCB	+ PLACED ( 10544 10224 ) FS ;
+  - MMI_FFCB_2$5$ MMI_FFCB	+ PLACED ( 21146 5917 ) FS ;
+  - MMI_FFCB_2$4$ MMI_FFCB	+ PLACED ( 39299 3 ) FS ;
+  - MMI_FFCB_2$3$ MMI_FFCB	+ PLACED ( 44363 5796 ) FS ;
+  - MMI_FFCB_2$2$ MMI_FFCB	+ PLACED ( 64064 10541 ) FS ;
+  - MMI_FFCB_2$1$ MMI_FFCB	+ PLACED ( 74507 100 ) FS ;
+  - MMI_FFCB_2$0$ MMI_FFCB	+ PLACED ( 97898 10838 ) FS ;
+  - MMI_FFCB_3 MMI_FFCB	+ PLACED ( 177 50237 ) FS ;
+  - MMI_BUFD$7$ MMI_BUFD	+ PLACED ( 2641 27970 ) N ;
+  - MMI_BUFD$6$ MMI_BUFD	+ PLACED ( 14373 15529 ) N ;
+  - MMI_BUFD$5$ MMI_BUFD	+ PLACED ( 25259 10993 ) N ;
+  - MMI_BUFD$4$ MMI_BUFD	+ PLACED ( 45657 11276 ) N ;
+  - MMI_BUFD$3$ MMI_BUFD	+ PLACED ( 50844 11272 ) N ;
+  - MMI_BUFD$2$ MMI_BUFD	+ PLACED ( 75652 13248 ) N ;
+  - MMI_BUFD$1$ MMI_BUFD	+ PLACED ( 82900 5753 ) N ;
+  - MMI_BUFD$0$ MMI_BUFD	+ PLACED ( 101597 16270 ) N ;
+  - MMI_BUFD_1$7$ MMI_BUFD	+ PLACED ( 1490 11121 ) N ;
+  - MMI_BUFD_1$6$ MMI_BUFD	+ PLACED ( 5803 11331 ) N ;
+  - MMI_BUFD_1$5$ MMI_BUFD	+ PLACED ( 16380 5157 ) N ;
+  - MMI_BUFD_1$4$ MMI_BUFD	+ PLACED ( 37250 5472 ) N ;
+  - MMI_BUFD_1$3$ MMI_BUFD	+ PLACED ( 58000 5500 ) N ;
+  - MMI_BUFD_1$2$ MMI_BUFD	+ PLACED ( 68024 5613 ) N ;
+  - MMI_BUFD_1$1$ MMI_BUFD	+ PLACED ( 88505 5450 ) N ;
+  - MMI_BUFD_1$0$ MMI_BUFD	+ PLACED ( 103387 5357 ) N ;
+  - MMI_BUFE MMI_BUFE	+ PLACED ( 113357 20384 ) N ;
+  - MMI_MUX4B$7$ MMI_MUX4B	+ PLACED ( 6578 44166 ) N ;
+  - MMI_MUX4B$6$ MMI_MUX4B	+ PLACED ( 14495 50114 ) N ;
+  - MMI_MUX4B$5$ MMI_MUX4B	+ PLACED ( 26858 15866 ) N ;
+  - MMI_MUX4B$4$ MMI_MUX4B	+ PLACED ( 43543 16746 ) N ;
+  - MMI_MUX4B$3$ MMI_MUX4B	+ PLACED ( 60202 16444 ) N ;
+  - MMI_MUX4B$2$ MMI_MUX4B	+ PLACED ( 72844 21910 ) N ;
+  - MMI_MUX4B$1$ MMI_MUX4B	+ PLACED ( 88014 49597 ) N ;
+  - MMI_MUX4B$0$ MMI_MUX4B	+ PLACED ( 102236 32767 ) N ;
+  - MMI_BUFE_1 MMI_BUFE	+ PLACED ( 104580 50061 ) N ;
+  - MMI_BUFE_2 MMI_BUFE	+ PLACED ( 110772 50071 ) N ;
+  - MMI_XOR2B_1 MMI_XOR2B	+ PLACED ( 112328 7293 ) N ;
+  - MMI_FFCB_4 MMI_FFCB	+ PLACED ( 109002 14424 ) FS ;
+  - MMI_FFCB_5 MMI_FFCB	+ PLACED ( 109114 1045 ) N ;
+  - adder8\/MMI_XOR2A MMI_XOR2A	+ PLACED ( 4227 33053 ) N ;
+  - adder8\/MMI_XOR2A_1 MMI_XOR2A	+ PLACED ( 58041 21910 ) N ;
+  - adder8\/MMI_NOR2B MMI_NOR2B	+ PLACED ( 168 32584 ) N ;
+  - adder8\/MMI_NOR2B_1 MMI_NOR2B	+ PLACED ( 51909 28003 ) N ;
+  - adder8\/MMI_INVB_ MMI_INVB	+ PLACED ( 110544 9460 ) N ;
+  - adder8\/MMI_NOR2B_ MMI_NOR2B	+ PLACED ( 16717 27523 ) N ;
+  - adder8\/MMI_OAI21B_ MMI_OAI21B	+ PLACED ( 45675 28003 ) FS ;
+  - adder8\/MMI_NAND2B MMI_NAND2B	+ PLACED ( 7695 36654 ) N ;
+  - adder8\/MMI_NAND2B_1 MMI_NAND2B	+ PLACED ( 17967 23313 ) N ;
+  - adder8\/MMI_NAND2B_2 MMI_NAND2B	+ PLACED ( 21516 21485 ) N ;
+  - adder8\/MMI_NAND2B_3 MMI_NAND2B	+ PLACED ( 35816 21225 ) N ;
+  - adder8\/MMI_NAND2B_4 MMI_NAND2B	+ PLACED ( 52239 23778 ) N ;
+  - adder8\/MMI_NAND2B_5 MMI_NAND2B	+ PLACED ( 88314 11235 ) N ;
+  - adder8\/MMI_NAND2B_6 MMI_NAND2B	+ PLACED ( 93878 11938 ) N ;
+  - adder8\/MMI_NAND2B_7 MMI_NAND2B	+ PLACED ( 99038 16697 ) N ;
+  - adder8\/MMI_OAI21B__1 MMI_OAI21B	+ PLACED ( 12558 22877 ) N ;
+  - adder8\/MMI_INVA_ MMI_INVA	+ PLACED ( 111337 20823 ) N ;
+  - adder8\/MMI_XOR2A_2 MMI_XOR2A	+ PLACED ( 15944 38895 ) N ;
+  - adder8\/MMI_NOR2B_2 MMI_NOR2B	+ PLACED ( 26238 21643 ) N ;
+  - adder8\/MMI_XOR2A_3 MMI_XOR2A	+ PLACED ( 30740 22130 ) N ;
+  - adder8\/MMI_XOR2A_4 MMI_XOR2A	+ PLACED ( 39032 10742 ) N ;
+  - adder8\/MMI_XOR2A_5 MMI_XOR2A	+ PLACED ( 80844 10690 ) N ;
+  - adder8\/MMI_XOR2A_6 MMI_XOR2A	+ PLACED ( 93495 21863 ) N ;
+  - adder8\/MMI_XOR2A_7 MMI_XOR2A	+ PLACED ( 102890 26735 ) N ;
+  - adder8\/MMI_NOR2B_3 MMI_NOR2B	+ PLACED ( 100342 23274 ) N ;
+  - adder8\/MMI_NOR2B_4 MMI_NOR2B	+ PLACED ( 93517 16188 ) N ;
+  - adder8\/MMI_NOR2B_5 MMI_NOR2B	+ PLACED ( 88139 9663 ) N ;
+  - adder8\/MMI_NOR2B_6 MMI_NOR2B	+ PLACED ( 14953 18375 ) N ;
+  - adder8\/MMI_XOR2B MMI_XOR2B	+ PLACED ( 18449 44403 ) FS ;
+  - adder8\/MMI_XOR2B_1 MMI_XOR2B	+ PLACED ( 29849 27717 ) FS ;
+  - adder8\/MMI_XOR2B_2 MMI_XOR2B	+ PLACED ( 43951 22706 ) FS ;
+  - adder8\/MMI_XNOR2B_ MMI_XNOR2B	+ PLACED ( 63265 21910 ) FS ;
+  - adder8\/MMI_XNOR2B__1 MMI_XNOR2B	+ PLACED ( 80309 16502 ) FS ;
+  - adder8\/MMI_XOR2B_3 MMI_XOR2B	+ PLACED ( 94495 27763 ) FS ;
+  - adder8\/MMI_XOR2B_4 MMI_XOR2B	+ PLACED ( 107886 26488 ) FS ;
+  - adder8\/MMI_AOI21B MMI_AOI21B	+ PLACED ( 84920 22006 ) FS ;
+  - adder8\/MMI_AO21B MMI_AO21B	+ PLACED ( 1923 38528 ) FS ;
+  - adder8\/MMI_OAI21B__2 MMI_OAI21B	+ PLACED ( 38874 25149 ) N ;
+  - adder8\/MMI_NOR2B_7 MMI_NOR2B	+ PLACED ( 38408 30514 ) N ;
+  - adder8\/MMI_NOR2B__1 MMI_NOR2B	+ PLACED ( 89561 27738 ) N ;
+  - adder8\/MMI_INVA__1 MMI_INVA	+ PLACED ( 596 37872 ) FS ;
+  - adder8\/MMI_XOR2B_5 MMI_XOR2B	+ PLACED ( 324 44287 ) FS ;
+  - adder8\/MMI_AOI21B_1 MMI_AOI21B	+ PLACED ( 9467 28926 ) FS ;
+  - adder8\/MMI_OAI21B__3 MMI_OAI21B	+ PLACED ( 10130 38097 ) FS ;
+  - adder8\/MMI_AOI21B_2 MMI_AOI21B	+ PLACED ( 22817 27408 ) FS ;
+  - adder8\/MMI_AOI21C MMI_AOI21C	+ PLACED ( 80934 27936 ) FS ;
+  - adder8\/MMI_INVA__2 MMI_INVA	+ PLACED ( 89147 16936 ) N ;
+  - adder8\/MMI_INVA__3 MMI_INVA	+ PLACED ( 91574 21810 ) N ;
+  - adder8\/MMI_NOR2B__2 MMI_NOR2B	+ PLACED ( 34448 33923 ) N ;
+  - adder8\/MMI_NAND2B_8 MMI_NAND2B	+ PLACED ( 21950 33327 ) FS ;
+  - adder8\/MMI_INVA MMI_INVA	+ PLACED ( 24777 32782 ) FS ;
+  - adder8\/MMI_INVA_1 MMI_INVA	+ PLACED ( 31581 38207 ) FS ;
+  - adder8\/MMI_NAND2B_9 MMI_NAND2B	+ PLACED ( 14231 34585 ) FS ;
+  - adder8\/MMI_INVA__4 MMI_INVA	+ PLACED ( 17900 31714 ) FS ;
+  - adder8\/MMI_OAI21B__4 MMI_OAI21B	+ PLACED ( 28493 33556 ) FS ;
+  - adder8\/MMI_OAI21B__5 MMI_OAI21B	+ PLACED ( 22827 38708 ) FS ;
+  - adder8\/MMI_INVA__5 MMI_INVA	+ PLACED ( 6571 39007 ) FS ;
+  - adder8\/MMI_OAI21B__6 MMI_OAI21B	+ PLACED ( 99002 20440 ) N ;
+  - adder8\/MMI_OAI21B__7 MMI_OAI21B	+ PLACED ( 87446 15684 ) N ;
+  - shift8\/MMI_MUX4B$7$ MMI_MUX4B	+ PLACED ( 51254 46289 ) FS ;
+  - shift8\/MMI_MUX4B$6$ MMI_MUX4B	+ PLACED ( 62688 46373 ) FS ;
+  - shift8\/MMI_MUX4B$5$ MMI_MUX4B	+ PLACED ( 51738 40403 ) FS ;
+  - shift8\/MMI_MUX4B$4$ MMI_MUX4B	+ PLACED ( 62802 28110 ) FS ;
+  - shift8\/MMI_MUX4B$3$ MMI_MUX4B	+ PLACED ( 49211 34203 ) FS ;
+  - shift8\/MMI_MUX4B$2$ MMI_MUX4B	+ PLACED ( 70504 40403 ) FS ;
+  - shift8\/MMI_MUX4B$1$ MMI_MUX4B	+ PLACED ( 87481 33754 ) FS ;
+  - shift8\/MMI_MUX4B$0$ MMI_MUX4B	+ PLACED ( 91430 39746 ) FS ;
+  - shift8\/MMI_BUFD$7$ MMI_BUFD	+ PLACED ( 46740 44526 ) FS ;
+  - shift8\/MMI_BUFD$6$ MMI_BUFD	+ PLACED ( 60689 50783 ) FS ;
+  - shift8\/MMI_BUFD$5$ MMI_BUFD	+ PLACED ( 54070 51054 ) FS ;
+  - shift8\/MMI_BUFD$4$ MMI_BUFD	+ PLACED ( 68629 21910 ) FS ;
+  - shift8\/MMI_BUFD$3$ MMI_BUFD	+ PLACED ( 44701 40403 ) FS ;
+  - shift8\/MMI_BUFD$2$ MMI_BUFD	+ PLACED ( 74066 44971 ) FS ;
+  - shift8\/MMI_BUFD$1$ MMI_BUFD	+ PLACED ( 89149 44659 ) FS ;
+  - shift8\/MMI_BUFD$0$ MMI_BUFD	+ PLACED ( 101366 45175 ) FS ;
+  - shift8\/MMI_BUFE MMI_BUFE	+ PLACED ( 114494 26327 ) FS ;
+  - shift8\/MMI_BUFE_1 MMI_BUFE	+ PLACED ( 113212 32122 ) FS ;
+  - shift8\/MMI_BUFD_1$7$ MMI_BUFD	+ PLACED ( 26376 49335 ) FS ;
+  - shift8\/MMI_BUFD_1$6$ MMI_BUFD	+ PLACED ( 27963 50272 ) FS ;
+  - shift8\/MMI_BUFD_1$5$ MMI_BUFD	+ PLACED ( 38270 37866 ) FS ;
+  - shift8\/MMI_BUFD_1$4$ MMI_BUFD	+ PLACED ( 73018 16714 ) FS ;
+  - shift8\/MMI_BUFD_1$3$ MMI_BUFD	+ PLACED ( 53419 22460 ) FS ;
+  - shift8\/MMI_BUFD_1$2$ MMI_BUFD	+ PLACED ( 81275 45346 ) FS ;
+  - shift8\/MMI_BUFD_1$1$ MMI_BUFD	+ PLACED ( 93293 55796 ) FS ;
+  - shift8\/MMI_BUFD_1$0$ MMI_BUFD	+ PLACED ( 108502 38155 ) FS ;
+  - shift8\/MMI_BUFE_2 MMI_BUFE	+ PLACED ( 113132 37943 ) FS ;
+  - shift8\/MMI_MUX2D$7$ MMI_MUX2D	+ PLACED ( 26779 43665 ) FS ;
+  - shift8\/MMI_MUX2D$6$ MMI_MUX2D	+ PLACED ( 32157 49818 ) FS ;
+  - shift8\/MMI_MUX2D$5$ MMI_MUX2D	+ PLACED ( 41593 49920 ) FS ;
+  - shift8\/MMI_MUX2D$4$ MMI_MUX2D	+ PLACED ( 70738 34310 ) FS ;
+  - shift8\/MMI_MUX2D$3$ MMI_MUX2D	+ PLACED ( 36401 43710 ) FS ;
+  - shift8\/MMI_MUX2D$2$ MMI_MUX2D	+ PLACED ( 73329 50003 ) FS ;
+  - shift8\/MMI_MUX2D$1$ MMI_MUX2D	+ PLACED ( 83398 55756 ) FS ;
+  - shift8\/MMI_MUX2D$0$ MMI_MUX2D	+ PLACED ( 106020 44001 ) FS ;
+END COMPONENTS
+PINS 49 ;
+  - a[7]	+ NET a\[7\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 930 310 ) N ;
+  - a[6]	+ NET a\[6\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 14570 310 ) N ;
+  - a[5]	+ NET a\[5\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 28210 310 ) N ;
+  - a[4]	+ NET a\[4\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 41850 310 ) N ;
+  - a[3]	+ NET a\[3\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 55490 310 ) N ;
+  - a[2]	+ NET a\[2\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 69130 310 ) N ;
+  - a[1]	+ NET a\[1\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 82770 310 ) N ;
+  - a[0]	+ NET a\[0\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 96410 310 ) N ;
+  - b[7]	+ NET b\[7\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 1550 310 ) N ;
+  - b[6]	+ NET b\[6\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 15190 310 ) N ;
+  - b[5]	+ NET b\[5\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 28830 310 ) N ;
+  - b[4]	+ NET b\[4\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 42470 310 ) N ;
+  - b[3]	+ NET b\[3\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 56110 310 ) N ;
+  - b[2]	+ NET b\[2\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 69750 310 ) N ;
+  - b[1]	+ NET b\[1\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 83390 310 ) N ;
+  - b[0]	+ NET b\[0\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 97030 310 ) N ;
+  - bypass0[7]	+ NET bypass0\[7\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 7130 310 ) N ;
+  - bypass0[6]	+ NET bypass0\[6\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 20770 310 ) N ;
+  - bypass0[5]	+ NET bypass0\[5\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 34410 310 ) N ;
+  - bypass0[4]	+ NET bypass0\[4\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 48050 310 ) N ;
+  - bypass0[3]	+ NET bypass0\[3\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 61690 310 ) N ;
+  - bypass0[2]	+ NET bypass0\[2\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 75330 310 ) N ;
+  - bypass0[1]	+ NET bypass0\[1\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 88970 310 ) N ;
+  - bypass0[0]	+ NET bypass0\[0\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 102610 310 ) N ;
+  - bypass1[7]	+ NET bypass1\[7\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 4650 310 ) N ;
+  - bypass1[6]	+ NET bypass1\[6\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 18290 310 ) N ;
+  - bypass1[5]	+ NET bypass1\[5\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 31930 310 ) N ;
+  - bypass1[4]	+ NET bypass1\[4\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 45570 310 ) N ;
+  - bypass1[3]	+ NET bypass1\[3\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 59210 310 ) N ;
+  - bypass1[2]	+ NET bypass1\[2\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 72850 310 ) N ;
+  - bypass1[1]	+ NET bypass1\[1\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 86490 310 ) N ;
+  - bypass1[0]	+ NET bypass1\[0\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 100130 310 ) N ;
+  - bypass_sel	+ NET bypass_sel + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 53010 ) W ;
+  - cin	+ NET cin + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 2790 ) W ;
+  - clk	+ NET clk + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 6510 ) W ;
+  - fctn_sel	+ NET fctn_sel + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 53630 ) W ;
+  - out[7]	+ NET out\[7\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 22630 61690 ) N ;
+  - out[6]	+ NET out\[6\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 33790 61690 ) N ;
+  - out[5]	+ NET out\[5\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 44950 61690 ) N ;
+  - out[4]	+ NET out\[4\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 56110 61690 ) N ;
+  - out[3]	+ NET out\[3\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 67270 61690 ) N ;
+  - out[2]	+ NET out\[2\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 79670 61690 ) N ;
+  - out[1]	+ NET out\[1\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 93310 61690 ) N ;
+  - out[0]	+ NET out\[0\] + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M2 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 106950 61690 ) N ;
+  - shift_ctrl[2]	+ NET shift_ctrl\[2\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 35030 ) W ;
+  - shift_ctrl[1]	+ NET shift_ctrl\[1\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 23250 ) W ;
+  - shift_ctrl[0]	+ NET shift_ctrl\[0\] + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 22630 ) W ;
+  - status	+ NET status + DIRECTION  OUTPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 310 58590 ) W ;
+  - subtract	+ NET subtract + DIRECTION  INPUT + USE  SIGNAL + LAYER M3 ( -155 -155 ) ( 155 155 )
+ + PLACED ( 119970 10230 ) W ;
+END PINS
+NETS 199 ;
+  - net_11[7]
+    ( MMI_BUFD$7$ in )
+    ( MMI_FFCB_2$7$ q ) ;
+  - net_11[6]
+    ( MMI_BUFD$6$ in )
+    ( MMI_FFCB_2$6$ q ) ;
+  - net_11[5]
+    ( MMI_BUFD$5$ in )
+    ( MMI_FFCB_2$5$ q ) ;
+  - net_11[4]
+    ( MMI_BUFD$4$ in )
+    ( MMI_FFCB_2$4$ q ) ;
+  - net_11[3]
+    ( MMI_BUFD$3$ in )
+    ( MMI_FFCB_2$3$ q ) ;
+  - net_11[2]
+    ( MMI_BUFD$2$ in )
+    ( MMI_FFCB_2$2$ q ) ;
+  - net_11[1]
+    ( MMI_BUFD$1$ in )
+    ( MMI_FFCB_2$1$ q ) ;
+  - net_11[0]
+    ( MMI_BUFD$0$ in )
+    ( MMI_FFCB_2$0$ q ) ;
+  - net_13[7]
+    ( adder8\/MMI_NAND2B in1 )
+    ( adder8\/MMI_NOR2B in0 )
+    ( adder8\/MMI_XOR2A in1 )
+    ( MMI_XOR2B$7$ out ) ;
+  - net_13[6]
+    ( adder8\/MMI_NOR2B_6 in0 )
+    ( adder8\/MMI_XOR2A_2 in1 )
+    ( adder8\/MMI_NAND2B_1 in1 )
+    ( MMI_XOR2B$6$ out ) ;
+  - net_13[5]
+    ( adder8\/MMI_XOR2A_3 in1 )
+    ( adder8\/MMI_NOR2B_2 in0 )
+    ( adder8\/MMI_NAND2B_2 in1 )
+    ( MMI_XOR2B$5$ out ) ;
+  - net_13[4]
+    ( adder8\/MMI_NOR2B_7 in0 )
+    ( adder8\/MMI_XOR2A_4 in1 )
+    ( adder8\/MMI_NAND2B_3 in1 )
+    ( MMI_XOR2B$4$ out ) ;
+  - net_13[3]
+    ( adder8\/MMI_NAND2B_4 in1 )
+    ( adder8\/MMI_NOR2B_1 in0 )
+    ( adder8\/MMI_XOR2A_1 in1 )
+    ( MMI_XOR2B$3$ out ) ;
+  - net_13[2]
+    ( adder8\/MMI_NOR2B_5 in0 )
+    ( adder8\/MMI_XOR2A_5 in1 )
+    ( adder8\/MMI_NAND2B_5 in1 )
+    ( MMI_XOR2B$2$ out ) ;
+  - net_13[1]
+    ( adder8\/MMI_NOR2B_4 in0 )
+    ( adder8\/MMI_XOR2A_6 in1 )
+    ( adder8\/MMI_NAND2B_6 in1 )
+    ( MMI_XOR2B$1$ out ) ;
+  - net_13[0]
+    ( adder8\/MMI_NOR2B_3 in0 )
+    ( adder8\/MMI_XOR2A_7 in1 )
+    ( adder8\/MMI_NAND2B_7 in1 )
+    ( MMI_XOR2B$0$ out ) ;
+  - net_14[7]
+    ( MMI_BUFD_1$7$ in )
+    ( MMI_FFCB_1$7$ q ) ;
+  - net_14[6]
+    ( MMI_BUFD_1$6$ in )
+    ( MMI_FFCB_1$6$ q ) ;
+  - net_14[5]
+    ( MMI_BUFD_1$5$ in )
+    ( MMI_FFCB_1$5$ q ) ;
+  - net_14[4]
+    ( MMI_BUFD_1$4$ in )
+    ( MMI_FFCB_1$4$ q ) ;
+  - net_14[3]
+    ( MMI_BUFD_1$3$ in )
+    ( MMI_FFCB_1$3$ q ) ;
+  - net_14[2]
+    ( MMI_BUFD_1$2$ in )
+    ( MMI_FFCB_1$2$ q ) ;
+  - net_14[1]
+    ( MMI_BUFD_1$1$ in )
+    ( MMI_FFCB_1$1$ q ) ;
+  - net_14[0]
+    ( MMI_BUFD_1$0$ in )
+    ( MMI_FFCB_1$0$ q ) ;
+  - net_1[7]
+    ( shift8\/MMI_MUX4B$4$ in0 )
+    ( shift8\/MMI_MUX4B$5$ in1 )
+    ( shift8\/MMI_MUX4B$6$ in2 )
+    ( shift8\/MMI_MUX4B$7$ in3 )
+    ( adder8\/MMI_NAND2B in0 )
+    ( adder8\/MMI_NOR2B in1 )
+    ( adder8\/MMI_XOR2A in0 )
+    ( MMI_BUFD$7$ out ) ;
+  - net_1[6]
+    ( shift8\/MMI_MUX4B$3$ in0 )
+    ( shift8\/MMI_MUX4B$4$ in1 )
+    ( shift8\/MMI_MUX4B$5$ in2 )
+    ( shift8\/MMI_MUX4B$6$ in3 )
+    ( adder8\/MMI_NOR2B_6 in1 )
+    ( adder8\/MMI_XOR2A_2 in0 )
+    ( adder8\/MMI_NAND2B_1 in0 )
+    ( MMI_BUFD$6$ out ) ;
+  - net_1[5]
+    ( shift8\/MMI_MUX4B$2$ in0 )
+    ( shift8\/MMI_MUX4B$3$ in1 )
+    ( shift8\/MMI_MUX4B$4$ in2 )
+    ( shift8\/MMI_MUX4B$5$ in3 )
+    ( adder8\/MMI_XOR2A_3 in0 )
+    ( adder8\/MMI_NOR2B_2 in1 )
+    ( adder8\/MMI_NAND2B_2 in0 )
+    ( MMI_BUFD$5$ out ) ;
+  - net_1[4]
+    ( shift8\/MMI_MUX4B$1$ in0 )
+    ( shift8\/MMI_MUX4B$2$ in1 )
+    ( shift8\/MMI_MUX4B$3$ in2 )
+    ( shift8\/MMI_MUX4B$4$ in3 )
+    ( adder8\/MMI_NOR2B_7 in1 )
+    ( adder8\/MMI_XOR2A_4 in0 )
+    ( adder8\/MMI_NAND2B_3 in0 )
+    ( MMI_BUFD$4$ out ) ;
+  - net_1[3]
+    ( shift8\/MMI_MUX4B$0$ in0 )
+    ( shift8\/MMI_MUX4B$1$ in1 )
+    ( shift8\/MMI_MUX4B$2$ in2 )
+    ( shift8\/MMI_MUX4B$3$ in3 )
+    ( adder8\/MMI_NAND2B_4 in0 )
+    ( adder8\/MMI_NOR2B_1 in1 )
+    ( adder8\/MMI_XOR2A_1 in0 )
+    ( MMI_BUFD$3$ out ) ;
+  - net_1[2]
+    ( shift8\/MMI_MUX4B$0$ in1 )
+    ( shift8\/MMI_MUX4B$1$ in2 )
+    ( shift8\/MMI_MUX4B$2$ in3 )
+    ( adder8\/MMI_NOR2B_5 in1 )
+    ( adder8\/MMI_XOR2A_5 in0 )
+    ( adder8\/MMI_NAND2B_5 in0 )
+    ( MMI_BUFD$2$ out ) ;
+  - net_1[1]
+    ( shift8\/MMI_MUX4B$0$ in2 )
+    ( shift8\/MMI_MUX4B$1$ in3 )
+    ( adder8\/MMI_NOR2B_4 in1 )
+    ( adder8\/MMI_XOR2A_6 in0 )
+    ( adder8\/MMI_NAND2B_6 in0 )
+    ( MMI_BUFD$1$ out ) ;
+  - net_1[0]
+    ( shift8\/MMI_MUX4B$0$ in3 )
+    ( adder8\/MMI_NOR2B_3 in1 )
+    ( adder8\/MMI_XOR2A_7 in0 )
+    ( adder8\/MMI_NAND2B_7 in0 )
+    ( MMI_BUFD$0$ out ) ;
+  - net_2[7]
+    ( MMI_MUX4B$7$ in0 )
+    ( shift8\/MMI_BUFD_1$7$ out ) ;
+  - net_2[6]
+    ( MMI_MUX4B$6$ in0 )
+    ( shift8\/MMI_BUFD_1$6$ out ) ;
+  - net_2[5]
+    ( MMI_MUX4B$5$ in0 )
+    ( shift8\/MMI_BUFD_1$5$ out ) ;
+  - net_2[4]
+    ( MMI_MUX4B$4$ in0 )
+    ( shift8\/MMI_BUFD_1$4$ out ) ;
+  - net_2[3]
+    ( MMI_MUX4B$3$ in0 )
+    ( shift8\/MMI_BUFD_1$3$ out ) ;
+  - net_2[2]
+    ( MMI_MUX4B$2$ in0 )
+    ( shift8\/MMI_BUFD_1$2$ out ) ;
+  - net_2[1]
+    ( MMI_MUX4B$1$ in0 )
+    ( shift8\/MMI_BUFD_1$1$ out ) ;
+  - net_2[0]
+    ( MMI_MUX4B$0$ in0 )
+    ( shift8\/MMI_BUFD_1$0$ out ) ;
+  - net_5[7]
+    ( MMI_FFCB$7$ d )
+    ( MMI_MUX4B$7$ out ) ;
+  - net_5[6]
+    ( MMI_FFCB$6$ d )
+    ( MMI_MUX4B$6$ out ) ;
+  - net_5[5]
+    ( MMI_FFCB$5$ d )
+    ( MMI_MUX4B$5$ out ) ;
+  - net_5[4]
+    ( MMI_FFCB$4$ d )
+    ( MMI_MUX4B$4$ out ) ;
+  - net_5[3]
+    ( MMI_FFCB$3$ d )
+    ( MMI_MUX4B$3$ out ) ;
+  - net_5[2]
+    ( MMI_FFCB$2$ d )
+    ( MMI_MUX4B$2$ out ) ;
+  - net_5[1]
+    ( MMI_FFCB$1$ d )
+    ( MMI_MUX4B$1$ out ) ;
+  - net_5[0]
+    ( MMI_FFCB$0$ d )
+    ( MMI_MUX4B$0$ out ) ;
+  - net_6[7]
+    ( MMI_MUX4B$7$ in1 )
+    ( adder8\/MMI_XOR2B_5 out ) ;
+  - net_6[6]
+    ( MMI_MUX4B$6$ in1 )
+    ( adder8\/MMI_XOR2B out ) ;
+  - net_6[5]
+    ( MMI_MUX4B$5$ in1 )
+    ( adder8\/MMI_XOR2B_1 out ) ;
+  - net_6[4]
+    ( MMI_MUX4B$4$ in1 )
+    ( adder8\/MMI_XOR2B_2 out ) ;
+  - net_6[3]
+    ( MMI_MUX4B$3$ in1 )
+    ( adder8\/MMI_XNOR2B_ out ) ;
+  - net_6[2]
+    ( MMI_MUX4B$2$ in1 )
+    ( adder8\/MMI_XNOR2B__1 out ) ;
+  - net_6[1]
+    ( MMI_MUX4B$1$ in1 )
+    ( adder8\/MMI_XOR2B_3 out ) ;
+  - net_6[0]
+    ( MMI_MUX4B$0$ in1 )
+    ( adder8\/MMI_XOR2B_4 out ) ;
+  - net_8[7]
+    ( MMI_XOR2B$7$ in0 )
+    ( MMI_BUFD_1$7$ out ) ;
+  - net_8[6]
+    ( MMI_XOR2B$6$ in0 )
+    ( MMI_BUFD_1$6$ out ) ;
+  - net_8[5]
+    ( MMI_XOR2B$5$ in0 )
+    ( MMI_BUFD_1$5$ out ) ;
+  - net_8[4]
+    ( MMI_XOR2B$4$ in0 )
+    ( MMI_BUFD_1$4$ out ) ;
+  - net_8[3]
+    ( MMI_XOR2B$3$ in0 )
+    ( MMI_BUFD_1$3$ out ) ;
+  - net_8[2]
+    ( MMI_XOR2B$2$ in0 )
+    ( MMI_BUFD_1$2$ out ) ;
+  - net_8[1]
+    ( MMI_XOR2B$1$ in0 )
+    ( MMI_BUFD_1$1$ out ) ;
+  - net_8[0]
+    ( MMI_XOR2B$0$ in0 )
+    ( MMI_BUFD_1$0$ out ) ;
+  - shift8/i[7]
+    ( shift8\/MMI_MUX2D$3$ in0 )
+    ( shift8\/MMI_MUX2D$7$ in1 )
+    ( shift8\/MMI_BUFD$7$ out ) ;
+  - shift8/i[6]
+    ( shift8\/MMI_MUX2D$2$ in0 )
+    ( shift8\/MMI_MUX2D$6$ in1 )
+    ( shift8\/MMI_BUFD$6$ out ) ;
+  - shift8/i[5]
+    ( shift8\/MMI_MUX2D$1$ in0 )
+    ( shift8\/MMI_MUX2D$5$ in1 )
+    ( shift8\/MMI_BUFD$5$ out ) ;
+  - shift8/i[4]
+    ( shift8\/MMI_MUX2D$0$ in0 )
+    ( shift8\/MMI_MUX2D$4$ in1 )
+    ( shift8\/MMI_BUFD$4$ out ) ;
+  - shift8/i[3]
+    ( shift8\/MMI_MUX2D$3$ in1 )
+    ( shift8\/MMI_BUFD$3$ out ) ;
+  - shift8/i[2]
+    ( shift8\/MMI_MUX2D$2$ in1 )
+    ( shift8\/MMI_BUFD$2$ out ) ;
+  - shift8/i[1]
+    ( shift8\/MMI_MUX2D$1$ in1 )
+    ( shift8\/MMI_BUFD$1$ out ) ;
+  - shift8/i[0]
+    ( shift8\/MMI_MUX2D$0$ in1 )
+    ( shift8\/MMI_BUFD$0$ out ) ;
+  - shift8/net_3[7]
+    ( shift8\/MMI_BUFD_1$7$ in )
+    ( shift8\/MMI_MUX2D$7$ out ) ;
+  - shift8/net_3[6]
+    ( shift8\/MMI_BUFD_1$6$ in )
+    ( shift8\/MMI_MUX2D$6$ out ) ;
+  - shift8/net_3[5]
+    ( shift8\/MMI_BUFD_1$5$ in )
+    ( shift8\/MMI_MUX2D$5$ out ) ;
+  - shift8/net_3[4]
+    ( shift8\/MMI_BUFD_1$4$ in )
+    ( shift8\/MMI_MUX2D$4$ out ) ;
+  - shift8/net_3[3]
+    ( shift8\/MMI_BUFD_1$3$ in )
+    ( shift8\/MMI_MUX2D$3$ out ) ;
+  - shift8/net_3[2]
+    ( shift8\/MMI_BUFD_1$2$ in )
+    ( shift8\/MMI_MUX2D$2$ out ) ;
+  - shift8/net_3[1]
+    ( shift8\/MMI_BUFD_1$1$ in )
+    ( shift8\/MMI_MUX2D$1$ out ) ;
+  - shift8/net_3[0]
+    ( shift8\/MMI_BUFD_1$0$ in )
+    ( shift8\/MMI_MUX2D$0$ out ) ;
+  - shift8/net_4[7]
+    ( shift8\/MMI_BUFD$7$ in )
+    ( shift8\/MMI_MUX4B$7$ out ) ;
+  - shift8/net_4[6]
+    ( shift8\/MMI_BUFD$6$ in )
+    ( shift8\/MMI_MUX4B$6$ out ) ;
+  - shift8/net_4[5]
+    ( shift8\/MMI_BUFD$5$ in )
+    ( shift8\/MMI_MUX4B$5$ out ) ;
+  - shift8/net_4[4]
+    ( shift8\/MMI_BUFD$4$ in )
+    ( shift8\/MMI_MUX4B$4$ out ) ;
+  - shift8/net_4[3]
+    ( shift8\/MMI_BUFD$3$ in )
+    ( shift8\/MMI_MUX4B$3$ out ) ;
+  - shift8/net_4[2]
+    ( shift8\/MMI_BUFD$2$ in )
+    ( shift8\/MMI_MUX4B$2$ out ) ;
+  - shift8/net_4[1]
+    ( shift8\/MMI_BUFD$1$ in )
+    ( shift8\/MMI_MUX4B$1$ out ) ;
+  - shift8/net_4[0]
+    ( shift8\/MMI_BUFD$0$ in )
+    ( shift8\/MMI_MUX4B$0$ out ) ;
+  - net_12
+    ( adder8\/MMI_INVB_ in )
+    ( MMI_XOR2B_1 out ) ;
+  - net_15
+    ( MMI_BUFE in )
+    ( MMI_FFCB_4 q ) ;
+  - net_3
+    ( MMI_XOR2B_1 in1 )
+    ( MMI_XOR2B$0$ in1 )
+    ( MMI_XOR2B$1$ in1 )
+    ( MMI_XOR2B$2$ in1 )
+    ( MMI_XOR2B$3$ in1 )
+    ( MMI_XOR2B$4$ in1 )
+    ( MMI_XOR2B$5$ in1 )
+    ( MMI_XOR2B$6$ in1 )
+    ( MMI_XOR2B$7$ in1 )
+    ( MMI_BUFE out ) ;
+  - net_4
+    ( MMI_XOR2B_1 in0 )
+    ( MMI_FFCB_5 q ) ;
+  - net_7
+    ( MMI_MUX4B$0$ sel0 )
+    ( MMI_MUX4B$1$ sel0 )
+    ( MMI_MUX4B$2$ sel0 )
+    ( MMI_MUX4B$3$ sel0 )
+    ( MMI_MUX4B$4$ sel0 )
+    ( MMI_MUX4B$5$ sel0 )
+    ( MMI_MUX4B$6$ sel0 )
+    ( MMI_MUX4B$7$ sel0 )
+    ( MMI_BUFE_1 out ) ;
+  - net_10
+    ( MMI_FFCB_3 d )
+    ( adder8\/MMI_AO21B out ) ;
+  - net_9
+    ( MMI_MUX4B$0$ sel1 )
+    ( MMI_MUX4B$1$ sel1 )
+    ( MMI_MUX4B$2$ sel1 )
+    ( MMI_MUX4B$3$ sel1 )
+    ( MMI_MUX4B$4$ sel1 )
+    ( MMI_MUX4B$5$ sel1 )
+    ( MMI_MUX4B$6$ sel1 )
+    ( MMI_MUX4B$7$ sel1 )
+    ( MMI_BUFE_2 out ) ;
+  - adder8\/net_28
+    ( adder8\/MMI_INVA__5 in )
+    ( adder8\/MMI_NAND2B out ) ;
+  - adder8\/net_29
+    ( adder8\/MMI_AOI21B in1 )
+    ( adder8\/MMI_INVA__3 out ) ;
+  - adder8\/net_30
+    ( adder8\/MMI_OAI21B__5 in0 )
+    ( adder8\/MMI_AOI21B_2 out ) ;
+  - adder8\/net_31
+    ( adder8\/MMI_OAI21B__2 in0 )
+    ( adder8\/MMI_NAND2B_3 out ) ;
+  - adder8\/net_32
+    ( adder8\/MMI_AOI21B in0 )
+    ( adder8\/MMI_INVA__2 out ) ;
+  - adder8\/net_33
+    ( adder8\/MMI_XOR2B_3 in1 )
+    ( adder8\/MMI_XOR2A_6 out ) ;
+  - adder8\/net_34
+    ( adder8\/MMI_XOR2B_2 in0 )
+    ( adder8\/MMI_OAI21B_ out ) ;
+  - adder8\/net_35
+    ( adder8\/MMI_XOR2B in1 )
+    ( adder8\/MMI_XOR2A_2 out ) ;
+  - adder8\/net_1
+    ( adder8\/MMI_NAND2B_9 in1 )
+    ( adder8\/MMI_INVA_1 in )
+    ( adder8\/MMI_NAND2B_8 in1 )
+    ( adder8\/MMI_NOR2B__2 out ) ;
+  - adder8\/net_36
+    ( adder8\/MMI_OAI21B__2 in2 )
+    ( adder8\/MMI_OAI21B_ in0 )
+    ( adder8\/MMI_NAND2B_4 out ) ;
+  - adder8\/net_2
+    ( adder8\/MMI_OAI21B__5 in2 )
+    ( adder8\/MMI_OAI21B__4 in2 )
+    ( adder8\/MMI_OAI21B__3 in2 )
+    ( adder8\/MMI_XNOR2B_ in0 )
+    ( adder8\/MMI_OAI21B_ in2 )
+    ( adder8\/MMI_AOI21C out ) ;
+  - adder8\/net_37
+    ( adder8\/MMI_XNOR2B__1 in0 )
+    ( adder8\/MMI_AOI21B out ) ;
+  - adder8\/net_3
+    ( adder8\/MMI_INVA in )
+    ( adder8\/MMI_AOI21B_2 in2 )
+    ( adder8\/MMI_AOI21B_1 in2 )
+    ( adder8\/MMI_OAI21B__2 out ) ;
+  - adder8\/net_38
+    ( adder8\/MMI_OAI21B__3 in0 )
+    ( adder8\/MMI_AOI21B_1 out ) ;
+  - adder8\/net_4
+    ( adder8\/MMI_INVA__1 in )
+    ( adder8\/MMI_NOR2B out ) ;
+  - adder8\/net_39
+    ( adder8\/MMI_XOR2B_1 in1 )
+    ( adder8\/MMI_XOR2A_3 out ) ;
+  - adder8\/net_40
+    ( adder8\/MMI_OAI21B__6 in1 )
+    ( adder8\/MMI_NOR2B_3 out ) ;
+  - adder8\/net_5
+    ( adder8\/MMI_NAND2B_8 in0 )
+    ( adder8\/MMI_INVA__4 out ) ;
+  - adder8\/net_41
+    ( adder8\/MMI_NOR2B__2 in1 )
+    ( adder8\/MMI_OAI21B__2 in1 )
+    ( adder8\/MMI_NOR2B_7 out ) ;
+  - adder8\/net_6
+    ( adder8\/MMI_INVA__4 in )
+    ( adder8\/MMI_AOI21B_2 in1 )
+    ( adder8\/MMI_NOR2B_ in0 )
+    ( adder8\/MMI_NOR2B_2 out ) ;
+  - adder8\/net_42
+    ( adder8\/MMI_AO21B in0 )
+    ( adder8\/MMI_INVA__5 out ) ;
+  - adder8\/net_43
+    ( adder8\/MMI_OAI21B__4 in1 )
+    ( adder8\/MMI_INVA_1 out ) ;
+  - adder8\/net_7
+    ( adder8\/MMI_XNOR2B__1 in1 )
+    ( adder8\/MMI_XOR2A_5 out ) ;
+  - adder8\/net_44
+    ( adder8\/MMI_XOR2B_2 in1 )
+    ( adder8\/MMI_XOR2A_4 out ) ;
+  - adder8\/net_8
+    ( adder8\/MMI_XOR2B_5 in0 )
+    ( adder8\/MMI_AO21B in1 )
+    ( adder8\/MMI_OAI21B__3 out ) ;
+  - adder8\/net_45
+    ( adder8\/MMI_OAI21B__4 in0 )
+    ( adder8\/MMI_INVA out ) ;
+  - adder8\/net_9
+    ( adder8\/MMI_OAI21B__7 in1 )
+    ( adder8\/MMI_NOR2B__1 in1 )
+    ( adder8\/MMI_NOR2B_5 out ) ;
+  - adder8\/net_46
+    ( adder8\/MMI_OAI21B__7 in0 )
+    ( adder8\/MMI_NAND2B_5 out ) ;
+  - adder8\/net_47
+    ( adder8\/MMI_OAI21B__6 in0 )
+    ( adder8\/MMI_NAND2B_7 out ) ;
+  - adder8\/net_48
+    ( adder8\/MMI_OAI21B__7 in2 )
+    ( adder8\/MMI_INVA__2 in )
+    ( adder8\/MMI_NAND2B_6 out ) ;
+  - adder8\/net_50
+    ( adder8\/MMI_AOI21C in0 )
+    ( adder8\/MMI_OAI21B__7 out ) ;
+  - adder8\/net_49
+    ( adder8\/MMI_XNOR2B_ in1 )
+    ( adder8\/MMI_XOR2A_1 out ) ;
+  - adder8\/net_10
+    ( adder8\/MMI_INVA__3 in )
+    ( adder8\/MMI_NOR2B__1 in0 )
+    ( adder8\/MMI_NOR2B_4 out ) ;
+  - adder8\/net_11
+    ( adder8\/MMI_AOI21B_1 in0 )
+    ( adder8\/MMI_OAI21B__1 out ) ;
+  - adder8\/net_12
+    ( adder8\/MMI_OAI21B__3 in1 )
+    ( adder8\/MMI_NAND2B_9 out ) ;
+  - adder8\/net_13
+    ( adder8\/MMI_AOI21C in1 )
+    ( adder8\/MMI_NOR2B__1 out ) ;
+  - adder8\/net_14
+    ( adder8\/MMI_XOR2B_4 in0 )
+    ( adder8\/MMI_INVA_ out ) ;
+  - adder8\/net_15
+    ( adder8\/MMI_OAI21B__1 in0 )
+    ( adder8\/MMI_NAND2B_1 out ) ;
+  - adder8\/net_16
+    ( adder8\/MMI_NOR2B__2 in0 )
+    ( adder8\/MMI_OAI21B_ in1 )
+    ( adder8\/MMI_NOR2B_1 out ) ;
+  - adder8\/net_17
+    ( adder8\/MMI_OAI21B__5 in1 )
+    ( adder8\/MMI_NAND2B_8 out ) ;
+  - adder8\/net_18
+    ( adder8\/MMI_XOR2B_4 in1 )
+    ( adder8\/MMI_XOR2A_7 out ) ;
+  - adder8\/net_19
+    ( adder8\/MMI_OAI21B__6 in2 )
+    ( adder8\/MMI_INVA_ in )
+    ( adder8\/MMI_INVB_ out ) ;
+  - adder8\/net_20
+    ( adder8\/MMI_XOR2B_1 in0 )
+    ( adder8\/MMI_OAI21B__4 out ) ;
+  - adder8\/net_21
+    ( adder8\/MMI_OAI21B__1 in1 )
+    ( adder8\/MMI_NOR2B_ in1 )
+    ( adder8\/MMI_NOR2B_6 out ) ;
+  - adder8\/net_22
+    ( adder8\/MMI_AOI21B_2 in0 )
+    ( adder8\/MMI_OAI21B__1 in2 )
+    ( adder8\/MMI_NAND2B_2 out ) ;
+  - adder8\/net_23
+    ( adder8\/MMI_XOR2B_5 in1 )
+    ( adder8\/MMI_XOR2A out ) ;
+  - adder8\/net_24
+    ( adder8\/MMI_NAND2B_9 in0 )
+    ( adder8\/MMI_AOI21B_1 in1 )
+    ( adder8\/MMI_NOR2B_ out ) ;
+  - adder8\/net_25
+    ( adder8\/MMI_XOR2B in0 )
+    ( adder8\/MMI_OAI21B__5 out ) ;
+  - adder8\/net_26
+    ( adder8\/MMI_AO21B in2 )
+    ( adder8\/MMI_INVA__1 out ) ;
+  - adder8\/net_27
+    ( adder8\/MMI_XOR2B_3 in0 )
+    ( adder8\/MMI_AOI21C in2 )
+    ( adder8\/MMI_AOI21B in2 )
+    ( adder8\/MMI_OAI21B__6 out ) ;
+  - shift8\/net_1
+    ( shift8\/MMI_MUX4B$0$ sel0 )
+    ( shift8\/MMI_MUX4B$1$ sel0 )
+    ( shift8\/MMI_MUX4B$2$ sel0 )
+    ( shift8\/MMI_MUX4B$3$ sel0 )
+    ( shift8\/MMI_MUX4B$4$ sel0 )
+    ( shift8\/MMI_MUX4B$5$ sel0 )
+    ( shift8\/MMI_MUX4B$6$ sel0 )
+    ( shift8\/MMI_MUX4B$7$ sel0 )
+    ( shift8\/MMI_BUFE out ) ;
+  - shift8\/net_2
+    ( shift8\/MMI_MUX2D$0$ sel )
+    ( shift8\/MMI_MUX2D$1$ sel )
+    ( shift8\/MMI_MUX2D$2$ sel )
+    ( shift8\/MMI_MUX2D$3$ sel )
+    ( shift8\/MMI_MUX2D$4$ sel )
+    ( shift8\/MMI_MUX2D$5$ sel )
+    ( shift8\/MMI_MUX2D$6$ sel )
+    ( shift8\/MMI_MUX2D$7$ sel )
+    ( shift8\/MMI_BUFE_2 out ) ;
+  - shift8\/net_5
+    ( shift8\/MMI_MUX4B$0$ sel1 )
+    ( shift8\/MMI_MUX4B$1$ sel1 )
+    ( shift8\/MMI_MUX4B$2$ sel1 )
+    ( shift8\/MMI_MUX4B$3$ sel1 )
+    ( shift8\/MMI_MUX4B$4$ sel1 )
+    ( shift8\/MMI_MUX4B$5$ sel1 )
+    ( shift8\/MMI_MUX4B$6$ sel1 )
+    ( shift8\/MMI_MUX4B$7$ sel1 )
+    ( shift8\/MMI_BUFE_1 out ) ;
+  - clk
+    ( MMI_FFCB_5 clk )
+    ( MMI_FFCB_4 clk )
+    ( MMI_FFCB_3 clk )
+    ( MMI_FFCB_2$0$ clk )
+    ( MMI_FFCB_2$1$ clk )
+    ( MMI_FFCB_2$2$ clk )
+    ( MMI_FFCB_2$3$ clk )
+    ( MMI_FFCB_2$4$ clk )
+    ( MMI_FFCB_2$5$ clk )
+    ( MMI_FFCB_2$6$ clk )
+    ( MMI_FFCB_2$7$ clk )
+    ( MMI_FFCB_1$0$ clk )
+    ( MMI_FFCB_1$1$ clk )
+    ( MMI_FFCB_1$2$ clk )
+    ( MMI_FFCB_1$3$ clk )
+    ( MMI_FFCB_1$4$ clk )
+    ( MMI_FFCB_1$5$ clk )
+    ( MMI_FFCB_1$6$ clk )
+    ( MMI_FFCB_1$7$ clk )
+    ( MMI_FFCB$0$ clk )
+    ( MMI_FFCB$1$ clk )
+    ( MMI_FFCB$2$ clk )
+    ( MMI_FFCB$3$ clk )
+    ( MMI_FFCB$4$ clk )
+    ( MMI_FFCB$5$ clk )
+    ( MMI_FFCB$6$ clk )
+    ( MMI_FFCB$7$ clk )
+    ( PIN clk ) ;
+  - out\[7\]
+    ( PIN out[7] )
+    ( MMI_FFCB$7$ q ) ;
+  - out\[6\]
+    ( PIN out[6] )
+    ( MMI_FFCB$6$ q ) ;
+  - out\[5\]
+    ( PIN out[5] )
+    ( MMI_FFCB$5$ q ) ;
+  - out\[4\]
+    ( PIN out[4] )
+    ( MMI_FFCB$4$ q ) ;
+  - out\[3\]
+    ( PIN out[3] )
+    ( MMI_FFCB$3$ q ) ;
+  - out\[2\]
+    ( PIN out[2] )
+    ( MMI_FFCB$2$ q ) ;
+  - out\[1\]
+    ( PIN out[1] )
+    ( MMI_FFCB$1$ q ) ;
+  - out\[0\]
+    ( PIN out[0] )
+    ( MMI_FFCB$0$ q ) ;
+  - b\[7\]
+    ( MMI_FFCB_1$7$ d )
+    ( PIN b[7] ) ;
+  - b\[6\]
+    ( MMI_FFCB_1$6$ d )
+    ( PIN b[6] ) ;
+  - b\[5\]
+    ( MMI_FFCB_1$5$ d )
+    ( PIN b[5] ) ;
+  - b\[4\]
+    ( MMI_FFCB_1$4$ d )
+    ( PIN b[4] ) ;
+  - b\[3\]
+    ( MMI_FFCB_1$3$ d )
+    ( PIN b[3] ) ;
+  - b\[2\]
+    ( MMI_FFCB_1$2$ d )
+    ( PIN b[2] ) ;
+  - b\[1\]
+    ( MMI_FFCB_1$1$ d )
+    ( PIN b[1] ) ;
+  - b\[0\]
+    ( MMI_FFCB_1$0$ d )
+    ( PIN b[0] ) ;
+  - a\[7\]
+    ( MMI_FFCB_2$7$ d )
+    ( PIN a[7] ) ;
+  - a\[6\]
+    ( MMI_FFCB_2$6$ d )
+    ( PIN a[6] ) ;
+  - a\[5\]
+    ( MMI_FFCB_2$5$ d )
+    ( PIN a[5] ) ;
+  - a\[4\]
+    ( MMI_FFCB_2$4$ d )
+    ( PIN a[4] ) ;
+  - a\[3\]
+    ( MMI_FFCB_2$3$ d )
+    ( PIN a[3] ) ;
+  - a\[2\]
+    ( MMI_FFCB_2$2$ d )
+    ( PIN a[2] ) ;
+  - a\[1\]
+    ( MMI_FFCB_2$1$ d )
+    ( PIN a[1] ) ;
+  - a\[0\]
+    ( MMI_FFCB_2$0$ d )
+    ( PIN a[0] ) ;
+  - status
+    ( PIN status )
+    ( MMI_FFCB_3 q ) ;
+  - bypass1\[7\]
+    ( MMI_MUX4B$7$ in2 )
+    ( PIN bypass1[7] ) ;
+  - bypass0\[7\]
+    ( MMI_MUX4B$7$ in3 )
+    ( PIN bypass0[7] ) ;
+  - bypass1\[6\]
+    ( MMI_MUX4B$6$ in2 )
+    ( PIN bypass1[6] ) ;
+  - bypass0\[6\]
+    ( MMI_MUX4B$6$ in3 )
+    ( PIN bypass0[6] ) ;
+  - bypass1\[5\]
+    ( MMI_MUX4B$5$ in2 )
+    ( PIN bypass1[5] ) ;
+  - bypass0\[5\]
+    ( MMI_MUX4B$5$ in3 )
+    ( PIN bypass0[5] ) ;
+  - bypass1\[4\]
+    ( MMI_MUX4B$4$ in2 )
+    ( PIN bypass1[4] ) ;
+  - bypass0\[4\]
+    ( MMI_MUX4B$4$ in3 )
+    ( PIN bypass0[4] ) ;
+  - bypass1\[3\]
+    ( MMI_MUX4B$3$ in2 )
+    ( PIN bypass1[3] ) ;
+  - bypass0\[3\]
+    ( MMI_MUX4B$3$ in3 )
+    ( PIN bypass0[3] ) ;
+  - bypass1\[2\]
+    ( MMI_MUX4B$2$ in2 )
+    ( PIN bypass1[2] ) ;
+  - bypass0\[2\]
+    ( MMI_MUX4B$2$ in3 )
+    ( PIN bypass0[2] ) ;
+  - bypass1\[1\]
+    ( MMI_MUX4B$1$ in2 )
+    ( PIN bypass1[1] ) ;
+  - bypass0\[1\]
+    ( MMI_MUX4B$1$ in3 )
+    ( PIN bypass0[1] ) ;
+  - bypass1\[0\]
+    ( MMI_MUX4B$0$ in2 )
+    ( PIN bypass1[0] ) ;
+  - bypass0\[0\]
+    ( MMI_MUX4B$0$ in3 )
+    ( PIN bypass0[0] ) ;
+  - fctn_sel
+    ( MMI_BUFE_1 in )
+    ( PIN fctn_sel ) ;
+  - bypass_sel
+    ( MMI_BUFE_2 in )
+    ( PIN bypass_sel ) ;
+  - subtract
+    ( MMI_FFCB_4 d )
+    ( PIN subtract ) ;
+  - cin
+    ( MMI_FFCB_5 d )
+    ( PIN cin ) ;
+  - shift_ctrl\[0\]
+    ( shift8\/MMI_BUFE in )
+    ( PIN shift_ctrl[0] ) ;
+  - shift_ctrl\[1\]
+    ( shift8\/MMI_BUFE_1 in )
+    ( PIN shift_ctrl[1] ) ;
+  - shift_ctrl\[2\]
+    ( shift8\/MMI_BUFE_2 in )
+    ( PIN shift_ctrl[2] ) ;
+  - VDD
+    ( MMI_FFCB_5 clrb )
+    ( MMI_FFCB_4 clrb )
+    ( MMI_FFCB_3 clrb )
+    ( MMI_FFCB_2$0$ clrb )
+    ( MMI_FFCB_2$1$ clrb )
+    ( MMI_FFCB_2$2$ clrb )
+    ( MMI_FFCB_2$3$ clrb )
+    ( MMI_FFCB_2$4$ clrb )
+    ( MMI_FFCB_2$5$ clrb )
+    ( MMI_FFCB_2$6$ clrb )
+    ( MMI_FFCB_2$7$ clrb )
+    ( MMI_FFCB_1$0$ clrb )
+    ( MMI_FFCB_1$1$ clrb )
+    ( MMI_FFCB_1$2$ clrb )
+    ( MMI_FFCB_1$3$ clrb )
+    ( MMI_FFCB_1$4$ clrb )
+    ( MMI_FFCB_1$5$ clrb )
+    ( MMI_FFCB_1$6$ clrb )
+    ( MMI_FFCB_1$7$ clrb )
+    ( MMI_FFCB$0$ clrb )
+    ( MMI_FFCB$1$ clrb )
+    ( MMI_FFCB$2$ clrb )
+    ( MMI_FFCB$3$ clrb )
+    ( MMI_FFCB$4$ clrb )
+    ( MMI_FFCB$5$ clrb )
+    ( MMI_FFCB$6$ clrb )
+    ( MMI_FFCB$7$ clrb ) ;
+  - GND
+    ( shift8\/MMI_MUX2D$4$ in0 )
+    ( shift8\/MMI_MUX2D$5$ in0 )
+    ( shift8\/MMI_MUX2D$6$ in0 )
+    ( shift8\/MMI_MUX4B$5$ in0 )
+    ( shift8\/MMI_MUX4B$6$ in1 )
+    ( shift8\/MMI_MUX4B$6$ in0 )
+    ( shift8\/MMI_MUX4B$7$ in2 )
+    ( shift8\/MMI_MUX4B$7$ in1 )
+    ( shift8\/MMI_MUX4B$7$ in0 )
+    ( shift8\/MMI_MUX2D$7$ in0 ) ;
+END NETS
+END DESIGN

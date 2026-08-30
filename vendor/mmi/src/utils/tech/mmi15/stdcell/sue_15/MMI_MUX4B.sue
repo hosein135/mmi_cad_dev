@@ -1,0 +1,125 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_MUX4B {} {
+  make output -name out -origin {1860 -100}
+  make input -name sel1 -origin {1250 440}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel1_L -origin {1540 440}
+  make name_net -name N1 -origin {1420 -320}
+  make name_net -name N2 -origin {1640 -320}
+  make xgate -orient RY -WP 1.54 -WN 0.77 -origin {1540 -320}
+  make xgate -orient RY -WP 1.54 -WN 0.77 -origin {1540 130}
+  make inverter -WP 0.77 -WN 0.385 -origin {1440 440}
+  make xgate -WP 1.54 -WN 0.77 -origin {1140 -420}
+  make inverter -WP 1.54 -WN 0.77 -origin {990 -420}
+  make xgate -WP 1.54 -WN 0.77 -origin {1140 -210}
+  make inverter -WP 1.54 -WN 0.77 -origin {990 -210}
+  make input -name in0 -origin {770 -420}
+  make input -name sel0 -origin {780 -310}
+  make input -name in1 -origin {770 -210}
+  make xgate -WP 1.54 -WN 0.77 -origin {1140 40}
+  make inverter -WP 1.54 -WN 0.77 -origin {990 40}
+  make xgate -WP 1.54 -WN 0.77 -origin {1140 250}
+  make inverter -WP 1.54 -WN 0.77 -origin {990 250}
+  make input -name in2 -origin {770 40}
+  make input -name in3 -origin {770 250}
+  make MMI_MUX4B -origin {1910 -480}
+  make inverter -WP 1.04 -WN 0.52 -origin {890 -90}
+  make inverter -WP 1.54 -WN 0.77 -origin {1780 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 12/08/99 -origin {1050 620}
+  make_wire 1830 -100 1860 -100
+  make_wire 1540 -390 1540 -360
+  make_wire 1700 -100 1750 -100
+  make_wire 1540 190 1540 160
+  make_wire 1040 -420 1110 -420
+  make_wire 1170 -420 1250 -420
+  make_wire 1250 -420 1250 -320
+  make_wire 960 -420 770 -420
+  make_wire 1040 -210 1110 -210
+  make_wire 1170 -210 1250 -210
+  make_wire 960 -210 770 -210
+  make_wire 1250 -210 1250 -320
+  make_wire 1140 -310 1140 -380
+  make_wire 1140 -310 1140 -240
+  make_wire 820 -310 820 -90
+  make_wire 820 -90 860 -90
+  make_wire 820 -310 780 -310
+  make_wire 820 -310 1140 -310
+  make_wire 1140 -90 1140 -170
+  make_wire 1080 -470 1140 -470
+  make_wire 1080 -90 940 -90
+  make_wire 1080 -90 1140 -90
+  make_wire 1080 -470 1080 -90
+  make_wire 1140 -470 1140 -450
+  make_wire 1250 -320 1420 -320
+  make_wire 1510 -320 1420 -320
+  make_wire 1040 40 1110 40
+  make_wire 1170 40 1250 40
+  make_wire 960 40 770 40
+  make_wire 1040 250 1110 250
+  make_wire 1170 250 1250 250
+  make_wire 960 250 770 250
+  make_wire 1140 150 1140 80
+  make_wire 1140 150 1140 220
+  make_wire 820 150 1140 150
+  make_wire 1140 370 1140 290
+  make_wire 1080 -10 1140 -10
+  make_wire 1080 370 1140 370
+  make_wire 1080 -10 1080 370
+  make_wire 1480 190 1540 190
+  make_wire 1540 -60 1600 -60
+  make_wire 1360 360 1360 440
+  make_wire 1540 -60 1540 90
+  make_wire 1480 -390 1540 -390
+  make_wire 1360 360 1480 360
+  make_wire 1480 -390 1480 190
+  make_wire 1480 190 1480 360
+  make_wire 1540 -290 1540 -60
+  make_wire 1600 -60 1600 440
+  make_wire 1250 130 1510 130
+  make_wire 1250 130 1250 250
+  make_wire 1250 130 1250 40
+  make_wire 1700 -320 1700 -100
+  make_wire 1700 -100 1700 130
+  make_wire 1570 -320 1640 -320
+  make_wire 1640 -320 1700 -320
+  make_wire 1570 130 1700 130
+  make_wire 1490 440 1540 440
+  make_wire 1540 440 1600 440
+  make_wire 1250 440 1360 440
+  make_wire 1360 440 1410 440
+  make_wire 820 -90 820 150
+  make_wire 1140 -90 1140 -10
+  make_wire 1140 -10 1140 10
+  make_text -origin {680 -560} -text {B Size}
+  make_text -origin {680 -580} -text {4:1 Mux}
+  make_text -origin {680 -600} -text MMI_MUX4B -size large
+}
+
+proc ICON_MMI_MUX4B args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 -90} -name in0
+  icon_term -type input -origin {-60 -30} -name in1
+  icon_term -type input -origin {-60 30} -name in2
+  icon_term -type input -origin {-60 90} -name in3
+  icon_term -type input -origin {-20 120} -orient R270 -name sel0
+  icon_term -type input -origin {20 100} -orient R270 -name sel1
+  icon_term -type output -origin {60 0} -name out
+  icon_line -40 -130 -40 130 40 90 40 -90 -40 -130
+  icon_line -60 -90 -40 -90
+  icon_line -60 -30 -40 -30
+  icon_line -60 30 -40 30
+  icon_line -60 90 -40 90
+  icon_line 60 0 40 0
+  icon_property -origin {-37 -90} -size small -label 0
+  icon_property -origin {0 0} -size large -anchor center -label B
+  icon_property -origin {-20 112} -size small -anchor center -label 0
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  icon_property -origin {-40 360} -type auto -name verilog -text {MMI_MUX4B [unique_name "" $name MMI_MUX4B]
+(.in0($in0), .in1($in1), .in2($in2), .in3($in3), 
+.sel0($sel0), .sel1($sel1), .out($out))\;}
+}
+

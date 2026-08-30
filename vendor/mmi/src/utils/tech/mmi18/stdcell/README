@@ -1,0 +1,122 @@
+NOTE:
+
+directory sue_fixed contains the schematics with fixed size fets.
+
+directory sue_param contains the schematics with parameterizable
+fet sizes - THIS IS THE DIRECTORY that has been modified by
+pat so the cells can be routed.
+
+The cell library includes:
+
+	gds for each cell
+	lef for each cell
+	timing library in .lib format
+	verilog behavioral model for each cell
+	spice netlist of each cell
+
+Proposed 0.18 um TSMC cell library characteristics:
+
+	Metal pitch (M1-M5)	0.74 um
+		square surrounds
+		stacked vias ok without any additional work
+
+	cell height		10 grids
+
+	Route on offset of 0.5 grids in X, Y.
+
+	Power (vdd, gnd) in M1, 1.0 um wide (shared)
+
+	Well and Substrate ties along top and bottom borders
+
+	minimum layout grid 0.01 um
+
+Process characteristics:
+
+	Minimum routable contacted pitch: 0.66 (square grid)
+				or	  0.56 x 0.66
+
+	Minimum pitch that allows all stacked vias: 0.73 um
+
+	Fet pitch	0.72 um.
+
+	Minimum fet with:
+		1 contact:	0.42 um
+		2 contacts:	0.89 um
+		3 contacts:	1.36 um
+
+Micro Magic cell library characteristics:
+
+	P:N ratio 2:1
+
+	Five different size cells: A,B,C,D,E
+		Strength corresponds to output drive strength, thus a
+		INVC, AND2C, MUX2C all have the same drive strength but
+		have different input capacitances and intrinsic delays.
+
+		E = 2xD, D = 2xC, C = 2xB, B = 2xA
+
+	Larger cells would break electromigration limits for min. wires.
+	(really maximum current, not electromigration).
+
+	Not all sizes for all cells.  Typically, the more inputs,
+	the fewer sizes.
+
+	for 0.18 um, 0.74 um grid, 10 grid height:
+
+		A size output: 0.92/0.46 (p/n)
+		B size output: 1.84/0.92
+		C size output: 3.68/1.84
+		...
+	
+		Maximum transistor height before folding: 2.35 um
+
+Cells from Micro Magic 0.25 um Library
+
+MMI_AND2B,C
+MMI_AND3B,C
+MMI_AND4B,C
+MMI_AO21B,C
+MMI_AO22B,C
+MMI_AO31B,C
+MMI_AOI21A,B,C
+MMI_AOI22A,B
+MMI_AOI31A,B
+MMI_BUFB,C,D,E
+MMI_FFCB		flipflop with scan and async. clear
+MMI_FFSB		flipflop with scan and async. set
+MMI_INAND2A,B,C
+MMI_INOR2A,B,C
+MMI_INVA,B,C,D,E
+MMI_MUX2A,B,C,D
+MMI_MUX3B,C
+MMI_MUX4B,C
+MMI_MUXI2A,B,C
+MMI_MUXI3B,C
+MMI_MUXI4B,C
+MMI_NAND2A,B,C,D
+MMI_NAND3A,B,C
+MMI_NAND4A,B,C
+MMI_NOR2A,B,C,D
+MMI_NOR3A,B
+MMI_OA21B,C
+MMI_OA22B,C
+MMI_OA31B,C
+MMI_OAI21A,B,C
+MMI_OAI22A,B
+MMI_OAI31A,B
+MMI_OR2B,C
+MMI_OR3B,C
+MMI_XNOR2A,B,C
+MMI_XOR2A,B,C
+filler cells
+clock buffers
+
+Additional cells needed by equator:
+
+tristate buffers
+latches
+other flipflops 
+fully decoded muxes
+full adder/ half adder (maybe)
+???
+

@@ -1,0 +1,227 @@
+# This is a generator for an AND or NAND.  This generator can produce circuits
+# with more inputs and/or larger final drive sizes than are available
+# in the standard cell library.
+
+
+proc ICON_busRLCX args {
+  # This line is needed for all generators
+  icon_generator $args {{NINPUTS 3} {TopLayer "Y" {Y N} } {Top_NINPUTS 3} {BotLayer "Y" {Y N} } {Bot_NINPUTS 3} }
+
+  # check for acceptable response on NINPUTS
+  if {$NINPUTS < 1} {
+    error "ERROR: NINPUTS ($NINPUTS) must be greater than 1"
+  }
+  # don't let the user get too crazy
+  if {$NINPUTS > 128} {
+    error "ERROR: NINPUTS ($NINPUTS) not supported"
+  }
+
+  ## check for top and bot ninputs
+  if { $TopLayer == "Y" && $Top_NINPUTS < 1} {
+	error "ERROR: Top_NINPUTS ($Top_NINPUTS) must be greater than 1"
+  }
+
+  if { $BotLayer == "Y" && $Bot_NINPUTS < 1} {
+	error "ERROR: Bot_NINPUTS ($Bot_NINPUTS) must be greater than 1"
+  }
+
+  if { $BotLayer == "N" } {
+  set Bot_NINPUTS 0 }
+
+  if { $TopLayer == "N" } {
+  set Top_NINPUTS 0 }
+
+  set TotalPins [expr $NINPUTS + $Bot_NINPUTS + $Top_NINPUTS ]
+
+  set half [expr $TotalPins / 2]
+  set rem [expr  $TotalPins % 2]
+
+
+  set start [expr ($half * -20) + ((1 - $rem) * 10)]
+
+  if { $TopLayer == "Y" && $BotLayer == "Y" } {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {length 100u} {wire M3} {width 0.2u} {space 0.2u} {Refwidth 1.0u} {bot M1} {Bot_width 0.2u} {Bot_space 0.2u} {Bot_Refwidth 1.0u} {top M5} {Top_width 0.2u} {Top_space 0.2u} {Top_Refwidth 1.0u} }
+  } elseif { $TopLayer == "Y" && $BotLayer == "N" } {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {length 100u} {wire M3} {width 0.2u} {space 0.2u} {Refwidth 1.0u} {top M5} {Top_width 0.2u} {Top_space 0.2u} {Top_Refwidth 1.0u} }
+  } elseif { $TopLayer == "N" && $BotLayer == "Y" } {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {length 100u} {wire M3} {width 0.2u} {space 0.2u} {Refwidth 1.0u} {bot M5} {Bot_width 0.2u} {Bot_space 0.2u} {Bot_Refwidth 1.0u} }
+  } else {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {length 100u} {wire M3} {width 0.2u} {space 0.2u}  {Refwidth 1.0u} } }
+
+  # icon body
+### rlc icon drawing 
+  icon_line -10 0 -12 0 -15 -5 -20 5 -25 -5 -30 5 -35 -5 -40 5 -45 -5 -48 0 -60 0
+  icon_property -origin {-50 30} -size small -anchor center -label gnd
+  icon_arc -70 15 -30 45 -start 66 -extent 47
+  icon_line -50 0 -50 10 -57 10 -43 10
+  icon_line 50 15 50 25 45 25 55 25
+  icon_property -origin {50 30} -size small -anchor center -label gnd
+  icon_arc 30 15 70 45 -start 66 -extent 47
+  icon_line 50 0 50 10 43 10 57 10
+  icon_arc 0 -10 20 10 -start 2 -extent 171
+  icon_arc 10 -10 20 10 -start 168 -extent 193
+  icon_arc 10 -10 30 10 -start 2 -extent 171
+  icon_arc 20 -10 30 10 -start 168 -extent 193
+  icon_arc 20 -10 40 10 -start 2 -extent 171
+  icon_arc 30 -10 40 10 -start 168 -extent 193
+  icon_arc 30 -10 50 10 -start 2 -extent 171
+  icon_arc -10 -10 10 10 -start 4 -extent 173
+  icon_arc 0 -10 10 10 -start 168 -extent 193
+  icon_line -50 15 -50 25 -55 25 -45 25
+  icon_line 50 0 100 0
+  icon_line -60 0 -100 0
+
+
+  set icon_left_x -120
+  set icon_right_x 120
+  set wire_overhang 20
+
+
+  # inputs / outputs
+    for {set i 0} {$i < $TotalPins} {incr i} {
+    if { $i < $Bot_NINPUTS } {
+	set result 0 
+    } elseif { $i >= [expr $Bot_NINPUTS + $NINPUTS ] } {
+	set result 2 
+    } else { 
+	set result 1 }
+    switch -exact $result {
+	0 {set lev "B" }
+	1 {set lev "W" }
+	2 {set lev "T" }
+    }
+
+      icon_line $icon_left_x $start [expr $icon_left_x + $wire_overhang ] $start
+
+    if { $lev == "B" } {
+      set b [expr $i % $Bot_NINPUTS ]
+     }
+    if { $lev == "W" } {
+      set b [expr ($i - $Bot_NINPUTS ) % $NINPUTS ]
+    }
+    if { $lev == "T" } {
+      set b [expr ($i - $Bot_NINPUTS - $NINPUTS ) % $Top_NINPUTS ]
+    }
+
+      icon_term -type inout -origin "$icon_left_x $start" -orient RX -name in${lev}$b
+      icon_property -origin "[expr $icon_left_x + $wire_overhang ] $start" -size small -label in${lev}$b
+      icon_line [expr $icon_right_x - $wire_overhang ] $start $icon_right_x $start
+      icon_term -type inout -origin "$icon_right_x $start" -name out${lev}$b
+      icon_property -origin "60 $start" -size small -label out${lev}$b
+
+  	set end [expr $start + 20]
+
+	icon_line [expr $icon_left_x + $wire_overhang ] $start [expr $icon_left_x + $wire_overhang ] $end
+	icon_line [expr $icon_right_x - $wire_overhang ] $start [expr $icon_right_x - $wire_overhang ] $end
+       
+	if { $i == 0 } {
+        icon_line [expr $icon_left_x + $wire_overhang ] [expr $start - 20] [expr $icon_right_x - $wire_overhang ] [ expr $start -20]
+	icon_line [expr $icon_right_x - $wire_overhang ] $start [expr $icon_right_x - $wire_overhang ] [expr $start - 20]
+	icon_line [expr $icon_left_x + $wire_overhang ] $start [expr $icon_left_x + $wire_overhang ] [expr $start - 20]
+	}
+
+	if { $i == [expr $TotalPins - 1] } {
+        icon_line [expr $icon_left_x + $wire_overhang ] [expr $start +20] [expr $icon_right_x - $wire_overhang ] [expr $start + 20]
+        icon_line [expr $icon_right_x - $wire_overhang ] $start [expr $icon_right_x - $wire_overhang ] $end 
+        icon_line [expr $icon_left_x + $wire_overhang ] $start [expr $icon_left_x + $wire_overhang ] $end
+
+        }
+
+
+      set start [expr $start + 20]
+    }
+
+ # spice property
+  set rlc_file "rlgc${NINPUTS}x "
+
+  set innets ""
+  set outnets ""
+
+  foreach lay { "B" "W" "T" } {
+
+    if { $lay == "B" } {
+      set lay_NINPUTS $Bot_NINPUTS 
+     }
+    if { $lay == "W" } {
+      set lay_NINPUTS $NINPUTS 
+    }
+    if { $lay == "T" } {
+      set lay_NINPUTS $Top_NINPUTS 
+    }
+
+  	for {set i 0} {$i < $lay_NINPUTS } {incr i} {
+  	set innets [format "%s \$in%s%d" $innets $lay $i ]
+  	set outnets [format "%s \$out%s%d" $outnets $lay $i] 
+        }
+  }
+
+### spice property
+  set rlcSpiceCommand "generateRLCSpice"
+  set rlc_file "rlgc${NINPUTS}x "
+
+   set spiceArgs [format "\[%s %s %s %s \"%s\" \"%s\" " $rlcSpiceCommand $TopLayer $BotLayer $rlc_file $innets $outnets]
+
+   set spiceArgs [format " %s \$length \$wire %d \$width \$space \$Refwidth" $spiceArgs $NINPUTS ]
+
+
+   if { $BotLayer == "Y" }  {
+   set spiceArgs [format " %s \$bot %d \$Bot_width \$Bot_space \$Bot_Refwidth " $spiceArgs $Bot_NINPUTS ]
+    }
+
+   if { $TopLayer == "Y" }  {
+   set spiceArgs [format " %s \$top %d \$Top_width \$Top_space \$Top_Refwidth " $spiceArgs $Top_NINPUTS ]
+    }
+
+   set spiceArgs [format " %s \$name \] " $spiceArgs ]
+
+
+## set technology metal options
+   set met_layers [getMetalLayers]
+
+  set mLayerPopup [format "popup \" %s \" " $met_layers ]
+
+  set x_icon_prop -120
+  set y_icon_prop 200
+  set y_count 0
+  set y_interval 20
+  # properties
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name M
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name name
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name length -default 100u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type fixed -name spice -text $spiceArgs
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name wire -choices $mLayerPopup
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name width -default 0.2u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name space -default 0.2u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Refwidth -default 1.0u
+  incr y_count
+
+  if { $BotLayer == "Y" }  {
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name bot -choices $mLayerPopup
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Bot_width -default 0.2u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Bot_space -default 0.2u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Bot_Refwidth -default 1.0u
+  incr y_count
+  }
+
+  if { $TopLayer == "Y" }  {
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name top -choices $mLayerPopup
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Top_width -default 0.2u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Top_space -default 0.2u
+  incr y_count
+  icon_property -origin "$x_icon_prop [expr $y_icon_prop + $y_interval * $y_count]" -type user -name Top_Refwidth -default 1.0u
+  incr y_count
+  }
+
+}

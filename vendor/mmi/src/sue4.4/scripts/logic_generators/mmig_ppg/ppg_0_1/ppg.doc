@@ -1,0 +1,67 @@
+Documentation for ppg
+---------------------
+rev 0.1, 2/2/99
+
+The ppg generator is used to derive simple partial product generation logic
+for a multiplier.
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS_A:
+    Definition:
+      The number of bits in input value A_H.  The number of partial 
+      products generated will be NBITS_A + NBITS_B.  The width of each
+      partial product will be max(NBITS_A, NBITS_B).
+    Legal Values:
+      1 <= n <= 63
+    Default:
+      8
+
+  NBITS_B:
+    Definition:
+      The number of bits in input value B_H.  The number of partial 
+      products generated will be NBITS_A + NBITS_B.  The width of each
+      partial product will be max(NBITS_A, NBITS_B).
+    Legal Values:
+      1 <= n <= 63
+    Default:
+      8
+
+  SignExtendInputs:
+    Definition:
+      This argument allows the user to specify whether the ppg logic's
+      inputs are sign or zero extended.
+    Legal Values:
+      The allowed values of this argument are "Y" (perform sign extension) 
+      and "N" (perform zero extension).
+    Default:
+      N
+
+  Algorithm:
+    Definition:
+      This argument allows the user to specify the partial product
+      generation algorithm.
+    Legal Values:
+      Simple
+    Default:
+      Simple
+
+  bitslice:    
+    Definition:
+      This argument directs DPC to enforce bitslice layout, or not.  
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+
+INPUT SIGNALS:
+--------------
+  A_H (multiplier) and B_H (multiplicand)
+
+
+OUTPUT SIGNALS:
+---------------
+  PP*_H (partial product vectors)
+
+

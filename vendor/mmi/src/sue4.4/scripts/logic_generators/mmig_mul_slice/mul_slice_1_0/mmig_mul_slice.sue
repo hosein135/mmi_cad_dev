@@ -1,0 +1,535 @@
+# This is a generator for a bitslice of a multiplier tree made up of 4:2 adders.
+
+proc NAME_mmig_mul_slice args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {AddExtraCSA "Y"} {HalfHeight "N"}}
+
+  # NBITS_A, NBITS_B
+  set nom [format "mmig_mul_slice_%dx%d_" $NBITS_A $NBITS_B]
+
+  # AddExtraCSA
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  } 
+
+  # HalfHeight
+  if {[string toupper $HalfHeight] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  } 
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_mul_slice args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {AddExtraCSA "Y"} {HalfHeight "N"}}
+
+  # which 4:2 adder?
+  if {[string toupper $HalfHeight] == "Y"} {
+    set m42a "MMIG_MUL_42ADDT"
+  } else {
+    set m42a "MMIG_MUL_42ADD"
+  }
+
+  # 4:2 adder icon info
+  # icon box info
+  setl {icon_x icon_y icon_left icon_bot icon_right icon_top} [generators_get_icon_size $m42a]
+
+  # icon port info
+  setl {count inpins outpins inoutpins} [generators_get_pin_info $m42a]
+  setl {port_in_x(1) port_in_y(1)} [generators_get_pin_xy "in1" $inpins]
+  setl {port_in_x(2) port_in_y(2)} [generators_get_pin_xy "in2" $inpins]
+  setl {port_in_x(3) port_in_y(3)} [generators_get_pin_xy "in3" $inpins]
+  setl {port_in_x(4) port_in_y(4)} [generators_get_pin_xy "in4" $inpins]
+  setl {port_sum_x port_sum_y} [generators_get_pin_xy "Sum_H" $outpins]
+  setl {port_carry_x port_carry_y} [generators_get_pin_xy "Carry_H" $outpins]
+  setl {port_cin_x port_cin_y} [generators_get_pin_xy "Cin_L" $inpins]
+  setl {port_cout_x port_cout_y} [generators_get_pin_xy "Cout_L" $outpins]
+
+  # drawing origin
+  set base_x -500
+  set base_y 0
+
+  # spacings between 4:2 adder icons
+  set xfudge $icon_x
+  set yfudge [expr $icon_y / 4]
+
+  # wire stub lengths
+  set ws1 50
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # figure out how many rows of 4:2 adders are needed
+  set j 1
+  for {set i 4} {$i <= $NBITS_A} {set i [expr $i * 2]} {
+    incr j
+    set log2($i) $j
+  }
+  if {[expr pow(2,$j)] == $NBITS_A} {
+    # NBITS_A is a power of 2
+    set rowcount [expr $j - 1]
+  } else {
+    # no it's not
+    set rowcount $j
+  }
+  set lastrow [expr $rowcount - 1]
+
+  # first we will figure out the maximum number of boxes per row, and initialize their locations
+  # to something bogus.  later the code will place the correct number of boxes in real locations.
+  # we will use the bogus location flag to indicate that the box doesn't exist, so its "outputs"
+  # will get wired to logic 0 when they are used as inputs elsewhere.
+  for {set i 0} {$i < $rowcount} {incr i} {
+    set n [expr $rowcount - $i - 1]
+    set bc [expr int(pow(2,$n))]
+    for {set j 0} {$j < $bc} {incr j} {
+      set adderloc($i,$j) "-1000 -1000 -1"
+    }
+  }
+
+  # figure out how many boxes are in each row, and how many total boxes, and the max number of boxes in one row
+  set totboxcount 0
+  set maxboxcount 0
+  set boxcount(0) [expr int($NBITS_A / 4)]
+  if {[expr $NBITS_A % 4] != 0} {
+    incr boxcount(0)
+  }
+  set totboxcount [expr $totboxcount + $boxcount(0)]
+  if {$boxcount(0) > $maxboxcount} {
+    set maxboxcount $boxcount(0)
+  }
+  for {set i 1} {$i < $rowcount} {incr i} {
+    set prevbc $boxcount([expr $i - 1])
+    set boxcount($i) [expr int($prevbc / 2)]
+    if {[expr $prevbc % 2] != 0} {
+      incr boxcount($i)
+    }
+    set totboxcount [expr $totboxcount + $boxcount($i)]
+    if {$boxcount($i) > $maxboxcount} {
+      set maxboxcount $boxcount($i)
+    }
+  }
+
+  # add an extra row if an extra CSA is desired
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set boxcount($rowcount) 1
+    set adderloc($lastrow,1) "0 0 0"
+    incr rowcount
+    incr lastrow
+    incr totboxcount
+  }
+
+  # figure out carry signal bit ranges
+  set c_count [expr $totboxcount - 1]
+  set carry_count [expr $c_count - 1]
+  if {$c_count == 0} {
+    set c_bitrange ""
+  } else {
+    set c_bitrange [format "\[%d\:0\]" $c_count]
+  }
+  if {$carry_count == 0} {
+    set carry_bitrange ""
+  } else {
+    set carry_bitrange [format "\[%d\:0\]" $carry_count]
+  }
+
+  set x 0
+  set inflag_x $base_x
+  set top_y [expr $base_y - (($maxboxcount * ($icon_y + $yfudge)) + (2 * $yfudge))]
+  set bot_y [expr $base_y + $icon_y + $yfudge]
+  set boxnum -1
+  set pin_pos 0
+
+  for {set i 0} {$i < $rowcount} {incr i} {
+    set bcount $boxcount($i)  
+    set y $base_y
+
+    for {set j 0} {$j < $bcount} {incr j} {
+      incr boxnum
+
+      # place 4:2 adder
+      make $m42a -origin "$x $y" 
+
+      # record placement
+      set adderloc($i,$j) "$x $y $boxnum"
+
+      # place input pins with the first row
+      if {$i == 0} {
+	for {set k 1} {$k < 5} {incr k} {
+	  set pin_x [expr $x + $port_in_x([expr 5 - $k])]
+	  set pin_y [expr $y + $port_in_y([expr 5 - $k])]
+	  make_wire $pin_x $pin_y $inflag_x $pin_y
+	  if {$pin_pos < $NBITS_A} {
+	    set pin_name [format "PP%d_H" $pin_pos]
+	    make input -origin "$inflag_x $pin_y" -name $pin_name
+	  } else {
+	    make global -origin "$inflag_x $pin_y" -name gnd
+	  }
+	  incr pin_pos
+	}
+
+      } else {
+	# wire backwards if it's not the first row
+	# note that the extra CSA row's in3, in4 inputs come from outside this schematic
+	for {set z 1} {$z < 5} {incr z} {
+	  set prev_idx_x [expr $i - 1]
+	  # in1, in2 connect to the upper box in previous row
+	  # in3, in4 connect to the lower box in previous row
+	  if {($z < 3)} {
+	    set prev_idx_y [expr 2*$j + 1]
+	  } else {
+	    set prev_idx_y [expr 2*$j]
+	  }
+	  set prev_origin_x [lindex $adderloc($prev_idx_x,$prev_idx_y) 0]
+	  set prev_origin_y [lindex $adderloc($prev_idx_x,$prev_idx_y) 1]
+	  set prev_boxnum [lindex $adderloc($prev_idx_x,$prev_idx_y) 2]
+
+	  if {($z == 1) || ($z == 3)} {
+	    if {($z == 1) && ($i == $lastrow) && ([string toupper $AddExtraCSA] == "Y")} {
+	      # wire up in1 to the extra CSA input
+	      set curr_x [expr $x + $port_in_x($z)]
+	      set curr_y [expr $y + $port_in_y($z)]
+	      set bend_x [expr $curr_x - 30]
+	      set csa_y [expr $top_y + $yfudge]
+	      make_wire $curr_x $curr_y $bend_x $curr_y
+	      make_wire $bend_x $curr_y $bend_x $csa_y
+	      make_wire $bend_x $csa_y $inflag_x $csa_y
+	      make input -origin "$inflag_x $csa_y" -name "CSA_A_H"
+	    } else {
+	      if {$prev_boxnum != -1} {
+		# previous box is present
+		# in1, in3 connect to sum ports of previous row
+		set wname [format "S_%d_%d_H" $prev_idx_x $prev_idx_y]
+		set bend_mul 2
+		# hook em up
+		set prev_x [expr $prev_origin_x + $port_sum_x]
+		set prev_y [expr $prev_origin_y + $port_sum_y]
+		set bend_x [expr $prev_x + $ws1]
+		set curr_x [expr $x + $port_in_x($z)]
+		set curr_y [expr $y + $port_in_y($z)]
+		make_wire $prev_x $prev_y $bend_x $prev_y
+		make name_net -name $wname -origin "$bend_x $prev_y"
+		make_wire $bend_x $prev_y $bend_x $curr_y
+		make_wire $bend_x $curr_y $curr_x $curr_y
+	      } else {
+		# previous box doesn't exist
+		set curr_x [expr $x + $port_in_x($z)]
+		set curr_y [expr $y + $port_in_y($z)]
+		set bend_x [expr $curr_x - $ws1]
+		make_wire $curr_x $curr_y $bend_x $curr_y
+		make global -origin "$bend_x $curr_y" -name gnd
+	      }
+	    }
+	  } else {
+	    if {($z == 2) && ($i == $lastrow) && ([string toupper $AddExtraCSA] == "Y")} {
+	      # wire up in2 to the extra CSA input
+	      set curr_x [expr $x + $port_in_x($z)]
+	      set curr_y [expr $y + $port_in_y($z)]
+	      set bend_x [expr $curr_x - 50]
+	      set csa_y [expr $top_y + $yfudge + $ws1]
+	      make_wire $curr_x $curr_y $bend_x $curr_y
+	      make_wire $bend_x $curr_y $bend_x $csa_y
+	      make_wire $bend_x $csa_y $inflag_x $csa_y
+	      make input -origin "$inflag_x $csa_y" -name "CSA_B_H"
+	    } else {
+	      if {$prev_boxnum != -1} {
+		# in2, in4 connect to carry out ports of previous bitslice
+		set prev_x [expr $prev_origin_x + $port_carry_x]
+		set prev_y [expr $prev_origin_y + $port_carry_y]
+		set bend_x [expr $prev_x + $ws1]
+		set curr_x [expr $x + $port_in_x($z)]
+		set curr_y [expr $y + $port_in_y($z)]
+		set wname [format "C0_%d_%d_H" $prev_idx_x $prev_idx_y]
+		make_wire $curr_x $curr_y $bend_x $curr_y
+		make_wire $bend_x $curr_y $bend_x $bot_y
+		if {$carry_count > 0} {
+		  make name_net_s -name "\[$prev_boxnum\]" -origin "$bend_x $bot_y"
+		}
+		make_wire $bend_x $bot_y $bend_x [expr $bot_y + 2*$ws1]
+		if {(($i == 1) || (($i == 0) && ($i == $lastrow))) && ($j == 0) && ($z == 4)} {
+		  make_wire $bend_x [expr $bot_y + 2*$ws1] $bend_x [expr $bot_y + 3*$ws1]
+		  make input -origin "$bend_x [expr $bot_y + 3*$ws1]" -name "CarryIn_H$carry_bitrange" -orient R270
+		} else {
+		  make_wire $bend_x [expr $bot_y + 2*$ws1] [expr $bend_x - $icon_x - $xfudge] [expr $bot_y + 2*$ws1]
+		}
+	      } else {
+		# previous box doesn't exist
+		set curr_x [expr $x + $port_in_x($z)]
+		set curr_y [expr $y + $port_in_y($z)]
+		set bend_x [expr $curr_x - $ws1]
+		make_wire $curr_x $curr_y $bend_x $curr_y
+		make global -origin "$bend_x $curr_y" -name gnd		
+	      }
+	    }
+	  }
+	}
+      }
+
+
+      # wire up the cout
+      set cout_x [expr $x + $port_cout_x]
+      set cout_y [expr $y + $port_cout_y]
+      make_wire $cout_x $cout_y $cout_x $top_y
+      if {$c_count > 0} {
+	make name_net_s -name "\[$boxnum\]" -origin "$cout_x $top_y"
+      }
+      make_wire $cout_x $top_y $cout_x [expr $top_y - $ws1]
+      if {($i == 0) && ($j == 0)} {
+	make_wire $cout_x [expr $top_y - $ws1] $cout_x [expr $top_y - 3 * $ws1]
+	make output -origin "$cout_x [expr $top_y - 3 * $ws1]" -name "Cout_L$c_bitrange" -orient R270
+      } else {
+	make_wire $cout_x [expr $top_y - $ws1] [expr $cout_x - $icon_x - $xfudge] [expr $top_y - $ws1]
+      }
+
+      # wire up the cin 
+      set cin_x [expr $x + $port_cin_x]
+      set cin_y [expr $y + $port_cin_y]
+      make_wire $cin_x $cin_y $cin_x $bot_y
+      if {$c_count > 0} {
+	make name_net_s -name "\[$boxnum\]" -origin "$cin_x $bot_y"
+      }
+      make_wire $cin_x $bot_y $cin_x [expr $bot_y + $ws1]
+      if {($i == 0) && ($j == 0)} {
+	make_wire $cin_x [expr $bot_y + $ws1] $cin_x [expr $bot_y + 3 * $ws1]
+	make input -origin "$cin_x [expr $bot_y + 3 * $ws1]" -name "Cin_L$c_bitrange" -orient R270
+      } else {
+	make_wire $cin_x [expr $bot_y + $ws1] [expr $cin_x - $icon_x - $xfudge] [expr $bot_y + $ws1]
+      }
+
+      # wire up the carry out
+      if {$i != $lastrow} {
+	set carry_x [expr $x + $port_carry_x]
+	set carry_y [expr $y + $port_carry_y]
+	set bend_x [expr $carry_x + $ws1]
+	make_wire $carry_x $carry_y $bend_x $carry_y
+	make_wire $bend_x $carry_y $bend_x $top_y
+	if {$carry_count > 0} {
+	  make name_net_s -name "\[$boxnum\]" -origin "$bend_x $top_y"
+	}
+	make_wire $bend_x $top_y $bend_x [expr $top_y - 2*$ws1]
+	if {($i == 0) && ($j == 0)} {
+	  make_wire $bend_x [expr $top_y - 2*$ws1] $bend_x [expr $top_y - 3 * $ws1]
+	  make output -origin "$bend_x [expr $top_y - 3 * $ws1]" -name "CarryOut_H$carry_bitrange" -orient R270
+	} else {
+	  make_wire $bend_x [expr $top_y - 2*$ws1] [expr $bend_x - $icon_x - $xfudge] [expr $top_y - 2*$ws1]
+	}
+      }
+
+      # next box placement
+      set x [expr $x + $icon_x + $xfudge]
+      set y [expr $y - $icon_y - $yfudge]
+    }
+  }
+
+  # final sum, carry out
+  set curr_origin_x [lindex $adderloc($lastrow,0) 0]
+  set curr_origin_y [lindex $adderloc($lastrow,0) 1]
+  # sum
+  set curr_x [expr $curr_origin_x + $port_sum_x]
+  set curr_y [expr $curr_origin_y + $port_sum_y]
+  set end_x [expr $curr_x + (4 * $ws1)]
+  make_wire $curr_x $curr_y $end_x $curr_y
+  make output -origin "$end_x $curr_y" -name "Sum_H"
+  # carry
+  set curr_x [expr $curr_origin_x + $port_carry_x]
+  set curr_y [expr $curr_origin_y + $port_carry_y]
+  set end_x [expr $curr_x + (4 * $ws1)]
+  make_wire $curr_x $curr_y $end_x $curr_y
+  make output -origin "$end_x $curr_y" -name "Carry_H"
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr $bot_y + 2 * $icon_y]" -owner emc -version 1.0 -date 05/18/00
+}
+
+
+proc ICON_mmig_mul_slice args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS_A 8} {NBITS_B 8} {AddExtraCSA "Y"} {HalfHeight "N"}}
+  
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # don't let the user get too crazy
+  if {$NRESBITS > 128} {
+    error "ERROR: NBITS_A + NBITS_B = $NRESBITS not supported"
+  }
+  
+  # check that NBITS_A is > 1
+  if {$NBITS_A < 1} {
+    error "ERROR: NBITS_A ($NBITS_A) not supported"
+  }
+  # check that NBITS_B is > 1
+  if {$NBITS_B < 1} {
+    error "ERROR: NBITS_B ($NBITS_B) not supported"
+  }
+  
+  # check for acceptable response on AddExtraCSA query
+  if {([string toupper $AddExtraCSA] != "Y") && ([string toupper $AddExtraCSA] != "N")} {
+    error "ERROR: AddExtraCSA property ($AddExtraCSA) must be Y or N"
+  }
+  set addCSA 0
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set addCSA 1
+  }
+  # check for acceptable response on HalfHeight query
+  if {([string toupper $HalfHeight] != "Y") && ([string toupper $HalfHeight] != "N")} {
+    error "ERROR: HalfHeight property ($HalfHeight) must be Y or N"
+  }
+
+  
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  
+  # figure out icon size
+  set cs_spacer 70
+  set pin_spacer 20
+  
+  # how many pins?
+  set pincount $NBITS_A
+  
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+  
+  set pin_pos [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    set wname [format "PP%d_H" $i]
+    icon_term -type input -origin "$icon_left $pin_pos" -name $wname
+    icon_property -origin "$icon_left_label $pin_pos" -size small -label $wname 
+    set pin_pos [expr $pin_pos - $pin_spacer]
+  }
+  
+  if {$addCSA == 1} {
+    icon_term -type input -origin "$icon_left [expr $icon_top + 2*$pin_spacer]" -name CSA_A_H
+    icon_property -origin "$icon_left_label [expr $icon_top + 2*$pin_spacer]" -size small -label CSA_A_H
+    icon_term -type input -origin "$icon_left [expr $icon_top + 3*$pin_spacer]" -name CSA_B_H
+    icon_property -origin "$icon_left_label [expr $icon_top + 3*$pin_spacer]" -size small -label CSA_B_H
+  }
+  
+  icon_term -type output -origin "$icon_right -10" -name Sum_H
+  icon_property -origin "$icon_right_label -10" -size small -label "Sum_H" -anchor e
+  icon_term -type output -origin "$icon_right 10" -name Carry_H
+  icon_property -origin "$icon_right_label 10" -size small -label "Carry_H" -anchor e
+  
+  # figure out how many rows of 4:2 adders are needed
+  set j 1
+  for {set i 4} {$i <= $NBITS_A} {set i [expr $i * 2]} {
+    incr j
+    set log2($i) $j
+  }
+  if {[expr pow(2,$j)] == $NBITS_A} {
+    # NBITS_A is a power of 2
+    set rowcount [expr $j - 1]
+  } else {
+    # no it's not
+    set rowcount $j
+  }
+  set lastrow [expr $rowcount - 1]
+
+  # figure out how many boxes are in each row, and how many total boxes, and the max number of boxes in one row
+  set totboxcount 0
+  set maxboxcount 0
+  set boxcount(0) [expr int($NBITS_A / 4)]
+  if {[expr $NBITS_A % 4] != 0} {
+    incr boxcount(0)
+  }
+  set totboxcount [expr $totboxcount + $boxcount(0)]
+  if {$boxcount(0) > $maxboxcount} {
+    set maxboxcount $boxcount(0)
+  }
+  for {set i 1} {$i < $rowcount} {incr i} {
+    set prevbc $boxcount([expr $i - 1])
+    set boxcount($i) [expr int($prevbc / 2)]
+    if {[expr $prevbc % 2] != 0} {
+      incr boxcount($i)
+    }
+    set totboxcount [expr $totboxcount + $boxcount($i)]
+    if {$boxcount($i) > $maxboxcount} {
+      set maxboxcount $boxcount($i)
+    }
+  }
+
+  # add an extra row if an extra CSA is desired
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set boxcount($rowcount) 1
+    set adderloc($lastrow,1) "0 0 0"
+    incr rowcount
+    incr lastrow
+    incr totboxcount
+  }
+  
+  set c_count [expr $totboxcount - 1]
+  set carry_count [expr $c_count - 1]
+  if {$c_count == 0} {
+    set c_bitrange ""
+  } else {
+    set c_bitrange [format "\[%d\:0\]" $c_count]
+  }
+  if {$carry_count == 0} {
+    set carry_bitrange ""
+  } else {
+    set carry_bitrange [format "\[%d\:0\]" $carry_count]
+  }
+  
+  icon_term -type input -origin "-40 $icon_bot" -orient R270 -name "Cin_L$c_bitrange"
+  icon_property -origin "-40 [expr $icon_bot - 20]" -size small -label "Cin_L" -anchor center
+  icon_property -origin "-40 [expr $icon_bot - 10]" -size small -label $c_bitrange -anchor center
+  
+  icon_term -type output -origin "-40 $icon_top" -orient R270 -name "Cout_L$c_bitrange"
+  icon_property -origin "-40 [expr $icon_top + 10]" -size small -label "Cout_L" -anchor center
+  icon_property -origin "-40 [expr $icon_top + 20]" -size small -label $c_bitrange -anchor center
+  
+  if {$c_count != 0} {
+    icon_term -type output -origin "40 $icon_top" -orient R270 -name "CarryOut_H$carry_bitrange"
+    icon_property -origin "40 [expr $icon_top + 10]" -size small -label "CarryOut_H" -anchor center
+    icon_property -origin "40 [expr $icon_top + 20]" -size small -label $carry_bitrange -anchor center
+  
+    icon_term -type input -origin "40 $icon_bot" -orient R270 -name "CarryIn_H$carry_bitrange"
+    icon_property -origin "40 [expr $icon_bot - 20]" -size small -label "CarryIn_H" -anchor center
+    icon_property -origin "40 [expr $icon_bot - 10]" -size small -label $carry_bitrange -anchor center
+  }  
+
+  set wname [format "%dx%dbit" $NBITS_A $NBITS_B]
+  icon_property -origin "0 -50" -size large -label $wname -anchor center
+  icon_property -origin "0 -30" -size large -label "Multiplier" -anchor center
+  icon_property -origin "0 -10" -size large -label "Tree" -anchor center
+  icon_property -origin "0 10" -size large -label "Bitslice" -anchor center
+  icon_property -origin "0 30" -size large -label {$name} -anchor center
+  if {[string toupper $HalfHeight] == "Y"} {
+    icon_property -origin {0 50} -anchor center -label "HH"
+  }
+  
+  set prop_y $icon_y
+  icon_property -origin "-70 $prop_y" -type user -name name
+  icon_property -origin "-70 [expr $prop_y + 20]" -type user -name M
+  icon_property -origin "-70 [expr $prop_y + 40]" -type user -name dpc
+  
+  icon_special -type sccs_title_bar -origin "-70 [expr $prop_y + 100]" -owner emc -version 1.0 -date 05/18/00
+}
+
+
+ 

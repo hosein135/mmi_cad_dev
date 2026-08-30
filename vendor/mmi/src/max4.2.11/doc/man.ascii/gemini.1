@@ -1,0 +1,594 @@
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+NAME
+       gemini - compare two circuit netlists
+
+SYNOPSIS
+       gemini [options] circuit1 circuit2
+
+
+DESCRIPTION
+       Gemini  compares	 the  two circuits contained in the files
+       circuit1 and circuit2  and  determines  whether	they  are
+       equivalent.  If the circuits are different, Gemini reports
+       a set of nets and devices that it thinks are the source of
+       the  difference.	  If the circuits are too different, then
+       this set may be too large to be helpful.	  In  this  case,
+       the  user may bind corresponding nodes in the two circuits
+       to help Gemini find the source of error.
+
+       The circuit file format is the  MIT/Berkeley  SIM  format,
+       widely  used  for  CMOS	and NMOS circuits.  The algorithm
+       used by Gemini is based on general graph	 isomorphism  and
+       thus is technology independent.	For a description of this
+       format, refer to the Gemini User's Guide.
+
+       Gemini first reads the two circuit  graphs  and	prints	a
+       summary containing the number of devices and nets in each.
+       Devices are either single transistors or chains of source-
+       drain connected transistors of the same type.  Gemini then
+       executes a graph isomorphism algorithm that matches  nodes
+       between	the  two  circuits in a series of passes.  Gemini
+       prints a series of digits indicating in thousands the num-
+       ber of nodes that have been matched.
+
+       Many programs that produce SIM format produce accompanying
+       .al (alias) files containing  `='  lines	 indicating  node
+       names that are equivalent.  Gemini automatically looks for
+       .al files corresponding to the circuit files specified  in
+       the command line.  The .al file is ignored if not present.
+
+       Part of the information produced by Gemini is  the  number
+       of matches that were deduced.  This indicates how success-
+       ful the local matching algorithm was  in	 matching  nodes.
+       If  this	 number is small with respect to the total number
+       of nodes in the circuits, it indicates that  the	 circuits
+       are very symmetrical.
+
+
+OPTIONS
+       The  option flags may be specified anywhere in the command
+       line and there need not be a space between  the	flag  and
+       its argument.
+
+
+       -h     Print  a short description of Gemini's command line
+	      options.
+
+
+
+Northwest LIS Release 3.2    4/23/93				1
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       -m     Do not deduce  matches  using  the  local	 matching
+	      algorithm;  rely	solely on the global partitioning
+	      algorithm.  The default is to use both.
+
+
+       -f     Case-fold names when reading  in	the  two  circuit
+	      graphs.	The  default  is  not to case-fold names.
+	      However, case sensitive node names are  NOT  recom-
+	      mended.	Note:  Vdd  and	 GND are special; case is
+	      always ignored for these two signal names.
+
+
+       -wtolerance
+	      Compare transistor size (length and width) for each
+	      matched  pair of devices and print a warning if the
+	      difference is greater than the  tolerance.   Toler-
+	      ance  sets  the tolerance as a percentage.  If this
+	      argument is omitted, the default tolerance  is  ten
+	      (e.g.  +/- 10%).	The default is to ignore transis-
+	      tor size matching.  Note that devices in	the  cir-
+	      cuit files must include size information, otherwise
+	      a run-time abort may result.
+
+
+       -ytolerance
+	      Compare the capacitance for each	matched	 pair  of
+	      nets  and	 print	a  warning  if	the difference is
+	      greater than the	tolerance.   Tolerance	sets  the
+	      tolerance	 as  a	percentage.   If this argument is
+	      omitted, the default tolerance  is  ten  (e.g.  +/-
+	      10%).   The  default  is	to  ignore capacitor size
+	      matching.	 All capacitances  are	with  respect  to
+	      ground.
+
+
+       -z     Print  all  nets	with zero connections.	These are
+	      often extraneous items like a logo but may in  fact
+	      be  something  more  serious like an input pad that
+	      has not been connected.	The  default  is  to  not
+	      print these nets.
+
+
+       -c     Disable  the preprocessing step that Gemini uses to
+	      collapse series transistor chains	 before	 applying
+	      the  isomorphism algorithm.  The default is to col-
+	      lapse chains.  The cost of this step varies.  Typi-
+	      cally 0-20% of the execution time is spent collaps-
+	      ing chains, but in some cases it may be 50%.
+
+
+       -C     Restrict the chain collapsing algorithm to collapse
+	      chains  only  if the candidate transistors have the
+	      same size (length and width).  The  default  is  to
+	      collapse chains without regard to size.
+
+
+
+Northwest LIS Release 3.2    4/23/93				2
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       -cw    Enable  warnings for those series transistors whose
+	      order does not  correspond  in  the  two	circuits.
+	      (Note  that -c and -cw are exclusive.)  The default
+	      is no warning other than a count of the  number  of
+	      series connected transistors out of order.
+
+
+       -F     Disable  the preprocessing step that Gemini uses to
+	      collapse	fingered  (parallel)  transistors  before
+	      applying the isomorphism algorithm.  The default is
+	      to collapse fingers.
+
+
+       -nnumber
+	      Set the threshold for inhibiting net information on
+	      mismatched  nets.	 If the net has fewer than number
+	      connections, then information is	printed	 out  for
+	      each  connection.	  Otherwise, only the net name is
+	      printed.	The default value is 10.
+
+
+       -v     Turn on Verbose mode.  This may cause more detailed
+	      information  to  be  printed  for nets and devices.
+	      Default mode is off.
+
+
+       -E  filename
+	      Read an equivalence file that  binds  corresponding
+	      nodes  in	 the two circuits.  Each line in the file
+	      begins with an equals sign (`=')	followed  by  two
+	      names,  the  first  from the first circuit and fol-
+	      lowed a name from the second; space or tab separate
+	      arguments.   These  two  nodes  are  bound together
+	      before the circuit graphs are matched.  Lines  that
+	      begin with a semicolon (`;') are ignored.
+
+
+       -D  filename
+	      Create  a dictionary file that indicates the match-
+	      ing nodes in the two circuits.  The file format  is
+	      the  same	 as  the  equivalence  file format.  Only
+	      nodes with real names (not *) are printed	 in  this
+	      file.
+
+
+       -M  symbol[:number]
+	      Create  an error file in Magic format, highlighting
+	      the devices that appear in the error  report.   The
+	      SIM  file	 extracted  from  Magic must be the first
+	      circuit specified on the command line.   Symbol  is
+	      the  name	 of  the root symbol of the Magic layout.
+	      The Magic output file is	produced  with	the  name
+	      "symbol.err.mag" and contains both labels and rect-
+	      angles on the error  layer  for  each  device  that
+
+
+
+Northwest LIS Release 3.2    4/23/93				3
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+	      appears in the device error list or as a connection
+	      in the net error list.  The devices  from	 the  two
+	      lists  are  distinguished by the label used.  A "D"
+	      label indicates  a  non-matching	device.	  An  "N"
+	      label  indicates	the device is connected to a non-
+	      matching net whose name is also given.  (Of  course
+	      a	 device	 may have both a D and N label.)  (The -n
+	      option can be used to control the devices listed in
+	      the  net	error  list.)  An optional number after a
+	      colon gives the value of lambda in CIF units.   The
+	      default  value  is 100 (corresponding to a 2 micron
+	      process).
+
+	      If  the  -cw  option  is	used,  transistor  chains
+	      appearing out of order are marked.  The error label
+	      given is "SIZE".	If the -w option is  used,  tran-
+	      sistors	with  sizes  outside  the  tolerance  are
+	      marked.  The error label indicates the size of  the
+	      matching transistor in the other circuit.
+
+
+       -G     Use  the Gemini input format instead of the default
+	      SIM format.  Note: this  feature	is  not	 actively
+	      supported; caveat emptor.
+
+
+       -I     Run  Gemini interactively.  This allows the user to
+	      give Gemini some help when  it  comes  to	 matching
+	      ambiguous	 nodes.	  An exclamation point (`!') as a
+	      user's response tells Gemini  to	continue  without
+	      asking any more questions.
+
+
+       The  following  flags  change  the  parameters used by the
+       graph isomorphism algorithm of Gemini.  Users are  advised
+       to leave these alone unless they understand what the algo-
+       rithm is doing.
+
+
+       -t     Trace the progress of the labeling procedure.  This
+	      shows  how  much	trouble Gemini is having with the
+	      circuit.
+
+
+       -o     Do not optimize the labeling procedure.  This means
+	      that ALL nodes are relabeled on every pass.
+
+
+       -pnumber
+	      Specify  the  number  of	labeling  passes where no
+	      progress is detected before trying something  dras-
+	      tic.  The default value is 2.
+
+
+
+
+
+Northwest LIS Release 3.2    4/23/93				4
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       -snumber
+	      Specify	the  number  of times  suspect	nodes are
+	      relabeled where no progress is detected before try-
+	      ing something even more drastic.	The default value
+	      is 1.
+
+
+       -enumber
+	      Gemini is allowed to stop when there are less  than
+	      this  many  unresolved  nodes  left in the two cir-
+	      cuits.  The default  value  is  0.   Changing  this
+	      value is not recommended.
+
+
+ERROR REPORT
+       Gemini  produces	 error	reports	 as  listings of nets and
+       devices it thinks are at fault.	The key idea is that  the
+       circuits	 are  identical if the given nets and devices are
+       deleted from the circuits.  Gemini has 2 different classes
+       of  error  nodes:  those	 that it thinks are definitely in
+       error and those that may be OK if the nodes in  the  first
+       class  are  fixed.   In general, it is best to examine all
+       nodes in the error report.
+
+       Devices and nets are printed in varying detail.	Nets  are
+       identified  by name and the devices to which they are con-
+       nected.	The -n option allows more or less  detail  to  be
+       shown  for  nets.  Devices are identified by name (if any)
+       and the nets to which they are connected.   These  connec-
+       tions  are listed in the same order as given in the device
+       definitions.  For SIM file  transistors,	 the  connections
+       are  listed  in	the same order as in the SIM file -- gate
+       followed by source and drain.   For  devices  representing
+       series  connected transistors, the gates are listed first,
+       in the order in which they appear between  the  collective
+       source and drain.
+
+
+SERIES CONNECTED TRANSISTORS
+       Unless  the  -c flag is used, series connected transistors
+       are merged into single devices.	Gemini	checks	as  these
+       devices	are  matched  to make sure the transistors are in
+       the same order in both circuits and prints a  warning  (if
+       -cw  is	used)  if  they are not.  In symmetrical circuits
+       where are there are chains with the  same  gate	sequence,
+       but  with  a different order, Gemini may arbitrarily match
+       the wrong chains and print a warning.  (This will be fixed
+       in a later version of Gemini.)
+
+
+FINGERED (PARALLEL) TRANSISTORS
+       Fingered	 or  parallel  transistors  share  the same gate,
+       source and drain connections.  They are equivalent to wide
+       single  transistors.  They are often used for high current
+
+
+
+Northwest LIS Release 3.2    4/23/93				5
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       structures such as clock drivers	 and  output  pads.   Two
+       transistors are candidates for combining if they are prim-
+       itive types (n or  p),  share  the  same	 primitive  type,
+       share  the  same gate, source and drain, and have the same
+       channel length.	Unless the -F  flag  is	 used,	candidate
+       transistors  are	 merged	 into  a  single transistor whose
+       width is the sum of the widths of the uncombined	 transis-
+       tors.
+
+
+USER-DEFINED DEVICES
+       Starting	 with  release 2.5, Gemini allows an extension of
+       the UCB/MIT  SIM	 format	 for  user-defined  devices  (see
+       sim(5)).	  User-defined	devices	 have two parts: the type
+       definition and the instance declaration.	 The type defini-
+       tion has the form
+
+	    DEFINE mydevice a a b c
+
+       and the instance has the form
+
+	    mydevice in2 in3 out5 out7 ; XYZ
+
+       XYZ is an optional attribute list.  The current version of
+       Gemini ignores the attribute list in user-defined devices,
+       but  it	may  be considered by the matching algorithm in a
+       future version.	The formal parameters in the type defini-
+       tion denote terminal classes.  Repeated parameter names in
+       the type definition denote symmetry,  i.e.  class  equiva-
+       lence.	Many  functions allow the inputs to appear in any
+       order (e.g. parity checking), and the  matching	algorithm
+       considers  all  symmetric  permutations	to  be	potential
+       matches.	 User-defined type  usages  that  are  not  well-
+       formed  cause  Gemini  to  terminate abnormally.	 The line
+       number and name of the input file are indicated in case of
+       error to help the user isolate the problem.
+
+       Here are the restrictions on user-defined types.	 The name
+       of a user-defined type must contain two or  more	 alphanu-
+       meric  characters.  Type definitions must precede instance
+       declarations in the input file.	Multiple definitions  may
+       appear for the same type but they must be consistent.  The
+       number of arguments in the instance  declaration	 must  be
+       the  same  as  the number of formal parameters in the type
+       definition.  User-defined  devices  are	neither	 combined
+       into  chains  nor folded.  If an attribute list is present
+       in an instance declaration, then	 whitespace  is	 required
+       between the last argument and the semicolon.
+
+
+SYMMETRIC CIRCUITS
+       When  there  is	symmetry  in the circuits being compared,
+       there are many different	 ways  that  some  nodes  can  be
+       matched	between	 the  two  circuits.   For  example, in a
+
+
+
+Northwest LIS Release 3.2    4/23/93				6
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       memory array, the word lines and bit lines can be permuted
+       giving  an  exponential	number of different ways to match
+       the nodes in the two circuits.  When Gemini  detects  that
+       its  algorithm  is making no progress, it assumes that the
+       problem is one of symmetry.  It also assumes that the par-
+       titions	that it has at that point are automorphism parti-
+       tions so that any match between nodes in	 matching  parti-
+       tions  is valid.	 If this assumption is invalid, then Gem-
+       ini may, in its arbitrary choice of two nodes, pick  nodes
+       that  do	 not match and then erroneously conclude that the
+       circuits are different.	If this happens, Gemini throws up
+       its  hands and refuses to conclude anything about the cir-
+       cuits.  The user must then use  the  equivalence	 file  to
+       remove  the  symmetry  causing the problem.  In the memory
+       example, this can be done by binding  the  address  inputs
+       and  the	 data outputs.	Although removing symmetry is not
+       often required, it can speed up the execution time.
+
+
+FINDING DIFFERENCES
+       When two circuits are different, Gemini attempts	 to  pin-
+       point  the  source of the difference.  This is a very hard
+       problem in general, and sometimes  Gemini  does	not  give
+       very  accurate feedback, especially if there are many dif-
+       ferences or if there is a lot of symmetry.  Here are  some
+       hints on how to proceed in this situation.
+
+
+       1.     Don't  use  Gemini  if the size of the two circuits
+	      differ by more than a few (~ 1%) nodes.
+
+
+       2.     If node names are easily decipherable,  generate	a
+	      dictionary  file	to find nodes that have been mis-
+	      matched in error.	 Such nodes  can  then	be  bound
+	      correctly using the equivalence file.
+
+
+       3.     Use  an  equivalence  file to give Gemini an anchor
+	      from which to work.  This file can be derived  from
+	      the  dictionary file.  The equivalence file is very
+	      important when  the  circuits  contain  substantial
+	      symmetry.
+
+
+       4.     Sometimes it is useful to turn off the local match-
+	      ing algorithm with the -m option and see if a  dif-
+	      ferent  set of discrepancies are flagged.	 This may
+	      give a hint as to the problem.
+
+
+DOUBLECHECKING GEMINI
+       Old versions of Gemini have been known to report differing
+       circuits	 as  being the same.  The way to ensure that this
+
+
+
+Northwest LIS Release 3.2    4/23/93				7
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       is not the case is to create a dictionary file  using  the
+       -D  option  and then rerun Gemini using the -E option with
+       this file.  There have been no reported instances of  this
+       type  of error with this version of Gemini.  PLEASE send a
+       bug report if you suspect that this has happened to you.
+
+
+RUN-TIME ERRORS
+       Gemini checks the internal consistency of its algorithm as
+       it  executes,  using run-time assertions.  If an assertion
+       fails, the program is unable to continue	 and  it  aborts.
+       If the -D option is used, Gemini writes out all the equiv-
+       alence information it had deduced  before  the  error  was
+       encountered.  This allows the user to iterate the process;
+       using the equivalence information will avoid  the  consis-
+       tency error on subsequent passes.  Failed assertions under
+       previous versions of Gemini sometimes caused  a	core-dump
+       or  an infinite loop, and no dictionary file was produced.
+
+       Run-time failures should be rare.  Send a bug  report  for
+       any  input  set	that  causes a run-time abort, especially
+       those that fail without printing	 the  message  "Assertion
+       failed."
+
+
+
+SEE ALSO
+	sim(5)
+	The Gemini User's Manual
+
+
+AUTHOR
+       Carl Ebeling, University of Washington
+	   ebeling@cs.washington.edu
+
+
+MAINTAINERS
+       Neil McKenzie, University of Washington
+	   mckenzie@cs.washington.edu
+
+       Larry McMurchie, University of Washington
+	   larry@cs.washington.edu
+
+
+BUGS
+       The Gemini file format is not actively supported.
+
+       Gemini  sometimes thinks that isomorphic circuits are dif-
+       ferent because it does  not  backtrack  on  the	guess  it
+       makes.
+
+       Old  versions of Gemini have been known to think that dif-
+       ferent  circuits	 were  isomorphic.   The  -E/-D	 checking
+       method described above can be used to doublecheck.
+
+
+
+Northwest LIS Release 3.2    4/23/93				8
+
+
+
+
+
+GEMINI(1.VLSI)	     VLSI Design Tools Manual	   GEMINI(1.VLSI)
+
+
+       Discrepancies  between  circuits	 are  sometimes	 not pin-
+       pointed well enough.
+
+       In rare cases, run-time errors may occur if  the	 circuits
+       are different.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Northwest LIS Release 3.2    4/23/93				9
+
+

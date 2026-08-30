@@ -1,0 +1,9 @@
+set NETLIST_CACHE(xgate,cells) {{icon nmos {}} {icon pmos {}}}
+set netlist_props verilog
+set netlist_level 1000
+set NETLIST_CACHE(xgate,version) MMI_SUE4.2.2
+set NETLIST_CACHE(xgate) {{module xgate (in, in_L, t1, t2);} {	inout		t1;} {	inout		t2;} {	input		in;} {	input		in_L;} { } {	pmos p(t2,t1,in_L);} {	nmos n(t2,t1,in);} {} {endmodule		// xgate} {}}
+set NETLIST_CACHE(xgate,names) {{590 280 {1 t2}} {480 310 {0 t1}} {520 190 {1 in} {2 in}} {520 370 {0 in_L} {2 in_L}} {520 250 {0 n}} {560 250 {0 t2}} {520 310 {0 p}} {480 250 {0 t1}} {450 280 {1 t1}} {560 310 {0 t2}}}
+set NETLIST_CACHE(xgate,wires) {{450 310 480 310 t1} {450 250 480 250 t1} {560 250 590 250 t2} {560 310 590 310 t2} {590 280 590 310 t2} {590 250 590 280 t2} {450 250 450 280 t1} {450 280 450 310 t1}}
+set NETLIST_CACHE(xgate,dpc) {{{0 0 0 n nmos 10 10 {{t2 inout d 5.0 5.0} {t1 inout s 5.0 5.0} {in input g 5.0 5.0}} {} {}} {0 10 0 p pmos 10 10 {{t2 inout d 5.0 5.0} {t1 inout s 5.0 5.0} {in_L input g 5.0 5.0}} {} {}}} {{} {}} {20 10 1} {{DPC WARNING: No size data for gates: nmos pmos.  Using default width and height of 10, 10 grids.}}}
+set NETLIST_CACHE(xgate,dpc_size) {{nmos nmos 10 10 1} {pmos pmos 10 10 1}}

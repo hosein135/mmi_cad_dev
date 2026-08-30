@@ -1,0 +1,20 @@
+#!/bin/csh -f
+
+# Script that Pearl runs to spice last critical path
+# Need to first fix the spice netlist with pearl_convert.tcl
+# args: in_file out_file plt_file ctl_file
+
+# MUST SET THIS PATH TO USE
+set root = /proj/tech/mmi25
+
+# first translate the spice input file
+set filename = tmp$$
+$root/library/pearl/pearl_convert.tcl $1 >! $filename
+mv $1 $1.old
+mv $filename $1
+
+# now run spice
+spice $1
+
+exit
+

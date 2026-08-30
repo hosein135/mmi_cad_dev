@@ -1,0 +1,343 @@
+; ****************************************************
+; *  0.35um DRC COMMAND FILE VER  2                  *
+; *  FOR TSMC LOGIC 0.35um SPQM 3.3V SILICIDE PROCESS*
+; *    (DESIGN RULE DOCUMENT: TA-1095-4001           *
+; ****************************************************
+;
+;****************   UPDATE DATE    *******************
+;                                                       
+;   6/27/1996                                           
+;                                                    
+;****************  USER NOTEMENTS  *******************
+;
+; 0) This rule command file is for user's references.
+; 1) The design rule dimension in this command file is using on silicon 
+;    dimension.
+; 2) This command file don't include sizing part for each layer.
+; 3) This command file is default for GDS data format.
+; 4) This command file only executes geometry checking, doesn't work for 
+;    electric.
+; 5) Users should input correct the "INPUT-LAYER" number, and related data
+;    file name.
+;
+;************  DESCRIPTION BLOCK  *****************
+;
+*DESCRIPTION
+  PRIMARY     = 
+  INDISK      = 
+  OUTDISK     = 
+  SYSTEM      = GDS2
+  SCALE       = .001 MICRON
+  RESOLUTION  = .01 MICRON
+  LISTERROR   = YES
+  PRINTFILE   = drc 
+  CNAMES-CSEN = YES
+  STATUS-COMMAND="cat jxsub.com >! ASIC_ERR.DB"
+  PROGRAM-DIR = /usr/cadence/dracula/   
+*END
+;
+;************  INPUT  LAYER  BLOCK  *****************
+;
+*INPUT-LAYER
+  NWELLBM  = 2
+  OD_BM    = 11 ; active area
+  POLY_BM  = 13
+  PP_BM    = 7  ; P+ imp area
+  NP_BM    = 8  ; N+ imp area
+  CO       = 15 ; contact
+  M1_BM    = 16 ; metal-1 
+  VIA      = 17 ; VIA  ( M1/VIA/M2 )
+  M2_BM    = 18 ; metal-2
+  VIA2     = 27 ; VIA2  ( M2/VIA2/M3 )
+  M3_BM    = 28 ; metal-3
+  VIA3     = 29 ; VIA3  
+  M4_BM    = 31 ; metal-4
+  CB       = 19 ; Passivation Window
+  ESD_BM   = 30 ; I/O area
+  RE       = 40 ; Resistor Protection Oxide 
+  SUBSTRATE = BULK 63 
+*END
+;*************************************************
+;**                                             **
+;**               MERGE BLOCK                   **
+;**                                             **
+;*************************************************
+*OPERATION
+  SIZE NWELLBM BY 0.01 NWELL_M
+  SIZE NWELL_M BY -0.01 NWELL
+;    
+  SIZE OD_BM BY 0.01 OD_M
+  SIZE OD_M BY -0.01 OD
+;    
+  SIZE POLY_BM BY 0.01 POLY_M
+  SIZE POLY_M BY -0.01 POLY
+;    
+  SIZE NP_BM BY 0.01 NP_M
+  SIZE NP_M BY -0.01 NP
+;    
+  SIZE PP_BM BY 0.01 PP_M
+  SIZE PP_M BY -0.01 PP
+;    
+  SIZE M1_BM BY 0.01 M1_M
+  SIZE M1_M BY -0.01 M1
+;    
+  SIZE M2_BM BY 0.01 M2_M
+  SIZE M2_M BY -0.01 M2
+;    
+  SIZE M3_BM BY 0.01 M3_M
+  SIZE M3_M BY -0.01 M3
+;    
+  SIZE M4_BM BY 0.01 M4_M
+  SIZE M4_M BY -0.01 M4
+;    
+  SIZE ESD_BM BY 0.01 ESD_M
+  SIZE ESD_M BY -0.01 ESD
+; ***************  END MERGE  *******************
+;
+;*************************************************
+;**                                             **
+;**              LAYER DEFINITION               **
+;**                                             **
+;*************************************************
+;
+  AND POLY OD GATE1
+  AND PP OD PPOD1
+  NOT PPOD1 POLY PPOD
+  SELECT GATE1 TOUCH[2:2] PPOD GATEP
+  AND NP OD NPOD1
+  NOT NPOD1 POLY NPOD
+  SELECT GATE1 TOUCH[2:2] NPOD GATEN
+  OR GATEN GATEP GATE
+  ;
+  OR PP NP IMP
+  ;
+  AND OD NWELL ODNW
+  NOT OD ODNW  ODPW
+  ;
+  AND PP ODNW PPODNW
+  AND PP ODPW PPODPW
+  AND NP ODNW NPODNW
+  AND NP ODPW NPODPW
+  ;
+  AND OD RE ODRE
+  AND POLY RE POLYRE
+  NOT OD RE ODNRE
+  NOT POLY RE POLYNRE
+  ;
+  NOT POLY GATE POFOX
+  AND CO POFOX COPOLY
+  ;
+  AND CO CB COCB
+  AND via CB v1cb
+  AND via2 CB v2cb
+  AND via3 CB v3cb
+;
+;*************************************************
+;**                                             **
+;**                 DRC CHECK                   **
+;**                                             **
+;*************************************************
+;######################
+;#####   N-WELL   #####
+;######################
+;
+  WIDTH NWELL LT 1.7 OUTPUT NWW 01              ; NW.W.1
+  EXT[H] NWELL LT 1.0 OUTPUT NWS 02             ; NW.S.2
+ ; (NW with different potential rule not included)
+;
+;######################
+;#####     OD     #####
+;######################
+;
+  ENC[TR] GATE POLY LT 0.001 GATEW 
+  PLENGTH GATEW RANGE 0 0.4 OUTPUT ODW 01       ; OD.W.1
+  SELECT OD TOUCH[2:2] POLY OD1
+  NOT OD OD1 ODIN
+  WIDTH ODIN LT 0.5 OUTPUT ODW 02               ; OD.W.2 
+						;( MIN WIDTH FOR INTERCONNECT )
+  EXT[H] PPOD LT 0.6 OUTPUT ODSN 01             ; OD.S.1 
+  EXT[H] NPOD LT 0.6 OUTPUT ODSP 01             ; OD.S.1 
+  ENC[T] NPODNW NWELL LT 0.2 OUTPUT ODC 01      ; OD.C.1
+  EXT[T] NPODPW NWELL LT 1.2 OUTPUT ODC 02      ; OD.C.2 ( FOR COLD-NWELL )
+  ENC[T] PPODNW NWELL LT 1.2 OUTPUT ODC 04      ; OD.C.4
+  EXT[T] PPODPW NWELL LT 0.2 OUTPUT ODC 05      ; OD.C.5
+  EXT[T] NPODNW PPODNW LT 0.001 &
+  EXT[TP] NPODNW GATEP LT 0.45 OUTPUT ODCN 06   ; OD.C.6
+  EXT[T] PPODPW NPODPW LT 0.001 &
+  EXT[TP] PPODPW GATEN LT 0.45 OUTPUT ODCP 06   ; OD.C.6  
+  EXT[O] PPOD NPOD LT 0.6 OUTPUT ODS 02         ; OD.S.2
+;
+;######################
+;#####    POLY    #####
+;######################
+;
+  ENC[TR] GATE OD LT 0.001 GATEL
+  PLENGTH GATEL RANGE 0 0.35 OUTPUT POW 01      ; PO.W.1, PO.W.2
+  WIDTH POLY LT 0.35 OUTPUT POW 02              ; PO.W.3
+  EXT GATE LT 0.65 OUTPUT POS 01                ; PO.S.1
+  EXT POFOX LT 0.45 OUTPUT POS 02               ; PO.S.2
+  EXT POFOX OD LT 0.2 OUTPUT POC 01             ; PO.C.1
+  ENC[T] GATE POLY LT 0.001 &
+  ENC GATE OD LT 0.6 OUTPUT POC 02              ; PO.C.2
+  ENC[T] GATE OD LT 0.001 &
+  ENC[TP] GATE POLY LT 0.4  OUTPUT POO 01       ; PO.O.1
+;  
+;######################
+;#####   P-PLUS   #####
+;######################
+;
+  WIDTH PP LT 0.6 OUTPUT PPW 01                 ; PP.W.1
+  EXT PP LT 0.6 OUTPUT PPS 01                   ; PP.S.1
+  EXT PP OD LT 0.35 OUTPUT PPC 01               ; PP.C.1
+						; PP.C.2(is the same to OD.C.6 )
+  ENC[T] GATEP POLY LT 0.001 &
+  ENC[TP] GATEP PP LT 0.45 OUTPUT PPC 03        ; PP.C.3
+  ;
+  INT PP OD LT 0.45 OUTPUT PPO 01               ; PP.O.1
+  ;;  
+  ENC[T] OD IMP LT 0.25 OUTPUT PNE 01           ; PP.E.1, NP.E.1     
+  ;;
+  AND NP POLY NPPO
+  AND PP POLY PPPO
+  EXT[TO] NPPO PPPO LT 0.25 OUTPUT PPC 05       ; PP.C.5,NP.C.5,PP.R.1  
+  ;;
+  AND PPODPW NPODPW PPTMP1
+  AND PPODNW NPODNW PPTMP2
+  OR PPTMP1 PPTMP2 PPTMP OUTPUT PPC 06          ; PP.C.6, NP.C.6
+;
+;######################
+;#####   N-PLUS   #####
+;######################
+;
+  WIDTH NP LT 0.6 OUTPUT NPW 01                 ; NP.W.1
+  EXT NP LT 0.6 OUTPUT NPS 01                   ; NP.S.1
+  EXT NP OD LT 0.35 OUTPUT NPC 01               ; NP.C.1
+						; NP.C.2(is the same to OD.C.6 )
+  ENC[T] GATEN POLY LT 0.001 &
+  ENC[TP] GATEN NP LT 0.45 OUTPUT NPC 03        ; NP.C.3
+  ;
+  INT NP OD LT 0.45 OUTPUT NPO 01               ; NP.O.1 
+;
+;######################
+;#####     CO     #####
+;######################
+;  
+  WIDTH CO LT 0.4 OUTPUT COW 01                 ; CO.W.1
+						; for Minimum width
+  ;
+  SIZE CO BY -0.2 COTMP
+  AREA COTMP RANGE 0 100 OUTPUT COWM 01         ; CO.W.1 for Maximum width
+  ; 
+  EXT CO LT 0.4 OUTPUT COS 01                   ; CO.S.1
+  AND CO OD COOD 
+  EXT COOD POLY LT 0.3 OUTPUT COC 01            ; CO.C.1
+  EXT[TO] COPOLY OD LT 0.4 OUTPUT COC 02        ; CO.C.2
+  ENC[T] CO OD LT 0.25 OUTPUT COE 01            ; CO.E.1 
+					
+  ENC[T] COPOLY POLY LT 0.2 OUTPUT COE 02       ; CO.E.2
+  ;
+  ENC[T] COOD PP LT 0.25 OUTPUT COE 03          ; CO.E.3
+  ENC[T] COOD NP LT 0.25 OUTPUT COE 04          ; CO.E.4
+  ;
+  AND CO GATE COGATE OUTPUT COR 01              ; CO.R.1
+  ;
+;
+;######################
+;#####     M1     #####
+;######################
+;
+  WIDTH M1 LT 0.5 OUTPUT M1W 01                 ; M1.W.1
+  EXT M1 LT 0.45 OUTPUT M1S 01                  ; M1.S.1
+  ENC[ETO] CO M1 LT 0.15 OUTPUT M1E 01          ; M1.E.1
+;
+;######################
+;#####    VIA     #####
+;######################
+;
+  WIDTH VIA LT 0.5 OUTPUT VIW 01                ; VIA1.W.1
+  not via v1cb via1n
+  SIZE via1n BY -0.25 v1tmp
+  AREA v1tmp RANGE 0 10000 OUTPUT viw2 01       ; via1.W.1 for Maximum width
+  EXT VIA LT 0.45 OUTPUT VIS 01                 ; VIA1.S.1
+  ENC[ETO] VIA M1 LT 0.2 OUTPUT VIE 01          ; VIA1.E.1
+; 
+;######################
+;#####     M2     #####
+;######################
+;
+  WIDTH M2 LT 0.6 OUTPUT M2W 01                 ; M2.W.1
+  EXT M2 LT 0.5 OUTPUT M2S 01                   ; M2.S.1
+  ENC[ETO] VIA M2 LT 0.15 OUTPUT M2E 01         ; M2.E.1
+;
+;######################
+;#####    VIA2    #####
+;######################
+;
+  WIDTH VIA2 LT 0.5 OUTPUT V2W 01               ; VIA2.W.1
+  not via2 v2cb via2n
+  SIZE via2n BY -0.25 v2tmp
+  AREA v2tmp RANGE 0 10000 OUTPUT v2w2 01       ; via2.W.1 for Maximum width 
+  EXT VIA2 LT 0.45 OUTPUT V2S 01                ; VIA2.S.1
+  ENC[ETO] VIA2 M2 LT 0.2 OUTPUT V2E 01         ; VIA2.E.1
+;
+;######################
+;#####     M3     #####
+;######################
+;
+  WIDTH M3 LT 0.6 OUTPUT M3W 01                 ; M3.W.1
+  EXT M3 LT 0.5 OUTPUT M3S 01                   ; M3.S.1
+  ENC[ETO] VIA2 M3 LT 0.15 OUTPUT M3E 01        ; M3.E.1
+;
+;######################
+;#####    VIA3    #####
+;######################
+;
+  WIDTH VIA3 LT 0.5 OUTPUT V3W 01               ; VIA3.W.1
+  not via3 v3cb via3n
+  SIZE via3n BY -0.25 v3tmp
+  AREA v3tmp RANGE 0 10000 OUTPUT v3w2 01       ; via3.W.1 for Maximum width 
+  EXT VIA3 LT 0.45 OUTPUT V3S 01                ; VIA3.S.1
+  ENC[ETO] VIA3 M3 LT 0.2 OUTPUT V3E 01         ; VIA3.E.1
+;
+;######################
+;#####     M4     #####
+;######################
+;
+  WIDTH M4 LT 0.6 OUTPUT M4W 01                 ; M4.W.1
+  EXT M4 LT 0.6 OUTPUT M4S 01                   ; M4.S.1
+  ENC[ETO] VIA3 M4 LT 0.15 OUTPUT M4E 01        ; M4.E.1
+;
+;######################
+;#####     CB     #####
+;######################
+;
+;CB RULE NOT INCLUDED IN THIS DRC FILE
+; 
+;######################
+;#####    ESD     #####
+;######################
+;
+  WIDTH ESD LT 0.6 OUTPUT ESDW 01               ; ESD.W.1
+  EXT ESD LT 0.6 OUTPUT ESDS 01                 ; ESD.S.1
+  AND ESD OD ESDOD
+  ENC ESDOD OD LT 0.5 OUTPUT ESDE 01            ; ESD.E.1
+  AND ESD CO ESDCO
+  ENC ESDCO ESD LT 0.5 OUTPUT ESDE 02           ; ESD.E.2
+  EXT[TO] ESD GATEN LT 0.5 OUTPUT ESDC 01       ; ESD.C.1
+  AND PPODPW ESDOD ESDTMP1
+  AND PPODNW ESDOD ESDTMP2
+  OR ESDTMP1 ESDTMP2 ESDTMP OUTPUT ESDC 02      ; ESD.C.2
+;
+;######################
+;#### RESIST OXIDE ####
+;######################
+;
+  WIDTH RE LT 0.8 OUTPUT RPW 01                 ; RPO.W.1
+  EXT[H] RE LT 0.8 OUTPUT RPS 01                ; RPO.S.1
+  EXT ODNRE RE LT 0.4 OUTPUT RPC 01             ; RPO.C.1
+  EXT COOD RE LT 0.4 OUTPUT RPC 02              ; RPO.C.2
+  EXT GATE RE LT 0.6 OUTPUT RPC 03              ; RPO.C.3
+  ENC ODRE RE LT 0.4 OUTPUT RPC 04              ; RPO.C.4
+  ENC ODRE OD LT 0.6 OUTPUT RPE 01              ; RPO.E.1
+*END 
+; 

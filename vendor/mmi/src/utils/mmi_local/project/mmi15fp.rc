@@ -1,0 +1,24 @@
+set dir $env(MMI_LOCAL)/project
+source $dir/mmi15.rc
+
+# Are we in max?
+if {$TOOL == "MAX"} {
+
+    # This communicates the technology to max.
+    set MAX_TECHNOLOGY mmi15-fplan
+
+    if {[info commands fplan_init] == "fplan_init"} {fplan_init}
+    set FPLAN(verilog_autoload) 1
+
+    # Floor-planner cell grid
+    # Set the over-all cell grid used for top level blocks here.
+    # Floor-planner cell grid - used for cell movement.
+    catch {grid_set -number 4 -rename fplan-block \
+	-user "6.2 1.24" -coarse "6.2 1.24" -fine "0.62 0.62" \
+	-coarse_visibility lines -fine_visibility dots}
+
+    if {[info commands fplan_read_lef] == "fplan_read_lef"} {
+	fplan_read_lef $FPLAN(DEFAULT_LEF_FILE)
+	fplan_read_lef -read_nl 0 $FPLAN(DEFAULT_LEF_HEADER_FILE)
+    }
+}

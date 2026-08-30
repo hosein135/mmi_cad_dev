@@ -1,0 +1,512 @@
+# This is a generator for a bitslice of a multiplier's partial product generation logic.
+
+proc NAME_mmig_ppg_slice args {
+  call_use_keyword $args {{NBITS 8} {Algorithm "Simple"} {A "Unsigned"} {ReduceInputLoad "N"}}
+
+  # NBITS
+  set nom [format "mmig_ppg_slice_%d" $NBITS]
+
+  # A
+  if {[string toupper $A] == "SIGNED"} {
+    set nom [format "%sS_" $nom]
+  }
+  if {[string toupper $A] == "UNSIGNED"} {
+    set nom [format "%sU_" $nom]
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set nom [format "%sB_" $nom]
+  }
+
+  # Algorithm
+  if {[string toupper $Algorithm] == "SIMPLE"} {
+    set nom [format "%sS" $nom]
+  }
+
+  # ReduceInputLoad
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_ppg_slice args {
+  call_use_keyword $args {{NBITS 8} {Algorithm "Simple"} {A "Unsigned"} {ReduceInputLoad "N"}}
+
+  global DPC
+
+  # drawing origin
+  set base_x -200
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 60
+
+  # icon info
+  # MMI_NAND2
+  setl {nand2count nand2inpins nand2outpins nand2inoutpins} [generators_get_pin_info "MMI_NAND2"]
+  # in
+  set npins [get_assoc ninputs $nand2count]
+  for {set i 0} {$i < $npins} {incr i} {
+    set data [lindex $nand2inpins $i]
+    set nand_in_x($i) [lindex $data 1]
+    set nand_in_y($i) [lindex $data 2]
+  }
+  # out
+  setl {nand_out_x nand_out_y} [generators_get_pin_xy "out" $nand2outpins]
+  # dimensions
+  setl {nand_x nand_y junk1 junk2 junk3 junk4} [generators_get_icon_size "MMI_NAND2"]
+
+  # MMI_NAND3
+  setl {nand3count nand3inpins nand3outpins nand3inoutpins} [generators_get_pin_info "MMI_NAND3"]
+  # in
+  set npins [get_assoc ninputs $nand3count]
+  for {set i 0} {$i < $npins} {incr i} {
+    set data [lindex $nand3inpins $i]
+    set nand3_in_x($i) [lindex $data 1]
+    set nand3_in_y($i) [lindex $data 2]
+  }
+  # out
+  setl {nand3_out_x nand3_out_y} [generators_get_pin_xy "out" $nand3outpins]
+
+  # MMI_INV
+  setl {invcount invinpins invoutpins invinoutpins} [generators_get_pin_info "MMI_INV"]
+  # in
+  setl {inv_in_x inv_in_y} [generators_get_pin_xy "in" $invinpins]
+  # out
+  setl {inv_out_x inv_out_y} [generators_get_pin_xy "out" $invoutpins]
+  # dimensions
+  setl {inv_x inv_y junk1 junk2 junk3 junk4} [generators_get_icon_size "MMI_INV"]
+
+  # MMI_BUF
+  setl {bufcount bufinpins bufoutpins bufinoutpins} [generators_get_pin_info "MMI_BUF"]
+  # in
+  setl {buf_in_x buf_in_y} [generators_get_pin_xy "in" $bufinpins]
+  # out
+  setl {buf_out_x buf_out_y} [generators_get_pin_xy "out" $bufoutpins]
+  # dimensions
+  setl {buf_x buf_y junk1 junk2 junk3 junk4} [generators_get_icon_size "MMI_BUF"]
+
+  # select the drive strengths
+  if {$NBITS <= 12} {
+    set small 1
+
+    # buffer
+    set buf_0_size "D"
+    set buf_0_demorgan 0
+
+    # inv_0
+    set inv_0_size "A"
+    set inv_0_demorgan 0
+
+    # inv_1
+    if {[string toupper $ReduceInputLoad] == "Y"} {
+      set inv_1_size "A"
+    } else {
+      set inv_1_size "B"
+    }
+    set inv_1_demorgan 0
+
+    # inv_2
+    set inv_2_size "C"
+    set inv_2_demorgan 0
+
+    # inv_3
+    set inv_3_size "D"
+    set inv_3_demorgan 1
+
+    # nand2_0
+    set nand2_0_size "B"
+    set nand2_0_demorgan 1
+
+    # nand2_1
+    if {[string toupper $ReduceInputLoad] == "Y"} {
+      set nand2_1_size "B"
+    } else {
+      set nand2_1_size "C"
+    }
+    set nand2_1_demorgan 0
+
+    # nand3_0
+    set nand3_0_size "C"
+    set nand3_0_demorgan 0
+
+  } else {
+    set small 0
+
+    # buffer
+    set buf_0_size "E"
+    set buf_0_demorgan 0
+
+    # inv_0
+    set inv_0_size "B"
+    set inv_0_demorgan 0
+
+    # inv_1
+    if {[string toupper $ReduceInputLoad] == "Y"} {
+      set inv_1_size "B"
+    } else {
+      set inv_1_size "C"
+    }
+    set inv_1_demorgan 0
+
+    # inv_2
+    set inv_2_size "D"
+    set inv_2_demorgan 0
+
+    # inv_3
+    set inv_3_size "E"
+    set inv_3_demorgan 1
+
+    # nand2_0
+    set nand2_0_size "C"
+    set nand2_0_demorgan 1
+
+    # nand2_1
+    if {[string toupper $ReduceInputLoad] == "Y"} {
+      set nand2_1_size "C"
+    } else {
+      set nand2_1_size "D"
+    }
+    set nand2_1_demorgan 0
+
+    # nand3_0
+    set nand3_0_size "B"
+    set nand3_0_demorgan 0
+  }
+
+
+  # spacings between nand-invert icon groups
+  set yfudge $nand_y
+
+  # set inflag, row spanner locations
+  set inflag_x $base_x
+  set rs_y [expr $base_y + 150]
+
+  # init the cell placement variables
+  # limit_h = bitpitch 
+  set limit_h $DPC(PITCH)
+  set curr_h 0
+  set rswidth 0
+  set rs_x 0
+  set last_origin_x 0
+  set row_start [expr $base_x + 200]
+  set y $base_y
+
+  # fake out the placement algorithm for big devices.
+  # reorder the devices so that two nands get placed in the same row,
+  # with their inverters placed in the next row.  
+  # done only for the unsigned bits.
+  set fake_out 0
+  # figure out the height of 2 nand2_1's
+  set nh [expr 2 * [generators_get_cell_height "MMI_NAND2" $nand2_1_size]]
+  # now the height of one inv_3
+  set ih [generators_get_cell_height "MMI_INV" $inv_3_size]
+  # if (nand2_1 + inv_3 + nand2_1) won't fit but (nand2_1 + nand2_1) will fit, fake out the placement
+  if {([expr $nh + $ih] > $limit_h) && ($nh <= $limit_h)} {
+    set fake_out 1
+  }
+
+  # row count dummy parameter for generators_place_cell, not used in this generator
+  set rc_dummy 0
+
+  for {set i 0} {$i < $NBITS} {incr i} {
+
+    if {($i == [expr $NBITS - 1]) && ([string toupper $A] != "UNSIGNED")} {
+      if {[string toupper $A] == "SIGNED"} {
+	# place B's inverter
+	set binv_origin_x [expr $row_start + int($inv_x / 2)]
+	set ok [generators_place_cell "MMI_INV" $inv_1_size $inv_1_demorgan binv_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+
+	# place nand
+	set nand_origin_x [expr $binv_origin_x + $inv_x + $ws1]
+	set nand_origin_y [expr $y + $nand_in_y(0)]
+	set ok [generators_place_cell "MMI_NAND2" $nand2_1_size $nand2_1_demorgan nand_origin_x $nand_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+
+	# place final inv
+	set inv_origin_x [expr $nand_origin_x + $nand_x + $ws1]
+	set ok [generators_place_cell "MMI_INV" $inv_3_size $inv_3_demorgan inv_origin_x $nand_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+      
+	# hook up inputs
+	set pin_x [expr $nand_origin_x + $nand_in_x(0)]
+	set pin_y [expr $nand_origin_y + $nand_in_y(0)]
+	set pin_name [format "A_%d_H" $i]
+	make_wire $pin_x $pin_y $inflag_x $pin_y
+	make input -origin "$inflag_x $pin_y" -name $pin_name
+	set pin_x [expr $binv_origin_x + $inv_in_x]
+	set pin_y [expr $y + $inv_in_y]
+	set pin_name [format "B_%d_H" $i]
+	make_wire $pin_x $pin_y $inflag_x $pin_y
+	make input -origin "$inflag_x $pin_y" -name $pin_name
+	
+	# hook up between binv & nand
+	make_wire [expr $binv_origin_x + $inv_out_x] $y [expr $nand_origin_x + $nand_in_x(1)] [expr $nand_origin_y + $nand_in_y(1)]
+
+	# hook up between nand & invert
+	make_wire [expr $nand_origin_x + $nand_out_x] $nand_origin_y [expr $inv_origin_x + $inv_in_x] $nand_origin_y
+
+	# mark output
+	set pin_x [expr $inv_origin_x + $inv_out_x]
+	set pin_y [expr $nand_origin_y + $inv_out_y]
+	set outpins($i) "$pin_x $pin_y"
+
+      }
+
+
+      if {[string toupper $A] == "BOTH"} {
+
+	# place B inverter
+	set binv_origin_x [expr $row_start + int($inv_x / 2)]
+	set binv_origin_y $y
+	set ok [generators_place_cell "MMI_INV" $inv_0_size $inv_0_demorgan binv_origin_x $binv_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+
+	# place ASigned inverter
+	set sinv_origin_x $binv_origin_x
+	set sinv_origin_y [expr $y - 2 * $nand_y]
+	set ok [generators_place_cell "MMI_INV" $inv_0_size $inv_0_demorgan sinv_origin_x $sinv_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+
+	# place nands
+	set nand1_origin_x [expr $sinv_origin_x + $inv_x + $ws1]
+	set nand1_origin_y [expr $y + $nand3_in_y(0)]
+	set ok [generators_place_cell "MMI_NAND3" $nand3_0_size $nand3_0_demorgan nand1_origin_x $nand1_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+	make_wire [expr $nand1_origin_x + $nand3_in_x(2)] [expr $nand1_origin_y + $nand3_in_y(2)] [expr $binv_origin_x + $inv_out_x] [expr $y + $inv_out_y]
+
+	set nand2_origin_x $nand1_origin_x
+	set nand2_origin_y [expr $sinv_origin_y + $nand3_in_y(2)]
+	set ok [generators_place_cell "MMI_NAND3" $nand3_0_size $nand3_0_demorgan nand2_origin_x $nand2_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+	make_wire [expr $nand2_origin_x + $nand3_in_x(0)] [expr $nand2_origin_y + $nand3_in_y(0)] [expr $sinv_origin_x + $inv_out_x] [expr $sinv_origin_y + $inv_out_y]
+
+	# hook up inputs
+	# A
+	set pin1_x [expr $nand1_origin_x + $nand3_in_x(0)]
+	set pin1_y [expr $nand1_origin_y + $nand3_in_y(0)]
+	set pin2_x [expr $nand2_origin_x + $nand3_in_x(2)]
+	set pin2_y [expr $nand2_origin_y + $nand3_in_y(2)]
+	set bend_x [expr $pin1_x - 20]
+	set wire_y [expr $y - $nand_y]
+	make_wire $pin1_x $pin1_y $bend_x $pin1_y
+	make_wire $bend_x $pin1_y $bend_x $wire_y
+	make_wire $pin2_x $pin2_y $bend_x $pin2_y
+	make_wire $bend_x $pin2_y $bend_x $wire_y
+	make_wire $bend_x $wire_y $inflag_x $wire_y
+	set pin_name [format "A_%d_H" $i]
+	make input -origin "$inflag_x $wire_y" -name $pin_name
+	# B
+	set pin_x [expr $nand2_origin_x + $nand3_in_x(1)]
+	set pin_y [expr $nand2_origin_y + $nand3_in_y(1)]
+	set bend_x [expr $binv_origin_x - $inv_x - $ws1]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	make_wire $bend_x $pin_y $bend_x $binv_origin_y
+	make_wire [expr $binv_origin_x + $inv_in_x] $binv_origin_y $bend_x $binv_origin_y
+	make_wire $bend_x $binv_origin_y $inflag_x $binv_origin_y
+	set pin_name [format "B_%d_H" $i]
+	make input -origin "$inflag_x $binv_origin_y" -name $pin_name
+	# ASigned
+	set pin_x [expr $nand1_origin_x + $nand3_in_x(1)]
+	set pin_y [expr $nand1_origin_y + $nand3_in_y(1)]
+	set bend_x [expr $sinv_origin_x - $inv_x - $ws1 - 20]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	make_wire $bend_x $pin_y $bend_x $sinv_origin_y
+	make_wire [expr $sinv_origin_x + $inv_in_x] $sinv_origin_y $bend_x $sinv_origin_y
+	make_wire $bend_x $sinv_origin_y $inflag_x $sinv_origin_y
+	make input -origin "$inflag_x $sinv_origin_y" -name "ASigned_H"
+
+	# place final nand
+	set nand3_origin_x [expr $nand2_origin_x + $nand_x + $ws1]
+	set nand3_origin_y $wire_y
+	set ok [generators_place_cell "MMI_NAND2" $nand2_0_size $nand2_0_demorgan nand3_origin_x $nand3_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+	set pin_x [expr $nand3_origin_x + $nand_in_x(0)]
+	set pin_y [expr $nand3_origin_y + $nand_in_y(0)]
+	set bend_x [expr $pin_x - 20]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	set pino_x [expr $nand2_origin_x + $nand3_out_x]
+	set pino_y [expr $nand2_origin_y + $nand3_out_y]
+	make_wire $bend_x $pin_y $bend_x $pino_y
+	make_wire $bend_x $pino_y $pino_x $pino_y
+	set pin_x [expr $nand3_origin_x + $nand_in_x(1)]
+	set pin_y [expr $nand3_origin_y + $nand_in_y(1)]
+	set bend_x [expr $pin_x - 20]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	set pino_x [expr $nand1_origin_x + $nand3_out_x]
+	set pino_y [expr $nand1_origin_y + $nand3_out_y]
+	make_wire $bend_x $pin_y $bend_x $pino_y
+	make_wire $bend_x $pino_y $pino_x $pino_y
+
+	# place buffer
+	set buf_origin_x [expr $nand3_origin_x + $nand_x + $ws1]
+	set buf_origin_y $nand3_origin_y
+	set ok [generators_place_cell "MMI_BUF" $buf_0_size $buf_0_demorgan buf_origin_x $buf_origin_y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+	make_wire [expr $buf_origin_x + $inv_in_x] [expr $buf_origin_y + $inv_in_y] [expr $nand3_origin_x + $nand_out_x] [expr $nand3_origin_y + $nand_out_y]
+
+	# mark output
+	set pin_x [expr $buf_origin_x + $inv_out_x] 
+	set pin_y [expr $buf_origin_y + $inv_out_y]
+	set outpins($i) "$pin_x $pin_y"
+      }
+
+    } else {
+
+      # place nand
+      set nand_origin_x [expr $row_start + int($nand_x / 2)]
+      set ok [generators_place_cell "MMI_NAND2" $nand2_1_size $nand2_1_demorgan nand_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $nand_x last_origin_x row_start rc_dummy]
+      if {($fake_out == 1) && ([expr $i % 4] == 1)} {
+	# fake the start of a new row, containing the previous inverter
+	set curr_h $ih
+	set rswidth $inv_x
+	set row_start [expr $last_origin_x - int($inv_x / 2)]
+	set rs_x $last_origin_x
+      } 
+
+      # place inv
+      set inv_origin_x [expr ($nand_origin_x + $nand_out_x) + $ws1 + ($inv_x + $inv_in_x)]
+      set ok [generators_place_cell "MMI_INV" $inv_3_size $inv_3_demorgan inv_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $inv_x last_origin_x row_start rc_dummy]
+
+      # hook up inputs
+      set pin_x [expr $nand_origin_x + $nand_in_x(0)]
+      set pin_y [expr $y + $nand_in_y(0)]
+      set pin_name [format "A_%d_H" $i]
+      make_wire $pin_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name $pin_name
+      set pin_x [expr $nand_origin_x + $nand_in_x(1)]
+      set pin_y [expr $y + $nand_in_y(1)]
+      set pin_name [format "B_%d_H" $i]
+      make_wire $pin_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name $pin_name
+      
+      # hook up between nand & invert
+      make_wire [expr $nand_origin_x + $nand_out_x] $y [expr $inv_origin_x + $inv_in_x] $y
+            
+      # mark output
+      set pin_x [expr $inv_origin_x + $inv_out_x]
+      set pin_y [expr $y + $inv_out_y]
+      set outpins($i) "$pin_x $pin_y"
+      
+      # increment y
+      set y [expr $y - $yfudge]
+
+    }
+  }
+
+  # hook up the outputs
+  set outflag_x [expr $last_origin_x + 200]
+  for {set j 0} {$j < $NBITS} {incr j} {
+    set pin_x [lindex $outpins($j) 0]
+    set pin_y [lindex $outpins($j) 1]
+    set pin_name [format "PP%d_H" $j]
+    make_wire $pin_x $pin_y $outflag_x $pin_y
+    make output -origin "$outflag_x $pin_y" -name $pin_name
+  }
+
+  # drop the final row spanner
+  set rsname [format "row_spanner%d" [expr int($rswidth/2)]]
+  generate row_spanner $rsname -width [expr int($rswidth/2)]
+  make $rsname -origin "$rs_x $rs_y"
+
+  # title bar
+  make sccs_title_bar -origin "[expr $inflag_x + int(($outflag_x - $inflag_x)/2)] [expr $base_y + 300]" -owner emc -version 0.9 -date 05/18/00
+}
+
+
+proc ICON_mmig_ppg_slice args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 8} {Algorithm "Simple"} {A "Unsigned" {radio Signed Unsigned Both}} {ReduceInputLoad "N"}}
+  
+  # don't let the user get too crazy
+  if {$NBITS > 64} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  
+  # check for acceptable response on Algorithm query
+  if {([string toupper $Algorithm] != "SIMPLE")} {
+    error "ERROR: Algorithm property ($Algorithm) must be Simple"
+  }
+  if {[string toupper $Algorithm] == "SIMPLE"} {
+    set alg_name "Simple"
+  }
+  # check for acceptable response on A query
+  if {([string toupper $A] != "SIGNED") &&
+      ([string toupper $A] != "UNSIGNED") &&
+      ([string toupper $A] != "BOTH")} {
+    error "ERROR: A property ($A) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on ReduceInputLoad query
+  if {([string toupper $ReduceInputLoad] != "Y") && ([string toupper $ReduceInputLoad] != "N")} {
+    error "ERROR: ReduceInputLoad property ($ReduceInputLoad) must be Y or N"
+  }
+  
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  
+  # figure out icon size
+  set cs_spacer 70
+  set pin_spacer 20
+  
+  # how many pins?
+  set pincount [expr 2 * $NBITS]
+  
+  # icon body
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+  
+  # pins
+  set pin_pos [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set wname [format "B_%d_H" $i]
+    icon_term -type input -origin "$icon_left $pin_pos" -name $wname
+    icon_property -origin "$icon_left_label $pin_pos" -size small -label $wname 
+    set pin_pos [expr $pin_pos - $pin_spacer]
+    set wname [format "A_%d_H" $i]
+    icon_term -type input -origin "$icon_left $pin_pos" -name $wname
+    icon_property -origin "$icon_left_label $pin_pos" -size small -label $wname 
+    set wname [format "PP%d_H" $i]
+    icon_term -type output -origin "$icon_right $pin_pos" -name $wname
+    icon_property -origin "$icon_right_label $pin_pos" -size small -label $wname -anchor e
+    set pin_pos [expr $pin_pos - $pin_spacer]
+  }
+
+  if {([string toupper $A] == "BOTH")} {
+    icon_term -type input -origin "$icon_left [expr $icon_top + $pin_spacer]" -name "ASigned_H"
+    icon_property -origin "$icon_left_label [expr $icon_top + $pin_spacer]" -size small -label "ASigned_H"
+  }
+  
+  # text
+  if {[string toupper $A] == "UNSIGNED"} {
+    set as "U"
+  }
+  if {[string toupper $A] == "SIGNED"} {
+    set as "S"
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set as "U,S"
+  }
+  set wname [format "%dbit (%s)" $NBITS $as]
+  icon_property -origin "0 -80" -size large -label $wname -anchor center
+  icon_property -origin "0 -40" -size large -label "Multiplier" -anchor center
+  set wname [format "%s PPG" $alg_name]
+  icon_property -origin "0 0" -size large -label $wname -anchor center
+  icon_property -origin "0 40" -size large -label "Bitslice" -anchor center
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    icon_property -origin "0 80" -size large -label "R" -anchor center
+  }
+  icon_property -origin "0 120" -size large -label {$name} -anchor center
+  
+  # junk
+  set prop_y $icon_y
+  icon_property -origin "-70 $prop_y" -type user -name name
+  icon_property -origin "-70 [expr $prop_y + 20]" -type user -name M
+  icon_property -origin "-70 [expr $prop_y + 40]" -type user -name dpc
+  
+  icon_special -type sccs_title_bar -origin "-70 [expr $prop_y + 140]" -owner emc -version 0.9 -date 05/18/00
+}
+
+
+ 

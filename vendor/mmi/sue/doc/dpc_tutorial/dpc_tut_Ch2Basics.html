@@ -1,0 +1,904 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_Tutorial">
+<meta name="LASTUPDATED" content="12/04/01 15:02:14">
+<title>Part 2   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+
+
+<p><table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+
+	<!-- THE FOLLOWING LINE IS THE TITLE OF THE DOCUMENT -->
+
+
+     <td> <center><font color="003366"><H1> DPC DataPath Compiler Tutorial </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_tut_Pt1Overview.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+<hr align="left">
+
+ 
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 2 </font>
+</h2>
+
+
+<h2>
+  <a name="1035949"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The DPC Placement Algorithm And Bit-Slice Design</font>
+</h2>
+
+
+<h3>
+  <a name="1046956"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DPC Basics</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035950"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now that we have seen how powerful DPC can be, it's time to learn how the placement algorithm works. </font>
+<p>
+<p>
+  <dt> <a name="1035951"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As you go through this section, remember that a more detailed description of these features and the setup parameters is given in the <em class="Emphasis">DPC Manual</em>. </font>
+<p>
+<p>
+  <dt> <a name="1035952"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to go through the following concepts: </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035953"> </a>How DPC does placement  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035954"> </a>Bit slice vs. packed gates  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035955"> </a>Advanced placement techniques  
+</li><p>
+</font>
+</ul></ul></ul>
+</dl></dl>
+
+<h4>
+  <a name="1035958"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>DPC Placement</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035959"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The placement of icons on the schematic directs the relative placement in the placement file. SUE assumes that data flows horizontally and builds the placement from the top, which is the most significant bit (MSB). See <a href="dpc_tut_Ch2Basics.html#1035972">Figure 13</a></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035972"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 13:   Data Flow Of DPC Data Paths</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig13.gif">
+</div></font><a name="1040986"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035973"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Don't try to build data pathdata paths with data flowing from the top of the page to the bottom, or with the LSB on the top. If you do, DPC will not give you the desired results. </font>
+<p>
+<p>
+  <dt> <a name="1035974"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most cell libraries are oriented so that the top of the cell has a horizontal power supply (for example, VDD) and the bottom has a horizontal ground supply (for example, GND or VSS). In this orientation, the cell heights are fixed but the cell widths vary depending on the function and power level of the cell. In the SUE DPC flow, cells are ROTATED 90 degrees. Therefore, schematics oriented by <em class="Emphasis">columns</em> in SUE will end up as <em class="Emphasis">rows</em> in the DEF file. When placing a data path into your chip, you can then rotate or flip the data path depending on the needs of the floorplan. </font>
+<p>
+<p>
+  <dt> <a name="1035975"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC automatically flips rows so that the power and ground supplies overlap between rows. The orientation of individual cells or blocks is notated with a slash in the DPC placement view, which you can verify with <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1035976"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In DPC, all sizes are normalized to grids, one grid being the wiring pitch or track. Thus all cell sizes, widths and lengths, will be integers as will bit pitches. Grids do not need to be square either. When DPC writes out parasitic and placement files, it will convert these grids back into real numbers. </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1035978"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The Basic Placement Algorithm</font></i>
+</h5>
+
+
+
+<h5>
+  <a name="1035980"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">A firm grasp of this section's concepts is essential to getting the most from DPC.</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1035982"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The first stage of DPC placement consists of breaking the entire design into columns. All icons whose boundaries overlap with other icons in the same column (even a little), excluding text, are placed in the same column. It is wise to leave a definite space between columns so that there is no confusion. All text (including the text in the icons), wires, arcs, lines, or icons that don't affect placement (like I/O's or title bars) are ignored during this step.</font>
+<p>
+<p>
+  <dt> <a name="1035984"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at an example.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1050489"> </a>We need a blank schematic, so make a new schematic called "<b><code class="CodeStrong">test</code></b>" or go to the "<b><code class="CodeStrong">no_name</code></b>" schematic. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035986"> </a>Find the <b><code class="CodeStrong">stdcell Library List Box</code></b> and add the <b><code class="CodeStrong">MMI_AND2</code></b> icon to your schematic. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1044514"> </a>Change the <b><code class="CodeStrong">MMI_AND2B</code></b> to a <b><code class="CodeStrong">MMI_AND2C</code></b> by holding down the Shift key and double-clicking on it. This brings up the generator menu where you can choose the "<b><code class="CodeStrong">C</code></b>" size. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1044633"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the standard cells in this library are generators so you can change strengths or demorgan icons. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1035989"> </a>Add the <b><code class="CodeStrong">MMI_MUX3</code></b> icon below the <b><code class="CodeStrong">MMI_AND2C</code></b> icon </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1035990"> </a>Add the <b><code class="CodeStrong">MMI_BUF</code></b> icon to the right of the <b><code class="CodeStrong">MMI_AND2C</code></b> icon </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035994"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your schematic should look like <a href="dpc_tut_Ch2Basics.html#1036005">Figure 14</a>-a.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036005"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 14:   Simple DPC Placement Example: a) Schematic; b) Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_tut_Ch2Basics13.gif" height="787" width="975">
+</div></font><a name="1041257"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036006"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now we are going to run DPC netlist. DPC netlist will create the placement file, Verilog netlist, and parasitic file for our schematic. We will then look at the placement. Note: in this case, the netlist and parasitic files are useless since we haven't added any wires. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036007"> </a>Type <b><strong class="Strong">Shift-n</strong></b> or <b><code class="CodeStrong">DPC Netlist</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. Don't do <b><code class="CodeStrong">DPC it</code></b> since that will also run timing and you will get errors since you haven't wired up your circuit yet. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036008"> </a>Type <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to see the placement. Your placement should look like <a href="dpc_tut_Ch2Basics.html#1036005">Figure 14</a>-b.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036012"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the placement is two columns, just like the schematic, and that the cells are placed from the top (or MSB) downward. Also verify that the columns are alternatively flipped -- look at the hash marks on the instances that signify orientation - so that the power/ground rails overlap correctly. </font>
+<p>
+<p>
+  <dt> <a name="1036013"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now we are going to change the schematic, rerun the DPC netlist, and look at the results. This is the first iteration loop in DPC. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1036014"> </a>Return to the schematic view by typing <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1036015"> </a>Move the <b><code class="CodeStrong">MMI_BUFB</code></b> gate to the left so it overlaps the right edge of the other two icons as shown in <a href="dpc_tut_Ch2Basics.html#1036029">Figure 15</a>-a.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1036029"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 15:   Placement of Overlapping Cells: a) Schematic; b) Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_tut_Ch2Basicsa.gif" height="797" width="975">
+</div></font><a name="1041416"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1036030"> </a>Rerun DPC netlist with hotkey <b><strong class="Strong">Shift-n</strong></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1036031"> </a>Toggle <b><code class="CodeStrong">Show Placement</code></b> with <b><strong class="Strong">Ctrl-a</strong></b> to see the resultant placement. Your placement view should now look like <a href="dpc_tut_Ch2Basics.html#1036029">Figure 15</a><b><strong class="Strong"> </strong></b>-b. What happened? </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036035"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since <b><code class="CodeStrong">MMI_BUFB</code></b> now overlaps with the <b><code class="CodeStrong">MMI_AND2C</code></b> icon, it is placed in the same column with it. Remember, it's a good idea to make sure cells CLEARLY DO NOT overlap if you want them to be placed in different columns. </font>
+<p>
+<p>
+  <dt> <a name="1036036"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice also that <b><code class="CodeStrong">MMI_BUFB</code></b> is located above <b><code class="CodeStrong">MMI_MUX3B</code></b> in the placement. This is because the icons are first segregated into columns and then sorted in each column from top to bottom based on their icon origin (the little "<b><strong class="Strong">+</strong></b>" in the icon view of the cell) which is usually near the center of the icon. </font>
+<p>
+<p>
+  <dt> <a name="1036037"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Often, you don't want to have to make icons overlap to get them into the same column like we just did. It was easy here, but if you've already drawn something complicated, including the wires, it can be a mess to change it. Instead, all you need to do is add an icon that is wide enough to overlap both columns (or more) that you want to interleave. There is a special icon for this called a "<b><code class="CodeStrong">row_spanner</code></b>" (think column spanner - it is a row in the layout because of the 90 degree rotation). This is a special empty generator whose width can be adjusted by shift-double-clicking on it so that it will span multiple columns. </font>
+<p>
+<p>
+  <dt> <a name="1036038"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's try using this <b><code class="CodeStrong">row_spanner</code></b><b><strong class="Strong"> </strong></b>in a trivial case. If you want to see it used in a more realistic example, look at the <b><code class="CodeStrong">alu8</code></b> and the <b><code class="CodeStrong">adder8</code></b> schematics from above. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1036039"> </a>Return to the schematic view of your test circuit with three icons in it by typing <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu or clicking on its name in the <b><code class="CodeStrong">Schematics</code></b> <b><code class="CodeStrong">List</code></b> <b><code class="CodeStrong">box</code></b>. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036040"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Move the gates so that they are in a horizontal line without any overlaps as in <a href="dpc_tut_Ch2Basics.html#1036053">Figure 16</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036053"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 16:   Horizontal Placement Of Non-Overlapping Cells</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig16.gif">
+</div></font><a name="1041511"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1036054"> </a>Now, add a <b><code class="CodeStrong">row_spanner</code></b> below them. The <b><code class="CodeStrong">row_spanner</code></b> is in the <b><code class="CodeStrong">dpc</code></b> <b><code class="CodeStrong">Library</code></b>. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1044740"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the <b><code class="CodeStrong">dpc Library</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>is not in an <b><code class="CodeStrong">Icon List</code></b> box, remember to simply hold down the left mouse button (Button-1) over one of the bottom list box title bars and then choose the <b><code class="CodeStrong">dpc List Box</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">.</font> </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1036056"> </a>If the <b><code class="CodeStrong">row_spanner</code></b> isn't wide enough,<b><strong class="Strong"> Shift double-click</strong></b> on the icon to bring up its generator and change its size. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1036060"> </a>Your schematic should now look like <a href="dpc_tut_Ch2Basics.html#1036071">Figure 17</a>-a. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1036071"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 17:   DPC Row Spanner: a) Schematic; b) Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_tut_Ch2Basics3.gif" height="900" width="975">
+</div></font><a name="1041604"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1036072"> </a>Now run <b><code class="CodeStrong">DPC Netlist</code></b> with <b><strong class="Strong">Shift-n</strong></b> and <b><code class="CodeStrong">Toggle Placement View</code></b> with <b><strong class="Strong">Ctrl-a</strong></b> to see the resultant placement. It should look like <a href="dpc_tut_Ch2Basics.html#1036071">Figure 17</a>-b. If not, try again. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036076"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">So far we have only dealt with schematics that had no bused icons, DPC properties (see below) or other bit specifiers. This mode is useful for packing small bits of control logic either by themselves, or in and around data paths. Now on to data paths. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036078"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Bit Slice Design</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1036079"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In most data paths, cells are placed in bit slices and do not overlap into adjacent bit slices. The data flows horizontally, confined to a single bit slice which keeps wires short and makes circuits fast. A notable exception is in logical or arithmetic functions which contain trees or other combining functions, like carry look-ahead adders. In these cases, cells must be placed in a more free-form arrangement, often crossing bit slices. In addition, the minimal control logic and buffering that drives rows of flipflops, muxes, etc. is often bit-slice independent. </font>
+<p>
+<p>
+  <dt> <a name="1036080"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Bused icons (icons with<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">[msb:lsb]</code></b><b><strong class="Strong"> </strong></b>or just <b><code class="CodeStrong">[num]</code></b> in their name) are expanded into the appropriate number of individual icons and automatically placed into the bit slice associated with their bit number. For example, an icon with the name <b><code class="CodeStrong">[3:2]</code></b> will be expanded into two icons,<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">[3] </code></b>and <b><code class="CodeStrong">[2]</code></b>, and placed in bit slices 3 and 2, while an icon with the name <b><code class="CodeStrong">[2]</code></b> is only one icon but will be placed in bit slice 2. Thus, the icon's name serves two purposes: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036082"> </a>It specifies how many instances are bused together (1 or more) AND </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036084"> </a>It specifies in which bit slice(s) to place the icon(s). </font>
+</p>   </ol>
+<p>
+  <dt> <a name="1036085"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the bit slice position can be overridden with the "<b><code class="CodeStrong">dpc property</code></b>" (see below). </font>
+<p>
+<p>
+  <dt> <a name="1036086"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If any icon in a column has a bit specifier, then the bit slices of that column will be aligned to the same bit slices of all other columns. Therefore, icons with name <b><code class="CodeStrong">[1]</code></b> will be aligned with all icons in all columns with the name <b><code class="CodeStrong">[1]</code></b> on that schematic. Consider the example in <a href="dpc_tut_Ch2Basics.html#1036099">Figure 18</a>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036099"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 18:   Simple Bit Slice Example</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag18.gif">
+</div></font><a name="1041802"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036100"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you place multiple bused icons in the column with overlapping bit slices, then the icons will be interleaved. Furthermore, within the bit slice, the icons will be packed in the same vertical order as on the schematic as demonstrated in the example in <a href="dpc_tut_Ch2Basics.html#1036113">Figure 19</a>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036113"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 19:   Interleaved Bit Slice Example</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag19.gif">
+</div></font><a name="1041910"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036114"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">What happens when you interleave too many cells so that they cannot fit into the bit slice? DPC has two ways of dealing with this situation: </font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1036116"> </a>Let the cells overflow into the next bit slice OR 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1036118"> </a>Force overflow cells into adjacent columns to the right in the same bit slice. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1036119"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Case 1 is considered the "<b><code class="CodeStrong">normal</code></b>" mode and case 2 is called "<b><code class="CodeStrong">bit_slice</code></b>". These modes are determined globally by the variable <b><code class="CodeStrong">DPC(MODE)</code></b><b><strong class="Strong"> </strong></b>and they can also be adjusted on a schematic by schematic basis by adding the <b><code class="CodeStrong">dpc_control</code></b> icon in the <b><code class="CodeStrong">dpc Library</code></b> and specifying the "<b><code class="CodeStrong">mode</code></b>". <a href="dpc_tut_Ch2Basics.html#1036132">Figure 20</a> <b><strong class="Strong">  </strong></b>is an example that shows the different placements that result from the different modes: </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036132"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 20:   Overflowing Bit Slice Example</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag20.gif">
+</div></font><a name="1042008"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036133"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Do this now: use the three gates in your test schematic in place of A, B, and C in the examples above and recreate the last three examples. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036134"> </a>Double-click on the gate icon to add the bit identifier in the name field, such as <b><code class="CodeStrong">[msb:lsb]</code></b> or just <b><code class="CodeStrong">[num]</code></b> in the <b><code class="CodeStrong">Edit Properties</code></b> popup menu.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036135"> </a>You should be able to move the icons around, rename them, and get the placement you expect. If not, you don't yet understand the placement algorithm. If you don't know how a schematic is going to place, you can't do good data path design. </font>
+</p>   </ol>
+</ol>
+<h5>
+  <a name="1036137"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Mixed Bit Slice Design</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1036138"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">What happens when you mix bused icons with non-bused icons in the same column? This happens all the time. All icons without a bit specification will be placed in the "current" bit location. Remember that the icons are being placed on a column by column basis starting from the icon whose origin is closest to the top in the schematic and working down. The "current" bit location is either the bit slice where the last icon was placed in the column or, if none, then the highest bit slice in the entire schematic (the top of the placement). </font>
+<p>
+<p>
+  <dt> <a name="1036139"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To override this rule, simply add a bit slice identifier to the icon with the desired bit location, such as <b><code class="CodeStrong">[3]</code></b>. This can be either placed in the <b><code class="CodeStrong">name</code></b> field in the <b><code class="CodeStrong">Edit Properties</code></b> popup for the icon, or in the <b><code class="CodeStrong">dpc</code></b> field for people who don't like to clutter up the name. Note: a bit specifier in the <b><code class="CodeStrong">dpc</code></b> field overrides the name field; and for specifying more than one bit, see the next section, <b><strong class="Strong">Getting Tricky</strong></b>, for the exact syntax.</font>
+<p>
+<p>
+  <dt> <a name="1036143"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Look at the example in <a href="dpc_tut_Ch2Basics.html#1036159">Figure 21</a>. Do you see where icon "<b><code class="CodeStrong">C</code></b>" and "<b><code class="CodeStrong">E</code></b>" got placed? Can you see why? </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036159"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 21:   Mixed Bit Slice Example</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag21.gif">
+</div></font><a name="1042131"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036160"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now use your <b><code class="CodeStrong">test</code></b> schematic and experiment with this example by adding more icons, running <b><code class="CodeStrong">DPC Netlist</code></b>, and looking at the placement. </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1036161"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Summary</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1036162"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's summarize the placement algorithm so far: </font>
+<p>
+<ol type="1">     <ol type="1">
+      <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList3" value="1"><a name="1036163"> </a>Segregate the icons into columns. </font>
+      <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList3" value="2"><a name="1036164"> </a>Process columns from left to right. </font>
+      <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList3" value="3"><a name="1036165"> </a>Process each icon from top downwards within a column. </font>
+      <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList3" value="4"><a name="1036166"> </a>If an icon has a bit-slice identifier, place it into that bit slice. Otherwise place at current bit position. </font>
+      <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList3" value="5"><a name="1036167"> </a><b><strong class="Strong">A bit specifier in the </strong></b><b><code class="CodeStrong">dpc</code></b><b><strong class="Strong"> field overrides the name. </strong></b></font>
+    </ol>
+</ol><p>
+  <dt> <a name="1036168"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Make sure you understand this before proceeding to the next section. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036170"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Getting Tricky</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1036171"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Not all data paths can be built with the simple rules just discussed, though most can. If you don't have much time, skip this section. </font>
+<p>
+<p>
+  <dt> <a name="1036172"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes a bus with more bits than the rest of the data path is needed; for example, from the output of a multiplier. To get this bus into the width of the rest of the data path, you want to double up the bit slices. The <b><code class="CodeStrong">dpc property</code></b> on standard cell icons is set up for just that and other non-standard cases. To specify the algorithmic bit slice positioning of a bus (as opposed to just bit number goes to bit position), add the following syntax to the <b><code class="CodeStrong">dpc</code></b> field on a bused icon: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">        p[max:min]=f($b)   or</font><a name="1036173"> </a>
+</p><font face="ITC Franklin Gothic Book">        p[bit]=f($b)       or simpler</font><a name="1036174"> </a>
+</p><font face="ITC Franklin Gothic Book">        p=f($b)            or simpler</font><a name="1036175"> </a>
+</p><font face="ITC Franklin Gothic Book">        f($b)
+</font><a name="1036176"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036177"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The variable "<b><code class="CodeStrong">$b</code></b>" will be substituted for the actual bit number. Examples of each type of syntax are shown below.<b><strong class="Strong"><center>
+<p>
+
+
+
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1044889"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><font  face="Verdana, Arial, Helvetica, sans-serif">Spaces are NOT allowed in expressions. Also, you can use the most simplified last form only when the expression includes a "</font><b><code class="CodeStrong">$b</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">" (see below).</font></font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1036179"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, to fit a 64-bit bus (<b><code class="CodeStrong">[63:0]</code></b>) into bit slices 31 to 0, use the following expression: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">        $b/2
+</font><a name="1036180"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036181"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To flip the order of an icon with the size <b><code class="CodeStrong">[15:0]</code></b>, use: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">        15-$b
+</font><a name="1036182"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036183"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To place all three inverters of <b><code class="CodeStrong">[2:0]</code></b> at bit slice position 5, use: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">        p=5
+<b><strong class="Strong"><center>
+</pre>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1045051"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this example you would need to use the "<b><code class="CodeStrong">p=f($b)</code></b>" syntax because it doesn't include a "$<b><code class="CodeStrong">b</code></b>". In other words, just putting a "<b><code class="CodeStrong">5</code></b>" in the <b><code class="CodeStrong">dpc property</code></b> won't work.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font><a name="1036184"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036187"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's experiment with these three cases: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036188"> </a>Load the cell "<b><code class="CodeStrong">example1.sue</code></b>" provided in the tutorial. You should see the schematic shown in <a href="dpc_tut_Ch2Basics.html#1036207">Figure 22</a><b><strong class="Strong"> </strong></b>-a. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036192"> </a>Double-click on one of the <b><code class="CodeStrong">MMI_AND2B</code></b> gates to see how the <b><code class="CodeStrong">dpc property</code></b> is entered. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1036193"> </a><b><code class="CodeStrong">DPC Netlist</code></b> with <b><strong class="Strong">Shift-n </strong></b>and toggle placement view with <b><strong class="Strong">Ctrl-a </strong></b>to see the placement as in <a href="dpc_tut_Ch2Basics.html#1036207">Figure 22</a><b><strong class="Strong"> </strong></b>-b. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1036207"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 22:   Tricky Placement Example: a) Schematic; b) Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_tut_Ch2Basics5.gif" height="889" width="975">
+</div></font><a name="1042214"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036208"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">What happened? The leftmost <b><code class="CodeStrong">MMI_AND2B</code></b> gate has a <b><code class="CodeStrong">dpc property</code></b> of "<b><code class="CodeStrong">$b/2</code></b>", which puts bit <b><code class="CodeStrong">[7]</code></b> in the 3rd bit slice (7/2 = 3 - integer arithmetic), bit<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">[6]</code></b> in the 3rd bit slice too (6/2 = 3), bit <b><code class="CodeStrong">[5]</code></b><b><strong class="Strong"> </strong></b>in the 2nd bit slice (5/2 = 2), etc. Hence, the cells are doubled up in a bit slice. </font>
+<p>
+<p>
+  <dt> <a name="1036209"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The center <b><code class="CodeStrong">MMI_AND2B</code></b> gate has a <b><code class="CodeStrong">dpc property</code></b> of "<b><code class="CodeStrong">3-$b</code></b>", which puts bit <b><code class="CodeStrong">[3]</code></b> into the 0th bit slice (3 - 3 = 0), bit <b><code class="CodeStrong">[2]</code></b> into the 1st bit slice (3 - 1 = 2), and so on. Hence, the bit order is reversed. To see this, zoom in closely on the top <b><code class="CodeStrong">MMI_AND2B</code></b> in the middle column and you will see that its name is "<b><code class="CodeStrong">MMI_AND2B_2$0$</code></b>" which means it is the LSB. You could also just select it and look in the <b><code class="CodeStrong">SUE Info Bar</code></b>, which displays information about the selected object. </font>
+<p>
+<p>
+  <dt> <a name="1036210"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Finally, the rightmost <b><code class="CodeStrong">MMI_AND2B</code></b> gate has a <b><code class="CodeStrong">dpc property</code></b> of "<b><code class="CodeStrong">p=2</code></b>" which means that every bit is placed in bit slice 2. </font>
+<p>
+<p>
+  <dt> <a name="1036211"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice also that in the schematic view, the text of the icons overlaps yet the icons are still segregated into different columns. This is because the text is ignored. </font>
+<p>
+<p>
+  <dt> <a name="1036213"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to specify some bits with a different algorithm than others, you can do that also, for example:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">	p[7:4]=2 p[3:0]=0
+</font><a name="1036215"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036217"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">which will put the top half of the icons in the second bit position and the bottom half into the bottommost bit position. You could have specified the bits completely, also:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">	p[7]=2 p[6]=2 p[5]=2 p[4]=2 p[3]=0 p[2]=0 p[1]=0 p[0]=0
+</font><a name="1036219"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036221"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Of course, if you don't specify any bits or ranges of bits, they will just get their normal default bit locations.</font>
+<p>
+<p>
+  <dt> <a name="1036223"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also specify what rows to place the icons of a bused icon in, using the following syntax:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">	r[max:min]=f($b)   or</font><a name="1036225"> </a>
+</p><font face="ITC Franklin Gothic Book">	r[bit]=f($b)       or simpler</font><a name="1036227"> </a>
+</p><font face="ITC Franklin Gothic Book">	r=f($b)
+</font><a name="1036229"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036231"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Thus, if you want to stack a bus in half the height but in two rows, you might use the syntax:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">	p=$b/2 r=$b%2
+</font><a name="1036233"> </a>
+</p></pre>
+  <dl>
+<p> <dt> <a name="1036235"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where the "%" is the mod operator in TCL (sometimes called the remainder operator).</font>
+<p>  </dl>
+<p>
+  <dt> <a name="1036236"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">"<b><code class="CodeStrong">example2</code></b>" demonstrates these two cases: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1036237"> </a>Load the cell <b><code class="CodeStrong">example2.sue</code></b> provided in the tutorial. You should see the schematic shown in <a href="dpc_tut_Ch2Basics.html#1036251">Figure 23</a>-a. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1036251"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 23:   "Example2.sue": a) Schematic; b) Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_tut_Ch2Basics2.gif" height="870" width="975">
+</div></font><a name="1042366"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1036252"> </a>Double-click on one of the <b><code class="CodeStrong">MMI_NAND2B</code></b> gates to see how the<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">dpc property</code></b> is entered. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1036253"> </a><b><code class="CodeStrong">DPC Netlist</code></b><b><strong class="Strong"> </strong></b>with <b><strong class="Strong">Shift-n</strong></b> and toggle placement view with <b><strong class="Strong">Ctrl-a</strong></b> to see the placement as in <a href="dpc_tut_Ch2Basics.html#1036251">Figure 23</a>-b. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036257"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the first <b><code class="CodeStrong">MMI_AND2B</code></b> gate has four of its instances in bit position number 2, and the other half in bit position number 0. Moving over to the next gate notice that there are 8 gates, placed in adjacent columns (vertical rows) in the lower 4 bit slices. In this example, no cells are placed in the upper 4 bit slices.</font>
+<p>
+<p>
+  <dt> <a name="1036259"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Consider this example. If you want to array an icon laterally instead of vertically, use this:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">	p=0 r=$b
+</font><a name="1036261"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036263"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the row syntax is more restrictive than the pitch syntax: you can't specify negative rows and you can't skip rows. This example is left for you to do on your own.</font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1036265"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting the Data Path Bit Pitch</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1036266"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The pitch or height of each bit position is predetermined by the designer, based on the technology and cell library. This pitch is specified in the<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">.suerc</code></b> file in terms of grids or routing tracks by the variable<b><code class="CodeStrong"> DPC(PITCH)</code></b>. Usually the pitch should be the same for everyone working on the same project or at least the same for each specific data pathdata path in the chip The bit pitch for a single schematic can, however, be overridden by adding the <b><code class="CodeStrong">dpc_control</code></b> icon and specifying the "pitch". </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1036268"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Adding Spaces</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1036269"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes, it is necessary to space cells or columns apart from each other in ways different than the simple bit-slice methodology. SUE provides this capability with "<b><code class="CodeStrong">spacer</code></b>" cells and with the "<b><code class="CodeStrong">dpc property</code></b>". A spacer might be needed to accommodate the routing congestion inherent in a large barrel shifter, for example. </font>
+<p>
+<p>
+  <dt> <a name="1036270"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">spacer</code></b> cell, which is in the <b><code class="CodeStrong">dpc Icon List Box</code></b> and is a special cell, allows you to add arbitrary horizontal and/or vertical space to a design. Think of this icon as a cell whose size can be adjusted on the schematic, but is otherwise empty. If you wanted to add some space between two rows of your design, place the spacer icon in the desired spot and set its <b><code class="CodeStrong">rows</code></b> line to, for example, "<b><code class="CodeStrong">1r</code></b>" or "<b><code class="CodeStrong">1row</code></b>". This will add one entire row of space (or one column in the placement view), which might be needed to improve the routability of a particularly congested area. If SUE doesn't see an "<b><code class="CodeStrong">r</code></b>" in the string, it will default to grids, which allows for finer control.<b><strong class="Strong"><center>
+
+
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1043862"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Some routers do not handle rows spaced by anything other than complete rows. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1036272"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's go back momentarily to the <b><code class="CodeStrong">alu8</code></b> example to add space to the shifter there. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036273"> </a>If <b><code class="CodeStrong">alu8</code></b> isn't already loaded, load it into SUE. Otherwise just click on <b><code class="CodeStrong">alu8</code></b> in the <b><code class="CodeStrong">Schematics List Box</code></b> to go to it. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036274"> </a>Select the <b><code class="CodeStrong">shifter</code></b> icon and push into it (hotkey: <b><strong class="Strong">e</strong></b>). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1036275"> </a>Find the <b><code class="CodeStrong">spacer</code></b> icon (it looks kind of like a stop sign) and change it's <b><code class="CodeStrong">row</code></b> property from "<b><code class="CodeStrong">0</code></b>" to "<b><code class="CodeStrong">1r</code></b>" for <em class="Emphasis">1 row</em>. This will add an empty column between the left and right columns - yes, the rows/columns nomenclature is imperfect. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1036276"> </a>Run <b><code class="CodeStrong">DPC Netlist</code></b> (<b><strong class="Strong">Shift-n</strong></b>) and <b><code class="CodeStrong">Toggle Show Placement</code></b> (<b><strong class="Strong">Ctrl-a</strong></b>). You should see the space between the two columns, as shown in <a href="dpc_tut_Ch2Basics.html#1036289">Figure 24</a>. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1036289"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 24:   Spacer Inserted Between Columns In "alu8"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig24.gif">
+</div></font><a name="1042510"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036290"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Why did we choose this place to put a spacer? In a barrel shifter, the inputs can be shifted by any amount, and thus we need a routing track across the data path equal to the shifter width. For an 8-bit shifter, we can easily route 8 wires over the cells, which in this example are 10 grids tall. For a 32-bit shifter or larger, we need to add space for the 32 wires, even using multiple layers of metal. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1036291"> </a>Now return to the shifter schematic with <b><code class="CodeStrong">Toggle Show Placement</code></b> (<b><strong class="Strong">Ctrl-a</strong></b>) and change the <b><code class="CodeStrong">row</code></b> <b><code class="CodeStrong">property</code></b> of the spacer to "<b><code class="CodeStrong">3</code></b>". This adds three grids of space. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1036292"> </a>Rerun <b><code class="CodeStrong">DPC Netlist</code></b> (<b><strong class="Strong">Shift-n</strong></b>) and<b><code class="CodeStrong"> Toggle Show Placement</code></b> (<b><strong class="Strong">Ctrl-a</strong></b>). You should see a smaller space between the two columns. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036293"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Spacer cells can also be added in between icons in a given column to provide extra space between icons. Simply change the <b><code class="CodeStrong">col</code></b> value to the desired number of grids of space. If DPC sees a "<b><code class="CodeStrong">p</code></b>" in the value, as in "<b><code class="CodeStrong">2p</code></b>" or "<b><code class="CodeStrong">2 pitches</code></b>", DPC will add that many pitches of space. </font>
+<p>
+<p>
+  <dt> <a name="1036294"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Another way to adjust the position of a cell in a column is by adding an offset in the <b><code class="CodeStrong">dpc</code></b> <b><code class="CodeStrong">property</code></b> of the icon. Offsets are of the form: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">        +&lt;number&gt;     OR    -&lt;number&gt;
+</pre>
+<b><strong class="Strong"><center>
+
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p> 
+ <a name="1045150"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The sign is mandatory, even for positive values. The value will add that many grids of space after placement of the above adjacent icon, and before placement of the icon which has its <b><code class="CodeStrong">dpc property</code></b> modified. If the value is negative, the icon will be moved up and may overlap another cell if you aren't careful. Some standard cell libraries allow cells to overlap by one grid and share diffusions. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font><a name="1036295"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1036297"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at an example. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036298"> </a>Load the cell <b><code class="CodeStrong">example3.sue</code></b> into SUE. You should see the schematic shown in <a href="dpc_tut_Ch2Basics.html#1036312">Figure 25</a>-a.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1036312"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 25:   Spacer Example: b) Schematic; b) Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_tut_Ch2Basics8.gif" height="935" width="975">
+</div></font><a name="1042587"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036313"> </a>Run <b><code class="CodeStrong">DPC Netlist</code></b> (<b><strong class="Strong">Shift-n</strong></b>) and <b><code class="CodeStrong">Toggle Show Placement</code></b> (<b><strong class="Strong">Ctrl-a</strong></b>). You should see a placement like <a href="dpc_tut_Ch2Basics.html#1036312">Figure 25</a><b><strong class="Strong"> </strong></b>-b. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036317"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we describe what happened, let's turn on the grid to make it easier to see: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036318"> </a>First set up the grid with <b><strong class="Strong">Shift-g</strong></b> or <b><code class="CodeStrong">Change Grid Spacing</code></b> in the <b><code class="CodeStrong">View</code></b> menu. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1036319"> </a>We want a nonuniform grid. If there is only an entry for "x", hit the <b><code class="CodeStrong">uniform</code></b> checkbutton to let us change by "<b><code class="CodeStrong">x</code></b>" and "<b><code class="CodeStrong">y</code></b>". </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1036320"> </a>Enter "<b><code class="CodeStrong">10</code></b>" for the "<b><code class="CodeStrong">x</code></b>" spacing since this is our cell height in grids and "<b><code class="CodeStrong">16</code></b>" for the "<b><code class="CodeStrong">y</code></b>" spacing since this is our bit pitch. Hit <b><code class="CodeStrong">Done</code></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1036321"> </a>Now display the grid with <b><strong class="Strong">g</strong></b> or <b><code class="CodeStrong">Toggle Grid</code></b> in the <b><code class="CodeStrong">View</code></b> menu if it isn't already displayed. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1036322"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at the leftmost column first. The big space between the top two icons is due to the <b><code class="CodeStrong">spacer</code></b> cell. Use <b><strong class="Strong">Ctrl-a</strong></b> to swap back and forth between the placement and schematic to follow this. You should also see the 2-grid space between <b><code class="CodeStrong">MMI_AO31B</code></b> and <b><code class="CodeStrong">MMI_AND3B</code></b> which came from the "<b><code class="CodeStrong">+2</code></b>" in the <b><code class="CodeStrong">dpc property</code></b> on <b><code class="CodeStrong">MMI_AND3B</code></b>. Finally, notice that the bottom two icons actually overlap by one grid, which is due to the "<b><code class="CodeStrong">-1</code></b>" <b><code class="CodeStrong">dpc property</code></b> on <b><code class="CodeStrong">MMI_AO21B</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1036323"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the rightmost column, we have interleaved two 3-bit bused icons. Do you see the space in every bit pitch between <b><code class="CodeStrong">MMI_XOR2A</code></b> and <b><code class="CodeStrong">MMI_AND2B</code></b>? This is from the "<b><code class="CodeStrong">+4</code></b>" <b><code class="CodeStrong">dpc property</code></b> on <b><code class="CodeStrong">MMI_AND2B</code></b>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036325"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Hierarchical placement</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1036326"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Data Path Compiler is fully hierarchical. If you place down an instance of a 16-bit adder, for example, all of the sub cells of that adder will be placed starting from the given position. This is not quite the same as if you had one multiple-column cell that was the adder. In that case, columns of the cell wouldn't be flipped automatically and thus you couldn't stack other cells above or below it (it would be a special cell with a different cell height). </font>
+<p>
+<p>
+  <dt> <a name="1036327"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Working with hierarchical cells may seem confusing at first; however, they act just like very large standard cells. For example, if you place a hierarchical cell that has 3 columns of cells in it, and you want to place a cell under each of the columns, you can't simply do as shown in <a href="dpc_tut_Ch2Basics.html#1036340">Figure 26</a>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036340"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 26:   Hierarchy Example 1</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag26.gif">
+</div></font><a name="1042684"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036341"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Instead, you must create a new hierarchical cell which contains the three cells and then stack the two different hierarchical cells as shown in <a href="dpc_tut_Ch2Basics.html#1036354">Figure 27</a>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1036354"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 27:   Hierarchy Example 2</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag27.gif">
+</div></font><a name="1042735"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036355"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you're motivated, try recreating this example in DPC. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1036357"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DPC Summary</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1036358"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As you have seen, DPC can make designing fast data paths a breeze. This tutorial only covered part of what DPC is capable of. To learn more about DPC, especially how to set up DPC for your own technology, be sure to read the<em class="Emphasis"> DPC User Guide</em>. </font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="right"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_tut_Pt1Overview.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+
+</body>
+</html>

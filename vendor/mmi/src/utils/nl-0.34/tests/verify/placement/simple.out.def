@@ -1,0 +1,63 @@
+DIVIDERCHAR "/" ;
+
+DESIGN simple ;
+
+DIEAREA ( -1000 -2000 ) ( 30000 40000 ) ;
+
+TRACKS X -500 DO 30 STEP 1000 LAYER M1 M2 M3 M4 M5 ;
+TRACKS Y -1500 DO 43 STEP 1000 LAYER M1 M2 M3 M4 M5 ;
+
+ROW ROW_0001 CORE1    -1000    -2000 N DO     31 BY 1 STEP     1000    10000 ;
+ROW ROW_0002 CORE1    -1000     8000 S DO     31 BY 1 STEP     1000    10000 ;
+ROW ROW_0003 CORE1    -1000    18000 N DO     31 BY 1 STEP     1000    10000 ;
+ROW ROW_0004 CORE1    -1000    28000 S DO     31 BY 1 STEP     1000    10000 ;
+
+COMPONENTS 3 ;
+- u1 MMI_NAND2A + PLACED ( -500 -500 ) E ;
+- u2 MMI_NAND2B + PLACED ( 5000 1000 ) W ;
+- u3 MMI_NAND2C + FIXED ( 10000 20000 ) FN ;
+END COMPONENTS
+
+PINS 5 ;
+- a + NET a + DIRECTION INPUT + USE SIGNAL
+  + PLACED ( -500 -500 ) N
+  + LAYER M2 ( -100 -200 ) ( 500 400 ) ;
+- b + NET b + DIRECTION INPUT + USE SIGNAL
+  + FIXED ( -500 1500 ) FE
+  + LAYER M1 ( 400 500 ) ( -200 -100 ) ;
+- c + NET c + DIRECTION INPUT + USE SIGNAL
+  + PLACED ( -500 2500 ) FS
+  + LAYER M3 ( 300 -300 ) ( -300 300 ) ;
+- d + NET d + DIRECTION INPUT + USE SIGNAL
+  + PLACED ( 1500 -500 ) FW
+  + LAYER M4 ( 250 -350 ) ( -350 250 ) ;
+- z + NET z + DIRECTION OUTPUT + USE SIGNAL
+  + FIXED ( 29500 39500 ) S
+  + LAYER M5 ( 50 -600 ) ( 650 0 ) ;
+END PINS
+
+NETS 7 ;
+- a
+    ( PIN a )
+    ( u1 in0 ) ;
+- b
+    ( PIN b )
+    ( u1 in1 ) ;
+- c
+    ( PIN c )
+    ( u2 in0 ) ;
+- d
+    ( PIN d )
+    ( u2 in1 ) ;
+- s
+    ( u1 out )
+    ( u3 in0 ) ;
+- t
+    ( u2 out )
+    ( u3 in1 ) ;
+- z
+    ( PIN z )
+    ( u3 out ) ;
+END NETS
+
+END DESIGN

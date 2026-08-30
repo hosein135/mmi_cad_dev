@@ -1,0 +1,437 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:42:08">
+<title>Appendix B   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_ApdxA-hotkeys.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_ApdxC_setup.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Appendix B </font>
+</h2>
+
+
+<h2>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">EDIF And SUE File Conversion</font>
+</h2>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019270"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This appendix provides information about the EDIF2SUE and SUE2EDIF file converters. These tools can be used to convert schematics between SUE and other schematic editors.</font>
+<p>
+<p>
+  <dt> <a name="1030386"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">edif2sue</code></b> is a tool for translating an EDIF design file into a set of SUE cell files. <b><code class="CodeStrong">edif2sue </code></b>requires a special license to execute.</font>
+<p>
+<p>
+  <dt> <a name="1030394"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">sue2edif</code></b> is a plug-in addition to SUE for writing an EDIF design file based on the current design loaded in SUE. <b><code class="CodeStrong">sue2edif</code></b> requires a special license to execute. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1014140"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">EDIF To SUE Translator: "edif2sue"</font>
+</h3>
+
+
+<h4>
+  <a name="1027894"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Usage</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027896"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">edif2sue</code></b> is a tool for translating an EDIF design file into a set of SUE cell files. This tool can be used to convert schematics generated with another schematic editor into SUE format. <b><code class="CodeStrong">edif2sue</code></b> requires a special license to execute.</font>
+<p>
+<p>
+  <dt> <a name="1027899"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A usage message is available by invoking <b><code class="CodeStrong">edif2sue </code></b>without parameters.</font>
+<p>
+<p>
+  <dt> <a name="1027900"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The most basic usage is:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">        edif2sue ediffile.edf
+</font><a name="1027902"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027904"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The above example (if <b><code class="CodeStrong">ediffile.edf</code></b> is a valid EDIF file) will create a set of files in the local subdirectory "<b><code class="CodeStrong">sue</code></b>", which should exist already.</font>
+<p>
+<p>
+  <dt> <a name="1027908"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The translation process consists of two parts, which are described below.</font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1027910"> </a>Reading-in and parsing the EDIF file.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1027911"> </a>Extracting and writing-out SUE files.</font>
+</p>   </ol>
+<p>
+  <dt> <a name="1027913"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A tool to write EDIF files from SUE is available as a plug-in option to SUE; see <b><code class="CodeStrong">sue2edif</code></b> documentation in the next section.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1027917"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Options</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027919"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Options are specified in an <b><code class="CodeStrong">e2s_rc</code></b> file. The default file is</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">$MMI_TOOLS/edif2sue/e2s_rc.</font><a name="1027920"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027922"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>An explicit path can be specified using the <b><code class="CodeStrong">-config_file &lt;path&gt;</code></b> command line option. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028327"> </a>Any number of paths can be specified.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027924"> </a>Files will be read in the order specified.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1027926"> </a>Calling <b><code class="CodeStrong">edif2sue</code></b> with no arguments will cause a usage message to be printed.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028336"> </a>Within the <b><code class="CodeStrong">e2s_rc</code></b> file, options are specified one per line. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028339"> </a>The fields of the line are read using the <b><code class="CodeStrong">scanf</code></b>. See the man page for details.</li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1027931"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The first field is the option keyword, as specified below; following fields are parameters of the option, if required.</font>
+<p>
+  <dl>
+<p> <dt> <a name="1027935"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">cellname_prefix:</strong></b> A complete design can be expected to contain low-level components such as transistors or simple gates whose name may collide with similar but probably not identical components in the local library. That will create an impossible situation if the intent is to edit the files. Therefore, the user should specify a prefix that will be applied to all the cell names extracted from the EDIF file (and consequently on the generated SUE files). </font>
+<p><p> <dt> <a name="1028366"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">So for example: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">cellname_prefix fred_
+</font><a name="1027943"> </a>
+      </pre>
+<p> <dt> <a name="1027944"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">With the above option, a cell named "<b><code class="CodeStrong">inverter</code></b>" would be renamed to <b><code class="CodeStrong">fred_inverter</code></b>, and its definition would appear in a file called <b><code class="CodeStrong">fred_inverter.sue</code></b>.</font>
+<p><p> <dt> <a name="1027949"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">outdir:</strong></b> Gives a relative or absolute pathname of a directory where the generated SUE files will be placed. The default is a local subdirectory named "<b><code class="CodeStrong">sue</code></b>". </font>
+<p><p> <dt> <a name="1027953"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">suppress_progress_messages:</strong></b> Ordinarily the tool will report what cell it is working on, which is reassuring and helpful for debugging, but may obscure important warning messages. This option will suppress progress reports; only warning messages will be displayed.</font>
+<p><p> <dt> <a name="1028418"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">continue_on_translate_errors:</strong></b> Ordinary the tool will abort with an error message when it encounters a situation it doesn't understand. Specifying this option will cause the tool to continue; obviously results will be unpredictable; a segmentation exception or invalid output may occur.</font>
+<p><p> <dt> <a name="1028439"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">literal_netnames:</strong></b> Net names syntax is somewhat variable among CAD tools. Ordinarily <b><code class="CodeStrong">edif2sue</code></b> will convert the names into a format acceptable to SUE. Note that this may require generating <em class="Emphasis">buscombine</em> psuedo-devices and additional generated names. The generated files may be more readable if the original netnames are presented exactly as they are in EDIF, which this option will do; but note that in this case the generated files may not be netlistable.</font>
+<p><p> <dt> <a name="1028466"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">ignore_property &lt;property_name&gt;:</strong></b> It may be found that some properties are not useful for SUE and cause excessive clutter; for example, the Cadence <b><code class="CodeStrong">port_order</code></b> property. This option causes all instances of the named property to be ignored. The option should be specified as often as required to ignore multiple properties, such as: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">ignore_property pin</font><a name="1028492"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">ignore_property schType</font><a name="1027980"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">ignore_property instancesLastChanged</font><a name="1027981"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">ignore_property lastSchematicExtraction</font><a name="1027982"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1027983"> </a>
+      </pre>
+      </pre>
+<p> <dt> <a name="1027984"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">use_global &lt;cell_name&gt; &lt;global_name&gt; {&lt;orientation&gt;}: </strong></b>This option says that an instance of <b><code class="CodeStrong">&lt;cell_name&gt;</code></b> should be treated as an instance of the SUE global <b><code class="CodeStrong">&lt;global_name&gt;</code></b>. The optional orientation parameter specifies how the global symbol should be displayed, for example:</font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">use_global VDD! vdd RXY
+</font><a name="1027988"> </a>
+      </pre>
+<p> <dt> <a name="1027989"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">says that a reference to <b><strong class="Strong">VDD!</strong></b> turns into a SUE global called <b><code class="CodeStrong">vdd</code></b>, and the symbol is displayed "upside down" (above its connection point).</font>
+<p><p> <dt> <a name="1027992"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">parse_only:</strong></b> Don't translate the file, just parse it and reconstitute the file to <b><code class="CodeStrong">stdout</code></b>. This has been occasionally useful for debugging. It also leads to uniform prettyprinting.</font>
+<p><p> <dt> <a name="1027996"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">skip_bad_ports:</strong></b> We have discovered some Cadence files that contain duplicate port implementations for some net bundle signals. For example, a cell might have a port called <b><code class="CodeStrong">DIN&lt;7:0&gt;</code></b> (actually a rename of this value), and<em class="Emphasis"> portimplementations</em> for <b><code class="CodeStrong">DIN&lt;3:0&gt;</code></b>, <b><code class="CodeStrong">DIN&lt;7&gt;</code></b>, and whatever, in addition to a portimplementation for <b><code class="CodeStrong">DIN&lt;7:0&gt;</code></b>. This is quite against the EDIF standard, but what can one do? This hack around just hopes that if the tool can't find a port name that exactly matches the portimplementation reference, it is an instance of this case and can be ignored. Obviously the option should only be invoked if the EDIF file is observed to exhibit this anomaly. If a port is skipped, a warning message is printed.</font>
+<p><p> <dt> <a name="1028627"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">ignore_property &lt;property_name&gt;:</strong></b> Properties with this name will be silently skipped over wherever encountered. This is for clutter reduction, and also makes it easier to produce netlists usable by SPICE. </font>
+<p><p> <dt> <a name="1028646"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">use_global &lt;cell_name&gt; &lt;global_name&gt; &lt;orientation&gt;:</strong></b> Rather than create an instance of a cell with this name (such as <b><code class="CodeStrong">VSS!</code></b>), link this net with the MMI <b><code class="CodeStrong">global_name</code></b> (such as <b><code class="CodeStrong">gnd</code></b>). If orientation is specified, apply that transformation to the global symbol, for example, so that <b><code class="CodeStrong">vdd</code></b> symbols will hang down from the top of the schematic as usually expected. </font>
+<p><p> <dt> <a name="1028669"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">add_verilog_property_by_library &lt;library-name&gt;:</strong></b> Add a Verilog property to cells in the named library, identifying them as base components to the Verilog simulator. </font>
+<p><p> <dt> <a name="1028686"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">round_to_grid_lines</strong></b>: Snap connection points to the nearest grid lines. WARNING: In some cases this may pull connections apart, resulting in opens. </font>
+<p><p> <dt> <a name="1028703"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">add_title_bar:</strong></b> This option causes a title bar to be added to each cell. </font>
+<p><p> <dt> <a name="1028718"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">suppress_instance_name_prefix</strong></b>: This option causes instance names that begin with the specified string to be suppressed; for EDIF files generated from SUE, that prefix is "<b><code class="CodeStrong">THING_</code></b>". </font>
+<p><p> <dt> <a name="1028735"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">ingore_cell_definition</strong></b>: If a definition for the named cell is encountered, don't create a SUE file for it. If an instance of the cell is encountered in the definition for some other cell, just write it out and hope SUE will know what to do. </font>
+<p><p> <dt> <a name="1028755"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">scale_coordinates</strong></b>: Multiply all coordinates encountered by the given factor. This might help get a translated schematic on-grid. (Note: in the ordinary course of things, <b><code class="CodeStrong">edif2sue</code></b> will issue a warning if it encounters a coordinate that is off-grid.) </font>
+<p><p> <dt> <a name="1028774"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">uniquify_duplicate_names</strong></b>: Duplicate names within the same scope are supposed to be illegal in EDIF, but at least one known EDIF writer doesn't respect this for power nets. This option will cause a uniquifying string (<b><code class="CodeStrong">__77nn</code></b>) to be appended to detected duplicate names. </font>
+<p>  </dl>
+</dl></dl>
+
+<h4>
+  <a name="1028053"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Cadence-Specific Options:</em></font>
+</h4>
+
+<dl>  <dl>
+<p> <dt> <a name="1028055"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">no_skip_bad_ports</strong></b>: In the case of "net splitter" type constructs, the subscripts on a <b><code class="CodeStrong">portRef</code></b> may not match those on the intended corresponding <b><code class="CodeStrong">portDef</code></b>. Strictly speaking this is a violation of the EDIF standard, but since we have enough information to do the right thing, we go ahead an connect the nets as probably intended. If this option is specified, warning messages will be printed when a mismatch is encountered, for human verification if desired.</font>
+<p><p> <dt> <a name="1028063"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">cadence_property_conversion</strong></b>: Cadence properties sometimes use a macro-substitution language; that is, they are not intended to be treated as the simple strings which they appear to be in the EDIF syntax. If this option is specified, we make a stab at interpreting the property.</font>
+<p><p> <dt> <a name="1028069"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">show_rippers</strong></b>: A Cadence "ripper" is a pseudo-device with one port that extracts a subset from a bus or net bundle. Since it has only one port, SUE believes that the two sides of the ripper are shorted together, with bad results. Therefore <b><code class="CodeStrong">edif2sue</code></b> normally suppresses the rippers and the wire segments connected to them. SUE matches the nets by name, so the schematic produced is equivalent. If it is desired to view the schematics exactly as they are presented in the EDIF, this option should be invoked. Note that in this case the generated files may not be netlistable. </font>
+<p>  </dl>
+</dl>
+<h3>
+  <a name="1028083"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Parsing</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028085"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The EDIF file is read in line-by-line. EDIF expressions are converted to a direct internal representation in a recursive top-down fashion; there is very little compaction.</font>
+<p>
+<p>
+  <dt> <a name="1028089"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Each expression is read in according to the definitions in the standard. Errors such as missing required fields or illegal fields will be detected and an error message identifying the line number of the error is produced. Name references are resolved as they are encountered in a completely correct manner. Naming errors will generate error messages.</font>
+<p>
+<p>
+  <dt> <a name="1028097"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There is no error recovery; a parsing error is immediately fatal. </font>
+<p>
+<p>
+  <dt> <a name="1028100"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The process if fairly memory-intensive. Experience shows that the internal representation is about as large as the input file. It is helpful to have that much physical memory available. A large file can take 15-30 minutes to read in. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028106"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Extraction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028108"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once parsing has completed successfully, <b><code class="CodeStrong">edif2sue</code></b> will walk over the tree of expressions looking for cell definitions. For each cell definition it will generate a SUE file.</font>
+<p>
+<p>
+  <dt> <a name="1028112"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Every effort has been made to make this process robust; that is, to check that the EDIF structure is not just syntactically correct, but is what we expect. In cases where the tool is surprised, as of this writing it will exit with the following message:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">            fatal error called
+</font><a name="1028116"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028117"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This gives an error number and a possibly helpful message. If you see this error message, send a detailed email message along with an example EDIF file to <em class="Emphasis">support@micromagic.com</em>.  </font>
+<p>
+<p>
+  <dt> <a name="1028121"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">(One can also specify the "<b><strong class="Strong">-continue_on_translate_errors</strong></b>" option as a stopgap, but this is obviously dangerous. Parsing errors cannot be continued.) </font>
+<p>
+<p>
+  <dt> <a name="1028125"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Some questionable but non-fatal situations will be noted in the standard output, which should be examined carefully when a new design is translated. The option <b><strong class="Strong">-suppress_progress_messages</strong></b> will make warning messages stand out more clearly.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028131"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">EDIF Information</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028133"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The EDIF supported is version 2 0 0 (EIA Recommended Standard EIA-548-1988, dated March 14, 1988). Some information is available from the EDIF Technical Center Web site; see <b><strong class="Strong">http://edif-tc.cs.man.ac.uk/index.html</strong></b>. Only "level 0" ("the basic level - only literal constants are permitted") is supported; levels 1 and 2 ("addition of parameters and expressions" and "addition of control-flow constructs") are not supported.</font>
+<p>
+<p>
+  <dt> <a name="1028142"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As of this writing, <b><code class="CodeStrong">edif2sue</code></b> will not give complete coverage for all legal EDIF constructs; however, meaningful error messages should be produced in cases where the tool becomes confused. </font>
+<p>
+<p>
+  <dt> <a name="1028147"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There is also some question about how various CAD tools map their internal databases into EDIF; there is plenty of room for idiosyncrasies or outright incorrectness. The following idiosyncrasies have been seen in the described tools:</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028152"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Cadence</em></font>
+</h4>
+
+<ul><ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028153"> </a>Net "joined" structure is not right for nets with complex names (see Cadence documentation on "iterated names" to understand how they have created a difficult problem for themselves) (for <b><code class="CodeStrong">edif2sue</code></b>, we use the "figure" drawing information to generate the schematics; we are unable to cross-check the figures against the joins in all cases.)</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028161"> </a>"ripper" cells have only one port (EDIF spec specifies that cell-type RIPPER objects have two ports); Cadence has geometrical rules to determine which nets connected to a ripper cell are connected to each other. (<b><code class="CodeStrong">edif2sue</code></b> suppresses the cells and their attached wire segments)</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029159"> </a>Portimplementation references don't always match port definitions for net bundles; see above concerning the "<b><strong class="Strong">skip_bad_ports</strong></b>" option </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029190"> </a>Indentation is deplorable (the <b><code class="CodeStrong">et pretty</code></b> command will fix it up, if desired)</li>
+ </font>
+
+
+</ul></ul>
+<h4>
+  <a name="1028175"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Synopsys</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028176"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Limited experience, but no discrepancies have been noted) </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028178"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Tanner</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028179"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Duplicate net names for power nets (as, "<b><code class="CodeStrong">VddB</code></b>") </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1029313"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SUE To EDIF Translator: "sue2edif" </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029315"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">sue2edif</code></b> is a plug-in addition to SUE for writing an EDIF design file based on the current design loaded in SUE. <b><code class="CodeStrong">sue2edif</code></b> requires a special license to execute. This program is used when you want to import SUE schematics into another schematic editor.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029318"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Installation</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029320"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To install the EDIF writer, you need to add the following line to your <b><code class="CodeStrong">.suerc</code></b> file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">menu_add -menu file -label "Write EDIF" -command edif_write -position 10 \</font><a name="1029322"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">                       -help "Writes the EDIF for the given schematic and descendents."
+</font><a name="1029323"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029468"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typically, this line is added to the site-wide <b><code class="CodeStrong">.suerc</code></b> file in <b><code class="CodeStrong">$MMI_TOOLS/../mmi_local/sue/.suerc</code></b>, so that all users can access it. The <b><code class="CodeStrong">.suerc</code></b> file in <b><code class="CodeStrong">mmi_local.sample</code></b> provided with the release includes this line commented out. You need only uncomment it. </font>
+<p>
+<p>
+  <dt> <a name="1029490"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When the tool has been properly installed, a new command <b><code class="CodeStrong">Write EDIF</code></b> will appear in the SUE <b><code class="CodeStrong">File</code></b> menu. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029333"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Operation</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029335"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Display the schematic view of the top-level cell of the design file to be written. </font>
+<p>
+<p>
+  <dt> <a name="1029337"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Click on the <b><code class="CodeStrong">Write EDIF</code></b> command in the <b><code class="CodeStrong">File</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1029339"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE will cycle through all included cells in the hierarchy of the current design. Progress messages are displayed on the SUE Message Area and in the SUE command window (the shell window from which you started SUE). </font>
+<p>
+<p>
+  <dt> <a name="1029557"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When the command is complete with no errors, the command window displays the message <b><code class="CodeStrong">Done</code></b>. The output EDIF file is written to the same directory as the top cell but with the "<b><code class="CodeStrong">.edif</code></b>" extension. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029347"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Output</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029349"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The EDIF file is a correct representation according to Version 2 0 0, published as "EIA Recommended Standard EIA-548-1988", dated March 14, 1988. Only "level 0" constructs are used. </font>
+<p>
+<p>
+  <dt> <a name="1029618"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The file written is an EDIF representation of the design selected. Each SUE cell called for in the design appears as a "cell" definition in the EDIF file. All the cells are organized into a single EDIF library within the file. </font>
+<p>
+<p>
+  <dt> <a name="1029652"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Cells are written for all constructs, including library components such as transistors and informational constructs such as title bars, so the complete design as it appears in SUE will be available to be imported into whatever other CAD tool. </font>
+<p>
+<p>
+  <dt> <a name="1029678"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The output file will be accurately read by the MMI EDIF conversion tool "<b><code class="CodeStrong">edif2sue</code></b>". The resulting set of SUE files reconstructs the original design. The correct operation of readers for other CAD tools is obviously beyond our control, but we would like to hear about difficulties and are willing to try to "make it work". </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029368"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">      A Note on Nets</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029370"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">EDIF contains redundant information describing nets; there is logical connectivity information in "joined" expressions, and there is graphical information in "display" expressions. </font>
+<p>
+<p>
+  <dt> <a name="1029747"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE uses the graphical information to construct its internal representation of the design, so "what you see is what you get." In other tools this may not be true, and discrepancies between the connectivity and graphical information may cause unpredictable problems. </font>
+<p>
+<p>
+  <dt> <a name="1029379"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The generated EDIF file contains correct connectivity information. In some cases a <b><code class="CodeStrong">name_net_s</code></b> component is used in a SUE schematic to select a subset of wires from a bus. EDIF has no way of representing this kind of construction directly, so what the tool does is create separate "joined" statements for each bit of buses which are "split" in this way. These individual nets have names like "<b><code class="CodeStrong">bit[3]</code></b>" and contain a joined statement that lists the one-bit-wide ports connected by this net; there is no graphical information. There is also a net with a name like "<b><code class="CodeStrong">bit[7:0]</code></b>" which contains the graphical information for all bits of the net, but no explicit connectivity information. The <b><code class="CodeStrong">name_net_sâ€™s</code></b> appear as distinct instances in the ordinary way. </font>
+<p>
+<p>
+  <dt> <a name="1029391"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If there is a problem with importing the generated EDIF file into other CAD tools, this is likely where it will be, due to the basic incompatibility of the various representations. </font>
+<p>
+<p>
+  <dt> <a name="1029311"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_ApdxA-hotkeys.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_ApdxC_setup.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

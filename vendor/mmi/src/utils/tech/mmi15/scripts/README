@@ -1,0 +1,24 @@
+TOP Level scripts to be run by humans:
+
+make_char
+	runs gensp.tcl
+		creates .sp
+		creates .lef
+	runs make_synlib.tcl
+		creates synopsys .lib
+	runs add_areas.tcl
+	runs syn2tlf
+	runs tlfc
+
+make_char install
+    cp ${LIBNAME}.V    ${LIBDIR}/verilog/${LIBNAME}.v
+    cp ${LIBNAME}.lib  ${LIBDIR}/synopsys/${FULLNAME}.lib
+    cp ${LIBNAME}.tlf  ${LIBDIR}/tlf/${FULLNAME}.tlf
+    cp ${LIBNAME}.ctlf ${LIBDIR}/tlf/${FULLNAME}.ctlf
+
+
+# Creates mmi15.lef and mmi15.dpc needed for add_areas.tcl
+
+concatlef
+	runs lef2dpc.tcl
+

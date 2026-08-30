@@ -1,0 +1,82 @@
+Copyright (C) 1998 - 2000 Micro Magic, Inc.
+All Rights Reserved
+
+Overview:
+==========
+
+This set of directories contain an example standard cell library and
+the associated files needed to run the SUE Data Path Compiler (DPC).
+This includes placement, timing (using either Cadence's Pearl static
+timing analyser or Synopsys's Primetime static timing analyser),
+verilog, and router data (LEF) for the library.  This library corresponds 
+to 0.25 um TSMC technology.
+
+
+Disclaimer:
+============
+
+MICRO MAGIC, INC. MAKES NO CLAIMS OR GUARANTEES, WHATSOEVER, ABOUT THE
+ACCURACY OF THE TIMING MODELS OR THE CORRECTNESS OF THE LAYOUTS (EITHER
+LVS OR DRC), THE VERILOG MODELS, THE ROUTING INFORMATION (LEF), OR ANY
+OTHER INFORMATION IN THIS LIBRARY.
+
+This example DOES NOT include a mechanism for generating the timing,
+verilog, or lef files from the included layouts and/or schematics.
+Any or all of these tools must be requested separately from Micro
+Magic and will only be provided once the tools have been purchased
+from Micro Magic and then (some of them) for additional cost.
+
+
+Installation:
+==============
+
+SUE DPC:
+
+The file:
+
+	mmi25/library/dpc/dpc.suerc
+
+contains all of the SUE startup data required to run DPC with this
+example.  The first line of this file must be edited to include the
+correct complete pathname to this installation.  Furthermore, if you
+want to run Primetime, instead of Pearl, you must uncomment out the
+line:
+
+	#set DPC_TIMING(simulator) "primetime"
+
+This file must be sourced when you start up SUE.  This can be done in
+a number of ways.  One way is to add the lines:
+
+        set tech <dir>
+	source $tech/library/dpc/dpc.suerc
+
+to the .suerc file in $MMI_TOOLS/../mmi_local/sue/.suerc or to your
+home or current directory .suerc files.  Alternatively, you can add
+the following lines:
+
+	switch [use_first PROJECT env(PROJECT)] {
+	  mmi25 {
+	    set tech <dir>
+	    source $tech/library/dpc/dpc.suerc
+	    puts "Setting up for DPC with mmi25 library ..."
+	  }
+	}
+
+to $MMI_TOOLS/../mmi_local/sue/.suerc or similar.  With this, you
+can load the DPC example by either invoking SUE by:
+
+	sue -SET PROJECT=mmi25
+
+or by setting the UNIX environment variable PROJECT to mmi25, e.g.:
+
+	setenv PROJECT mmi25
+
+and then simply invoking SUE with:
+
+	sue
+
+
+Example Circuit:
+
+A very simple example circuit, alu8, is also included.  Try running
+"dpc it" or "dpc netlist" on it.

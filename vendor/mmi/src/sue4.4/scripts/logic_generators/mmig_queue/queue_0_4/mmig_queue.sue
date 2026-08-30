@@ -1,0 +1,489 @@
+# This is a generator for queues.
+
+proc NAME_mmig_queue args {
+  call_use_keyword $args {{NBITS 32} {Depth 8} {OutputSize "C"}}
+
+  # NBITS
+  set nom [format "mmig_queue_%d" $NBITS]
+
+  # OutputSize
+  if {[string toupper $OutputSize] == "C"} {
+    set nom [format "%sC" $nom]
+  }
+  if {[string toupper $OutputSize] == "D"} {
+    set nom [format "%sD" $nom]
+  }
+  if {[string toupper $OutputSize] == "E"} {
+    set nom [format "%sE" $nom]
+  }
+
+  # Depth
+  set nom [format "%s%d" $nom $Depth]
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_queue args {
+  call_use_keyword $args {{NBITS 32} {Depth 8} {OutputSize "C"}}
+
+  set debug 0
+
+  # figure out max index & bitranges
+  setl {maxidx max_bitrange vmax_bitrange} [generators_compute_bitrange $NBITS]
+
+  # figure out how many select bits there are 
+  set sel_bitrange [format "\[%d:0\]" [expr $Depth - 1]]
+
+
+  # select the mux cells
+  for {set i 0} {$i < $Depth} {incr i} {
+      set muxcell($i) "MMIG_QUE_MUX2B"
+  }
+
+
+  # mux icon properties
+  setl {count inpins outpins inoutpins} [generators_get_pin_info "MMIG_QUE_MUX2B"]
+  set nin [get_assoc ninputs $count]
+  for {set p 0} {$p < $nin} {incr p} {
+    set data [lindex $inpins $p]
+    if {$p == [expr $nin - 1]} {
+      set port_sel_x [lindex $data 1]
+      set port_sel_y [lindex $data 2]
+    } else {
+      set port_in_x($p) [lindex $data 1]
+      set port_in_y($p) [lindex $data 2]
+    }
+  }
+  # out
+  set data [lindex $outpins 0]
+  set port_out_x [lindex $data 1]
+  set port_out_y [lindex $data 2]
+  # other
+  setl {icon_mux_x icon_mux_y junk1 junk2 icon_mux_right icon_mux_top} [generators_get_icon_size "MMIG_QUE_MUX2B"]
+  set maxport 1
+
+
+  # buffer icon properties
+  set bufname [NAME_MMI_BUF -Size D -DeMorgan 0]
+  generate MMI_BUF $bufname -Size D -DeMorgan 0
+  setl {count inpins outpins inoutpins} [generators_get_pin_info "MMI_BUF"]
+  # in
+  set data [lindex $inpins 0]
+  set port_buf_in_x [lindex $data 1]
+  set port_buf_in_y [lindex $data 2]
+  # out
+  set data [lindex $outpins 0]
+  set port_buf_out_x [lindex $data 1]
+  set port_buf_out_y [lindex $data 2]
+  # other
+  set icon_dim [generators_get_icon_size "MMI_BUF"]
+  set icon_buf_x [lindex $icon_dim 0]
+
+
+  # FF icon properties
+  set ffname [NAME_MMI_FFC -Size B]
+  generate MMI_FFC $ffname -Size B
+  setl {count inpins outpins inoutpins} [generators_get_pin_info "MMI_FFC"]
+  set nin [get_assoc ninputs $count]
+  # inputs
+  for {set p 0} {$p < $nin} {incr p} {
+    # alphabetical pin order: clearn clk D scan_en scan_in
+    set data [lindex $inpins $p]
+    switch $p {
+      0 {
+	set port_ff_reset_x [lindex $data 1]
+	set port_ff_reset_y [lindex $data 2]
+      }    
+      1 {
+	set port_ff_clk_x [lindex $data 1]
+	set port_ff_clk_y [lindex $data 2]
+      }
+      2 {
+	set port_ff_in_x [lindex $data 1]
+	set port_ff_in_y [lindex $data 2]
+      }
+      3 {
+	set port_ff_scan_en_x [lindex $data 1]
+	set port_ff_scan_en_y [lindex $data 2]
+      }
+      4 {
+	set port_ff_scan_in_x [lindex $data 1]
+	set port_ff_scan_in_y [lindex $data 2]
+      }
+    }
+  }
+  # Q
+  set data [lindex $outpins 0]
+  set port_ff_out_x [lindex $data 1]
+  set port_ff_out_y [lindex $data 2]
+  # other
+  set icon_dim [generators_get_icon_size "MMI_FFC"]
+  set icon_ff_x [lindex $icon_dim 0]
+
+
+  # and2 icon properties
+  set and2name [NAME_MMI_AND2 -Size C -DeMorgan 0]
+  generate MMI_AND2 $and2name -Size C -DeMorgan 0
+  setl {count inpins outpins inoutpins} [generators_get_pin_info "MMI_AND2"]
+  set nin [get_assoc ninputs $count]
+  for {set p 0} {$p < $nin} {incr p} {
+    set data [lindex $inpins $p]
+    set port_and2_in_x($p) [lindex $data 1]
+    set port_and2_in_y($p) [lindex $data 2]
+  }
+  # out
+  set data [lindex $outpins 0]
+  set port_and2_out_x [lindex $data 1]
+  set port_and2_out_y [lindex $data 2]
+  # other
+  set icon_dim [generators_get_icon_size "MMI_AND2"]
+  set icon_and2_x [lindex $icon_dim 0]
+
+
+  # ao21 icon properties
+  set ao21name [NAME_MMI_AO21 -Size C -DeMorgan 0]
+  generate MMI_AO21 $ao21name -Size C -DeMorgan 0
+  setl {count inpins outpins inoutpins} [generators_get_pin_info "MMI_AO21"]
+  set nin [get_assoc ninputs $count]
+  for {set p 0} {$p < $nin} {incr p} {
+    set data [lindex $inpins $p]
+    set port_ao_in_x($p) [lindex $data 1]
+    set port_ao_in_y($p) [lindex $data 2]
+  }
+  # out
+  set data [lindex $outpins 0]
+  set port_ao_out_x [lindex $data 1]
+  set port_ao_out_y [lindex $data 2]
+  # other
+  set icon_dim [generators_get_icon_size "MMI_AO21"]
+  set icon_ao21_x [lindex $icon_dim 0]
+
+
+  # wire stub lengths
+  set ws1 40
+  set ws2 2*$ws1
+  
+  # distances
+  set xfudge [expr 3 * $ws2]
+  set delta_x [expr $icon_mux_x + $xfudge + $icon_ff_x + $xfudge]
+
+  # init drawing location
+  set x 0
+  set y 0
+
+  # wire tracks
+  set inflag_x [expr $x - (6 * $ws1)]
+  set outflag_x [expr $x + ($Depth * $delta_x) + ($icon_ao21_x + 2*$ws1 + $icon_buf_x)]
+  set sel_y [expr $y + $port_ff_clk_y + 3*$ws1]
+  set reset_y [expr $sel_y + $ws1]
+  set clk_y [expr $reset_y + $ws1]
+  set fdbk_y [expr $icon_mux_top - 3*$ws1]
+  set ao_y [expr $fdbk_y - 3*$ws1]
+  set head_y [expr $ao_y - 3*$ws1]
+  set rs_y [expr $head_y - 3*$ws1]
+  set name_y [expr $sel_y - $ws1]
+
+
+  # draw the shifter
+  for {set i 0} {$i < $Depth} {incr i} {
+
+    # place mux cell
+    set mux_x $x
+    make $muxcell($i) -origin "$mux_x $y" -name "$max_bitrange"
+
+    # place FF
+    set ff_x [expr $mux_x + $icon_mux_right + $xfudge + [expr $icon_ff_x / 2]]
+    make $ffname -origin "$ff_x $y" -name "$max_bitrange"
+
+    # hook scan_en to gnd
+    set pin_x [expr $ff_x + $port_ff_scan_en_x]
+    set pin_y [expr $y + $port_ff_scan_en_y]
+    make global -name gnd -origin "$pin_x $pin_y"
+
+    # hook scan_in to gnd
+    set pin_x [expr $ff_x + $port_ff_scan_in_x]
+    set pin_y [expr $y + $port_ff_scan_in_y]
+    make global -name gnd -origin "$pin_x $pin_y"
+
+    # wire between mux & FF
+    set muxout_x [expr $mux_x + $port_out_x]
+    set muxout_y [expr $y + $port_out_y]
+    set nnet_x [expr $muxout_x + 3*$ws1]
+    set ffin_x [expr $ff_x + $port_ff_in_x]
+    set ffin_y [expr $y + $port_ff_in_y]
+    make_wire $muxout_x $muxout_y $nnet_x $muxout_y
+    set lname [format "Mux%d_H%s" $i $vmax_bitrange]
+    make name_net_s -origin "$nnet_x $muxout_y" -name $lname
+    make_wire $nnet_x $muxout_y $ffin_x $ffin_y
+
+    # wire up clk
+    set pin_x [expr $ff_x + $port_ff_clk_x]
+    set pin_y [expr $y + $port_ff_clk_y]
+    set nnet_y $name_y
+    make_wire $pin_x $pin_y $pin_x $nnet_y
+    set lname [format "\[%d\]" $i]
+    make name_net_s -origin "$pin_x $nnet_y" -name $lname -orient R90
+    make_wire $pin_x $nnet_y $pin_x $clk_y
+    if {$i == 0} {
+      make_wire $pin_x $clk_y $inflag_x $clk_y
+      set lname [format "Clk\[%d:0\]" [expr $Depth - 1]]
+      make input -name $lname -origin "$inflag_x $clk_y"
+    } else {
+      make_wire $pin_x $clk_y [expr $pin_x - $delta_x] $clk_y
+    }
+
+    # wire up reset
+    set pin_x [expr $ff_x + $port_ff_reset_x]
+    set pin_y [expr $y + $port_ff_reset_y]
+    set nnet_y $name_y
+    make_wire $pin_x $pin_y $pin_x $nnet_y
+    set lname [format "\[%d\]" $i]
+    make name_net_s -origin "$pin_x $nnet_y" -name $lname -orient R90X
+    make_wire $pin_x $nnet_y $pin_x $reset_y
+    if {$i == 0} {
+      make_wire $pin_x $reset_y $inflag_x $reset_y
+      set lname [format "Reset_L\[%d:0\]" [expr $Depth - 1]]
+      make input -name $lname -origin "$inflag_x $reset_y"
+    } else {
+      make_wire $pin_x $reset_y [expr $pin_x - $delta_x] $reset_y
+    }
+
+    # wire up select
+    set pin_x [expr $mux_x + $port_sel_x]
+    set pin_y [expr $y + $port_sel_y]
+    set nnet_y $name_y
+    make_wire $pin_x $pin_y $pin_x $nnet_y
+    set lname [format "\[%d\]" $i]
+    make name_net_s -origin "$pin_x $nnet_y" -name $lname -orient R90
+    make_wire $pin_x $nnet_y $pin_x $sel_y
+    if {$i == 0} {
+      make_wire $pin_x $sel_y $inflag_x $sel_y
+      set lname [format "Push_H\[%d:0\]" [expr $Depth - 1]]
+      make input -name $lname -origin "$inflag_x $sel_y"
+    } else {
+      make_wire $pin_x $sel_y [expr $pin_x - $delta_x] $sel_y
+    }
+
+    # wire output of FF
+    set ffout_x [expr $ff_x + $port_ff_out_x]
+    set ffout_y [expr $y + $port_ff_out_y]
+    set nnet_x [expr $ffout_x + $ws2]
+    make_wire $ffout_x $ffout_y $nnet_x $ffout_y
+    set lname [format "R%d_H%s" $i $vmax_bitrange]
+    make name_net_s -origin "$nnet_x $ffout_y" -name $lname
+    set stub_x [expr $nnet_x + $ws1]
+    make_wire $nnet_x $ffout_y $stub_x $ffout_y
+
+    # wire up the inputs
+    # in0:  hold
+    make_wire $stub_x $ffout_y $stub_x $fdbk_y
+    set pin_x [expr $mux_x + $port_in_x(0)]
+    set pin_y [expr $y + $port_in_y(0)]
+    set hold_x [expr $pin_x - $ws1]
+    make_wire $stub_x $fdbk_y $hold_x $fdbk_y
+    make_wire $hold_x $fdbk_y $hold_x $pin_y
+    make_wire $hold_x $pin_y $pin_x $pin_y
+
+    # in1:  push
+    # intermediate inputs
+    if {$i == 0} {
+      # first stage
+      set pin_x [expr $mux_x + $port_in_x(1)]
+      set pin_y [expr $y + $port_in_y(1)]
+      set lname [format "In_H%s" $vmax_bitrange]
+      make_wire $pin_x $pin_y $inflag_x $pin_y
+      make input -name $lname -origin "$inflag_x $pin_y"
+    } else {
+      # not the first stage
+      set pin_x [expr $mux_x + $port_in_x($maxport)]
+      set pin_y [expr $y + $port_in_y($maxport)]
+      set bend_x [expr $pin_x - 3*$ws1]
+      set bend_y [expr $y + $port_ff_out_y]
+      make_wire $pin_x $pin_y $bend_x $pin_y
+      make_wire $bend_x $pin_y $bend_x $bend_y
+    }
+
+
+    # for the first stage, add the output AND2
+    # in0:  head[me]
+    # in1:  this stage's output
+    # for the rest of the stages, add the output AO21
+    # in0:  previous stage's output
+    # in1:  head[me]
+    # in2:  this stage's output
+    set ao_x [expr $mux_x + $delta_x]
+    if {$i == 0} {
+      set gtype [NAME_MMI_AND2 -Size C]
+    } else {
+      set gtype [NAME_MMI_AO21 -Size C]
+    }
+    make $gtype -origin "$ao_x $ao_y" -name $max_bitrange
+    set nnet_y [expr $head_y + $ws1]
+    # for MMI_AO21C, in2; for MMI_AND2C, in1
+    if {$i == 0} {
+      set pin_x [expr $ao_x + $port_and2_in_x(1)]
+      set pin_y [expr $ao_y + $port_and2_in_y(1)]      
+    } else {
+      set pin_x [expr $ao_x + $port_ao_in_x(2)]
+      set pin_y [expr $ao_y + $port_ao_in_y(2)]
+    }
+    make_wire $stub_x $fdbk_y $stub_x $pin_y
+    make_wire $stub_x $pin_y $pin_x $pin_y
+    # for MMI_AO21C, in1; for MMI_AND2C, in0
+    if {$i == 0} {
+      set pin_x [expr $ao_x + $port_and2_in_x(0)]
+      set pin_y [expr $ao_y + $port_and2_in_y(0)]
+    } else {
+      set pin_x [expr $ao_x + $port_ao_in_x(1)]
+      set pin_y [expr $ao_y + $port_ao_in_y(1)]
+    }
+    make_wire $stub_x $pin_y $pin_x $pin_y
+    make_wire $stub_x $pin_y $stub_x $nnet_y
+    set lname [format "\[%d\]" $i]
+    make name_net_s -origin "$stub_x $nnet_y" -name $lname -orient R90
+    make_wire $stub_x $nnet_y $stub_x $head_y
+    if {$i == 0} {
+      make_wire $stub_x $head_y $inflag_x $head_y
+      set lname [format "Head_H\[%d:0\]" [expr $Depth - 1]]
+      make input -name $lname -origin "$inflag_x $head_y"
+    } else {
+      make_wire $stub_x $head_y [expr $stub_x - $delta_x] $head_y
+    }
+    # for MMI_AO21C only, in0
+    if {$i > 0} {
+      set pin_x [expr $ao_x + $port_ao_in_x(0)]
+      set pin_y [expr $ao_y + $port_ao_in_y(0)]
+      set bend_x [expr $stub_x - $ws1]
+      set out_y [expr $ao_y + $port_ao_out_y]
+      make_wire $pin_x $pin_y $bend_x $pin_y
+      make_wire $bend_x $pin_y $bend_x $out_y
+      make_wire $bend_x $out_y $prevout_x $out_y
+    }
+
+    # save this stage's output pin location for the next stage to use
+    if {$i == 0} {
+      set prevout_x [expr $ao_x + $port_and2_out_x]
+    } else {
+      set prevout_x [expr $ao_x + $port_ao_out_x]
+    }
+
+    # increment x
+    set x [expr $x + $delta_x]
+  }
+
+  # add the output buffer
+  if {($OutputSize == "D") || ($OutputSize == "E")}  {
+    set buf_x [expr $prevout_x + $icon_buf_x]
+    if {$OutputSize == "D"} {
+      set bufname [NAME_MMI_BUF -Size D -DeMorgan 0]
+      generate MMI_BUF $bufname -Size D -DeMorgan 0
+    } else {
+      set bufname [NAME_MMI_BUF -Size E -DeMorgan 0]
+      generate MMI_BUF $bufname -Size E -DeMorgan 0
+    }
+    make $bufname -origin "$buf_x $out_y" -name $max_bitrange
+    set pin_x [expr $buf_x + $port_buf_in_x]
+    make_wire $prevout_x $out_y $pin_x $out_y
+    make_wire [expr $buf_x + $port_buf_out_x] $out_y $outflag_x $out_y
+    # add row_spanner
+    set rswidth [expr $icon_buf_x + $icon_ao21_x + ($pin_x - $prevout_x)]
+    set rsname [format "row_spanner%d" [expr int($rswidth/2)]]
+    generate row_spanner $rsname -width [expr int($rswidth/2)]
+    make $rsname -origin "$prevout_x $rs_y"
+  } else {
+    make_wire $prevout_x $out_y $outflag_x $out_y
+  }
+  set lname [format "Out_H%s" $vmax_bitrange]
+  make output -name $lname -origin "$outflag_x $out_y"
+
+
+  # title bar
+  make sccs_title_bar -origin "[expr int(($outflag_x - $inflag_x)/2)] [expr $clk_y + 150]" -owner emc -version 0.4 -date 5/23/00
+}
+
+
+proc ICON_mmig_queue args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 32} {Depth 8} {OutputSize "C" {radio C D E}}}
+
+  # check for acceptable response on NBITS
+  if {$NBITS < 1} {
+    error "ERROR: NBITS ($NBITS) must be greater than 0"
+  }
+  # don't let the user get too crazy
+  if {$NBITS > 128} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  # figure out max index & bitranges
+  setl {maxidx max_bitrange vmax_bitrange} [generators_compute_bitrange $NBITS]
+
+  # check for acceptable response on Depth
+  if {$Depth < 1} {
+    error "ERROR: Depth ($Depth) must be greater than 0"
+  }
+  # don't let the user get too crazy
+  if {$Depth > 128} {
+    error "ERROR: Depth ($Depth) not supported"
+  }
+
+  # check for acceptable response on OutputSize
+  if {([string toupper $OutputSize] != "C") &&
+      ([string toupper $OutputSize] != "D") &&
+      ([string toupper $OutputSize] != "E")} {
+    error "ERROR: OutputSize ($OutputSize) not supported"
+  }
+      
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  set icon_h [expr 20 + (2 * 30)]
+  set icon_bot [expr $icon_h / 2]
+  set icon_top [expr - ($icon_bot)]
+  icon_line -80 $icon_bot -80 $icon_top 80 $icon_top 80 $icon_bot -80 $icon_bot
+
+  # data input
+  icon_term -type input -origin {-80 0} -name "In_H$vmax_bitrange"
+  icon_property -origin {-70 0} -size small -label In
+
+  # width
+  icon_property -origin "-70 [expr $icon_top + 10]" -size small -label $max_bitrange
+
+
+  # control inputs
+  # clock
+  set depth_bitrange [format "\[%d:0\]" [expr $Depth - 1]]
+  icon_term -type input -origin "0 $icon_bot" -name Clk$depth_bitrange -orient R270
+  icon_line -10 $icon_bot 0 [expr $icon_bot - 10] 10 $icon_bot
+  # reset
+  icon_term -type input -origin "20 $icon_bot" -name Reset_L$depth_bitrange -orient R270
+  icon_property -origin "20 [expr $icon_bot - 10]" -size small -anchor center -label R
+  # push
+  icon_term -type input -origin "-20 $icon_bot" -name Push_H$depth_bitrange -orient R270
+  icon_property -origin "-20 [expr $icon_bot -10]" -size small -anchor center -label Push
+  # head
+  icon_term -type input -origin "40 $icon_bot" -name Head_H$depth_bitrange -orient R270
+  icon_property -origin "40 [expr $icon_bot - 10]" -size small -anchor center -label Head
+
+  # outputs
+  icon_term -type output -origin {80 0} -name "Out_H$vmax_bitrange"
+  icon_property -origin {70 0} -size small -anchor e -label Out_H
+  # width
+  icon_property -origin "70 [expr $icon_top + 10]" -size small -anchor e -label $max_bitrange
+
+  # text
+  set depthlabel [format "%d Deep" $Depth]
+  icon_property -origin {0 -20} -anchor center -label "$depthlabel"
+  icon_property -origin {0 0} -anchor center -label Queue
+  icon_property -origin {0 20} -anchor center -label $OutputSize
+
+  # junk
+  icon_property -origin {-70 300} -type user -name name
+  icon_property -origin {-70 320} -type user -name M
+  icon_property -origin {-70 340} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 460} -owner emc -version 0.4 -date 5/23/00
+  # this property makes a generator pop up in "Schematic" mode rather than "Verilog" mode
+  icon_property -origin {-70 360} -type fixed -name netlist_level -text 2000
+
+}

@@ -1,0 +1,96 @@
+#!/bin/csh -f
+
+# Runs calibre lvs remotely
+
+if ($1 == "" || $1 == "-h" || $1 == "-help") then
+  echo ""
+  echo "Usage: lvs_it <spice_file> <gds_file> <tech>"
+  echo ""
+  echo "filenames must include extension."
+  echo "<tech> is the max technology name"
+  echo ""
+  exit
+endif
+
+##################################################################
+##################################################################
+#           SITE CUSTOMIZATION
+
+# This is where the node locked license lives.
+set calibrehost=mmifs3.micromagic.com
+# for the local host, use
+#set calibrehost = `uname -n`
+
+# Set this variable to point to calibre drc deck
+if ($3 == "mmi25") then
+  set calibre_deck = /proj/tech/mmi25/decks/tsmc25.calibre_lvs
+else if ($3 == "mmi18") then
+  set calibre_deck = /proj/tech/mmi18/decks/tsmc18.calibre_lvs
+else
+  echo "Aborting, don't know what calibre deck to use with tech = $3."
+  exit 1
+endif
+
+# NOTE: you must remove any lines in your calibre deck of that start with
+#
+#        LAYOUT PRIMARY
+#        LAYOUT PATH
+#        LAYOUT SYSTEM
+#        SOURCE PRIMARY
+#        SOURCE PATH
+#        SOURCE SYSTEM
+#        LVS_REPORT
+
+# Set the variable "setup" to contain any setup required to run calibre
+set setup="source ~cad/cad_cshrc"
+
+##################################################################
+##################################################################
+
+if (! -e $1) then
+  echo "Aborting, can't find file $1"
+  exit 1
+endif
+
+date
+
+set filename = $1:r
+
+set spicecell = `basename $1:r`
+set gdscell = `basename $2:r`
+
+# Hack to get "" in the next file
+set q = '"'
+
+# create header file for this run.
+echo "INCLUDE $calibre_deck\
+LAYOUT PRIMARY $q$gdscell$q\
+LAYOUT PATH $q$2$q\
+LAYOUT SYSTEM GDSII\
+SOURCE PRIMARY $q$spicecell$q\
+SOURCE PATH $q$1$q\
+SOURCE SYSTEM SPICE\
+LVS REPORT $q$filename.report$q" \
+> $filename.calibre
+
+# now run calibre
+set host = `uname -n`
+# If already on host, do not use rsh
+echo "Starting calibre lvs on host $q$calibrehost$q ..."
+if ( "$host" == "$calibrehost" ) then
+    $setup ; calibre -lvs $filename.calibre > $filename.calibre_log
+else
+    rsh $calibrehost "cd `pwd`; $setup ; calibre -lvs $filename.calibre > $filename.calibre_log"
+endif
+
+echo "Results written to $q$filename.report$q and $q$filename.calibre_log$q."
+
+# get the error count
+grep CORRECT $filename.calibre_log
+grep Error: $filename.report
+
+echo "done."
+
+date
+
+exit

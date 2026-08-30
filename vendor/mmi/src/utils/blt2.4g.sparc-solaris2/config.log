@@ -1,0 +1,138 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:643: checking host system type
+configure:664: checking target system type
+configure:682: checking build system type
+configure:733: checking which C compiler
+configure:930: checking how to run the C preprocessor
+configure:951: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:994: checking if C compiler is really gcc
+configure:1033: checking default compiler flags
+configure:1070: checking for a BSD compatible install
+configure:1122: checking for ranlib
+configure:1149: checking whether ln -s works
+configure:1177: checking for ANSI C header files
+configure:1190: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1257: gcc -o conftest    conftest.c  1>&5
+configure:1281: checking for sys/wait.h that is POSIX.1 compatible
+configure:1302: gcc -c   conftest.c 1>&5
+configure:1323: checking whether time.h and sys/time.h may both be included
+configure:1337: gcc -c   conftest.c 1>&5
+configure:1361: checking for string.h
+configure:1371: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1361: checking for float.h
+configure:1371: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1361: checking for math.h
+configure:1371: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1361: checking for errno.h
+configure:1371: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1361: checking for limits.h
+configure:1371: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1361: checking for sys/param.h
+configure:1371: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1401: checking for sys/time.h
+configure:1411: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1401: checking for waitflags.h
+configure:1411: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1407: waitflags.h: No such file or directory
+configure: failed program was:
+#line 1406 "configure"
+#include "confdefs.h"
+#include <waitflags.h>
+configure:1401: checking for sys/wait.h
+configure:1441: checking for malloc.h
+configure:1451: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1441: checking for memory.h
+configure:1451: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1481: checking for setjmp.h
+configure:1491: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1574: checking for stdlib.h
+configure:1584: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1574: checking for unistd.h
+configure:1584: gcc -E  conftest.c >/dev/null 2>conftest.out
+configure:1612: checking whether strdup is declared in header files
+configure:1653: checking whether drand48 is declared in header files
+configure:1702: checking for strdup
+configure:1730: gcc -o conftest    conftest.c  1>&5
+configure:1702: checking for drand48
+configure:1730: gcc -o conftest    conftest.c  1>&5
+configure:1702: checking for srand48
+configure:1730: gcc -o conftest    conftest.c  1>&5
+configure:1762: checking for size_t
+configure:1795: checking for pid_t
+configure:1828: checking whether byte ordering is bigendian
+configure:1846: gcc -c   conftest.c 1>&5
+configure: In function `main':
+configure:1841: `bogus' undeclared (first use this function)
+configure:1841: (Each undeclared identifier is reported only once
+configure:1841: for each function it appears in.)
+configure:1841: parse error before `endian'
+configure: failed program was:
+#line 1835 "configure"
+#include "confdefs.h"
+#include <sys/types.h>
+#include <sys/param.h>
+int main() {
+
+#if !BYTE_ORDER || !BIG_ENDIAN || !LITTLE_ENDIAN
+ bogus endian macros
+#endif
+; return 0; }
+configure:1894: gcc -o conftest    conftest.c  1>&5
+configure: failed program was:
+#line 1881 "configure"
+#include "confdefs.h"
+main () {
+  /* Are we little or big endian?  From Harbison&Steele.  */
+  union
+  {
+    long l;
+    char c[sizeof (long)];
+  } u;
+  u.l = 1;
+  exit (u.c[sizeof (long) - 1] == 1);
+}
+configure:1928: checking whether union wait is defined correctly
+configure:1945: gcc -c   conftest.c 1>&5
+configure: In function `main':
+configure:1938: storage size of `x' isn't known
+configure: failed program was:
+#line 1933 "configure"
+#include "confdefs.h"
+#include <sys/types.h> 
+#include <sys/wait.h>
+int main() {
+
+union wait x;
+WIFEXITED(x);		/* Generates compiler error if WIFEXITED
+			 * uses an int. */
+
+; return 0; }
+configure:1974: checking whether DBL_EPSILON is defined in float.h
+configure:2058: checking for X
+configure:2295: checking for tclConfig.sh
+configure:2333: checking for tkConfig.sh
+configure:2371: checking for itclConfig.sh
+configure:2545: checking for main in -lsocket
+configure:2560: gcc -o conftest    conftest.c -lsocket   1>&5
+configure:2594: checking for main in -lnsl
+configure:2609: gcc -o conftest    conftest.c -lnsl  -lsocket  1>&5
+configure:2643: checking for main in -lm
+configure:2658: gcc -o conftest    conftest.c -lm  -lnsl -lsocket  1>&5
+configure:2786: checking for itcl.h
+configure:2796: gcc -E   -I/mmi-cad/utils/tcltk/install.sparc-solaris2/include -I/usr/openwin/include conftest.c >/dev/null 2>conftest.out
+configure:2792: itcl.h: No such file or directory
+configure: failed program was:
+#line 2791 "configure"
+#include "confdefs.h"
+#include <itcl.h>
+configure:2826: checking for itk.h
+configure:2836: gcc -E   -I/mmi-cad/utils/tcltk/install.sparc-solaris2/include -I/usr/openwin/include conftest.c >/dev/null 2>conftest.out
+configure:2832: itk.h: No such file or directory
+configure: failed program was:
+#line 2831 "configure"
+#include "confdefs.h"
+#include <itk.h>
+configure:2871: checking BLT major version number
+configure:2904: checking BLT minor version number

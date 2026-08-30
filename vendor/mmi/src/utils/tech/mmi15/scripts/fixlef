@@ -1,0 +1,18 @@
+#!/bin/csh -f
+
+# fix names in lef
+set TECH = mmi15
+set ROOTDIR = /proj/tech/$TECH
+set LEFDIR = $ROOTDIR/library/lef
+
+sed \
+    -e 's/gnd/VSS/'\
+    -e 's/vdd/VDD/'\
+    -e 's/M1/metal1/'\
+    -e 's/M2/metal2/'\
+    -e 's/M3/metal3/'\
+    -e 's/M4/metal4/'\
+    -e 's/M5/metal5/'\
+    $LEFDIR/$TECH.lef > $LEFDIR/$TECH.plef
+
+exit

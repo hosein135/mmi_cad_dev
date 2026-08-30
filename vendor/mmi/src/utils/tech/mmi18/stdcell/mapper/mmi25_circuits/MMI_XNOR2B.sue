@@ -1,0 +1,77 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_XNOR2B {} {
+  make global -name gnd -origin {670 560}
+  make global -orient RY -name vdd -origin {300 160}
+  make pmos -W 2.4 -origin {300 300}
+  make pmos -W 2.4 -origin {300 200}
+  make pmos -W 2.4 -origin {670 200}
+  make global -name gnd -origin {300 560}
+  make pmos -W 2.4 -origin {670 300}
+  make output -name out -origin {870 360}
+  make nmos -W 2.4 -origin {300 520}
+  make nmos -W 2.4 -origin {300 420}
+  make nmos -W 2.4 -origin {670 420}
+  make nmos -W 2.4 -origin {670 520}
+  make pmos -W 2.4 -origin {400 300}
+  make pmos -W 2.4 -origin {400 200}
+  make pmos -W 2.4 -origin {770 200}
+  make pmos -W 2.4 -origin {770 300}
+  make inverter -WP 2.4 -WN 1.2 -origin {470 520}
+  make inverter -WP 2.4 -WN 1.2 -origin {50 420}
+  make input -name in1 -origin {-20 520}
+  make input -name in0 -origin {-20 420}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in0_L -origin {140 420}
+  make global -orient RY -name vdd -origin {400 160}
+  make global -orient RY -name vdd -origin {670 160}
+  make global -orient RY -name vdd -origin {770 160}
+  make name_net -name in1_L -origin {550 520}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {330 740}
+  make_wire 300 380 300 360
+  make_wire 300 340 300 360
+  make_wire 300 240 300 260
+  make_wire 670 480 670 460
+  make_wire 670 240 670 260
+  make_wire 670 360 670 380
+  make_wire 300 480 300 460
+  make_wire 670 340 670 360
+  make_wire 590 200 590 520
+  make_wire 240 200 190 200
+  make_wire 190 200 190 520
+  make_wire -20 420 20 420
+  make_wire -20 300 -20 420
+  make_wire 590 200 610 200
+  make_wire 590 520 610 520
+  make_wire 240 520 440 520
+  make_wire 400 240 400 260
+  make_wire 340 200 240 200
+  make_wire 400 340 400 360
+  make_wire 770 240 770 260
+  make_wire 770 340 770 360
+  make_wire 770 360 870 360
+  make_wire 610 200 710 200
+  make_wire -20 300 240 300
+  make_wire -20 520 190 520
+  make_wire 190 520 240 520
+  make_wire 140 420 100 420
+  make_wire 140 420 240 420
+  make_wire 300 360 400 360
+  make_wire 400 360 670 360
+  make_wire 670 360 770 360
+  make_wire 550 520 520 520
+  make_wire 550 520 590 520
+  make_wire 450 300 540 420
+  make_wire 540 300 450 420
+  make_wire 240 300 340 300
+  make_wire 340 300 450 300
+  make_wire 540 420 610 420
+  make_wire 540 300 610 300
+  make_wire 610 300 710 300
+  make_wire 240 420 450 420
+  make_text -origin {-10 110} -text {Exclusive NOR}
+  make_text -origin {-10 130} -text {B Size}
+  make_text -origin {-10 90} -text MMI_XNOR2B -size large
+}
+

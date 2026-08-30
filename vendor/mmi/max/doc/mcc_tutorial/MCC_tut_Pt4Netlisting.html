@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="12/07/01 12:05:54">
+<title>Part 4   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img SRC="images/mmi-logo.gif"></td>
+     <td><font color="003366"><b><H1> MCC MegaCell Compiler Tutorial</H1></b></font></td>
+   </tr>
+</table>
+<p>
+<div>
+
+<table align="right" width="331" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MCC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MCC_tut_Pt3CritPathAnal.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+
+<p> 
+<hr align="left">
+
+ 
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 4 </font>
+</h2>
+
+
+<h2>
+  <a name="1028534"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Netlisting</font>
+</h2>
+
+
+<h3>
+  <a name="1029070"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Overview</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029208"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have built a megacell, you must verify it. Furthermore, a netlist (typically in SPICE format) of the megacell must be provided with the layout for higher level or full-chip LVS. Otherwise, even if the megacell by itself is perfect and connected correctly to the surrounding circuitry, the chip might not work because someone accidentally ran a wire over it and shorted part of it out. </font>
+<p>
+<p>
+  <dt> <a name="1029210"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC enables you to extract a netlist directly from the megacell layout, and verify the megacell from that netlist. This eliminates the time-consuming task of creating a full schematic of the megacell and iterating with LVS to verify that the schematic and layout are the same.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1029211"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SPICE Netlist</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029212"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC creates a two-level SPICE netlist (leaf cells and top level netlist) of your megacell by executing the <b><code class="CodeStrong">MC Netlist</code></b> command and selecting the <b><code class="CodeStrong">SPICE</code></b> option. The netlist contains a top level <b><code class="CodeStrong">subckt</code></b> call, which instantiates all of the leaf cells and inserts loads on all of the top level nets. Each leaf cell also has a <b><code class="CodeStrong">subckt</code></b> definition that includes loads on all nets except for I/O's, since these are included in the top level <b><code class="CodeStrong">subckt</code></b>. A leaf cell is defined as a cell that contains a transistor or transistor cell (gcell). </font>
+<p>
+<p>
+  <dt> <a name="1029213"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this exercise, we will create a SPICE netlist for an SRAM. First, let's generate an SRAM of a different size.</font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029214"> </a>Select <b><code class="CodeStrong">MC Build</code></b> from the <b><code class="CodeStrong">Tool</code></b> menu and set <b><code class="CodeStrong">ROWS</code></b> to <b><code class="CodeStrong">16</code></b> and <b><code class="CodeStrong">COLS</code></b> to <b><code class="CodeStrong">32</code></b>, which will create an 128x4 SRAM.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029215"> </a>Select <b><code class="CodeStrong">MC Netlist</code></b> from the <b><code class="CodeStrong">Tool</code></b> menu</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029216"> </a>When the popup form appears, as shown in <a href="MCC_tut_Pt4Netlisting.html#1041446">Figure 29</a>, click on the <b><code class="CodeStrong">spice</code></b> toggle button and click <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+<p>
+  <dt> <a name="1029217"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are going to use the SPICE netlist for LVS purposes, you do not want to output <b><strong class="Strong">parasitics</strong></b>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1041446"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 29:   MC Netlist Popup Form</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mc_netlist.gif">
+</div></font><a name="1041457"> </a>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029218"> </a>Look at the generated SPICE netlist, <b><code class="CodeStrong">MMI_SRAM128X4.sp</code></b>.</font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1029219"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This netlist can now be used for LVS purposes.</font>
+<p>  </dl>
+</pre>
+
+<h3>
+  <a name="1029220"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Verilog Netlist</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029221"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also extract a Verilog netlist from your MCC layout. This Verilog netlist can be used for functional verification of the megacell. For example, if you have created an SRAM, you want to insure that each memory cell is uniquely addressed and that there are no unwanted sign inversions. </font>
+<p>
+<p>
+  <dt> <a name="1029222"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the chip that this megacell is going into is verified in Verilog, you can also substitute this extracted Verilog model for the behavioral model used in simulation and verification of the entire chip. Although the extracted model is much slower than the behavioral model to simulate, it allows you to verify the desired megacell functionality. Often megacells, such as memories, are black-boxed manually, which provides a likely spot for errors if you cannot verify the actual megacell. </font>
+<p>
+<p>
+  <dt> <a name="1029223"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's create a Verilog netlist for our SRAM.</font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029224"> </a>Select <b><code class="CodeStrong">MC Netlis</code></b><b><strong class="Strong">t</strong></b> from the <b><code class="CodeStrong">Tool</code></b> menu</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029225"> </a>When the popup appears, click on the <b><code class="CodeStrong">verilog </code></b>toggle button and click <b><code class="CodeStrong">Done</code></b>.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029226"> </a>Look at the generated Verilog netlist, <b><code class="CodeStrong">MMI_SRAM128X4.v</code></b>.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1041560"> </a>To run the Verilog simulation, you need to create a test Verilog file. In a shell window, type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd &lt;path to tutorials&gt;/max/verilog
+</font><a name="1029229"> </a>
+</p></pre>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1029230"> </a>Look at the <b><code class="CodeStrong">test_sram128x64.v</code></b> file.</font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1029231"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This is a manually created test file for a larger SRAM. If you want to generate a Verilog netlist to run with this test Verilog file, generate a new SRAM with <b><code class="CodeStrong">ROWS</code></b> set to <b><code class="CodeStrong">16</code></b> and <b><code class="CodeStrong">COLS</code></b> set to <b><code class="CodeStrong">64</code></b>. Then, generate a Verilog netlist for <b><code class="CodeStrong">MMI_SRAM_128X64</code></b>. This will take a little while. The <b><code class="CodeStrong">Verilog.log</code></b> file shows the results of running Verilog simulation on this file.</font>
+<p>  </dl>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1029232"> </a>Go to the<b><code class="CodeStrong"> v.lib</code></b> directory by typing:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd v.lib
+</font><a name="1029233"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1029234"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This is where the behavioral models for the leaf cells are located. They were hand generated. </font>
+<p>  </dl>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1029235"> </a>Look at <b><code class="CodeStrong">mmi_sram_wld.v</code></b> for a representative example.</font>
+</p>   </ol>
+<p>
+  <dt> <a name="1029236"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most of the behavioral models are very simple.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1029237"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Summary</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029238"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You have completed the following tasks:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029239"> </a>Run <b><code class="CodeStrong">MC Build</code></b> and generated SRAMS. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029240"> </a>Learned about tiling, via programming and port propagation. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029241"> </a>Run <b><code class="CodeStrong">MC What</code></b> to help create tiling commands. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029242"> </a>Run <b><code class="CodeStrong">MC Critical Path</code></b> 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029243"> </a>Plotted critical path nets in NST. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029244"> </a>Generated SPICE and Verilog netlists. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1029245"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC is a very powerful tool for building all types of regular structures. It has many powerful features to assist in memory analysis. Additionally, MCC makes it much easier to port a design to a new process.</font>
+<p>
+<p>
+  <dt> <a name="1029246"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For more details on how to use MCC, refer to the MCC Manual.</font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table align="right" width="331" border="0" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MCC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MCC_tut_Pt3CritPathAnal.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+
+</body>
+</html>

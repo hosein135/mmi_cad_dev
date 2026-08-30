@@ -1,0 +1,41 @@
+DESIGN m ;
+
+COMPONENTS 4 ;
+- sub0/u1 MMI_NOR2A + PLACED ( 0 1 ) N ;
+- sub1/u1 MMI_NOR2A + PLACED ( 2 3 ) S ;
+- sub0/u2 MMI_FILL_1 + FIXED ( 4 5 ) E ;
+- sub1/u2 MMI_FILL_1 + FIXED ( 6 7 ) W ;
+- sub0/u3 MMI_FILL_2 + FIXED ( 8 9 ) FN ;
+END COMPONENTS
+
+PINS 6 ;
+- a[0] + NET a[0] + DIRECTION INPUT + USE SIGNAL ;
+- a[1] + NET a[1] + DIRECTION INPUT + USE SIGNAL ;
+- b[0] + NET b[0] + DIRECTION INPUT + USE SIGNAL ;
+- b[1] + NET b[1] + DIRECTION INPUT + USE SIGNAL ;
+- z[0] + NET z[0] + DIRECTION OUTPUT + USE SIGNAL ;
+- z[1] + NET z[1] + DIRECTION OUTPUT + USE SIGNAL ;
+END PINS
+
+NETS 6 ;
+- a[0]
+    ( PIN a[0] )
+    ( sub0/u1 in0 ) ;
+- a[1]
+    ( PIN a[1] )
+    ( sub1/u1 in0 ) ;
+- b[0]
+    ( PIN b[0] )
+    ( sub0/u1 in1 ) ;
+- b[1]
+    ( PIN b[1] )
+    ( sub1/u1 in1 ) ;
+- z[0]
+    ( sub0/u1 out )
+    ( PIN z[0] ) ;
+- z[1]
+    ( sub1/u1 out )
+    ( PIN z[1] ) ;
+END NETS
+
+END DESIGN

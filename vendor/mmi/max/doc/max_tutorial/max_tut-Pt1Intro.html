@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="11/27/01 13:22:57">
+<title>Part 1   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout Environment Tutorial </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="max_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="max_tut-Preface.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="max_tut-Pt2Layout.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="max_tut-Pt4MAX-LS.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 1 </font>
+</h2>
+
+
+<h2>
+  <a name="1013124"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h2>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014141"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Welcome to MAX, the full-custom layout editor from Micro Magic Tools. MAX is more than just a simple layout editor. It is a complete layout environment.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1014142"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MAX Features</font>
+</h3>
+
+<ul><ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014143"> </a>Interactive viewing and editing of hierarchical layout 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014144"> </a>Continuous DRC feedback during layout 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014145"> </a>Hierarchical and incremental DRC 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014146"> </a>Built in netlisting 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014147"> </a>Interactive connectivity tracing 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014148"> </a>Interactive wiring tool with flylines to show connections not yet completed 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014149"> </a>Layout generator for gates (using MAX-LS) 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014150"> </a>Generators for large regular structures such as SRAMS, ROMs, PLA's, and DRAM's (with the optional MegaCell Compiler) 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014151"> </a>Interfaces to other tools, including schematic capture (for example SUE), and batch DRC and LVS (for example <em class="Emphasis">Dracula</em> or <em class="Emphasis">Calibre</em>). 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014152"> </a>Smart palette for easy control and feedback on layers 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014153"> </a>Full customization and extension via Tcl/Tk scripting language and API 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014154"> </a>Technology independence via technology description files 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014155"> </a>Optimized for large databases 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014156"> </a>Very Fast Redisplay for Whole Chip Viewing and Inspection 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014157"> </a>Reads/writes GDSII 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014158"> </a>Runs on Solaris and Linux operating systems. 
+</li><p>
+</font>
+</ul></ul></ul>
+</>
+<dl><dl>
+<p>
+  <dt> <a name="1014159"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This tutorial will introduce you to many of these features. Consult the <em class="Emphasis">Micro Magic Tools MAX User Guide</em> and on-line documentation for further information.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1014160"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Starting up MAX</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014161"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we get started make sure someone has already installed MAX at your site.</font>
+<p>
+<p>
+  <dt> <a name="1014162"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To run the tutorials, you need to make a personal copy of the MAX tutorial example files using<b><code class="CodeStrong"> mmi_tutorial</code></b>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1038069"> </a>To install the MAX tutorial, type the following at the UNIX prompt:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">mmi_tutorial</font><a name="1014165"> </a>
+</p><font face="ITC Franklin Gothic Book"></font><a name="1038136"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1014167"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Make sure that the appropriate tool (MAX) is selected and then click on <b><code class="CodeStrong">I</code></b><b><code class="CodeStrong">nstall Tutorial</code></b>.  The default installation directory is <b><code class="CodeStrong">â€œmmi_private/tutorialâ€</code></b> in your home directory.  You can also select a different directory for installation.  Don't worry if the directory doesn't exist, the <b><code class="CodeStrong">mmi_tutorial</code></b> script will make it if it can.  You can also use this to reinstall a clean copy of the tutorial.</font>
+<p>  </dl>
+   </ol>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014168"> </a>To start the tutorial, you must first "<b><strong class="Strong">cd</strong></b>" (change directory) to the directory that you installed the tutorial into.  If you used the default directory, type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd ~/mmi_private/tutorial/max </font><a name="1014169"> </a>
+</p><font face="Courier"></font><a name="1014170"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1014171"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Otherwise, replace the above directory with the directory you selected.  This directory contains files that you will need to run the tutorial.</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014172"> </a>Then to start MAX, simply type: </font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">max</font><a name="1014173"> </a>
+</p><font face="Courier"></font><a name="1014174"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014175"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A window should come up that looks something like <a href="max_tut-Pt1Intro.html#1014177">Figure 1</a>. The rest of this portion of the tutorial will go over each section of the MAX windows.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014177"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 1:   MAX Window</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max_window.gif">
+</div></font><a name="1029029"> </a>
+</pre>
+
+<h3>
+  <a name="1014182"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MAX Screen Layout</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014183"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">On the very top of the window the title bar should say "<b><code class="CodeStrong">max: UNNAMED</code></b>".</font>
+<p>
+<p>
+  <dt> <a name="1014184"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><font  face="Verdana, Arial, Helvetica, sans-serif">"</font><b><code class="CodeStrong">UNNAMED</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">"</font> means that you have<em class="Emphasis"> </em><em class="Emphasis">not specified the file</em> (cell) you wish to edit.</font>
+<p>
+<p>
+  <dt> <a name="1014185"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, across the top you should see the menu bar which contains the following menu items: <b><code class="CodeStrong">File</code></b>, <b><code class="CodeStrong">Edit</code></b>, <b><code class="CodeStrong">View</code></b>, <b><code class="CodeStrong">Tools</code></b>, <b><code class="CodeStrong">Misc</code></b>, <b><code class="CodeStrong">Local</code></b>, and <b><code class="CodeStrong">Help</code></b>. These are pull down menus much like any other application.</font>
+<p>
+<p>
+  <dt> <a name="1014186"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Directly to the right of the <b><code class="CodeStrong">Help</code></b> menu is the <b><code class="CodeStrong">MAX Message Area</code></b>. Depending on the location of the cursor, it currently says something like "<b><code class="CodeStrong">main mode, BUT-1 selects, BUT-2 moves selection...</code></b>". The <b><code class="CodeStrong">MAX Message Area </code></b>is a sort of mini-help feature. It tells you what each mouse button does, and when you have pulled down one of the menus from the menu bar, the message area will give you a short explanation of what the highlighted menu item does.</font>
+<p>
+<p>
+  <dt> <a name="1038254"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The remainder of this section of the tutorial goes over each area of the MAX window. Refer to the MAX User Guide for a more detailed description of the MAX window. Figure points out the different attributes of the MAX window.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1038261"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 2:   MAX Layout Window</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max_layout_window.gif">
+</div></font><a name="1043458"> </a>
+</pre>
+
+<h4>
+  <a name="1014187"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Cell List Boxes</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014188"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Down the right side of the window are several small List boxes.</font>
+<p>
+<p>
+  <dt> <a name="1014189"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Each List Box contains cells in a given directory. That directory can be the user's "working directory" or a library.</font>
+<p>
+<p>
+  <dt> <a name="1014190"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Additional List Boxes can be added (or boxes deleted) by clicking the left mouse button (Button-1) over the List box header (the part that says <b><code class="CodeStrong">users/tutorial/max</code></b> in <a href="max_tut-Pt1Intro.html#1014177">Figure 1</a>).</font>
+<p>
+<p>
+  <dt> <a name="1014194"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Then simply click the left mouse button (Button-1) on either <b><code class="CodeStrong">Make new list box,</code></b> or <b><code class="CodeStrong">Close this list box</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1014195"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The directory the list box points to can also be changed by clicking on the desired directory. The directory list includes the directories of all cells that are currently loaded into MAX.</font>
+<p>
+<p>
+  <dt> <a name="1014196"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your <b><code class="CodeStrong">.maxrc</code></b> file can specify library directories to be autoloaded at startup time.</font>
+<p>
+<p>
+  <dt> <a name="1014197"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">.maxrc</code></b> file contains several other useful pieces of information. (See the <em class="Emphasis">Micro Magic Tools MAX User Guide</em> for more details.)</font>
+<p>
+<p>
+  <dt> <a name="1014198"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can adjust the width of the list boxes by moving the mouse pointer over the vertical bar just to the left of the text. The bar will change to a little line with arrows on both the left and right sides.</font>
+<p>
+<p>
+  <dt> <a name="1014199"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When the arrows appear you can adjust the width by simply holding down the left mouse button (Button-1) and dragging the mouse to the left or right.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014200"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Navigation window</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014201"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Below the list boxes is the <b><code class="CodeStrong">Navigation Window</code></b>. For large designs, you can use the <b><code class="CodeStrong">Navigation Window</code></b> to control the view you see in the main <b><code class="CodeStrong">MAX window</code></b>.<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1018467"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Simply holding down the left mouse button (Button-1) and dragging out a region in the <b><code class="CodeStrong">Navigation Window</code></b><b><code class="CodeStrong"> </code></b>will cause the main window to zoom to that region.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</font>
+<p>
+<p>
+  <dt> <a name="1014203"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The small colored buttons on the right of the <b><code class="CodeStrong">Navigation Window</code></b> allow you to do several things.</font>
+<p>
+<p>
+  <dt> <a name="1014204"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The topmost button (green by default) will toggle between the last two zoom views. The additional buttons allow you to save and return to views.</font>
+<p>
+  <dl>
+<p> <dt> <a name="1014205"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if you were at a view you knew you wanted to return to, you would simply click the right mouse button (Button-3) on the middle (blue) button to remember that location and zoom factor.</font>
+<p>  </dl>
+<p>
+  <dt> <a name="1014206"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you later wish to return to that view you simply click the left mouse button (Button-1) on that blue button to return to where you were.</font>
+<p>
+<p>
+  <dt> <a name="1014207"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The top button always toggles to the last view. If you desire, you can add additional buttons to save views. Both the number of view-save buttons, and their colors, can be changed in your <b><code class="CodeStrong">.maxrc</code></b> file.</font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1014208"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Scroll and Zoom bars</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1014209"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">Scroll Bars</em> are laid across the bottom and right side of the <b><code class="CodeStrong">Layout Window</code></b> (and on the right side of the List boxes). These work like the scroll bars in most other applications.</font>
+<p>
+<p>
+  <dt> <a name="1014210"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Below the bottom scroll bar is the <em class="Emphasis">Zoom Bar</em>. Pulling the slider button to the left zooms in, and to the right zooms out.</font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1014211"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Mouse Coordinates and Box Size Location </font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1014212"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the lower right hand corner the <em class="Emphasis">Box Size</em> (in microns) is displayed. (More about the Box later.) This is useful when you wish to make an object a precise size. It is also useful for when you select an object and want to know how big it is. </font>
+<p>
+<p>
+  <dt> <a name="1014213"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Just to the left of the Box Size is the <em class="Emphasis">Mouse Coordinates display</em>. Mouse coordinates are oriented with respect to the top level cell.</font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1014214"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DRC Control and Status</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1014215"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the lower left corner is the <b><strong class="Strong">DRC Status Box</strong></b>. It tells you the current status of the continuous interactive DRC which runs in MAX. The <b><code class="CodeStrong">DRC Status Box</code></b> also has a small radio button to turn the interactive DRC on or off with left mouse button.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014216"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>The Palette</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014217"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Down the left side of the window is the <em class="Emphasis">Smart Palette</em>. The Smart Palette provides many features: </font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014218"> </a>It controls which layers are visible, and lets you choose layers for `painting' (drawing rectangles). 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014219"> </a>It gives feedback on what is currently under the cursor, and what is currently selected.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014220"> </a>It allows you to control which layers can be selected.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014221"> </a>And finally, it allows you change the color or stipple patterns of any of the layers. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1038466"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Refer to the MAX User Guide for more details.</font>
+<p>
+</dl></dl>
+<h4>
+  <a name="1014222"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014223"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Just above the palette are several buttons (<b><code class="CodeStrong">Active:</code></b><em class="Emphasis">, -</em><b><code class="CodeStrong">cells</code></b><b><strong class="Strong">-</strong></b><em class="Emphasis">, -</em><b><code class="CodeStrong">all-</code></b>). </font>
+<p>
+<p>
+  <dt> <a name="1014224"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Active</strong></b> lets you select the <em class="Emphasis">active</em> layer. If you start a wire, it starts in the current Active layer. If Active is set to <em class="Emphasis">auto</em>, the wire starts on the layer the cursor is currently over, or the default layer (usually set to M1).</font>
+<p>
+<p>
+  <dt> <a name="1014227"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Cells</strong></b> controls whether or not sub-cells and gcells can be selected.</font>
+<p>
+<p>
+  <dt> <a name="1014228"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><i><strong class="StrongItalic">All</strong></i> allows you to make all of the layers visible or invisible at the same time.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014229"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Getting Help</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014230"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we go any further, here is how to get help if you ever need it.</font>
+<p>
+<p>
+  <dt> <a name="1038520"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are several levels of help available "on-line" to MAX users. You already know about the quick <b><code class="CodeStrong">Help</code></b> listed in the <b><code class="CodeStrong">MAX Message Area</code></b>. In addition, you can access the complete on-line manual, the complete list of active hotkeys, and complete documentation of the text commands at any time.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1038536"> </a>Assuming you have MAX running, click and hold down the left mouse button (Button-1) on the <b><code class="CodeStrong">Help</code></b> menu. This should pop up a sub menu as shown in <a href="max_tut-Pt1Intro.html#1014243">Figure 3</a>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014236"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">About MAX</code></b> tells you the version of MAX you are running, the technology you are using, etc. You should make sure that you are running the <b><code class="CodeStrong">mmi18</code></b> technology for this tutorial.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014237"> </a>If the technology is NOT set to <b><code class="CodeStrong">mmi18</code></b> then quit out of MAX (Hotkey: <b><strong class="Strong">Ctrl-d</strong></b>) and restart it by typing:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">max -tech mmi18</font><a name="1014238"> </a>
+</p><font face="Courier"></font><a name="1014239"> </a>
+</p></pre>
+   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1014240"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">mmi18</code></b> is a generic 0.18um CMOS technology provided by Micro Magic Tools. It is similar (although not exactly the same) to many current 0.18um technologies and is a good place to start if you need to generate your own technology file.</font>
+<p>
+<p>
+  <dt> <a name="1014241"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">About MAX</code></b> will also tell you where the <b><code class="CodeStrong">MMI_TOOLS</code></b> environment variable points to. (This is the directory where the MMI tools are installed at your site.)</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014243"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 3:   MAX Help Menu</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014247"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><div align="center"><img src="images/max4_fig02.gif">
+</div></font>
+<p>
+<p>
+  <dt> <a name="1014248"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">Current Hot Keys</code></b> gives you a list of all available hot keys. You can also hit the Space bar to bring up this list.</font>
+<p>
+<p>
+  <dt> <a name="1014249"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">Text Commands/Variables</code></b> brings up documentation for the MAX text commands and variables. Text commands are useful for writing scripts, generators, and other helpful programs. Text commands and the Tcl/Tk interface are the MAX API. They allow the user to add their own features to the <b><code class="CodeStrong">Local</code></b> and <b><code class="CodeStrong">Tool</code></b> menus.</font>
+<p>
+<p>
+  <dt> <a name="1014250"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">MAX Manual</code></b> brings up the MAX manual in your browser. The default browser is <em class="Emphasis">Netscape</em>. This can be changed in your <b><code class="CodeStrong">.maxrc</code></b> file.</font>
+<p>
+<p>
+  <dt> <a name="1014251"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">MAX Tutorial </code></b>brings up this tutorial.</font>
+<p>
+<p>
+  <dt> <a name="1014252"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">MMI Documentation Guide</code></b> brings up all of the documentation for all of the Micro Magic Tools software. This document has links to items like the <em class="Emphasis">Micro Magic Tools SUE User Guide</em>, the <em class="Emphasis">Micro Magic Tools MAX User Guide</em>, other Micro Magic Tools software programs, and even to this tutorial.</font>
+<p>
+<p>
+  <dt> <a name="1014253"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before proceeding you should bring up the <em class="Emphasis">Micro Magic Tools MAX User Guide </em>and see what's there. The User Guide is the reference manual to MAX and contains lots of information that you will not find in this simple tutorial.</font>
+<p>
+<p>
+  <dt> <a name="1014254"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You might also want to look at the menu items just to familiarize yourself with what's there.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1038545"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Tear Off Menus</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1038551"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes it is convenient to make a menu its own window.</font>
+<p>
+<p>
+  <dt> <a name="1014256"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example:</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1038556"> </a>Going back to the <b><code class="CodeStrong">Help</code></b> menu: when you hold down the left mouse button (Button-1) over the <b><code class="CodeStrong">Help</code></b> menu notice that there is a dotted line just before the <b><code class="CodeStrong">About MAX</code></b> menu item (not shown in the above figure).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1038557"> </a>If you release the button while over the dotted line the menu will "tear off". The menu then becomes a full-fledged window, like any other window on your desktop. The exact behavior will depend upon which OS and window environment you are running.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014259"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are running SUN's<em class="Emphasis"> </em><em class="Emphasis">Common Desktop Environment (CDE) </em>then the following applies:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014260"> </a>The window iconifies by clicking the small dot in the top right corner.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014261"> </a>You can move the window by clicking and holding down the left mouse button (Button-1) over the top title bar and dragging it around (release button to stop).  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014262"> </a>Or you can close the window by holding down the right mouse button (Button-3) over the top title bar and selecting <b><code class="CodeStrong">Close</code></b> from the menu that pops up, or typing <b><code class="CodeStrong">Alt-F4</code></b>. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1014263"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are running another window manager, your windows might behave a little differently. Consult your window system documentation for more details.</font>
+<p>
+<p>
+  <dt> <a name="1014264"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The chosen menu will stay pulled-down until you select a menu item, or another menu. </font>
+<p>
+<p>
+  <dt> <a name="1014269"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="max_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="max_tut-Preface.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="max_tut-Pt2Layout.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="max_tut-Pt4MAX-LS.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

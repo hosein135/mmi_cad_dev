@@ -1,0 +1,22 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_INAND2A {} {
+  make output -name out -origin {220 20}
+  make inverter -WP 1.2 -WN 0.6 -origin {-60 0}
+  make nand2 -WP 1.2 -WN 1.2 -origin {120 20}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in1_L -origin {50 0}
+  make input -name in1 -origin {-160 0}
+  make input -name in0 -origin {-160 40}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {-50 200}
+  make_wire 190 20 220 20
+  make_wire -160 0 -90 0
+  make_wire -160 40 100 40
+  make_wire 50 0 -10 0
+  make_wire 50 0 100 0
+  make_text -origin {-250 -180} -text {2 Input NAND with one inverted input}
+  make_text -origin {-250 -160} -text {A Size}
+  make_text -origin {-250 -200} -text MMI_INAND2A -size large
+}
+

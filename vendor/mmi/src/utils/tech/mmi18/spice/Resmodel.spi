@@ -1,0 +1,374 @@
+
+.subckt rnwod_t n2 n1 lr=length wr=width
+
+.param rsh=500 dw=0.0705u ptc1=3.68e-3 ptc2=9.54e-6 pvc1=2.77e-3 pvc2=2.49e-4 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 nwdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 nwdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rnwod_t
+
+
+.subckt rnwod_b n2 n1 lr=length wr=width
+
+.param rsh=350 dw=0.0705u ptc1=3.68e-3 ptc2=9.54e-6 pvc1=2.77e-3 pvc2=2.49e-4 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 nwdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 nwdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rnwod_b
+
+
+.subckt rnwod_w n2 n1 lr=length wr=width
+
+.param rsh=650 dw=0.0705u ptc1=3.68e-3 ptc2=9.54e-6 pvc1=2.77e-3 pvc2=2.49e-4 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 nwdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx nwdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 nwdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rnwod_w
+
+
+.subckt rn_t n2 n1 lr=length wr=width
+
+.param rsh=6.8 dw=-0.0825u ptc1=3.35e-3 ptc2=4.31e-7 pvc1=7.56e-05 pvc2=1.24e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rn_t
+
+
+.subckt rn_b n2 n1 lr=length wr=width
+
+.param rsh=4.3 dw=-0.0825u ptc1=3.35e-3 ptc2=4.31e-7 pvc1=7.56e-05 pvc2=1.24e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rn_b
+
+
+.subckt rn_w n2 n1 lr=length wr=width
+
+.param rsh=9.3 dw=-0.0825u ptc1=3.35e-3 ptc2=4.31e-7 pvc1=7.56e-05 pvc2=1.24e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rn_w
+
+.subckt rns_t n2 n1 lr=length wr=width
+
+.param rsh=4.1 dw=-0.0825u ptc1=3.35e-3 ptc2=4.31e-7 pvc1=7.56e-05 pvc2=1.24e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+ 
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+ 
+.ends rns_t
+ 
+ 
+.subckt rns_b n2 n1 lr=length wr=width
+ 
+.param rsh=1.35 dw=-0.0825u ptc1=3.35e-3 ptc2=4.31e-7 pvc1=7.56e-05 pvc2=1.24e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+ 
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+ 
+.ends rns_b
+ 
+ 
+.subckt rns_w n2 n1 lr=length wr=width
+ 
+.param rsh=6.85 dw=-0.0825u ptc1=3.35e-3 ptc2=4.31e-7 pvc1=7.56e-05 pvc2=1.24e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+ 
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+ 
+.ends rns_w
+
+.subckt rnrpo_t n2 n1 lr=length wr=width
+
+.param rsh=59.0 dw=0u ptc1=1.47e-3 ptc2=8.32e-7 pvc1=7.55e-04 pvc2=1.97e-04 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rnrpo_t
+
+
+.subckt rnrpo_b n2 n1 lr=length wr=width
+
+.param rsh=53.2 dw=0u ptc1=1.47e-3 ptc2=8.32e-7 pvc1=7.55e-04 pvc2=1.97e-04 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rnrpo_b
+
+
+.subckt rnrpo_w n2 n1 lr=length wr=width
+
+.param rsh=64.8 dw=0u ptc1=1.47e-3 ptc2=8.32e-7 pvc1=7.55e-04 pvc2=1.97e-04 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 gnd n2 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 gnd nm ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 gnd nn ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 gnd nx ndio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 gnd n1 ndio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rnrpo_w
+
+
+.subckt rp_t n2 n1 lr=length wr=width
+
+.param rsh=7.2 dw=-0.074u ptc1=3.44e-3 ptc2=5.02e-7 pvc1=-2.51e-04 pvc2=1.03e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rp_t
+
+
+.subckt rp_b n2 n1 lr=length wr=width
+
+.param rsh=4.2 dw=-0.074u ptc1=3.44e-3 ptc2=5.02e-7 pvc1=-2.51e-04 pvc2=1.03e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rp_b
+
+
+.subckt rp_w n2 n1 lr=length wr=width
+
+.param rsh=10.2 dw=-0.074u ptc1=3.44e-3 ptc2=5.02e-7 pvc1=-2.51e-04 pvc2=1.03e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rp_w
+
+.subckt rps_t n2 n1 lr=length wr=width
+
+.param rsh=4.4 dw=-0.074u ptc1=3.44e-3 ptc2=5.02e-7 pvc1=-2.51e-04 pvc2=1.03e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rps_t
+
+
+.subckt rps_b n2 n1 lr=length wr=width
+
+.param rsh=2.4 dw=-0.074u ptc1=3.44e-3 ptc2=5.02e-7 pvc1=-2.51e-04 pvc2=1.03e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+ 
+.ends rps_b
+ 
+ 
+.subckt rps_w n2 n1 lr=length wr=width
+ 
+.param rsh=6.4 dw=-0.074u ptc1=3.44e-3 ptc2=5.02e-7 pvc1=-2.51e-04 pvc2=1.03e-03 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+ 
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+ 
+.ends rps_w
+
+
+.subckt rprpo_t n2 n1 lr=length wr=width
+
+.param rsh=133.0 dw=0u ptc1=1.43e-3 ptc2=7.82e-7 pvc1=-1.19e-03 pvc2=-1.8e-04 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rprpo_t
+
+
+.subckt rprpo_b n2 n1 lr=length wr=width
+
+.param rsh=114.0 dw=0u ptc1=1.43e-3 ptc2=7.82e-7 pvc1=-1.19e-03 pvc2=-1.8e-04 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rprpo_b
+
+
+.subckt rprpo_w n2 n1 lr=length wr=width
+
+.param rsh=152.0 dw=0u ptc1=1.43e-3 ptc2=7.82e-7 pvc1=-1.19e-03 pvc2=-1.8e-04 pt='temper'
+.param tfac='1.0+ptc1*(pt-25.0)+ptc2*(pt-25.0)**2'
+
+r1 n2 nm 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r2 nm nn 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r3 nn nx 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+r4 nx n1 'rsh*lr/(4.0*(wr-2*dw))*(1+pvc1*v(n2,n1)+pvc2*v(n2,n1)**2)*tfac'
+d1 n2 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+d2 nm vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d3 nn vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d4 nx vdd pdio area='(wr-2*dw)*lr/5.0' pj='2.0*lr/5.0'
+d5 n1 vdd pdio area='(wr-2*dw)*lr/5.0' pj='(wr-2*dw)+2.0*lr/5.0'
+
+.ends rprpo_w

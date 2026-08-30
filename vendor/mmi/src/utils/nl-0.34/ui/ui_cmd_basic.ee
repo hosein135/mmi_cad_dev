@@ -1,0 +1,2491 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "nl.h"
+#include "pnl.h"
+#include "ast2g.h"
+#include "hier.h"
+#include "tcl.h"
+#include "ui.h"
+#include "ui_int.h"
+
+
+#(defcommand create_design
+   "Create an empty design."
+   (name string "name of design to create"))
+{
+  nl_design design = nl_design_create (name, context);
+
+  if ( design == NULL ) {
+    error ("a design named %s could not be created.", name);
+  }
+  else {
+    ui_cmd_object_result (interp, (nl_object) design, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+static char *ui_create_idesign_attr;
+
+
+static
+int
+ui_create_idesign_predicate (nl_design design)
+{
+  Tcl_Obj *flag_obj = NULL;
+  
+  nl_design_attr_get_by_name (ui_create_idesign_attr, design, &flag_obj);
+
+  if ( flag_obj == NULL ) {
+    return 0;
+  }
+  else {
+    int len;
+
+    Tcl_GetStringFromObj (flag_obj, &len);
+
+    return len != 0;
+  }
+}
+
+
+#(defcommand create_idesign
+   "Create an idesign based on the specified design."
+   (-stop_attribute string "do not descend into designs that have this attribute")
+   &optional
+   (design current_design "top level design of the idesign"))
+{
+  nl_idesign idesign;
+  nl_predicate pred = NULL;
+
+  if ( stop_attribute != NULL ) {
+    ui_create_idesign_attr = stop_attribute;
+    pred = (nl_predicate) ui_create_idesign_predicate;
+  }
+
+  idesign = nl_idesign_create (design, NULL, pred);
+
+  if ( idesign == NULL ) {
+    error ("an idesign for %s could not be created.",
+	   nl_design_name (design));
+  }
+  else {
+    ui_cmd_object_result (interp, (nl_object) idesign, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand remove_idesigns
+   "Remove all idesigns associated witht he specified design."
+   &optional
+   (design current_design "remove the idesigns associated with this design"))
+{
+  nl_design_for_all_idesigns (design, idesign) {
+    nl_idesign_free_tree (idesign);
+  } nl_end_for;
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_idesign_root
+   "Return the top level of the current idesign tree."
+   &optional
+   (design current_design "return the root of the tree for this design"))
+{
+  int num_idesigns = nl_design_num_idesigns (design);
+
+  if ( num_idesigns == 0 ) {
+    error ("there are no idesigns for the specified design.");
+  }
+
+  {
+    nl_idesign idesign = nl_design_first_idesign (design);
+    nl_icell icell = nl_idesign_icell (idesign);
+    nl_design top_design;
+
+    while ( icell != NULL ) {
+      idesign = nl_icell_idesign (icell);
+      icell = nl_idesign_icell (idesign);
+    }
+
+    top_design = nl_idesign_design (idesign);
+
+    ui_cmd_object_result (interp, (nl_object) top_design, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_reference
+   "Create a reference in the specified design."
+   (name string "name of reference to create")
+   &optional
+   (design current_design "design in which to create the reference"))
+{
+  nl_reference reference = nl_reference_create (name, design, NULL);
+
+  if ( reference == NULL ) {
+    error ("a reference named %s could not be created.", name);
+  }
+  else {
+    ui_cmd_object_result (interp, (nl_object) reference, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand add_reference_parameter
+   "Add a parameter value to the specified reference."
+   (reference reference "add the parameter to this reference")
+   (value integer "value of parameter to add"))
+{
+  nl_reference_add_parameter (reference, value);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_refpin
+   "Create a refpin on the specified reference."
+   (name string "name of the refpin to create")
+   (reference reference "reference on which to create the refpin"))
+{
+  nl_refpin refpin = nl_refpin_create (name, NULL, reference);
+
+  if ( refpin == NULL ) {
+    error ("a refpin named %s could not be created.", name);
+  }
+  else {
+    ui_cmd_object_result (interp, (nl_object) refpin, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand get_reference_refpins
+  "Return a list of all the refpins on the specified reference."
+   (-inputs boolean "return only input pins")
+   (-outputs boolean "return only output pins")
+   (-inouts boolean "return only inout pins")
+   (reference reference "get the refpins of this reference"))
+{
+  if ( !inputs && !outputs && !inouts ) {
+    inputs = outputs = inouts = 1;
+  }
+
+  nl_reference_for_all_refpins (reference, refpin) {
+    nl_direction direction = nl_refpin_direction (refpin);
+
+    switch (direction) {
+    case nl_direction_in:
+      if ( inputs )
+	ui_cmd_append_result_walker ((nl_object) refpin, interp);
+      break;
+
+    case nl_direction_out:
+      if ( outputs )
+	ui_cmd_append_result_walker ((nl_object) refpin, interp);
+      break;
+
+    case nl_direction_inout:
+    case nl_direction_unknown:
+      if ( inouts )
+	ui_cmd_append_result_walker ((nl_object) refpin, interp);
+      break;
+
+    default:
+      ASSERT (0);
+    }
+  } nl_end_for;
+
+  return TCL_OK;
+}
+
+
+
+#(defcommand copy_reference
+  "Make a copy of the specified reference in the specified design."
+  (reference reference "copy this reference")
+  (design design "into this design"))
+{
+  nl_design ref_design = nl_reference_design (reference);
+  nl_reference new_ref;
+
+  if ( ref_design == design ) {
+    error ("attempt to copy a reference (%s) into its own design (%s)",
+	   nl_reference_name (reference), nl_design_name (design));
+  }
+
+  new_ref = hier_copy_reference (reference, design, NULL);
+
+  ui_cmd_object_result (interp, (nl_object) new_ref, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_cell
+   "Create a cell (instance) of the specified reference."
+   (name string "name of the cell to create")
+   (reference reference "create an instance of this reference"))
+{
+  nl_cell cell = nl_cell_create (name, reference);
+
+  if ( cell == NULL ) {
+    error ("a cell named %s could not be created.", name);
+  }
+  else {
+    ui_cmd_object_result (interp, (nl_object) cell, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand create_bus
+   "Create a bus with specified type and members."
+   (name string "the name of the bus")
+   (left integer "the left bound of the bus")
+   (right integer "the right bound of the bus")
+   (members tcl_object "a list of the members of the bus, in order"))
+{
+  int objc;
+  Tcl_Obj **objv;
+
+  Tcl_ListObjGetElements (interp, members, &objc, &objv);
+
+  if ( objc < 1 ) {
+    error ("list of members must have a length of at least one.");
+  }
+
+  {
+    nl_object first = ui_obj_get_nl_object (objv[0]);
+    nl_kind member_kind = nl_object_kind (first);
+    nl_object owner;
+    nl_object type_owner;
+
+    switch (member_kind) {
+    case nl_kind_port:
+    case nl_kind_net:
+    case nl_kind_cell: {
+      nl_design_object des_obj = (nl_design_object) first;
+      owner = (nl_object) nl_design_object_design (des_obj);
+      type_owner = owner;
+      break;
+    }
+    case nl_kind_refpin: {
+      nl_refpin refpin = (nl_refpin) first;
+      owner = (nl_object) nl_refpin_reference (refpin);
+      type_owner = (nl_object) nl_reference_design ((nl_reference) owner);
+      break;
+    }
+    case nl_kind_libpin: {
+      nl_libpin libpin = (nl_libpin) first;
+      owner = (nl_object) nl_libpin_libcell (libpin);
+      type_owner = (nl_object) nl_libcell_library ((nl_libcell) owner);
+      break;
+    }
+    default:
+      error ("first element of the list of members is not of an appropriate type.");
+    }
+
+    {
+      int i;
+
+      for ( i = 1; i < objc; i++ ) {
+	nl_object member = ui_obj_get_nl_object (objv[i]);
+	nl_kind kind = nl_object_kind (member);
+
+	if ( kind != member_kind ) {
+	  error ("all elements of the list of member must have the same type.  "
+		 "Found one that was %s instead of %s.", nl_kind_to_string (kind),
+		 nl_kind_to_string (member_kind));
+	}
+      }
+    }
+
+    {
+      nl_type scalar = nl_type_get_scalar (type_owner);
+      nl_type type = nl_type_get_array (scalar, left, right);
+      nl_bus bus = nl_bus_create (name, type, member_kind, owner);
+      int i;
+
+      for ( i = 0; i < objc; i++ ) {
+	nl_object member = ui_obj_get_nl_object (objv[i]);
+	nl_kind kind = nl_object_kind (member);
+
+	switch (kind) {
+	case nl_kind_cell: {
+	  nl_cell cell = (nl_cell) member;
+	  nl_design design = nl_cell_design (cell);
+
+	  if ( owner != (nl_object) design ) {
+	    error ("cell member %s (in design %s) does not belong to the same design "
+		   "as the other bus members (in design %s)", nl_cell_name (cell),
+		   nl_design_name (nl_cell_design (cell)),
+		   nl_design_name ((nl_design) nl_type_owner (type)));
+	  }
+	  nl_bus_add_cell (bus, cell);
+	  break;
+	}
+	case nl_kind_net: {
+	  nl_net net = (nl_net) member;
+	  nl_bus_add_net (bus, net);
+	  break;
+	}
+	case nl_kind_port: {
+	  nl_port port = (nl_port) member;
+	  nl_bus_add_port (bus, port);
+	  break;
+	}
+	case nl_kind_refpin: {
+	  nl_refpin refpin = (nl_refpin) member;
+	  nl_bus_add_refpin (bus, refpin);
+	  break;
+	}
+	case nl_kind_libpin: {
+	  nl_libpin libpin = (nl_libpin) member;
+	  nl_bus_add_libpin (bus, libpin);
+	  break;
+	}
+	default:
+	  ASSERT (0);
+	}
+      }
+      
+      ui_cmd_object_result (interp, (nl_object) bus, NULL);
+    }
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_library
+  "Create an empty library with the specified name."
+  (name string "name of library to create"))
+{
+  nl_library library = nl_library_create (name, context);
+
+  ui_cmd_object_result (interp, (nl_object) library, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_libraries
+  "List all of the libraries.")
+{
+  nl_context_for_all_libraries (context, library) {
+    ui_cmd_append_result_walker ((nl_object) library, interp);
+  } nl_end_for;
+
+  return TCL_OK;
+}
+
+
+#(defcommand remove_library
+   "Remove the specified libraries from memory."
+   (-all boolean "remove all libraries")
+   (-silent boolean "don't print a message when removing a library")
+   &optional
+   (library library "library to remove"))
+{
+  if ( all ) {
+    nl_context_for_all_libraries (context, des) {
+      char *name = nl_library_name (des);
+
+      if ( !silent ) {
+	printf ("Removing library \"%s\"\n", name);
+      }
+      nl_context_remove_library (context, des);
+    } nl_end_for;
+  }
+  else {
+    char *name;
+
+    if ( library == NULL ) {
+      error ("a library must be specified unless the -all option is used.");
+    }
+
+    name = nl_library_name (library);
+
+    if ( !silent ) {
+      printf ("Removing library \"%s\"\n", name);
+    }
+
+    nl_context_remove_library (context, library);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_libcell
+  "Create a libcell within the specified library."
+  (name string "name of libcell to create")
+  (library library "create the libcell in this library"))
+{
+  nl_libcell result = nl_libcell_create (name, library);
+  pnl_library plibrary = NULL;
+  nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+  if ( plibrary != NULL ) {
+    pnl_libcell_create (result, plibrary);
+  }
+
+  ui_cmd_object_result (interp, (nl_object) result, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_libcells
+  "List all of the libcells in the specified library."
+  (library library "list the libcells in this library"))
+{
+  nl_library_for_all_libcells (library, libcell) {
+    ui_cmd_append_result_walker ((nl_object) libcell, interp);
+  } nl_end_for;
+  
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_name
+  "Return the name of the specified libcell."
+  (libcell libcell "get the name of this libcell"))
+{
+  char *name = nl_libcell_name (libcell);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_name
+  "Return the name of the specified libpin."
+  (libpin libpin "get the name of this libpin"))
+{
+  char *name = nl_libpin_name (libpin);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_library
+  "Return the library to which the specified libcell belongs."
+  (libcell libcell "get the library of this libcell"))
+{
+  nl_library library = nl_libcell_library (libcell);
+
+  ui_cmd_object_result (interp, (nl_object) library, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_pins
+  "Return a list of the pins of the specified libcell."
+  (-nosupply boolean "do not list supply (POWER, GROUND, or ANALOG) pins")
+  (libcell libcell "get the pins of this libcell"))
+{
+  nl_libcell_for_all_libpins (libcell, libpin) {
+    nl_use use = nl_libpin_use (libpin);
+
+    if ( !nosupply || ( use != nl_use_power && use != nl_use_ground ) ) {
+      ui_cmd_append_result_walker ((nl_object) libpin, interp);
+    }
+  } nl_end_for;
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_cell
+   "Return the libcell to which the specified libpin belongs."
+   (libpin libpin "get the libcell of this libpin"))
+{
+  nl_libcell libcell = nl_libpin_libcell (libpin);
+
+  ui_cmd_object_result (interp, (nl_object) libcell, NULL);
+
+  return TCL_OK;
+}
+
+  
+#(defcommand get_libpin_direction
+   ("Return the direction (in, out, or inout) of the specified libpin")
+   (libpin libpin "get the direction of this libpin"))
+{
+  nl_direction direction = nl_libpin_direction (libpin);
+  const char *result = nl_direction_to_string (direction);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_use
+   ("Return the use (signal, power, ground, clock, or analog) of the"
+    "specified libpin")
+   (libpin libpin "get the use of this libpin"))
+{
+  nl_use use = nl_libpin_use (libpin);
+  const char *result = nl_use_to_string (use);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_libpin
+  "Create a libpin on the specified libcell."
+  (name string "name of libpin to create")
+  (dir string "the direction of the libpin (in, out, or inout)")
+  (libcell libcell "create the libpin on this libcell"))
+{
+  nl_direction direction = nl_string_to_direction (dir);
+
+  if ( direction == nl_direction_null ) {
+    error ("could not convert %s to a direction, "
+	   "must be either in, out, or inout", dir);
+  }
+  else {
+    nl_libpin result = nl_libpin_create (name, direction, libcell);
+    nl_library library = nl_libcell_library (libcell);
+    pnl_library plibrary = NULL;
+
+    nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+    if ( plibrary != NULL ) {
+      pnl_libcell plibcell = pnl_library_get_libcell (plibrary, libcell);
+
+      pnl_libpin_create (result, plibcell);
+    }
+    
+    ui_cmd_object_result (interp, (nl_object) result, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand create_libpin_bus
+   "Create a bus of libpins with specified type."
+   (name string "the name of the bus")
+   (dir string "the direction of the libpin bus to create (in, out, or inout)")
+   (left integer "the left bound of the bus")
+   (right integer "the right bound of the bus")
+   (libcell libcell "create the libpin bus in this libcell"))
+{
+  nl_direction direction = nl_string_to_direction (dir);
+
+  if ( direction == nl_direction_null ) {
+    error ("invalid direction, \"%s\", must be "
+	   "\"in\", \"out\", or \"inout\".", dir);
+  }
+  else {
+    nl_library library = nl_libcell_library (libcell);
+    pnl_library plibrary = NULL;
+    pnl_libcell plibcell = NULL;
+    nl_type scalar = nl_type_get_scalar ((nl_object) library);
+    nl_type type = nl_type_get_array (scalar, left, right);
+    nl_bus libpin_bus = nl_bus_create (name, type, nl_kind_libpin,
+				       (nl_object) libcell);
+    int name_len = strlen (name);
+    int style_len = strlen (ui_bus_naming_style);
+    char *name_buf = alloca (name_len + style_len + 16);
+
+    nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+    if ( plibrary != NULL ) {
+      plibcell = pnl_library_get_libcell (plibrary, libcell);
+    }
+
+    nl_type_for_all_indexes (type, index) {
+      nl_libpin libpin;
+
+      sprintf (name_buf, ui_bus_naming_style, name, index);
+      libpin = nl_libpin_create (name_buf, direction, libcell);
+
+      nl_bus_add_libpin (libpin_bus, libpin);
+
+      if ( plibcell != NULL ) {
+	pnl_libpin_create (libpin, plibcell);
+      }
+    } nl_end_for;
+
+    ui_cmd_object_result (interp, (nl_object) libpin_bus, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand remove_cell
+    "Remove the specified cell (instance)."
+    (cell cell "cell to be removed"))
+{
+  nl_design design = nl_cell_design (cell);
+
+  nl_design_remove_cell (design, cell);
+
+  return TCL_OK;
+}
+
+
+#(defcommand remove_reference
+    "Remove the specified reference."
+    (reference reference "reference to be removed"))
+{
+  ar cells = nl_reference_instances (reference);
+  int num_inst = ar_size (cells);
+
+  if ( num_inst > 0 ) {
+    error ("reference %s has %d instances; it cannot be removed",
+	   nl_reference_name (reference), num_inst);
+  }
+  else {
+    nl_design design = nl_reference_design (reference);
+
+    nl_design_remove_reference (design, reference);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand remove_port
+   "Remove the specified port from the design."
+   (port port "port to remove"))
+{
+  nl_design design = nl_port_design (port);
+  char *design_name = nl_design_name (design);
+  char *port_name = STRDUPA (nl_port_name (port));
+
+  /* First figure out if removing this port will break connections elsewhere. */
+
+  nl_context_for_all_designs (context, des) {
+    nl_reference ref = nl_design_get_reference_by_name (des, design_name);
+
+    if ( ref != NULL ) {
+      nl_object down_obj = nl_reference_down_design (ref);
+
+      if ( down_obj == (nl_object) design ) {
+	nl_object obj = nl_reference_get_refpin_by_name (ref, port_name);
+
+	if ( obj != NULL ) {
+	  nl_refpin refpin = (nl_refpin) obj;
+
+	  nl_reference_for_all_instances (ref, cell) {
+	    nl_pin pin = nl_cell_get_pin_by_refpin (cell, refpin);
+	    nl_net net = nl_pin_net (pin);
+
+	    if ( net != NULL ) {
+	      error ("cell %s in design %s has a connection to pin %s",
+		     nl_cell_name (cell), nl_design_name (des), port_name);
+	    }
+	  } nl_end_for;
+	}
+      }
+    }
+  } nl_end_for;
+
+  nl_design_remove_port (design, port);
+
+  nl_context_for_all_designs (context, des) {
+    nl_reference ref = nl_design_get_reference_by_name (des, design_name);
+
+    if ( ref != NULL ) {
+      nl_object down_obj = nl_reference_down_design (ref);
+
+      if ( down_obj == (nl_object) design ) {
+	nl_object obj = nl_reference_get_refpin_by_name (ref, port_name);
+
+	if ( obj != NULL ) {
+	  nl_refpin refpin = (nl_refpin) obj;
+
+	  nl_reference_remove_refpin (ref, refpin);
+	}
+      }
+    }
+  } nl_end_for;
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_net
+   "Create a net in the specified design."
+   (name string "name of the net to create")
+   (class string "class of net to create (wire, tri, wand, wor, reg, trireg, supply0, or supply1)")
+   &optional
+   (design current_design "create the net in this design"))
+{
+  nl_wireclass wireclass = nl_string_to_wireclass (class);
+
+  if ( wireclass == nl_wireclass_null ) {
+    error ("invalid class, \"%s\", must be one of wire, tri, wand, wor, reg, "
+	   "trireg, supply0, or supply1.", class);
+  }
+  else {
+    nl_net net = nl_net_create (name, wireclass, design);
+
+    if ( net == NULL ) {
+      error ("a net named %s could not be created.", name);
+    }
+    else {
+      if ( wireclass == nl_wireclass_supply0 ) {
+	nl_design_add_supply0 (design, (nl_object) net);
+      }
+      else if ( wireclass == nl_wireclass_supply1 ) {
+	nl_design_add_supply1 (design, (nl_object) net);
+      }
+
+      ui_cmd_object_result (interp, (nl_object) net, NULL);
+
+      return TCL_OK;
+    }
+  }
+}
+
+
+#(defcommand remove_net
+    "Remove the specified net (instance)."
+    (net net "net to be removed"))
+{
+  nl_bus bus = nl_net_bus (net);
+
+  if ( bus != NULL ) {
+    error ("net %s can't be removed because it is a member of bus %s.",
+	   nl_net_name (net), nl_bus_name (bus));
+  }
+  else {
+    nl_design design = nl_net_design (net);
+
+    nl_design_remove_net (design, net);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_port
+  "Create a port in the specified design."
+  (-nonet boolean "do not create a net to go with the port")
+  (name string "name of the port to create")
+  (dir string "the direction of the port to create (in, out, or inout)")
+  &optional
+  (design current_design "create a port on this design"))
+{
+  nl_direction direction = nl_string_to_direction (dir);
+
+  if ( direction == nl_direction_null ) {
+    error ("invalid direction, \"%s\", must be "
+	   "\"in\", \"out\", or \"inout\".", dir);
+  }
+  else {
+    nl_port port = nl_port_create (name, design, direction);
+
+    if ( port == NULL ) {
+      error ("a port named %s could not be created.", name);
+    }
+    else {
+      if ( !nonet ) {
+	nl_net net = nl_net_create (name, nl_wireclass_wire, design);
+	nl_pin pin = nl_port_pin (port);
+
+	nl_pin_connect_net (pin, net);
+      }
+
+      {
+	char *design_name = nl_design_name (design);
+
+	nl_context_for_all_designs (context, des) {
+	  nl_reference ref
+	    = nl_design_get_reference_by_name (des, design_name);
+
+	  if ( ref != NULL ) {
+	    nl_object down_design = nl_reference_down_design (ref);
+
+	    if ( (nl_object) design == down_design ) {
+	      nl_refpin_create (name, (nl_object) port, ref);
+	    }
+	  }
+	} nl_end_for;
+      }
+      
+      ui_cmd_object_result (interp, (nl_object) port, NULL);
+
+      return TCL_OK;
+    }
+  }
+}
+
+
+#(defcommand get_scalar_type
+   "Return the scalar type."
+   &optional
+   (design current_design "return the scalar type for this design"))
+{
+  nl_type result = nl_type_get_scalar ((nl_object) design);
+
+  ui_cmd_object_result (interp, (nl_object) result, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_integer_type
+   "Return the integer type."
+   &optional
+   (design current_design "return the scalar type for this design"))
+{
+  nl_type result = nl_type_get_integer ((nl_object) design);
+
+  ui_cmd_object_result (interp, (nl_object) result, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_array_type
+   "Create a type with the specified parameters."
+   (left integer "left bound of the array")
+   (right integer "right bound of the array")
+   (base type "the type of the array members"))
+{
+  nl_type result = nl_type_get_array (base, left, right);
+
+  ui_cmd_object_result (interp, (nl_object) result, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_net_bus
+   "Create a bus of nets with specified type."
+   (name string "the name of the bus")
+   (class string "class of nets to create (wire, tri, wand, wor, reg, trireg, supply0, or supply1)")
+   (left integer "the left bound of the bus")
+   (right integer "the right bound of the bus")
+   &optional
+   (design current_design "create the port bus in this design"))
+{
+  nl_wireclass wireclass = nl_string_to_wireclass (class);
+
+  if ( wireclass == nl_wireclass_null ) {
+    error ("invalid class, \"%s\", must be one of wire, tri, wand, wor, reg, "
+	   "trireg, supply0, or supply1.", class);
+  }
+  else {
+    int name_len = strlen (name);
+    int style_len = strlen (ui_bus_naming_style);
+    char *name_buf = alloca (name_len + style_len + 16);
+    nl_type scalar = nl_type_get_scalar ((nl_object) design);
+    nl_type type = nl_type_get_array (scalar, left, right);
+    nl_bus net_bus
+      = nl_bus_create (name, type, nl_kind_net, (nl_object) design);
+
+    nl_type_for_all_indexes (type, index) {
+      nl_net net;
+
+      sprintf (name_buf, ui_bus_naming_style, name, index);
+      net = nl_net_create (name_buf, wireclass, design);
+      nl_bus_add_net (net_bus, net);
+    } nl_end_for;
+
+    ui_cmd_object_result (interp, (nl_object) net_bus, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand create_port_bus
+   "Create a bus of ports with specified type."
+   (name string "the name of the bus")
+   (dir string "the direction of the port bus to create (in, out, or inout)")
+   (left integer "the left bound of the bus")
+   (right integer "the right bound of the bus")
+   &optional
+   (design current_design "create the port bus in this design"))
+{
+  nl_direction direction = nl_string_to_direction (dir);
+
+  if ( direction == nl_direction_null ) {
+    error ("invalid direction, \"%s\", must be "
+	   "\"in\", \"out\", or \"inout\".", dir);
+  }
+  else {
+    int name_len = strlen (name);
+    int style_len = strlen (ui_bus_naming_style);
+    char *name_buf = alloca (name_len + style_len + 16);
+    nl_type scalar = nl_type_get_scalar ((nl_object) design);
+    nl_type type = nl_type_get_array (scalar, left, right);
+    nl_bus port_bus
+      = nl_bus_create (name, type, nl_kind_port, (nl_object) design);
+    nl_bus net_bus
+      = nl_bus_create (name, type, nl_kind_net, (nl_object) design);
+
+    nl_type_for_all_indexes (type, index) {
+      nl_port port;
+      nl_net net;
+      nl_pin pin;
+
+      sprintf (name_buf, ui_bus_naming_style, name, index);
+      port = nl_port_create (name_buf, design, direction);
+      nl_bus_add_port (port_bus, port);
+      net = nl_net_create (name_buf, nl_wireclass_wire, design);
+      nl_bus_add_net (net_bus, net);
+
+      pin = nl_port_pin (port);
+      nl_pin_connect_net (pin, net);
+    } nl_end_for;
+
+    ui_cmd_object_result (interp, (nl_object) port_bus, NULL);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand create_refpin_bus
+   "Create a bus of refpins with specified type."
+   (name string "the name of the bus")
+   (left integer "the left bound of the bus")
+   (right integer "the right bound of the bus")
+   (reference reference "create the refpin bus in this design"))
+{
+  int name_len = strlen (name);
+  int style_len = strlen (ui_bus_naming_style);
+  char *name_buf = alloca (name_len + style_len + 16);
+  nl_design design = nl_reference_design (reference);
+  nl_type scalar = nl_type_get_scalar ((nl_object) design);
+  nl_type type = nl_type_get_array (scalar, left, right);
+  nl_bus refpin_bus
+    = nl_bus_create (name, type, nl_kind_refpin, (nl_object) reference);
+
+  nl_type_for_all_indexes (type, index) {
+    nl_refpin refpin;
+
+    sprintf (name_buf, ui_bus_naming_style, name, index);
+    refpin = nl_refpin_create (name_buf, NULL, reference);
+    nl_bus_add_refpin (refpin_bus, refpin);
+  } nl_end_for;
+
+  ui_cmd_object_result (interp, (nl_object) refpin_bus, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_parent
+   "Get the parent cell of the specified hierarchical cell."
+   (icell icell "get the parent of this cell"))
+{
+  nl_idesign idesign = nl_icell_idesign (icell);
+  nl_icell parent = nl_idesign_icell (idesign);
+  
+  ui_cmd_object_result (interp, (nl_object) parent, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_idesign_cell
+   "Get the parent cell of the specified hierarchical cell."
+   (idesign idesign "get the parent of this cell"))
+{
+  nl_icell icell = nl_idesign_icell (idesign);
+
+  if ( icell != NULL ) {
+    ui_cmd_object_result (interp, (nl_object) icell, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_libcell
+   "Declare the specified design to be a library cell."
+   (design design "declare this design to be a library cell"))
+{
+  nl_design_set_libcell (design, 1);
+
+  return TCL_OK;
+}
+
+
+#(defcommand unset_libcell
+   "Declare the specified design not to be a library cell."
+   (design design "declare this design not to be a library cell"))
+{
+  nl_design_set_libcell (design, 0);
+
+  return TCL_OK;
+}
+
+
+#(defcommand is_libcell
+   "Return 1 if the specified design is a library cell, 0 otherwise."
+   (design design "return this libcell status of this design"))
+{
+  int result = nl_design_libcell (design);
+  Tcl_Obj *obj = Tcl_NewIntObj (result);
+
+  Tcl_SetObjResult (interp, obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand connect_pin
+   "Connect the specified pin to the specified net."
+   (pin pin "pin to connect")
+   (net net "connect the pin to this net"))
+{
+  if ( nl_pin_net (pin) != NULL ) {
+    nl_net pin_net = nl_pin_net (pin);
+    nl_refpin refpin = nl_pin_refpin (pin);
+    char *pin_name;
+
+    if ( refpin == NULL ) {
+      nl_port port = (nl_port) nl_pin_owner (pin);
+      pin_name = nl_port_name (port);
+    }
+    else {
+      pin_name = nl_refpin_name (refpin);
+    }
+
+    error ("pin %s already has a connection (to net %s).",
+	   pin_name, nl_net_name (pin_net));
+  }
+  
+  nl_pin_connect_net (pin, net);
+
+  return TCL_OK;
+}
+
+
+#(defcommand disconnect_pin
+   "Disconnect the specified pin from any net it is attached to."
+   (pin pin "pin to disconnect"))
+{
+  nl_pin_disconnect (pin);
+
+  return TCL_OK;
+}
+  
+
+#(defcommand get_pin_net
+   "Return the net connected to the specified pin."
+   (pin_or_ipin pin_or_ipin "get the net connected to this pin"))
+{
+  nl_kind kind = nl_object_kind (pin_or_ipin);
+
+  if ( kind == nl_kind_pin ) {
+    nl_pin pin = (nl_pin) pin_or_ipin;
+    nl_net net = nl_pin_net (pin);
+
+    if ( net != NULL ) {
+      ui_cmd_object_result (interp, (nl_object) net, NULL);
+    }
+  }
+  else {
+    nl_ipin ipin = (nl_ipin) pin_or_ipin;
+    nl_inet inet = nl_ipin_inet (ipin);
+
+    if ( inet != NULL ) {
+      ui_cmd_object_result (interp, (nl_object) inet, NULL);
+    }
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_pin_owner
+   "Return the owner (a cell or a port) of the specified pin."
+   (pin_or_ipin pin_or_ipin "get the owner of this pin"))
+{
+  nl_kind kind = nl_object_kind (pin_or_ipin);
+
+  if ( kind == nl_kind_pin ) {
+    nl_pin pin = (nl_pin) pin_or_ipin;
+    nl_cell_or_port owner = nl_pin_owner (pin);
+
+    ui_cmd_object_result (interp, (nl_object) owner, NULL);
+  }
+  else {
+    nl_ipin ipin = (nl_ipin) pin_or_ipin;
+    nl_idesign_object owner = nl_ipin_owner (ipin);
+
+    ui_cmd_object_result (interp, (nl_object) owner, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_pin_direction
+   "Return the direction of the specified pin."
+   (pin pin "get the direction of this pin"))
+{
+  nl_direction direction = nl_pin_direction (pin);
+  const char *str = nl_direction_to_string (direction);
+
+  Tcl_SetResult (interp, (char *) str, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_name
+   "Return the name of the specified port."
+   (port port "get the name of this port"))
+{
+  char *name = nl_port_name (port);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_direction
+   "Return the direction of the specified port."
+   (port port "get the direction of this port"))
+{
+  nl_direction direction = nl_port_direction (port);
+  const char *str = nl_direction_to_string (direction);
+
+  Tcl_SetResult (interp, (char *) str, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_pin_refpin
+   "Return the reference pin (refpin) of the specified pin."
+   (pin pin "get the refpin of this pin"))
+{
+  nl_refpin refpin = nl_pin_refpin (pin);
+  Tcl_Obj *obj = ui_obj_create ((nl_object) refpin, pin_path);
+
+  Tcl_SetObjResult (interp, obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_refpin_owner
+   "Return the owner (reference) of the specified refpin."
+   (refpin refpin "get the owner of this refpin"))
+{
+  nl_reference reference = nl_refpin_reference (refpin);
+  Tcl_Obj *result;
+
+  if ( reference == NULL ) {
+    result = Tcl_NewListObj (0, NULL);
+  }
+  else {
+    result = ui_obj_create ((nl_object) reference, refpin_path);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_refpin_direction
+   "Return the direction of the specified reference pin."
+   (refpin refpin "get the direction of this refpin"))
+{
+  nl_direction direction = nl_refpin_direction (refpin);
+  const char *str = nl_direction_to_string (direction);
+
+  Tcl_SetResult (interp, (char *) str, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_refpin_down_port
+  "Return the down port of the specified refpin."
+  (refpin refpin "get this down pin of this refpin"))
+{
+  nl_object down_port = nl_refpin_down_port (refpin);
+  Tcl_Obj *result;
+
+  if ( down_port == NULL ) {
+    result = Tcl_NewListObj (0, NULL);
+  }
+  else {
+    result = ui_obj_create ((nl_object) down_port, refpin_path);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_design_name
+   "Return the name of the specified design."
+   (design design "get the name of this design"))
+{
+  char *name = nl_design_name (design);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_pin_name
+   "Return the name of the specified pin."
+   (pin pin "return the name of this pin"))
+{
+  nl_refpin refpin = nl_pin_refpin (pin);
+
+  if ( refpin == NULL ) {
+    nl_cell_or_port owner = nl_pin_owner (pin);
+
+    ASSERT (nl_cell_or_port_kind (owner) == nl_kind_port);
+
+    Tcl_SetResult (interp, nl_cell_or_port_name (owner), TCL_VOLATILE);
+  }
+  else {
+    Tcl_SetResult (interp, nl_refpin_name (refpin), TCL_VOLATILE);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_reference_name
+   "Return the name of the specified reference."
+   (reference reference "return the name of this reference"))
+{
+  char *name = nl_reference_name (reference);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_refpin_name
+   "Return the name of the specified refpin."
+   (refpin refpin "return the name of this refpin"))
+{
+  char *name = nl_refpin_name (refpin);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_name 
+   "Return the instance name of the specified cell."
+   (cell cell "return the name of this cell"))
+{
+  char *name = nl_cell_name (cell);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_name 
+   "Return the instance name of the specified net."
+   (net net "return the name of this net"))
+{
+  char *name = nl_net_name (net);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_design
+   "Rename the specified design to the specified name."
+   (design design "rename this design")
+   (name string "the new name for this design"))
+{
+  nl_design_rename (design, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_net
+   "Rename the specified net to the specified name."
+   (net net "rename this net")
+   (name string "the new name for this net"))
+{
+  nl_net_rename (net, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_cell
+   "Rename the specified cell to the specified name."
+   (cell cell "rename this cell")
+   (name string "the new name for this cell"))
+{
+  nl_cell_rename (cell, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_port
+   "Rename the specified port to the specified name."
+   (port port "rename this port")
+   (name string "the new name for this port"))
+{
+  nl_port_rename (port, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_reference
+  "Rename the specified reference to the specified name."
+  (reference reference "rename this reference")
+  (name string "the new name for this reference"))
+{
+  nl_reference_rename (reference, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_net_bus
+   ("Rename the specified net bus to the specified name.  All the members"
+    "of the bus get renamed as well.")
+   (bus net_bus "rename this net bus")
+   (name string "the new name for this bus"))
+{
+  nl_bus_rename (bus, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_port_bus
+   ("Rename the specified port bus to the specified name.  All the members"
+    "of the bus get renamed as well.")
+   (bus port_bus "rename this port bus")
+   (name string "the new name for this bus"))
+{
+  nl_bus_rename (bus, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_cell_bus
+   ("Rename the specified cell bus to the specified name.  All the members"
+    "of the bus get renamed as well.")
+   (bus cell_bus "rename this cell bus")
+   (name string "the new name for this bus"))
+{
+  nl_bus_rename (bus, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand rename_refpin
+  ("Rename the specified refpin.")
+  (refpin refpin "rename this refpin")
+  (name string "the new name of this refpin"))
+{
+  nl_refpin_rename (refpin, name);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_design
+   "Return the design that contains the given net."
+   (net_or_inet net_or_inet "get the design of this net"))
+{
+  nl_kind kind = nl_object_kind (net_or_inet);
+
+  if ( kind == nl_kind_net ) {
+    nl_net net = (nl_net) net_or_inet;
+    nl_design design = nl_net_design (net);
+
+    ui_cmd_object_result (interp, (nl_object) design, NULL);
+  }
+  else {
+    nl_inet inet = (nl_inet) net_or_inet;
+    nl_idesign idesign = nl_inet_idesign (inet);
+
+    ui_cmd_object_result (interp, (nl_object) idesign, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_reference_design
+   "Return the design that contains the given reference."
+   (reference reference "get the design of this reference"))
+{
+  nl_design design = nl_reference_design (reference);
+
+  ui_cmd_object_result (interp, (nl_object) design, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_pin
+   "Return the pin of the specified cell with the specified name."
+   (cell_or_icell cell_or_icell "get the pin of this cell")
+   (name string "get the pin with this name"))
+{
+  nl_kind kind = nl_object_kind (cell_or_icell);
+  nl_cell cell;
+
+  if ( kind == nl_kind_cell ) {
+    cell = (nl_cell) cell_or_icell;
+  }
+  else {
+    cell = nl_icell_cell ((nl_icell) cell_or_icell);
+  }
+
+  {
+    nl_reference reference = nl_cell_reference (cell);
+    nl_object refpin = nl_reference_get_refpin_by_name (reference, name);
+
+    if ( refpin == NULL ) {
+      error ("cell %s has no pin named %s.", nl_cell_name (cell), name);
+    }
+    else if ( nl_object_kind (refpin) == nl_kind_bus ) {
+      error ("pin %s of cell %s is a bus.", name, nl_cell_name (cell));
+    }
+    else {
+
+      if ( kind == nl_kind_cell ) {
+	nl_pin pin = nl_cell_get_pin_by_refpin (cell, (nl_refpin) refpin);
+
+	ui_cmd_object_result (interp, (nl_object) pin, cell_or_icell_path);
+      }
+      else {
+	nl_icell icell = (nl_icell) cell_or_icell;
+	nl_ipin ipin
+	  = nl_icell_get_ipin_by_refpin (icell, (nl_refpin) refpin);
+	
+	ui_cmd_object_result (interp, (nl_object) ipin, NULL);
+      }
+    }
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand get_cell_reference
+   "Return the reference of the specified cell."
+   (cell cell "return the reference of this cell"))
+{
+  nl_reference reference = nl_cell_reference (cell);
+
+  ui_cmd_object_result (interp, (nl_object) reference, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_design
+   "Return the design that contains the given cell."
+   (cell_or_icell cell_or_icell "get the design of this cell"))
+{
+  if ( nl_object_kind (cell_or_icell) == nl_kind_cell ) {
+    nl_cell cell = (nl_cell) cell_or_icell;
+    nl_design design = nl_cell_design (cell);
+
+    ui_cmd_object_result (interp, (nl_object) design, NULL);
+  }
+  else {
+    nl_icell icell = (nl_icell) cell_or_icell;
+    nl_idesign idesign = nl_icell_idesign (icell);
+
+    ui_cmd_object_result (interp, (nl_object) idesign, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_design
+   "Return the design that contains the given port."
+   (port_or_iport port_or_iport "get the design of this port"))
+{
+  if ( nl_object_kind (port_or_iport) == nl_kind_port ) {
+    nl_port port = (nl_port) port_or_iport;
+    nl_design design = nl_port_design (port);
+
+    ui_cmd_object_result (interp, (nl_object) design, NULL);
+  }
+  else {
+    nl_iport iport = (nl_iport) port_or_iport;
+    nl_idesign idesign = nl_iport_idesign (iport);
+
+    ui_cmd_object_result (interp, (nl_object) idesign, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_pin
+   "Return the pin associated with the specified port."
+   (port_or_iport port_or_iport "get the pin of this port"))
+{
+  if ( nl_object_kind (port_or_iport) == nl_kind_port ) {
+    nl_port port = (nl_port) port_or_iport;
+    nl_pin pin = nl_port_pin (port);
+
+    ui_cmd_object_result (interp, (nl_object) pin, NULL);
+  }
+  else {
+    nl_iport iport = (nl_iport) port_or_iport;
+    nl_ipin ipin = nl_iport_ipin (iport);
+
+    ui_cmd_object_result (interp, (nl_object) ipin, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_or_port_pins
+   ("Return the pins of the specified cell or port.  By default, all pins are"
+    "returned.  This behavior can be modified with any combination of the"
+    "switches.")
+   (-inputs boolean "get only input pins")
+   (-outputs boolean "get only output pins")
+   (-inouts boolean "get only inout pins")
+   (cell_or_port cell_port_icell_or_iport "get the pins of this cell or port"))
+{
+  nl_kind kind = nl_object_kind (cell_or_port);
+
+  if ( !inputs && !outputs && !inouts ) {
+    inputs = 1;
+    outputs = 1;
+    inouts = 1;
+  }
+  
+  if ( kind == nl_kind_port || kind == nl_kind_iport ) {
+    nl_port port;
+    nl_idesign idesign = NULL;
+    nl_direction direction;
+    nl_pin result = NULL;
+
+    if ( kind == nl_kind_port ) {
+      port = (nl_port) cell_or_port;
+    }
+    else {
+      nl_iport iport = (nl_iport) cell_or_port;
+      port = nl_iport_port (iport);
+      idesign = nl_iport_idesign (iport);
+    }
+
+    direction = nl_port_direction (port);
+
+    switch (direction) {
+    case nl_direction_in:
+      if ( outputs )
+	result = nl_port_pin (port);
+      break;
+    case nl_direction_out:
+      if ( inputs )
+	result = nl_port_pin (port);
+      break;
+    case nl_direction_inout:
+    case nl_direction_unknown:
+      if ( inouts )
+	result = nl_port_pin (port);
+      break;
+    default:
+      ASSERT (0);
+    }
+
+    if ( kind == nl_kind_port ) {
+      ui_cmd_object_result (interp, (nl_object) result, NULL);
+    }
+    else {
+      nl_ipin ipin = nl_idesign_get_ipin (idesign, result);
+      ui_cmd_object_result (interp, (nl_object) ipin, NULL);
+    }
+  }
+  else {
+    nl_cell cell;
+    nl_idesign idesign;
+
+    if ( kind == nl_kind_cell ) {
+      cell = (nl_cell) cell_or_port;
+      idesign = NULL;
+    }
+    else {
+      nl_icell icell = (nl_icell) cell_or_port;
+      cell = nl_icell_cell (icell);
+      idesign = nl_icell_idesign (icell);
+    }
+    
+    if ( inputs ) {
+      nl_cell_for_all_inputs (cell, pin) {
+	if ( kind == nl_kind_cell ) {
+	  ui_cmd_append_result_walker ((nl_object) pin, interp);
+	}
+	else {
+	  nl_ipin ipin = nl_idesign_get_ipin (idesign, pin);
+	  ui_cmd_append_result_walker ((nl_object) ipin, interp);
+	}
+      } nl_end_for;
+    }
+
+    if ( outputs ) {
+      nl_cell_for_all_outputs (cell, pin) {
+	if ( kind == nl_kind_cell ) {
+	  ui_cmd_append_result_walker ((nl_object) pin, interp);
+	}
+	else {
+	  nl_ipin ipin = nl_idesign_get_ipin (idesign, pin);
+	  ui_cmd_append_result_walker ((nl_object) ipin, interp);
+	}
+      } nl_end_for;
+    }
+
+    if ( inouts ) {
+      nl_cell_for_all_inouts (cell, pin) {
+	if ( kind == nl_kind_cell ) {
+	  ui_cmd_append_result_walker ((nl_object) pin, interp);
+	}
+	else {
+	  nl_ipin ipin = nl_idesign_get_ipin (idesign, pin);
+	  ui_cmd_append_result_walker ((nl_object) ipin, interp);
+	}
+      } nl_end_for;
+    }
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_reference_cells
+   "Return a list of all cells (instances) of a given reference."
+   (reference reference "return the cells of this reference"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  nl_reference_for_all_instances (reference, cell) {
+    ui_cmd_append_object_list (interp, result, (nl_object) cell,
+			       reference_path);
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand remove_design
+   "Remove the specified designs from memory."
+   (-all boolean "remove all designs")
+   (-silent boolean "don't print a message when removing a design")
+   &optional
+   (design design "design to remove"))
+{
+  if ( all ) {
+    nl_context_for_all_designs (context, des) {
+      char *name = nl_design_name (des);
+      if ( !silent ) {
+	printf ("Removing design \"%s\"\n", name);
+      }
+      nl_context_remove_design (context, des);
+    } nl_end_for;
+  }
+  else {
+    char *name;
+
+    if ( design == NULL ) {
+      error ("a design must be specified unless the -all option is used.");
+    }
+
+    name = nl_design_name (design);
+    if ( !silent ) {
+      printf ("Removing design \"%s\"\n", name);
+    }
+    nl_context_remove_design (context, design);
+  }
+
+  return TCL_OK;
+}
+
+
+static
+void
+ui_cmd_free_attribute (void *ptr)
+{
+  Tcl_Obj *obj = *(Tcl_Obj **)ptr;
+
+  if ( obj != NULL ) {
+    Tcl_DecrRefCount (obj);
+  }
+}
+
+
+#(defcommand remove_attribute 
+  "Remove the specified attribute."
+  (name string "name of the attribute to remove")
+  &optional
+  (design current_design "remove the attribute from this design"))
+{
+  nl_attr attr = nl_design_get_attr_by_name (design, name);
+
+  if ( attr == NULL ) {
+    error ("design %s does not contain an attribute named %s",
+	   nl_design_name (design), name);
+  }
+  else {
+    nl_design_remove_attr (design, attr);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand attribute_kind
+   "Return the kind of object that the specified attribute applies to."
+   (attr attr "get the object kind of this attribute"))
+{
+  nl_kind kind = nl_attr_attr_of (attr);
+  char *kind_str = (char *) nl_kind_to_string (kind);
+  Tcl_Obj *kind_obj = Tcl_NewStringObj (kind_str, -1);
+
+  Tcl_SetObjResult (interp, kind_obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_design_attribute
+   "Create and return a new design attribute."
+   (name string "name of the attribute to create")
+   &optional
+   (design current_design "create the attribute on this design"))
+{
+  nl_design_attr result
+    = nl_design_attr_create (name, design, nl_density_sparse,
+			     sizeof (Tcl_Obj *), NULL,
+			     ui_cmd_free_attribute);
+
+  Tcl_Obj *obj = ui_obj_create ((nl_object) result, NULL);
+
+  Tcl_SetObjResult (interp, obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand query_design_attribute
+  "Return 1 if the specified design has the specified attribute, 0 otherwise."
+  (attr_name string "name of the attribute to get")
+  &optional
+  (design current_design "get the attribute for this design"))
+{
+  Tcl_Obj *obj;
+  Tcl_Obj *result;
+  nl_attr attr = nl_design_get_attr_by_name (design, attr_name);
+
+  if ( attr == NULL || nl_attr_attr_of (attr) != nl_kind_design ) {
+    result = Tcl_NewIntObj (0);
+  }
+  else {
+    nl_design_attr_get ((nl_design_attr) attr, design, &obj);
+
+    result = Tcl_NewIntObj (obj != NULL);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_design_attribute
+  "Create and return a new design attribute."
+  (attr design_attr "name of the attribute to get")
+  (design design "get the attribute for this design"))
+{
+  Tcl_Obj *obj;
+
+  nl_design_attr_get (attr, design, &obj);
+
+  if ( obj == NULL ) {
+    error ("Design %s does not have attribute %s.",
+	   nl_design_name (design), nl_design_attr_name (attr));
+  }
+  else {
+    Tcl_SetObjResult (interp, obj);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_design_attribute
+  "Create and return a new design attribute."
+  (attr design_attr "name of the attribute to get")
+  (design design "set the attribute of this design")
+  (value tcl_object "set the attribute to this value"))
+{
+  Tcl_IncrRefCount (value);
+
+  nl_design_attr_set (attr, design, &value);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_cell_attribute
+  "Create and return a new cell attribute."
+  (-dense boolean "create a dense attribute")
+  (name string "name of the attribute to create")
+  &optional
+  (design current_design "design in which to create the attribute"))
+{
+  nl_density density = dense ? nl_density_dense : nl_density_sparse;
+  nl_cell_attr result = nl_cell_attr_create (name, design, density,
+					     sizeof (Tcl_Obj *), NULL,
+					     ui_cmd_free_attribute);
+
+  Tcl_Obj *obj = ui_obj_create ((nl_object) result, design_path);
+
+  Tcl_SetObjResult (interp, obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand query_cell_attribute
+  "Return 1 if the specified cell has the specified attribute, 0 otherwise."
+  (attr_name string "name of the attribute to get")
+  (cell cell "get the attribute for this cell"))
+{
+  Tcl_Obj *obj;
+  Tcl_Obj *result;
+  nl_design design = nl_cell_design (cell);
+  nl_attr attr = nl_design_get_attr_by_name (design, attr_name);
+
+  if ( attr == NULL || nl_attr_attr_of (attr) != nl_kind_cell ) {
+    result = Tcl_NewIntObj (0);
+  }
+  else {
+    nl_cell_attr_get ((nl_cell_attr) attr, cell, &obj);
+
+    result = Tcl_NewIntObj (obj != NULL);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_attribute
+  "Create and return a new cell attribute."
+  (attr cell_attr "name of the attribute to get")
+  (cell cell "get the attribute for this cell"))
+{
+  Tcl_Obj *obj;
+
+  nl_cell_attr_get (attr, cell, &obj);
+
+  if ( obj == NULL ) {
+    error ("Cell %s does not have attribute %s.",
+	   nl_cell_name (cell), nl_cell_attr_name (attr));
+  }
+  else {
+    Tcl_SetObjResult (interp, obj);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_cell_attribute
+  "Create and return a new cell attribute."
+  (attr cell_attr "name of the attribute to get")
+  (cell cell "set the attribute of this cell")
+  (value tcl_object "set the attribute to this value"))
+{
+  Tcl_IncrRefCount (value);
+
+  nl_cell_attr_set (attr, cell, &value);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_net_attribute
+  "Create and return a new net attribute."
+  (-dense boolean "create a dense attribute")
+  (name string "name of the attribute to create")
+  &optional
+  (design current_design "design in which to create the attribute"))
+{
+  nl_density density = dense ? nl_density_dense : nl_density_sparse;
+  nl_net_attr result = nl_net_attr_create (name, design, density,
+					   sizeof (Tcl_Obj *), NULL,
+					   ui_cmd_free_attribute);
+  Tcl_Obj *obj = ui_obj_create ((nl_object) result, design_path);
+
+  Tcl_SetObjResult (interp, obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_attribute
+  "Create and return a new net attribute."
+  (attr net_attr "name of the attribute to get")
+  (net net "get the attribute for this net"))
+{
+  Tcl_Obj *obj;
+
+  nl_net_attr_get (attr, net, &obj);
+
+  if ( obj != NULL ) {
+    Tcl_SetObjResult (interp, obj);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_net_attribute
+  "Create and return a new net attribute."
+  (attr net_attr "name of the attribute to get")
+  (net net "set the attribute of this net")
+  (value tcl_object "set the attribute to this value"))
+{
+  Tcl_IncrRefCount (value);
+
+  nl_net_attr_set (attr, net, &value);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_port_attribute
+  "Create and return a new port attribute."
+  (-dense boolean "create a dense attribute")
+  (name string "name of the attribute to create")
+  &optional
+  (design current_design "design in which to create the attribute"))
+{
+  nl_density density = dense ? nl_density_dense : nl_density_sparse;
+  nl_port_attr result = nl_port_attr_create (name, design, density,
+					     sizeof (Tcl_Obj *), NULL,
+					     ui_cmd_free_attribute);
+  Tcl_Obj *obj = ui_obj_create ((nl_object) result, design_path);
+
+  Tcl_SetObjResult (interp, obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_attribute
+  "Create and return a new port attribute."
+  (attr port_attr "name of the attribute to get")
+  (port port "get the attribute for this port"))
+{
+  Tcl_Obj *obj;
+
+  nl_port_attr_get (attr, port, &obj);
+
+  if ( obj != NULL ) {
+    Tcl_SetObjResult (interp, obj);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_port_attribute
+  "Create and return a new port attribute."
+  (attr port_attr "name of the attribute to get")
+  (port port "set the attribute of this port")
+  (value tcl_object "set the attribute to this value"))
+{
+  Tcl_IncrRefCount (value);
+
+  nl_port_attr_set (attr, port, &value);
+
+  return TCL_OK;
+}
+
+
+static
+void
+get_net_and_idesign (nl_object net_or_inet, ar path, nl_context context,
+		     int hier, nl_idesign *idesign_p, nl_net *net_p)
+{
+  nl_kind kind = nl_object_kind (net_or_inet);
+  nl_idesign idesign;
+  nl_net net;
+
+  if ( kind == nl_kind_net ) {
+    net = (nl_net) net_or_inet;
+
+    if ( hier ) {
+      if ( path == NULL || ar_size (path) == 0 ) {
+	nl_design design = nl_net_design (net);
+	int num_idesigns = nl_design_num_idesigns (design);
+
+	if ( num_idesigns > 1 ) {
+	  error ("net %s is instantiated more than once in the current "
+		 "instance tree.\n"
+		 "    Please specify a unique instance of this net.",
+		 nl_net_name (net));
+	}
+	else if ( num_idesigns == 0 ) {
+	  error ("no instance tree has been created or\n"
+		 "    net %s is not instantiated in the current tree.",
+		 nl_net_name (net));
+	}
+	else {
+	  idesign = nl_idesign_get_or_create (design, NULL);
+	}
+      }
+      else {
+	idesign = ui_get_idesign_for_path (path, context);
+      }
+    }
+    else {
+      idesign = NULL;
+    }
+  }
+  else {
+    nl_inet inet = (nl_inet) net_or_inet;
+
+    net = nl_inet_net (inet);
+    idesign = nl_inet_idesign (inet);
+  }
+
+  *net_p = net;
+  *idesign_p = idesign;
+}
+
+
+#(defcommand get_net_pins
+  ("Return a list of all the pins connected to the specified net.  Any"
+   "combination of the switches may be used to get only certain pins.  If no"
+   "switches are specified, all pins are returned.")
+  (-drivers boolean "return only the drivers of the net")
+  (-loads boolean "return only the loads of the net")
+  (-fanios boolean "return only the inout pins connected to the net")
+  (-hierarchy boolean "cross hierarchy boundaries")
+  (-recursive boolean "same as -hierarchy")   
+  (-noassign boolean "cross assignment buffers")
+  (net_or_inet net_or_inet "get the pins connected to this net"))
+{
+  int do_hier = (hierarchy || recursive);
+  nl_idesign idesign;
+  nl_net net;
+
+  if ( !drivers && !loads && !fanios ) {
+    drivers = 1;
+    loads = 1;
+    fanios = 1;
+  }
+
+  get_net_and_idesign (net_or_inet, net_or_inet_path, context, do_hier,
+		       &idesign, &net);
+
+  nl_walk_connected_pins (net, idesign, noassign, do_hier, drivers, loads,
+			  fanios, ui_cmd_append_result_walker, interp);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_nets
+   "Return a list of all nets that are connected to the specified net."
+   (-hierarchy boolean "return nets that are connected through the hierarchy")
+   (-noassign boolean "return nets that are connected through assignments")
+   (net_or_inet net_or_inet "get the nets connected to this net"))
+{
+  nl_net net;
+  nl_idesign idesign;
+
+  get_net_and_idesign (net_or_inet, net_or_inet_path, context, hierarchy,
+		       &idesign, &net);
+
+  nl_walk_connected_nets (net, idesign, noassign, hierarchy, 1, 1, 1,
+			  (nl_walk_fun) ui_cmd_append_result_walker, interp);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_pins
+   ("Return a list of all the pins on the specified cell.  Any combination of"
+    "the switches may be used to get only certain pins.  If no switches are"
+    "specified, all pins are returned.")
+   (-inputs boolean "return only input pins")
+   (-outputs boolean "return only output pins")
+   (-inouts boolean "return only inout pins")
+   (cell_or_icell cell_or_icell "get the pins of this cell"))
+{
+  nl_kind kind = nl_object_kind (cell_or_icell);
+
+  if ( !inputs && !outputs && !inouts ) {
+    inputs = 1;
+    outputs = 1;
+    inouts = 1;
+  }
+
+  if ( kind == nl_kind_cell ) {
+    nl_cell cell = (nl_cell) cell_or_icell;
+
+    if ( inputs ) {
+      nl_cell_for_all_inputs (cell, pin) {
+	ui_cmd_append_result_walker ((nl_object) pin, interp);
+      } nl_end_for;
+    }
+    
+    if ( outputs ) {
+      nl_cell_for_all_outputs (cell, pin) {
+	ui_cmd_append_result_walker ((nl_object) pin, interp);
+      } nl_end_for;
+    }
+    
+    if ( inouts ) {
+      nl_cell_for_all_inouts (cell, pin) {
+	ui_cmd_append_result_walker ((nl_object) pin, interp);
+      } nl_end_for;
+    }
+  }
+  else {
+    nl_icell icell = (nl_icell) cell_or_icell;
+
+    if ( inputs ) {
+      nl_icell_for_all_inputs (icell, ipin) {
+	ui_cmd_append_result_walker ((nl_object) ipin, interp);
+      } nl_end_for;
+    }
+    
+    if ( outputs ) {
+      nl_icell_for_all_outputs (icell, ipin) {
+	ui_cmd_append_result_walker ((nl_object) ipin, interp);
+      } nl_end_for;
+    }
+    
+    if ( inouts ) {
+      nl_icell_for_all_inouts (icell, ipin) {
+	ui_cmd_append_result_walker ((nl_object) ipin, interp);
+      } nl_end_for;
+    }
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_bus
+   "Get the bus to which the specified port belongs."
+   (port port "get the bus of this port"))
+{
+  nl_bus bus = nl_port_bus (port);
+
+  if ( bus != NULL ) {
+    Tcl_Obj *result = ui_obj_create ((nl_object) bus, NULL);
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_bus
+   "Get the bus to which the specified net belongs."
+   (net net "get the bus of this net"))
+{
+  nl_bus bus = nl_net_bus (net);
+
+  if ( bus != NULL ) {
+    Tcl_Obj *result = ui_obj_create ((nl_object) bus, NULL);
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_bus
+   "Get the bus to which the specified cell belongs."
+   (cell cell "get the bus of this cell"))
+{
+  nl_bus bus = nl_cell_bus (cell);
+
+  if ( bus != NULL ) {
+    Tcl_Obj *result = ui_obj_create ((nl_object) bus, NULL);
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_bus
+   "Get the bus to which the specified libpin belongs."
+   (libpin libpin "get the bus of this libpin"))
+{
+  nl_bus bus = nl_libpin_bus (libpin);
+
+  if ( bus != NULL ) {
+    ui_cmd_object_result (interp, (nl_object) bus, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_bus_offset 
+   "Get the bus offset of the specified cell."
+   (cell cell "get the bus offset of this cell"))
+{
+  int offset = nl_cell_bus_offset (cell);
+  Tcl_Obj *result = Tcl_NewIntObj (offset);
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_line
+   ("Get the file name and line number on which the specified cell was"
+    "instantiated.")
+   (cell cell "get the file and line of this cell"))
+{
+  char *file = nl_cell_file (cell);
+
+  if ( file != NULL ) {
+    int line = nl_cell_line (cell);
+    Tcl_Obj *file_obj = Tcl_NewStringObj (file, -1);
+    Tcl_Obj *line_obj = Tcl_NewIntObj (line);
+    Tcl_Obj *objv[2];
+    Tcl_Obj *result;
+
+    objv[0] = file_obj;
+    objv[1] = line_obj;
+
+    result = Tcl_NewListObj (2, objv);
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_bus_name 
+   "Return the name of the specified bus."
+   (bus bus "get the name of this bus"))
+{
+  char *name = nl_bus_name (bus);
+
+  Tcl_SetResult (interp, name, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_bus_members
+   ("Return a list of the members of the specified bus."
+    "By default, the members are ordered from LSB to MSB"
+    "(i.e. the 0th element is the LSB).")
+   (-reverse boolean "return the members in the order MSB to LSB")
+   (bus bus "get the members of this bus"))
+{
+  if ( reverse ) {
+    nl_bus_for_all_members_reverse (bus, member) {
+      ui_cmd_append_result_walker (member, interp);
+    } nl_end_for;
+  }
+  else {
+    ar members = nl_bus_members (bus);
+
+    ui_cmd_object_list_result (interp, members, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_bus_type
+   "Return the type of the specified bus."
+   (bus bus "get the type of this bus"))
+{
+  nl_type type = nl_bus_type (bus);
+  Tcl_Obj *result = ui_obj_create ((nl_object) type, NULL);
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_type_left
+   "Return the left bound of the specified type."
+   (type type "get the left bound of this type"))
+{
+  int left = nl_type_left (type);
+  Tcl_Obj *result = Tcl_NewIntObj (left);
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_type_right
+   "Return the right bound of the specified type."
+   (type type "get the right bound of this type"))
+{
+  int right = nl_type_right (type);
+  Tcl_Obj *result = Tcl_NewIntObj (right);
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_reference_link
+   ("Return the link of the specified reference (either a subdesign "
+    "or a libcell).")
+   (reference reference "get the link of this reference"))
+{
+  nl_object down_obj = nl_reference_down_design (reference);
+
+  if ( down_obj != NULL ) {
+    ui_cmd_object_result (interp, down_obj, NULL);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_icell_cell 
+  "Return the cell for the specified instance cell (icell)."
+  (icell icell "get the cell of this icell"))
+{
+  nl_cell cell = nl_icell_cell (icell);
+
+  ui_cmd_object_result (interp, (nl_object) cell, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_inet_net 
+  "Return the net for the specified instance net (inet)."
+  (inet inet "get the net of this inet"))
+{
+  nl_net net = nl_inet_net (inet);
+
+  ui_cmd_object_result (interp, (nl_object) net, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_iport_port 
+  "Return the port for the specified instance port (iport)."
+  (iport iport "get the port of this iport"))
+{
+  nl_port port = nl_iport_port (iport);
+
+  ui_cmd_object_result (interp, (nl_object) port, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_ipin_pin 
+  "Return the pin for the specified instance pin (ipin)."
+  (ipin ipin "get the pin of this ipin"))
+{
+  nl_pin pin = nl_ipin_pin (ipin);
+
+  ui_cmd_object_result (interp, (nl_object) pin, NULL);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_idesign_design 
+  "Return the design for the specified instance design (idesign)."
+  (idesign idesign "get the design of this idesign"))
+{
+  nl_design design = nl_idesign_design (idesign);
+
+  ui_cmd_object_result (interp, (nl_object) design, NULL);
+
+  return TCL_OK;
+}
+
+
+void
+ui_cmd_register_basic_commands (Tcl_Interp *interp, char *prefix,
+				nl_context context)
+{
+#(register-all-commands)
+}

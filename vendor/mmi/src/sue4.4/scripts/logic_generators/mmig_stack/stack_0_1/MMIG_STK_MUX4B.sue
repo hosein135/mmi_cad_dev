@@ -1,0 +1,72 @@
+# SUE version MMI_SUE4.0p3
+
+proc SCHEMATIC_MMIG_STK_MUX4B {} {
+  make MMI_AOI22 -origin {440 500}
+  make MMI_AOI22 -origin {440 380}
+  generate MMI_NAND2 MMI_NAND2B_ -Size B -DeMorgan 1
+  make MMI_NAND2B_ -origin {700 440}
+  make output -name out -origin {880 440}
+  make input -name in0 -origin {160 330}
+  make input -name in1 -origin {160 390}
+  make input -name in2 -origin {160 450}
+  make input -name in3 -origin {160 510}
+  make input -name {sel[3:0]} -origin {160 550}
+  make name_net_s -name N1 -origin {610 420}
+  make name_net_s -name N2 -origin {610 460}
+  make row_spanner -origin {550 650}
+  make name_net_s -name {[3]} -origin {280 550}
+  make name_net_s -name {[0]} -origin {280 370}
+  make name_net_s -name {[2]} -origin {280 490}
+  make name_net_s -name {[1]} -origin {280 430}
+  make MMIG_STK_MUX4B -origin {850 160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.2 -date 06/04/99 -origin {400 790}
+  make_wire 540 500 580 500
+  make_wire 580 500 580 460
+  make_wire 540 380 580 380
+  make_wire 580 380 580 420
+  make_wire 760 440 880 440
+  make_wire 160 510 340 510
+  make_wire 160 450 340 450
+  make_wire 160 390 340 390
+  make_wire 160 330 340 330
+  make_wire 240 370 240 430
+  make_wire 240 430 240 490
+  make_wire 240 490 240 550
+  make_wire 240 550 160 550
+  make_wire 610 420 580 420
+  make_wire 610 420 640 420
+  make_wire 610 460 580 460
+  make_wire 610 460 640 460
+  make_wire 280 550 240 550
+  make_wire 280 550 340 550
+  make_wire 280 490 340 490
+  make_wire 280 490 240 490
+  make_wire 280 430 340 430
+  make_wire 280 430 240 430
+  make_wire 280 370 340 370
+  make_wire 280 370 240 370
+  make_text -origin {80 120} -text MMIG_STK_MUX4B -size large
+}
+
+proc ICON_MMIG_STK_MUX4B args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 -60} -name in0
+  icon_term -type input -origin {-60 -20} -name in1
+  icon_term -type input -origin {-60 20} -name in2
+  icon_term -type input -origin {-60 60} -name in3
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {0 80} -orient R270 -name {sel[3:0]}
+  icon_property -origin {-60 220} -type user -name name
+  icon_property -origin {-60 240} -type user -name M
+  icon_property -origin {-60 260} -type user -name dpc
+  icon_line -40 -100 40 -60 40 60 -40 100 -40 -100
+  icon_line -60 -20 -40 -20
+  icon_line -60 -60 -40 -60
+  icon_line -60 20 -40 20
+  icon_property -origin {-30 -60} -size small -label 0
+  icon_property -origin {0 0} -anchor center -label {STK B}
+  icon_line -60 60 -40 60
+  icon_line 40 0 60 0
+}
+

@@ -1,0 +1,651 @@
+Pearl version 4.3-s077
+cmd> readtechnology /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/pearl/pearl.tech
+cmd> readctlf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/tlf/mmi25.ctlf
+cmd> readverilog /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.vg
+cmd> toplevelcell alu8
+Network alu8 has 157 devices and 253 nodes
+cmd> readspf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.est_dspf
+Warning: net clk has no driver on it.
+Msg: File "/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.est_dspf" does not have instance section
+cmd> setmaxpossibilities 5
+cmd> waveform -name _WAVE_ -period 3ns -rise_first 0 1.5n
+cmd> clockwaveform clk _WAVE_
+cmd> arrival a[7:0] _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew a[7:0] 200ps 200ps 200ps 200ps
+cmd> arrival b[7:0] _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew b[7:0] 200ps 200ps 200ps 200ps
+cmd> arrival shift_ctrl[2:0] _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew shift_ctrl[2:0] 200ps 200ps 200ps 200ps
+cmd> arrival cin _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew cin 200ps 200ps 200ps 200ps
+cmd> arrival subtract _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew subtract 200ps 200ps 200ps 200ps
+cmd> arrival bypass_sel _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew bypass_sel 200ps 200ps 200ps 200ps
+cmd> arrival fctn_sel _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew fctn_sel 200ps 200ps 200ps 200ps
+cmd> arrival bypass0[7:0] _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew bypass0[7:0] 200ps 200ps 200ps 200ps
+cmd> arrival bypass1[7:0] _WAVE_ ^ 600ps 600ps 600ps 600ps
+cmd> inputslew bypass1[7:0] 200ps 200ps 200ps 200ps
+cmd> setnodecapacitance out[7:0] +20fF
+cmd> departure out[7:0] _WAVE_ ^ 1.8n 1.8n 1.8n 1.8n
+cmd> setnodecapacitance status +20fF
+cmd> departure status _WAVE_ ^ 1.8n 1.8n 1.8n 1.8n
+cmd> setpathfilter -same_path -similar_path -node_suffix [#]
+cmd> idealclocks yes
+cmd> timingverify -check setup
+ 1: Setup constraint slack      368ps MMI_FFCB$7$ (MMI_FFCB D v -> clk ^)
+ 2: Setup constraint slack      606ps MMI_FFCB$7$ (MMI_FFCB D ^ -> clk ^)
+ 3: Setup constraint slack      630ps MMI_FFCB$5$ (MMI_FFCB D ^ -> clk ^)
+ 4: Setup constraint slack      631ps MMI_FFCB$6$ (MMI_FFCB D ^ -> clk ^)
+ 5: Setup constraint slack      633ps MMI_FFCB$4$ (MMI_FFCB D ^ -> clk ^)
+cmd> setdelaypathformat out_delay delta_delay load_cap fanout out_rise_fall out_node device cell
+cmd> showpossibility 1 5
+Possibility 1:
+Setup constraint slack 368ps MMI_FFCB$7$ (MMI_FFCB D v -> clk ^)
+  Clk edge: clk ^ at 0ps + Tcycle = 3000ps
+  Setup time: 426ps
+  Data edge: clk ^ -> MMI_FFCB$7$/D v at 2206ps
+  Required cycle time: 2632ps (1.00 cycle path)
+ Delay Delta Load Cap Fanout Rise/Fall Node              Device               Cell      
+ ----- ----- -------- ------ --------- ----              ------               ----      
+   0ps                     0     200ps _WAVE_ ^                                         
+ 600ps 600ps     21fF      1     200ps shift_ctrl[0] ^   arrival                        
+ 824ps 224ps    211fF      8     122ps shift8/net_1 ^    shift8/MMI_BUFE      MMI_BUFE  
+ 824ps   0ps    211fF      8     122ps shift8/net_1 ^                                   
+1224ps 400ps     14fF      1     127ps shift8/net_4[7] v shift8/MMI_MUX4B$7$  MMI_MUX4B 
+1224ps   0ps     14fF      1     127ps shift8/net_4[7] v                                
+1428ps 203ps     56fF      2      68ps shift8/i[7] v     shift8/MMI_BUFD$7$   MMI_BUFD  
+1428ps   0ps     56fF      2      68ps shift8/i[7] v                                    
+1677ps 249ps     14fF      1      65ps shift8/net_3[7] v shift8/MMI_MUX2D$7$  MMI_MUX2D 
+1677ps   0ps     14fF      1      65ps shift8/net_3[7] v                                
+1841ps 164ps     18fF      1      38ps net_2[7] v        shift8/MMI_BUFD_1$7$ MMI_BUFD  
+1841ps   0ps     18fF      1      38ps net_2[7] v                                       
+2206ps 365ps     26fF      1     164ps net_5[7] v        MMI_MUX4B$7$         MMI_MUX4B 
+2206ps   0ps     26fF      1     164ps net_5[7] v                                       
+Possibility 2:
+Setup constraint slack 606ps MMI_FFCB$7$ (MMI_FFCB D ^ -> clk ^)
+  Clk edge: clk ^ at 0ps + Tcycle = 3000ps
+  Setup time: 180ps
+  Data edge: clk ^ -> MMI_FFCB$7$/D ^ at 2214ps
+  Required cycle time: 2394ps (1.00 cycle path)
+ Delay Delta Load Cap Fanout Rise/Fall Node            Device               Cell       
+ ----- ----- -------- ------ --------- ----            ------               ----       
+   0ps                    27     200ps clk ^                                           
+ 429ps 429ps     25fF      1     107ps net_15 v        MMI_FFCB_4           MMI_FFCB   
+ 429ps   0ps     25fF      1     107ps net_15 v                                        
+ 663ps 235ps    257fF      9     117ps net_3 v         MMI_BUFE             MMI_BUFE   
+ 663ps   0ps    257fF      9     117ps net_3 v                                         
+ 886ps 223ps     48fF      3     285ps net_13[0] ^     MMI_XOR2B$0$         MMI_XOR2B  
+ 886ps   0ps     48fF      3     285ps net_13[0] ^                                     
+1034ps 148ps     18fF      1     122ps adder8/net_40 v adder8/MMI_NOR2B_3   MMI_NOR2B  
+1034ps   0ps     18fF      1     122ps adder8/net_40 v                                 
+1308ps 274ps     68fF      3     361ps adder8/net_27 ^ adder8/MMI_OAI21B__6 MMI_OAI21B 
+1308ps   0ps     68fF      3     361ps adder8/net_27 ^                                 
+1501ps 193ps    101fF      5     217ps adder8/net_2 v  adder8/MMI_AOI21C    MMI_AOI21C 
+1501ps   0ps    101fF      5     217ps adder8/net_2 v                                  
+1684ps 183ps     27fF      2     208ps adder8/net_8 ^  adder8/MMI_OAI21B__3 MMI_OAI21B 
+1684ps   0ps     27fF      2     208ps adder8/net_8 ^                                  
+1875ps 190ps     13fF      1     158ps net_6[7] ^      adder8/MMI_XOR2B_5   MMI_XOR2B  
+1875ps   0ps     13fF      1     158ps net_6[7] ^                                      
+2214ps 339ps     26fF      1     155ps net_5[7] ^      MMI_MUX4B$7$         MMI_MUX4B  
+2214ps   0ps     26fF      1     155ps net_5[7] ^                                      
+Possibility 3:
+Setup constraint slack 630ps MMI_FFCB$5$ (MMI_FFCB D ^ -> clk ^)
+  Clk edge: clk ^ at 0ps + Tcycle = 3000ps
+  Setup time: 180ps
+  Data edge: clk ^ -> MMI_FFCB$5$/D ^ at 2189ps
+  Required cycle time: 2370ps (1.00 cycle path)
+ Delay Delta Load Cap Fanout Rise/Fall Node            Device               Cell       
+ ----- ----- -------- ------ --------- ----            ------               ----       
+   0ps                    27     200ps clk ^                                           
+ 429ps 429ps     25fF      1     107ps net_15 v        MMI_FFCB_4           MMI_FFCB   
+ 429ps   0ps     25fF      1     107ps net_15 v                                        
+ 663ps 235ps    257fF      9     117ps net_3 v         MMI_BUFE             MMI_BUFE   
+ 663ps   0ps    257fF      9     117ps net_3 v                                         
+ 886ps 223ps     48fF      3     285ps net_13[0] ^     MMI_XOR2B$0$         MMI_XOR2B  
+ 886ps   0ps     48fF      3     285ps net_13[0] ^                                     
+1034ps 148ps     18fF      1     122ps adder8/net_40 v adder8/MMI_NOR2B_3   MMI_NOR2B  
+1034ps   0ps     18fF      1     122ps adder8/net_40 v                                 
+1308ps 274ps     68fF      3     361ps adder8/net_27 ^ adder8/MMI_OAI21B__6 MMI_OAI21B 
+1308ps   0ps     68fF      3     361ps adder8/net_27 ^                                 
+1501ps 193ps    101fF      5     217ps adder8/net_2 v  adder8/MMI_AOI21C    MMI_AOI21C 
+1501ps   0ps    101fF      5     217ps adder8/net_2 v                                  
+1658ps 156ps     18fF      1     169ps adder8/net_20 ^ adder8/MMI_OAI21B__4 MMI_OAI21B 
+1658ps   0ps     18fF      1     169ps adder8/net_20 ^                                 
+1849ps 191ps     15fF      1     169ps net_6[5] ^      adder8/MMI_XOR2B_1   MMI_XOR2B  
+1849ps   0ps     15fF      1     169ps net_6[5] ^                                      
+2189ps 340ps     26fF      1     155ps net_5[5] ^      MMI_MUX4B$5$         MMI_MUX4B  
+2189ps   0ps     26fF      1     155ps net_5[5] ^                                      
+Possibility 4:
+Setup constraint slack 631ps MMI_FFCB$6$ (MMI_FFCB D ^ -> clk ^)
+  Clk edge: clk ^ at 0ps + Tcycle = 3000ps
+  Setup time: 180ps
+  Data edge: clk ^ -> MMI_FFCB$6$/D ^ at 2189ps
+  Required cycle time: 2369ps (1.00 cycle path)
+ Delay Delta Load Cap Fanout Rise/Fall Node            Device               Cell       
+ ----- ----- -------- ------ --------- ----            ------               ----       
+   0ps                    27     200ps clk ^                                           
+ 429ps 429ps     25fF      1     107ps net_15 v        MMI_FFCB_4           MMI_FFCB   
+ 429ps   0ps     25fF      1     107ps net_15 v                                        
+ 663ps 235ps    257fF      9     117ps net_3 v         MMI_BUFE             MMI_BUFE   
+ 663ps   0ps    257fF      9     117ps net_3 v                                         
+ 886ps 223ps     48fF      3     285ps net_13[0] ^     MMI_XOR2B$0$         MMI_XOR2B  
+ 886ps   0ps     48fF      3     285ps net_13[0] ^                                     
+1034ps 148ps     18fF      1     122ps adder8/net_40 v adder8/MMI_NOR2B_3   MMI_NOR2B  
+1034ps   0ps     18fF      1     122ps adder8/net_40 v                                 
+1308ps 274ps     68fF      3     361ps adder8/net_27 ^ adder8/MMI_OAI21B__6 MMI_OAI21B 
+1308ps   0ps     68fF      3     361ps adder8/net_27 ^                                 
+1501ps 193ps    101fF      5     217ps adder8/net_2 v  adder8/MMI_AOI21C    MMI_AOI21C 
+1501ps   0ps    101fF      5     217ps adder8/net_2 v                                  
+1662ps 161ps     19fF      1     176ps adder8/net_25 ^ adder8/MMI_OAI21B__5 MMI_OAI21B 
+1662ps   0ps     19fF      1     176ps adder8/net_25 ^                                 
+1850ps 187ps     13fF      1     159ps net_6[6] ^      adder8/MMI_XOR2B     MMI_XOR2B  
+1850ps   0ps     13fF      1     159ps net_6[6] ^                                      
+2189ps 339ps     26fF      1     155ps net_5[6] ^      MMI_MUX4B$6$         MMI_MUX4B  
+2189ps   0ps     26fF      1     155ps net_5[6] ^                                      
+Possibility 5:
+Setup constraint slack 633ps MMI_FFCB$4$ (MMI_FFCB D ^ -> clk ^)
+  Clk edge: clk ^ at 0ps + Tcycle = 3000ps
+  Setup time: 180ps
+  Data edge: clk ^ -> MMI_FFCB$4$/D ^ at 2186ps
+  Required cycle time: 2367ps (1.00 cycle path)
+ Delay Delta Load Cap Fanout Rise/Fall Node            Device               Cell       
+ ----- ----- -------- ------ --------- ----            ------               ----       
+   0ps                    27     200ps clk ^                                           
+ 429ps 429ps     25fF      1     107ps net_15 v        MMI_FFCB_4           MMI_FFCB   
+ 429ps   0ps     25fF      1     107ps net_15 v                                        
+ 663ps 235ps    257fF      9     117ps net_3 v         MMI_BUFE             MMI_BUFE   
+ 663ps   0ps    257fF      9     117ps net_3 v                                         
+ 886ps 223ps     48fF      3     285ps net_13[0] ^     MMI_XOR2B$0$         MMI_XOR2B  
+ 886ps   0ps     48fF      3     285ps net_13[0] ^                                     
+1034ps 148ps     18fF      1     122ps adder8/net_40 v adder8/MMI_NOR2B_3   MMI_NOR2B  
+1034ps   0ps     18fF      1     122ps adder8/net_40 v                                 
+1308ps 274ps     68fF      3     361ps adder8/net_27 ^ adder8/MMI_OAI21B__6 MMI_OAI21B 
+1308ps   0ps     68fF      3     361ps adder8/net_27 ^                                 
+1501ps 193ps    101fF      5     217ps adder8/net_2 v  adder8/MMI_AOI21C    MMI_AOI21C 
+1501ps   0ps    101fF      5     217ps adder8/net_2 v                                  
+1656ps 155ps     17fF      1     168ps adder8/net_34 ^ adder8/MMI_OAI21B_   MMI_OAI21B 
+1656ps   0ps     17fF      1     168ps adder8/net_34 ^                                 
+1846ps 190ps     14fF      1     167ps net_6[4] ^      adder8/MMI_XOR2B_2   MMI_XOR2B  
+1846ps   0ps     14fF      1     167ps net_6[4] ^                                      
+2186ps 340ps     26fF      1     155ps net_5[4] ^      MMI_MUX4B$4$         MMI_MUX4B  
+2186ps   0ps     26fF      1     155ps net_5[4] ^                                      
+cmd> # done
+cmd> # done
+cmd> findmincycletime
+           Domain     Cycle Time       Rise       Fall
+           ------     ----------       ----       ----
+_WAVE_     default        2632ps        0ps     1316ps
+clk        default        2632ps        0ps     1316ps
+
+ 1: Setup constraint slack        0ps MMI_FFCB$7$ (MMI_FFCB D v -> clk ^)
+ 2: Setup constraint slack      238ps MMI_FFCB$7$ (MMI_FFCB D ^ -> clk ^)
+ 3: Setup constraint slack      262ps MMI_FFCB$5$ (MMI_FFCB D ^ -> clk ^)
+ 4: Setup constraint slack      263ps MMI_FFCB$6$ (MMI_FFCB D ^ -> clk ^)
+ 5: Setup constraint slack      265ps MMI_FFCB$4$ (MMI_FFCB D ^ -> clk ^)
+cmd> # done
+cmd> # done
+cmd> shownodematches * > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_in
+cmd> system sed -e 's/^ /showdelays/' -e 's/^Found/#/' /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_in > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out
+cmd> include /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[7]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[6]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[5]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[4]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[3]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[2]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[1]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays a[0]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[7]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[6]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[5]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[4]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[3]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[2]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[1]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays b[0]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[7]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[6]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[5]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[4]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[3]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[2]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[1]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass0[0]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[7]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[6]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[5]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[4]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[3]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[2]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[1]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass1[0]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays bypass_sel
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays cin
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays clk
+clk v ->  1316ps v
+clk ^ -> 0ps ^ 
+Clock network node
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays fctn_sel
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[7]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[6]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[5]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[4]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[3]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[2]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[1]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays out[0]
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift_ctrl[2]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift_ctrl[1]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift_ctrl[0]
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays status
+clk ^ -> 472ps ^ 417ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays subtract
+_WAVE_ ^ -> 600ps ^ 600ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[7]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[6]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[5]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[4]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[3]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[2]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[1]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_11[0]
+clk ^ -> 462ps ^ 408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_12
+clk ^ -> 674ps-808ps ^ 600ps-830ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[7]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[6]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[5]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[4]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[3]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[2]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[1]
+clk ^ -> 887ps-888ps ^ 794ps-885ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_13[0]
+clk ^ -> 885ps-886ps ^ 793ps-884ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[7]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[6]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[5]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[4]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[3]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[2]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[1]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_14[0]
+clk ^ -> 465ps ^ 411ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_15
+clk ^ -> 486ps ^ 429ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[7]
+clk ^ -> 668ps ^ 619ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[6]
+clk ^ -> 668ps ^ 619ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[5]
+clk ^ -> 668ps ^ 619ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[4]
+clk ^ -> 668ps ^ 619ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[3]
+clk ^ -> 668ps ^ 619ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[2]
+clk ^ -> 659ps ^ 612ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[1]
+clk ^ -> 652ps ^ 605ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_1[0]
+clk ^ -> 643ps ^ 597ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[7]
+clk ^ -> 1177ps-1735ps ^ 1255ps-1841ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[6]
+clk ^ -> 1177ps-1735ps ^ 1255ps-1841ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[5]
+clk ^ -> 1177ps-1735ps ^ 1255ps-1841ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[4]
+clk ^ -> 1177ps-1735ps ^ 1255ps-1841ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[3]
+clk ^ -> 1177ps-1737ps ^ 1255ps-1837ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[2]
+clk ^ -> 1177ps-1737ps ^ 1255ps-1837ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[1]
+clk ^ -> 1177ps-1737ps ^ 1255ps-1837ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_2[0]
+clk ^ -> 1177ps-1737ps ^ 1255ps-1837ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_3
+clk ^ -> 716ps ^ 663ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_4
+clk ^ -> 477ps ^ 421ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[7]
+clk ^ -> 950ps-2214ps ^ 1012ps-2206ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[6]
+clk ^ -> 950ps-2189ps ^ 1012ps-2206ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[5]
+clk ^ -> 950ps-2189ps ^ 1012ps-2206ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[4]
+clk ^ -> 950ps-2186ps ^ 1012ps-2206ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[3]
+clk ^ -> 950ps-2062ps ^ 1012ps-2201ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[2]
+clk ^ -> 950ps-2062ps ^ 1012ps-2201ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[1]
+clk ^ -> 950ps-2062ps ^ 1012ps-2201ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_5[0]
+clk ^ -> 950ps-2062ps ^ 1012ps-2201ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[7]
+clk ^ -> 1026ps-1875ps ^ 1091ps-1789ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[6]
+clk ^ -> 1028ps-1850ps ^ 1092ps-1769ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[5]
+clk ^ -> 1042ps-1849ps ^ 1108ps-1768ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[4]
+clk ^ -> 1039ps-1846ps ^ 1032ps-1766ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[3]
+clk ^ -> 1033ps-1625ps ^ 1103ps-1560ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[2]
+clk ^ -> 1024ps-1568ps ^ 1095ps-1490ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[1]
+clk ^ -> 1004ps-1516ps ^ 1068ps-1418ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_6[0]
+clk ^ -> 999ps-1315ps ^ 1065ps-1316ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_7
+_WAVE_ ^ -> 824ps ^ 845ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_8
+_WAVE_ ^ -> 797ps ^ 822ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_10
+clk ^ -> 1083ps-1934ps ^ 1054ps-1854ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[7]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[6]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[5]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[4]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[3]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[2]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[1]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays net_9[0]
+clk ^ -> 623ps ^ 580ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays gnd
+Constant value = 0
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays vdd
+Constant value = 1
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$7$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$7$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$6$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$6$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$5$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$5$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$4$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$4$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$3$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$3$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$2$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$2$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$1$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$1$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$0$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB$0$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$7$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$7$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$6$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$6$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$5$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$5$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$4$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$4$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$3$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$3$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$2$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$2$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$1$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$1$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$0$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_1$0$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$7$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$7$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$6$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$6$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$5$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$5$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$4$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$4$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$3$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$3$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$2$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$2$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$1$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$1$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$0$_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_2$0$_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_3_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_3_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_4_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_4_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_5_floating_pin_scan_en
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays MMI_FFCB_5_floating_pin_scan_in
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_28
+clk ^ -> 706ps-1014ps ^ 742ps-955ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_29
+clk ^ -> 961ps-1216ps ^ 877ps-1182ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_30
+clk ^ -> 904ps-1381ps ^ 894ps-1421ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_31
+clk ^ -> 711ps-1019ps ^ 745ps-958ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_32
+clk ^ -> 916ps-1157ps ^ 893ps-1230ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_33
+clk ^ -> 954ps-1141ps ^ 863ps-1092ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_34
+clk ^ -> 916ps-1656ps ^ 865ps-1588ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_35
+clk ^ -> 977ps-1144ps ^ 884ps-1095ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_1
+clk ^ -> 1007ps-1250ps ^ 943ps-1253ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_36
+clk ^ -> 770ps-1080ps ^ 788ps-1004ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_2
+clk ^ -> 1046ps-1466ps ^ 1103ps-1501ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_37
+clk ^ -> 1029ps-1402ps ^ 1074ps-1457ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_3
+clk ^ -> 936ps-1314ps ^ 874ps-1254ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_38
+clk ^ -> 920ps-1381ps ^ 973ps-1421ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_4
+clk ^ -> 701ps-985ps ^ 788ps-1013ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_39
+clk ^ -> 987ps-1155ps ^ 891ps-1103ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_40
+clk ^ -> 699ps-1008ps ^ 777ps-1034ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_5
+clk ^ -> 1012ps-1249ps ^ 926ps-1215ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_41
+clk ^ -> 768ps-1054ps ^ 847ps-1079ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_6
+clk ^ -> 778ps-1064ps ^ 856ps-1090ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_42
+clk ^ -> 845ps-1064ps ^ 818ps-1131ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_43
+clk ^ -> 1119ps-1437ps ^ 1178ps-1421ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_7
+clk ^ -> 976ps-1154ps ^ 880ps-1102ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_44
+clk ^ -> 985ps-1153ps ^ 889ps-1102ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_8
+clk ^ -> 1121ps-1684ps ^ 1051ps-1608ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_45
+clk ^ -> 1008ps-1395ps ^ 1079ps-1460ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_9
+clk ^ -> 759ps-1054ps ^ 836ps-1079ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_46
+clk ^ -> 700ps-1019ps ^ 736ps-958ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_47
+clk ^ -> 679ps-1016ps ^ 718ps-956ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_48
+clk ^ -> 734ps-1064ps ^ 759ps-992ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_50
+clk ^ -> 885ps-1272ps ^ 835ps-1205ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_49
+clk ^ -> 985ps-1153ps ^ 889ps-1101ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_10
+clk ^ -> 721ps-1022ps ^ 800ps-1049ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_11
+clk ^ -> 859ps-1234ps ^ 822ps-1212ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_12
+clk ^ -> 1072ps-1410ps ^ 1092ps-1346ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_13
+clk ^ -> 938ps-1223ps ^ 870ps-1236ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_14
+clk ^ -> 991ps-1127ps ^ 901ps-1133ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_15
+clk ^ -> 711ps-1019ps ^ 745ps-958ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_16
+clk ^ -> 769ps-1055ps ^ 848ps-1081ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_17
+clk ^ -> 1048ps-1404ps ^ 1089ps-1342ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_18
+clk ^ -> 951ps-1147ps ^ 858ps-1097ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_19
+clk ^ -> 726ps-958ps ^ 807ps-943ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_20
+clk ^ -> 1212ps-1658ps ^ 1123ps-1589ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_21
+clk ^ -> 768ps-1054ps ^ 847ps-1079ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_22
+clk ^ -> 783ps-1094ps ^ 797ps-1014ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_23
+clk ^ -> 976ps-1143ps ^ 883ps-1094ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_24
+clk ^ -> 994ps-1247ps ^ 942ps-1240ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_25
+clk ^ -> 1023ps-1662ps ^ 1021ps-1593ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_26
+clk ^ -> 901ps-1129ps ^ 815ps-1103ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays adder8/net_27
+clk ^ -> 958ps-1308ps ^ 877ps-1220ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_1
+_WAVE_ ^ -> 824ps ^ 846ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_2
+_WAVE_ ^ -> 837ps ^ 857ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[7]
+clk ^ -> 1154ps-1384ps ^ 1174ps-1428ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[6]
+clk ^ -> 1154ps-1384ps ^ 1173ps-1428ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[5]
+clk ^ -> 1149ps-1384ps ^ 1165ps-1428ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[4]
+clk ^ -> 1149ps-1384ps ^ 1160ps-1428ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[3]
+_WAVE_ ^ -> 1127ps-1362ps ^ 1141ps-1408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[2]
+clk ^ -> 1122ps-1362ps ^ 1141ps-1408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[1]
+clk ^ -> 1113ps-1362ps ^ 1137ps-1408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/i[0]
+clk ^ -> 1103ps-1362ps ^ 1127ps-1408ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[7]
+clk ^ -> 1027ps-1585ps ^ 1091ps-1677ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[6]
+clk ^ -> 1027ps-1585ps ^ 1091ps-1677ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[5]
+clk ^ -> 1027ps-1585ps ^ 1091ps-1677ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[4]
+clk ^ -> 1027ps-1585ps ^ 1091ps-1677ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[3]
+clk ^ -> 1027ps-1587ps ^ 1091ps-1672ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[2]
+clk ^ -> 1027ps-1587ps ^ 1091ps-1672ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[1]
+clk ^ -> 1027ps-1587ps ^ 1091ps-1672ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_3[0]
+clk ^ -> 1027ps-1587ps ^ 1091ps-1672ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[7]
+clk ^ -> 972ps-1200ps ^ 977ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[6]
+clk ^ -> 972ps-1200ps ^ 975ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[5]
+clk ^ -> 967ps-1200ps ^ 968ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[4]
+clk ^ -> 967ps-1200ps ^ 962ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[3]
+_WAVE_ ^ -> 967ps-1200ps ^ 962ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[2]
+clk ^ -> 962ps-1200ps ^ 962ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[1]
+clk ^ -> 953ps-1200ps ^ 959ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_4[0]
+clk ^ -> 942ps-1200ps ^ 949ps-1224ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> showdelays shift8/net_5
+_WAVE_ ^ -> 797ps ^ 821ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out> # 253 matches
+cmd> system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_in
+cmd> system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.tmp_out
+cmd> findslownodes -limit 0.6ns > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/alu8.slow_nodes
+cmd> 

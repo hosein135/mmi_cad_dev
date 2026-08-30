@@ -1,0 +1,108 @@
+
+# Micro Magic's New Spicetool command file
+# This procedure must be executed first (before loading other tcl files)
+
+set VERSION MMI_NST$NST_VERSION
+
+# Done in nstAppinit.c
+#if {[info exists COMPILE_TIME]} {
+#  puts "Version $VERSION Compiled $COMPILE_TIME"
+#} else {
+#  puts "Version $VERSION"
+#}
+
+# Note that the executable will set the global variable NST_DIR.
+
+# New Spicetool has the following TCL entry points:
+#   nst_load filename            loads in a .tr0 file into spicetool
+#   nst_plot filename node       plots the node from a loaded filename
+#   nst_unplot filename node     unplots the node from a loaded filename
+#   nst_erase_all                clears all graph screens
+#   nst_copy old new             moves data from old filename to new
+#   nst_reset                    clears all screens, unloads all data
+#
+# These routines are set up to be called from a schematic entry 
+# program for cross probing of spice waveforms from a schematic.
+#
+# nst_copy is used for plotting old data.  Before reloading a new
+# spice run of foo.tr0, first issue:
+#   nst_copy foo.tr0 foo.tr0~
+# and then:
+#   nst_load foo.tr0
+# now old data can be plotted using
+#   nst_plot foo.tr0~ node
+
+# The following c routines are required to make new spicetool work:
+#   nst_read_tr0 filename id    does the ugly work of reading the binary
+#   nst_get_node ptr node_name node_id
+#                               moves the data for the given node from the
+#                               c structure into the blt package vector.
+#   nst_free_struct ptr         frees the c datastructure in ptr
+
+# In addition to the spice binary node types, nst_axis keeps the axis
+# names for other possible axis types
+
+# Default font size for menus, etc.
+option add *Font *-helvetica-Bold-R-Normal-*-140-*
+
+set nst_axis(1) Voltage
+set nst_axis(2) Frequency
+set nst_axis(5) Phase
+set nst_axis(6) Sweep
+set nst_axis(8) Current
+# these ones are not standard in the hspice file format
+set nst_axis(11) "Voltage Magnitude"
+set nst_axis(12) "Voltage Phase"
+set nst_axis(13) "Current Magnitude"
+set nst_axis(14) "Current Phase"
+
+set LEFT_MARGIN 50
+
+# So you can get the colors right in a color printer
+set nst_colormap(white) {0.0 0.0 0.0 setrgbcolor}
+set nst_colormap(black) {1.0 1.0 1.0 setrgbcolor}
+
+set nst_graph_id 1
+set nst_graphs {}
+
+# id for data sets
+set nst_id 1
+set nst_files {}
+
+set NST_LOCK 1
+
+# otherwise if you mistype, you wait forever
+set auto_noexec 1
+
+# A list of all the derived nodes
+
+set nst_derived_nodes {}
+
+# tell tcl where to get the nst procs.
+#lappend auto_path $NST_DIR
+
+# Load in the default settings (these settings can be changed by users
+# by setting their value in a "~/.nstrc" and/or ".nstrc" file)
+puts "Sourcing $NST_DIR/.nstrc"
+source $NST_DIR/.nstrc
+
+# Source the user's generic customization file if it exists.  This will 
+# override any defaults values just sourced in default .nstrc
+if {[file exists "~/.nstrc"]} {
+  puts "Sourcing ~/.nstrc"
+  source "~/.nstrc"
+}
+
+# Source this directory's specific customization file if it exists.  This will
+# override any defaults values just sourced in either .nstrc, unless
+# you happen to be in the main nst directory.
+set pwd [pwd]
+if {[file exists ".nstrc"] && $NST_DIR != $pwd} {
+  puts "Sourcing $pwd/.nstrc"
+  source ".nstrc"
+}
+
+# Set colors to be like in tk3.6
+tk_bisque
+
+set NST_ORIG_COLORS $NST_COLORS

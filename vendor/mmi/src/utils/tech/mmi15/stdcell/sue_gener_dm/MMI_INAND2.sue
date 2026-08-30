@@ -1,0 +1,318 @@
+# Created using mapper from:
+#"MMI_INAND2 {A {MMI_INAND2A {in0 in0} {in1 in1} {out out}} {MMI_INAND2A_ {in0 in0} {in1 in1} {out out}}} {B {MMI_INAND2B {in0 in0} {in1 in1} {out out}} {MMI_INAND2B_ {in0 in0} {in1 in1} {out out}}} {C {MMI_INAND2C {in0 in0} {in1 in1} {out out}} {MMI_INAND2C_ {in0 in0} {in1 in1} {out out}}} "
+
+proc SCHEMATIC_MMI_INAND2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    A {
+      if {!$DeMorgan} {
+
+  make output -name out -origin {220 20}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in1_L -origin {50 0}
+  make input -name in1 -origin {-160 0}
+  make input -name in0 -origin {-160 40}
+  make nand2 -WP 0.77 -WN 0.77 -origin {120 20}
+  make inverter -WP 0.77 -WN 0.385 -origin {-60 0}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {-50 200}
+  make_wire 190 20 220 20
+  make_wire -160 0 -90 0
+  make_wire -160 40 100 40
+  make_wire 50 0 -10 0
+  make_wire 50 0 100 0
+  make_text -origin {-250 -180} -text {2 Input NAND with one inverted input}
+  make_text -origin {-250 -160} -text {A Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_INAND2 MMI_INAND2A -Size A -DeMorgan 0
+        make MMI_INAND2A -origin "$urx $ury"
+      } else {
+        generate MMI_INAND2 MMI_INAND2A -Size A -DeMorgan 0
+        make MMI_INAND2A -origin {0 0}
+        set terms [api_terminal_data MMI_INAND2A]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_INAND2A"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_INAND2 MMI_INAND2A_ -Size A -DeMorgan 1
+        make MMI_INAND2A_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    B {
+      if {!$DeMorgan} {
+
+  make output -name out -origin {220 20}
+  make input -name in1 -origin {-220 0}
+  make input -name in0 -origin {-220 40}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in1_L -origin {20 0}
+  make nand2 -WP 1.54 -WN 1.54 -origin {120 20}
+  make inverter -WP 0.77 -WN 0.385 -origin {-120 0}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {-20 210}
+  make_wire 190 20 220 20
+  make_wire -220 0 -150 0
+  make_wire -220 40 100 40
+  make_wire 20 0 -70 0
+  make_wire 20 0 100 0
+  make_text -origin {-250 -180} -text {2 Input NAND with one inverted input}
+  make_text -origin {-250 -160} -text {B Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_INAND2 MMI_INAND2B -Size B -DeMorgan 0
+        make MMI_INAND2B -origin "$urx $ury"
+      } else {
+        generate MMI_INAND2 MMI_INAND2B -Size B -DeMorgan 0
+        make MMI_INAND2B -origin {0 0}
+        set terms [api_terminal_data MMI_INAND2B]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_INAND2B"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_INAND2 MMI_INAND2B_ -Size B -DeMorgan 1
+        make MMI_INAND2B_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    C {
+      if {!$DeMorgan} {
+
+  make output -name out -origin {610 -70}
+  make input -name in1 -origin {-60 -20}
+  make input -name in0 -origin {-60 80}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in1_L -origin {160 -20}
+  make global -orient RY -name vdd -origin {330 -160}
+  make global -orient RY -name vdd -origin {580 -160}
+  make global -name gnd -origin {330 120}
+  make global -name gnd -origin {440 120}
+  make pmos -W 3.08 -origin {330 -120}
+  make pmos -W 3.08 -origin {580 -120}
+  make nmos -W 1.54 -origin {330 -20}
+  make nmos -W 1.54 -origin {440 -20}
+  make nmos -W 1.54 -origin {440 80}
+  make nmos -W 1.54 -origin {330 80}
+  make inverter -WP 1.54 -WN 0.77 -origin {40 -20}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {170 280}
+  make_wire 580 -70 610 -70
+  make_wire -60 -20 10 -20
+  make_wire 160 -20 90 -20
+  make_wire 330 -80 330 -70
+  make_wire 330 -60 330 -70
+  make_wire 270 -120 270 -20
+  make_wire 580 -80 580 -70
+  make_wire 330 20 330 40
+  make_wire 520 -120 520 80
+  make_wire 440 -60 440 -70
+  make_wire 440 20 440 40
+  make_wire 380 80 270 80
+  make_wire 380 80 520 80
+  make_wire 440 -70 330 -70
+  make_wire 440 -70 580 -70
+  make_wire 380 -20 270 -20
+  make_wire 270 80 -60 80
+  make_wire 270 -20 160 -20
+  make_text -origin {-110 -240} -text {2 input NAND with one inverted input}
+  make_text -origin {-110 -220} -text {C Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_INAND2 MMI_INAND2C -Size C -DeMorgan 0
+        make MMI_INAND2C -origin "$urx $ury"
+      } else {
+        generate MMI_INAND2 MMI_INAND2C -Size C -DeMorgan 0
+        make MMI_INAND2C -origin {0 0}
+        set terms [api_terminal_data MMI_INAND2C]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_INAND2C"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_INAND2 MMI_INAND2C_ -Size C -DeMorgan 1
+        make MMI_INAND2C_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_INAND2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_INAND2[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_INAND2 args {
+  icon_generator $args {{Size "A" {radio A B C}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B") && ($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_INAND2 icon body
+  if {$DeMorgan} {
+    icon_arc -60 -30 50 110 -start 35 -extent 50
+    icon_arc -60 -110 50 30 -start 275 -extent 50
+    icon_arc -58 -30 -38 30 -start 270 -extent 180
+    icon_line -48 -30 0 -30
+    icon_line -48 30 0 30
+    icon_line 40 0 60 0
+    icon_line -60 20 -40 20
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc -30 -30 40 30 -start 277 -extent 166
+    icon_line 10 -30 -40 -30 -40 30 10 30
+    icon_arc -60 30 -40 10 -start 0 -extent 359
+    icon_line -40 -20 -60 -20
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+  }
+
+  # properties
+  icon_property -origin {-37 -22} -size small -label F
+  icon_property -origin {0 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 20} -name in1
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_INAND2 -Size $Size]
+  set nname [NAME_MMI_INAND2 -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    A {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+    B {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+    C {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

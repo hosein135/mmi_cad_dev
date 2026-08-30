@@ -1,0 +1,45 @@
+Documentation for stack
+-----------------------
+rev 0.1, 6/4/99:  Initial release.  No behavioral verilog.
+
+
+The stack generator is used to derive stack structures made up of
+registers.  Multiple inputs are muxed in at the top of the stack.
+Push and Pop operations cause the data to be moved, respectively,
+further down or further up in the stack.  The output is driven from
+the top-of-stack register.
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS:
+    Definition:  
+      The width of the data stored in the stack.  
+    Legal Values:
+      1 <= NBITS <= 128
+    Default:
+      32
+
+  NInputs:
+    Definition:
+      The number of inputs to be muxed in at the first stage of the stack.
+    Legal Values:
+      1 <= NInputs <= 6
+    Default:
+      1
+
+  Depth:
+    Definition:
+      The depth of the stack (number of registers it contains)
+    Legal Values:
+      1 <= Depth <= 128
+    Default:
+      8
+
+  OutputSize:
+    Definition:
+      The drive strength of the final output driver.
+    Legal Values:
+      B, C, D, E
+    Default:
+      B

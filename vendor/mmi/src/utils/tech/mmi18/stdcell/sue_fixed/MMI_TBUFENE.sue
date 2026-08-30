@@ -1,0 +1,90 @@
+# SUE version MMI_SUE4.1.7
+
+proc SCHEMATIC_MMI_TBUFENE {} {
+  make output -name s_out -origin {-520 -710}
+  make input -orient R270 -name s_en -origin {-660 -630}
+  make input -orient R270 -name s_in -origin {-640 -630}
+  make input -orient R270 -name clrb -origin {-700 -630}
+  make input -orient R270 -name clk -origin {-680 -630}
+  make output -name en -origin {610 -940}
+  make output -name enb -origin {600 -1030}
+  make inverter -WP 0.92 -WN 0.46 -origin {-150 -920}
+  make inverter -WP 0.92 -WN 0.46 -origin {-360 -940}
+  make inverter -WP 0.92 -WN 0.46 -origin {-460 -940}
+  make nor2 -orient RY -WP 3.2 -WN 0.8 -origin {-10 -940}
+  make inverter -orient R270 -WP 1.24 -WN 0.62 -origin {-540 -800}
+  make input -name d -origin {-730 -730}
+  make nor2 -orient RY -WP 0.92 -WN 0.46 -origin {-270 -920}
+  make MMI_SFFCB -origin {-670 -730}
+  make inverter -WP 14.72 -WN 7.36 -origin {470 -940}
+  make inverter -WP 14.72 -WN 7.36 -origin {470 -1030}
+  make inverter -WP 4.88 -WN 2.44 -origin {320 -1030}
+  make inverter -WP 1.64 -WN 0.82 -origin {170 -1030}
+  make inverter -WP 2.44 -WN 1.22 -origin {320 -940}
+  make MMI_TBUFENE -origin {280 -1190}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/03/00 -origin {-390 -490}
+  make_wire -680 -630 -680 -650
+  make_wire -640 -630 -640 -650
+  make_wire -610 -710 -520 -710
+  make_wire -540 -940 -490 -940
+  make_wire -410 -940 -390 -940
+  make_wire -100 -920 -30 -920
+  make_wire -70 -990 -70 -960
+  make_wire -70 -960 -30 -960
+  make_wire -540 -730 -540 -770
+  make_wire -540 -730 -600 -730
+  make_wire -600 -730 -550 -730
+  make_wire -600 -730 -610 -730
+  make_wire -540 -990 -540 -940
+  make_wire -540 -990 -70 -990
+  make_wire -540 -940 -540 -850
+  make_wire -310 -940 -290 -940
+  make_wire -200 -920 -180 -920
+  make_wire -660 -640 -350 -640
+  make_wire -350 -640 -350 -900
+  make_wire -350 -900 -290 -900
+  make_wire -660 -640 -660 -630
+  make_wire -660 -640 -660 -650
+  make_wire 60 -940 100 -940
+  make_wire 100 -1030 140 -1030
+  make_wire 100 -1030 100 -940
+  make_wire 100 -940 290 -940
+  make_wire 370 -940 440 -940
+  make_wire 520 -940 610 -940
+  make_wire 220 -1030 290 -1030
+  make_wire 370 -1030 440 -1030
+  make_wire 520 -1030 600 -1030
+  make_text -origin {-730 -1210} -text {Flipflop with asynchronous clear (active low)
+and delay cell for driving tristate buffers}
+  make_text -origin {-730 -1180} -text {B Size}
+  make_text -origin {-730 -1240} -text MMI_TBUFENE -size large
+}
+
+proc ICON_MMI_TBUFENE args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-100 -60} -name s_en
+  icon_term -type input -origin {-100 -40} -name s_in
+  icon_term -type input -origin {-120 -20} -name clrb
+  icon_term -type input -origin {-100 0} -name clk
+  icon_term -type output -origin {100 0} -name s_out
+  icon_term -type output -origin {100 -40} -orient RY -name en
+  icon_term -type output -origin {100 -60} -orient RY -name enb
+  icon_term -type input -origin {-100 -80} -name d
+  icon_property -origin {-50 70} -type user -name name
+  icon_property -origin {-50 90} -type user -name M
+  icon_property -origin {-50 110} -type user -name dpc
+  icon_line -100 -120 -100 30 100 30 100 -120 -100 -120
+  icon_property -origin {-20 -90} -label TBUFEN
+  icon_property -origin {0 -70} -label E
+  icon_arc -120 -30 -100 -10 -start 15 -extent 345
+  icon_property -origin {-90 -80} -label d
+  icon_property -origin {-90 -60} -label s_en
+  icon_property -origin {-90 -40} -label s_in
+  icon_property -origin {-90 -20} -label clrb
+  icon_property -origin {-90 0} -label clk
+  icon_property -origin {90 0} -anchor e -label s_out
+  icon_property -origin {90 -40} -anchor e -label en
+  icon_property -origin {90 -60} -anchor e -label enb
+}
+

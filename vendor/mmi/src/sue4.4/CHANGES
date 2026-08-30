@@ -1,0 +1,31 @@
+
+#####################################################################
+################# PLEASE READ THIS FILE ## ##########################
+#####################################################################
+
+This file list changes in new versions of SUE that pose
+incompatibilities to older versions.  Note that I always attempt to
+keep incompatibilities to an absolute minimum.  Generally, these
+incompatibilities only require changes to the .suerc file.
+
+#####################################################################
+
+Changes in MMI_SUE2.4
+
+Small incompatibility with SUE version 2.3 and earlier in spice
+property in an icon.  Newlines in spice properties now translate
+into new lines in the netlist.  If you want to break up the text
+in a spice property for better readability, you musst use a
+newline FOLLOWED by a "+", i.e. the spice continuation character.
+Note that the netlister will reformat this to insure that you
+don't exceed the spice line length limitations.  
+
+Note also that the inline_verilog or inline_spice routines are
+being phased out.  In the future, please put all netlisting properties
+in the icons only.
+
+The use of the verilog probe has been made more general to allow other
+waveform viewers than signalscan.  The old signalscan lines in .suerc
+have now been combined into a single VERILOG_PROBE line.
+
+#####################################################################

@@ -1,0 +1,41 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_NAND3B {} {
+  make global -orient RY -name vdd -origin {0 -140}
+  make input -name in0 -origin {-100 0}
+  make global -orient RY -name vdd -origin {200 -140}
+  make input -name in1 -origin {-100 100}
+  make global -orient RY -name vdd -origin {360 -140}
+  make input -name in2 -origin {-100 200}
+  make global -name gnd -origin {0 240}
+  make output -name out -origin {480 -50}
+  make pmos -W 2.4 -origin {360 -100}
+  make pmos -W 2.4 -origin {200 -100}
+  make pmos -W 2.4 -origin {0 -100}
+  make nmos -W 3.6 -origin {0 0}
+  make nmos -W 3.6 -origin {0 100}
+  make nmos -W 3.6 -origin {0 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.5 -date 07/19/99 -origin {120 390}
+  make_wire 0 -60 0 -50
+  make_wire 0 -40 0 -50
+  make_wire -60 -100 -60 0
+  make_wire -100 0 -60 0
+  make_wire 200 -60 200 -50
+  make_wire 0 40 0 60
+  make_wire 140 -100 140 100
+  make_wire 360 -60 360 -50
+  make_wire 0 140 0 160
+  make_wire 300 -100 300 200
+  make_wire -100 100 -60 100
+  make_wire -100 200 -60 200
+  make_wire 200 -50 360 -50
+  make_wire 360 -50 480 -50
+  make_wire 300 200 -60 200
+  make_wire 140 100 -60 100
+  make_wire 200 -50 0 -50
+  make_text -origin {-160 -210} -text {3 Input NAND}
+  make_text -origin {-160 -190} -text {B Size}
+  make_text -origin {-160 -230} -text MMI_NAND3B -size large
+}
+

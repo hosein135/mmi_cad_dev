@@ -1,0 +1,32 @@
+proc doit {} {
+    nl_link mmi15 top
+
+    fplan_save_nl_props
+    # This fails is library was created previously.
+    set result [nl_pat_walk_hier_cells top]
+
+    setl {x1 y1 x2 y2} [fplan_bbox -cell MMI_BUFD]
+    setl {xsize ysize} [list [expr $x2-$x1] [expr $y2-$y1]]
+
+    lay_text -clear
+    lay_line -clear
+
+    foreach thing $result {
+	setl {cell x1 y1 x2 y2 xform path parent} $thing
+	setl {x y ori} $xform
+	set x [expr $x/1000.0]
+	set y [expr $y/1000.0]
+	set x1 [expr $x1/1000.0]
+	set y1 [expr $y1/1000.0]
+	set x2 [expr $x2/1000.0]
+	set y2 [expr $y2/1000.0]
+
+	# Draw a box around the cell.
+	layt_rect $x1 $y1 $x2 $y2
+	# Put a cross at the origin, and label the orientation.
+	layt_cross $x $y
+	lay_text [expr $x+0.5] [expr $y+0.5] $ori
+    }
+}
+
+doit

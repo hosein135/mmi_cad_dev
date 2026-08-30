@@ -1,0 +1,1 @@
+../extract/MMI_NOR2C.sp

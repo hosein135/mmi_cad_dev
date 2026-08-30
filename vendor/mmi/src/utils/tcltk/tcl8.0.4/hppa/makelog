@@ -1,0 +1,9 @@
+gcc -c -O -Wall -Wconversion  -I./../generic -I. -DHAVE_GETCWD=1 -DHAVE_UNISTD_H=1 -DUSE_TERMIOS=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_TZNAME=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_ST_BLKSIZE=1 -DSTDC_HEADERS=1 -DNO_UNION_WAIT=1 -DNEED_MATHERR=1 -DRETSIGTYPE=void -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 -DHAVE_SYS_FILIO_H=1        -DTCL_SHLIB_EXT=\"\" ./../compat/strtod.c
+./../compat/strtod.c: In function `strtod':
+./../compat/strtod.c:111: warning: subscript has type `char'
+./../compat/strtod.c:209: warning: subscript has type `char'
+rm -f libtcl8.0.a
+ar cr libtcl8.0.a panic.o regexp.o tclAsync.o tclBasic.o tclBinary.o tclCkalloc.o tclClock.o tclCmdAH.o tclCmdIL.o tclCmdMZ.o tclCompExpr.o tclCompile.o tclDate.o tclEnv.o tclEvent.o tclExecute.o tclFCmd.o tclFileName.o tclGet.o tclHash.o tclHistory.o tclIndexObj.o tclInterp.o tclIO.o tclIOCmd.o tclIOSock.o tclIOUtil.o tclLink.o tclListObj.o tclLoad.o tclMain.o tclNamesp.o tclNotify.o tclObj.o tclParse.o tclPipe.o tclPkg.o tclPosixStr.o tclPreserve.o tclProc.o tclStringObj.o tclTimer.o tclUtil.o tclVar.o tclResolve.o tclMtherr.o tclUnixChan.o tclUnixEvent.o tclUnixFCmd.o tclUnixFile.o tclUnixPipe.o tclUnixSock.o tclUnixTime.o tclUnixInit.o tclUnixNotfy.o strtod.o tclLoadNone.o
+ranlib libtcl8.0.a
+gcc  tclAppInit.o -L/volume/mmi/utils/tcltk/tcl8.0/hp9000-hpux10 -ltcl8.0 -lnsl -lm -lc \
+	 -o tclsh

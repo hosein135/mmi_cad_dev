@@ -1,0 +1,3069 @@
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 -- $* ; exit $status
+
+# Creates max technology files from a table description of layers
+# and templates
+
+# TODO: add xlate_me to add other drc rules
+
+set MAKE_TECH_VERSION 1
+
+set MAX_VERSION max3
+
+set GOLDEN_TECHS "g18 g25 g35" 
+
+# does the work
+
+proc make_tech args {
+
+  global env GOLDEN_TECHS DERIVES COLOR LAYERS XLATE RULES DRC_DATA
+  global gds_layers devices MAX_VERSION metal_color_layers ALIAS
+  global txt_layers gds_layers MAKE_TECH_VERSION _SPECIAL_
+
+  set default_min 0.4
+  set default_overlap 0.04
+
+  if {[llength [lindex $args 0]] < 2} {
+    usage_info_exit
+  }
+
+  call_keyword [lindex $args 0] {{tech ""} {r} {install} {file ""} {h}}
+
+  if {$h} {
+    usage_info_exit
+  }
+
+  if {![info exists env(MMI_TOOLS)]} {
+    puts "Aborting, must set MMI_TOOLS environment variable."
+    exit 1
+  }
+
+  if {[lsearch $GOLDEN_TECHS $tech] != -1} {
+    puts "Aborting, can't replace any of the GOLDEN TECHNOLOGY files: $GOLDEN_TECHS"
+    return
+  }
+
+  if {$file == ""} {
+    puts "Aborting, must supply layer file name."
+    usage_info_exit
+  }
+
+  if {![file readable $file]} {
+    puts "Aborting, Can't read file $file\n"
+    return
+  }
+
+  # if tech not set, use suffix from source file
+  if {$tech == ""} {
+    set tech [file rootname [file tail $file]]
+  }
+
+  # figure out the pathname of this script
+  set script [info script]
+
+  # track down any links
+  while {[file type $script] == "link"} {
+    set scriptdir [file dirname $script]
+    set script [file readlink $script]
+    if {[file dirname $script] == "." || [string index $script 0] == "."} {  
+      set script $scriptdir/$script	
+    }
+  }
+
+  set sourceroot [file dirname $script]
+
+  if {$install} {
+    # install into mmi_local
+    if {[use_first env(MMI_LOCAL)] != ""} {
+      set techroot $env(MMI_LOCAL)
+    } else {
+      set techroot $env(MMI_TOOLS)/../mmi_local
+    }
+    if {[file isdir $techroot/$MAX_VERSION]} {
+      set techroot $techroot/$MAX_VERSION/tech
+    } else {
+      set techroot $techroot/max/tech
+    }
+
+    # get rid of ~
+    set techroot [file nativename $techroot]
+
+    # make directory if needed
+    if {![file isdir $techroot]} {
+      # make this directory
+      catch "exec mkdir $techroot"
+    }
+
+  } else {
+    # install into mmi_private
+    set techroot "~/mmi_private"
+
+    # get rid of ~
+    set techroot [file nativename $techroot]
+
+    if {[file isdir $techroot/$MAX_VERSION]} {
+      set techroot $techroot/$MAX_VERSION/tech
+    } else {
+      set techroot $techroot/max/tech
+    }
+    
+    # make the directory if needed
+    if {![file isdir $techroot]} {
+      set makedir ""
+      foreach string [split $techroot /] {
+	if {$string == ""} {
+	  continue
+	}
+	append makedir /$string
+
+	if {![file isdir $makedir]} {
+	  # make this directory
+	  catch "exec mkdir $makedir"
+	}
+      }
+    }
+  }
+
+  if {![file isdir $techroot]} {
+    puts "Aborting, no directory $techroot"
+    exit 1
+  }
+
+  if {[catch "open $file r" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    return
+  } 
+
+  setl {tech techvar} [split $tech -]
+  if {$techvar != ""} {
+    set techvar "${tech}-$techvar"
+  } else {
+    set techvar $tech
+  }
+
+  if {[file readable $techroot/$tech/$techvar.tech27]} {
+    if {$r} {
+      # remove old technology files of same name
+      puts "Removing existing technology files for technology \"$techvar\"."
+      if {[catch "exec rm -rf $techroot/$tech/$techvar.*"]} {
+	puts "Aborting, can't remove existing technology files \"$techroot/$tech/$techvar.*\".  Change permissions or choose another name."
+	exit 1
+      }
+    } else {
+      puts "Aborting, technology file \"$techroot/$tech/$techvar\" already exists."
+      puts "Use -r option to replace."
+      exit 1
+    }
+  }
+
+  set planes ""
+  set types ""
+  set ignores ""
+  set bbox ""
+  set iname ""
+  set act ""
+  set poly ""
+  set gds_layer ""
+  set act_types ""
+  set metal_types ""
+  set metal_color_layers ""
+  set other_types ""
+  set parasitics ""
+  set DRC_DATA(vias) ""
+  set last_metal ""
+  set last_via ""
+  set drcs ""
+  set other_connects ""
+  set RULES ""
+  set sets ""
+  set preserve_ports 0
+  set text ""
+  set gdsonly ""
+  set device_list ""
+  set paints ""
+  set square 0
+
+  puts "Parsing layer file \"$file\" ..."
+
+  while {[gets $FILE_ID line] >= 0} {
+
+    set line [remove_comments $line]
+
+    set line [string trim $line]
+
+    if {$line == ""} {
+      # blank line, ignore
+      continue
+    }
+
+    # look for a continuation (backslash at end of line)
+    while {[string index $line [expr [string length $line] - 1]] == "\\"} {
+      # continuation, append next line
+      gets $FILE_ID line2
+
+      set line2 [remove_comments $line2]
+
+      set line "[string trimright $line \\] $line2"
+    }
+
+    # check for illegal characters
+    if {[regexp {\{|\}} $line bogus] && \
+	    [string tolower [lindex $line 0]] != "set"} {
+      puts "ERROR: line contains {}, skipping\n\t$line"
+      continue
+    }
+
+    switch [string tolower [lindex $line 0]] {
+
+      preserve_ports {
+	# writes different ports to different data types
+	set preserve_ports 1
+      }
+
+      square_vias {
+	# arrays vias larger than minimum
+	set square 1
+      }
+
+      set {
+	# pass through directly to <tech>.tcl file
+	lappend sets $line
+      }
+
+      drc {
+	# drc rule
+
+	# look for special case of enclosure with two different values
+	set ruletype [string tolower [lindex $line 2]]
+	if {$ruletype == "width"} {
+	  # need this value for enclosure
+	  set _WIDTHS_([lindex $line 1]) [lindex $line 3]
+
+	} elseif {$ruletype == "enc"} {
+	  if {![catch "expr [lindex $line 5]"]} {
+	    set value [expr [lindex $line 4] * 1.0]
+	    set value2 [expr [lindex $line 5] * 1.0]
+	    if {$value != $value2} {
+	      # this is it
+
+	      # derive some temporary layers
+	      set enc [lindex $line 3]
+
+	      if {![info exists _WIDTHS_($enc)]} {
+		# can't do it without enc width
+		puts "WARNING: Skipping enclosure rule.  Need to define width for layer $enc first:\n$line"
+		continue
+	      }
+
+	      set enc_by [lindex $line 1]
+	      set max_value [max $value $value2]
+	      set min_value [min $value $value2]
+	      set del_value [expr $max_value - $min_value]
+	      set lname ${enc_by}_${enc}_check
+
+	      set DERIVES(${enc_by}_${enc}_sx) "$enc_by shrinkx $del_value"
+	      if {$min_value > 0.0} {
+		set shrink " shrink $min_value"
+
+	      } elseif {$min_value < 0.0} {
+		# doesn't work because of DRC rule
+		set shrink " grow [expr 0 - $min_value]"
+
+	      } else {
+		# do nothing
+		set shrink ""
+	      }
+
+	      set DERIVES($lname) "$enc_by shrinky $del_value or ${enc_by}_${enc}_sx$shrink and $enc"
+
+	      # check width on this puppy
+	      lappend drcs [lreplace $line 1 5 $lname width $_WIDTHS_($enc)] 
+
+	      # override normal drc message
+	      set _SPECIAL_(width,$lname) "$enc_by enclosure of $enc = $max_value um on at least 2 opposite sides"
+	      # for now to make gcells work
+#	      set _SPECIAL_(enclose,$enc_by,$enc) $max_value
+	      set _SPECIAL_(enclose,$enc_by,$enc) "$value $value2"
+	      
+	      # still needs an enclosure rule for smallest value
+	      set line [lreplace $line 4 5 $min_value]
+	    }
+	  }
+	}
+
+	lappend drcs $line
+      }
+
+      derive {
+	# derive a new layer
+	if {[lindex $line 2] != "from"} {
+	  puts "ERROR, no \"from\" keyword in derive command, skipping:\n\t$line"
+	  continue
+	}
+
+	set DERIVES([lindex $line 1]) [lrange $line 3 end]
+      }
+
+      connect {
+	# connect two layers
+	lappend other_connects [lrange $line 1 2]
+      }
+
+      device {
+	# define a device, like and nfet
+	# example: device nfet from poly ndif
+	# assume a fet for now -- generalize later
+
+	# look for bulk connection
+	set bulk ""
+	if {[set pos [lsearch $line -bulk_terminal]] != -1} {
+	  # user defined bulk terminal
+	  set bulk [lindex $line [expr $pos + 1]]
+	  set line [lreplace $line $pos [expr $pos + 1]]
+	}
+
+	setl {bogus device bogus l1 l2 l3} $line
+	set devices($device) "$l1 $l2 $l3"
+
+	if {$bulk != ""} {
+	  set devices_bulk($device) $bulk
+	}
+
+	lappend device_list $device
+      }
+
+      default {
+	# layer definition
+	setl {layer gds txt type width space color} "$line - - - - - -"
+
+	if {[lsearch "annotation flyline label" $layer] != -1} {
+	  puts "WARNING, skipping layer \"$layer\":  reserverd word."
+	  continue
+	}
+
+	if {[info exists PROCESSED(layer,$layer)]} {
+	  puts "WARNING, skipping duplicate definition of layer \"$layer\"."
+	  continue
+	}
+	set PROCESSED(layer,$layer) 1
+
+	set COLOR($layer) $color
+	set gds_layers($layer) $gds
+	set txt_layers($layer) $txt
+
+	if {![catch "expr $width"]} {
+	  # valid number, save it
+	  lappend drcs "drc $layer width $width"
+	  set _WIDTHS_($layer) $width
+	}
+	if {![catch "expr $space"]} {
+	  # valid number, save it
+	  lappend drcs "drc $layer space $space"
+	}
+	
+	switch _$type {
+	  
+	  _gdsonly {
+	    # don't make a place or type for this
+	    lappend gds_layer $layer
+	    lappend gdsonly $layer
+	    set DERIVES(GDS_$layer) $layer
+	    set XLATE($layer) GDS_$layer
+	  }
+
+	  _act - _active {
+	    # active
+	    lappend act $layer
+	    if {[lsearch $planes active] == -1} {
+	      lappend planes active
+	    }
+	    lappend types "active $layer"
+	    lappend gds_layer $layer
+	    lappend act_types $layer
+	  }
+	  
+	  _poly {
+	    lappend poly $layer
+	    if {[lsearch $planes active] == -1} {
+	      lappend planes active
+	    }
+	    lappend types "active $layer"
+	    lappend gds_layer $layer
+	    lappend act_types $layer
+	    lappend parasitics $layer
+	  }
+
+	  _via {
+	    lappend planes $layer
+	    lappend types "$layer $layer"
+	    lappend gds_layer $layer
+	    lappend DRC_DATA(vias) $layer
+	    lappend metal_types $layer
+
+	    if {$last_metal == ""} {
+	      # must be a contact
+	      if {$act_types != ""} {
+		foreach a $act_types {
+		  lappend connects($layer) $a
+		}
+		set last_via $layer
+	      }
+	    } else {
+	      # via, metal below
+	      set connects($layer) $last_metal
+	      set last_via $layer
+	      # do we need to do this?
+	      set last_metal ""
+	    }
+	  }
+	  
+	  _metal {
+	    lappend planes $layer
+	    lappend types "$layer $layer"
+	    lappend gds_layer $layer
+	    lappend metal_types $layer
+	    lappend metal_color_layers $layer
+	    lappend parasitics $layer
+	    if {$last_via != ""} {
+	      # connect to this via
+	      lappend connects($last_via) $layer
+	      # do we need to do this?
+	      set last_via ""
+	    }
+	    set last_metal $layer
+	  }
+
+	  _ignore {
+	    # ignore this on gds input
+	    lappend ignores $layer
+	  }
+
+	  _bbox {
+	    # write out bbox on gds input/output
+	    set bbox $layer
+	  }
+
+	  _iname {
+	    # write out iname on gds input/output
+	    set iname $layer
+
+	    if {[string first prop $gds_layers($layer)] == 0} {
+	      # special case for propattr
+	      set gds_layers($layer) "propattr:$txt_layers($layer)"
+	      set txt_layers($layer) -
+	    }
+	  }
+
+	  _text {
+	    # special layer for reading and writing labels (text)
+	    if {$text != ""} {
+	      puts "WARNING, duplicate text type, skipping layer \"$layer\".  If you want multiple, combine gds with commas on one line."
+	      continue
+	    }
+
+	    set text $layer
+
+	    if {$gds_layers($layer) != "-" && \
+		    ($txt_layers($layer) == "-" || $txt_layers($layer) == "")} {
+	      # let them put the layer in the text slot
+	      set txt_layers($layer) $gds_layers($layer)
+	    }
+	  }
+
+	  default {
+	    # other layers type
+	    if {$type != "" && $type != "-"} {
+	      puts "WARNING, unknow type \"$type\" for layer \"$layer\"."
+	      continue
+	    }
+
+	    lappend planes $layer
+	    lappend types "$layer $layer"
+	    lappend gds_layer $layer
+	    lappend other_types $layer
+	    set type other
+	  }
+	}
+      }
+    }
+  }
+
+  # close the file
+  close $FILE_ID
+
+  foreach type $types {
+    setl {a b} $type
+    set LAYERS($b) 1
+    set PLANE_OF($b) $a
+  }
+
+  # if no devices defined, define a fet
+  if {$act != "" && $poly != "" && [array names devices] == ""} {
+    foreach one $act {
+      # don't make devices out of derived by something
+      if {$txt_layers($one) != "-"} {
+	continue
+      }
+
+      if {[string first p [string tolower $one]] == 0} {
+	set fetname pfet
+      } elseif {[string first n [string tolower $one]] == 0} {
+	set fetname nfet
+      } else {
+	set fetname fet
+      }
+
+      if {[info exists fetnames($fetname)]} {
+	# can't have a duplicate
+	set fetname $fetname[incr fetnames($fetname)]
+      } else {
+	set fetnames($fetname) 1
+      }
+
+      set devices($fetname) [list [lindex $poly 0] $one]
+      lappend device_list $fetname
+    }
+  }
+
+  # walk thru devices and set them up
+  foreach device $device_list {
+    setl {l1 l2 l3} $devices($device)
+
+    set PLANE_OF($device) $PLANE_OF($l1)
+
+    lappend types "$PLANE_OF($l2) $device"
+    lappend gds_layer $device
+    set gds_layers($device) derived
+
+    set compose 1
+    if {$l3 != ""} {
+      # special case, third layer determines type
+      # find other device without this layer
+      foreach _device $device_list {
+	if {$device == $_device} {
+	  continue
+	}
+
+	if {[lrange $devices($device) 0 1] == [lrange $devices($_device) 0 1]} {
+	  # this is it
+	  set compose 0
+	  lappend paints "paint $_device $l3 $device"
+	  lappend paints "erase $device $l3 $_device"
+	  break
+	}
+      }
+    }
+    if {$compose} {
+      # just put in the compose section
+      lappend paints "compose $device $l1 $l2"
+    }
+
+    # add connections
+    lappend other_connects "$device $l1"
+
+    # until simple layers
+    foreach l "$l1 $l2" {
+      if {![info exists XLATE($l)]} {
+	set XLATE($l) $l
+      }
+      set XLATE($l) "$XLATE($l),$device"
+    }
+  }
+
+  # so far, so good.  Let's build the tech directory
+  if {![file isdirectory $techroot/$tech]} {
+    puts "Building tech directory $techroot/$tech"
+
+    if {[catch "exec mkdir $techroot/$tech"]} {
+      puts "Aborting, can't make directory $techroot/$tech"
+      exit 1
+    }
+  }
+
+  # copy the technology source file into the directory with the appripriate name
+  catch "exec cp $file $techroot/$tech/$techvar.source"
+
+  # now make the .tech file
+  if {[catch "open $techroot/$tech/$techvar.tech w" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  # header stuff
+  puts $FILE_ID "/*\tMAX TECHNOLOGY FILE: $techvar"
+  puts $FILE_ID "\tAutogenerated by make_tech on [clock format [clock seconds]]"
+  puts $FILE_ID "*/\n"
+
+  puts $FILE_ID "/* "
+  puts $FILE_ID "* To use this file, need to run through the following:"
+  puts $FILE_ID "*	mmi_cpp -P -traditional $techvar.tech | mmi_m4 > $techvar.tech27"
+  puts $FILE_ID "*/\n"
+  puts $FILE_ID "\#include \"drc_macros.i\"\n"
+  puts $FILE_ID "tech"
+  puts $FILE_ID "\t$tech"
+  puts $FILE_ID "end\n"
+  puts $FILE_ID "version"
+  puts $FILE_ID "\tversion STRING_CAT($techvar,__TIME__,__DATE__)"
+  puts $FILE_ID "\tdescription \"$techvar\""
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "planes"
+  foreach plane $planes {
+    puts $FILE_ID "\t$plane"
+  }
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "types"
+  foreach type $types {
+    setl {a b} $type
+    puts $FILE_ID "\t$a\t$b"
+  }
+
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "contact"
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "styles"
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "compose"
+#  if {$act != "" && $poly != ""} {
+#    foreach device $device_list {
+#      setl {tops bots} $devices($device)
+#      foreach top $tops {
+#	foreach bot $bots {
+#	  puts $FILE_ID "\tcompose\t$device\t$top\t$bot"
+#	}
+#      }
+#    }
+    foreach paint $paints {
+      puts $FILE_ID "\t$paint"
+    }
+#  }
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "connect"
+  foreach con $other_connects {
+    puts $FILE_ID "\t[join $con \t]"
+    # TODO: add to DRC_DATA
+  }
+
+  foreach con $DRC_DATA(vias) {
+    if {[info exists connects($con)]} {
+      if {[llength $connects($con)] < 2} {
+	# ignore
+	unset connects($con)
+	continue
+      }
+
+      puts $FILE_ID "\t$con\t[join $connects($con) ,]"
+      foreach other_con $connects($con) {
+	lappend DRC_DATA(connect,$con) $other_con
+	lappend DRC_DATA(connect,$other_con) $con
+      }
+    }
+  }
+  puts $FILE_ID "end\n"
+
+  # figures out any aliases
+  foreach layer [array names DERIVES] {
+    if {[string range $layer 0 3] == "GDS_"} {
+      # special case, skip
+      continue
+    }
+
+    if {[use_first gds_layers($layer)] == "derived"} {
+      # this is done in the cifinput section
+      continue
+    }
+
+    if {[lsearch $DERIVES($layer) $layer] == -1} {
+      set ALIAS($layer) [split [lindex $DERIVES($layer) 0] ,]
+    }
+  }
+
+  # go thru drc layers here to derive ciflayers needed and
+  # override any space/width rules from the table.
+  foreach drc $drcs {
+    # remove comments
+    set pos [string first \; $drc]
+    if {$pos == -1} {
+      # no comment
+      set comment ""
+      set drc [lrange [string trim $drc] 1 end]
+    } else {
+      set comment "  [string trim [string range $drc [expr $pos + 1] end]]"
+      set drc [lrange [string trim [string range $drc 0 [expr $pos - 1]]] 1 end]
+    }
+
+    set layer [lindex $drc 0]
+    set ruletype [string tolower [lindex $drc 1]]
+    switch _$ruletype {
+      _width - _space {
+	# minimum width or space
+	if {$ruletype == "space"} {
+	  set ruletype spacing
+	}
+
+	addrule $ruletype $layer [lindex $drc 2] $comment
+      }
+      _area {
+	# minimum area
+	set value [expr [lindex $drc 2] * 1.0]
+	if {[info exists DRC_DATA(width,$layer)]} {
+	  set value2 $DRC_DATA(width,$layer)
+	} else {
+	  puts "WARNING: Skipping area rule for layer \"$layer\".  Need to define width for layer first."
+	  continue
+	}
+	if {[is_derived $layer] || [info exists XLATE($layer)] != ""} {
+	  # cif
+	  lappend RULES "\tcifarea [ciflayer_of $layer] $value $value2 \\"
+	} else {
+	  # noncif
+	  lappend RULES "\tarea $layer $value $value2 \\"
+	}
+	lappend RULES "\t\t\"$layer minimum area = $value um2.$comment\"\n"
+	set DRC_DATA(area,$layer) $value
+      }
+
+      _space_to {
+	# spacing between two layers
+	set layer2 [lindex $drc 2]
+	set value [expr [lindex $drc 3] * 1.0]
+
+	if {$value < 0.0} {
+	  # illegal
+	  puts "WARNING: negative layer spacing illegal, setting to 0.0 in:\n\tdrc $drc"
+	  set value 0.0
+	}
+
+	# add drc_data using aliases if present
+	add_drc_data space_to $layer $layer2 $value reverse
+
+	set c ""
+
+	# both layers must be cif or not cif for drc.  If only one is cif,
+	# make a templayer for the other.
+	if {[any_ciflayers "$layer $layer2"]} {
+	  # need to use cifspacing
+	  set l [ciflayer_of $layer]
+	  set l2 [ciflayer_of $layer2]
+
+	  if {$value == 0.0} {
+	    lappend RULES "\tCIF_NO_OVERLAP($l, $l2, \\"
+	    set c ")"
+	  } else {
+	    lappend RULES "\tcifspacing $l $l2 $value touching_illegal \\"
+	  }
+
+
+	} else {
+	  # both are non-ciflayers
+	  if {$value == 0.0} {
+	    lappend RULES \
+		"\tNO_OVERLAP($layer,$PLANE_OF($layer),$layer2,$PLANE_OF($layer2), \\"
+	    set c ")"
+
+	  } else {
+	    lappend RULES \
+		"\tspacing $layer $layer2 $value touching_illegal \\"
+	  }
+
+	}
+	lappend RULES \
+	    "\t\t\"$layer to $layer2 minimum spacing = $value um.$comment\"$c\n"
+
+      }
+      _enc {
+	# enclosure (overlaps)
+	set enclosed [lindex $drc 2]
+	set value [expr [lindex $drc 3] * 1.0]
+	set overlap_layers($layer,$enclosed) $value
+
+	if {$value < 0} {
+	  puts "WARNING: skipping drc enclose command \"[lindex $drc 1]\" with negative enclosure in line:\n\tdrc $drc"
+	  continue
+	}
+
+	# both layers must be cif or not cif for drc.  If only one is cif,
+	# make a templayer for the other.
+	if {[any_ciflayers "$layer $enclosed"]} {
+	  # need to use cifenclosure
+	  set l [ciflayer_of $layer]
+	  set l_enc [ciflayer_of $enclosed]
+
+	  if {$value == 0.0} {
+	    lappend RULES "\tCIF_COVER($l_enc,$l, \\"
+	  } else {
+	    lappend RULES "\tCIF_ENCLOSE($l_enc,$l,$value, \\"
+	  }
+
+	} else {
+	  # both are non-ciflayers
+	  # TODO: should lookup planes instead of assuming same as type.
+
+	  if {$value == 0.0} {
+	    lappend RULES \
+		"\tCOVER($enclosed,$PLANE_OF($enclosed),$layer,$PLANE_OF($layer), \\"
+	  } else {
+	    lappend RULES \
+	      "\tENCLOSE($enclosed,$PLANE_OF($enclosed),$layer,$PLANE_OF($layer),$value, \\"
+	  }
+	}
+	lappend RULES \
+	    "\t\t\"$layer minimum enclosure of $enclosed = $value um.$comment\")\n"
+	# add drc_data using aliases if present
+	add_drc_data enclose $layer $enclosed $value
+      }
+      _ext {
+	# Note: both layers must be on same place for < max3.0
+	set enclosed [lindex $drc 2]
+	set value [expr [lindex $drc 3] * 1.0]
+	lappend RULES \
+	    "\tedge4way $enclosed/active $layer/active $value $layer/active 0 0 \\"
+	lappend RULES \
+	    "\t\t\"$layer minimum extension past $enclosed = $value um.$comment\"\n"
+	set DRC_DATA(extend,$layer,$enclosed) $value
+      }
+      default {
+	puts "WARNING: skipping unknown drc command \"[lindex $drc 1]\" in line:\n\tdrc $drc"
+      }
+    }
+  }
+
+  puts $FILE_ID "cifoutput"
+  puts $FILE_ID "style $tech\n"
+  puts $FILE_ID "\tunits .001 .001 .001 .001"
+  puts $FILE_ID "\tcharset unrestricted\n"
+
+  if {$iname != ""} {
+    puts $FILE_ID "\tiname [parse_gds $gds_layers($iname) 0]"
+  }
+
+  if {$bbox != ""} {
+    puts $FILE_ID "\tbbox [parse_gds $gds_layers($bbox) 0]"
+  }
+
+  puts $FILE_ID ""
+
+  set cifout_order ""
+
+  foreach layer $gds_layer {
+    if {[lsearch "- derived" $gds_layers($layer)] == -1} {
+
+      lappend cifout_order $layer
+
+      if {[info exists DERIVES($layer)]} {
+	# derived on output
+	set label_layer [lindex $DERIVES($layer) 0]
+#xxx
+	lappend cifouts($layer) "\tlayer GDS_$layer [xlate_me $label_layer]"
+	eval lappend cif_depend($layer) [split [xlate_me $label_layer] ,]
+	set ops [lrange $DERIVES($layer) 1 end]
+	while {$ops != ""} {
+	  lappend cifouts($layer) \
+	      "\t\t[lindex $ops 0] [xlate_me [lindex $ops 1]]"
+	  eval lappend cif_depend($layer) [split [xlate_me [lindex $ops 1]] ,]
+	  if {[lindex $ops 1] == $layer || $layer == $label_layer} {
+	    # special case, use this layer for the label layer
+	    set label_layer $layer
+
+	    # this is a rederive of a layer
+	    set no_derive_cifouts($layer) \
+		[list "\tlayer GDS_$layer [xlate_me $layer]"]
+	  }
+	  set ops [lrange $ops 2 end]
+	}
+
+	# so we don't do this later on
+	unset DERIVES($layer)
+
+      } else {
+	# just pass straight thru
+	if {[lsearch $gdsonly $layer] != -1} {
+	  # special case.  gdsonly but not derived.  Ignore on output
+	  continue
+	}
+	lappend cifouts($layer) "\tlayer GDS_$layer [xlate_me $layer]"
+	set label_layer $layer
+      }
+
+      # square via if we know width and spacing and user specified to
+      if {$square && [lsearch $DRC_DATA(vias) $layer] != -1} {
+	# this is a via
+	if {[info exists DRC_DATA(width,$layer)] && \
+		[info exists DRC_DATA(spacing,$layer)]} {
+	  # put in squaring
+	  lappend cifouts($layer) \
+	      "\t/* squares <border> <size> <separation> \[align\] */"
+	  lappend cifouts($layer) \
+	      "\tsquares 0 $DRC_DATA(width,$layer) $DRC_DATA(spacing,$layer) align"
+	}
+      }
+
+      # special for nonmanhattan's since they don't get layer ops (for now)
+      set _cifouts ""
+      lappend _cifouts "\tpolygons [xlate_me $label_layer]"
+
+      # uses first layer for derived layers for labels.  This first
+      # layer can be a comma-separated list.  CANNOT do separate text
+      # layers for a comma separated list.
+      
+      # NOTE: not always right.  Special case if layer is in operation
+      # use that layer only.  See above.
+
+      if {[info exists txt_layers($label_layer)] && \
+	      $txt_layers($label_layer) != "-"} {
+	# separate layers, doesn't look for multiple layers
+	lappend _cifouts "\tcalma [parse_gds $gds_layers($layer) 0]\n"
+	
+	lappend _cifouts "\tlayer TXT_$layer"
+	lappend _cifouts "\tlabels [xlate_me $label_layer]"
+
+	lappend _cifouts "\tcalma [parse_gds $txt_layers($label_layer) 0]"
+	set tmp $txt_layers($label_layer)
+
+      } else {
+	# use same as paint
+	lappend _cifouts "\tlabels [xlate_me $label_layer]"
+
+	lappend _cifouts "\tcalma [parse_gds $gds_layers($layer) 0]"
+
+	set tmp $gds_layers($layer)
+      }
+
+      # special case for preserving ports
+      if {$preserve_ports} {
+	if {[string first : $tmp] != -1} {
+	  puts "WARNING: can't preserve ports on layer \"$layer\" because $tmp includes datatypes"
+	} else {
+	  # add port types
+	  set c 0
+	  foreach port_type "comment hidden local global input output inout" {
+	    lappend _cifouts "\tport [parse_gds $tmp $c] $port_type"
+	    incr c
+	  }
+	}
+      }
+      lappend _cifouts ""
+
+      eval lappend cifouts($layer) $_cifouts
+
+      if {[info exists no_derive_cifouts($layer)]} {
+	# special no derive case
+	eval lappend no_derive_cifouts($layer) $_cifouts
+      }
+    }
+  }
+
+  # add derived layers
+  foreach layer [array names DERIVES] {
+    if {[string range $layer 0 3] == "GDS_"} {
+      # special case, skip
+      continue
+    }
+
+    if {[use_first gds_layers($layer)] == "derived"} {
+      # this is done in the cifinput section
+      continue
+    }
+
+    lappend cifout_order $layer
+
+    lappend cifouts($layer) \
+	"\ttemplayer $layer [xlate_me [lindex $DERIVES($layer) 0]]"
+    eval lappend cif_depend($layer) [split [xlate_me [lindex $DERIVES($layer) 0]] ,]
+
+    set ops [lrange $DERIVES($layer) 1 end]
+    while {$ops != ""} {
+      lappend cifouts($layer) "\t\t[lindex $ops 0] [xlate_me [lindex $ops 1]]"
+      eval lappend cif_depend($layer) [split [xlate_me [lindex $ops 1]] ,]
+      set ops [lrange $ops 2 end]
+    }
+  }
+
+  if {$text != ""} {
+    # add the text layer
+    set layer $text
+    lappend cifout_order $layer
+
+    lappend cifouts($layer) ""
+
+    lappend cifouts($layer) "\tlayer [xlate_me TXT_$layer]"
+    lappend cifouts($layer) "\tlabels space"
+    lappend cifouts($layer) "\tcalma [parse_gds $txt_layers($layer) 0]"
+
+    set tmp $txt_layers($layer)
+
+    # special case for preserving ports
+    if {$preserve_ports} {
+      if {[string first : $tmp] != -1} {
+	puts "WARNING: can't preserve ports on layer \"$layer\" because $tmp includes datatypes"
+      } else {
+	# add port types
+	set c 0
+	foreach port_type "comment hidden local global input output inout" {
+	  lappend cifouts($layer) "\tport [parse_gds $tmp $c] $port_type"
+	  incr c
+	}
+      }
+    }
+  }
+
+  set all_types [concat $act_types $metal_types $other_types]
+
+  # now put everything in depend order
+  # NOTE: needs to be multiple pass -- sorts three times now
+  set depend_order ""
+  foreach layer $cifout_order {
+
+    if {[lsearch $depend_order $layer] != -1} {
+      # already got this
+      continue
+    }
+
+    if {[info exists cif_depend($layer)]} {
+      # might depend on something
+      foreach l $cif_depend($layer) {
+	
+	if {[lsearch $all_types $l] != -1} {
+	  # max layer, not derived
+	  continue
+	}
+
+	regsub "^GDS_" $l "" l
+
+	if {$l != $layer && [info exists cif_depend($l)]} {
+	  # need this layer first
+	  if {[lsearch $depend_order $l] == -1} {
+	    # not already added, add
+	    lappend depend_order $l
+	  }
+	}
+      }
+    }
+
+    lappend depend_order $layer
+  }
+
+  # do it again
+  set cifout_order $depend_order
+  set depend_order ""
+  foreach layer $cifout_order {
+
+    if {[lsearch $depend_order $layer] != -1} {
+      # already got this
+      continue
+    }
+
+    if {[info exists cif_depend($layer)]} {
+      # might depend on something
+      foreach l $cif_depend($layer) {
+	
+	if {[lsearch $all_types $l] != -1} {
+	  # max layer, not derived
+	  continue
+	}
+
+	regsub "^GDS_" $l "" l
+
+	if {$l != $layer && [info exists cif_depend($l)]} {
+	  # need this layer first
+	  if {[lsearch $depend_order $l] == -1} {
+	    # not already added, add
+	    lappend depend_order $l
+	  }
+	}
+      }
+    }
+
+    lappend depend_order $layer
+  }
+
+  # one more time
+  set cifout_order $depend_order
+  set depend_order ""
+  foreach layer $cifout_order {
+
+    if {[lsearch $depend_order $layer] != -1} {
+      # already got this
+      continue
+    }
+
+    if {[info exists cif_depend($layer)]} {
+      # might depend on something
+      foreach l $cif_depend($layer) {
+	
+	if {[lsearch $all_types $l] != -1} {
+	  # max layer, not derived
+	  continue
+	}
+
+	regsub "^GDS_" $l "" l
+
+	if {$l != $layer && [info exists cif_depend($l)]} {
+	  # need this layer first
+	  if {[lsearch $depend_order $l] == -1} {
+	    # not already added, add
+	    lappend depend_order $l
+	  }
+	}
+      }
+    }
+
+    lappend depend_order $layer
+  }
+
+  foreach layer $depend_order {
+    if {[info exists cifouts($layer)]} {
+      puts $FILE_ID [join $cifouts($layer) \n]
+    }
+  }
+
+  puts $FILE_ID "end\n"
+
+  set calma ""
+
+  puts $FILE_ID "cifinput"
+  puts $FILE_ID "style\t$tech"
+  # scalefactor not needed, default to cifoutput
+#  puts $FILE_ID "\tscalefactor\t1\n"
+
+  if {$iname != ""} {
+    puts $FILE_ID "\tiname [parse_gds $gds_layers($iname) 0]"
+  }
+
+  if {$bbox != ""} {
+    puts $FILE_ID "\tbbox [parse_gds $gds_layers($bbox) 0]"
+  }
+
+  foreach layer $ignores {
+    if {$gds_layers($layer) != "-"} {
+      puts $FILE_ID "\tignore\tGDS_$layer"
+      lappend calma "\tcalma GDS_$layer\t[parse_gds $gds_layers($layer) *]"
+    }
+    if {$txt_layers($layer) != "-"} {
+      puts $FILE_ID "\tignore\tTXT_$layer"
+      lappend calma "\tcalma TXT_$layer\t[parse_gds $txt_layers($layer) *]"
+    }
+  }
+
+  puts $FILE_ID ""
+
+  foreach type $types {
+    setl {plane layer} $type
+
+    if {[lsearch "-" $gds_layers($layer)] == -1} {
+      if {$gds_layers($layer) == "derived"} {
+	if {![info exists DERIVES($layer)]} {
+	  if {![info exists devices($layer)]} {
+	    puts "WARNING: no derivation for derived layer \"$layer\"."
+	  }
+	  continue
+	}
+	# derived on input
+	set label_layer [lindex $DERIVES($layer) 0]
+	if {![info exists txt_layer($label_layer)]} {
+	  set label_layer $layer
+	}
+
+#xxx
+	puts $FILE_ID "\tlayer $layer [gds_of [lindex $DERIVES($layer) 0]]"
+	set ops [lrange $DERIVES($layer) 1 end]
+	while {$ops != ""} {
+	  puts $FILE_ID "\t\t[lindex $ops 0] [gds_of [lindex $ops 1] in]"
+	  set ops [lrange $ops 2 end]
+	}
+      } else {
+	# passed directly thru on input
+	puts $FILE_ID "\tlayer $layer GDS_$layer"
+	set label_layer $layer
+      }
+
+      if {$txt_layers($label_layer) != "-" && \
+	      ![gds_contains $layer $label_layer]} {
+	# use different
+	# special case if both same and different
+	if {$txt_layers(same,$label_layer)} {
+	  puts $FILE_ID "\tlabels GDS_$label_layer"
+	}
+
+	if {0 && [info exists txt_layers(save,$label_layer)] && \
+		[llength $txt_layers(save,$label_layer)] > 1} {
+	  set i 0
+	  foreach x $txt_layers(save,$label_layer) {
+	    puts $FILE_ID "\tlabels TXT_${label_layer}_[incr i]"
+	  }
+	  puts $FILE_ID ""
+
+	} else {
+	  puts $FILE_ID "\tlabels TXT_$label_layer\n"
+	}
+
+
+
+      } else {
+	# use same as paint
+	puts $FILE_ID "\tlabels GDS_$label_layer\n"
+      }
+    }
+  }
+
+  # add gds layer numbers
+  foreach layer $gds_layer {
+    if {[lsearch "- derived" $gds_layers($layer)] == -1} {
+      set tmp ""
+      set tmp_layers $gds_layers($layer)
+
+      foreach one [parse_gds $gds_layers($layer) * in] {
+	lappend calma "\tcalma GDS_$layer\t$one"
+	lappend tmp [lindex $one 0]
+      }
+
+      if {[info exists txt_layers(save,$layer)]} {
+	set tmp ""
+	set tmp_layers $gds_layers($layer)
+
+	set i 0
+	foreach one $txt_layers(save,$layer) {
+	  if {0 && [llength $txt_layers(save,$layer)] > 1} {
+	    lappend calma "\tcalma TXT_${layer}_[incr i]\t$one"
+	  } else {
+	    lappend calma "\tcalma TXT_$layer\t$one"
+	  }
+	  lappend tmp [lindex $one 0]
+	}
+      }
+
+      # special case for preserving ports
+      if {$preserve_ports} {
+	if {[string first : $tmp_layers] != -1} {
+	  # already gave warning on cifoutput
+	} else {
+	  # add port types
+	  foreach TMP $tmp {
+	    set c 0
+	    foreach port_type "comment hidden local global input output inout" {
+	      lappend calma "\tport $port_type $TMP $c"
+	      incr c
+	    }
+	  }
+	}
+      }
+    }
+  }
+
+  if {$text != ""} {
+    # add the text layer
+    set layer $text
+
+    lappend calma "\tlayer space"
+    lappend calma "\tlabels TXT_$layer"
+
+    set tmp ""
+    foreach one [parse_gds $txt_layers($layer) * in] {
+      lappend calma "\tcalma TXT_$layer $one"
+      lappend tmp [lindex $one 0]
+    }
+
+    # special case for preserving ports
+    if {$preserve_ports} {
+      if {[string first : $tmp_layers] != -1} {
+	# already gave warning on cifoutput
+      } else {
+	# add port types
+	foreach TMP $tmp {
+	  set c 0
+	  foreach port_type "comment hidden local global input output inout" {
+	    lappend calma "\tport $port_type $TMP $c"
+	    incr c
+	  }
+	}
+      }
+    }
+  }
+
+  foreach line $calma {
+    puts $FILE_ID $line
+  }
+
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "mzrouter"
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "drc"
+  puts $FILE_ID "cifstyle $tech\n"
+
+  # add the drc rules
+  puts $FILE_ID [join $RULES \n]
+
+  set device [array names devices]
+  if {$device != ""} {
+    puts $FILE_ID "\tno_overlap\t[join $device ,]\t[join $device ,]\n"
+  }
+
+  if {$DRC_DATA(vias) != ""} {
+    puts $FILE_ID "\texact_overlap\t[join $DRC_DATA(vias) ,]\n"
+  }
+
+  puts $FILE_ID "end\n"
+
+  puts $FILE_ID "extract"
+  puts $FILE_ID "style\t$tech"
+  puts $FILE_ID "\tnoplaneordering\n"
+
+  # put in some simple extraction stuff
+  puts $FILE_ID "\tcscale\t1"
+  puts $FILE_ID "\tlambda\t1"
+  puts $FILE_ID "\tstep\t1000"
+  puts $FILE_ID "\tsidehalo\t0\n"
+
+  # simple default values
+  foreach layer $parasitics {
+    puts $FILE_ID "\tresist $layer 115"
+    puts $FILE_ID "\tareacap $layer 0.0001"
+    puts $FILE_ID "\tperimc $layer space/$PLANE_OF($layer) 0.1\n"
+  }
+
+  # put in the devices 
+  foreach device $device_list {
+    if {[info exists devices_bulk($device)]} {
+      # use user specified
+      set bulk $devices_bulk($device)
+
+    } else {
+      if {[string first p [string tolower $device]] == 0} {
+	set bulk Vdd!
+      } else {
+	set bulk GND!
+      }
+    }
+
+    puts $FILE_ID \
+	"\tfet $device [lindex $devices($device) 1] 2 $device $bulk 0 0"
+    set DRC_DATA(device,fet,$device) $devices($device)
+  }
+
+  puts $FILE_ID "\nend\n"
+
+  # close the file
+  close $FILE_ID
+
+  # now make the palette file
+  if {[catch "open $techroot/$tech/$techvar.palette w" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  puts $FILE_ID "\# Palette setup of layer order, colors, stipples, etc."
+  puts $FILE_ID "\# Autogenerated by make_tech.\n"
+
+  set stipple 0
+
+  # determine which layers are solids since max only allows 9
+  set solids $poly
+  foreach layer $act {
+    if {![info exists LAYERS($txt_layers($layer))]} {
+      lappend solids $layer
+    }
+  }
+  foreach layer $metal_types {
+    if {[lsearch $DRC_DATA(vias) $layer] == -1} {
+      lappend solids $layer
+    }
+  }
+
+  set DRC_DATA(layer_order) ""
+  if {$metal_types != ""} {
+    puts $FILE_ID "\npal_add_group metal"
+  }
+  foreach layer [lreverse $metal_types] {
+    lappend DRC_DATA(layer_order) $layer
+    if {[lsearch $DRC_DATA(vias) $layer] != -1} {
+      # via
+      puts $FILE_ID "pal_layer $layer \{[color_of $layer via]\} \{stipple outline \n\t[join [stipple_of $stipple] \n\t]\n\}"
+      incr stipple
+    } else {
+      # metal
+      if {[lsearch $solids $layer] > 9} {
+	# out of solids, use a stipple
+	puts $FILE_ID "pal_layer $layer \{[color_of $layer metal]\} \{stipple \n\t[join [stipple_of $stipple] \n\t]\n\}"
+	incr stipple
+
+      } else {
+	puts $FILE_ID "pal_layer $layer \{[color_of $layer metal]\} solid"
+      }
+    }
+  }
+
+  if {$act != "" || $poly != ""} {
+    puts $FILE_ID "\npal_add_group active"
+
+    foreach layer $poly {
+      lappend DRC_DATA(layer_order) $layer
+      puts $FILE_ID "pal_layer $layer \{[color_of $layer poly]\} solid"
+    }
+
+    # until simple layers
+    foreach device $device_list {
+      lappend DRC_DATA(layer_order) $device
+      setl {l1 l2} $devices($device)
+      # pal_compose only understands simple layers
+      set l1 [lindex $l1 0]
+      set l2 [lindex $l2 0]
+
+      puts $FILE_ID "pal_compose $device $l1 $l2"
+    }
+
+    set special_stipple "\
+	00110011 \
+	00110011 \
+	11111111 \
+	11111111 \
+	11001100 \
+	11001100 \
+	11111111 \
+	11111111"
+
+    foreach layer $act {
+      lappend DRC_DATA(layer_order) $layer
+      if {[info exists LAYERS($txt_layers($layer))]} {
+	# special case of nwc, pwc
+	puts $FILE_ID "pal_compose $layer $txt_layers($layer) \{stipple\n\t[join $special_stipple \n\t]\n\}"
+
+      } else {
+	puts $FILE_ID "pal_layer $layer \{[color_of $layer act]\} solid"
+      }
+    }
+  }
+
+  if {$other_types != ""} {
+
+    puts $FILE_ID "\npal_add_group other"
+
+    foreach layer $other_types {
+      lappend DRC_DATA(layer_order) $layer
+      puts $FILE_ID "pal_layer $layer \{[color_of $layer]\} \{stipple \n\t[join [stipple_of $stipple] \n\t]\n\}"
+      incr stipple
+    }
+  }
+
+  # close the file
+  close $FILE_ID
+
+  # move the drc_macros.i files here
+  if {![file readable $techroot/$tech/drc_macros.i]} {
+    if {[catch "exec cp $sourceroot/drc_macros.i $techroot/$tech/drc_macros.i"]} {
+      puts "ERROR, can't copy $sourceroot/drc_macros.i to $techroot/$tech/drc_macros.i"
+    }
+  }
+
+  # now make the .tech27 file
+  set save_cd [pwd]
+  cd $techroot/$tech
+ 
+  if {[catch "exec mmi_cpp -P -traditional $techvar.tech | mmi_m4 > $techvar.tech27" msg]} {
+    puts "ERROR, can't make $techvar.tech27: $msg"
+    cd $save_cd
+    exit 1
+  }
+  cd $save_cd
+
+  # create a .tcl file
+  if {[catch "open $techroot/$tech/$techvar.tcl w" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    exit 1
+  } 
+
+  puts $FILE_ID "\# $techvar.tcl technology file.  Companion to $techvar.tech."
+  puts $FILE_ID "\# AUTOGENERATED FROM make_tech.  DO NOT EDIT THIS FILE."
+
+  puts $FILE_ID ""
+
+  puts $FILE_ID "set MAKE_TECH_VERSION $MAKE_TECH_VERSION"
+  puts $FILE_ID ""
+
+  # figure out reasonable dimension of layout by looking at widths
+
+  # default
+  set typical 0.3
+  foreach layer $metal_types {
+    if {[lsearch $DRC_DATA(vias) $layer] == -1} {
+      # not a via
+      if {[info exists DRC_DATA(width,$layer)]} {
+	set typical $DRC_DATA(width,$layer)
+	break
+      }
+    }
+  }
+  puts $FILE_ID "set MN_TYPICAL_WIRE_WIDTH $typical"
+
+  puts $FILE_ID "\n\# DRC Database.  Access with techinfo command.\n"
+  foreach rule [lsort [array names DRC_DATA]] {
+    puts $FILE_ID [list set DRC_DATA($rule) $DRC_DATA($rule)]
+  }
+
+  puts $FILE_ID "\n\# Variables passed directly from technology source file.\n"
+  puts $FILE_ID [join $sets \n]
+
+  # close the file
+  close $FILE_ID
+
+  # now move the color_map and display_styles files here if needed.
+#  if {![file readable $techroot/$tech/$tech.color_map]} {
+#    if {[catch "exec cp $sourceroot/template.color_map $techroot/$tech/$tech.color_map"]} {
+#      puts "ERROR, can't copy $sourceroot/template.color_map to $techroot/$tech/$tech.color_map"
+#    }
+#  }
+
+#  if {![file readable $techroot/$tech/$tech.display_styles]} {
+#    if {[catch "exec cp $sourceroot/template.display_styles $techroot/$tech/$tech.display_styles"]} {
+#      puts "ERROR, can't copy $sourceroot/template.display_styles to $techroot/$tech/$tech.display_styles"
+#    }
+#  }
+
+  puts "Generated technology \"$techvar\" in \"$techroot/$tech\"."
+  puts "done."
+}
+
+
+# add drc_data using aliases if present
+
+proc add_drc_data {ruletype layer layer2 value {type noreverse}} {
+
+  global ALIAS DRC_DATA _SPECIAL_
+
+  foreach l1s [use_first ALIAS($layer) layer] {
+    foreach l1 [split $l1s ,] {
+      foreach l2s [use_first ALIAS($layer2) layer2] {
+	foreach l2 [split $l2s ,] {
+	  if {$type == "reverse"} {
+	    if {[info exists DRC_DATA($ruletype,$l2,$l1)]} {
+	      # switch
+	      set DRC_DATA($ruletype,$l1,$l2) $DRC_DATA($ruletype,$l2,$l1)
+	      unset DRC_DATA($ruletype,$l2,$l1)
+	    }
+	  }
+
+	  if {[info exists DRC_DATA($ruletype,$l1,$l2)]} {
+	    # duplicate, choose smaller???
+	    set DRC_DATA($ruletype,$l1,$l2) \
+		[min $value $DRC_DATA($ruletype,$l1,$l2)]
+	  } elseif {[info exists _SPECIAL_($ruletype,$layer,$layer2)]} {
+	    set DRC_DATA($ruletype,$l1,$l2) $_SPECIAL_($ruletype,$layer,$layer2)
+	  } else {
+	    set DRC_DATA($ruletype,$l1,$l2) $value
+	  }
+
+#	  if {$type == "reverse"} {
+#	    set DRC_DATA($ruletype,$l2,$l1) $DRC_DATA($ruletype,$l1,$l2)
+#	  }
+	}
+      }
+    }
+  }
+}
+
+
+proc addrule {ruletype layer value comment} {
+
+  global RULES DRC_DATA _SPECIAL_
+
+  if {[info exists DRC_DATA($ruletype,$layer)]} {
+    puts "WARNING, skipping duplicate drc $ruletype definition for layer $layer."
+    return
+  }
+
+  # turn value into float
+  set value [expr $value * 1.0]
+
+  # check if this layer is a derived layer
+  if {[is_derived $layer]} {
+    # derived
+    set useruletype cif$ruletype
+    set l [ciflayer_of $layer]
+  } else {
+    set useruletype $ruletype
+    set l [xlate_me $layer]
+  }
+
+  if {$ruletype == "width"} {
+    lappend RULES "\t$useruletype $l $value \\"
+  } else {
+    # different syntax for spacing
+    lappend RULES "\t$useruletype $l $l $value touching_ok \\"
+  }
+
+  if {[info exists _SPECIAL_($ruletype,$layer)]} {
+    # special message for this layer
+    lappend RULES "\t\t\"$_SPECIAL_($ruletype,$layer).$comment\"\n"
+
+  } else {
+    lappend RULES "\t\t\"$layer minimum $ruletype = $value um.$comment\"\n"
+  }
+
+  set DRC_DATA($ruletype,$layer) $value
+}
+
+
+proc any_ciflayers {layers} {
+
+  foreach layer $layers {
+    foreach l [split $layer ,] { 
+      if {[is_derived $l]} {
+	# this guy is a ciflayer
+	return 1
+      }
+    }
+  }
+
+  # no ciflyaers
+  return 0
+}
+
+
+proc is_derived {l} {
+
+  global LAYERS DERIVES gds_layers devices
+
+  if {(![info exists LAYERS($l)] && ![info exists devices($l)]) || \
+	  ([info exists LAYERS($l)] && [info exists DERIVES($l)] && \
+	       [lsearch "- derived" $gds_layers($l)] == -1)} {
+    # derived
+    return 1
+
+  } else {
+    # not derived
+    return 0
+  }
+}
+
+
+# returns the ciflayer corresponding to or, if none, makes one
+
+proc ciflayer_of {l} {
+
+  global DERIVES LAYERS gds_layers
+  
+  foreach layer [split $l ,] {
+
+    if {[info exists DERIVES(DRC_$layer)]} {
+      # ciflayer already derived.  Use it.
+      lappend layers DRC_$layer
+
+    } elseif {[info exists DERIVES(GDS_$layer)]} {
+      # ciflayer already derived.  Use it.
+      lappend layers GDS_$layer
+
+    } elseif {[info exists DERIVES($layer)] && [info exists LAYERS($layer)]} {
+      if {[lsearch "- derived" $gds_layers($layer)] == -1} {
+	# ciflayer already derived.  Use it.
+	lappend layers GDS_$layer
+      } else {
+	# make a ciflayer for this
+	set DERIVES(DRC_$layer) $layer
+	lappend layers DRC_$layer
+      }
+
+    } elseif {![info exists DERIVES($layer)]} {
+      # make a ciflayer for this
+      set DERIVES(DRC_$layer) $layer
+      lappend layers DRC_$layer
+
+    } else {
+      lappend layers $layer
+    }
+  }
+
+  return [join $layers ,]
+}
+
+
+# returns 1 if the label is in the paint layer
+
+proc gds_contains {paint label} {
+
+  global txt_layers gds_layers
+
+  set same 0
+
+  foreach label_gds [parse_gds $txt_layers($label) * in] {
+    set save 1
+    foreach paint_gds [parse_gds $gds_layers($paint) * in] {
+      if {$paint_gds == $label_gds} {
+	set save 0
+	set same 1
+	break
+      }
+    }
+
+    if {$save} {
+      lappend txt_layers(save,$label) $label_gds
+    }
+  }
+
+  set txt_layers(same,$label) $same
+
+  if {[info exists txt_layers(save,$label)]} {
+    return 0
+  } else {
+    return 1
+  }
+}
+
+
+# translate layer to add connect.  Not needed after simple layers.
+
+proc xlate_me {layer} {
+
+  global XLATE
+
+  set layers ""
+  foreach l [split $layer ,] {
+    lappend layers [use_first XLATE($l) l]
+  }
+
+  return [join $layers ,]
+}
+
+
+# show the usage info and then exit
+
+proc usage_info_exit {} {
+
+  puts ""
+  puts "Usage:"
+  puts "\t-h\t\tprint this message"
+  puts "\t-file\t\tpathname to technology source file (required)"
+  puts "\t-tech\t\ttechnology name (defaults to source file minus suffix)"
+  puts "\t-install\tinstall in MMI_LOCAL (otherwise in MMI_PRIVATE)"
+  puts "\t-r\t\treplace existing technology file"
+  puts ""
+  exit 1
+}
+
+
+# return the gds layer number and datatype
+
+proc parse_gds {string default {type out}} {
+
+  set return ""
+  if {[string first \: $string] != -1} {
+    # data types, must separate with ;
+    set groups [split $string \;]
+  } else {
+    # no data types
+    set groups [split $string ,]
+  }
+
+  foreach group $groups {
+
+    setl {gds dt} [split $group :]
+
+    if {$type == "out"} {
+      # can't output to mutiple layers (how to tell)
+      # choose first
+      set gds [lindex [split $gds ,] 0]
+      set dt [lindex [split $dt -,] 0]
+    }
+
+    if {$dt == "" || $dt == "*"} {
+      # use datatype 0 for output by default
+      set dt $default
+    } else {
+      # replace ranges
+      set new ""
+      foreach one [split $dt ,] {
+	setl {start end} [split $one -]
+	if {$end == "" || $end == $start} {
+	  # not a range
+	  lappend new $start
+	} elseif {$end < $start} {
+	  puts "ERROR: skipping illegal datatype range \"$one\" in \"$string\"."
+	  lappend new $start
+	} else {
+	  # range
+	  for {set i $start} {$i <= $end} {incr i} {
+	    lappend new $i
+	  }
+	}
+      }
+      set dt [join $new ,]
+    }
+
+    if {$type == "out"} {
+      return "$gds $dt"
+    }
+
+    lappend return "$gds $dt"
+  }
+
+  return $return
+}
+
+
+# like call_with_keyword but returns a list of arguments not keyworded AND
+# keyworded arguments not in default list.  unlike call_with_keyword,
+# doesn't error if arguments aren't in default list.
+
+proc call_keyword {_ARG_LIST _DEFAULT_LIST} {
+  
+  set _RETURN ""
+
+  upvar default_value default_value
+  upvar defaulted defaulted
+  foreach _DEFAULT $_DEFAULT_LIST {
+    set _ARG_NAME [lindex $_DEFAULT 0] 
+    upvar $_ARG_NAME $_ARG_NAME
+    if {[llength $_DEFAULT] == 1} {
+      set ${_ARG_NAME}_BINARY 1
+      set $_ARG_NAME 0
+    } else {
+      set ${_ARG_NAME}_BINARY 0
+      set $_ARG_NAME [lindex $_DEFAULT 1]
+    }
+    set default_value($_ARG_NAME) [set $_ARG_NAME]
+    set defaulted($_ARG_NAME) 1
+  }
+
+  for {set _INDEX 0} {$_INDEX < [llength $_ARG_LIST]} {} {
+    if {[string index [lindex $_ARG_LIST $_INDEX] 0] == "-"} {
+      # is a keyword pair
+      set _ARG_NAME [string range [lindex $_ARG_LIST $_INDEX] 1 end]
+      set _ARG_VALUE [lindex $_ARG_LIST [expr $_INDEX+1]]
+    
+      if {[use_first ${_ARG_NAME}_BINARY] == 1} {
+	# binary switch
+	set $_ARG_NAME 1
+	incr _INDEX
+
+      } elseif {[info exists $_ARG_NAME] == 0} {
+	lappend _RETURN -$_ARG_NAME $_ARG_VALUE
+	incr _INDEX 2
+
+      } else {
+	set $_ARG_NAME $_ARG_VALUE
+	set defaulted($_ARG_NAME) 0
+	incr _INDEX 2
+      }
+
+    } else {
+      # not a keyword pair
+      lappend _RETURN [lindex $_ARG_LIST $_INDEX]
+
+      incr _INDEX
+    }
+  }
+  return $_RETURN
+}
+
+
+proc gds_of {layer {type out}} {
+
+  global LAYERS
+
+  if {$type == "out" && [info exists LAYERS($layer)]} {
+    return $layer
+  } elseif {[string first GDS_ $layer] == 0} {
+    return $layer
+  } else {
+    return GDS_$layer
+  }
+}
+
+
+# removes comments, inluding ones in continuations
+
+proc remove_comments {line} {
+
+  if {[set pos [string first \# $line]] != -1} {
+    # remove comment to end of line (but preserve backslash if any)
+    if {[string index $line [expr [string length $line] - 1]] == "\\"} {
+      if {[string index [string trim $line] 0] == "\#"} {
+	# ignore case where entire line is a comment
+	set char ""
+      } else {
+	set char "\\"
+      }
+    } else {
+      set char ""
+    }
+    set line "[string range $line 0 [expr $pos -1]]$char"
+  }
+
+  return $line
+}
+
+# returns an rgb color.  If type given, tries to be smart.
+
+proc color_of {layer {type other}} {
+
+  global COLOR_NO COLOR SAMPLE_COLORS RGB SMART_COLORS metal_color_layers
+
+  if {[info exists COLOR($layer)]} {
+    set color [string tolower [string trim $COLOR($layer)]]
+    if {$color != "" && $color != "-"} {
+      # user has actually specified a color
+      if {[llength [split $color ,]] == 3} {
+	# rgb triple
+	return [split $color ,]
+      }
+
+      # try to look it up in rgb.txt
+      if {[info exists RGB($color)]} {
+	return $RGB($color)
+      }
+    }
+  }
+
+  # pick intelligent colors for the layers
+  switch $type {
+    via {
+      return "0 0 0"
+    }
+
+    poly - act {
+      if {$type == "act" && ![info exists SMART_COLORS(diff_order)]} {
+	# special case, want ndif first 
+	if {[string first p $layer] != -1} {
+	  # pdif first, switch order
+	  setl {a b} $SMART_COLORS(act) 
+	  set SMART_COLORS(act) [list $b $a]
+	}
+
+	# set this so we only do it once
+	set SMART_COLORS(diff_order) 1
+      }
+
+      if {![info exists SMART_COLORS(${type}_no)]} {
+	set SMART_COLORS(${type}_no) 0
+      }
+      set color [lindex $SMART_COLORS(${type}) $SMART_COLORS(${type}_no)]
+      incr SMART_COLORS(${type}_no)
+
+      if {$color != ""} {
+	return $color
+      }
+    }
+
+    metal {
+      # always use this approach
+      if {1 || [string index $layer 0] == "L" || \
+	      [regexp {[0-9][0-9]} $metal_color_layers]} {
+	# user has chosen layer name, use from order given
+	set index [lsearch $metal_color_layers $layer]
+	if {$index != -1} {
+	  set color [lindex $SMART_COLORS(metal) [incr index]]
+	  if {$color != ""} {
+	    return $color
+	  }
+	}
+
+      } else {
+	# get based on metal layer number
+	set index ""
+	regexp {([0-9])} $layer tmp index
+	if {$index != ""} {
+	  set color [lindex $SMART_COLORS(metal) $index]
+	  if {$color != ""} {
+	    return $color
+	  }
+	}
+      }
+    }
+  }
+
+  set color [lindex $SAMPLE_COLORS $COLOR_NO]
+  incr COLOR_NO
+
+  if {$color == ""} {
+    # wrap
+    set COLOR_NO 0
+    set color [lindex $SAMPLE_COLORS $COLOR_NO]
+    incr COLOR_NO
+  }
+
+  return $color
+}
+
+
+# return a stipple
+
+proc stipple_of {stipple} {
+
+  global STIPPLES NO_STIPPLES
+
+  # there are NO_STIPPLES stipples
+  return [lindex $STIPPLES [expr $stipple % $NO_STIPPLES]]
+}
+
+
+# GLOBAL DEFINITIONS
+
+set COLOR_NO 0
+
+set SMART_COLORS(poly) {{236 67 0}}
+# ndif, pdif
+set SMART_COLORS(act) {{66 213 66} {202 160 115}}
+# metal0-6
+set SMART_COLORS(metal) {{255 255 0} {8 139 255} {182 134 222} {255 160 65}
+  {61 122 188} {255 215 0}}
+
+set SAMPLE_COLORS {{200 100 100} {100 200 100} {50 150 150} {76 132 167}
+  {203 134 56} {132 144 20} {78 156 245} {23 204 120} {50 144 176}
+  {90 203 160} {150 130 110} {180 120 160} {60 210 210} {40 120 80}
+  {220 140 180} {30 70 100} {230 240 130} {200 160 34} {45 145 87}
+  {105 67 202} {34 88 109} {203 220 34} {123 40 240} {140 23 23}
+  {203 134 56} {132 144 20} {78 156 245} {23 204 120} {50 144 176}
+  {90 203 160} {150 130 110} {180 120 160} {60 210 210} {40 120 80}
+  {220 140 180} {30 70 100} {230 240 130} {200 160 34} {45 145 87}
+  {105 67 202} {34 88 109} {203 220 34} {123 40 240} {140 23 23}
+}
+
+# from rgb.txt
+
+set RGB(snow) "255 250 250"
+set RGB(ghostwhite) "248 248 255"
+set RGB(whitesmoke) "245 245 245"
+set RGB(gainsboro) "220 220 220"
+set RGB(floralwhite) "255 250 240"
+set RGB(oldlace) "253 245 230"
+set RGB(linen) "250 240 230"
+set RGB(antiquewhite) "250 235 215"
+set RGB(papayawhip) "255 239 213"
+set RGB(blanchedalmond) "255 235 205"
+set RGB(bisque) "255 228 196"
+set RGB(peachpuff) "255 218 185"
+set RGB(navajowhite) "255 222 173"
+set RGB(moccasin) "255 228 181"
+set RGB(cornsilk) "255 248 220"
+set RGB(ivory) "255 255 240"
+set RGB(lemonchiffon) "255 250 205"
+set RGB(seashell) "255 245 238"
+set RGB(honeydew) "240 255 240"
+set RGB(mintcream) "245 255 250"
+set RGB(azure) "240 255 255"
+set RGB(aliceblue) "240 248 255"
+set RGB(lavender) "230 230 250"
+set RGB(lavenderblush) "255 240 245"
+set RGB(mistyrose) "255 228 225"
+set RGB(white) "255 255 255"
+set RGB(black) "0 0 0"
+set RGB(darkslategray) "47 79 79"
+set RGB(darkslategrey) "47 79 79"
+set RGB(dimgray) "105 105 105"
+set RGB(dimgrey) "105 105 105"
+set RGB(slategray) "112 128 144"
+set RGB(slategrey) "112 128 144"
+set RGB(lightslategray) "119 136 153"
+set RGB(lightslategrey) "119 136 153"
+set RGB(gray) "190 190 190"
+set RGB(grey) "190 190 190"
+set RGB(lightgrey) "211 211 211"
+set RGB(lightgray) "211 211 211"
+set RGB(midnightblue) "25 25 112"
+set RGB(navy) "0 0 128"
+set RGB(navyblue) "0 0 128"
+set RGB(cornflowerblue) "100 149 237"
+set RGB(darkslateblue) "72 61 139"
+set RGB(slateblue) "106 90 205"
+set RGB(mediumslateblue) "123 104 238"
+set RGB(lightslateblue) "132 112 255"
+set RGB(mediumblue) "0 0 205"
+set RGB(royalblue) "65 105 225"
+set RGB(blue) "0 0 255"
+set RGB(dodgerblue) "30 144 255"
+set RGB(deepskyblue) "0 191 255"
+set RGB(skyblue) "135 206 235"
+set RGB(lightskyblue) "135 206 250"
+set RGB(steelblue) "70 130 180"
+set RGB(lightsteelblue) "176 196 222"
+set RGB(lightblue) "173 216 230"
+set RGB(powderblue) "176 224 230"
+set RGB(paleturquoise) "175 238 238"
+set RGB(darkturquoise) "0 206 209"
+set RGB(mediumturquoise) "72 209 204"
+set RGB(turquoise) "64 224 208"
+set RGB(cyan) "0 255 255"
+set RGB(lightcyan) "224 255 255"
+set RGB(cadetblue) "95 158 160"
+set RGB(mediumaquamarine) "102 205 170"
+set RGB(aquamarine) "127 255 212"
+set RGB(darkgreen) "0 100 0"
+set RGB(darkolivegreen) "85 107 47"
+set RGB(darkseagreen) "143 188 143"
+set RGB(seagreen) "46 139 87"
+set RGB(mediumseagreen) "60 179 113"
+set RGB(lightseagreen) "32 178 170"
+set RGB(palegreen) "152 251 152"
+set RGB(springgreen) "0 255 127"
+set RGB(lawngreen) "124 252 0"
+set RGB(green) "0 255 0"
+set RGB(chartreuse) "127 255 0"
+set RGB(mediumspringgreen) "0 250 154"
+set RGB(greenyellow) "173 255 47"
+set RGB(limegreen) "50 205 50"
+set RGB(yellowgreen) "154 205 50"
+set RGB(forestgreen) "34 139 34"
+set RGB(olivedrab) "107 142 35"
+set RGB(darkkhaki) "189 183 107"
+set RGB(khaki) "240 230 140"
+set RGB(palegoldenrod) "238 232 170"
+set RGB(lightgoldenrodyellow) "250 250 210"
+set RGB(lightyellow) "255 255 224"
+set RGB(yellow) "255 255 0"
+set RGB(gold) "255 215 0" 
+set RGB(lightgoldenrod) "238 221 130"
+set RGB(goldenrod) "218 165 32"
+set RGB(darkgoldenrod) "184 134 11"
+set RGB(rosybrown) "188 143 143"
+set RGB(indianred) "205 92 92"
+set RGB(saddlebrown) "139 69 19"
+set RGB(sienna) "160 82 45"
+set RGB(peru) "205 133 63"
+set RGB(burlywood) "222 184 135"
+set RGB(beige) "245 245 220"
+set RGB(wheat) "245 222 179"
+set RGB(sandybrown) "244 164 96"
+set RGB(tan) "210 180 140"
+set RGB(chocolate) "210 105 30"
+set RGB(firebrick) "178 34 34"
+set RGB(brown) "165 42 42"
+set RGB(darksalmon) "233 150 122"
+set RGB(salmon) "250 128 114"
+set RGB(lightsalmon) "255 160 122"
+set RGB(orange) "255 165 0"
+set RGB(darkorange) "255 140 0"
+set RGB(coral) "255 127 80"
+set RGB(lightcoral) "240 128 128"
+set RGB(tomato) "255 99 71"
+set RGB(orangered) "255 69 0"
+set RGB(red) "255 0 0"
+set RGB(hotpink) "255 105 180"
+set RGB(deeppink) "255 20 147"
+set RGB(pink) "255 192 203"
+set RGB(lightpink) "255 182 193"
+set RGB(palevioletred) "219 112 147"
+set RGB(maroon) "176 48 96"
+set RGB(mediumvioletred) "199 21 133"
+set RGB(violetred) "208 32 144"
+set RGB(magenta) "255 0 255"
+set RGB(violet) "238 130 238"
+set RGB(plum) "221 160 221"
+set RGB(orchid) "218 112 214"
+set RGB(mediumorchid) "186 85 211"
+set RGB(darkorchid) "153 50 204"
+set RGB(darkviolet) "148 0 211"
+set RGB(blueviolet) "138 43 226"
+set RGB(purple) "160 32 240"
+set RGB(mediumpurple) "147 112 219"
+set RGB(thistle) "216 191 216"
+set RGB(snow1) "255 250 250"
+set RGB(snow2) "238 233 233"
+set RGB(snow3) "205 201 201"
+set RGB(snow4) "139 137 137"
+set RGB(seashell1) "255 245 238"
+set RGB(seashell2) "238 229 222"
+set RGB(seashell3) "205 197 191"
+set RGB(seashell4) "139 134 130"
+set RGB(antiquewhite1) "255 239 219"
+set RGB(antiquewhite2) "238 223 204"
+set RGB(antiquewhite3) "205 192 176"
+set RGB(antiquewhite4) "139 131 120"
+set RGB(bisque1) "255 228 196"
+set RGB(bisque2) "238 213 183"
+set RGB(bisque3) "205 183 158"
+set RGB(bisque4) "139 125 107"
+set RGB(peachpuff1) "255 218 185"
+set RGB(peachpuff2) "238 203 173"
+set RGB(peachpuff3) "205 175 149"
+set RGB(peachpuff4) "139 119 101"
+set RGB(navajowhite1) "255 222 173"
+set RGB(navajowhite2) "238 207 161"
+set RGB(navajowhite3) "205 179 139"
+set RGB(navajowhite4) "139 121 94"
+set RGB(lemonchiffon1) "255 250 205"
+set RGB(lemonchiffon2) "238 233 191"
+set RGB(lemonchiffon3) "205 201 165"
+set RGB(lemonchiffon4) "139 137 112"
+set RGB(cornsilk1) "255 248 220"
+set RGB(cornsilk2) "238 232 205"
+set RGB(cornsilk3) "205 200 177"
+set RGB(cornsilk4) "139 136 120"
+set RGB(ivory1) "255 255 240"
+set RGB(ivory2) "238 238 224"
+set RGB(ivory3) "205 205 193"
+set RGB(ivory4) "139 139 131"
+set RGB(honeydew1) "240 255 240"
+set RGB(honeydew2) "224 238 224"
+set RGB(honeydew3) "193 205 193"
+set RGB(honeydew4) "131 139 131"
+set RGB(lavenderblush1) "255 240 245"
+set RGB(lavenderblush2) "238 224 229"
+set RGB(lavenderblush3) "205 193 197"
+set RGB(lavenderblush4) "139 131 134"
+set RGB(mistyrose1) "255 228 225"
+set RGB(mistyrose2) "238 213 210"
+set RGB(mistyrose3) "205 183 181"
+set RGB(mistyrose4) "139 125 123"
+set RGB(azure1) "240 255 255"
+set RGB(azure2) "224 238 238"
+set RGB(azure3) "193 205 205"
+set RGB(azure4) "131 139 139"
+set RGB(slateblue1) "131 111 255"
+set RGB(slateblue2) "122 103 238"
+set RGB(slateblue3) "105 89 205"
+set RGB(slateblue4) "71 60 139"
+set RGB(royalblue1) "72 118 255"
+set RGB(royalblue2) "67 110 238"
+set RGB(royalblue3) "58 95 205"
+set RGB(royalblue4) "39 64 139"
+set RGB(blue1) "0 0 255"
+set RGB(blue2) "0 0 238"
+set RGB(blue3) "0 0 205"
+set RGB(blue4) "0 0 139"
+set RGB(dodgerblue1) "30 144 255"
+set RGB(dodgerblue2) "28 134 238"
+set RGB(dodgerblue3) "24 116 205"
+set RGB(dodgerblue4) "16 78 139"
+set RGB(steelblue1) "99 184 255"
+set RGB(steelblue2) "92 172 238"
+set RGB(steelblue3) "79 148 205"
+set RGB(steelblue4) "54 100 139"
+set RGB(deepskyblue1) "0 191 255"
+set RGB(deepskyblue2) "0 178 238"
+set RGB(deepskyblue3) "0 154 205"
+set RGB(deepskyblue4) "0 104 139"
+set RGB(skyblue1) "135 206 255"
+set RGB(skyblue2) "126 192 238"
+set RGB(skyblue3) "108 166 205"
+set RGB(skyblue4) "74 112 139"
+set RGB(lightskyblue1) "176 226 255"
+set RGB(lightskyblue2) "164 211 238"
+set RGB(lightskyblue3) "141 182 205"
+set RGB(lightskyblue4) "96 123 139"
+set RGB(slategray1) "198 226 255"
+set RGB(slategray2) "185 211 238"
+set RGB(slategray3) "159 182 205"
+set RGB(slategray4) "108 123 139"
+set RGB(lightsteelblue1) "202 225 255"
+set RGB(lightsteelblue2) "188 210 238"
+set RGB(lightsteelblue3) "162 181 205"
+set RGB(lightsteelblue4) "110 123 139"
+set RGB(lightblue1) "191 239 255"
+set RGB(lightblue2) "178 223 238"
+set RGB(lightblue3) "154 192 205"
+set RGB(lightblue4) "104 131 139"
+set RGB(lightcyan1) "224 255 255"
+set RGB(lightcyan2) "209 238 238"
+set RGB(lightcyan3) "180 205 205"
+set RGB(lightcyan4) "122 139 139"
+set RGB(paleturquoise1) "187 255 255"
+set RGB(paleturquoise2) "174 238 238"
+set RGB(paleturquoise3) "150 205 205"
+set RGB(paleturquoise4) "102 139 139"
+set RGB(cadetblue1) "152 245 255"
+set RGB(cadetblue2) "142 229 238"
+set RGB(cadetblue3) "122 197 205"
+set RGB(cadetblue4) "83 134 139"
+set RGB(turquoise1) "0 245 255"
+set RGB(turquoise2) "0 229 238"
+set RGB(turquoise3) "0 197 205"
+set RGB(turquoise4) "0 134 139"
+set RGB(cyan1) "0 255 255"
+set RGB(cyan2) "0 238 238"
+set RGB(cyan3) "0 205 205"
+set RGB(cyan4) "0 139 139"
+set RGB(darkslategray1) "151 255 255"
+set RGB(darkslategray2) "141 238 238"
+set RGB(darkslategray3) "121 205 205"
+set RGB(darkslategray4) "82 139 139"
+set RGB(aquamarine1) "127 255 212"
+set RGB(aquamarine2) "118 238 198"
+set RGB(aquamarine3) "102 205 170"
+set RGB(aquamarine4) "69 139 116"
+set RGB(darkseagreen1) "193 255 193"
+set RGB(darkseagreen2) "180 238 180"
+set RGB(darkseagreen3) "155 205 155"
+set RGB(darkseagreen4) "105 139 105"
+set RGB(seagreen1) "84 255 159"
+set RGB(seagreen2) "78 238 148"
+set RGB(seagreen3) "67 205 128"
+set RGB(seagreen4) "46 139 87"
+set RGB(palegreen1) "154 255 154"
+set RGB(palegreen2) "144 238 144"
+set RGB(palegreen3) "124 205 124"
+set RGB(palegreen4) "84 139 84"
+set RGB(springgreen1) "0 255 127"
+set RGB(springgreen2) "0 238 118"
+set RGB(springgreen3) "0 205 102"
+set RGB(springgreen4) "0 139 69"
+set RGB(green1) "0 255 0"
+set RGB(green2) "0 238 0"
+set RGB(green3) "0 205 0"
+set RGB(green4) "0 139 0"
+set RGB(chartreuse1) "127 255 0"
+set RGB(chartreuse2) "118 238 0"
+set RGB(chartreuse3) "102 205 0"
+set RGB(chartreuse4) "69 139 0"
+set RGB(olivedrab1) "192 255 62"
+set RGB(olivedrab2) "179 238 58"
+set RGB(olivedrab3) "154 205 50"
+set RGB(olivedrab4) "105 139 34"
+set RGB(darkolivegreen1) "202 255 112"
+set RGB(darkolivegreen2) "188 238 104"
+set RGB(darkolivegreen3) "162 205 90"
+set RGB(darkolivegreen4) "110 139 61"
+set RGB(khaki1) "255 246 143"
+set RGB(khaki2) "238 230 133"
+set RGB(khaki3) "205 198 115"
+set RGB(khaki4) "139 134 78"
+set RGB(lightgoldenrod1) "255 236 139"
+set RGB(lightgoldenrod2) "238 220 130"
+set RGB(lightgoldenrod3) "205 190 112"
+set RGB(lightgoldenrod4) "139 129 76"
+set RGB(lightyellow1) "255 255 224"
+set RGB(lightyellow2) "238 238 209"
+set RGB(lightyellow3) "205 205 180"
+set RGB(lightyellow4) "139 139 122"
+set RGB(yellow1) "255 255 0"
+set RGB(yellow2) "238 238 0"
+set RGB(yellow3) "205 205 0"
+set RGB(yellow4) "139 139 0"
+set RGB(gold1) "255 215 0"
+set RGB(gold2) "238 201 0"
+set RGB(gold3) "205 173 0"
+set RGB(gold4) "139 117 0"
+set RGB(goldenrod1) "255 193 37"
+set RGB(goldenrod2) "238 180 34"
+set RGB(goldenrod3) "205 155 29"
+set RGB(goldenrod4) "139 105 20"
+set RGB(darkgoldenrod1) "255 185 15"
+set RGB(darkgoldenrod2) "238 173 14"
+set RGB(darkgoldenrod3) "205 149 12"
+set RGB(darkgoldenrod4) "139 101 8"
+set RGB(rosybrown1) "255 193 193"
+set RGB(rosybrown2) "238 180 180"
+set RGB(rosybrown3) "205 155 155"
+set RGB(rosybrown4) "139 105 105"
+set RGB(indianred1) "255 106 106"
+set RGB(indianred2) "238 99 99"
+set RGB(indianred3) "205 85 85"
+set RGB(indianred4) "139 58 58"
+set RGB(sienna1) "255 130 71"
+set RGB(sienna2) "238 121 66"
+set RGB(sienna3) "205 104 57"
+set RGB(sienna4) "139 71 38"
+set RGB(burlywood1) "255 211 155"
+set RGB(burlywood2) "238 197 145"
+set RGB(burlywood3) "205 170 125"
+set RGB(burlywood4) "139 115 85"
+set RGB(wheat1) "255 231 186"
+set RGB(wheat2) "238 216 174"
+set RGB(wheat3) "205 186 150"
+set RGB(wheat4) "139 126 102"
+set RGB(tan1) "255 165 79"
+set RGB(tan2) "238 154 73"
+set RGB(tan3) "205 133 63"
+set RGB(tan4) "139 90 43"
+set RGB(chocolate1) "255 127 36"
+set RGB(chocolate2) "238 118 33"
+set RGB(chocolate3) "205 102 29"
+set RGB(chocolate4) "139 69 19"
+set RGB(firebrick1) "255 48 48"
+set RGB(firebrick2) "238 44 44"
+set RGB(firebrick3) "205 38 38"
+set RGB(firebrick4) "139 26 26"
+set RGB(brown1) "255 64 64"
+set RGB(brown2) "238 59 59"
+set RGB(brown3) "205 51 51"
+set RGB(brown4) "139 35 35"
+set RGB(salmon1) "255 140 105"
+set RGB(salmon2) "238 130 98"
+set RGB(salmon3) "205 112 84"
+set RGB(salmon4) "139 76 57"
+set RGB(lightsalmon1) "255 160 122"
+set RGB(lightsalmon2) "238 149 114"
+set RGB(lightsalmon3) "205 129 98"
+set RGB(lightsalmon4) "139 87 66"
+set RGB(orange1) "255 165 0"
+set RGB(orange2) "238 154 0"
+set RGB(orange3) "205 133 0"
+set RGB(orange4) "139 90 0"
+set RGB(darkorange1) "255 127 0"
+set RGB(darkorange2) "238 118 0"
+set RGB(darkorange3) "205 102 0"
+set RGB(darkorange4) "139 69 0"
+set RGB(coral1) "255 114 86"
+set RGB(coral2) "238 106 80"
+set RGB(coral3) "205 91 69"
+set RGB(coral4) "139 62 47"
+set RGB(tomato1) "255 99 71"
+set RGB(tomato2) "238 92 66"
+set RGB(tomato3) "205 79 57"
+set RGB(tomato4) "139 54 38"
+set RGB(orangered1) "255 69 0"
+set RGB(orangered2) "238 64 0"
+set RGB(orangered3) "205 55 0"
+set RGB(orangered4) "139 37 0"
+set RGB(red1) "255 0 0"
+set RGB(red2) "238 0 0"
+set RGB(red3) "205 0 0"
+set RGB(red4) "139 0 0"
+set RGB(deeppink1) "255 20 147"
+set RGB(deeppink2) "238 18 137"
+set RGB(deeppink3) "205 16 118"
+set RGB(deeppink4) "139 10 80"
+set RGB(hotpink1) "255 110 180"
+set RGB(hotpink2) "238 106 167"
+set RGB(hotpink3) "205 96 144"
+set RGB(hotpink4) "139 58 98"
+set RGB(pink1) "255 181 197"
+set RGB(pink2) "238 169 184"
+set RGB(pink3) "205 145 158"
+set RGB(pink4) "139 99 108"
+set RGB(lightpink1) "255 174 185"
+set RGB(lightpink2) "238 162 173"
+set RGB(lightpink3) "205 140 149"
+set RGB(lightpink4) "139 95 101"
+set RGB(palevioletred1) "255 130 171"
+set RGB(palevioletred2) "238 121 159"
+set RGB(palevioletred3) "205 104 137"
+set RGB(palevioletred4) "139 71 93"
+set RGB(maroon1) "255 52 179"
+set RGB(maroon2) "238 48 167"
+set RGB(maroon3) "205 41 144"
+set RGB(maroon4) "139 28 98"
+set RGB(violetred1) "255 62 150"
+set RGB(violetred2) "238 58 140"
+set RGB(violetred3) "205 50 120"
+set RGB(violetred4) "139 34 82"
+set RGB(magenta1) "255 0 255"
+set RGB(magenta2) "238 0 238"
+set RGB(magenta3) "205 0 205"
+set RGB(magenta4) "139 0 139"
+set RGB(orchid1) "255 131 250"
+set RGB(orchid2) "238 122 233"
+set RGB(orchid3) "205 105 201"
+set RGB(orchid4) "139 71 137"
+set RGB(plum1) "255 187 255"
+set RGB(plum2) "238 174 238"
+set RGB(plum3) "205 150 205"
+set RGB(plum4) "139 102 139"
+set RGB(mediumorchid1) "224 102 255"
+set RGB(mediumorchid2) "209 95 238"
+set RGB(mediumorchid3) "180 82 205"
+set RGB(mediumorchid4) "122 55 139"
+set RGB(darkorchid1) "191 62 255"
+set RGB(darkorchid2) "178 58 238"
+set RGB(darkorchid3) "154 50 205"
+set RGB(darkorchid4) "104 34 139"
+set RGB(purple1) "155 48 255"
+set RGB(purple2) "145 44 238"
+set RGB(purple3) "125 38 205"
+set RGB(purple4) "85 26 139"
+set RGB(mediumpurple1) "171 130 255"
+set RGB(mediumpurple2) "159 121 238"
+set RGB(mediumpurple3) "137 104 205"
+set RGB(mediumpurple4) "93 71 139"
+set RGB(thistle1) "255 225 255"
+set RGB(thistle2) "238 210 238"
+set RGB(thistle3) "205 181 205"
+set RGB(thistle4) "139 123 139"
+set RGB(gray0) "0 0 0"
+set RGB(grey0) "0 0 0"
+set RGB(gray1) "3 3 3"
+set RGB(grey1) "3 3 3"
+set RGB(gray2) "5 5 5"
+set RGB(grey2) "5 5 5"
+set RGB(gray3) "8 8 8"
+set RGB(grey3) "8 8 8"
+set RGB(gray4) "10 10 10" 
+set RGB(grey4) "10 10 10" 
+set RGB(gray5) "13 13 13" 
+set RGB(grey5) "13 13 13" 
+set RGB(gray6) "15 15 15" 
+set RGB(grey6) "15 15 15" 
+set RGB(gray7) "18 18 18" 
+set RGB(grey7) "18 18 18" 
+set RGB(gray8) "20 20 20" 
+set RGB(grey8) "20 20 20" 
+set RGB(gray9) "23 23 23" 
+set RGB(grey9) "23 23 23" 
+set RGB(gray10) "26 26 26" 
+set RGB(grey10) "26 26 26" 
+set RGB(gray11) "28 28 28" 
+set RGB(grey11) "28 28 28" 
+set RGB(gray12) "31 31 31" 
+set RGB(grey12) "31 31 31" 
+set RGB(gray13) "33 33 33" 
+set RGB(grey13) "33 33 33" 
+set RGB(gray14) "36 36 36" 
+set RGB(grey14) "36 36 36" 
+set RGB(gray15) "38 38 38" 
+set RGB(grey15) "38 38 38" 
+set RGB(gray16) "41 41 41" 
+set RGB(grey16) "41 41 41" 
+set RGB(gray17) "43 43 43" 
+set RGB(grey17) "43 43 43" 
+set RGB(gray18) "46 46 46" 
+set RGB(grey18) "46 46 46" 
+set RGB(gray19) "48 48 48" 
+set RGB(grey19) "48 48 48" 
+set RGB(gray20) "51 51 51" 
+set RGB(grey20) "51 51 51" 
+set RGB(gray21) "54 54 54" 
+set RGB(grey21) "54 54 54" 
+set RGB(gray22) "56 56 56" 
+set RGB(grey22) "56 56 56" 
+set RGB(gray23) "59 59 59" 
+set RGB(grey23) "59 59 59" 
+set RGB(gray24) "61 61 61" 
+set RGB(grey24) "61 61 61" 
+set RGB(gray25) "64 64 64" 
+set RGB(grey25) "64 64 64" 
+set RGB(gray26) "66 66 66" 
+set RGB(grey26) "66 66 66" 
+set RGB(gray27) "69 69 69" 
+set RGB(grey27) "69 69 69" 
+set RGB(gray28) "71 71 71" 
+set RGB(grey28) "71 71 71" 
+set RGB(gray29) "74 74 74" 
+set RGB(grey29) "74 74 74" 
+set RGB(gray30) "77 77 77" 
+set RGB(grey30) "77 77 77" 
+set RGB(gray31) "79 79 79" 
+set RGB(grey31) "79 79 79" 
+set RGB(gray32) "82 82 82" 
+set RGB(grey32) "82 82 82" 
+set RGB(gray33) "84 84 84" 
+set RGB(grey33) "84 84 84" 
+set RGB(gray34) "87 87 87" 
+set RGB(grey34) "87 87 87" 
+set RGB(gray35) "89 89 89" 
+set RGB(grey35) "89 89 89" 
+set RGB(gray36) "92 92 92" 
+set RGB(grey36) "92 92 92" 
+set RGB(gray37) "94 94 94" 
+set RGB(grey37) "94 94 94" 
+set RGB(gray38) "97 97 97" 
+set RGB(grey38) "97 97 97" 
+set RGB(gray39) "99 99 99" 
+set RGB(grey39) "99 99 99" 
+set RGB(gray40) "102 102 102" 
+set RGB(grey40) "102 102 102" 
+set RGB(gray41) "105 105 105" 
+set RGB(grey41) "105 105 105" 
+set RGB(gray42) "107 107 107" 
+set RGB(grey42) "107 107 107" 
+set RGB(gray43) "110 110 110" 
+set RGB(grey43) "110 110 110" 
+set RGB(gray44) "112 112 112" 
+set RGB(grey44) "112 112 112" 
+set RGB(gray45) "115 115 115" 
+set RGB(grey45) "115 115 115" 
+set RGB(gray46) "117 117 117" 
+set RGB(grey46) "117 117 117" 
+set RGB(gray47) "120 120 120" 
+set RGB(grey47) "120 120 120" 
+set RGB(gray48) "122 122 122" 
+set RGB(grey48) "122 122 122" 
+set RGB(gray49) "125 125 125" 
+set RGB(grey49) "125 125 125" 
+set RGB(gray50) "127 127 127" 
+set RGB(grey50) "127 127 127" 
+set RGB(gray51) "130 130 130" 
+set RGB(grey51) "130 130 130" 
+set RGB(gray52) "133 133 133" 
+set RGB(grey52) "133 133 133" 
+set RGB(gray53) "135 135 135" 
+set RGB(grey53) "135 135 135" 
+set RGB(gray54) "138 138 138" 
+set RGB(grey54) "138 138 138" 
+set RGB(gray55) "140 140 140" 
+set RGB(grey55) "140 140 140" 
+set RGB(gray56) "143 143 143" 
+set RGB(grey56) "143 143 143" 
+set RGB(gray57) "145 145 145" 
+set RGB(grey57) "145 145 145" 
+set RGB(gray58) "148 148 148" 
+set RGB(grey58) "148 148 148" 
+set RGB(gray59) "150 150 150" 
+set RGB(grey59) "150 150 150" 
+set RGB(gray60) "153 153 153" 
+set RGB(grey60) "153 153 153" 
+set RGB(gray61) "156 156 156" 
+set RGB(grey61) "156 156 156" 
+set RGB(gray62) "158 158 158" 
+set RGB(grey62) "158 158 158" 
+set RGB(gray63) "161 161 161" 
+set RGB(grey63) "161 161 161" 
+set RGB(gray64) "163 163 163" 
+set RGB(grey64) "163 163 163" 
+set RGB(gray65) "166 166 166" 
+set RGB(grey65) "166 166 166" 
+set RGB(gray66) "168 168 168" 
+set RGB(grey66) "168 168 168" 
+set RGB(gray67) "171 171 171" 
+set RGB(grey67) "171 171 171" 
+set RGB(gray68) "173 173 173" 
+set RGB(grey68) "173 173 173" 
+set RGB(gray69) "176 176 176" 
+set RGB(grey69) "176 176 176" 
+set RGB(gray70) "179 179 179" 
+set RGB(grey70) "179 179 179" 
+set RGB(gray71) "181 181 181" 
+set RGB(grey71) "181 181 181" 
+set RGB(gray72) "184 184 184" 
+set RGB(grey72) "184 184 184" 
+set RGB(gray73) "186 186 186" 
+set RGB(grey73) "186 186 186" 
+set RGB(gray74) "189 189 189" 
+set RGB(grey74) "189 189 189" 
+set RGB(gray75) "191 191 191" 
+set RGB(grey75) "191 191 191" 
+set RGB(gray76) "194 194 194" 
+set RGB(grey76) "194 194 194" 
+set RGB(gray77) "196 196 196" 
+set RGB(grey77) "196 196 196" 
+set RGB(gray78) "199 199 199" 
+set RGB(grey78) "199 199 199" 
+set RGB(gray79) "201 201 201" 
+set RGB(grey79) "201 201 201" 
+set RGB(gray80) "204 204 204" 
+set RGB(grey80) "204 204 204" 
+set RGB(gray81) "207 207 207" 
+set RGB(grey81) "207 207 207" 
+set RGB(gray82) "209 209 209" 
+set RGB(grey82) "209 209 209" 
+set RGB(gray83) "212 212 212" 
+set RGB(grey83) "212 212 212" 
+set RGB(gray84) "214 214 214" 
+set RGB(grey84) "214 214 214" 
+set RGB(gray85) "217 217 217" 
+set RGB(grey85) "217 217 217" 
+set RGB(gray86) "219 219 219" 
+set RGB(grey86) "219 219 219" 
+set RGB(gray87) "222 222 222" 
+set RGB(grey87) "222 222 222" 
+set RGB(gray88) "224 224 224" 
+set RGB(grey88) "224 224 224" 
+set RGB(gray89) "227 227 227" 
+set RGB(grey89) "227 227 227" 
+set RGB(gray90) "229 229 229" 
+set RGB(grey90) "229 229 229" 
+set RGB(gray91) "232 232 232" 
+set RGB(grey91) "232 232 232" 
+set RGB(gray92) "235 235 235" 
+set RGB(grey92) "235 235 235" 
+set RGB(gray93) "237 237 237" 
+set RGB(grey93) "237 237 237" 
+set RGB(gray94) "240 240 240" 
+set RGB(grey94) "240 240 240" 
+set RGB(gray95) "242 242 242" 
+set RGB(grey95) "242 242 242" 
+set RGB(gray96) "245 245 245" 
+set RGB(grey96) "245 245 245" 
+set RGB(gray97) "247 247 247" 
+set RGB(grey97) "247 247 247" 
+set RGB(gray98) "250 250 250" 
+set RGB(grey98) "250 250 250" 
+set RGB(gray99) "252 252 252" 
+set RGB(grey99) "252 252 252" 
+set RGB(gray100) "255 255 255" 
+set RGB(grey100) "255 255 255" 
+set RGB(darkgrey) "169 169 169"
+set RGB(darkgray) "169 169 169"
+set RGB(darkblue) "0 0 139"
+set RGB(darkcyan) "0 139 139"
+set RGB(darkmagenta) "139 0 139"
+set RGB(darkred) "139 0 0"
+set RGB(lightgreen) "144 238 144"
+
+
+# stipples
+
+set NO_STIPPLES 36
+
+lappend STIPPLES "\
+    10101010 \
+    00000000 \
+    10101010 \
+    00000000 \
+    10101010 \
+    00000000 \
+    10101010 \
+    00000000"
+
+lappend STIPPLES "\
+    01010101 \
+    00000000 \
+    01010101 \
+    00000000 \
+    01010101 \
+    00000000 \
+    01010101 \
+    00000000"
+
+lappend STIPPLES "\
+    00000000 \
+    10101010 \
+    00000000 \
+    10101010 \
+    00000000 \
+    10101010 \
+    00000000 \
+    10101010"
+
+lappend STIPPLES "\
+    00000000 \
+    01010101 \
+    00000000 \
+    01010101 \
+    00000000 \
+    01010101 \
+    00000000 \
+    01010101"
+
+lappend STIPPLES "\
+    00100000 \
+    00010000 \
+    00001000 \
+    00000100 \
+    00000010 \
+    00000001 \
+    10000000 \
+    01000000 "
+
+lappend STIPPLES "\
+    01000000 \
+    10000000 \
+    00000001 \
+    00000010 \
+    00000100 \
+    00001000 \
+    00010000 \
+    00100000 "
+
+lappend STIPPLES "\
+    10001000 \
+    01000100 \
+    00100010 \
+    00010001 \
+    10001000 \
+    01000100 \
+    00100010 \
+    00010001 "
+
+lappend STIPPLES "\
+    00010001 \
+    00100010 \
+    01000100 \
+    10001000 \
+    00010001 \
+    00100010 \
+    01000100 \
+    10001000 "
+
+lappend STIPPLES "\
+    10000001 \
+    01000010 \
+    00100100 \
+    00011000 \
+    00011000 \
+    00100100 \
+    01000010 \
+    10000001 "
+
+lappend STIPPLES "\
+    10011001 \
+    01000010 \
+    00100100 \
+    10011001 \
+    10011001 \
+    00100100 \
+    01000010 \
+    10011001 "
+
+lappend STIPPLES "\
+    00000000 \
+    00000000 \
+    00011000 \
+    00100100 \
+    00100100 \
+    00011000 \
+    00000000 \
+    00000000 "
+
+lappend STIPPLES "\
+    00000000 \
+    01100110 \
+    01100110 \
+    00000000 \
+    00000000 \
+    01000010 \
+    00111100 \
+    00000000 "
+
+lappend STIPPLES "\
+    00001000 \
+    00000100 \
+    00000010 \
+    00000001 \
+    10000000 \
+    01000000 \
+    00100000 \
+    00010000 "
+
+lappend STIPPLES "\
+    00010000 \
+    00100000 \
+    01000000 \
+    10000000 \
+    00000001 \
+    00000010 \
+    00000100 \
+    00001000"
+
+lappend STIPPLES "\
+    00100010 \
+    00010001 \
+    10001000 \
+    01000100 \
+    00100010 \
+    00010001 \
+    10001000 \
+    01000100 "
+
+lappend STIPPLES "\
+    01000100 \
+    10001000 \
+    00010001 \
+    00100010 \
+    01000100 \
+    10001000 \
+    00010001 \
+    00100010 "
+
+lappend STIPPLES "\
+    00011000 \
+    00100100 \
+    01000010 \
+    10000001 \
+    10000001 \
+    01000010 \
+    00100100 \
+    00011000 "
+
+lappend STIPPLES "\
+    01100110 \
+    10010000 \
+    00001001 \
+    01100110 \
+    01100110 \
+    00001001 \
+    10010000 \
+    01100110 "
+
+lappend STIPPLES "\
+    00000000 \
+    00111100 \
+    01000010 \
+    01000010 \
+    01000010 \
+    01000010 \
+    00111100 \
+    00000000 "
+
+lappend STIPPLES "\
+    00000000 \
+    01100110 \
+    01100110 \
+    00000000 \
+    00000000 \
+    00111100 \
+    01000010 \
+    00000000 "
+
+
+lappend STIPPLES "\
+    00100000 \
+    00010000 \
+    00001000 \
+    00000100 \
+    00000010 \
+    00000001 \
+    10000000 \
+    01000000 "
+
+lappend STIPPLES "\
+    01000000 \
+    10000000 \
+    00000001 \
+    00000010 \
+    00000100 \
+    00001000 \
+    00010000 \
+    00100000 "
+
+lappend STIPPLES "\
+    10001000 \
+    01000100 \
+    00100010 \
+    00010001 \
+    10001000 \
+    01000100 \
+    00100010 \
+    00010001 "
+
+lappend STIPPLES "\
+    00010001 \
+    00100010 \
+    01000100 \
+    10001000 \
+    00010001 \
+    00100010 \
+    01000100 \
+    10001000 "
+
+lappend STIPPLES "\
+    10000001 \
+    01000010 \
+    00100100 \
+    00011000 \
+    00011000 \
+    00100100 \
+    01000010 \
+    10000001 "
+
+lappend STIPPLES "\
+    10011001 \
+    01000010 \
+    00100100 \
+    10011001 \
+    10011001 \
+    00100100 \
+    01000010 \
+    10011001 "
+
+lappend STIPPLES "\
+    00000000 \
+    00000000 \
+    00011000 \
+    00100100 \
+    00100100 \
+    00011000 \
+    00000000 \
+    00000000 "
+
+lappend STIPPLES "\
+    00000000 \
+    01100110 \
+    01100110 \
+    00000000 \
+    00000000 \
+    01000010 \
+    00111100 \
+    00000000 "
+
+lappend STIPPLES "\
+    00001000 \
+    00000100 \
+    00000010 \
+    00000001 \
+    10000000 \
+    01000000 \
+    00100000 \
+    00010000 "
+
+lappend STIPPLES "\
+    00010000 \
+    00100000 \
+    01000000 \
+    10000000 \
+    00000001 \
+    00000010 \
+    00000100 \
+    00001000"
+
+lappend STIPPLES "\
+    00100010 \
+    00010001 \
+    10001000 \
+    01000100 \
+    00100010 \
+    00010001 \
+    10001000 \
+    01000100 "
+
+lappend STIPPLES "\
+    01000100 \
+    10001000 \
+    00010001 \
+    00100010 \
+    01000100 \
+    10001000 \
+    00010001 \
+    00100010 "
+
+lappend STIPPLES "\
+    00011000 \
+    00100100 \
+    01000010 \
+    10000001 \
+    10000001 \
+    01000010 \
+    00100100 \
+    00011000 "
+
+lappend STIPPLES "\
+    01100110 \
+    10010000 \
+    00001001 \
+    01100110 \
+    01100110 \
+    00001001 \
+    10010000 \
+    01100110 "
+
+lappend STIPPLES "\
+    00000000 \
+    00111100 \
+    01000010 \
+    01000010 \
+    01000010 \
+    01000010 \
+    00111100 \
+    00000000 "
+
+lappend STIPPLES "\
+    00000000 \
+    01100110 \
+    01100110 \
+    00000000 \
+    00000000 \
+    00111100 \
+    01000010 \
+    00000000 "
+
+
+
+
+
+# do it
+if {[catch [list make_tech $argv] msg]} {
+  puts "ERROR in make_tech: $msg"
+  exit 1
+}
+
+# success
+exit 0

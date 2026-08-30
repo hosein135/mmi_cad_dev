@@ -1,0 +1,128 @@
+# mmi25-ext.tcl technology file.  Companion to mmi25-ext.tech.
+
+
+set MN_TYPICAL_WIRE_WIDTH 0.32
+
+# DRC Database.  Access with techinfo command.
+
+set DRC_DATA(area,m1) 0.36
+set DRC_DATA(area,m2) 0.36
+set DRC_DATA(area,m3) 0.36
+set DRC_DATA(area,m4) 0.36
+set DRC_DATA(connect,ct) {ndif pdif nwc pwc poly m1}
+set DRC_DATA(connect,m1) {ct v12}
+set DRC_DATA(connect,m2) {v12 v23}
+set DRC_DATA(connect,m3) {v23 v34}
+set DRC_DATA(connect,m4) {v34 v45}
+set DRC_DATA(connect,m5) v45
+set DRC_DATA(connect,ndif) ct
+set DRC_DATA(connect,nwc) ct
+set DRC_DATA(connect,pdif) ct
+set DRC_DATA(connect,poly) ct
+set DRC_DATA(connect,pwc) ct
+set DRC_DATA(connect,v12) {m1 m2}
+set DRC_DATA(connect,v23) {m2 m3}
+set DRC_DATA(connect,v34) {m3 m4}
+set DRC_DATA(connect,v45) {m4 m5}
+set DRC_DATA(device,fet,nfet) {poly ndif }
+set DRC_DATA(device,fet,pfet) {poly pdif }
+set DRC_DATA(enclose,GDS_nplus,poly) 0.1
+set DRC_DATA(enclose,GDS_pplus,poly) 0.1
+set DRC_DATA(enclose,m1,ct) 0.09
+set DRC_DATA(enclose,m1,v12) 0.09
+set DRC_DATA(enclose,m2,v12) 0.09
+set DRC_DATA(enclose,m2,v23) 0.1
+set DRC_DATA(enclose,m3,v23) 0.09
+set DRC_DATA(enclose,m3,v34) 0.09
+set DRC_DATA(enclose,m4,v34) 0.09
+set DRC_DATA(enclose,m4,v45) 0.09
+set DRC_DATA(enclose,m5,v45) 0.09
+set DRC_DATA(enclose,ndif,ct) 0.14
+set DRC_DATA(enclose,nplus,ndif) 0.26
+set DRC_DATA(enclose,nplus,nfet) 0.33
+set DRC_DATA(enclose,nplus,nwc) 0.04
+set DRC_DATA(enclose,nw,nwc) 0.16
+set DRC_DATA(enclose,nw,pdif) 0.6
+set DRC_DATA(enclose,nwc,ct) 0.14
+set DRC_DATA(enclose,pdif,ct) 0.14
+set DRC_DATA(enclose,poly,ct) 0.14
+set DRC_DATA(enclose,pplus,pdif) 0.26
+set DRC_DATA(enclose,pplus,pfet) 0.33
+set DRC_DATA(enclose,pplus,pwc) 0.04
+set DRC_DATA(enclose,pwc,ct) 0.14
+set DRC_DATA(extend,ndif,nfet) 0.44
+set DRC_DATA(extend,pdif,pfet) 0.44
+set DRC_DATA(extend,poly,nfet) 0.36
+set DRC_DATA(extend,poly,pfet) 0.36
+set DRC_DATA(layer_order) {m5 v45 m4 v34 m3 v23 m2 v12 m1 ct poly nfet pfet ndif pdif nwc pwc nw n2v n3v pplus nplus prb pass sram esd rpo cap psub2 res resid diodeid compass io vtd drcdum mbound}
+set DRC_DATA(space_to,ct,nfet) 0.22
+set DRC_DATA(space_to,ct,pfet) 0.22
+set DRC_DATA(space_to,nplus,pdif) 0.3
+set DRC_DATA(space_to,nplus,pfet) 0.33
+set DRC_DATA(space_to,nplus,pplus) 0.1
+set DRC_DATA(space_to,nplus,pwc) 0.14
+set DRC_DATA(space_to,nw,ndif) 0.6
+set DRC_DATA(space_to,nw,pwc) 0.16
+set DRC_DATA(space_to,poly,ndif) 0.14
+set DRC_DATA(space_to,poly,nwc) 0.14
+set DRC_DATA(space_to,poly,pdif) 0.14
+set DRC_DATA(space_to,poly,pwc) 0.14
+set DRC_DATA(space_to,pplus,ndif) 0.3
+set DRC_DATA(space_to,pplus,nfet) 0.33
+set DRC_DATA(space_to,pplus,nwc) 0.14
+set DRC_DATA(space_to,v12,nfet) 0.01
+set DRC_DATA(space_to,v12,pfet) 0.01
+set DRC_DATA(spacing,ct) 0.3
+set DRC_DATA(spacing,m1) 0.32
+set DRC_DATA(spacing,m2) 0.4
+set DRC_DATA(spacing,m3) 0.4
+set DRC_DATA(spacing,m4) 0.4
+set DRC_DATA(spacing,m5) 0.46
+set DRC_DATA(spacing,n2v) 0.44
+set DRC_DATA(spacing,n3v) 0.44
+set DRC_DATA(spacing,ndif) 0.4
+set DRC_DATA(spacing,nfet) 0.5
+set DRC_DATA(spacing,nplus) 0.44
+set DRC_DATA(spacing,nw) 0.6
+set DRC_DATA(spacing,nwc) 0.4
+set DRC_DATA(spacing,pdif) 0.4
+set DRC_DATA(spacing,pfet) 0.5
+set DRC_DATA(spacing,poly) 0.36
+set DRC_DATA(spacing,pplus) 0.44
+set DRC_DATA(spacing,pwc) 0.4
+set DRC_DATA(spacing,v12) 0.35
+set DRC_DATA(spacing,v23) 0.35
+set DRC_DATA(spacing,v34) 0.35
+set DRC_DATA(spacing,v45) 0.35
+set DRC_DATA(vias) {ct v12 v23 v34 v45}
+set DRC_DATA(width,ct) 0.3
+set DRC_DATA(width,m1) 0.32
+set DRC_DATA(width,m2) 0.4
+set DRC_DATA(width,m3) 0.4
+set DRC_DATA(width,m4) 0.4
+set DRC_DATA(width,m5) 0.44
+set DRC_DATA(width,n2v) 0.44
+set DRC_DATA(width,n3v) 0.44
+set DRC_DATA(width,ndif) 0.3
+set DRC_DATA(width,nplus) 0.44
+set DRC_DATA(width,nw) 1.2
+set DRC_DATA(width,nwc) 0.3
+set DRC_DATA(width,pdif) 0.3
+set DRC_DATA(width,poly) 0.24
+set DRC_DATA(width,pplus) 0.44
+set DRC_DATA(width,pwc) 0.3
+set DRC_DATA(width,v12) 0.36
+set DRC_DATA(width,v23) 0.36
+set DRC_DATA(width,v34) 0.36
+set DRC_DATA(width,v45) 0.36
+
+# Variables passed directly from technology source file.
+
+set GRID(resolution) 0.01
+set LAYER_NAME(pdiff) pdif
+set LAYER_NAME(ndiff) ndif
+set LAYER_NAME(nplus) nplus
+set LAYER_NAME(pplus) pplus
+set LAYER_NAME(nwell) nw
+set LAYER_NAME(poly) poly
+set LAYER_NAME(contact) ct

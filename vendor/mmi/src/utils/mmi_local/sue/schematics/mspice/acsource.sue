@@ -1,0 +1,20 @@
+# SUE version MMI_SUE4.3.4
+
+proc ICON_acsource args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {mag 1}}
+  icon_term -type inout -origin {0 40} -name v_minus
+  icon_term -type inout -origin {0 -40} -orient RY -name v_plus
+  icon_line 0 -20 0 -40 0 -40
+  icon_property -origin {-200 130} -type fixed -name spice -text {[unique_name v $name] $v_plus $v_minus AC $mag}
+  icon_property -origin {-100 80} -type user -name name
+  icon_property -origin {-100 100} -type user -name mag -default 1
+  icon_line -15 30 -5 30
+  icon_line -15 -30 -5 -30
+  icon_line -10 -35 -10 -25
+  icon_property -origin {10 -20} -label {$mag}
+  icon_arc -20 -20 20 20 -start 352 -extent 359
+  icon_line 0 40 0 20 0 20
+  icon_arc -20 -10 0 20 -start 12 -extent 158
+  icon_arc 0 -16 20 14 -start 348 -extent -158
+}
+

@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Micro Magic Tools - MegaCell Compiler - Datasheet</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="STYLESHEET" type="text/css" href="mainstyle.css">
+</head>
+
+<body bgcolor="#ffffff" topmargin="6" leftmargin="6" marginwidth="6" marginheight="6">
+
+<!-- BEGIN HEADER INCLUDE -->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tr><td rowspan="3"><img src="../mmi-logo.gif"/></td></tr>
+
+<td width="200">
+	<table border="0" cellpadding="0" cellspacing="0">
+	<tr>
+	<td><a class="tbc" href="index.html"><b>Micro Magic Tools Overview</b></a><br /></td></tr>
+	
+	<tr valign="bottom">
+	<td class="tbc" height="35">&nbsp;&#149; <a href="sue.html">SUE Design Manager</a></td></tr>
+	
+	<tr valign="bottom">
+	<td class="tbc" height="35">&nbsp;&#149; <a href="datapath.html">DataPath Compiler</a></td></tr>
+
+	</table>
+<td width="180">
+	<table border="0" cellpadding="0" cellspacing="0">
+
+	<tr valign="bottom">
+	<td class="tbc" height="75">&nbsp;&#149; <a href="max.html">MAX Layout Editor</a> and<br />
+
+	&nbsp;&nbsp;&nbsp;<a href="max.html">MAX-LS Layout System</a></td></tr>
+
+	<tr>
+	<td class="tbc" height="40">&nbsp;&#149; <a href="megacell.html">MegaCell Compiler</a></td></tr>
+	</table>
+
+</td></tr>
+</table>
+
+<!-- END HEADER INCLUDE -->
+
+<p class="doctype">D A T A S H E E T</p>
+
+<h3>MegaCell Compiler</h3>
+
+<img src="images/mcc_on.gif" alt="" align="right" border="0" usemap="#mmi_tool" width="263" height="295" />
+
+<p>
+The MegaCell Compiler allows users to easily build their own generators for SRAMs, DRAMs, ROMs, pad rings, or any other regular or semi-regular structure, in just minutes. 
+Verilog, HSPICE, critical path netlists, and timing models can all be generated automatically.</p>
+
+<ul style="line-height: 20px;">
+<li>Design, build, and analyze custom memories</li>
+<li>Process independent algorithmic generators</li>
+<li>Extract Verilog from layout</li>
+<li>Path pruning reduces SPICE Deck by a thousand times</li></ul>
+
+<p>
+The MegaCell compiler makes building all types of regular structures such as SRAMs, CAMs, DRAMs, register files, FIFOs, ROMs, PLAs, and pad rings fast and easy. The MegaCell 
+compiler is so fast that any size repetitive structure can be built in the time it takes to load the data from the disk&#151;mere seconds for even multi-megabit SRAMs.</p>
+
+<p>
+<span class="l3">Design and Build Custom Memories</span><br />
+
+The MegaCell is a compiler designer's helper. It allows custom memory designers to quickly and easily construct and verify complete megacells from correct leaf cell 
+layouts. It significantly reduces the effort required for full-custom memory design.</p>
+
+<p>
+More than just a simple tiler, the MegaCell compiler has a fully hierarchical, relative-position tiling engine driven by a simple syntax. Or instances can be arranged in 
+the desired configuration and it determines the syntax to create that configuration. Because the tiler is relative and uses the abutment boundaries of the cells themselves, 
+process shrinks and even technology retargeting are effortless once the leaf cells have been migrated.</p>
+
+	<table align="right" border="0" cellpadding="3" cellspacing="0">
+	<tr>
+	<td class="tbc" width="250">Figure 1. Build a family of SRAMs in a matter of minutes.</td></tr>
+
+	<tr>
+	<td><a href="images/mcc-fig1a_large.gif"><img src="images/mcc-fig1a.gif" alt="Click to enlarge image" border="0" width="250" height="258" /><br clear="all" />
+	<img src="images/enlarge_sm.gif" alt="Click to enlarge image" border="0" width="68" height="16" /></a></td></tr>
+	</table>
+
+<span class="bcopy">
+The MegaCell compiler also provides a new scheme for programming rows and mux's, called through programming. Instead of relying on absolute coordinates, it automatically 
+traces wire paths, finds overlaps, and automatically adds the appropriate vias.</span>
+
+<p>
+To complete the megacell, this tool propagates ports from leaf cells to the top level and renames them under programmatic control. Simply program the tool to propagate the 
+output ports on all of the sense amps, for example, and you get all of the ports from DOUT[0] to DOUT[31]. Because MegaCell compiler handles tiling through programming and 
+port propagation, megacells can be easily parameterized. The programming interface is so concise that a complete SRAM implementation requires less than 100 lines of code.</p>
+
+<p>
+This tool allows a designer to parameterize the memory, that is, to build different sizes and configurations of the same basic memory structure simply by changing key 
+parameters such as the number of rows or columns. This vastly speeds construction and verification, especially in large memory designs. By doing all construction and 
+verification first on a very small structure, the iteration time is minimized. When the small structure passes, the full size typically passes on the first try. Hence, 
+parameterization helps regardless of the number of final sizes and configurations desired.</p>
+
+<p>
+<span class="l3">Analyze and Verify Custom Memories</span><br />
+
+A big challenge in megacell design is verification, because of the size and analog circuit techniques needed for high speed and low power. Physical, functional, performance, 
+and noise analysis verification are essential parts of all megacells. The MegaCell compiler extracts both complete SPICE and Verilog netlists of the finished megacells. In 
+addition, it automatically extracts critical paths for performance evaluation.</p>
+
+<p>
+In fact, the MegaCell compiler can create a compacted netlist of your megacell through any cells that you select. This netlist is generated by tracing the cone of logic 
+backwards to the input ports and forwards to the output ports from the selected cells., and pruning unnecessary gates, resulting in a thousand-time decrease in SPICE deck 
+size. Thus, selecting the memory cell that is furthest away from the decoders, gives the longest path for the memory.</p>
+
+<p class="l3">The Power of MAX</p>
+
+	<table align="right" border="0" cellpadding="3" cellspacing="4">
+	<tr>
+	<td class="tbc" width="250">Figure 2. View and analyze "critical" path for a megacell.</td></tr>
+
+	<tr>
+
+	<td><a href="images/mcc-fig2a_large.gif"><img src="images/mcc-fig2a.gif" alt="Click to enlarge image" border="0" width="250" height="260" /><br clear="all" />
+	<img src="images/enlarge_sm.gif" alt="Click to enlarge image" border="0" width="68" height="16" /></a></td></tr>
+	</table>
+
+<span class="bcopy">
+The MegaCell compiler runs from the MAX Layout Editor, another Micro Magic tool that provides a full-custom layout editor, giving all the power to view, edit, and modify 
+megacells before and after creation. While the MAX layout editor is ideal for creating the leaf cells, cells can also be imported through GDSII from other layout editors. 
+The MegaCell compiler and the MAX layout editor provide full API support through the industry-standard Tcl/Tk programming language.</span>
+
+<p class="l3">Features</p>
+
+<ul style="line-height: 20px;">
+<li>Creates user-configurable SRAMs, ROMs, CAMs, PLAs, DRAMs, FIFOs, pad rings, and so forth</li>
+
+<li>Fully hierarchical relative tiling engine.</li>
+<li>Uses programming by tracing wire paths, not by specifying coordinates</li>
+<li>Saves thousands of lines of code and reduces errors.</li>
+<li>Very fast execution.</li>
+<li>Automatic Verilog netlisting directly from layouts means time-consuming LVS is no longer required.</li>
+<li>Creates fully parameterizable megacells easily.</li>
+<li>Completely independent of technology.</li>
+<li>Automatic extraction of critical-path netlists.</li>
+<li>Interfaces to industry-standard verification tools.</li>
+
+<li>Simple port propagation.</li>
+<li>Available on Linux and Solaris platforms</li></ul>
+
+<p class="footer">
+
+Last Updated: May 26, 2004</div>
+
+</body>
+</html>

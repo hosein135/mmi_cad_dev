@@ -1,0 +1,137 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_ripplepC_L {} {
+  make input -orient RY -name A_H -origin {120 440}
+  make input -orient RY -name B_H -origin {120 480}
+  make output -name Sum_H -origin {1680 610}
+  make output -orient R90Y -name Cout_H -origin {880 170}
+  generate name_net_s name_net -cell name_net
+  make name_net -name G_L -origin {510 460}
+  make name_net -name P_L -origin {960 590}
+  generate row_spanner row_spanner200 
+  make row_spanner200 -origin {1010 1400}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {450 1400}
+  make name_net -name K_L -origin {510 610}
+  make name_net -name K_H -origin {510 540}
+  make name_net -name Cin_H -origin {960 630}
+  make input -orient RY -name Inject_H -origin {120 1000}
+  make name_net -name Inject_L -origin {1450 1040}
+  make input -orient RY -name C_H -origin {120 1110}
+  make input -orient R90Y -name Cin_L -origin {880 1240}
+  make name_net -name C_L -origin {1450 1110}
+  make name_net -name Carry_L -origin {1450 760}
+  make row_spanner200 -origin {1480 1400}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -orient RY -origin {240 460}
+  generate MMI_NOR2 MMI_NOR2B_1 -Size B -DeMorgan 1
+  make MMI_NOR2B_1 -orient RY -origin {240 540}
+  make MMI_NAND2 -orient RY -origin {630 590}
+  generate MMI_OAI21 MMI_OAI21C_1 -Size C -DeMorgan 1
+  make MMI_OAI21C_1 -orient R270 -origin {880 350}
+  generate MMI_XNOR2 MMI_XNOR2C_1 -Size C -DeMorgan 1
+  make MMI_XNOR2C_1 -orient RY -origin {1080 610}
+  generate MMI_AO22 MMI_AO22C -Size C
+  make MMI_AO22C -orient R90Y -origin {1620 870}
+  generate MMI_INV MMI_INVC_ -Size C -DeMorgan 1
+  make MMI_INVC_ -origin {1590 1190}
+  make output -name CinB_H -origin {1680 1190}
+  make ripplepC_L -origin {220 220}
+  generate MMI_INV MMI_INVA 
+  make MMI_INVA -origin {1330 1040}
+  make MMI_INVA -origin {1330 1110}
+  make MMI_INVA -origin {630 690}
+  make MMI_INVA -origin {410 610}
+  generate MMI_INV MMI_INVA_ -DeMorgan 1
+  make MMI_INVA_ -origin {1330 1190}
+  generate MMI_INV MMI_INVB -Size B
+  make MMI_INVB -origin {1450 1190}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.9 -date 03/09/99 -origin {890 1530}
+  make_wire 920 540 510 540
+  make_wire 150 480 120 480
+  make_wire 850 460 550 460
+  make_wire 920 630 920 690
+  make_wire 960 630 920 630
+  make_wire 170 440 170 520
+  make_wire 150 480 150 560
+  make_wire 550 760 880 760
+  make_wire 150 480 180 480
+  make_wire 180 560 150 560
+  make_wire 330 540 330 610
+  make_wire 550 570 570 570
+  make_wire 550 460 550 570
+  make_wire 550 690 570 690
+  make_wire 550 690 550 760
+  make_wire 920 450 920 540
+  make_wire 880 450 880 760
+  make_wire 1020 630 960 630
+  make_wire 1610 970 1610 1000
+  make_wire 120 1000 1240 1000
+  make_wire 1240 1000 1610 1000
+  make_wire 1570 970 1570 1110
+  make_wire 1670 970 1670 1150
+  make_wire 1630 970 1630 1040
+  make_wire 1240 1000 1240 1040
+  make_wire 120 440 170 440
+  make_wire 170 440 180 440
+  make_wire 300 460 510 460
+  make_wire 510 460 550 460
+  make_wire 170 520 180 520
+  make_wire 300 540 330 540
+  make_wire 330 540 510 540
+  make_wire 330 610 350 610
+  make_wire 470 610 510 610
+  make_wire 510 610 570 610
+  make_wire 690 590 960 590
+  make_wire 960 590 1020 590
+  make_wire 690 690 920 690
+  make_wire 880 170 880 250
+  make_wire 850 450 850 460
+  make_wire 1140 610 1680 610
+  make_wire 1620 760 1620 770
+  make_wire 880 760 1450 760
+  make_wire 1450 760 1620 760
+  make_wire 1270 1040 1240 1040
+  make_wire 1390 1040 1450 1040
+  make_wire 1450 1040 1630 1040
+  make_wire 1270 1110 120 1110
+  make_wire 1390 1110 1450 1110
+  make_wire 1450 1110 1570 1110
+  make_wire 1270 1190 1240 1190
+  make_wire 1240 1190 1240 1150
+  make_wire 1240 1150 1670 1150
+  make_wire 880 1150 880 1240
+  make_wire 880 1150 1240 1150
+  make_wire 1650 1190 1680 1190
+  make_wire 1510 1190 1530 1190
+  make_text -origin {1160 260} -text {This is the same cell as rippleC_L, with a carry in mux added 
+to allow carry injection mid-chain.}
+}
+
+proc ICON_ripplepC_L args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin_L
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout_H
+  icon_term -type input -origin {-140 90} -name C_H
+  icon_term -type input -origin {-140 70} -name Inject_H
+  icon_term -type output -origin {140 20} -name CinB_H
+  icon_property -origin {-70 220} -type user -name name
+  icon_property -origin {-70 240} -type user -name M
+  icon_property -origin {-70 260} -type user -name pad
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor e -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label ripplepC_L
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {-130 70} -label Inj_H
+  icon_property -origin {-130 90} -label C_H
+  icon_property -origin {130 20} -rotate 1 -label CinB_H
+}
+

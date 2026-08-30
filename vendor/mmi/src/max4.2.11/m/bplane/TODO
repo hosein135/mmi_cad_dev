@@ -1,0 +1,84 @@
+TODO
+----
+
+enuming more bins than necessary!
+
+change ba_bins to char *, to catch direct refs.
+
+DANGER WILL ROBINSON:  current code assumes IHashDelete() does not
+		       resize table.
+
+code bp_stat
+
+bp flags as well as enum flags?
+
+canonicalize rects consistently!
+instances, (rm or restore cellPlaneLock?)
+max cell bbox update - optimize.
+export bp_bbox?
+BPAdd() updates bp_bbox, but currently not BPDelete()!?
+
+
+define OVERLAP properly for degenerate search areas.
+
+protocol changes:
+  no add/deletes during enums, execept deleteCurrent.
+  deleteCurrent ok during nested enums.  
+
+document multiple links.
+
+
+TEST SUITE
+----------
+
+bp_test [-verbose [filename]] 
+returns:  0 on failure, 1 on success.
+
+tests:
+
+1.  exercise various corners.
+2.  "random". 
+
+silent unless -verbose option.
+if file, redirect output to it
+
+BPLANE INTERFACE DESIGN
+=======================
+
+see bplane.h !!!
+
+
+ISSUES:
+
+concurrent enums?
+	currently don't allow add/delete during concurrent enums.
+	could loosen up if useful - but not clear it is so, keep
+	things simple for now.
+
+groups?
+	idea: support small number of groups by having
+	separate bplane for each group.  Do selection this
+	way.  Logically layered on top of bplanes - but may	
+	want to integrate.  
+	DECISION:  defer for now.
+
+pack/unpack?
+	Seems incompatible with user alloc/dealloc.
+	Complicated.
+	DECISION:  Forget it.
+
+coarse/fine with cache.
+	can be added later.  should fit in nicely.
+	no special support needed.
+
+integrated find/add?
+	can add later.  
+	don't worry about it now.
+	
+May want to add attributes, via external hash.
+
+
+
+
+
+

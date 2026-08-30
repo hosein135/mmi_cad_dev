@@ -1,0 +1,132 @@
+MACRO MMI_OAI22B
+	CLASS CORE ;
+	FOREIGN MMI_OAI22B 0 0 ;
+	SIZE 5.58 BY 6.2 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.16 3.76 0.44 5.045 ;
+			LAYER M1 ;
+			RECT 2.085 3.76 2.365 5.045 ;
+			LAYER M1 ;
+			RECT 4.005 3.76 4.285 5.045 ;
+			LAYER M1 ;
+			RECT 0.16 3.57 4.285 3.76 ;
+			LAYER M1 ;
+			RECT 3.22 3.22 3.6 3.57 ;
+			LAYER M1 ;
+			RECT 3.345 2.4 3.535 3.22 ;
+			LAYER M1 ;
+			RECT 1.445 2.21 4.03 2.4 ;
+			LAYER M1 ;
+			RECT 1.445 1.88 1.635 2.21 ;
+			LAYER M1 ;
+			RECT 3.84 1.88 4.03 2.21 ;
+			LAYER M1 ;
+			RECT 1.355 1.18 1.635 1.88 ;
+			LAYER M1 ;
+			RECT 3.835 1.18 4.115 1.88 ;
+		END
+		AntennaDiffArea 2.5718 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.32 3.18 2.76 3.37 ;
+			LAYER M1 ;
+			RECT 1.32 3.09 1.6 3.18 ;
+			LAYER M1 ;
+			RECT 2.57 2.98 2.76 3.18 ;
+			LAYER M1 ;
+			RECT 2.57 2.93 2.98 2.98 ;
+			LAYER M1 ;
+			RECT 2.57 2.695 3.005 2.93 ;
+			LAYER M1 ;
+			RECT 2.6 2.65 3.005 2.695 ;
+			LAYER M1 ;
+			RECT 2.6 2.6 2.98 2.65 ;
+		END
+		AntennaGateArea 0.693 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.175 0.42 0.455 1.88 ;
+			LAYER M1 ;
+			RECT 2.595 0.42 2.875 1.545 ;
+			LAYER M1 ;
+			RECT 5.015 0.42 5.295 1.88 ;
+			LAYER M1 ;
+			RECT 0 -0.42 5.58 0.42 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.98 2.6 2.36 2.98 ;
+		END
+		AntennaGateArea 0.693 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 5.78 5.58 6.62 ;
+			LAYER M1 ;
+			RECT 1.12 3.985 1.4 5.78 ;
+			LAYER M1 ;
+			RECT 3.045 3.985 3.325 5.78 ;
+		END
+	END VDD
+	PIN in3
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 4.46 2.6 4.84 2.98 ;
+		END
+		AntennaGateArea 0.693 ;
+	END in3
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.74 2.885 1.12 2.98 ;
+			LAYER M1 ;
+			RECT 0.555 2.605 1.12 2.885 ;
+			LAYER M1 ;
+			RECT 0.815 2.6 1.12 2.605 ;
+		END
+		AntennaGateArea 0.693 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 2.035 1.88 3.435 2.01 ;
+		LAYER M1 ;
+		RECT 0.765 0.98 1.045 1.88 ;
+		LAYER M1 ;
+		RECT 1.945 1.82 3.525 1.88 ;
+		LAYER M1 ;
+		RECT 1.945 0.98 2.225 1.82 ;
+		LAYER M1 ;
+		RECT 0.765 0.785 2.225 0.98 ;
+		LAYER M1 ;
+		RECT 3.245 0.98 3.525 1.82 ;
+		LAYER M1 ;
+		RECT 4.425 0.98 4.705 1.88 ;
+		LAYER M1 ;
+		RECT 3.245 0.785 4.705 0.98 ;
+	END
+END MMI_OAI22B

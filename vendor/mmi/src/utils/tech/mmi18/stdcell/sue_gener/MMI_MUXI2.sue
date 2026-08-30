@@ -1,0 +1,278 @@
+# Created using mapper from:
+#"MMI_MUXI2 {A {MMI_MUXI2A {in0 in0} {in1 in1} {sel sel} {out out}} {MMI_MUXI2A_ {in0 in0} {in1 in1} {sel sel} {out out}}} {B {MMI_MUXI2B {in0 in0} {in1 in1} {sel sel} {out out}} {MMI_MUXI2B_ {in0 in0} {in1 in1} {sel sel} {out out}}} "
+
+proc SCHEMATIC_MMI_MUXI2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    A {
+      if {!$DeMorgan} {
+
+  make inverter -WP 0.92 -WN 0.46 -origin {310 490}
+  make input -name sel -origin {200 270}
+  make input -name in0 -origin {190 160}
+  make input -name in1 -origin {190 370}
+  make output -name out -origin {800 260}
+  make xgate -WP 1.84 -WN 0.92 -origin {560 160}
+  make inverter -WP 1.84 -WN 0.92 -origin {410 160}
+  make inverter -WP 1.84 -WN 0.92 -origin {410 370}
+  make xgate -WP 1.84 -WN 0.92 -origin {560 370}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/09/99 -origin {340 630}
+  make_wire 460 160 530 160
+  make_wire 590 160 670 160
+  make_wire 670 160 670 260
+  make_wire 380 160 190 160
+  make_wire 460 370 530 370
+  make_wire 590 370 670 370
+  make_wire 380 370 190 370
+  make_wire 670 370 670 260
+  make_wire 560 270 560 200
+  make_wire 560 270 560 340
+  make_wire 240 270 240 490
+  make_wire 240 490 280 490
+  make_wire 240 270 200 270
+  make_wire 240 270 560 270
+  make_wire 560 490 560 410
+  make_wire 500 110 560 110
+  make_wire 500 490 360 490
+  make_wire 500 490 560 490
+  make_wire 500 110 500 490
+  make_wire 560 110 560 130
+  make_wire 800 260 670 260
+  make_text -origin {20 50} -text {Inverting 2:1 Mux}
+  make_text -origin {20 70} -text {A Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_MUXI2 MMI_MUXI2A -Size A -DeMorgan 0
+        make MMI_MUXI2A -origin "$urx $ury"
+      } else {
+        generate MMI_MUXI2 MMI_MUXI2A -Size A -DeMorgan 0
+        make MMI_MUXI2A -origin {0 0}
+        set terms [api_terminal_data MMI_MUXI2A]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_MUXI2A"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {sel} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {sel} -orient $orient
+        } else {
+          make $type -origin $origin -name {sel}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_MUXI2 MMI_MUXI2A_ -Size A -DeMorgan 1
+        make MMI_MUXI2A_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    B {
+      if {!$DeMorgan} {
+
+  make input -name sel -origin {120 310}
+  make input -name in0 -origin {110 200}
+  make input -name in1 -origin {110 410}
+  make output -name out -origin {700 300}
+  make xgate -WP 3.68 -WN 1.84 -origin {480 200}
+  make inverter -WP 3.68 -WN 1.84 -origin {330 200}
+  make inverter -WP 3.68 -WN 1.84 -origin {330 410}
+  make xgate -WP 3.68 -WN 1.84 -origin {480 410}
+  make inverter -WP 1.24 -WN 0.62 -origin {230 530}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/09/99 -origin {280 670}
+  make_wire 380 200 450 200
+  make_wire 510 200 590 200
+  make_wire 590 200 590 300
+  make_wire 300 200 110 200
+  make_wire 380 410 450 410
+  make_wire 510 410 590 410
+  make_wire 300 410 110 410
+  make_wire 590 410 590 300
+  make_wire 480 310 480 240
+  make_wire 480 310 480 380
+  make_wire 160 310 160 530
+  make_wire 160 530 200 530
+  make_wire 160 310 120 310
+  make_wire 160 310 480 310
+  make_wire 480 530 480 450
+  make_wire 420 150 480 150
+  make_wire 420 530 280 530
+  make_wire 420 530 480 530
+  make_wire 420 150 420 530
+  make_wire 480 150 480 170
+  make_wire 700 300 590 300
+  make_text -origin {-60 90} -text {B Size}
+  make_text -origin {-60 70} -text {Inverting 2:1 Mux}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_MUXI2 MMI_MUXI2B -Size B -DeMorgan 0
+        make MMI_MUXI2B -origin "$urx $ury"
+      } else {
+        generate MMI_MUXI2 MMI_MUXI2B -Size B -DeMorgan 0
+        make MMI_MUXI2B -origin {0 0}
+        set terms [api_terminal_data MMI_MUXI2B]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_MUXI2B"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {sel} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {sel} -orient $orient
+        } else {
+          make $type -origin $origin -name {sel}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_MUXI2 MMI_MUXI2B_ -Size B -DeMorgan 1
+        make MMI_MUXI2B_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_MUXI2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_MUXI2[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_MUXI2 args {
+  icon_generator $args {{Size "A" {radio A B}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_MUXI2 icon body
+  icon_line -40 -70 -40 70 40 30 40 -30 -40 -70
+
+  if {$DeMorgan} {
+    icon_arc -60 -20 -40 -40 -start 0 -extent 359
+    icon_arc -60 20 -40 40 -start 0 -extent 359
+    icon_line 60 0 40 0
+  } else {
+    icon_line -60 -30 -40 -30
+    icon_line -60 30 -40 30
+    icon_arc 60 -10 40 10 -start 0 -extent 359
+  }
+
+  # properties
+  icon_property -origin {-37 -30} -size small -label 0 
+  icon_property -origin {0 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 -30} -name in0
+  icon_term -type input -origin {-60 30} -name in1
+  icon_term -type input -origin {0 50} -orient R270 -name sel
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_MUXI2 -Size $Size]
+  set nname [NAME_MMI_MUXI2 -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    A {
+    set pnames ".in0(\$in0), .in1(\$in1), .sel(\$sel), .out(\$out)"
+    }
+    B {
+    set pnames ".in0(\$in0), .in1(\$in1), .sel(\$sel), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

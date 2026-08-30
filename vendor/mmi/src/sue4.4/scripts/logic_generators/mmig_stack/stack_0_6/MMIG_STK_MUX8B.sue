@@ -1,0 +1,121 @@
+# SUE version MMI_SUE4.0p3
+
+proc SCHEMATIC_MMIG_STK_MUX8B {} {
+  generate MMI_AOI22 MMI_AOI22A -Size A
+  make MMI_AOI22A -origin {360 250}
+  generate MMI_AOI22 MMI_AOI22A -Size A
+  make MMI_AOI22A -origin {360 410}
+  generate MMI_AOI22 MMI_AOI22A -Size A
+  make MMI_AOI22A -origin {360 570}
+  generate MMI_AOI22 MMI_AOI22A -Size A
+  make MMI_AOI22A -origin {360 730}
+  generate MMI_NAND4 MMI_NAND4B_ -Size B -DeMorgan 1
+  make MMI_NAND4B_ -origin {660 490}
+  make name_net_s -name {[0]} -origin {220 240}
+  make name_net_s -name {[1]} -origin {220 300}
+  make name_net_s -name {[2]} -origin {220 400}
+  make name_net_s -name {[3]} -origin {220 460}
+  make name_net_s -name {[4]} -origin {220 560}
+  make name_net_s -name {[5]} -origin {220 620}
+  make name_net_s -name {[6]} -origin {220 720}
+  make name_net_s -name {[7]} -origin {220 780}
+  make input -name in0 -origin {50 200}
+  make input -name in1 -origin {50 260}
+  make input -name in2 -origin {50 360}
+  make input -name in3 -origin {50 420}
+  make input -name in4 -origin {50 520}
+  make input -name in5 -origin {50 580}
+  make input -name in6 -origin {50 680}
+  make input -name in7 -origin {50 740}
+  make output -name out -origin {720 490}
+  make MMIG_STK_MUX8B -origin {690 20}
+  make input -name {sel[7:0]} -origin {50 780}
+  make name_net_s -name N1 -origin {510 250}
+  make name_net_s -name N2 -origin {510 410}
+  make name_net_s -name N4 -origin {510 730}
+  make name_net_s -name N3 -origin {510 570}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.2 -date 06/04/99 -origin {290 1000}
+  make_wire 550 570 550 500
+  make_wire 260 240 220 240
+  make_wire 260 300 220 300
+  make_wire 220 300 140 300
+  make_wire 140 300 140 240
+  make_wire 140 240 220 240
+  make_wire 220 460 140 460
+  make_wire 260 560 220 560
+  make_wire 220 560 140 560
+  make_wire 260 620 220 620
+  make_wire 220 620 140 620
+  make_wire 260 720 220 720
+  make_wire 220 720 140 720
+  make_wire 260 780 220 780
+  make_wire 220 780 140 780
+  make_wire 140 400 220 400
+  make_wire 220 400 260 400
+  make_wire 550 410 550 480
+  make_wire 260 460 220 460
+  make_wire 140 400 140 300
+  make_wire 140 400 140 460
+  make_wire 140 780 140 720
+  make_wire 140 720 140 620
+  make_wire 140 620 140 560
+  make_wire 140 560 140 460
+  make_wire 50 200 260 200
+  make_wire 50 260 260 260
+  make_wire 50 360 260 360
+  make_wire 50 420 260 420
+  make_wire 50 520 260 520
+  make_wire 50 580 260 580
+  make_wire 50 680 260 680
+  make_wire 50 740 260 740
+  make_wire 50 780 140 780
+  make_wire 570 520 600 520
+  make_wire 550 500 600 500
+  make_wire 580 460 600 460
+  make_wire 550 480 600 480
+  make_wire 570 520 570 730
+  make_wire 580 250 580 460
+  make_wire 510 410 460 410
+  make_wire 510 410 550 410
+  make_wire 510 570 460 570
+  make_wire 510 570 550 570
+  make_wire 510 730 460 730
+  make_wire 510 730 570 730
+  make_wire 510 250 460 250
+  make_wire 510 250 580 250
+  make_text -origin {10 -40} -text {8 Input Mux}
+  make_text -origin {10 -80} -text MMIG_STK_MUX8B -size large
+}
+
+proc ICON_MMIG_STK_MUX8B args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 -70} -name in0
+  icon_term -type input -origin {0 90} -orient R270 -name {sel[7:0]}
+  icon_term -type input -origin {-60 -50} -name in1
+  icon_term -type input -origin {-60 -30} -name in2
+  icon_term -type input -origin {-60 -10} -name in3
+  icon_term -type input -origin {-60 10} -name in4
+  icon_term -type input -origin {-60 30} -name in5
+  icon_term -type input -origin {-60 50} -name in6
+  icon_term -type input -origin {-60 70} -name in7
+  icon_term -type output -origin {60 0} -name out
+  icon_property -origin {-60 200} -type user -name name
+  icon_property -origin {-60 220} -type user -name M
+  icon_property -origin {-60 240} -type user -name dpc
+  icon_line -40 -90 -40 90
+  icon_line 60 0 40 0
+  icon_line -60 -70 -40 -70
+  icon_line -60 -50 -40 -50
+  icon_line -60 -30 -40 -30
+  icon_line -60 -10 -40 -10
+  icon_line -60 10 -40 10
+  icon_line -60 30 -40 30
+  icon_line -60 50 -40 50
+  icon_line -60 70 -40 70
+  icon_line -40 -90 -40 -110 40 -70
+  icon_line 40 -70 40 70 -40 110 -40 90
+  icon_property -origin {0 0} -anchor center -label {STK B}
+  icon_property -origin {-30 -70} -size small -label 0
+}
+

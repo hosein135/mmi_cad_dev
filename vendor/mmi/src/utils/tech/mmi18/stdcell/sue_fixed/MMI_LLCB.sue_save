@@ -1,0 +1,126 @@
+# Created using mapper from:
+#"MMI_LLC {B {MMI_LLCB {D D} {clk clk} {clearn clearn} {Q Q}}}"
+
+proc SCHEMATIC_MMI_LLCB {} {
+  set size B
+  switch $size {
+    "B" {
+
+  make input -name clk -origin {-100 -840}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {130 -840}
+  make inverter -WP 2.4 -WN 1.2 -origin {990 -1030}
+  make output -name Q -origin {1170 -1030}
+  make inverter -WP 1.2 -WN 0.6 -origin {220 -680}
+  make input -name clearn -origin {110 -680}
+  make name_net -orient RX -name clk -origin {-130 -1230}
+  make name_net -orient RX -name clk_L -origin {-130 -1310}
+  make global -name gnd -origin {-190 -1110}
+  make global -orient RY -name vdd -origin {-190 -1430}
+  make inverter -WP 1.2 -WN 0.6 -origin {10 -840}
+  make nmos -orient RX -W 0.36 -L '2*ln_min' -origin {-190 -1150}
+  make nmos -orient RX -W 0.36 -L '2*ln_min' -origin {-190 -1230}
+  make nor2 -orient RY -WP 2.4 -WN 0.6 -origin {460 -1030}
+  make pmos -orient RX -W 0.6 -origin {-190 -1390}
+  make xgate -orient RXY -WP 0.6 -WN 0.6 -origin {-450 -1050}
+  make name_net -orient RXY -name clk_L -origin {-450 -1020}
+  make name_net -orient RX -name clk -origin {-450 -1090}
+  make pmos -orient RX -W 0.6 -origin {-190 -1310}
+  make name_net -name clear -origin {340 -680}
+  make name_net -name N1 -origin {-560 -1050}
+  make name_net -name N2 -origin {-270 -1270}
+  make name_net -name N3 -origin {630 -1030}
+  make inverter -WP 2.4 -WN 1.2 -origin {-660 -1050}
+  make input -name D -origin {-800 -1050}
+  make name_net -name N4 -origin {880 -1030}
+  make inverter -WP 1.2 -WN 0.6 -origin {750 -1030}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 11/23/99 -origin {180 -460}
+  make_wire -20 -840 -100 -840
+  make_wire 190 -680 110 -680
+  make_wire 60 -840 130 -840
+  make_wire -130 -1390 -90 -1390
+  make_wire -270 -1270 -290 -1270
+  make_wire -270 -1270 -190 -1270
+  make_wire 1040 -1030 1170 -1030
+  make_wire 880 -1030 800 -1030
+  make_wire 880 -1030 960 -1030
+  make_wire -800 -1050 -690 -1050
+  make_wire -610 -1050 -560 -1050
+  make_wire -560 -1050 -480 -1050
+  make_wire -290 -1270 -290 -1050
+  make_wire -90 -1390 -90 -1150
+  make_wire -420 -1050 -290 -1050
+  make_wire -130 -1150 -90 -1150
+  make_wire -90 -1150 580 -1150
+  make_wire -290 -1050 440 -1050
+  make_wire 530 -1030 580 -1030
+  make_wire 580 -1030 630 -1030
+  make_wire 580 -1030 580 -1150
+  make_wire 630 -1030 720 -1030
+  make_wire 270 -680 340 -680
+  make_wire 340 -680 380 -680
+  make_wire 380 -1010 380 -680
+  make_wire 380 -1010 440 -1010
+  make_text -origin {-640 -1600} -text {Lockup latch with asynchronous clear (active low)}
+  make_text -origin {-640 -1570} -text {B Size}
+  make_text -origin {-640 -1630} -text MMI_LLCB -size large
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        make MMI_LLCB -origin "$urx $ury"
+    }
+
+  }
+}
+
+
+proc ICON_MMI_LLCB args {
+  set size B
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_LLC icon body
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 100 -20 80 -start 0 -extent 359
+
+  # properties
+  icon_property -origin {0 -50} -size large -anchor center -label LLC
+  icon_property -origin {0 -30} -size large -anchor center -label $size
+  icon_property -origin {-50 0} -label D
+  icon_property -origin {50 0} -anchor e -label Q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label clearn
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name D
+  icon_term -type input -origin {-30 100} -orient R270 -name clearn
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+
+  # outputs
+  icon_term -type output -origin {60 0} -name Q
+
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_LLCB
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.D(\$\{D\}), .clk(\$\{clk\}), .clearn(\$\{clearn\}), .Q(\$\{Q\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+
+}

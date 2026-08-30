@@ -1,0 +1,590 @@
+# This is a generator for an AND or NAND.  This generator can produce circuits
+# with more inputs and/or larger final drive sizes than are available
+# in the standard cell library.
+
+
+proc NAME_mmig_AND args {
+  call_use_keyword $args {{NINPUTS 4} {OutputAssertion "H"} {OutputSize "B"} {BitSlice "N"} {ReduceInputLoad "N"}}
+
+  # OutputAssertion
+  if {[string toupper $OutputAssertion] == "L"} {
+    set nom "mmig_NAND"
+  } else {
+    set nom "mmig_AND"
+  }
+
+  # NINPUTS
+  set nom [format "%s%d" $nom $NINPUTS]
+
+  # OutputSize
+  set size [string toupper $OutputSize]
+  set nom [format "%s%s" $nom $size]
+
+  # other options
+  if {([string toupper $BitSlice] == "Y") || ([string toupper $ReduceInputLoad] == "Y")} {
+    set nom [format "%s_" $nom]
+  }
+
+  # BitSlice
+  if {[string toupper $BitSlice] == "Y"} {
+    set nom [format "%sB" $nom]
+  }
+
+  # ReduceInputLoad
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set nom [format "%sR" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_AND args {
+  call_use_keyword $args {{NINPUTS 4} {OutputAssertion "H"} {OutputSize "B"} {BitSlice "N"} {ReduceInputLoad "N"}}
+
+  set debug 0
+  
+  # make the arguments more digestible
+  # NINPUTS
+  set maxidx [expr $NINPUTS - 1]
+  # bitranges
+  if {$NINPUTS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  set xfudge 300
+  set yfudge 150
+
+
+  # figure out how many rows there will be, and mark the gate types
+  set done 0
+  set rowcount 0
+  set gcount $NINPUTS
+  
+  while {$done == 0} {
+
+    # select the gate type
+    if {[expr $rowcount % 2] == 0} {
+      # row with high-asserted inputs:  the gate is a NAND
+      # algorithm:
+      #  the preferred gate is a NAND3.  use NAND3s until there
+      #  are 2, 3, or 4 inputs remaining; then use a NAND2, NAND3, or NAND4.
+      set nNAND2 0
+      set nNAND4 0
+      set nNAND3 [expr $gcount / 3]
+      set nrem [expr $gcount % 3]
+      # last group has 1 input:  replace final NAND3 with a NAND4
+      if {$nrem == 1} {
+	set nNAND3 [expr $nNAND3 - 1]
+	set nNAND4 1
+      }
+      # last group has 2 inputs:  add a NAND2
+      if {$nrem == 2} {
+	set nNAND2 1
+      }
+      # place the NAND3s first
+      for {set i 0} {$i < $nNAND3} {incr i} {
+	set gate_type($rowcount,$i) "MMI_NAND3"
+	set gate_size($rowcount,$i) "B"
+	set gate_demorgan($rowcount,$i) 0
+      }
+      # place the NAND2, if it exists
+      if {$nNAND2 == 1} {
+	set gate_type($rowcount,$nNAND3) "MMI_NAND2"
+	set gate_size($rowcount,$nNAND3) "B"
+	set gate_demorgan($rowcount,$nNAND3) 0
+      }
+      # place the NAND4, if it exists
+      if {$nNAND4 == 1} {
+	set gate_type($rowcount,$nNAND3) "MMI_NAND4"
+	set gate_size($rowcount,$nNAND3) "B"
+	set gate_demorgan($rowcount,$nNAND3) 0
+      }
+
+      if {$debug} {puts [format "Row %d, %d inputs: %d NAND3s, %d NAND2s, %d NAND4s" $rowcount $gcount $nNAND3 $nNAND2 $nNAND4]}
+      set gcount [expr $nNAND2 + $nNAND3 + $nNAND4]
+
+    }  else {
+      # row with low-asserted inputs:  the gate is a demorganned NOR
+      # algorithm: 
+      #  the preferred gate is a NOR2.  use NOR2s until there
+      #  are 3 inputs remaining; then use a NOR3.
+      set nNOR2 [expr $gcount / 2]
+      set nNOR3 [expr $gcount % 2]
+      for {set i 0} {$i < $nNOR2} {incr i} {
+	set gate_type($rowcount,$i) "MMI_NOR2"
+	set gate_size($rowcount,$i) "B"
+	set gate_demorgan($rowcount,$i) 1
+      }
+      # last group has 1 input:  replace final NOR2 with a NOR3
+      if {$nNOR3 == 1} {
+	set gate_type($rowcount,[expr $nNOR2 - 1]) "MMI_NOR3"
+	set gate_size($rowcount,[expr $nNOR2 - 1]) "B"
+	set gate_demorgan($rowcount,[expr $nNOR2 - 1]) 1
+      }
+
+      if {$debug} {puts [format "Row %d, %d inputs: %d NOR2s, %d NOR3s" $rowcount $gcount $nNOR2 $nNOR3]}
+      set gcount $nNOR2
+    }
+
+    set ngates($rowcount) $gcount
+    incr rowcount
+    
+    if {$gcount == 1} {
+      set done 1
+    }
+  }
+
+  # figure out the drawing placement -- center each gate with respect to its inputs
+  set ninputs(MMI_NAND2) 2
+  set ninputs(MMI_NAND3) 3
+  set ninputs(MMI_NAND4) 4
+  set ninputs(MMI_NOR2) 2
+  set ninputs(MMI_NOR3) 3
+  set ninputs(MMI_AND2) 2
+  set ninputs(MMI_AND3) 3
+  set ninputs(MMI_AND4) 4
+  set ninputs(MMI_OR2) 2
+  set ninputs(MMI_OR3) 3
+  set ninputs(MMI_INV) 1
+  set ninputs(MMI_BUF) 1
+
+  for {set i 0} {$i < $rowcount} {incr i} {
+    if {$i == 0} {
+      # row 0
+      set y 0
+      for {set j 0} {$j < $ngates($i)} {incr j} {
+	set place($i,$j) $y
+	set y [expr $y - $yfudge]
+	if {$debug} {puts [format "Row %d, gate %d:  y = %d" $i $j $place($i,$j)]}
+      }
+    } else {
+      set jprev 0
+      for {set j 0} {$j < $ngates($i)} {incr j} {
+	set nin $ninputs($gate_type($i,$j))
+	set start $place([expr $i - 1],$jprev)
+	set end $place([expr $i - 1],[expr $jprev + $nin - 1])
+	set place($i,$j) [expr int(($end - $start)/2) + $start]
+	set jprev [expr $jprev + $nin]
+	if {$debug} {puts [format "Row %d, gate %d:  y = %d" $i $j $place($i,$j)]}
+      }
+
+    }
+  }
+
+  # create the desired output assertion
+  # the assertion level is already correct if:
+  #  - there are an even number of rows, and OutputAssertion = H
+  #  - there are an odd number of rows, and OutputAssertion = L
+  if {(([expr $rowcount % 2] == 0) && ([string toupper $OutputAssertion] == "L")) ||
+      (([expr $rowcount % 2] == 1) && ([string toupper $OutputAssertion] == "H"))} {
+    set lastrow [expr $rowcount - 1]
+    switch $gate_type($lastrow,0) {
+      MMI_AOI22  {set gate_type($lastrow,0) "MMI_AO22"}
+      MMI_NAND2  {set gate_type($lastrow,0) "MMI_AND2"}
+      MMI_NAND3  {set gate_type($lastrow,0) "MMI_AND3"}
+      MMI_NAND4  {set gate_type($lastrow,0) "MMI_AND4"}
+      MMI_NOR2   {set gate_type($lastrow,0) "MMI_OR2"}
+      MMI_NOR3   {set gate_type($lastrow,0) "MMI_OR3"}
+      default    {error "ERROR, Unknown gate type $gate_type($lastrow,0) in row $lastrow, position 0"}
+    }
+  }
+      
+  # reduce the input loading
+  # this reduces the size of the first row's gates from B to A, if possible.
+  # (only possible if the gates are MMI_NAND2's, MMI_NAND3's, or MMI_NAND4's)
+  # this slows down the logic, but the reduced input loading may make it worthwhile.
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    for {set j 0} {$j < $ngates(0)} {incr j} {
+      if {($gate_type(0,$j) == "MMI_NAND2") || ($gate_type(0,$j) == "MMI_NAND3") ||
+	  ($gate_type(0,$j) == "MMI_NAND4")} {
+	set gate_size(0,$j) "A"
+      }
+    }
+  }
+  
+  # create the desired OutputSize
+  set lastrow [expr $rowcount - 1]
+  # OutputSize = B
+  # the only way we could need a correction here is if there is only one row (= one gate)
+  # and ReduceInputLoad=Y
+  if {[string toupper $OutputSize] == "B"} {
+    if {$lastrow == 0} {
+      set gate_size($lastrow,0) "B"
+    }
+  }
+    
+  # OutputSize = C:  upsize the final gate, if possible; else add BUFC  
+  if {[string toupper $OutputSize] == "C"} {
+    switch $gate_type($lastrow,0) {
+      MMI_NAND2 -
+      MMI_NAND3 -
+      MMI_NAND4 -
+      MMI_NOR2 -
+      MMI_AO22 -
+      MMI_AND2 -
+      MMI_AND3 -
+      MMI_AND4 -
+      MMI_OR2 -
+      MMI_OR3 {
+	set gate_size($lastrow,0) "C"
+      }
+      MMI_AOI22 -
+      MMI_NOR3 {
+	set gate_type($rowcount,0) "MMI_BUF"
+	set gate_size($rowcount,0) "C"
+	if {[string toupper $OutputAssertion] == "H"} {
+	  set buf_demorgan 0
+	} else {
+	  set buf_demorgan 1
+	}
+	set gate_demorgan($rowcount,0) $buf_demorgan
+	set place($rowcount,0) $place($lastrow,0)
+	set ngates($rowcount) 1
+	incr rowcount
+      }
+      default     {error "ERROR, Unknown gate type $gate_type($lastrow,0) in row $lastrow, position 0"}
+    }
+  }
+
+  # OutputSize = D or E
+  # algorithm:
+  #  - upsize final gate if possible (only possible for MMI_NOR2 and MMI_NAND2, with OutputSize=D)
+  #  - else:
+  #    - for final gates which have 1 level of inversion:  add BUFD or BUFE
+  #    - for final gates which have 2 levels of inversion:  replace gate with non-inverted C gate + INVD/INVE
+  #      - exception:  there is no MMI_NOR3C or MMI_AOI22C, so:
+  #        - for OutputSize=D, replace gate with non-inverted B gate + INVD
+  #        - for OutputSize=E, stick with MMI_OR3B/MMI_AO22B and add BUFE
+  if {([string toupper $OutputSize] == "D") || ([string toupper $OutputSize] == "E")} {
+    if {([string toupper $OutputSize] == "D") &&
+	(($gate_type($lastrow,0) == "MMI_NOR2") || ($gate_type($lastrow,0) == "MMI_NAND2"))} {
+	set gate_size($lastrow,0) "D"
+    } else {
+
+      if {[string toupper $OutputAssertion] == "H"} {
+	set buf_demorgan 0
+	set inv_demorgan 1
+      } else {
+	set buf_demorgan 1
+	set inv_demorgan 0
+      }
+      
+      switch $gate_type($lastrow,0) {
+	MMI_AOI22  -
+	MMI_NAND2  -
+	MMI_NAND3  -
+	MMI_NAND4  -
+	MMI_NOR2   -
+	MMI_NOR3   {
+	  set gate_type($rowcount,0) "MMI_BUF"
+	  set gate_size($rowcount,0) [string toupper $OutputSize]
+	  set gate_demorgan($rowcount,0) $buf_demorgan
+	  set place($rowcount,0) $place($lastrow,0)
+	  set ngates($rowcount) 1
+	  incr rowcount
+	}
+	
+	MMI_AO22   -	
+	MMI_OR3   {
+	  if {[string toupper $OutputSize] == "E"} {
+	    set gate_type($rowcount,0) "MMI_BUF"
+	    set gate_size($rowcount,0) [string toupper $OutputSize]
+	    set gate_demorgan($rowcount,0) $buf_demorgan
+	    set place($rowcount,0) $place($lastrow,0)
+	    set ngates($rowcount) 1
+	    incr rowcount
+	  } else {
+	    # change this gate to B size inverting version
+	    switch $gate_type($lastrow,0) {
+	      MMI_AO22  {set gate_type($lastrow,0) "MMI_AOI22"}
+	      MMI_OR3   {set gate_type($lastrow,0) "MMI_NOR3"}
+	    }
+	    set gate_size($lastrow,0) "B"
+	    # add inverter
+	    set gate_type($rowcount,0) "MMI_INV"
+	    set gate_size($rowcount,0) [string toupper $OutputSize]
+	    set gate_demorgan($rowcount,0) $inv_demorgan
+	    set place($rowcount,0) $place($lastrow,0)
+	    set ngates($rowcount) 1
+	    incr rowcount
+	  }
+	}
+
+	MMI_AND2  -
+	MMI_AND3  -
+	MMI_AND4  -
+	MMI_OR2   {
+	  # change this gate to C size inverting version
+	  switch $gate_type($lastrow,0) {
+	    MMI_AND2  {set gate_type($lastrow,0) "MMI_NAND2"}
+	    MMI_AND3  {set gate_type($lastrow,0) "MMI_NAND3"}
+	    MMI_AND4  {set gate_type($lastrow,0) "MMI_NAND4"}
+	    MMI_OR2   {set gate_type($lastrow,0) "MMI_NOR2"}
+	  }
+	  set gate_size($lastrow,0) "C"
+	  # add inverter
+	  set gate_type($rowcount,0) "MMI_INV"
+	  set gate_size($rowcount,0) [string toupper $OutputSize]
+	  set gate_demorgan($rowcount,0) $inv_demorgan
+	  set place($rowcount,0) $place($lastrow,0)
+	  set ngates($rowcount) 1
+	  incr rowcount
+	}
+	default     {error "ERROR, Unknown gate type $gate_type($lastrow,0) in row $lastrow, position 0"}
+      }
+    }
+  }
+
+
+  # draw the gates
+  set x 0
+  for {set i 0} {$i < $rowcount} {incr i} {
+    for {set j 0} {$j < $ngates($i)} {incr j} {
+      set gate_name($i,$j) [NAME_$gate_type($i,$j) -Size $gate_size($i,$j) -DeMorgan $gate_demorgan($i,$j)]
+      generate $gate_type($i,$j) $gate_name($i,$j) -Size $gate_size($i,$j) -DeMorgan $gate_demorgan($i,$j)
+      if {[string toupper $BitSlice] == "Y"} {
+	make $gate_name($i,$j) -origin "$x $place($i,$j)" -name {[0]}
+      } else {
+	make $gate_name($i,$j) -origin "$x $place($i,$j)"
+      }
+    }
+    set x [expr $x + $xfudge]
+  }
+
+
+  #  wire up the gates
+  for {set i 0} {$i < $rowcount} {incr i} {
+    if {$i == 0} {
+      # first row:  inputs
+
+      set inflag_x [expr -1 * $xfudge]
+      set wt1_x [expr $inflag_x + 100]
+      set label_x [expr $wt1_x + 50]
+      set label_num [expr $NINPUTS - 1]
+
+      for {set j 0} {$j < $ngates($i)} {incr j} {
+	set nin $ninputs($gate_type($i,$j))
+	set terms [api_terminal_data $gate_name($i,$j)]
+	
+	for {set k [expr $nin - 1]} {$k >= 0} {set k [expr $k - 1]} {
+	  set data [get_assoc "in$k" $terms]
+	  set origin [get_assoc origin $data]
+	  set pin_x [expr ($i * $xfudge) + [lindex $origin 0]]
+	  set pin_y [expr $place($i,$j) + [lindex $origin 1]]
+	  make_wire $pin_x $pin_y $inflag_x $pin_y
+	  make input -origin "$inflag_x $pin_y" -name in$label_num
+	  set label_num [expr $label_num - 1]
+	}
+      }
+
+    } else {
+      # last and intermediate rows
+
+      set jprev 0
+      set wt0_x [expr ($i * $xfudge) - ($xfudge/2) - 20]
+      set wt1_x [expr $wt0_x + 20]
+      set wt2_x [expr $wt1_x + 20]
+      
+      for {set j 0} {$j < $ngates($i)} {incr j} {
+	
+	set nin $ninputs($gate_type($i,$j))
+	set terms [api_terminal_data $gate_name($i,$j)]
+	
+	for {set k [expr $nin - 1]} {$k >= 0} {set k [expr $k - 1]} {
+	  # find the input pin location
+	  switch $gate_type($i,$j) {
+	    MMI_INV -
+	    MMI_BUF { set pin_name "in"}
+	    default {set pin_name "in$k"}
+	  }
+	  set data [get_assoc $pin_name $terms]
+	  set origin [get_assoc origin $data]
+	  set pin_x [expr ($i * $xfudge) + [lindex $origin 0]]
+	  set pin_y [expr $place($i,$j) + [lindex $origin 1]]
+	  
+	  # find the connecting pin in the previous row
+	  set pterms [api_terminal_data $gate_name([expr $i - 1],$jprev)]
+	  set pdata [get_assoc {out} $pterms]
+	  set porigin [get_assoc origin $pdata]
+	  set ppin_x [expr (($i - 1) * $xfudge) + [lindex $porigin 0]]
+	  set ppin_y [expr $place([expr $i - 1],$jprev) + [lindex $porigin 1]]
+	  
+	  # hook them up
+	  switch $k {
+	    0 {set wt_x $wt2_x}
+	    1 {set wt_x $wt0_x}
+	    2 {set wt_x $wt1_x}
+	    3 {set wt_x $wt2_x}
+	    default     {error "ERROR, Invalid number of pins ($k) on gate $gate_name($i,$j)"}
+	  }
+	  if {$k == [expr $nin - 1]} {
+	    set wt_x $wt2_x
+	  }
+
+	  make_wire $pin_x $pin_y $wt_x $pin_y
+	  if {$pin_y != $ppin_y} {
+	    make_wire $wt_x $pin_y $wt_x $ppin_y
+	  }
+	  make_wire $wt_x $ppin_y $ppin_x $ppin_y
+	  
+	  # next gate
+	  incr jprev
+	}
+      }
+    }
+  }
+  # last row:  wire up the output pin
+  # last row:  output
+  set j 0
+  set i [expr $rowcount - 1]
+  set outflag_x [expr $rowcount * $xfudge]
+  
+  # out:  output
+  set terms [api_terminal_data $gate_name($i,$j)]
+  set data [get_assoc {out} $terms]
+  set origin [get_assoc origin $data]
+  set pin_x [expr ($i * $xfudge) + [lindex $origin 0]]
+  set pin_y [expr $place($i,$j) + [lindex $origin 1]]
+  make_wire $pin_x $pin_y $outflag_x $pin_y
+  make output -origin "$outflag_x $pin_y" -name out
+
+  
+  # place the row_spanner 
+  set rswidth [expr int(($rowcount * $xfudge)/2)]
+  set rsname [format "row_spanner%d" $rswidth]
+  generate row_spanner $rsname -width $rswidth
+  make $rsname -origin "[expr $rswidth - 100] 200"
+  
+  # place the dpc control block
+  if {[string toupper $BitSlice] == "Y"} {
+    make dpc_control -mode bit_slice -origin "[expr $rowcount * $xfudge] 230"
+  }
+
+  # place the title bar
+  make sccs_title_bar -origin "[expr $rswidth - 100] 300" -owner emc -version 0.1 -date 01/21/00
+}
+
+
+proc ICON_mmig_AND args {
+  # This line is needed for all generators
+  icon_generator $args {{NINPUTS 4} {OutputAssertion "H" {H L}} {OutputSize "B" {B C D E}} {BitSlice "N" {Y N}} {ReduceInputLoad "N" {Y N}}}
+
+  # check for acceptable response on NINPUTS
+  if {$NINPUTS < 2} {
+    error "ERROR: NINPUTS ($NINPUTS) must be greater than 1"
+  }
+  # don't let the user get too crazy
+  if {$NINPUTS > 128} {
+    error "ERROR: NINPUTS ($NINPUTS) not supported"
+  }
+  set half [expr $NINPUTS / 2]
+  set rem [expr $NINPUTS % 2]
+  set start [expr ($half * -20) + ((1 - $rem) * 10)]
+
+  # bitranges
+  set maxidx [expr $NINPUTS - 1]
+  set max_bitrange [format "\[%d:0\]" $maxidx]
+  set vmax_bitrange $max_bitrange
+
+  # check for acceptable response on OutputAssertion
+  if {([string toupper $OutputAssertion] != "H") &&
+      ([string toupper $OutputAssertion] != "L")} {
+    error "ERROR: OutputAssertion ($OutputAssertion) must be H or L"
+  }
+
+  # check for acceptable response on OutputSize
+  if {([string toupper $OutputSize] != "B") &&
+      ([string toupper $OutputSize] != "C") &&
+      ([string toupper $OutputSize] != "D") &&
+      ([string toupper $OutputSize] != "E")} {
+    error "ERROR: OutputSize ($OutputSize) must be B, C, D, or E"
+  }
+    
+  # check for acceptable response on BitSlice
+  if {([string toupper $BitSlice] != "Y") &&
+      ([string toupper $BitSlice] != "N")} {
+    error "ERROR: BitSlice ($BitSlice) must be Y or N"
+  }
+  
+  # check for acceptable response on ReduceInputLoad
+  if {([string toupper $ReduceInputLoad] != "Y") &&
+      ([string toupper $ReduceInputLoad] != "N")} {
+    error "ERROR: ReduceInputLoad ($ReduceInputLoad) must be Y or N"
+  }
+  
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  icon_arc -30 -30 40 30 -start 277 -extent 166
+  icon_line 10 -30 -40 -30 -40 30 10 30
+
+  # output
+  if {[string toupper $OutputAssertion] == "L"} {
+    icon_arc 60 -10 40 10 -start 0 -extent 359
+  } else {
+    icon_line 60 0 40 0
+  }
+  icon_term -type output -origin {60 0} -name out  
+
+  # inputs
+  if {$NINPUTS == 2} {
+    icon_line -40 -20 -60 -20
+    icon_line -40 20 -60 20
+    icon_term -type input -origin {-60 -20} -name in0
+    icon_term -type input -origin {-60 20} -name in1
+  } else {
+    for {set i 0} {$i < $NINPUTS} {incr i} {
+      icon_line -60 $start -40 $start
+      icon_term -type input -origin "-60 $start" -name in$i
+
+      if {($start > 30) || ($start < -30)} {
+	if {$start > 30} {
+	  set end [expr $start - 20]
+	  if {$end < 30} {
+	    set end 30
+	  }
+	}
+	if {$start < -30} {
+	  set end [expr $start + 20]
+	  if {$end > -30} {
+	    set end -30
+	  }
+	}
+	icon_line -40 $start -40 $end
+      }
+
+      set start [expr $start + 20]
+    }
+  }
+
+  # properties
+  icon_property -origin {-37 -22} -size small -label F
+  icon_property -origin {0 0} -size large -anchor center -label $OutputSize
+
+  # junk
+  icon_property -origin {-70 300} -type user -name name
+  icon_property -origin {-70 320} -type user -name M
+  icon_property -origin {-70 340} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 460} -owner emc -version 0.1 -date 01/21/00
+  # this property makes a generator pop up in "Schematic" mode rather than "Verilog" mode
+  icon_property -origin {-70 360} -type fixed -name netlist_level -text 2000
+
+  # generate verilog property
+  set fname [NAME_mmig_AND -NINPUTS $NINPUTS -OutputAssertion $OutputAssertion -OutputSize $OutputSize -BitSlice $BitSlice -ReduceInputLoad $ReduceInputLoad]
+
+  set pnames [format "in0(\$in0)"]
+  for {set i 1} {$i < $NINPUTS} {incr i} {
+    set pnames [format "%s, in%d(\$in%d)" $pnames $i $i]
+  }
+  set pnames [format "%s, out(\$out)" $pnames ]
+
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin {-70 380} -type fixed -name verilog -text $vprop  
+
+}

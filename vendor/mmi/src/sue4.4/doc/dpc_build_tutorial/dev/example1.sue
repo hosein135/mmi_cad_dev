@@ -1,0 +1,11 @@
+# SUE version MMI_SUE4.2.7
+
+proc SCHEMATIC_example1 {} {
+  generate MMI_AND2 MMI_AND2B 
+  make MMI_AND2B -name {[7:0]} -dpc {$b/2} -origin {170 200}
+  make MMI_AND2B -name {[3:0]} -dpc p=2 -origin {490 200}
+  make MMI_AND2B -name {[3:0]} -dpc {3-$b} -origin {330 200}
+  make_text -origin {110 50} -text {Example of using dpc properties to
+control placement.}
+}
+

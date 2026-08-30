@@ -1,0 +1,21 @@
+| units: 100 tech: cmos-s   format: UCB
+= GND Gnd 
+= Vdd VDD 
+= GND gnd 
+= Vdd vdd 
+p a Vdd /cnor_0/_CNOR1_0 2 3 0 0
+p b /cnor_0/_CNOR1_0 _CIRCUIT12_1 2 3 0 0
+e a GND _CIRCUIT12_1 2 3 0 0
+e b _CIRCUIT12_1 GND 2 3 0 0
+p _CIRCUIT12_1 Vdd /cnor3_1/_CNOR31_0 2 3 0 0
+p _CIRCUIT13_2 /cnor3_1/_CNOR31_0 /cnor3_1/_CNOR32_1 2 3 0 0
+p _CIRCUIT11_0 /cnor3_1/_CNOR32_1 f 2 3 0 0
+e _CIRCUIT12_1 f GND 2 3 0 0
+e _CIRCUIT11_0 f GND 2 3 0 0
+e _CIRCUIT13_2 f GND 2 3 0 0
+p d Vdd _CIRCUIT13_2 2 3 0 0
+e c _CIRCUIT13_2 Vdd 2 3 0 0
+e d _CIRCUIT13_2 /cnand_2/_CNAND1_0 2 3 0 0
+e c /cnand_2/_CNAND1_0 GND 2 3 0 0
+p e Vdd _CIRCUIT11_0 2 3 0 0
+e e _CIRCUIT11_0 GND 2 3 0 0

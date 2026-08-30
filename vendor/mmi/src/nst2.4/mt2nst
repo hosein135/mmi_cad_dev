@@ -1,0 +1,74 @@
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# Reads a .mt file and alters it slightly so it can be read by nst in
+# ascii column format.  See below for Usage
+
+proc mt2nst {filename} {
+
+  # open file for reading
+  if {[catch "open $filename r" FILE_ID]} {
+    # problem
+    puts "mt2nst ERROR: $FILE_ID"
+    exit 1
+  } 
+
+  # toast first line
+  gets $FILE_ID line
+
+  # add ASCII to next line
+  gets $FILE_ID line
+  puts "ASCII $line"
+
+  # if next line is broken across multiple, unbreak it
+  set headings ""
+  while {1} {
+    gets $FILE_ID line
+    set line [string trim $line]    
+
+    set headings [concat $headings $line]
+
+    # NOTE: last char is #
+    set len [expr [string length $line] - 1]
+    if {[string index $line $len] == "\#"} {
+      # end
+      break
+    }
+  }
+
+  puts $headings
+  set len [llength $headings]
+
+  # now fix potentially broken data lines
+  set data ""
+  while {[gets $FILE_ID line] >= 0} {
+    set line [string trim $line]
+
+    set data [concat $data $line]
+
+    if {[llength $data] == $len} {
+      # done with this line
+      puts $data
+      set data ""
+    }
+  }
+
+
+  # close the file
+  close $FILE_ID
+}
+
+
+if {[string index $argv 0] == "" || [string index $argv 0] == "-"} {
+  puts "Usage: \n"
+  puts "  mt2nst <filename> > <new_filename>\n"
+
+  exit 0
+}
+
+# do it
+mt2nst [lindex $argv 0]
+
+exit 0

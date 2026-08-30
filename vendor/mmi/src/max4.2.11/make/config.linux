@@ -1,0 +1,48 @@
+# Max configuration for final make (optimized)
+
+# ------------------------------------------------------------------------
+#       Include shared config
+#       (should come first so that sets below override/modify)
+# ------------------------------------------------------------------------
+-include $(MMI_UTILS)/config/main.config
+
+# ------------------------------------------------------------------------
+#       Configuration Ids
+# ------------------------------------------------------------------------
+CONFIG := linux
+
+# ------------------------------------------------------------------------
+#       Libraries
+# ------------------------------------------------------------------------
+# -lmcheck causes heap consistency checking by malloc
+# when compiling for gprof, add:  -lgmon 
+CONFIG_LIBS := $(CONFIG_LIBS) 
+
+# ------------------------------------------------------------------------
+#       Defines for conditional compilation.
+# ------------------------------------------------------------------------
+# when compiling for gprof add:  -DGMON
+# to turn off sanity checks, compile with -DNDEBUG
+# MHA's "notes" -DMHA
+# -DPARANOID to do extra assertions.
+CONFIG_DEFINES :=  $(CONFIG_DEFINES)
+
+# ------------------------------------------------------------------------
+#       Other compiler flags
+# ------------------------------------------------------------------------
+# -ggdb for debug
+# -pg for gprof
+# -save-temps to look at intermediate files
+# -O3 creates slower code than -O2 on pcs
+CONFIG_DEFINES_PERMISSIVE := $(CONFIG_DEFINES) -O2
+CONFIG_DEFINES := $(CONFIG_DEFINES_PERMISSIVE) -Wreturn-type -Wuninitialized -Werror
+
+
+# ------------------------------------------------------------------------
+#       Strip program for final executable (echo) for noop
+# ------------------------------------------------------------------------
+CONFIG_STRIP = strip
+
+
+
+

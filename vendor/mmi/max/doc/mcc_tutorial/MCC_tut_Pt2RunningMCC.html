@@ -1,0 +1,971 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="12/07/01 12:05:51">
+<title>Part 2   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img SRC="images/mmi-logo.gif"></td>
+     <td><font color="003366"><b><H1> MCC MegaCell Compiler Tutorial</H1></b></font></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MCC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MCC_tut_Pt1Intro.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="MCC_tut_Pt3CritPathAnal.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="MCC_tut_Pt4Netlisting.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 2 </font>
+</h2>
+
+
+<h2>
+  <a name="1028534"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running MCC</font>
+</h2>
+
+
+<h3>
+  <a name="1028574"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Overview</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1040768"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this part of the tutorial ,we describe how to run MCC and how to write the MCC control program.</font>
+<p>
+<p>
+  <dt> <a name="1040839"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">
+
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr bgcolor="#FFFFFF">
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"></p>
+<table border="0" width="80%" align="center" cellpadding="10">
+<tr>
+<td align="center" width="80"><img SRC="images/note.gif"></td>
+<td></td>
+</tr>
+</table>
+
+<br clear="left">
+ 
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1040890"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before going further in this tutorial, make sure you've read the "Memory Design Basics" section of the Micro Magic Tools MCC Manual. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+
+</font>
+<p>
+<p>
+  <dt> <a name="1028576"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC provides 4 basic commands to MAX: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">MC Build</font><a name="1028577"> </a>
+</p><font face="ITC Franklin Gothic Book">MC What</font><a name="1028578"> </a>
+</p><font face="ITC Franklin Gothic Book">MC Critical Path</font><a name="1028579"> </a>
+</p><font face="ITC Franklin Gothic Book">MC Netlist
+</font><a name="1028580"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1028581"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We will cover each of these commands in this tutorial.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028582"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MC Build</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028583"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To create a megacell, you need two things: the leaf cells in MAX format and the control program written in <b><strong class="Strong">Tcl</strong></b>. The control program sets up parameters and defines the tiling, via programming, and port propagation. Typically, this control file is sourced by the <b><code class="CodeStrong">.maxrc</code></b> file on startup. Otherwise, it can be sourced from the command line in MAX. It can also be included directly in the <b><code class="CodeStrong">.maxrc</code></b> file.</font>
+<p>
+<p>
+  <dt> <a name="1028584"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Refer to the "Creating Megacells" section of the MCC Manual for details on MCC control program syntax. </font>
+<p>
+<p>
+  <dt> <a name="1028585"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As part of this tutorial, we have provided an example SRAM control program written in <b><strong class="Strong">Tcl</strong></b> along with the necessary leaf cells in MAX format. </font>
+<p>
+<p>
+  <dt> <a name="1043625"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">First, we will create a small version of the SRAM and look as some of the tiling features.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028589"> </a>In MAX, go to the <b><code class="CodeStrong">Tool</code></b> menu and select <b><code class="CodeStrong">MC Build</code></b>. The popup form in <a href="MCC_tut_Pt2RunningMCC.html#1028599">Figure 2</a> appears.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028599"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 2:   Megacell Generator Popup Form</em></font>
+</h4>
+
+<ul> 
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig01.gif">
+</div></font><a name="1030889"> </a>
+  <dl>
+<p> <dt> <a name="1028600"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the name of the megacell is already filled in. When you started up MAX, the <b><code class="CodeStrong">.maxrc</code></b> file in the current directory was read into MAX. </font>
+<p>  </dl>
+</ul> 
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028601"> </a>In a shell window, type<b><code class="CodeStrong"> more .maxrc</code></b>. Look at the <b><code class="CodeStrong">.maxrc</code></b> file, and notice the line:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">source sram.tcl</font><a name="1028602"> </a>
+</p><font face="ITC Franklin Gothic Book"></font><a name="1029806"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1028603"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It sources the control program, <b><code class="CodeStrong">sram.tcl</code></b>. </font>
+<p>  </dl>
+   </ol>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028604"> </a>Look at <b><code class="CodeStrong">sram.tcl</code></b> (type <b><code class="CodeStrong">more sram.tcl</code></b>) and notice the following lines:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book"># Default generator name in "MC Build" menu.</font><a name="1029820"> </a>
+</p><font face="ITC Franklin Gothic Book">set MC(default_generator) sram
+</font><a name="1029821"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1029822"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The variable<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">MC(default_generator)</code></b><b><strong class="Strong"> </strong></b>specifies the name of the generator that is filled in when you start <b><code class="CodeStrong">MC Build</code></b>. The variable can also be defined in a <b><code class="CodeStrong">.maxrc</code></b> file. </font>
+<p><p> <dt> <a name="1028608"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">program</code></b> and <b><code class="CodeStrong">propagate</code></b> toggle buttons (refer to <a href="MCC_tut_Pt2RunningMCC.html#1028599">Figure 2</a>) control whether <b><code class="CodeStrong">MC Build</code></b> should program the vias and propagate the terminals, respectively. Typically, these toggle buttons should be on, as in the example. We will discuss this in detail later.</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028609"> </a>Accept the defaults by clicking on <b><code class="CodeStrong">Done</code></b>. Another popup form appears (see <a href="MCC_tut_Pt2RunningMCC.html#1028622">Figure 3</a>).</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028622"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 3:   SRAM Generator Properties</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig02.gif">
+</div></font><a name="1031076"> </a>
+  <dl>
+<p> <dt> <a name="1028623"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The parameters in the top part of the form, and their defaults, are defined in the <b><code class="CodeStrong">sram.tcl</code></b> file. </font>
+<p>  </dl>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1041030"> </a>Look at the <b><code class="CodeStrong">sram.tcl</code></b> file and notice the following lines:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book"># Parameters associated with this generator so the </font><a name="1028624"> </a>
+</p><font face="ITC Franklin Gothic Book"># user can change them in the menu.</font><a name="1028625"> </a>
+</p><font face="ITC Franklin Gothic Book">set MC(sram,parameters) "ROWS COLS"</font><a name="1028626"> </a>
+</p><font face="ITC Franklin Gothic Book">...</font><a name="1028627"> </a>
+</p><font face="ITC Franklin Gothic Book"># Parameters that control SRAM size and shape.</font><a name="1028628"> </a>
+</p><font face="ITC Franklin Gothic Book">set ROWS 16</font><a name="1028629"> </a>
+</p><font face="ITC Franklin Gothic Book">set COLS 16
+</font><a name="1028630"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1028631"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The variable <b><strong class="Strong">MC(sram,parameters)</strong></b><b><code class="CodeStrong"> </code></b>specifies the additional fields that are parameters for the SRAM megacell. The default values specified in this case are the smallest reasonable size of SRAM that can be built with this control program.</font>
+<p>
+
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr bgcolor="#FFFFFF">
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"></p>
+<table border="0" width="80%" align="center" cellpadding="10">
+<tr>
+<td align="center" width="80"><img SRC="images/note.gif"></td>
+<td></td>
+</tr>
+</table>
+
+<br clear="left">
+ 
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1044203"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">prefix</code></b>, <b><code class="CodeStrong">suffix</code></b> and <b><code class="CodeStrong">name</code></b> variables control the names of the cells generated by<b><code class="CodeStrong"> MC Build</code></b>. Refer to the <b><code class="CodeStrong">MC Build</code></b> section of the <em class="Emphasis">MCC Manual</em> for more details.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+
+</font><a name="1044019"> </a>
+</pre>
+  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1028633"> </a>Leave the default values and click on <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1028634"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC now builds the SRAM. It first tiles all the cells as specified in the<b><code class="CodeStrong"> sram.tcl</code></b> control program. It then does via programming, and finally propagates the I/Os to the top level of hierarchy. You should see the completed SRAM as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028647">Figure 4</a>.</font>
+<p>  </dl>
+</ol>
+<h4>
+  <a name="1028647"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 4:   Layout For "MMI_SRAM128X2"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig03.gif">
+</div></font><a name="1031263"> </a>
+</pre>
+
+<h3>
+  <a name="1028648"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Tiling</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028649"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now, we will look at how tiling works in an MCC control program. To do this, we will push into some of the smaller cells that make up this SRAM.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028650"> </a>Zoom in on the upper left corner of the SRAM. To do this:</font>
+</p><p><ul>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1044982"> </a>Type the hotkey:<b><strong class="Strong"> z. </strong></b>This will put you into "zoom" mode. Then, hold down mouse Button-1 and drag the mouse to define a box around the area you wish to zoom in on. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1045161"> </a>Release mouse Button-1, and the screen will display the magnified view. </font>
+</p></ul>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028654"> </a>Select the SRAM cell (<b><code class="CodeStrong">mmi_sram_cell</code></b>) as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028664">Figure 5</a>. <br>(Place your mouse over the cell and use the use the <b><strong class="Strong">f </strong></b>hotkey for <b><code class="CodeStrong">Select Cell</code></b>. You might need to type the <b><strong class="Strong">f</strong></b><b><strong class="Strong"> </strong></b>hotkey multiple times without moving the mouse to toggle through the cells under your mouse.)</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028664"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 5:   The Selected SRAM Cell "mmi_sram_cell"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig04.gif">
+</div></font><a name="1031458"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028665"> </a>Push into <b><code class="CodeStrong">mmi_sram_cell</code></b> (hotkey: <b><strong class="Strong">e</strong></b>).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028666"> </a>To make it easier to see the SRAM cell, turn off the visibility of the <b><code class="CodeStrong">nw</code></b>, <b><code class="CodeStrong">nplus</code></b> and <b><code class="CodeStrong">pplus</code></b> layers. <br>(Click with Button-1 on the colored squares to the left of the layer names in the palette. This hides the selected layers.)</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028670"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see the SRAM cell as shown in <a href="MCC_tut_Pt2RunningMCC.html#1049779">Figure 6</a>.<b><strong class="Strong">
+</pre>
+<p>
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr bgcolor="#FFFFFF">
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"></p>
+<table border="0" width="80%" align="center" cellpadding="10">
+<tr>
+<td align="center" width="80"><img SRC="images/note.gif"></td>
+<td></td>
+</tr>
+</table>
+
+<br clear="left">
+ 
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1033569"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you're not familiar with the MAX commands used in this tutorial, complete the MAX Tutorial before continuing. You can also use the MAX Manual as a reference.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1049779"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 6:   Layout Of "mmi_sram_cell"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig05.gif">
+</div></font><a name="1049783"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1049758"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028672"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Abutment</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028673"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <em class="Emphasis">tiler</em> places cells next to and on top of other cells. To do this correctly, the tiler needs to know the desired cell abutment boundaries. This is especially important for memories because leaf cells typically overlap and share contacts, wires, and source/drain areas. Note that MCC does not care about the cell origin, only the abutment boundaries. </font>
+<p>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr bgcolor="#FFFFFF">
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"></p>
+<table border="0" width="80%" align="center" cellpadding="10">
+<tr>
+<td align="center" width="80"><img SRC="images/note.gif"></td>
+<td></td>
+</tr>
+</table>
+
+<br clear="left">
+ 
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1046480"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Abutment boundaries must be rectangular.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+
+</font><a name="1046412"> </a>
+</pre>
+<p>
+  <dt> <a name="1028684"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC supports different means of determining the cell abutment boundaries. </font>
+<p>
+<p>
+  <dt> <a name="1041214"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The suggested and most common way is to draw a special layer in each leaf cell whose extent is the abutment boundary. This layer is often called "<b><code class="CodeStrong">prb</code></b>" for "place and route boundary". </font>
+<p>
+<p>
+  <dt> <a name="1028685"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This was the method used for the cells in our SRAM.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1049983"> </a>Look at the SRAM cell in MAX, and notice that the <b><code class="CodeStrong">prb</code></b> layer does not come to the edge of the cell.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1050028"> </a>If you have difficulty seeing the <b><code class="CodeStrong">prb</code></b> layer, toggle the visibility of the layer on and off.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028687"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also type the coordinates of the abutment boundary into the<b><code class="CodeStrong"> MC_DATA</code></b> array. If you had a leaf cell called "<b><code class="CodeStrong">foo</code></b>" whose abutment boundary was at the coordinates (0, 0) and (13.4, 8.6), you would add the following line to a file that needs to be sourced into MAX (for example, in your <b><code class="CodeStrong">.maxrc</code></b> file) before you run MCC. </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">set MC_DATA(foo) "foo 0 0 13.4 8.6"
+</font><a name="1028688"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1028689"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Refer to the "Abutment" section of the MCC Manual for more details.</font>
+<p>
+</dl></dl>
+<h4>
+  <a name="1028690"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Text Labels</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028691"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While we're looking at <b><code class="CodeStrong">mmi_sram_cell</code></b>, let's look at how the labels are specified for the cell. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028692"> </a>Turn off visibility of the <b><code class="CodeStrong">m3</code></b> and <b><code class="CodeStrong">prb</code></b> layers to help you better see the labels.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028693"> </a>Zoom in on the lower left corner of the cell</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028697"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see something like <a href="MCC_tut_Pt2RunningMCC.html#1028707">Figure 7</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028707"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 7:   Text Labels For Magnified Area Of "mmi_sram_cell"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig06.gif">
+</div></font><a name="1031593"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028708"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For your design to be properly netlisted, as well as to be able to do critical path analysis, you need to properly define the ports on each cell. All inputs should be defined as input (signified with the <b><strong class="Strong">&lt;</strong></b> symbol in front of text). The same needs to be done for outputs (<b><strong class="Strong">&gt; </strong></b>symbol) and bidirectional ports (<b><strong class="Strong">&lt;&gt;</strong></b> symbol). Power labels need to be defined as globals (<b><strong class="Strong">!</strong></b> symbol). Refer to the MAX User Guide for details on how to specify text direction and type.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028709"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Basic Tiling Commands and MC What</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028710"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let us look at some basic tiling commands. To do this, we'll push into some of the lower level cells of the SRAM and use the <b><code class="CodeStrong">MC What</code></b> command to help us understand the tiling commands.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028711"> </a>Type<b><strong class="Strong"> </strong></b><b><strong class="Strong">ctrl-e</strong></b> to pop back up to the top level of the SRAM hierarchy.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028712"> </a>Zoom in again on the upper left corner of the SRAM.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028713"> </a>Select the <b><code class="CodeStrong">MMI_SRAM_cell_4_128X2</code></b> cell by typing <b><strong class="Strong">f</strong></b> (select cell) multiple times over the same location until the correct cell is selected, as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028732">Figure 8</a>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028717"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Because this is a cell generated by MCC, notice the <b><code class="CodeStrong">MMI_SRAM_</code></b> prefix and the <b><code class="CodeStrong">_128X2</code></b> suffix. When we generated this SRAM, the prefix was set to <b><code class="CodeStrong">MMI_SRAM_</code></b> (see <a href="MCC_tut_Pt2RunningMCC.html#1028622">Figure 3</a>). The suffix was set to:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">_[expr $ROWS * 8]X[expr $COLS / 8]
+</font><a name="1028721"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1028722"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Remember both <b><code class="CodeStrong">ROWS</code></b> and <b><code class="CodeStrong">COLS</code></b> were set to <b><code class="CodeStrong">16</code></b>, therefore the suffix will be <b><code class="CodeStrong">_128X2</code></b> .</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028732"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 8:   "MMI_SRAM_cell_4_128X2" Cell Selected</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig07.gif">
+</div></font><a name="1031639"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028733"> </a>Push into <b><code class="CodeStrong">MMI_SRAM_cell_4_128X2,</code></b> using the <b><strong class="Strong">e</strong></b> hotkey.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1028734"> </a>Turn visibility on for the <b><code class="CodeStrong">prb</code></b> layer.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1031677"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see the layout for the cell, as in <a href="MCC_tut_Pt2RunningMCC.html#1031687">Figure 9</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1031687"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 9:   Layout For "MMI_SRAM_cell_4"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig08.gif">
+</div></font><a name="1031693"> </a>
+</pre>
+
+<h5>
+  <a name="1031688"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MC What</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1035600"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This cell has four placements of<b><code class="CodeStrong"> mmi_sram_cell</code></b>. The easiest way to learn how to tile cells is to use the <b><code class="CodeStrong">MC What</code></b> command. <b><code class="CodeStrong">MC What</code></b> looks at your current cell and figures out the tiling commands for your control file and prints those commands in the <b><code class="CodeStrong">MAX Command Window</code></b> (the window from which you started MAX).</font>
+<p>
+<p>
+  <dt> <a name="1047182"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following exercise demonstrates how to use <b><code class="CodeStrong">MC What</code></b>.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028753"> </a>Go to the <b><code class="CodeStrong">Tool</code></b> menu and select <b><code class="CodeStrong">MC What</code></b>. The popup form in <a href="MCC_tut_Pt2RunningMCC.html#1028763">Figure 10</a> appears.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028763"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 10:   MC What Popup Form</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig09.gif">
+</div></font><a name="1031736"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028765"> </a>Leave <b><code class="CodeStrong">hierarchy</code></b> turned off.</font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1047065"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">hierarchy</code></b> button controls whether <b><code class="CodeStrong">MC What</code></b> only writes out the tiling commands for this level of hierarchy (toggle turned off) or generates the tiling commands for all levels of hierarchy under the current cell (toggle turned on).</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028766"> </a>We will now remove prefixes or suffixes, by entering them in the appropriate fields.</font>
+</p><p><ul>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028767"> </a>Type <b><code class="CodeStrong">MMI_SRAM_</code></b> in the <b><code class="CodeStrong">remove_prefix</code></b> field.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1045604"> </a>Type <b><code class="CodeStrong">_128X2 </code></b>in the <b><code class="CodeStrong">remove_suffix</code></b> field.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1047617"> </a>Click on <b><code class="CodeStrong">Done</code></b>.</font>
+</p></ul>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028770"> </a>Go to the <b><code class="CodeStrong">MAX Command Window</code></b> (the window from which you started MAX) and look at what MCC printed out. You should see something like the following:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">Creating MC build commands for cell "MMI_SRAM_cell_4_128X2" ...</font><a name="1028771"> </a>
+</p><font face="ITC Franklin Gothic Book">set MACRO(cell_4) {CELL {{mmi_sram_cell fy} {mmi_sram_cell r180}} {mmi_sram_cell {mmi_sram_cell fx}}}
+</font><a name="1028772"> </a>
+</p></pre>
+   </ol>
+   </ol>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1047621"> </a>To make it easier to see how the tiling works, let's turn off the visibility of the internals of the cells. Select <b><code class="CodeStrong">MMI_SRAM_cell_4_128X2</code></b><b><strong class="Strong"> </strong></b>by typing the hotkey <b><strong class="Strong">f</strong></b> in an area with no layout.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1028775"> </a>Use the <b><strong class="Strong">h</strong></b> hotkey or select <b><code class="CodeStrong">Internals, Hide Area</code></b> from the <b><code class="CodeStrong">View</code></b> menu. <br>You should now see something like <a href="MCC_tut_Pt2RunningMCC.html#1028802">Figure 11</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028802"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 11:   "MMI_SRAM_cell_4" With Internals Turned Off</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_sram_cell.gif">
+</div></font><a name="1031772"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1041577"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at the tiling command again.</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">set MACRO(cell_4) {CELL {{mmi_sram_cell fy} {mmi_sram_cell r180}} {mmi_sram_cell {mmi_sram_cell fx}}}
+</font><a name="1041578"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1041579"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC tiles rows of cells from the bottom up. So, the first (bottom) row is:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">{{mmi_sram_cell fy} {mmi_sram_cell r180}}
+</font><a name="1041580"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1041584"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you look at <a href="MCC_tut_Pt2RunningMCC.html#1028802">Figure 11</a>, you'll see that the first cell has an orientation of <b><strong class="Strong">fy</strong></b> (flipped around the y-axis) and the second has an orientation of <b><strong class="Strong">r180</strong></b> (rotated 180 degrees). The second row is:</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">{{mmi_sram_cell {mmi_sram_cell fx}}
+</font><a name="1041585"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1041589"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Again looking at <a href="MCC_tut_Pt2RunningMCC.html#1028802">Figure 11</a>, in the second (upper) row the first cell is neither rotated nor flipped and the second cell has an orientation of <b><strong class="Strong">fx</strong></b>.</font>
+<p>
+</dl></dl>
+<h4>
+  <a name="1028806"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>More Tiling Examples</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1041794"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let us look at another example of tiling.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1041795"> </a>Type <b><strong class="Strong">ctrl-e</strong></b> to pop back up to the top level of the SRAM hierarchy.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1041796"> </a>Type<b><strong class="Strong"> f</strong></b> in an area with no layout to select the top level cell and then type <b><strong class="Strong">i</strong></b> to show all the internals.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1040696"> </a>Now, to look at the next level of hierarchy. Zoom in again on the upper left corner of the SRAM.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028807"> </a>Select the<b><code class="CodeStrong"> MMI_SRAM_half_row2_128X2</code></b> cell by typing <b><strong class="Strong">f </strong></b>multiple times over the same location until the correct cell is selected, as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028820">Figure 12</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028820"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 12:   "MMI_SRAM_half_row2_128X2" Cell Selected</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_half_row1.gif">
+</div></font><a name="1041955"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1041956"> </a>Push into <b><code class="CodeStrong">MMI_SRAM_half_row2_128X2</code></b> using the <b><strong class="Strong">e</strong></b> hotkey.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1041957"> </a>Go to the <b><code class="CodeStrong">Tool</code></b> menu and select <b><code class="CodeStrong">MC What</code></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1041958"> </a>Leave <b><code class="CodeStrong">hierarchy</code></b> turned off.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1041959"> </a>Leave <b><code class="CodeStrong">MMI_SRAM_</code></b> in the <b><code class="CodeStrong">remove_prefix</code></b> field.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1041960"> </a>Leave <b><code class="CodeStrong">_128X2 </code></b>in the <b><code class="CodeStrong">remove_suffix</code></b> field.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1041961"> </a>Click on <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1028828"> </a>To make it easier to see how the tiling works, once again turn off the visibility of the internals of the cells. Select the top level of hierarchy by typing the hotkey <b><strong class="Strong">f</strong></b> in an area with no layout. Use the <b><strong class="Strong">h</strong></b> hotkey or select<b><code class="CodeStrong"> Internals, Hide Area</code></b> from the <b><code class="CodeStrong">View</code></b> menu.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028833"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see the layout for the cell, as in <a href="MCC_tut_Pt2RunningMCC.html#1028843">Figure 13</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028843"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 13:   "MMI_SRAM_half_row_128X2" Cell</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_half_row2.gif">
+</div></font><a name="1031872"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1028844"> </a>Go to the <b><code class="CodeStrong">MAX Command Window</code></b> (the window from which you started MAX) and look at what was printed out. You should see something like the following:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">Creating MC build commands for cell "MMI_SRAM_half_row2_128X2" ...</font><a name="1028845"> </a>
+</p><font face="ITC Franklin Gothic Book">set MACRO(half_row2) {CELL {{REPEAT 4 cell_4}}}
+</font><a name="1028846"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1028847"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This example has <b><code class="CodeStrong">cell_4_128X2</code></b> repeated four times. The tiling command uses the <b><code class="CodeStrong">REPEAT</code></b> command to accomplish this. The result from <b><code class="CodeStrong">MC What</code></b> uses an absolute value for the number of times to repeat the cell. </font>
+<p>  </dl>
+   </ol>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="13"><a name="1028848"> </a>Look at the <b><code class="CodeStrong">sram.tcl</code></b> file (<b><code class="CodeStrong">more sram.tcl</code></b>) and look for the following line.</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">set MACRO(half_row2) {CELL {{REPEAT [expr $COLS/4] cell_4}}}
+</font><a name="1028849"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1028850"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that instead of an absolute value, an expression is used that gets the <b><code class="CodeStrong">REPEAT</code></b> value from the variable <b><code class="CodeStrong">COLS</code></b> divided by 4. This makes our SRAM parameterizable.</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="14"><a name="1028852"> </a>If you want to investigate the tiling commands in the <b><code class="CodeStrong">sram.tcl</code></b> control file, we have created a SUE schematic that shows how this SRAM is put together. To view this schematic, go to a shell window and type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd ~mmi_private/tutorial/mcc/sue</font><a name="1028853"> </a>
+</p><font face="ITC Franklin Gothic Book">sue floorplan
+</font><a name="1028854"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1050374"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see something like <a href="MCC_tut_Pt2RunningMCC.html#1028868">Figure 14</a>. (For more examples of tiling commands, go to the "Tiling" section of the MCC Manual.)</font>
+<p>
+<p>
+  <dt> <a name="1028858"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028868"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 14:   Example Floorplan Of SRAM</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_floorplan.gif">
+</div></font><a name="1032020"> </a>
+</pre>
+
+<h3>
+  <a name="1028870"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Via Programming</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028871"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have tiled up a memory, you need to make every memory cell unique. This entails, at the very least, programming the word line decoders so that each one gets a unique set of addresses. Instead of creating overlay cells that contain the desired connections, or specifying exact X,Y locations, MCC uses via programming. Connections are done with vias and programmed algorithmically, simplifying the programming of vias.</font>
+<p>
+<p>
+  <dt> <a name="1048274"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To further simplify via programming, MCC determines where to put the vias and what vias to use by tracing nets. You need to specify only the desired ports to be connected, and MCC will figure out where the nets overlap, and what the layers are, and add the appropriate vias. If you need to change your design or port it to another process, the via programming will still work because it is not hard-coded to any positions. </font>
+<p>
+<p>
+  <dt> <a name="1028873"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at our small SRAM to see how to program the vias for the word line decoding.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028874"> </a>Type <b><strong class="Strong">ctrl-e</strong></b> to pop back up to the top level of the SRAM.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028875"> </a>Type <b><strong class="Strong">f</strong></b> in an area with no layout to select the top level cell, and then type <b><strong class="Strong">i</strong></b> to show all the internals.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028876"> </a>Turn off visibility of the <b><code class="CodeStrong">prb</code></b> layer.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028877"> </a>Push into the <b><code class="CodeStrong">MMI_SRAM_wlds_128X2</code></b> cell. You can either do this by selecting it with the <b><strong class="Strong">f</strong></b> hotkey (as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028890">Figure 15</a>) and then pushing into the cell, or you can select <b><code class="CodeStrong">MMI_SRAM_wlds_128X2</code></b> from the <b><code class="CodeStrong">Cell List</code></b>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028890"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 15:   "MMI_SRAM_wlds_128X2" Cell Selected</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_wlds1.gif">
+</div></font><a name="1032169"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1028891"> </a>Turn off all layers except <b><code class="CodeStrong">m2</code></b>, <b><code class="CodeStrong">v12</code></b>, and <b><code class="CodeStrong">m1</code></b> to make it easier to see the vias.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1028892"> </a>Zoom in on the bottom third of the cell and select a <b><code class="CodeStrong">mmi_sram_wld</code></b> cell (hotkey: <b><strong class="Strong">f</strong></b>) as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028905">Figure 16</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028905"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 16:   "mmi_sram_wld" Cell Selected</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_wld1.gif">
+</div></font><a name="1032185"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1048466"> </a>Push into the cell (hotkey: <b><strong class="Strong">e</strong></b>)</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1048679"> </a>Zoom in on the area as shown in <a href="MCC_tut_Pt2RunningMCC.html#1048410">Figure 17</a>. The arrows in the figure point to the locations <b><code class="CodeStrong">v12</code></b> vias will be placed. Vias can be placed where rectangles on different layers overlap.</font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1048680"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The via programming is actually done in the higher level cell, <b><code class="CodeStrong">MMI_SRAM_wlds_128x2</code></b>.</font>
+<p>  </dl>
+</ol>
+<h4>
+  <a name="1048410"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 17:   Locations For Via Programming</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/MCC_tut_Pt2RunningMCC16.gif" height="556" width="750">
+</div></font><a name="1032339"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1028932"> </a>Pop back up to the <b><code class="CodeStrong">MMI_SRAM_wlds_128X2</code></b> cell (hotkey: <b><strong class="Strong">ctrl-e</strong></b>).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1028936"> </a>Zoom in on the lower right section of the cell, as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028946">Figure 18</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028946"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 18:   "MMI_SRAM_wlds_128X2" Cell</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_wlds2.gif">
+</div></font><a name="1032451"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1028950"> </a>Select the right-most <b><code class="CodeStrong">m2</code></b> net as shown in <a href="MCC_tut_Pt2RunningMCC.html#1028946">Figure 18</a>. This net is named <b><code class="CodeStrong">en_a3_0_feed</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1028951"> </a>In another shell window, type the following commands:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd ~/mmi_private/tutorial/mcc/sue</font><a name="1028952"> </a>
+</p><font face="ITC Franklin Gothic Book">sue via_programming
+</font><a name="1028953"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028957"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your should now see the schematic shown in <a href="MCC_tut_Pt2RunningMCC.html#1028967">Figure 19</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028967"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 19:   Via Programming Schematic</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_via_program.gif">
+</div></font><a name="1032581"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="13"><a name="1028968"> </a>Open the <b><code class="CodeStrong">sram.tcl </code></b>file again and look for the following lines:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book"># program the word lines</font><a name="1028969"> </a>
+</p><font face="ITC Franklin Gothic Book">  program_cell wlds</font><a name="1028970"> </a>
+</p><font face="ITC Franklin Gothic Book"></font><a name="1028971"> </a>
+</p><font face="ITC Franklin Gothic Book">  program \</font><a name="1028972"> </a>
+</p><font face="ITC Franklin Gothic Book">      {en_a3_0_feed en_a3_1_feed} \</font><a name="1028973"> </a>
+</p><font face="ITC Franklin Gothic Book">      in2 \</font><a name="1028974"> </a>
+</p><font face="ITC Franklin Gothic Book">      "mmi_sram_wld_%d" \</font><a name="1028975"> </a>
+</p><font face="ITC Franklin Gothic Book">      $ROWS \</font><a name="1028976"> </a>
+</p><font face="ITC Franklin Gothic Book">      1</font><a name="1028977"> </a>
+</p><font face="ITC Franklin Gothic Book"></font><a name="1028978"> </a>
+</p><font face="ITC Franklin Gothic Book">  program \</font><a name="1028979"> </a>
+</p><font face="ITC Franklin Gothic Book">      {a4_a5_0_feed a4_a5_1_feed a4_a5_2_feed a4_a5_3_feed} \</font><a name="1028980"> </a>
+</p><font face="ITC Franklin Gothic Book">      in0 \</font><a name="1028981"> </a>
+</p><font face="ITC Franklin Gothic Book">      "mmi_sram_wld_%d" \</font><a name="1028982"> </a>
+</p><font face="ITC Franklin Gothic Book">      $ROWS \</font><a name="1028983"> </a>
+</p><font face="ITC Franklin Gothic Book">      2</font><a name="1028984"> </a>
+</p><font face="ITC Franklin Gothic Book"></font><a name="1028985"> </a>
+</p><font face="ITC Franklin Gothic Book">  program \</font><a name="1028986"> </a>
+</p><font face="ITC Franklin Gothic Book">      {a6_a7_0_feed a6_a7_1_feed a6_a7_2_feed a6_a7_3_feed} \</font><a name="1028987"> </a>
+</p><font face="ITC Franklin Gothic Book">      in1 \</font><a name="1028988"> </a>
+</p><font face="ITC Franklin Gothic Book">      "mmi_sram_wld_%d" \</font><a name="1028989"> </a>
+</p><font face="ITC Franklin Gothic Book">      $ROWS \</font><a name="1028990"> </a>
+</p><font face="ITC Franklin Gothic Book">      8</font><a name="1028991"> </a>
+</p><font face="ITC Franklin Gothic Book">}
+</font><a name="1028992"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028993"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">program</code></b> command drives the programming of vias, and takes the following arguments: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">program \</font><a name="1028994"> </a>
+</p><font face="ITC Franklin Gothic Book">&lt;list of ports to alternatively connect&gt; \</font><a name="1028995"> </a>
+</p><font face="ITC Franklin Gothic Book">&lt;port to connect to in cell&gt; \</font><a name="1028996"> </a>
+</p><font face="ITC Franklin Gothic Book">&lt;format of name of instance to connect in&gt; \</font><a name="1028997"> </a>
+</p><font face="ITC Franklin Gothic Book">&lt;number of cells to make connections in&gt; \</font><a name="1028998"> </a>
+</p><font face="ITC Franklin Gothic Book">&lt;number of cells to program before moving to next port&gt;
+</font><a name="1028999"> </a>
+</p></pre>
+</dl></dl><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="14"><a name="1029000"> </a>Now look at the first <b><code class="CodeStrong">program</code></b> command for our SRAM:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">program \</font><a name="1029001"> </a>
+</p><font face="ITC Franklin Gothic Book">      {en_a3_0_feed en_a3_1_feed} \</font><a name="1029002"> </a>
+</p><font face="ITC Franklin Gothic Book">      in2 \</font><a name="1029003"> </a>
+</p><font face="ITC Franklin Gothic Book">      "mmi_sram_wld_%d" \</font><a name="1029004"> </a>
+</p><font face="ITC Franklin Gothic Book">      $ROWS \</font><a name="1029005"> </a>
+</p><font face="ITC Franklin Gothic Book">      1
+</font><a name="1029006"> </a>
+</p></pre>
+   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1029007"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The labels for both <b><code class="CodeStrong">&lt;list of ports to alternatively connect&gt;</code></b><b><strong class="Strong"> </strong></b>and<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">&lt;port to connect to in cell&gt;</code></b><b><strong class="Strong"> </strong></b>are actually down in the <b><code class="CodeStrong">mmi_sram_wld</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> cell, but the vi</font>as will be placed in the<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">MMI_SRAM_wlds_128X2</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> cell.</font></font>
+<p>
+<p>
+  <dt> <a name="1029011"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The net we highlighted in <a href="MCC_tut_Pt2RunningMCC.html#1028946">Figure 18</a> was <b><code class="CodeStrong">en_a3_feed</code></b>. This signal was connected to <b><code class="CodeStrong">in2 </code></b>from<b><code class="CodeStrong"> </code></b>the<b><code class="CodeStrong"> mmi_sram_wld </code></b>cell. MCC will look for instances of <b><code class="CodeStrong">mmi_sram_wld</code></b> and the names of the instances will be <b><code class="CodeStrong">mmi_sram_wld_0</code></b>, <b><code class="CodeStrong">mmi_sram_wld_1, </code></b><font  face="Verdana, Arial, Helvetica, sans-serif">iterated</font><b><code class="CodeStrong"> </code></b>up to <b><code class="CodeStrong">mmi_sram_wld_15</code></b>. Remember, we set <b><code class="CodeStrong">ROWS</code></b> to 16 for this example, so <b><strong class="Strong">%d</strong></b> will go from 0 to 15. Because <b><code class="CodeStrong">&lt;number of cells to program before moving to next port&gt; </code></b>is set to 1, MCC will alternate between connecting <b><code class="CodeStrong">en_a3_0_feed</code></b> to <b><code class="CodeStrong">in2</code></b> and connecting <b><code class="CodeStrong">en_a3_1_feed</code></b> to <b><code class="CodeStrong">in2</code></b>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="15"><a name="1029015"> </a>Select the <b><code class="CodeStrong">en_a3_1_feed</code></b> net as shown in <a href="MCC_tut_Pt2RunningMCC.html#1029025">Figure 20</a> and notice that the alternate instances of <b><code class="CodeStrong">mmi_sram_wld</code></b> have the vias programmed. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029025"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 20:   Net "en_a3_1_feed" Selected</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_wlds3.gif">
+</div></font><a name="1032714"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="16"><a name="1029026"> </a>Look at the next <b><code class="CodeStrong">program</code></b> command:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">program \</font><a name="1029027"> </a>
+</p><font face="ITC Franklin Gothic Book">      {a4_a5_0_feed a4_a5_1_feed a4_a5_2_feed a4_a5_3_feed} \</font><a name="1029028"> </a>
+</p><font face="ITC Franklin Gothic Book">      in0 \</font><a name="1029029"> </a>
+</p><font face="ITC Franklin Gothic Book">      "mmi_sram_wld_%d" \</font><a name="1029030"> </a>
+</p><font face="ITC Franklin Gothic Book">      $ROWS \</font><a name="1029031"> </a>
+</p><font face="ITC Franklin Gothic Book">      2
+</font><a name="1029032"> </a>
+</p></pre>
+   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="17"><a name="1029033"> </a>Select the nets <b><code class="CodeStrong">a4_a5_0_feed, a4_a5_1_feed, a4_a5_2_feed </code></b><font  face="Verdana, Arial, Helvetica, sans-serif">and</font><b><code class="CodeStrong"> a4_a5_3_feed</code></b><b><strong class="Strong">. </strong></b>Do this typing the <b><strong class="Strong">s</strong></b> hotkey over <b><code class="CodeStrong">a4_a5_0_feed</code></b>. Then to add to the selection, select <b><code class="CodeStrong">Select Net(add)</code></b> from the <b><code class="CodeStrong">Misc</code></b> menu in MAX and then click with Button-1 on the next net.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029038"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see something like <a href="MCC_tut_Pt2RunningMCC.html#1029050">Figure 21</a>.</font>
+<p>
+<p>
+  <dt> <a name="1029039"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Starting from the bottom, <b><code class="CodeStrong">a4_a5_0_feed</code></b> gets connected to <b><code class="CodeStrong">in0</code></b> in the first two cells and then <b><code class="CodeStrong">a4_a5_1_feed</code></b> gets connected to <b><code class="CodeStrong">in0</code></b> in the next two cells and so on.</font>
+<p>
+<p>
+  <dt> <a name="1029040"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can look at the next four nets to the left of these nets to see the programming of the <b><code class="CodeStrong">a6_a7_0_feed</code></b> through <b><code class="CodeStrong">a6_a7_3_feed</code></b> nets.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029050"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 21:   Nets "a4_a5_x_feed" Selected</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_wlds4.gif">
+</div></font><a name="1032835"> </a>
+</pre>
+
+<h3>
+  <a name="1029051"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Port Propagation</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029052"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have tiled up and via programmed a megacell, you can add the I/O and global ports to the megacell for verification and connection to the outside world. MCC adds these ports by propagating them directly up from the leaf cells and renaming them (if needed). The ports are simply added to the top level on the same layer and at the same location as the ports in the leaf cells, as if the entire megacell were flattened. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029053"> </a>Look again at the <b><code class="CodeStrong">sram.tcl</code></b> file (<b><code class="CodeStrong">more sram.tcl</code></b>) and look for the following lines:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book"># Controls port propagation.</font><a name="1029054"> </a>
+</p><font face="ITC Franklin Gothic Book"># left | right | up | down (defaults to left if not defined)</font><a name="1029055"> </a>
+</p><font face="ITC Franklin Gothic Book">set MC(default_propagate_direction) left</font><a name="1029056"> </a>
+</p><font face="ITC Franklin Gothic Book"></font><a name="1029057"> </a>
+</p><font face="ITC Franklin Gothic Book">set MC(sram,propagate,tmp) {</font><a name="1029058"> </a>
+</p><font face="ITC Franklin Gothic Book">  {count {mmi_sram_read_mux4/Dout rdata\[%d\]}} </font><a name="1029059"> </a>
+</p><font face="ITC Franklin Gothic Book">  {count {mmi_sram_wdata_latch/din wdata\[%d\]}}</font><a name="1029060"> </a>
+</p><font face="ITC Franklin Gothic Book">  {prop mmi_sram_base_0/a[0] mmi_sram_base_0/a[1] mmi_sram_base_0/a[2]}</font><a name="1029061"> </a>
+</p><font face="ITC Franklin Gothic Book">  {prop mmi_sram_base_0/a[3]}</font><a name="1029062"> </a>
+</p><font face="ITC Franklin Gothic Book">  {prop mmi_sram_base_0/a[4] mmi_sram_base_0/a[5] mmi_sram_base_0/a[6]}</font><a name="1029063"> </a>
+</p><font face="ITC Franklin Gothic Book">  {prop mmi_sram_base_0/memenable mmi_sram_base_0/wenable mmi_sram_base_0/clk}</font><a name="1029064"> </a>
+</p><font face="ITC Franklin Gothic Book">  {prop mmi_sram_base_0/gnd mmi_sram_base_0/vdd}</font><a name="1029065"> </a>
+</p><font face="ITC Franklin Gothic Book">}
+</font><a name="1029066"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029067"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When propagating inputs and outputs that are a function of the size of the megacell, you typically use the <b><code class="CodeStrong">count</code></b> command. The <b><code class="CodeStrong">count</code></b> command propagates each port in a group of leaf cells with unique names. In the previous propagate command example, if there are 16 copies of the <b><code class="CodeStrong">mmi_sram_read_mux4</code></b> leaf cell in the design, you will get the ports<b><code class="CodeStrong"> rdata[0]</code></b> to <b><code class="CodeStrong">rdata[15]</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1029068"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the <b><code class="CodeStrong">count</code></b> command, the ports can be labeled from right to left (<em class="Emphasis">left</em>), left to right (<em class="Emphasis">right</em>), top to bottom (<em class="Emphasis">down</em>), or bottom to top (<em class="Emphasis">up</em>). The default <b><code class="CodeStrong">count</code></b> direction is right to left, so <b><code class="CodeStrong">rdata[0]</code></b> will be on the right.</font>
+<p>
+<p>
+  <dt> <a name="1029069"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The other commands in the previous "Port Propagation" section simply propagate the signals keeping the same names. For example, the port <b><code class="CodeStrong">mmi_sram_base_0/a[0] </code></b>is brought to the top level and named <b><code class="CodeStrong">a[0]</code></b>. Refer to the "Port Propagation" section of the MCC Manual for further details.</font>
+<p>
+<p>
+  <dt> <a name="1043809"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="MCC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="MCC_tut_Pt1Intro.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="MCC_tut_Pt3CritPathAnal.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="MCC_tut_Pt4Netlisting.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

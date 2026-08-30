@@ -1,0 +1,341 @@
+# remove once this gets maxtcl code
+# Example generator cell (gcell) to make polysilicon
+# surface-micromachined variable-capacitance radial-gap
+# 3:2 motors.
+
+# Note: your layers may vary
+
+proc gcell_make_motor {properties} -desc {
+  gcell procedure to make a contact/via
+} {
+
+  # get values out of properties list
+  set stators [get_assoc stators $properties]
+  set radius [get_assoc radius $properties]
+  set gap [get_assoc gap $properties]
+  set bearing_radius [get_assoc bearing_radius $properties]
+  set width [get_assoc width $properties]
+  set overlap [get_assoc overlap $properties]
+  set rotor_angle [get_assoc rotor_angle $properties]
+  set rotors [expr $stators * 2 / 3]
+
+  # make up some layers
+  set layer3 [lindex [techinfo vias] 0]
+  set tmp [techinfo below $layer3]
+  if {[lsearch $tmp poly] != -1} {
+    set layer1 poly
+  } else {
+    set layer1 [lindex $tmp 0]
+  }
+
+  set layer2 [techinfo above $layer3]
+  set layer4 [lindex [lreverse [techinfo layer_order]] 1]
+
+  # draw it
+
+  # make the stators
+  set angle [expr 360.0 / $stators]
+  for {set i 0} {$i < $stators} {incr i} {
+    # make 'm
+    make_pie_wedge $layer1 \
+	[expr $radius + $gap] [expr $radius + $gap + 2*$width] \
+	[expr $i * $angle] [expr ($i + $overlap) * $angle]
+    # make the insulation below
+    make_pie_wedge $layer4 \
+	[expr $radius + 3*$gap] [expr $radius + 3*$gap + 2*$width] \
+	[expr ($i - 0.1 * $overlap) * $angle] [expr ($i + 1.1 * $overlap) * $angle]
+  }
+
+  # make the rotor
+  # the hub
+  make_pie_wedge $layer1 \
+      [expr $bearing_radius] [expr $bearing_radius + $width] 0 180
+  make_pie_wedge $layer1 \
+      [expr $bearing_radius] [expr $bearing_radius + $width] 180 360
+
+  set angle [expr 360.0 / $rotors]
+  set rotor_overlap [expr $overlap * 2.0 / 3]
+  for {set i 0} {$i < $rotors} {incr i} {
+    # the arms
+    make_rotated_rect $layer1 \
+	$bearing_radius [expr 0 - $width / 2.0] \
+	[expr $radius - 0.9 * $width] [expr $width / 2.0] \
+	[expr ($i + $rotor_overlap / 2.0) * $angle + $rotor_angle]
+    # the end
+    make_pie_wedge $layer1 \
+	[expr $radius - $width] $radius \
+	[expr $i * $angle + $rotor_angle] \
+	[expr ($i + $rotor_overlap) * $angle + $rotor_angle]
+  }
+
+  # make the rotor cap
+  make_pie_wedge $layer2 \
+      0 [expr $bearing_radius + $width/3.0] 0 360
+
+  # make contact to the rotor cap
+  make_pie_wedge $layer3 \
+      0 [expr 0.8 * $bearing_radius] 0 360
+
+  return "$stators:$rotors motor"
+}
+
+
+proc gcell_make_props_motor {prop_list} {
+
+  if {[set bbox [get_assoc _BBOX_  $prop_list]] != ""} {
+    set prop_list [rm_assoc _BBOX_ $prop_list]
+
+    # get max width of square bbox
+    setl {x1 y1 x2 y2} $bbox
+    set max [max [expr $x2 - $x1] [expr $y2 - $y1]]
+
+    set radius [get_assoc radius $prop_list]
+    set gap [get_assoc gap $prop_list]
+    set width [get_assoc width $prop_list]
+
+    set old_max [expr 2 * ($radius + 3*$gap + 2*$width)]
+
+    # scale everything linearly
+    set scale [expr $max / $old_max]
+
+    set prop_list \
+	[put_assoc [uusnap [expr [get_assoc radius $prop_list] * $scale]] \
+			radius $prop_list]
+
+    set prop_list \
+	[put_assoc [uusnap [expr [get_assoc gap $prop_list] * $scale]] \
+			gap $prop_list]
+
+    set prop_list \
+	[put_assoc [uusnap [expr [get_assoc width $prop_list] * $scale]] \
+			width $prop_list]
+
+    set prop_list \
+	[put_assoc [uusnap [expr [get_assoc bearing_radius $prop_list] * $scale]] \
+			bearing_radius $prop_list]
+
+  }
+
+  return $prop_list
+}
+
+
+proc make_pie_wedge {layer inside_radius outside_radius start_angle end_angle {sides_per_degree 0.25}} -desc {
+  make a wedge of a pie.  angles in degrees
+} {
+
+  if {$start_angle > $end_angle} {
+    set end_angle [expr $end_angle + 360]
+  }
+
+  # munge this so the side are spaced correctly
+  set angle [expr ($end_angle - $start_angle) / \
+		 round(($end_angle - $start_angle) * $sides_per_degree)]
+
+  set convert [expr 3.14159265 / 180]
+
+  set inside ""
+  set outside ""
+
+  set end_angle [expr $end_angle + $angle/2.0]
+
+  for {set i $start_angle} {$i <= $end_angle} {set i [expr $i + $angle]} {
+    set theta [expr $i * $convert]
+
+    # pat changed: this is not correct:
+    #lappend inside [list \
+	[expr $inside_radius * cos($theta)] \
+	[expr $inside_radius * sin($theta)]]
+
+    # Note: x and y are reversed here!
+    lappend inside \
+	[expr $inside_radius * sin($theta)] \
+	[expr $inside_radius * cos($theta)]
+
+    lappend outside \
+	[expr $outside_radius * cos($theta)] \
+	[expr $outside_radius * sin($theta)]
+  }
+
+  if {$inside_radius == 0} {
+    if {($end_angle - $start_angle) >= 360} {
+      # full circle
+      set coords $outside
+    } else {
+      # piece o' pie
+      set coords [concat $outside 0 0]
+    }
+
+  } else {
+    set coords [concat $outside [lreverse $inside]]
+  }
+
+  eval gcell_polygon $layer $coords
+}
+
+
+proc make_rotated_rect {layer x1 y1 x2 y2 angle} -desc {
+  rotate a rectangle around origin by given angle in degrees
+} {
+
+  set angle [expr $angle * 3.14159265 / 180]
+
+  set coords ""
+  eval lappend coords [_rotate_point $x1 $y1 $angle]
+  eval lappend coords [_rotate_point $x2 $y1 $angle]
+  eval lappend coords [_rotate_point $x2 $y2 $angle]
+  eval lappend coords [_rotate_point $x1 $y2 $angle]
+
+  eval gcell_polygon $layer $coords
+}
+
+
+proc _rotate_point {x y angle} {
+
+  if {$x == 0 && $y == 0} {
+    # special case
+    return "$x $y"
+  }
+
+  set r [expr sqrt($x * $x + $y * $y)]
+
+  # what is the current angle
+  set theta [expr atan2($y,$x)]
+
+  return [list \
+	      [uusnap [expr $r * cos($theta + $angle)]] \
+	      [uusnap [expr $r * sin($theta + $angle)]] \
+	     ]
+}
+
+
+# now define it and give default arguments
+
+define_gcell motor \
+    [list \
+	 "stators 6 -number -incr 3" \
+	 "radius 50" \
+	 "gap 1" \
+	 "bearing_radius 5" \
+	 "width 10" \
+	 "overlap 0.6" \
+	 "rotor_angle 0 -number" \
+     ]
+
+
+
+
+
+
+
+# The fun stuff
+
+proc _spin_it {} {
+
+  global _SPIN
+
+  # find all of the selected motors
+  set names ""
+  foreach list [split [sel_what cells] \n] {
+    set name [lindex $list 0]
+    if {[string first "\#motor" $name] == 0} {
+      # this is one
+      lappend names $name
+    }
+  }
+
+  if {$names == ""} {
+    puts "Aborting, must select one or more motors to spin."
+    return
+  }
+
+  set save_box [lay_box]
+  
+  if {![info exists _SPIN(status)]} {
+    set _SPIN(status) go
+  }
+
+  puts "Start spinning ..."
+
+  set angle 0
+  while {$_SPIN(status) == "go"} {
+
+    foreach name $names {
+      edit_gcell_props $name -rotor_angle $angle
+    }
+    
+    :select clear
+    eval lay_box $save_box
+
+    set angle [expr $angle + 30]
+    if {$angle >= 360} {
+      set angle [expr $angle - 360]
+    }
+
+    update
+
+    # compute speed
+    set speed [expr (31 - $_SPIN(speed)) * (31 - $_SPIN(speed))]
+    after $speed
+
+    set save_box [lay_box]
+  }
+
+  # reselect motors
+  foreach name $names {
+    sel_cell -more $name
+  }
+  eval lay_box $save_box
+}
+
+
+# Note: this namespace export is required because this tcl .maxg file 
+# is created inside a namespace specific to this gcell, but we
+# want to call proc spin from the global namespace
+namespace export spin
+proc spin {} {
+
+  global _SPIN
+
+  set _SPIN(speed) 50
+
+  set w .spin
+  catch {destroy $w}
+
+  # TOPLEVEL
+  toplevel $w -borderwidth 0
+  wm geometry $w "+0+200"
+  wm title $w "Spin Control"
+
+  # make a slider for the speed
+  frame $w.speed
+  label $w.speed.label -text speed -anchor e -width 10
+  scale $w.speed.v -orient horizontal -showvalue 0 \
+      -variable _SPIN(speed) \
+      -length 150 \
+      -from 1 \
+      -to 30 \
+      -highlightthickness 0
+
+  pack $w.speed.label $w.speed.v -side left -pady 8
+  pack $w.speed -side top
+
+  frame $w.buttons
+
+  # Note: the namespace current is required because this tcl .maxg file 
+  # is created inside a namespace specific to this gcell, but we
+  # want to call _spin_it from the global namespace
+  button $w.go -text "Go" \
+      -padx 2 -pady 2 -command "set _SPIN(status) go ; [namespace current]::_spin_it"
+
+  button $w.stop -text "Stop" \
+      -padx 2 -pady 2 -command "set _SPIN(status) stop ; puts {stopped.}"
+
+  button $w.quit -text "Quit" \
+      -padx 2 -pady 2 -command "set _SPIN(status) stop ; destroy $w ; puts {stopped.}"
+
+  pack $w.go $w.stop $w.quit -side left \
+      -in $w.buttons -padx 4m -ipadx 2m -pady 1m -expand 1
+
+  pack $w.buttons -side bottom
+}

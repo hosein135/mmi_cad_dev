@@ -1,0 +1,638 @@
+# This is a generator for multiplier partial product generation logic.
+
+proc NAME_ppg args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned"} {B "Unsigned"} {Algorithm "Simple"} {ReduceInputLoad "N"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # NBITS_A
+  set nom [format "ppg_%d" $NBITS_A]
+
+  # A
+  if {[string toupper $A] == "SIGNED"} {
+    set nom [format "%sSx" $nom]
+  }
+  if {[string toupper $A] == "UNSIGNED"} {
+    set nom [format "%sUx" $nom]
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set nom [format "%sBx" $nom]
+  }
+
+  # NBITS_B
+  set nom [format "%s%d" $nom $NBITS_B]
+
+  # B
+  if {[string toupper $B] == "SIGNED"} {
+    set nom [format "%sS_" $nom]
+  }
+  if {[string toupper $B] == "UNSIGNED"} {
+    set nom [format "%sU_" $nom]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set nom [format "%sB_" $nom]
+  }
+
+  # Algorithm
+  if {[string toupper $Algorithm] == "SIMPLE"} {
+    set nom [format "%sS" $nom]
+  }
+
+  # ReduceInputLoad
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # HalfHeight
+  if {[string toupper $HalfHeight] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # bitslice
+  if {[string toupper $bitslice] == "Y"} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_ppg args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned"} {B "Unsigned"} {Algorithm "Simple"} {ReduceInputLoad "N"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # generate ppg_slice icon
+  set ppg_slice_name [NAME_ppg_slice -NBITS $NBITS_A -Algorithm $Algorithm -A $A -ReduceInputLoad $ReduceInputLoad]
+  generate ppg_slice $ppg_slice_name -NBITS $NBITS_A -Algorithm $Algorithm -A $A -ReduceInputLoad $ReduceInputLoad
+
+  # ppg_slice icon box info
+  setl {icon_x icon_y icon_left icon_bot icon_right icon_top} [generators_get_icon_size $ppg_slice_name]
+  
+  # ppg_slice icon port info
+  setl {count inpins outpins inoutpins} [generators_get_pin_info $ppg_slice_name]
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    set aname [format "A_%d_H" $i]
+    set port_a($i) [generators_get_pin_xy $aname $inpins]
+    set bname [format "B_%d_H" $i]
+    set port_b($i) [generators_get_pin_xy $bname $inpins]
+    set pname [format "PP%d_H" $i]
+    set port_ppg($i) [generators_get_pin_xy $pname $outpins]
+  }
+  set port_asigned [generators_get_pin_xy "ASigned_H" $inpins]
+  
+  # drawing origin
+  set base_x -500
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  if {[string toupper $HalfHeight] == "Y"} {
+    set x2 [expr $icon_x + 100]
+  } else {
+    set x2 0
+  }
+  set wire_base_x [expr $x2 + $icon_right + $ws1]
+
+  set x 0
+  set y $base_y
+  set delta_y [expr $icon_y + 2 * $ws1]
+
+  for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+    if {[string toupper $HalfHeight] == "Y"} {
+      set bitpos [expr int($bit / 2)]
+    } else {
+      set bitpos $bit
+    }
+    if {[expr ($bit % 2)] == 0} {
+      set x 0
+    } else {
+      set x $x2
+    }
+
+    if {[string toupper $bitslice] == "Y"} {
+      make $ppg_slice_name -origin "$x $y" -name "\[$bitpos\]"
+    } else {
+      make $ppg_slice_name -origin "$x $y" 
+    }
+    # record placement
+    set bsloc($bit) "$x $y"
+    set y [expr $y - $delta_y]
+  }
+
+  # finished placing the array; now wire the outputs together.
+  for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+    # find the origin of the last adder cell
+    set origin_x [lindex $bsloc($bit) 0]
+    set origin_y [lindex $bsloc($bit) 1]
+
+    for {set i 0} {$i < $NBITS_A} {incr i} {
+      set pin_x [expr $origin_x + [lindex $port_ppg($i) 0]]
+      set pin_y [expr $origin_y + [lindex $port_ppg($i) 1]]
+      set label_x [expr $pin_x + $ws1]
+      make_wire $pin_x $pin_y $label_x $pin_y
+      make name_net_s -name "\[$bit\]" -origin "$label_x $pin_y"
+      set wire_x [expr $wire_base_x + ($i + 1) * $ws1]
+      make_wire $label_x $pin_y $wire_x $pin_y
+      if {$bit > 0} {
+	make_wire $wire_x $pin_y $wire_x [expr $pin_y + $delta_y]
+      } else {
+	make_wire $wire_x $pin_y [expr $wire_x + 2 * $ws1] $pin_y
+	set wname [format "PP%d_H\[%d:0\]" $i $maxresidx]
+	make output -origin "[expr $wire_x + 2 * $ws1] $pin_y" -name $wname
+      }
+    }
+  }
+
+
+  # now hook up the multiplier inputs
+  # draw the wires first
+  set wire_start_x [expr $icon_left - 6 * $ws1]
+  set wire_start_y [expr ($icon_y / 2) + 2 * $ws1]
+  set wire_length [expr ($delta_y * $NRESBITS) + (2 * $ws1)]
+  # A_H
+  set a_x $wire_start_x
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y - $wire_length]
+  make_wire $wire_start_x $wire_start_y [expr $wire_start_x - $ws1] $wire_start_y
+  make input -name "A_H\[$maxaidx:0\]" -origin "[expr $wire_start_x - $ws1] $wire_start_y"
+
+  # B_H
+  set wire_start_x [expr $wire_start_x + $ws1]
+  set b_x $wire_start_x
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y - $wire_length]
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y + $ws1]
+  make_wire $wire_start_x [expr $wire_start_y + $ws1] [expr $wire_start_x - $ws1] [expr $wire_start_y + $ws1] 
+  make input -name "B_H\[$maxbidx:0\]" -origin "[expr $wire_start_x - $ws1] [expr $wire_start_y + $ws1]"
+
+  # ground
+  set wire_start_x [expr $wire_start_x + $ws1]
+  set gnd_x $wire_start_x
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y - $wire_length]
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y + $ws1]
+  make global -name gnd -origin "$wire_start_x [expr $wire_start_y + $ws1]"
+
+  # hook up A_H (multiplier) inputs
+  # algorithm:  connect A[0] to A[0], A[1] to A[1], etc.; repeat for each bit position
+  for {set i 0} {$i < $NRESBITS} {incr i} {
+    set origin_x [lindex $bsloc($i) 0]
+    set origin_y [lindex $bsloc($i) 1]
+    for {set j 0} {$j < $NBITS_A} {incr j} {
+      set anet_x [expr $origin_x + [lindex $port_a($j) 0]]
+      set anet_y [expr $origin_y + [lindex $port_a($j) 1]]
+      set label_x [expr $anet_x - $ws1]
+      make_wire $anet_x $anet_y $label_x $anet_y
+      make name_net_s -name "\[$j\]" -origin "$label_x $anet_y"
+      make_wire $label_x $anet_y $a_x $anet_y
+    }
+  }
+
+  # add nandbuf cells to condition the sign extended B_H bits if needed
+  if {[string toupper $B] == "BOTH"} {
+    if {[string toupper $HalfHeight] == "Y"} {
+      set x [expr $a_x - 2 * $icon_x - 100]
+      set x2 [expr $x + $icon_x + 100]
+    } else {
+      set x [expr $a_x - $icon_x]
+      set x2 $x 
+    }
+    set label_x [expr $x2 + $icon_right + $ws1]
+    # place the input control wire
+    set bsigned_x [expr $x + $icon_left - $ws1]
+    make_wire $bsigned_x $wire_start_y $bsigned_x [expr $wire_start_y - $wire_length]
+    make_wire $bsigned_x $wire_start_y $bsigned_x [expr $wire_start_y + $ws1]
+    make input -origin "$bsigned_x [expr $wire_start_y + $ws1]" -name "BSigned_H" -orient R270
+
+    # figure out how many nandbufs are needed per bit position, and place them
+    for {set j $NBITS_B} {$j < $NRESBITS} {incr j} {
+      if {[string toupper $HalfHeight] == "Y"} {
+	set bitpos [expr int($j / 2)]
+      } else {
+	set bitpos $j
+      }
+      if {[expr ($j % 2)] == 0} {
+	set nb_origin_x $x
+      } else {
+	set nb_origin_x $x2
+      }
+      set numbufs [expr ($j - $NBITS_B) + 1]
+      set origin_y [lindex $bsloc($j) 1]
+      set nname [NAME_nandbuf -NBITS $numbufs -IconHeight $NBITS_A -ReduceInputLoad $ReduceInputLoad]
+      generate nandbuf $nname -NBITS $numbufs -IconHeight $NBITS_A -ReduceInputLoad $ReduceInputLoad
+      make $nname -origin "$nb_origin_x $origin_y" -name "\[$bitpos\]"
+
+      # get pin info
+      setl {count inpins outpins inoutpins} [generators_get_pin_info $nname]
+      
+      # wire up the B_H input
+      setl {pin_x pin_y} [generators_get_pin_xy "In1_H" $inpins]
+      set pin_x [expr $nb_origin_x + $pin_x]
+      set pin_y [expr $origin_y + $pin_y]
+      make_wire $b_x $pin_y $label_x $pin_y
+      make name_net_s -name "\[$maxbidx\]" -origin "$label_x $pin_y"
+      make_wire $label_x $pin_y $pin_x $pin_y
+
+      # wire up the BSigned_H input
+      setl {pin_x pin_y} [generators_get_pin_xy "In0_H" $inpins]
+      set pin_x [expr $nb_origin_x + $pin_x]
+      set pin_y [expr $origin_y + $pin_y]
+      make_wire $pin_x $pin_y $bsigned_x $pin_y
+
+      # record the origin
+      set nbloc($j) "$nb_origin_x $origin_y"
+    }
+  }
+
+
+  # hook up B_H (multiplicand) or GND to the other nand input
+  # algorithm:  0...0||B_H
+  #             0...0||B_H||0
+  #             0...0||B_H||00
+  #             ...
+  #             B_H||0...0
+  # variant:  if B is Signed, replace the upper 0's with the msb of B_H
+  for {set j 0} {$j < $NBITS_A} {incr j} {
+    # init the algorithm variables
+    set zero_trail $j
+    set zero_lead [expr $NBITS_B + $j]
+    set bidx 0
+
+    for {set i 0} {$i < $NRESBITS} {incr i} {
+      set origin_x [lindex $bsloc($i) 0]
+      set origin_y [lindex $bsloc($i) 1]
+      set bnet_x [expr $origin_x + [lindex $port_b($j) 0]]
+      set bnet_y [expr $origin_y + [lindex $port_b($j) 1]]
+      set label_x [expr $bnet_x - 2* $ws1]
+      if {$i < $zero_trail} {
+	# connect nand input to gnd
+	make_wire $bnet_x $bnet_y $gnd_x $bnet_y
+      } elseif {$i >= $zero_lead} {
+	if {[string toupper $B] == "SIGNED"} {
+	  # connect nand input to msb of B_H
+	  make_wire $bnet_x $bnet_y $label_x $bnet_y
+	  make name_net_s -name "\[$maxbidx\]" -origin "$label_x $bnet_y" 
+	  make_wire $label_x $bnet_y $b_x $bnet_y
+	} 
+	if {[string toupper $B] == "BOTH"} {
+	  # connect nand input to output of nandbuf cell
+	  set nb_origin_x [lindex $nbloc($i) 0]
+	  set nbpin_x [expr $nb_origin_x + $icon_right]
+	  set nblabel_x [expr $nbpin_x + $ws1]
+	  make_wire $bnet_x $bnet_y $nblabel_x $bnet_y
+	  set bname [format "NB%d_%d_H\[%d\]" $j $i $maxbidx]
+	  make name_net_s -name $bname -origin "$nblabel_x $bnet_y"
+	  make_wire $nblabel_x $bnet_y $nbpin_x $bnet_y
+	}
+	if {[string toupper $B] == "UNSIGNED"} {
+	  # connect nand input to gnd
+	  make_wire $bnet_x $bnet_y $gnd_x $bnet_y
+	}
+      } else {
+	# connect nand input to B_H
+	make_wire $bnet_x $bnet_y $label_x $bnet_y
+	make name_net_s -name "\[$bidx\]" -origin "$label_x $bnet_y" 
+	make_wire $label_x $bnet_y $b_x $bnet_y
+	incr bidx
+      }
+      set y [expr $y - $delta_y]
+    }
+  }
+
+  # hook up the ASigned_H wire if needed
+  if {[string toupper $A] == "BOTH"} {
+    set asigned_x [expr $gnd_x + $ws1]
+    make_wire $asigned_x $wire_start_y $asigned_x [expr $wire_start_y - $wire_length]
+    make_wire $asigned_x $wire_start_y $asigned_x [expr $wire_start_y + $ws1]
+    make input -origin "$asigned_x [expr $wire_start_y + $ws1]" -name "ASigned_H" -orient R270
+    for {set i 0} {$i < $NRESBITS} {incr i} {
+      set origin_x [lindex $bsloc($i) 0]
+      set origin_y [lindex $bsloc($i) 1]
+      set anet_x [expr $origin_x + [lindex $port_asigned 0]]
+      set anet_y [expr $origin_y + [lindex $port_asigned 1]]
+      make_wire $anet_x $anet_y $asigned_x $anet_y
+    }
+  }
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr (0 + 2 * $delta_y)]" -owner emc -version 1.3 -date 02/29/00
+
+  # force hookups
+  show_connects "" clean
+}
+
+
+
+proc ICON_ppg args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned" {radio Signed Unsigned Both}} {B "Unsigned" {radio Signed Unsigned Both}} {Algorithm "Simple"} {ReduceInputLoad "N"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # don't let the user get too crazy
+  if {$NRESBITS > 128} {
+    error "ERROR: NBITS_A + NBITS_B = $NRESBITS not supported"
+  }
+  if {$NBITS_A < 1} {
+    error "ERROR: NBITS_A ($NBITS_A) not supported"
+  }
+  if {$NBITS_B < 1} {
+    error "ERROR: NBITS_B ($NBITS_B) not supported"
+  }
+  # check for acceptable response on A query
+  if {([string toupper $A] != "SIGNED") &&
+      ([string toupper $A] != "UNSIGNED") &&
+      ([string toupper $A] != "BOTH")} {
+    error "ERROR: A property ($A) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on B query
+  if {([string toupper $B] != "SIGNED") &&
+      ([string toupper $B] != "UNSIGNED") &&
+      ([string toupper $B] != "BOTH")} {
+    error "ERROR: B property ($B) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on Algorithm query
+  if {([string toupper $Algorithm] != "SIMPLE")} {
+    error "ERROR: Algorithm property ($Algorithm) must be Simple"
+  }
+  if {[string toupper $Algorithm] == "SIMPLE"} {
+    set alg_name "Simple" 
+  }
+  # check for acceptable response on ReduceInputLoad query
+  if {([string toupper $ReduceInputLoad] != "Y") && ([string toupper $ReduceInputLoad] != "N")} {
+    error "ERROR: ReduceInputLoad property ($ReduceInputLoad) must be Y or N"
+  }
+  # check for acceptable response on HalfHeight query
+  if {([string toupper $HalfHeight] != "Y") && ([string toupper $HalfHeight] != "N")} {
+    error "ERROR: HalfHeight property ($HalfHeight) must be Y or N"
+  }
+  # check for acceptable response on bitslice query
+  if {([string toupper $bitslice] != "Y") && ([string toupper $bitslice] != "N")} {
+    error "ERROR: bitslice property ($bitslice) must be Y or N"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # figure out icon size
+  set cs_spacer 100
+  set pin_spacer 40
+  
+  # how many output pins?
+  set pincount $NBITS_A
+
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]  
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+
+  # inputs
+  icon_term -type input -origin "$icon_left -20" -name "A_H\[$maxaidx:0\]"
+  icon_property -origin "$icon_left_label -20" -size small -label A_H
+  icon_property -origin "$icon_left_label -10" -size small -label "\[$maxaidx:0\]"
+  icon_term -type input -origin "$icon_left 20" -name "B_H\[$maxbidx:0\]"
+  icon_property -origin "$icon_left_label 20" -size small -label B_H
+  icon_property -origin "$icon_left_label 30" -size small -label "\[$maxbidx:0\]"
+  if {[string toupper $A] == "BOTH"} {
+    icon_term -type input -origin "[expr $icon_left + $cs_spacer] $icon_bot" -orient R270 -name "ASigned_H"
+    icon_property -origin "[expr $icon_left + $cs_spacer] [expr $icon_bot - 20]" -size small -anchor center -label ASigned_H
+  }
+  if {[string toupper $B] == "BOTH"} {
+    icon_term -type input -origin "[expr $icon_left + $cs_spacer + $pin_spacer] $icon_bot" -orient R270 -name "BSigned_H"
+    icon_property -origin "[expr $icon_left + $cs_spacer + $pin_spacer] [expr $icon_bot - 10]" -size small -anchor center -label BSigned_H
+  }
+
+  # outputs
+  set pin_y [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    set pin_name [format "PP%d_H" $i]
+    set pin_idx [format "\[%d:0\]" $maxresidx]
+    set pname [format "%s%s" $pin_name $pin_idx]
+    icon_term -type output -origin "$icon_right $pin_y" -name $pname
+    icon_property -origin "$icon_right_label $pin_y" -size small -label $pin_name -anchor e
+    if {$i == 0} {
+      icon_property -origin "$icon_right_label [expr $pin_y + 20]" -size small -label $pin_idx -anchor e
+    }
+    set pin_y [expr $pin_y - $pin_spacer]
+  }
+
+  # text
+  set lname [format "%dx%dbit" $NBITS_A $NBITS_B]
+  icon_property -origin {0 -80} -size large -anchor center -label $lname
+  icon_property -origin {0 0} -size large -anchor center -label Multiplier
+  set lname [format "%s PPG" $alg_name]
+  icon_property -origin {0 40} -size large -anchor center -label $lname
+  icon_property -origin {0 80} -size large -anchor center -label Logic
+  if {[string toupper $A] == "UNSIGNED"} {
+    set as "U"
+  }
+  if {[string toupper $A] == "SIGNED"} {
+    set as "S"
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set as "U,S"
+  }
+  if {[string toupper $B] == "UNSIGNED"} {
+    set bs "U"
+  }
+  if {[string toupper $B] == "SIGNED"} {
+    set bs "S"
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set bs "U,S"
+  }
+  set lname [format "%s x %s" $as $bs]
+  icon_property -origin {0 -40} -size large -anchor center -label $lname
+  set mods ""
+  if {[string toupper $HalfHeight] == "Y"} {
+    set mods " HH "
+  }
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    set mods [format "%s%s" $mods " R "]
+  }
+  icon_property -origin {0 120} -anchor center -label $mods
+
+
+  # junk
+  set junk_y [expr $icon_bot + 200]
+  icon_property -origin "0 $junk_y" -type user -name name
+  icon_property -origin "0 [expr $junk_y + 20]" -type user -name M
+  icon_property -origin "0 [expr $junk_y + 40]" -type user -name dpc
+  # this property makes a generator pop up in "Schematic" mode rather than "Verilog" mode
+  icon_property -origin "0 [expr $junk_y + 60]" -type fixed -name netlist_level -text 2000
+  icon_special -type sccs_title_bar -origin "0 [expr $junk_y + 160]" -owner emc -version 1.3 -date 02/29/00
+
+
+  # generate verilog property
+  set fname [NAME_ppg -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -Algorithm $Algorithm -ReduceInputLoad $ReduceInputLoad -HalfHeight $HalfHeight -bitslice $bitslice]
+
+  set pnames [format ".A_H(\$\{A_H\[%d:0\]\}), .B_H(\$\{B_H\[%d:0\]\})" $maxaidx $maxbidx]  
+  if {[string toupper $A] == "BOTH"} {
+    set pnames [format "%s, .ASigned_H(\$\{ASigned_H\})" $pnames]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set pnames [format "%s, .BSigned_H(\$\{BSigned_H\})" $pnames]
+  }
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    set pnames [format "%s, .PP%d_H(\$\{PP%d_H\[%d:0\]\})" $pnames $i $i $maxresidx]
+  }
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin "0 [expr $junk_y + 80]" -type fixed -name verilog -text $vprop  
+
+  # behavioral verilog code
+  set filename "$fname.vb"
+  if {[catch "open $filename w" FILE_ID]} {
+    puts "WARNING: Couldn't open file $filename"
+  }
+
+  # header stuff
+  puts $FILE_ID [format "// Behavioral verilog for partial product generator %s:" $fname]
+  puts $FILE_ID "//   NBITS_A = $NBITS_A"
+  puts $FILE_ID "//   NBITS_B = $NBITS_B"
+  puts $FILE_ID "//   A = $A"
+  puts $FILE_ID "//   B = $B"
+  puts $FILE_ID "//   Algorithm = $Algorithm"
+  puts $FILE_ID "//   ReduceInputLoad = $ReduceInputLoad"
+  puts $FILE_ID "//   HalfHeight = $HalfHeight"
+  puts $FILE_ID "//   bitslice = $bitslice"
+
+  set ppnames ""
+  if {[string toupper $A] == "BOTH"} {
+    set ppnames [format "%s, ASigned_H" $ppnames]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set ppnames [format "%s, BSigned_H" $ppnames]
+  }
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    set ppnames [format "%s, PP%d_H" $ppnames $i]
+  }
+  puts $FILE_ID [format "module %s (A_H, B_H%s);\n" $fname $ppnames]
+
+  set ppbitrange [format "\[%d:0\]" $maxresidx]
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    puts $FILE_ID [format "\toutput %s\tPP%d_H;" $ppbitrange $i]
+  }
+  
+  puts $FILE_ID [format "\tinput \[%d:0\]\tA_H;" $maxaidx]
+  puts $FILE_ID [format "\tinput \[%d:0\]\tB_H;" $maxbidx]
+  if {[string toupper $A] == "BOTH"} {
+    puts $FILE_ID [format "\tinput      \tASigned_H;"]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    puts $FILE_ID [format "\tinput      \tBSigned_H;"]
+  }
+
+  puts $FILE_ID [format "\n\tparameter\tinitial_value = 'b 0;"]
+  puts $FILE_ID [format "\tparameter\tdelay = 0.1;\n"]
+
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    puts $FILE_ID [format "\treg %s\tPP%d_H;" $ppbitrange $i]
+  }
+  puts $FILE_ID [format "\treg %s\tbtemp;" $ppbitrange]
+
+  # initialize
+  puts $FILE_ID [format "\n\tinitial"]
+  puts $FILE_ID [format "\t  begin"]
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    puts $FILE_ID [format "\t    PP%d_H = initial_value;" $i]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+  # execute
+  set ppnames ""
+  if {[string toupper $A] == "BOTH"} {
+    set ppnames [format "%s or ASigned_H" $ppnames]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set ppnames [format "%s or BSigned_H" $ppnames]
+  }
+  puts $FILE_ID [format "\n\talways @(A_H or B_H%s)" $ppnames]
+  puts $FILE_ID [format "\t  begin"]
+
+  for {set i 0} {$i < $NBITS_A} {incr i} {
+    set top_bits [expr $NRESBITS - $NBITS_A - $i]
+    puts $FILE_ID [format "\n\t    if (A_H\[%d\])" $i]
+    puts $FILE_ID [format "\t      begin"]
+
+    if {$top_bits == 0} {
+      set top_string_signed ""
+      set top_string_unsigned ""
+    } else {
+      set top_string_signed [format "%d\{B_H\[%d\]\}," $top_bits $maxbidx]
+      set top_string_unsigned [format "%d'b0," $top_bits]
+    }
+    if {$i == 0} {
+      set bot_string ""
+    } else {
+      set bot_string [format ",%d'b0" $i]
+    }
+    set bsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_signed $maxbidx $bot_string]
+    set bunsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_unsigned $maxbidx $bot_string]
+
+    if {[string toupper $B] == "SIGNED"} {
+      puts $FILE_ID [format "\t        btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+    }
+    if {[string toupper $B] == "UNSIGNED"} {
+      puts $FILE_ID [format "\t        btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+    }
+    if {[string toupper $B] == "BOTH"} {
+      puts $FILE_ID [format "\t        if (BSigned_H)"]
+      puts $FILE_ID [format "\t          btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+      puts $FILE_ID [format "\t        else"]
+      puts $FILE_ID [format "\t          btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+    }
+
+    if {$i == $maxaidx} {
+      if {[string toupper $A] == "SIGNED"} {
+	puts $FILE_ID [format "\t        PP%d_H\[%d:0\] = ~btemp\[%d:0\];" $i $maxresidx $maxresidx]
+      }
+      if {[string toupper $A] == "UNSIGNED"} {
+	puts $FILE_ID [format "\t        PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+      }
+      if {[string toupper $A] == "BOTH"} {
+	puts $FILE_ID [format "\t        if (ASigned_H)"]
+	puts $FILE_ID [format "\t          PP%d_H\[%d:0\] = ~btemp\[%d:0\];" $i $maxresidx $maxresidx]
+	puts $FILE_ID [format "\t        else"]
+	puts $FILE_ID [format "\t          PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+      }
+    } else {
+      puts $FILE_ID [format "\t        PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+    }
+
+    puts $FILE_ID [format "\t      end"]
+    puts $FILE_ID [format "\t    else"]
+    puts $FILE_ID [format "\t      PP%d_H\[%d:0\] = 'b0;" $i $maxresidx]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+  # done
+  puts $FILE_ID [format "\nendmodule\t\t//%s" $fname]
+  close $FILE_ID
+}

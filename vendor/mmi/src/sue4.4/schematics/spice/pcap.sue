@@ -1,0 +1,16 @@
+# SUE version MMI_SUE3.0
+
+proc ICON_pcap args {
+  icon_setup $args {{origin {0 0}} {orient R0} {capacitance 10fF}}
+  icon_term -type inout -origin {0 0} -orient RY -name t1
+  icon_property -origin {-90 90} -type user -name capacitance -default 10fF
+  icon_property -origin {-110 130} -type fixed -name spice -text {[unique_name CP] $t1 gnd $capacitance}
+  icon_property -origin {-110 160} -type fixed -name sim -text {C $t1 gnd [expr 1.0e15*[parse_pp_number $capacitance]]}
+  icon_line 0 20 0 15 -5 15 5 15
+  icon_line 0 10 0 0
+  icon_line -5 20 5 20 0 25 -5 20
+  icon_line -5 10 5 10
+  icon_property -origin {10 5} -size small -label pcap
+  icon_property -origin {10 20} -size small -label {$capacitance}
+}
+

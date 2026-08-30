@@ -1,0 +1,111 @@
+# This does some tests on the proc_redef stuff.
+# Start tclsh and source this file.
+# It will print an error if something is wrong.
+
+source proc_redef.tcl
+# source this for setl and assert.
+source share_utils.tcl
+
+
+proc myproc {{-a} {-b def} {-point 0 0} c d {e cdef}} {
+  setl {x y} $point
+  return "a=$a b=$b c=$c d=$d e=$e x=$x y=$y"
+}
+
+set result [myproc this that]
+assert {$result == "a=0 b=def c=this d=that e=cdef x=0 y=0"}
+
+set result [myproc -a -b new -point 1 2 this that those]
+assert {$result == "a=1 b=new c=this d=that e=those x=1 y=2"}
+set result [myproc -a -- -b c]
+assert {$result == "a=1 b=def c=-b d=c e=cdef x=0 y=0"}
+set result [myproc -unrecognized -a b]
+assert {$result == "a=0 b=def c=-unrecognized d=-a e=b x=0 y=0"}
+
+proc bad {{-b def}} {
+}
+
+proc bad2 {{-b def} {x}} {
+}
+
+
+# These should fail:
+assert {[catch {myproc a}]}
+assert {[catch {myproc a b c d}]}
+assert {[catch {bad -b}]}
+assert {[catch {bad2 -b}]}
+
+
+proc proc1 {} -desc {
+ this is the proc1 desc
+} -doc {
+ this is the proc1 doc
+} {
+}
+
+proc proc2 {} -desc {
+ this is the proc2 desc
+} -doc {
+ this is the proc2 doc
+} {
+}
+
+assert {$PROC_DOCUMENTATION(proc1,desc) == "this is the proc1 desc"}
+assert {$PROC_DOCUMENTATION(proc1,doc) == "this is the proc1 doc"}
+assert {$PROC_DOCUMENTATION(proc2,desc) == "this is the proc2 desc"}
+assert {$PROC_DOCUMENTATION(proc2,doc) == "this is the proc2 doc"}
+
+assert {[_proc_doc_usage myproc] == {myproc [-a] [-b value] [-point value value] c d [e]}}
+assert {[_proc_doc_usage bad] == {bad [-b value]}}
+assert {[_proc_doc_usage proc1] == "proc1"}
+
+
+# make sure null options are null!
+proc nulltest {{-a ""} {-b "" ""} {c ""}} {
+  if {$a != ""} {
+    puts "a is not null!"
+  }
+  setl {x y} $b
+  if {$x != ""} {
+    puts "x is not null!"
+  }
+  if {$c != ""} {
+    puts "c is not null!"
+  }
+}
+
+nulltest
+
+
+# Was using these procs for some speed tests.
+
+proc foo {{-binary} {-option default} {-point 0 0} {-area "a 1" "a 2" a3 a4} a b c} {
+}
+
+
+proc foo3 {args} {
+  call_keyword {{-binary} {-option default}} $args
+}
+
+proc foo4 {args} {
+  set a [lindex $args 0]
+  set b [lindex $args 1]
+  set c [lindex $args 2]
+}
+
+
+
+# Try a namespace
+
+namespace eval mynamespace {
+    proc foo {{-anoption} a} -desc {
+	a private foo
+    } {
+	return [list $anoption $a]
+    }
+}
+
+assert {[mynamespace::foo xx] == [list 0 xx]}
+assert {[mynamespace::foo -anoption xx] == [list 1 xx]}
+
+assert {$PROC_DOCUMENTATION(::mynamespace::foo,desc) == "a private foo"}

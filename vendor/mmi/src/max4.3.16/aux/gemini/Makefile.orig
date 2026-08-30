@@ -1,0 +1,176 @@
+#$Id: Makefile,v 2.7 1993/12/17 04:48:51 mckenzie Exp mckenzie $
+UVT = ../..
+B = $(UVT)/bin
+MAN = $(UVT)/man
+ALL = gemini
+#CC = cc
+CC = gcc
+
+# Use for released version
+#CFLAGS = -DASSERTIONS -O
+#CFLAGS = -DASSERTIONS -O3
+# Use for development
+CFLAGS = -DASSERTIONS -g -DDEBUG
+
+SRC= match.c hash.c readgraph.c gemini.c queue.c alloc.c simnet.c \
+	simread.c simalloc.c properties.c equate.c nxtarg.c skipto.c \
+	chains.c deduce.c fingers.c userdef.c
+OBJ= match.o hash.o readgraph.o gemini.o queue.o alloc.o simnet.o \
+	simread.o simalloc.o properties.o equate.o nxtarg.o skipto.o \
+	chains.o deduce.o fingers.o userdef.o
+
+all:	$(ALL)
+
+tags:	gemini.h
+	ctags *.c *.h
+
+gemini:		$(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -lm -o gemini
+
+clean:
+	/bin/rm -f $(OBJ) gemini *~ *.bak
+
+install: all
+	/bin/cp gemini $B
+	/bin/cp gemini.1i $(MAN)/man1
+
+depend:
+	cc -M $(CFLAGS) $(SRC) | sed '/\/usr\/include\//d' >makedep
+	cp Makefile Makefile.bak
+	(echo '/^# DEPENDENCIES/+2,$$d'; \
+	  echo '$$r makedep'; \
+	  echo 'w'; echo 'q' ) | ed - Makefile
+	rm makedep
+
+# DEPENDENCIES - Don't edit anything below this line.
+
+match.o: match.c
+match.o: ./gemini.h
+match.o: ./queue.h
+match.o: ./properties.h
+match.o: ./graph.h
+match.o: ./debug.h
+match.o: ./simread.h
+match.o: ./oldprotos.h
+hash.o: hash.c
+hash.o: ./gemini.h
+hash.o: ./queue.h
+hash.o: ./properties.h
+hash.o: ./graph.h
+hash.o: ./debug.h
+hash.o: ./simread.h
+hash.o: ./oldprotos.h
+readgraph.o: readgraph.c
+readgraph.o: ./gemini.h
+readgraph.o: ./queue.h
+readgraph.o: ./properties.h
+readgraph.o: ./graph.h
+readgraph.o: ./debug.h
+readgraph.o: ./simread.h
+readgraph.o: ./oldprotos.h
+gemini.o: gemini.c
+gemini.o: ./gemini.h
+gemini.o: ./queue.h
+gemini.o: ./properties.h
+gemini.o: ./graph.h
+gemini.o: ./debug.h
+gemini.o: ./simread.h
+gemini.o: ./oldprotos.h
+gemini.o: ./gemvars.h
+queue.o: queue.c
+queue.o: ./gemini.h
+queue.o: ./queue.h
+queue.o: ./properties.h
+queue.o: ./graph.h
+queue.o: ./debug.h
+queue.o: ./simread.h
+queue.o: ./oldprotos.h
+alloc.o: alloc.c
+alloc.o: ./gemini.h
+alloc.o: ./queue.h
+alloc.o: ./properties.h
+alloc.o: ./graph.h
+alloc.o: ./debug.h
+alloc.o: ./simread.h
+alloc.o: ./oldprotos.h
+simnet.o: simnet.c
+simnet.o: ./gemini.h
+simnet.o: ./queue.h
+simnet.o: ./properties.h
+simnet.o: ./graph.h
+simnet.o: ./debug.h
+simnet.o: ./simread.h
+simnet.o: ./oldprotos.h
+simread.o: simread.c
+simread.o: ./gemini.h
+simread.o: ./queue.h
+simread.o: ./properties.h
+simread.o: ./graph.h
+simread.o: ./debug.h
+simread.o: ./simread.h
+simread.o: ./oldprotos.h
+simalloc.o: simalloc.c
+simalloc.o: ./gemini.h
+simalloc.o: ./queue.h
+simalloc.o: ./properties.h
+simalloc.o: ./graph.h
+simalloc.o: ./debug.h
+simalloc.o: ./simread.h
+simalloc.o: ./oldprotos.h
+properties.o: properties.c
+properties.o: ./gemini.h
+properties.o: ./queue.h
+properties.o: ./properties.h
+properties.o: ./graph.h
+properties.o: ./debug.h
+properties.o: ./simread.h
+properties.o: ./oldprotos.h
+equate.o: equate.c
+equate.o: ./gemini.h
+equate.o: ./queue.h
+equate.o: ./properties.h
+equate.o: ./graph.h
+equate.o: ./debug.h
+equate.o: ./simread.h
+equate.o: ./oldprotos.h
+nxtarg.o: nxtarg.c
+nxtarg.o: ./gemini.h
+nxtarg.o: ./queue.h
+nxtarg.o: ./properties.h
+nxtarg.o: ./graph.h
+nxtarg.o: ./debug.h
+nxtarg.o: ./simread.h
+nxtarg.o: ./oldprotos.h
+skipto.o: skipto.c
+chains.o: chains.c
+chains.o: ./gemini.h
+chains.o: ./queue.h
+chains.o: ./properties.h
+chains.o: ./graph.h
+chains.o: ./debug.h
+chains.o: ./simread.h
+chains.o: ./oldprotos.h
+deduce.o: deduce.c
+deduce.o: ./gemini.h
+deduce.o: ./queue.h
+deduce.o: ./properties.h
+deduce.o: ./graph.h
+deduce.o: ./debug.h
+deduce.o: ./simread.h
+deduce.o: ./oldprotos.h
+fingers.o: fingers.c
+fingers.o: ./gemini.h
+fingers.o: ./queue.h
+fingers.o: ./properties.h
+fingers.o: ./graph.h
+fingers.o: ./debug.h
+fingers.o: ./simread.h
+fingers.o: ./oldprotos.h
+userdef.o: userdef.c
+userdef.o: ./gemini.h
+userdef.o: ./queue.h
+userdef.o: ./properties.h
+userdef.o: ./graph.h
+userdef.o: ./debug.h
+userdef.o: ./simread.h
+userdef.o: ./oldprotos.h

@@ -1,0 +1,478 @@
+
+  **********************************************
+  *             TSMC SPICE MODEL               *
+  **********************************************
+
+    PROCESS :  0.18um LOGIC SALICIDE (1P6M, 1.8V/3.3V)
+
+    DOC. NO.:  TA-10A5-6001 (T-018-LO-SP-001)
+
+    VERSION :  1.5
+
+    DATE    :  July 1, 1999
+
+
+1) MOS MODEL :
+ 
+ A) HSPICE LEVEL 49 :
+
+    ## library files:
+
+    All models are included in file '/hspice/log018_1.l' for H97.2
+                               and  '/hspice/log018_2.l' for H98.2 & H98.4
+
+********************************************************************************
+*                                                                             
+*       SPICE model release notes for H97.2, H97.4 and H98.2 and H98.4:         
+*                                                                         
+*                                                                             
+* (1) New parameter "CALCACM" is added in the H98.2 & H98.4                    
+*                                                                             
+*
+*     In H97.2 & H97.4, the default values of AS/AD and PS/PD are zero when
+* Bsim3v3.1 model with ACM=12 is used. This results in zero junction capacitance
+* and incorrect junction leakage current, if AS/AD and PS/PD are not specified
+* in the netlist. In H98.2 & H98.4, with CALCACM >0, the default calculation of 
+* AS/AD and PS/PD will be calculated using HDIF. When CALCACM=0, the default is 
+* zero for AS/AD and PS/PD.
+*
+* (2) New parameter "VFBFLAG" is added in H98.2 & H98.4
+*
+*     In H97.2 & H97.4, The capacitance model CAPMOD=0 normally uses a
+* threshold voltage defined as Vth = vfbc + phi+ k1 * sqrt(phi - vbs), where
+* vfbc is derived from the model parameter VFBCV. In this way, the CV will not
+* track with VTH0 for corner simulation. In H98.2 and H98.4, VFBFLAG=1 uses
+* Vth=vfb + phi + k1 * sqrt(phi - vbs), where vfb is identical to the  
+* flatband voltage used in the drain current calculations. The resultant CV
+* simulation will track with change in VTH0, which is more physical for corner
+* case simulation. The VFBFLAG default value is zero.
+*
+* (3) Difference in simulation results for H97.2, H97.4 and H98.2 & H98.4
+*
+*     With VFBFLAG=1 and CALCACM=1 in H98.2/H98.4, the simulation results based
+* on ring oscillator delay indicates that the difference is less than 6% 
+* between the ring oscillator speed by using H98.2/H98.4 and that by using 
+* H97.2 & H97.4. The discrepancy is mainly due to the effect of VFBFLAG=1. 
+* By setting VFBFLAG=0, users would obtain the same results from H97.2, H97.4
+* , H98.2 and H98.4.
+*
+******************************************************************************
+******************************************************************************
+
+      1. 1.8V MOS DEVICE MODELS
+  
+        a. Normal 1.8V N/PMOS model
+
+         .lib TT : Typical model
+              SS : Slow NMOS Slow PMOS model
+              FF : Fast NMOS Fast PMOS model
+              SF : Slow NMOS Fast PMOS model
+              FS : Fast NMOS Slow PMOS model
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch.1         1.20   20.0         10.05  100.      um
+            nch.2         0.50   1.20         10.05  100.      um
+            nch.3         0.18   0.50         10.05  100.      um
+            nch.4         1.20   20.0         1.25   10.05     um
+            nch.5         0.50   1.20         1.25   10.05     um
+            nch.6         0.18   0.50         1.25   10.05     um
+            nch.7         1.20   20.0         0.55   1.25      um
+            nch.8         0.50   1.20         0.55   1.25      um
+            nch.9         0.18   0.50         0.55   1.25      um
+            nch.10        1.20   20.0         0.22   0.55      um
+            nch.11        0.50   1.20         0.22   0.55      um
+            nch.12        0.18   0.50         0.22   0.55      um
+          ----------------------------------------------------------
+            pch.1         1.20   20.0         10.05  100.      um
+            pch.2         0.50   1.20         10.05  100.      um
+            pch.3         0.18   0.50         10.05  100.      um
+            pch.4         1.20   20.0         1.25   10.05     um
+            pch.5         0.50   1.20         1.25   10.05     um
+            pch.6         0.18   0.50         1.25   10.05     um
+            pch.7         1.20   20.0         0.55   1.25      um
+            pch.8         0.50   1.20         0.55   1.25      um
+            pch.9         0.18   0.50         0.55   1.25      um
+            pch.10        1.20   20.0         0.22   0.55      um
+            pch.11        0.50   1.20         0.22   0.55      um
+            pch.12        0.18   0.50         0.22   0.55      um
+          ----------------------------------------------------------
+
+        b. 1.8V native NMOS model
+
+         .lib TT_NA : Typical 1.8V native NMOS model
+              SS_NA : Slow 1.8V native NMOS model
+              FF_NA : Fast 1.8V native NMOS model
+              SF_NA : Slow 1.8V native NMOS model
+              FS_NA : Fast 1.8V native NMOS model
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nanch        0.5     10.0         0.22   100.      um
+          ----------------------------------------------------------
+
+         The parameter HDIF listed in model card is TSMC minimum-rule value,
+         users must change this value according to their layout.
+   
+         (ps: for more information about ACM = 12, please refer to the HSPICE
+              release note. User must specify AS/AD and PS/PD in the netlist
+              to avoid zero junction capacitance and to obtain correct
+              junction leakage current.)
+
+
+      2. 3.3V MOS DEVICE MODELS
+
+         .lib TT_3V : Typical model
+              SS_3V : Slow NMOS Slow PMOS model
+              FF_3V : Fast NMOS Fast PMOS model
+              SF_3V : Slow NMOS Fast PMOS model
+              FS_3V : Fast NMOS Slow PMOS model
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch3.1         1.20   20.0         10.07  100.      um
+            nch3.2         0.50   1.20         10.07  100.      um
+            nch3.3         0.35   0.50         10.07  100.      um
+            nch3.4         1.20   20.0         1.27   10.07     um
+            nch3.5         0.50   1.20         1.27   10.07     um
+            nch3.6         0.35   0.50         1.27   10.07     um
+            nch3.7         1.20   20.0         0.57   1.27      um
+            nch3.8         0.50   1.20         0.57   1.27      um
+            nch3.9         0.35   0.50         0.57   1.27      um
+            nch3.10        1.20   20.0         0.22   0.57      um
+            nch3.11        0.50   1.20         0.22   0.57      um
+            nch3.12        0.35   0.50         0.22   0.57      um
+          ----------------------------------------------------------
+            pch3.1         1.20   20.0         10.05  100.      um
+            pch3.2         0.50   1.20         10.05  100.      um
+            pch3.3         0.30   0.50         10.05  100.      um
+            pch3.4         1.20   20.0         1.25   10.05     um
+            pch3.5         0.50   1.20         1.25   10.05     um
+            pch3.6         0.30   0.50         1.25   10.05     um
+            pch3.7         1.20   20.0         0.55   1.25      um
+            pch3.8         0.50   1.20         0.55   1.25      um
+            pch3.9         0.30   0.50         0.55   1.25      um
+            pch3.10        1.20   20.0         0.22   0.55      um
+            pch3.11        0.50   1.20         0.22   0.55      um
+            pch3.12        0.30   0.50         0.22   0.55      um
+          ----------------------------------------------------------
+             ech3          0.50   1.2          15.0   50.0      um
+          ----------------------------------------------------------
+
+       
+         .lib TT_3VNA : Typical 3.3V native NMOS model
+              SS_3VNA : Slow 3.3V native NMOS model
+              FF_3VNA : Fast 3.3V native NMOS model
+              SF_3VNA : Slow 3.3V native NMOS model
+              FS_3VNA : Fast 3.3V native NMOS model
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nanch3       1.2     10.0         0.22   100.      um
+          ----------------------------------------------------------
+
+         The parameter HDIF listed in model card is TSMC minimum-rule value,
+         users must change this value according to their layout.
+   
+         (ps: for more information about ACM = 12, please refer to the HSPICE
+              release note. User must specify AS/AD and PS/PD in the netlist
+              to avoid zero junction capacitance and to obtain correct
+              junction leakage current.)
+
+
+ B) Spectre V4.4.3 model :
+
+    All models are included in file '/SPECTRE/V443/log018.scs' for 
+    SPECTRE V4.4.3.
+
+      1. 1.8V MOS DEVICE MODELS
+  
+        a. Normal 1.8V N/PMOS model
+
+           section tt : Typical model
+                   ss : Slow NMOS Slow PMOS model
+                   ff : Fast NMOS Fast PMOS model
+                   sf : Slow NMOS Fast PMOS model
+                   fs : Fast NMOS Slow PMOS model
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch           0.18   20.0         0.22   100.      um
+          ----------------------------------------------------------
+            pch           0.18   20.0         0.22   100.      um
+          ----------------------------------------------------------
+
+        b. 1.8V native NMOS model
+
+           section tt_na : Typical 1.8V native NMOS model
+                   ss_na : Slow 1.8V native NMOS model
+                   ff_na : Fast 1.8V native NMOS model
+                   sf_na : Slow 1.8V native NMOS model
+                   fs_na : Fast 1.8V native NMOS model
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nanch        0.5     10.0         0.22   100.      um
+          ----------------------------------------------------------
+
+         The parameter HDIF listed in model card is TSMC minimum-rule value,
+         users must change this value according to their layout.
+   
+      2. 3.3V MOS DEVICE MODELS
+
+        a. 3.3V N/P MOS model
+
+         section tt_3v : Typical model
+                 ss_3v : Slow NMOS Slow PMOS model
+                 ff_3v : Fast NMOS Fast PMOS model
+                 sf_3v : Slow NMOS Fast PMOS model
+                 fs_3v : Fast NMOS Slow PMOS model
+
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nch3           0.35   20.0         0.22   100.      um
+          ----------------------------------------------------------
+            pch3           0.30   20.0         0.22   100.      um
+          ----------------------------------------------------------
+            ech3           0.50   1.2          15.0   50.0      um
+          ----------------------------------------------------------
+
+
+        b. 3.3V native NMOS model
+
+           section tt_3vna : Typical 3.3V native NMOS model
+                   ss_3vna : Slow 3.3V native NMOS model
+                   ff_3vna : Fast 3.3V native NMOS model
+                   sf_3vna : Slow 3.3V native NMOS model
+                   fs_3vna : Fast 3.3V native NMOS model
+
+           Model name    length range         width range     unit
+                         low     high         low    high    
+          ----------------------------------------------------------
+            nanch3       1.2     10.0         0.22   100.      um
+          ----------------------------------------------------------
+
+         The parameter HDIF listed in model card is TSMC minimum-rule value,
+         users must change this value according to their layout.
+
+2) VERTICAL P+/NW/PSUB BIPOLAR
+
+    A) HSPICE LEVEL 49 :
+ 
+     ## library files:
+
+     All models are included in file 'log018_1.l' for H97.2
+                               and  'log018_2.l' for H98.2
+
+      .lib BIP
+
+    B) Spectre V4.4.3 model :
+
+      All models are included in file 'log018.scs' for 
+      SPECTRE V4.4.3.
+
+      .section bip
+
+
+            Model name      emitter area      base area         unit
+          ------------------------------------------------------------
+              pnp10            10x10            16x16           um^2
+              pnp5              5x5             11x11           um^2
+              pnp2              2x2              8x8            um^2
+          ------------------------------------------------------------
+            ( P+/NW/PUB vertical PNP bipolar )
+
+
+3) N+/PW, P+/NW & NW/PSUB junction diode
+
+ A) HSPICE LEVEL 49 :
+
+    ## library files:
+
+    All models are included in file 'log018_1.l' for H97.2
+                               and  'log018_2.l' for H98.2
+      .lib DIO
+
+        Scalable junction diode model ( level 3 ) was used for modeling.
+        User can change the AREA, PJ (perimeter) according their layout
+        to simulate their circuit.
+
+
+4) INTERCONNECTION MODEL TABLE in intercon directory
+
+       1. typ_strA : typical case, structure A interconnection table
+
+       2. typ_strB : typical case, structure B interconnection table
+
+       3. wor_strA : worst   case, structure A interconnection table
+
+       4. wor_strB : worst   case, structure B interconnection table
+
+       5. bes_strA : best    case, structure A interconnection table
+
+       6. bes_strB : best    case, structure B interconnection table
+
+
+5) RESISTOR Equivalent Circuit Model
+
+      resmodel.spi
+
+              Resistor Type             Best      Typical    Worst
+         ------------------------------------------------------------- 
+           N+ Diff. w/i Silicide        rn_b       rn_t       rn_w
+           P+ Diff. w/i Silicide        rp_b       rp_t       rp_w
+           N+ Diff. w/o Silicide       rnrpo_b    rnrpo_t    rnrpo_w
+           P+ Diff. w/o Silicide       rprpo_b    rprpo_t    rprpo_w
+           N-well ( under OD )         rnwod_b    rnwod_t    rnwod_w
+         -------------------------------------------------------------
+        
+       User must include ResModel.spi file and call Lib DIO  when use these 
+       Resistor equivalent circuit models. The method of using these models
+       is the same as subcircuit. 
+
+       If the simulated subcircuit uses small width, i.e., <2um, in N+ diff 
+       and P+ diff w/i silicide, the resistor equivalent circuit model
+       is:
+
+              Resistor Type             Best      Typical    Worst
+         ------------------------------------------------------------- 
+           N+ Diff. w/i Silicide        rns_b      rns_t      rns_w
+           P+ Diff. w/i Silicide        rps_b      rps_t      rps_w
+
+
+6) RESISTOR MODELS
+
+ A) HSPICE LEVEL 49 :
+
+    ## library files:
+
+    All models are included in file 'log018_1.l' for H97.2
+                               and  'log018_2.l' for H98.2
+
+      .lib RESISTOR
+
+ B) Spectre V4.4.3 model :
+
+    All models are included in file 'log018.scs' for 
+    SPECTRE V4.4.3.
+
+      .section res
+
+           Model name      structure   
+                         
+          -----------------------------------------
+           RNOD         N+diff w/i silicide
+           RNODW        N+diff w/i silicide 0.22um<W<2um
+           RPOD         P+diff w/i silicide
+           RPODW        P+diff w/i silicide 0.22um<W<2um
+           RNODRPO      N+diff w/o silicide
+           RPODRPO      P+diff w/o silicide
+           RNWOD        NW diff(under OD)
+           RNWSTI       NW diff(under STI)
+           RNPO1        N+Poly w/i silicide
+           RNPO1W       N+Poly w/i silicide 0.18um<W<2um
+           RPPO1        P+Poly w/i silicide
+           RPPO1W       P+Poly w/i silicide 0.18um<W<2um
+           RNPO1RPO     N+Poly w/o silicide
+           RPPO1RPO     P+Poly w/o silicide
+           RM1          Metal 1
+           RM2          Metal 2
+           RM3          Metal 3
+           RM4          Metal 4
+           RM5          Metal 5
+           RM6          Metal 6
+          -----------------------------------------
+
+
+7) RAW DATA :
+
+      ## raw data files:
+
+        1.  readme.txt : explain how to read the raw data format 
+
+        2.  nmos.log   : for 1.8V NMOS DEVICES GROUP 
+
+        3.  pmos.log   : for 1.8V PMOS DEVICES GROUP
+
+        4.  nanmos.log : for 1.8V native NMOS DEVICES GROUP
+
+        5.  nmos3v.log : for 3.3V NMOS DEVICES GROUP
+
+        6.  pmos3v.log : for 3.3V PMOS DEVICES GROUP
+
+        7.  nanmos3v.log  : for 3.3V native NMOS DEVICES GROUP
+
+8) GDS file
+
+   'a24.gds.Z.uuencode'
+
+   The GDS file of 0.18um bipolar layout for the 0.18um bipolar model.
+   It is a uuencoded and compressed file.
+
+9) layer.txt
+
+   CAD layer definition for the 0.18um bipolar layout GDS file. 
+
+10) UPDATE HISTORY :
+
+        V1.5 : 1. Update 0.18um 1.8V native NMOS model from V0.1 to V1.1.
+               2. Create 0.18um 3.3V native NMOS model V1.1.
+               3. Update resistance models: change resistance table format;
+                  update Rs data for poly, diffusion and well; add effective
+                  width range definition for Rs in poly, diffusion, and well;
+                  and update VC1 and VC2 with different applied voltage for
+                  different patterns.
+               4. Add resistor equivalent circuit model in floppy.
+               5. Update 10x10, 5x5, 2x2 bipolar models for HSPICE and SPECTRE
+                  compatible.
+               6. Correct typing error in section 8.3 comparison tables: 1.8V
+                  PMOS 10/0.18 simulated Vt data in FS corner; 3.3V PMOS 10/0.3
+                  simulated Vt data in SS, FF, SF, and FS corner; and 3.3V PMOS
+                  10/0.3 simulated data in SF and FS corner.
+               7. Remove HSPICE 97.4 and SPECTRE 4.4.1 (replaced by 4.4.3) from
+                  model cards.
+        V1.4 : 1. Create 0.18um 1.8V native NMOS preliminary model.
+               2. Add three HSPICE level 3 noise parameters for both 1.8V 
+                  and 3.3V normal N/PMOS models in HSPICE model files. 
+               3. Change HDIF value to TSMC minimum rule in both 1.8V and 3.3V
+                  N/PMOS model.
+               4. Update simulation result of ring-oscillator speed by using
+                  H98.2 in section 3.4.
+               5. Update worst-case simulated results of ring-oscillator speed
+                  by using H98.2 and setting HDIF=0.2um, TSMC minimum rule
+                  (section 8.4).
+
+        V1.3:  1. Modify the parameters, VTH0, LVTH0, WVTH0, PVTH0, AGS, LAGS,
+                  WAGS and PAGS in the pch3.3/pch3_3 of 3.3V PMOS model to fix
+                  the continuity issues at model boundary.
+               2. Add 3.3V NMOS with ESD implant models.
+               3. Update interconnect capacitance models.
+               4. Update sheet resistance, TC1, TC2, and deltaW of metal1~6 in
+                  resistor table.
+               5. Add the P-substrate voltage coefficients of NW diffusion 
+                  (under OD) resistance in resistor table.
+
+	V1.2 : 1. Added 5-corners 3.3V mos models. 
+
+	V1.1 : 1. Updated 5-corners 1.8V mos models. 
+ 	       2. Updated 10x10 bipolar model.
+	       3. Added 5x5 and 2x2 bipolar models. 
+               4. Updated diode models.
+ 	       5. Update interconnect capacitance models.
+   	       6. Added resistance models.
+ 	       7. Delete 3.3V mos model(will be included in V1.2 release).
+
+      	V0.2 : 1. Add 1.8V model corner, 3.3V MOS model & corner.
+
+      	V0.1 : 1. Create preliminary model.

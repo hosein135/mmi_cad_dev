@@ -1,0 +1,345 @@
+/*
+ * magic.h --
+ *
+ * Global definitions for all MAGIC modules
+ *
+ *     ********************************************************************* 
+ *     * Copyright (C) 1985, 1990 Regents of the University of California. * 
+ *     * Permission to use, copy, modify, and distribute this              * 
+ *     * software and its documentation for any purpose and without        * 
+ *     * fee is hereby granted, provided that the above copyright          * 
+ *     * notice appear in all copies.  The University of California        * 
+ *     * makes no representations about the suitability of this            * 
+ *     * software for any purpose.  It is provided "as is" without         * 
+ *     * express or implied warranty.  Export of this software outside     * 
+ *     * of the United States of America may require an export license.    * 
+ *     *********************************************************************
+ *
+ * rcsid="$Header"
+ */
+
+#define	_MAGIC
+
+/* Note:  System files, such as "stdio.h" and "sys/types.h", should be
+ * included before this magic.h file.
+ */
+
+#ifdef ALPHA32BIT
+/* must be before any declarations with pointers in them! */
+#pragma pointer_size(short)
+#ifndef ALPHA
+#define	ALPHA
+#endif
+#endif
+
+/* --------------------- Universal pointer type ----------------------- */
+
+typedef char *	ClientData;
+
+/* --------------------------- Booleans ------------------------------- */
+
+#define	bool	int
+#define	TRUE	1
+#define	FALSE	0
+
+/* --------------------------- Infinities ------------------------------ */
+
+/* maximum representable positive integer */
+/* (special case vaxes to avoid compiler bug in ultrix) */
+#ifdef vax
+#define MAXINT 0x7fffffff
+#else
+#ifndef MAXINT
+#define MAXINT (((unsigned int) ~0) >> 1)
+#endif
+#endif
+
+/* ----------------------- Simple functions --------------------------- */
+
+#ifndef	MAX
+#define MAX(a,b)	(((a) < (b)) ? (b) : (a))
+#endif
+
+#ifndef	MIN
+#define MIN(a,b)	(((a) > (b)) ? (b) : (a))
+#endif
+
+#define	ABS(x)		(((x) >= 0)  ? (x) : -(x))
+#define	ABSDIFF(x,y)	(((x) < (y)) ? (y) - (x) : (x) - (y))
+#define ODD(i)		(i&1)
+#define EVEN(i)		(!(i&1))
+/* Round anything (e.g. a double) to nearest integer */
+#define ROUND(x) ((int)((x)+.5))
+
+/* ------------ Function headers of globally used functions ----------- */
+
+/* under ANSI C the system header files take care of this */
+#ifndef __STDC__
+extern char *strcpy(), *strncpy(), *index(), *rindex();
+extern char *strcat(), *strncat();
+#endif
+
+
+/* -------------------------- Search paths ---------------------------- */
+
+extern char CellLibPath[];	/* Used as last resort in finding cells. */
+extern char SysLibPath[];	/* Used as last resort in finding system
+				 * files like color maps, styles, etc.
+				 */
+
+/* --------------------- Debugging and assertions --------------------- */
+
+#ifdef	PARANOID
+#define	ASSERT(p, where) \
+    ((!(p)) \
+	? (sprintf(AbortMessage, "%s botched: %s\n",  \
+	    where, "p"), \
+	fputs(AbortMessage, stderr), \
+	niceabort(), \
+	TRUE) \
+	: FALSE)
+#else
+#define	ASSERT(p, where)	(FALSE)
+#endif	PARANOID
+
+/* This version of Magic uses the #define flags defined by the compilers on
+ * different machines, not the old-style flags defined by the Magic
+ * maintainer.  If we goof, however, the compiler should choke on the following
+ * code, yielding a (somewhat) intelligible error message.
+ */
+#ifdef 	SUN2
+    err1 = Dont_use_SUN2_flag_as_the_compiler_defines_the_sun_flag;
+#endif	SUN2
+#ifdef 	SUN3
+    err2 = Dont_use_SUN3_flag_as_the_compiler_defines_the_sun_flag;
+#endif	SUN3
+#ifdef 	VAX
+    err3 = Dont_use_VAX_flag_as_the_compiler_defines_the_vax_flag;
+#endif	VAX
+
+
+/* ------------------------ Malloc/free ------------------------------- */
+
+/*
+ * Magic has its own versions of malloc() and free(), called mallocMagic()
+ * and freeMagic().  Magic procedures should ONLY use these procedures.
+ * Just for the sake of robustness, though, we define malloc and free
+ * here to error strings.
+ */
+#define	malloc	You_should_use_the_Magic_procedure_mallocMagic instead
+#define	free	You_should_use_the_Magic_procedure_freeMagic instead
+#define calloc	You_should_use_the_Magic_procedure_callocMagic instead
+
+/* ---------- Flag for global variables (for readability) ------------- */
+/*	      Also a Void type, which is like void except that we	*/
+/*	      can declare pointers to functions that return it.	        */
+
+#define	global	/* Nothing */
+#define Void	int
+
+/* ------------ Globally-used strings. -------------------------------- */
+
+extern char *MagicVersion;
+extern char *MagicCompileTime;
+extern char AbortMessage[];
+
+/* ---------------- Start of Machine Configuration Section ----------------- */
+
+/* The great thing about standards is that there are so many to choose from! */
+#ifdef	m68k
+#define	mc68000		
+#endif
+
+
+    /* ------- Configuration:  Selection of Byte Ordering ------- */
+
+/*	Big Endian:
+ *		MSB....................LSB
+ *		byte0  byte1  byte2  byte3
+ *
+ *	Little Endian:
+ *		MSB....................LSB
+ *		byte3  byte2  byte1  byte0
+ *
+ *	In big-endian, a pointer to a word points to the byte that
+ *	contains the most-significant-bit of the word.  In little-endian, 
+ *	it points to the byte containing the least-significant-bit.
+ *
+ */
+
+#ifdef	linux
+#define	IS_LITTLE_ENDIAN	/* Intel x86 processors running Linux >=.99p7. */
+#endif
+
+#ifdef	vax
+#define	IS_LITTLE_ENDIAN	/* The good 'ol VAX. */
+#endif
+
+#ifdef	MIPSEL
+#define	IS_LITTLE_ENDIAN	/* MIPS processors in little-endian mode. */
+#endif
+
+#ifdef	wrltitan
+#define	IS_LITTLE_ENDIAN 	/* A DEC-WRL titan research machine (only 20 exist). */
+			/* NOT intended for the Ardent titan machine. */
+#endif
+
+#ifdef	MIPSEB
+#define	IS_BIG_ENDIAN	/* MIPS processors in big-endian mode. */
+#endif
+
+#ifdef	mc68000
+#define	IS_BIG_ENDIAN	/* All 68xxx machines, such as Sun2's and Sun3's. */
+#endif
+
+#ifdef	macII
+#define	IS_BIG_ENDIAN	/* Apple MacII (also a 68000, but being safe here.) */
+#endif
+
+#ifdef	sparc
+#define	IS_BIG_ENDIAN	/* All SPARC-based machines. */
+#endif
+
+#ifdef	ibm032
+#define	IS_BIG_ENDIAN 	/* IBM PC-RT and related machines. */
+#endif
+
+#ifdef	hp9000s300
+#define	IS_BIG_ENDIAN 	/* HP 9000 machine.  */
+#endif
+
+#ifdef	hp9000s800
+#define	IS_BIG_ENDIAN 	/* HP 9000 machine.  */
+#endif
+
+#ifdef	hp9000s820
+#define	IS_BIG_ENDIAN 	/* HP 9000 machine.  */
+#endif
+
+#ifdef	ALPHA
+#define	IS_LITTLE_ENDIAN	/* Digital Alpha AXP */
+#endif
+
+/* Well, how'd we do? */
+
+#if	!defined(IS_BIG_ENDIAN) && !defined(IS_LITTLE_ENDIAN)
+    You_need_to_define_IS_LITTLE_ENDIAN_or_IS_BIG_ENDIAN_for_your_machine.
+#endif
+#if	defined(IS_BIG_ENDIAN) && defined(IS_LITTLE_ENDIAN)
+    You_should_not_define_both_IS_LITTLE_ENDIAN_and_IS_BIG_ENDIAN.
+#endif
+
+    /* ------- Configuration:  Handle Missing Routines/Definitions ------- */
+
+/* Many machines don't have the moncontrol() procedure.  (see main.c) */
+#ifdef	wrltitan
+# define NEED_MONCNTL
+#endif
+#ifdef	SYSV
+# define NEED_MONCNTL
+#endif
+#if defined(sun) && !defined(sparc)
+# define NEED_MONCNTL
+#endif  
+#ifdef	ALPHA
+# define NEED_MONCNTL
+#endif  
+
+/* System V is missing some BSDisms. */
+#ifdef SYSV
+# ifndef index
+#  define index(x,y)		strchr((x),(int)(y))
+# endif
+# ifndef bcopy
+#  define bcopy(a, b, c)	memcpy(b, a, c)
+# endif
+# ifndef bzero
+#  define bzero(a, b)		memset(a, 0, b)
+# endif
+# ifndef bcmp
+#  define bcmp(a, b, c)		memcmp(b, a, c)
+# endif
+# ifndef rindex
+#  define rindex(x,y)  strrchr((x),(int)(y))
+# endif
+#endif
+
+/* Some machines need vfprintf().  (A temporary MIPS bug?) (see txOutput.c) */
+#if 	(defined(MIPSEB) && defined(SYSTYPE_BSD43)) || ibm032
+# define	NEED_VFPRINTF
+#endif
+
+/* Some machines don't have the varargs.h package.  If your machine is one
+ * of these, try turning this flag on.
+ */
+#ifdef	funny_machine_no_varargs
+# define	NO_VARARGS
+#endif
+
+/* Some machines expect signal handlers to return an "int".  But most machines
+ * expect them to return a "void".  If your machine expects an "int", put in
+ * an "ifdef" below.
+ */
+
+#if 	(defined(MIPSEB) && defined(SYSTYPE_BSD43)) || ibm032
+# define	SIG_RETURNS_INT
+#endif
+
+/* We have this really fancy abort procedure in misc/niceabort.c.  However,
+ * these days only vax's appear to have all the things neccessary to make it
+ * work (i.e. /usr/ucb/gcore).
+ */
+
+#ifdef	vax
+# define	FANCY_ABORT
+#endif
+
+/* 
+ * Sprintf is a "char *" under BSD, and an "int" under System V. 
+ */
+
+/* under ANSI C the system header files take care of this */
+#ifndef  __STDC__
+#ifdef	SYSV
+    extern int sprintf();
+#else
+#ifndef ALPHA
+    extern char* sprintf();
+#endif
+#endif
+#endif  __STDC__
+
+/*
+ * Linux
+ */
+#ifdef	linux
+#define       sigvec          sigaction
+#define       sv_handler      sa_handler
+#endif
+
+
+/*
+ * Irix 
+ */
+#ifdef IRIX
+#define vfork fork
+#endif
+
+
+
+/*
+ * Select system call
+ *
+ * 	Note:  Errors here may be caused by not including <sys/types.h> 
+ *	before "magic.h"
+ */
+#ifndef FD_SET
+#define fd_set int
+#define FD_SET(n, p)    ((*(p)) |= (1 << (n)))
+#define FD_CLR(n, p)    ((*(p)) &= ~(1 << (n)))
+#define FD_ISSET(n, p)  ((*(p)) & (1 << (n)))
+#define FD_ZERO(p)      (*(p) = 0)
+#endif
+
+/* ------------------ End of Machine Configuration Section ----------------- */
+

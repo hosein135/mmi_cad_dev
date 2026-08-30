@@ -1,0 +1,309 @@
+# This is a generator for a bitslice of nand-inverts.
+
+# MMIG_place_cell
+#
+# This proc places a cell in the current row if its layout will fit in the bit pitch.
+# Otherwise it starts a new row, and places the cell there.
+#
+# Parameters:
+# cell             - name of cell, ex. MMIG_NAND2A
+# x_in             - desired schematic x coordinate of "cell".  this should be a location in 
+#                    the row currently being populated.  if MMIG_place_cell determines that 
+#                    there is not enough space in this row for "cell", it will place "cell" 
+#                    in a new row, and modify x_in to reflect "cell"'s actual placement.  
+#                    otherwise it will place "cell" at x_in.
+# curr_h_in        - total (layout) height of the current row.  will be modified to
+#                    reflect the total height after placement of "cell".
+# limit_h          - maximum total (layout) height of a row
+# rswidth_in       - schematic width (x dimension) of the row currently being drawn.
+#                    also known as the row spanner width.  will be modified to reflect
+#                    the drawn width of this row, after placement of "cell".
+# rsx_in           - midpoint (schematic x coordinate) of the row currently being drawn.
+#                    also known as the row spanner's x coordinate.  will be modified to
+#                    reflect the new midpoint of the row after placement of "cell".
+# rsy              - schematic y coordinate of the row spanner.
+# cell_width       - width (schematic x dimension) of the "cell" icon.
+# last_origin_x_in - origin (schematic x coordinate) of the rightmost cell
+#                    placed in the current row.  will be modified to reflect
+#                    the placement of "cell".
+# row_start_in     - the leftmost schematic x coordinate of this row.  will be
+#                    modified to reflect placement of "cell".
+
+proc MMIG_place_cell { cell x_in y curr_h_in limit_h rswidth_in rsx_in rsy cell_width last_origin_x_in row_start_in} {
+  upvar $x_in x
+  upvar $curr_h_in curr_h
+  upvar $rswidth_in rswidth
+  upvar $rsx_in rsx
+  upvar $last_origin_x_in last_origin_x
+  upvar $row_start_in row_start
+
+  set ws1 60
+
+  # get the cell height info
+  switch $cell {
+    MMI_NAND2A  {set cell_h 3}
+    MMI_NAND2B -
+    MMI_NAND2B_ {set cell_h 3}
+    MMI_NAND2C -
+    MMI_NAND2C_ {set cell_h 5}
+    MMI_NAND2D  {set cell_h 9}
+
+    MMI_NAND3A  {set cell_h 4}
+    MMI_NAND3B  {set cell_h 6}
+
+    MMI_INVA    {set cell_h 2}
+    MMI_INVB -
+    MMI_INVB_   {set cell_h 2}
+    MMI_INVC -
+    MMI_INVC_   {set cell_h 3}
+    MMI_INVD_   {set cell_h 4}
+    MMI_INVE_   {set cell_h 7}
+
+    MMI_BUFD    {set cell_h 5}
+    MMI_BUFE    {set cell_h 9}
+
+    default     {error "Request to place unknown cell ($cell) in MMIG_place_cell"}
+  }
+
+  if {(($curr_h + $cell_h) > $limit_h) || ($curr_h == 0)} {
+    # won't fit, so start a new row.
+    # first drop the row spanner under the previous row, unless there isn't one
+    if {$curr_h != 0} {
+      set rsname [format "row_spanner%d" [expr int($rswidth/2)]]
+      generate row_spanner $rsname -width [expr int($rswidth/2)]
+      make $rsname -origin "$rsx $rsy"
+
+      # set start of new row
+      set row_start [expr $row_start + $rswidth + $ws1]
+     }
+
+    # set new cell origin
+    set last_origin_x [expr $row_start + int($cell_width / 2)]
+    set x $last_origin_x
+
+    # place cell
+    make $cell -origin "$last_origin_x $y"
+
+    # adjust curr_h
+    set curr_h $cell_h
+
+    # set new row_spanner info
+    set rswidth $cell_width
+    set rsx $last_origin_x
+
+    return 0
+
+  } else {
+    # will fit, place it in this row
+    # place cell
+    make $cell -origin "$x $y"
+
+    # adjust curr_h
+    set curr_h [expr $curr_h + $cell_h]
+
+    # adjust row_spanner info
+    # set new cell origin
+    if {$x > $last_origin_x} {
+      set last_origin_x $x
+      set rswidth [expr $rswidth + $ws1 + $cell_width]
+      set rsx [expr $row_start + int($rswidth / 2)]
+    }
+
+    return 1
+  }
+
+}
+
+
+proc SCHEMATIC_nandbuf args {
+  call_use_keyword $args {{NBITS 8} {IconHeight 8} {ReduceInputLoad "N"}}
+
+  # drawing origin
+  set base_x -350
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  # icon info
+  # MMI_NAND2
+  set nand_x 120
+  set nand_y 60
+  set nand_in0_x -60
+  set nand_in0_y -20
+  set nand_in1_x -60
+  set nand_in1_y 20
+  set nand_out_x 60
+  set nand_out_y 0
+  # MMI_INV
+  set inv_x 120
+  set inv_y 60
+  set inv_in_x -60
+  set inv_in_y 0
+  set inv_out_x 60
+  set inv_out_y 0
+
+  # select the cells
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    generate MMI_NAND2 MMI_NAND2A -Size A
+    set nand2_0 "MMI_NAND2A"
+    generate MMI_INV MMI_INVB_ -Size B -DeMorgan 1
+    set inv_0 "MMI_INVB_"
+  } else {
+    generate MMI_NAND2 MMI_NAND2B -Size B
+    set nand2_0 "MMI_NAND2B"
+    generate MMI_INV MMI_INVC_ -Size C -DeMorgan 1
+    set inv_0 "MMI_INVC_"
+  }
+
+  # spacings between nand-invert icon groups
+  set yfudge $nand_y
+
+  # set inflag, wire track, row spanner locations
+  set inflag_x $base_x
+  set wire0_x [expr $inflag_x + $ws1]
+  set wire1_x [expr $wire0_x + $ws1]
+  set rs_y [expr $base_y + 150]
+
+  # init the cell placement variables
+  # bitpitch = 24
+  set limit_h 24
+  set curr_h 0
+  set rswidth 0
+  set rs_x 0
+  set last_origin_x 0
+  set row_start [expr $base_x + 350]
+  set y $base_y
+
+
+  for {set i 0} {$i < $NBITS} {incr i} {
+
+    # place nand
+    set nand_origin_x [expr $row_start + int($nand_x / 2)]
+    set ok [MMIG_place_cell $nand2_0 nand_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $nand_x last_origin_x row_start]
+     
+    # place inv
+    set inv_origin_x [expr ($nand_origin_x + $nand_out_x) + $ws1 + ($inv_x + $inv_in_x)]
+    set ok [MMIG_place_cell $inv_0 inv_origin_x $y curr_h $limit_h rswidth rs_x $rs_y $nand_x last_origin_x row_start]
+
+    # hook up inputs
+    set pin_x [expr $nand_origin_x + $nand_in0_x]
+    set pin_y [expr $y + $nand_in0_y]
+    make_wire $pin_x $pin_y $wire0_x $pin_y
+    if {$i == 0} {
+      make_wire $wire0_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name "In0_H"
+    } else {
+      make_wire $wire0_x $pin_y $wire0_x [expr $pin_y + $yfudge]
+    }
+    set pin_x [expr $nand_origin_x + $nand_in1_x]
+    set pin_y [expr $y + $nand_in1_y]
+    make_wire $pin_x $pin_y $wire1_x $pin_y
+    if {$i == 0} {
+      make_wire $wire1_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name "In1_H"
+    } else {
+      make_wire $wire1_x $pin_y $wire1_x [expr $pin_y + $yfudge]
+    }
+
+    # hook up between nand & invert
+    make_wire [expr $nand_origin_x + $nand_out_x] $y [expr $inv_origin_x + $inv_in_x] $y
+      
+    # mark output
+    set pin_x [expr $inv_origin_x + $inv_out_x]
+    set pin_y [expr $y + $inv_out_y]
+    set outpins($i) "$pin_x $pin_y"
+
+    # increment y
+    set y [expr $y - $yfudge]
+  }
+
+  # hook up the outputs
+  set outflag_x [expr $last_origin_x + 200]
+  for {set j 0} {$j < $NBITS} {incr j} {
+    set pin_x [lindex $outpins($j) 0]
+    set pin_y [lindex $outpins($j) 1]
+    set pin_name [format "Out%d_H" $j]
+    make_wire $pin_x $pin_y $outflag_x $pin_y
+    make output -origin "$outflag_x $pin_y" -name $pin_name
+  }
+
+  # drop the final row spanner
+  set rsname [format "row_spanner%d" [expr int($rswidth/2)]]
+  generate row_spanner $rsname -width [expr int($rswidth/2)]
+  make $rsname -origin "$rs_x $rs_y"
+
+  # title bar
+  make sccs_title_bar -origin "[expr $inflag_x + int(($outflag_x - $inflag_x)/2)] [expr $base_y + 300]" -owner emc -version 0.5 -date 05/27/99
+}
+
+
+proc ICON_nandbuf args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 8} {IconHeight 8} {ReduceInputLoad "N"}}
+  
+  # don't let the user get too crazy
+  if {$NBITS > 64} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  
+  # check for acceptable response on ReduceInputLoad query
+  if {([string toupper $ReduceInputLoad] != "Y") && ([string toupper $ReduceInputLoad] != "N")} {
+    error "ERROR: ReduceInputLoad property ($ReduceInputLoad) must be Y or N"
+  }
+  
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  
+  # figure out icon size
+  set cs_spacer 70
+  set pin_spacer 20
+  
+  # how many pins?
+  set pincount [expr 2 * $IconHeight]
+  
+  # icon body
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+  
+  # inputs
+  icon_term -type input -origin "$icon_left 0" -name "In0_H"
+  icon_property -origin "$icon_left_label 0" -size small -label In0_H
+  icon_term -type input -origin "$icon_right [expr $icon_bot - $pin_spacer]" -name "In1_H"
+  icon_property -origin "$icon_right_label [expr $icon_bot - $pin_spacer]" -size small -label In1_H -anchor e
+
+  # outputs
+  set pin_pos [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set wname [format "Out%d_H" $i]
+    icon_term -type output -origin "$icon_right $pin_pos" -name $wname
+    icon_property -origin "$icon_right_label $pin_pos" -size small -label $wname -anchor e
+    set pin_pos [expr $pin_pos - 2 * $pin_spacer]
+  }
+
+  # text
+  set wname [format "%dbit" $NBITS]
+  icon_property -origin "0 -60" -size large -label $wname -anchor center
+  icon_property -origin "0 -20" -size large -label "Nand Buffer" -anchor center
+  if {[string toupper $ReduceInputLoad] == "Y"} {
+    icon_property -origin "0 20" -size large -label "R" -anchor center
+  }  
+  icon_property -origin "0 60" -size large -label {$name} -anchor center
+  
+  # junk
+  set prop_y $icon_y
+  icon_property -origin "-70 $prop_y" -type user -name name
+  icon_property -origin "-70 [expr $prop_y + 20]" -type user -name M
+  icon_property -origin "-70 [expr $prop_y + 40]" -type user -name dpc
+  
+  icon_special -type sccs_title_bar -origin "-70 [expr $prop_y + 140]" -owner emc -version 0.5 -date 05/27/99
+}
+
+
+ 

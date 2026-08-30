@@ -1,0 +1,393 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "skip-list.h"
+#include "nl.h"
+#include "pnl.h"
+#include "tcl.h"
+#include "ui.h"
+#include "ui_int.h"
+
+#include "v2nl.h"
+#include "nl2v.h"
+#include "def2pnl.h"
+#include "nl2sim.h"
+#include "lef2pnl.h"
+#include "vim2nl.h"
+
+
+#(defcommand read_verilog
+   ("Read the specified Verilog file(s).  If any design specified in file already"
+    "exists in memory, the in-memory design is overwritten.")
+   (-ports_only boolean "ignore the insides of the Verilog modules")
+   (-rtl boolean "read RTL Verilog")
+   (-define tcl_object "define these macros before reading (like {{foo 1} {bar 2}})")
+   (-silent boolean "don't print the message about the current design being set")
+   (files tcl_object "Verilog files to read"))
+{
+  ar defines_ar = ar_alloc (0, sizeof (char *));
+  ar files_ar = ar_alloc (0, sizeof (char *));
+  volatile ar designs = NULL;
+
+  error_unwind_protect {
+    if ( define != NULL ) {
+      int objc;
+      Tcl_Obj **objv;
+      int status = Tcl_ListObjGetElements (interp, define, &objc, &objv);
+      int i;
+
+      if ( status != TCL_OK ) {
+	return status;
+      }
+
+      for ( i = 0; i < objc; i++ ) {
+	int def_objc;
+	Tcl_Obj **def_objv;
+	int status = Tcl_ListObjGetElements (interp, objv[i], &def_objc, &def_objv);
+	char *var;
+	char *val;
+
+	if ( status != TCL_OK ) {
+	  return status;
+	}
+
+	var = Tcl_GetStringFromObj (def_objv[0], NULL);
+	ar_add (defines_ar, &var);
+
+	if ( def_objc == 1 ) {
+	  val = "";
+	}
+	else if ( def_objc == 2 ) {
+	  val = Tcl_GetStringFromObj (def_objv[1], NULL);
+	}
+	else {
+	  char *str = Tcl_GetStringFromObj (objv[i], NULL);
+	  error ("malformed macro definition, {%s}, should be like {<var> <value>}",
+		 str);
+	}
+
+	ar_add (defines_ar, &val);
+      }
+    }
+
+    {
+      int objc;
+      Tcl_Obj **objv;
+      int status = Tcl_ListObjGetElements (interp, files, &objc, &objv);
+      int i;
+
+      if ( status != TCL_OK ) {
+	return status;
+      }
+
+      for ( i = 0; i < objc; i++ ) {
+	char *file = Tcl_GetStringFromObj (objv[i], NULL);
+	Tcl_DString buf;
+	char *expanded = Tcl_TranslateFileName (interp, file, &buf);
+	char *expanded_copy = STRDUP (expanded);
+
+	Tcl_DStringFree (&buf);
+	ar_add (files_ar, &expanded_copy);
+      }
+    }
+
+    designs = v2nl_read_verilog_files (context, files_ar, defines_ar,
+				       ui_bus_naming_style, ports_only, rtl);
+  }
+  error_on_exit {
+    if ( defines_ar != NULL )
+      ar_free (defines_ar);
+
+    if ( files_ar != NULL ) {
+      ar_for_all (files_ar, char *, filename) {
+	FREE (filename);
+      } ar_end_for;
+
+      ar_free (files_ar);
+    }
+  } error_end;
+
+  if ( ar_size (designs) == 0 ) {
+    printf ("No designs were read.\n");
+    ui_cmd_object_list_result (interp, designs, NULL);
+  }
+  else {
+    int num_designs = ar_size (designs);
+    nl_design first_design = AR_REF (designs, nl_design, num_designs-1);
+
+    ui_set_current_design (interp, context, first_design, silent);
+    ui_cmd_object_list_result (interp, designs, NULL);
+  }
+
+  ar_free (designs);
+
+  return TCL_OK;
+}
+
+
+#(defcommand read_def
+   ("Read the physical information from a .def file.  The design specified in"
+    "the .def file must exist in memory.")
+   (-offset tcl_object "location offset in the form: {dx dy}")
+   (-translate string "orientation translation (N, S, E, W, FN, FS, FW, or FW)")
+   (-filler tcl_object "list of filler cell types")
+   (-zero tcl_object "list of logic 0 nets")
+   (-one tcl_object "list of logic 1 nets")
+   (-nohierarchy boolean "read a flat DEF")
+   (ifp readable_file ".def file to read")
+   &optional
+   (icell icell "top level cell of the design to be read"))
+{
+  volatile int flag;
+  int dx = 0;
+  int dy = 0;
+  volatile ar filler_ar = NULL;
+  volatile ar zero_ar = NULL;
+  volatile ar one_ar = NULL;
+  volatile pnl_orientation orient = pnl_orientation_N;
+
+  error_unwind_protect {
+    if ( offset != NULL ) {
+      int objc;
+      Tcl_Obj **objv;
+      int status = Tcl_ListObjGetElements (interp, offset, &objc, &objv);
+
+      if ( status != TCL_OK ) {
+	error ("Can't convert -offset argument %s to a list.",
+	       Tcl_GetStringFromObj (offset, NULL));
+      }
+      else if ( objc != 2 ) {
+	error ("-offset argument should be a list with two elements.");
+      }
+      else {
+	status = Tcl_GetIntFromObj (interp, objv[0], &dx);
+
+	if ( status != TCL_OK ) {
+	  error ("can't convert %s to an integer in -offset argument.",
+		 Tcl_GetStringFromObj (objv[0], NULL));
+	}
+
+	status = Tcl_GetIntFromObj (interp, objv[1], &dy);
+
+	if ( status != TCL_OK ) {
+	  error ("can't convert %s to an integer in -offset argument.",
+		 Tcl_GetStringFromObj (objv[0], NULL));
+	}
+      }
+    }
+
+    if ( translate != NULL ) {
+      orient = pnl_string_to_orientation (translate);
+
+      if ( orient == pnl_orientation_null ) {
+	error ("invalid orientation for -translate (%s), "
+	       "must be either N, S, E, W, FN, FS, FE, or FW.", translate);
+      }
+    }
+
+    if ( filler != NULL ) {
+      int i;
+      int objc;
+      Tcl_Obj **objv;
+      int status = Tcl_ListObjGetElements (interp, filler, &objc, &objv);
+
+      if ( status != TCL_OK ) {
+	error ("Can't convert -filler argument %s to a list.",
+	       Tcl_GetStringFromObj (offset, NULL));
+      }
+
+      filler_ar = ar_alloc (objc, sizeof (char *));
+
+      for ( i = 0; i < objc; i++ ) {
+	char *str = Tcl_GetStringFromObj (objv[i], NULL);
+	ar_add (filler_ar, &str);
+      }
+    }
+
+    if ( zero != NULL ) {
+      int i;
+      int objc;
+      Tcl_Obj **objv;
+      int status = Tcl_ListObjGetElements (interp, zero, &objc, &objv);
+
+      if ( status != TCL_OK ) {
+	error ("Can't convert -zero argument %s to a list.",
+	       Tcl_GetStringFromObj (offset, NULL));
+      }
+
+      zero_ar = ar_alloc (objc, sizeof (char *));
+
+      for ( i = 0; i < objc; i++ ) {
+	char *str = Tcl_GetStringFromObj (objv[i], NULL);
+	ar_add (zero_ar, &str);
+      }
+    }
+
+    if ( one != NULL ) {
+      int i;
+      int objc;
+      Tcl_Obj **objv;
+      int status = Tcl_ListObjGetElements (interp, one, &objc, &objv);
+
+      if ( status != TCL_OK ) {
+	error ("Can't convert -one argument %s to a list.",
+	       Tcl_GetStringFromObj (offset, NULL));
+      }
+
+      one_ar = ar_alloc (objc, sizeof (char *));
+
+      for ( i = 0; i < objc; i++ ) {
+	char *str = Tcl_GetStringFromObj (objv[i], NULL);
+	ar_add (one_ar, &str);
+      }
+    }
+
+    flag = def2pnl_read_def (ifp, context, icell, dx, dy, orient, filler_ar,
+			     zero_ar, one_ar, nohierarchy);
+  }
+  error_on_exit {
+    if ( ifp != stdin ) {
+      fclose (ifp);
+    }
+
+    if ( filler_ar != NULL )
+      ar_free (filler_ar);
+
+    if ( zero_ar != NULL )
+      ar_free (zero_ar);
+
+    if ( one_ar != NULL )
+      ar_free (one_ar);
+  } error_end;
+
+  if ( flag ) {
+    return TCL_OK;
+  }
+  else {
+    error ("the specified .def file could not be read.");
+  }
+}
+
+
+#(defcommand read_lef
+  "Read the physical library information from a .lef file."
+  (ifp readable_file "the LEF file")
+  (library library "read the physical information for this library"))
+{
+  error_unwind_protect {
+    lef2pnl_read_lef (ifp, context, library);
+  }
+  error_on_exit {
+    if ( ifp != stdin ) {
+      fclose (ifp);
+    }
+  }
+  error_end;
+
+  return TCL_OK;
+}
+
+
+#(defcommand write_verilog
+   "Write a Verilog representation of the specified design to a file."
+   (-hierarchy boolean "recursively write out all linked subdesigns")
+   (-libcell_stubs boolean "write stub modules for libcell designs")
+   (ofp writable_file "Verilog file to be written")
+   &optional
+   (design current_design "design to write"))
+{
+  int flag = nl2v_write_verilog (ofp, design, hierarchy, libcell_stubs);
+
+  if ( ofp != stdout ) {
+    fclose (ofp);
+  }
+
+  if ( flag ) {
+    return TCL_OK;
+  }
+  else {
+    error ("the specified Verilog file could not be written.");
+  }
+}
+
+
+#(defcommand write_sim
+   "Write a .sim representation of the specified design to a file."
+   (-hierarchy boolean "write out the hierarchy as a flat .sim file")
+   (ofp writable_file ".sim file to be written")
+   &optional
+   (design current_design "design to write"))
+{
+  int flag = nl2sim_write_sim (ofp, design, hierarchy);
+
+  if ( ofp != stdout ) {
+    fclose (ofp);
+  }
+
+  if ( flag ) {
+    return TCL_OK;
+  }
+  else {
+    error ("the specified .sim file could not be written.");
+  }
+}
+
+
+#(defcommand read_vim_tech
+   "Read a VIM tech file."
+   (-silent boolean "don't print a message about the current design being set")
+   (ifp readable_file "file to read"))
+{
+  nl_design design = vim2nl_read_vim_tech (context, ifp);
+
+  if ( design != NULL ) {
+    ui_cmd_object_result (interp, (nl_object) design, NULL);
+    ui_set_current_design (interp, context, design, silent);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand read_vim_placement
+   "Read a VIM placement file."
+   (ifp readable_file "file to read"))
+{
+  vim2nl_read_vim_placement (context, ui_x_grid_size, ui_y_grid_size, ifp);
+
+  return TCL_OK;
+}
+
+
+#(defcommand read_vim_physcell
+   "Read a VIM physcell file."
+   (-core_site string "name of core site in row site array")
+   (ifp readable_file "file to read"))
+{
+  if ( core_site == NULL ) {
+    core_site = "CORE";
+  }
+
+  vim2nl_read_vim_physcell (context, ui_x_grid_size, ui_y_grid_size, ifp,
+			    core_site);
+
+  return TCL_OK;
+}
+
+
+void
+ui_cmd_register_io_commands (Tcl_Interp *interp, char *prefix, nl_context context)
+{
+#(register-all-commands)
+}

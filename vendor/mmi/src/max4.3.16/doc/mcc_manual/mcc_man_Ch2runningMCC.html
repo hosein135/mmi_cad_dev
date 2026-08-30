@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 18:16:46">
+<title>Running MCC</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MCC MegaCell Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="mcc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="mcc_man_Ch1overview.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="mcc_man_Ch3create-megacells.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1043864"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 2 </font>
+</h2>
+
+
+<h1>
+  <a name="1043855"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running MCC</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1045128"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setup </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1045129"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have an MCC license (<b><code class="CodeStrong">max_mcc</code></b>), you need to enable the MCC menu commands with the command <b><code class="CodeStrong">mc_init</code></b>. Typically, you add this command to the system <b><code class="CodeStrong">.maxrc</code></b> file (<b><code class="CodeStrong">$MMI_TOOLS/../mmi_local/max/.maxrc</code></b>) so everyone has access to it. If only specific users run MCC, they can add it to their own <b><code class="CodeStrong">.maxrc</code></b> files (<b><code class="CodeStrong">~/mmi_private/max/.maxrc</code></b>). </font>
+<p>
+<p>
+  <dt> <a name="1043613"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">mc_init</code></b> command adds the MCC commands to the <b><code class="CodeStrong">Tool</code></b> menu in the MAX Layout Editor. All of the MCC commands are prefixed by the string <b><code class="CodeStrong">MC</code></b> for clarity. These commands are discussed in the next section. When a user attempts to execute any one of these commands, MAX checks that a valid MCC license is available, and if so, checks out that license for the remainder of the MAX session. Note that the <b><code class="CodeStrong">mc_init</code></b> command by itself does not check out an MCC license. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1043614"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running MCC</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1043615"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC provides four basic commands to MAX: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1043616"> </a>MC Build</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1043617"> </a>MC Netlist</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1043618"> </a>MC Critical Path</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1043619"> </a>MC What</li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1043621"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also run these commands in batch mode or by scripts. For more information concerning their syntax, see <a href="mcc_man_Ch3create-megacells.html#1029204"><b><code class="CodeStrong">Running MCC in Batch Mode </code></b> </a>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1043626"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>MC Build</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1043627"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">MC Build </code></b>command tells MCC to build a megacell. It first prompts you with a popup that lets you choose the name of the megacell to create (see <a href="mcc_man_Ch2runningMCC.html#1043647">Figure 1</a>). This megacell must be defined and loaded into MAX through the control program described in the <a href="mcc_man_Ch3create-megacells.html#1028486"><em class="Emphasis">Creating Megacells</em></a><em class="Emphasis"> </em>chapter. You can set the default megacell name by setting the following variable in the control program: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(default_generator) &lt;<b><code class="CodeEmphasis">name</code></b>&gt;
+</font><a name="1043632"> </a>
+      </pre>
+<p>
+  <dt> <a name="1044391"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you were working on an SRAM, you might add the following line so you wouldn't have to enter it in the menu every time you restart MAX: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(default_generator) sram
+</font><a name="1043635"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043645"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The popup form also allows you to turn off <a href="mcc_man_Ch3create-megacells.html#1028915"><b><code class="CodeStrong">Via Programming </code></b> </a> and <a href="mcc_man_Ch3create-megacells.html#1028948"><b><code class="CodeStrong">Port Propagation </code></b> </a>. Typically these should be turned on to create a complete megacell. However, when debugging a megacell, you might want to turn off one or the other to speed up the megacell generation.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1043647"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 1:   MC Build Popup Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcmake.gif" border="1">
+</div></font><a name="1043651"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1043655"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you click on <b><code class="CodeStrong">Done</code></b>, a second popup form appears (see <a href="mcc_man_Ch2runningMCC.html#1043660">Figure 2</a>) which provides more options specific to this megacell. The top of this form contains a list of any parameters and their default values. You can change these values to create a different version of this megacell or change the defaults in the control program. For a description of how to set up these defaults, see the section on <a href="mcc_man_Ch3create-megacells.html#1028643"><b><code class="CodeStrong">Parameters </code></b> </a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1043660"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 2:   SRAM MegaCell Popup Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/sram_make.gif" border="1">
+</div></font><a name="1043664"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1043665"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The bottom half of the menu (below the horizontal line) provides three different fields: <b><code class="CodeStrong">prefix</code></b>, <b><code class="CodeStrong">suffix</code></b>, and <b><code class="CodeStrong">name</code></b>. When <b><code class="CodeStrong">MCC Build</code></b> creates a megacell, it typically creates a number of hierarchical cells. Depending on the input parameters, these cells probably contain different numbers of leaf cells or other hierarchical cells and thus need unique names. </font>
+<p>
+<p>
+  <dt> <a name="1043667"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if you need two types of SRAMs on your chip, one that has 128 rows and another that has 256 rows, the memory cores and spine are different between the two memories. The <b><code class="CodeStrong">prefix</code></b> and <b><code class="CodeStrong">suffix</code></b> fields allow you to add a prefix and suffix to all created cells. The suffix defaults to the concatenation of all of the parameter values, separated by underscores. If you had the one parameter, <b><code class="CodeStrong">ROWS</code></b>, the hierarchical cells <b><code class="CodeStrong">memory_core</code></b> and <b><code class="CodeStrong">spine</code></b> would be named by default: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">memory_core_256, spine_256</font><a name="1043670"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1043671"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043672"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">for the case where <b><code class="CodeStrong">ROWS=256</code></b> and </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">memory_core_128, spine_128</font><a name="1043673"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1043674"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043675"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">for the case where <b><code class="CodeStrong">ROWS=128</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1043676"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to the suffix, you might want to prefix all generated cells by a unique ID. This might be either the name of your company or the section of the chip that this megacell goes into. To add a unique ID, simply change the prefix field. For example, if these two previously described memories went into the instruction unit of the chip, you might set the prefix to be "<b><code class="CodeStrong">IU_</code></b>" and then the cells would be named: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">IU_memory_core_256, IU_spine_256, etc.</font><a name="1043677"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1043678"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043679"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Lastly, the top level cell of the megacell sometimes requires a special name, like <b><code class="CodeStrong">ASYNC_RAM128X10,</code></b> or something similar, which doesn't fit with the prefix and suffix naming scheme. The name field allows you to name this cell specially. </font>
+<p>
+<p>
+  <dt> <a name="1043680"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As described previously, if a suffix is not specified, it defaults in the menu to the parameters separated by underscores. The prefix, suffix, and name can also be set using the following lines in the control program: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(&lt;<b><code class="CodeEmphasis">megacell</code></b>&gt;,prefix) &lt;<b><code class="CodeEmphasis">prefix</code></b>&gt; 
+set MC(&lt;<b><code class="CodeEmphasis">megacell</code></b>&gt;,suffix) &lt;<b><code class="CodeEmphasis">suffix</code></b>&gt;
+set MC(&lt;<b><code class="CodeEmphasis">megacell</code></b>&gt;,name) &lt;<b><code class="CodeEmphasis">name</code></b>&gt;</font><a name="1043682"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1043685"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043686"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(sram,prefix) IU_
+set MC(sram,suffix) {_$ROWS}
+set MC(sram,name) ASNYC_RAM128X10</font><a name="1043687"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1043688"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043689"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you have multiple parameters, you need to be careful of the <b><strong class="Strong">tcl</strong></b> syntax. (For more information on <b><strong class="Strong">tcl</strong></b>, refer to the Scriptics <b><strong class="Strong">tcl/tk</strong></b> page at<b><strong class="Strong"> http://www.scriptics.com</strong></b>.) </font>
+<p>
+<p>
+  <dt> <a name="1045288"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if you have <b><code class="CodeStrong">ROWS</code></b> and <b><code class="CodeStrong">COLUMNS</code></b> as parameters and you want a suffix of the form <b><code class="CodeStrong">32X10</code></b>, you need the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(sram,suffix) {${ROWS}X$COLUMNS}</font><a name="1043692"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1043693"> </a>
+      </pre>
+<p>
+  <dt> <a name="1043694"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The outside set of braces ({}) tells <b><strong class="Strong">tcl</strong></b> to delay the evaluation of the variables. The inside set of braces ({}) tells <b><strong class="Strong">tcl</strong></b> that the variable is <b><code class="CodeStrong">ROWS</code></b>, not <b><code class="CodeStrong">ROWSX</code></b>. The inside braces ({}) are also needed if an underscore (_) replaces the <b><code class="CodeStrong">X</code></b>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1043696"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>MC Netlist</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1044552"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">MC Netlist</code></b> command creates either a SPICE or Verilog netlist for the current MAX cell, as shown in <a href="mcc_man_Ch2runningMCC.html#1043703">Figure 3</a>. The created netlists are "two-level"; that is, they have a main cell that calls leaf cells. In the case of SPICE, the leaf cells are extracted SPICE <b><strong class="Strong">subckt's </strong></b>(subcircuits). In Verilog, they are hand built behavioral Verilog modules. For more information, see <a href="mcc_man_Ch3create-megacells.html#1028977"><b><code class="CodeStrong">Netlisting </code></b> </a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1043703"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 3:   MC Netlist Popup Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mc_netlist.gif" border="1">
+</div></font><a name="1043707"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1043708"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You use the <b><code class="CodeStrong">MC Netlist</code></b> command to set the type of netlist and optionally include parasitics and comments (verbose mode). If you are creating a SPICE netlist for LVS, you typically do not want parasitics, but you do want them for simulation. Note that Verilog netlisting ignores the parasitics switch. The verbose mode adds comments to the netlist detailing which text labels in the layout are attached to which nets. This is useful for debugging, but makes the netlists very large. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1043712"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>MC Critical Path</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1043713"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">MC Critical Path</code></b> command creates a SPICE netlist of the circuits in the cone of logic emanating in both directions from the selected cell(s). To run, you typically select the memory cell (for a memory) that is furthest away from the address/control inputs and then run <b><code class="CodeStrong">MC Critical Path</code></b>. This will bring up the pop-up menu shown in <a href="mcc_man_Ch2runningMCC.html#1045351">Figure 4</a>. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1045351"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 4:   Critical Path Extraction Pop-up Menu</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/crit_path_menu.gif" border="1">
+</div></font><a name="1045374"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1045350"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It will either create a SPICE <b><code class="CodeStrong">netlist</code></b> of the critical path, create a <b><code class="CodeStrong">layout</code></b> cell containing only the polygons associated with the critical path, or simply bring up the critical path pop-up <b><code class="CodeStrong">menu</code></b> shown in <a href="mcc_man_Ch2runningMCC.html#1043718">Figure 5</a>. If you select <b><code class="CodeStrong">netlist</code></b>, MCC will automatically create a small critical path netlist of the design (typically about 1000 devices) that can be simulated to verify performance from an extracted layout. The SPICE netlist includes R's and C's. For further details, see <a href="mcc_man_Ch3create-megacells.html#1029045"><b><code class="CodeStrong">Critical Path Netlist </code></b> </a>. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1043718"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 5:   MC Critical Path Popup Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mc_cp.gif" border="1">
+</div></font><a name="1043722"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1043726"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once the critical path has been created, the menu in <a href="mcc_man_Ch2runningMCC.html#1043718"><font  face="Verdana, Arial, Helvetica, sans-serif">Figure 5</font></a> appears, allowing you to view the critical path. Once the path(s) has been simulated, the results can be plotted with the NST waveform viewer, as shown in <a href="mcc_man_Ch2runningMCC.html#1044846">Figure 6</a>. For more information, see <a href="mcc_man_Ch3create-megacells.html#1029090"><b><code class="CodeStrong">Extracting the Critical Path </code></b> </a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1044846"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 6:   Plotting Critical Path With NST Waveform Viewer</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_man_Ch2runningMCC2.gif" height="406" width="975" border="1">
+</div></font><a name="1044861"> </a>
+      </pre>
+
+<h4>
+  <a name="1043728"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>MC What</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1043730"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">MC What</code></b> command helps you to create the tiling programs for megacells. You do not need to run <b><code class="CodeStrong">MC What, </code></b>but it can help in creating tiling programs or converting megacells built by hand or by other tools into an MCC parameterized megacell. </font>
+<p>
+<p>
+  <dt> <a name="1043731"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The syntax for the tiler takes a little getting used to because of its lists-of-lists structure. <b><code class="CodeStrong">MC What</code></b> allows you to simply drop the instances in a layout the way you want them, and <b><code class="CodeStrong">MC What</code></b> will create the appropriate tiling commands to generate that layout (for more information, see the section <a href="mcc_man_Ch3create-megacells.html#1028656"><b><code class="CodeStrong">Tiling </code></b> </a>). The tiling commands are described in detail in Chapter 3, "Creating Megacells". Note that <b><code class="CodeStrong">MC What</code></b> only helps generate the tiling, it does not help set up via programming or port propagation. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1043736"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 7:   MC What Popup Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mc_what.gif" border="1">
+</div></font><a name="1043740"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1043744"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you run <b><code class="CodeStrong">MC What</code></b>, you get a popup with three options as shown in <a href="mcc_man_Ch2runningMCC.html#1043736">Figure 7</a>. By default, <b><code class="CodeStrong">MC What</code></b> only creates the MACRO line (refer to the section <a href="mcc_man_Ch3create-megacells.html#1028656">Tiling</a>) for the current MAX cell and does not descend the hierarchy. If you turn on <b><code class="CodeStrong">hierarchy</code></b>, <b><code class="CodeStrong">MC What</code></b> will attempt to create the tiling commands for that cell all the way down to leaf cells. Thus if you run <b><code class="CodeStrong">MC What</code></b><b><code class="CodeStrong"> </code></b>on an entire hierarchical memory, you get a complete tiling program for that memory, if everything works correctly. <b><code class="CodeStrong">MC What</code></b> fails if the memory is not partitioned correctly or it cannot determine which cells are leaf cells. </font>
+<p>
+<p>
+  <dt> <a name="1043748"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The final two fields in the <b><code class="CodeStrong">MC What </code></b>menu are <b><code class="CodeStrong">remove_prefix</code></b> and <b><code class="CodeStrong">remove_suffix</code></b>. These act like the prefix and suffix fields in the <b><code class="CodeStrong">MC Build</code></b> command except in reverse. If you have a megacell that you are trying to decompose, these fields allow you to strip off prefixes or suffixes from all hierarchical cells. </font>
+<p>
+<p>
+  <dt> <a name="1043749"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that <b><code class="CodeStrong">MC What</code></b> does not necessarily create the best way to build a megacell; you might be able to group items more efficiently. Note also that <b><code class="CodeStrong">MC What</code></b> does not know when to add "<b><code class="CodeStrong">TOP</code></b>" or any other special keywords, and that in this version <b><code class="CodeStrong">MC What</code></b> ignores any spaces between abutment boundaries of cells. </font>
+<p>
+<p>
+  <dt> <a name="1029071"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="mcc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="mcc_man_Ch1overview.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="mcc_man_Ch3create-megacells.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

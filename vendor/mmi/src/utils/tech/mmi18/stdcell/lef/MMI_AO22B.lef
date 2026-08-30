@@ -1,0 +1,124 @@
+MACRO MMI_AO22B
+	CLASS CORE ;
+	FOREIGN MMI_AO22B 0 0 ;
+	SIZE 4.44 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.78 4.785 4.12 5.96 ;
+			LAYER M1 ;
+			RECT 3.78 4.2 4.24 4.785 ;
+			LAYER M1 ;
+			RECT 4.01 2.96 4.24 4.2 ;
+			LAYER M1 ;
+			RECT 3.87 2.22 4.24 2.96 ;
+			LAYER M1 ;
+			RECT 4.01 1.655 4.24 2.22 ;
+			LAYER M1 ;
+			RECT 3.78 1.115 4.24 1.655 ;
+			LAYER M1 ;
+			RECT 3.78 0.815 4.12 1.115 ;
+		END
+		AntennaDiffArea 1.3248 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.145 2.81 0.595 2.815 ;
+			LAYER M1 ;
+			RECT 0.145 2.47 0.76 2.81 ;
+			LAYER M1 ;
+			RECT 0.145 2.365 0.595 2.47 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.75 0.5 1.09 1.655 ;
+			LAYER M1 ;
+			RECT 3.06 0.5 3.4 1.155 ;
+			LAYER M1 ;
+			RECT 0 -0.5 4.44 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.42 3.63 0.76 3.97 ;
+			LAYER M1 ;
+			RECT 0.19 3.34 0.76 3.63 ;
+			LAYER M1 ;
+			RECT 0.19 3.11 2.35 3.34 ;
+			LAYER M1 ;
+			RECT 2.12 2.365 2.35 3.11 ;
+			LAYER M1 ;
+			RECT 2.09 2.025 2.43 2.365 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 4.44 7.9 ;
+			LAYER M1 ;
+			RECT 0.18 4.2 0.52 6.9 ;
+			LAYER M1 ;
+			RECT 3.06 4.2 3.4 6.9 ;
+		END
+	END VDD
+	PIN in3
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.13 2.2 3.555 2.815 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in3
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.99 2.365 1.585 2.815 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 0.9 5.73 2.68 5.96 ;
+		LAYER M1 ;
+		RECT 0.9 4.2 1.24 5.73 ;
+		LAYER M1 ;
+		RECT 1.62 4.2 1.96 5.48 ;
+		LAYER M1 ;
+		RECT 2.34 4.68 2.68 5.73 ;
+		LAYER M1 ;
+		RECT 1.715 3.8 1.945 4.2 ;
+		LAYER M1 ;
+		RECT 3.42 3.8 3.76 3.805 ;
+		LAYER M1 ;
+		RECT 1.715 3.57 3.76 3.8 ;
+		LAYER M1 ;
+		RECT 2.66 1.655 2.89 3.57 ;
+		LAYER M1 ;
+		RECT 3.42 3.465 3.76 3.57 ;
+		LAYER M1 ;
+		RECT 1.91 1.425 2.89 1.655 ;
+		LAYER M1 ;
+		RECT 1.91 0.815 2.25 1.425 ;
+	END
+END MMI_AO22B

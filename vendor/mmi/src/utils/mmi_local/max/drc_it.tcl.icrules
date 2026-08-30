@@ -1,0 +1,428 @@
+# drc_it.tcl
+
+# This tcl procedure will run icrules DRC's on the current cell and
+# return feedback information for MAX in a file called _DRCS_.
+# That file will automatically be read into the current cell so
+# the DRC's will be displayed.  Note that another procedure at
+# the bottom of this file is used to attach appropriate text to
+# each of the feedback regions.  This needs to be done so the user
+# can make sense of the feedback information.
+
+# One potential bug is that when the icrules output (drc_results)
+# is being parsed, the routine looks for a line with a single
+# string in it to determine that a new DRC has been encountered
+# (i.e. the line that reads "if {[llength $line] == 1} {").
+# This may not always be true.  What will likely need to be done
+# is to have another procedure that will decode the first string
+# in each line to determine if it is a DRC or not.  Care must
+# be taken to ensure that ALL DRCs are accounted for in that
+# procedure.
+
+# Randy Smith
+
+# drc_it.tcl, Version 1.7, 97/04/08
+
+proc drc_it {{quiet 1}} -desc {
+runs icrules drc on the current cell
+} {
+  global DRC_RULES_FILE LAYINFO tech
+
+  set cell [lay_rootcell]
+
+  if {$cell == "(UNNAMED)"} {
+    msg "Aborting, drc_it won't work with an unnamed cell.\n"
+    return
+  }
+
+  set drc_results "drc_results[pid]"
+
+  # Clear all previous feedback
+  :feedback clear
+
+  # write out the gds for the current cell
+  :calma write $cell
+
+  # create the ic rules command file
+  lappend text "LAYOUT SYSTEM GDSII"
+  lappend text "LAYOUT PATH '$cell.gds'"
+  lappend text "LAYOUT PRIMARY $cell"
+  lappend text "DRC RESULTS DATABASE $drc_results"
+  lappend text "DRC SUMMARY REPORT drc_summary"
+  lappend text "DRC MAXIMUM VERTEX 4"
+  lappend text "INCLUDE '$DRC_RULES_FILE'"
+  
+  set command_file "[pwd]/command[pid]"
+  exec echo [join $text \n] > $command_file
+
+  # run drc (ic rules)
+  puts "running icrules..."
+
+  if {$quiet != 1} {
+    # not quietly
+#  exec rsh mmics6 \
+    "source ~cad/cad_cshrc; cd [pwd]; icverify -icrules $command_file" \
+    >& [exec tty]
+  } else {
+    # quietly
+    exec rsh mmics6 \
+	"source ~cad/cad_cshrc; cd [pwd]; icverify -icrules $command_file"
+  }
+
+  # read the drc_results file and create cells with errors in it.
+  puts "parsing drc results file..."
+
+  set file_id [open $drc_results r]
+
+  # create a feedback source file.
+  set error_file "_DRCS_"
+  set error_id [open $error_file w]
+
+  gets $file_id line
+  set scale [lindex $line 1]
+
+  set error_types 0
+
+  while {[gets $file_id line] >= 0} {
+    if {[llength $line] == 1} {
+      # only occurs when starting a new error cell
+      set error_type $line
+
+      # next line says how many errors
+      gets $file_id line
+      set errors [lindex $line 0]
+
+      # ignore next bogus line
+      gets $file_id line
+
+      if {$errors == 0} {
+	# no errors, go on to next error cell
+	continue
+      }
+
+      incr error_types
+      puts "  $error_type"
+
+      # we have errors, collect them into a cell
+      for {set i 0} {$i < $errors} {incr i} {
+	gets $file_id line
+	if {[lindex $line 0] == "e"} {
+	  # parse an edge rule
+	  gets $file_id line
+	  set xa [lindex $line 0]
+	  set ya [lindex $line 1]
+	  set xb [lindex $line 2]
+	  set yb [lindex $line 3]
+	  gets $file_id line
+	  set xc [lindex $line 0]
+	  set yc [lindex $line 1]
+	  set xd [lindex $line 2]
+	  set yd [lindex $line 3]
+
+	} elseif {[lindex $line 0] == "p"} {
+	  # parse a polygon rule
+	  set psides [lindex $line 2]
+	  if {$psides == 3} {
+	    gets $file_id line
+	    set xa [lindex $line 0]
+	    set ya [lindex $line 1]
+	    gets $file_id line
+	    set xb [lindex $line 0]
+	    set yb [lindex $line 1]
+	    gets $file_id line
+	    set xc [lindex $line 0]
+	    set yc [lindex $line 1]
+	    set xd [lindex $line 0]
+	    set yd [lindex $line 1]
+	  } elseif {$psides == 4} {
+	    gets $file_id line
+	    set xa [lindex $line 0]
+	    set ya [lindex $line 1]
+	    gets $file_id line
+	    set xb [lindex $line 0]
+	    set yb [lindex $line 1]
+	    gets $file_id line
+	    set xc [lindex $line 0]
+	    set yc [lindex $line 1]
+	    gets $file_id line
+	    set xd [lindex $line 0]
+	    set yd [lindex $line 1]
+	  } else {
+	    puts "Non 3 or 4 Sided Polygonal Data Output"
+	  }
+	}
+
+	set x1 [lindex [lsort -integer "$xa $xb $xc $xd"] 0]
+	set x2 [lindex [lsort -integer "$xa $xb $xc $xd"] 3]
+	set y1 [lindex [lsort -integer "$ya $yb $yc $yd"] 0]
+	set y2 [lindex [lsort -integer "$ya $yb $yc $yd"] 3]
+	set x1 [round_list_scale [expr $x1*1.0/$scale] $LAYINFO(grid)]
+	set y1 [round_list_scale [expr $y1*1.0/$scale] $LAYINFO(grid)]
+	set x2 [round_list_scale [expr $x2*1.0/$scale] $LAYINFO(grid)]
+	set y2 [round_list_scale [expr $y2*1.0/$scale] $LAYINFO(grid)]
+
+	puts $error_id "lay_box $x1 $y1 $x2 $y2"
+	puts $error_id ":feedback add \"[get_drc_text $error_type]\" pale"
+      }
+    }
+  }
+
+  # close the files
+  close $error_id
+  close $file_id
+
+  # delete the command file and the result file
+#  catch {exec rm -f $command_file}
+  catch {exec rm -f $drc_results}
+
+  if {$error_types == 0} {
+    puts "DRC complete.  Cell is CLEAN!"
+  } else {
+    puts "DRC complete.  $error_types error types found."
+  }
+  source  _DRCS_
+}
+
+
+proc get_drc_text {drc_type} -desc {
+translates drc error name into text for tsmc
+} {
+
+  switch $drc_type {
+    NWW1 {return "NWELL Dimension < 1.7 um"}
+    NWS2 {return "NWELL Space < 1.0 um"}
+    NWCO1 {return "This NWELL is not contacted"}
+    PWCO1 {return "Substrate is not contacted"}
+    NWCO2 {return "Nearest NWELL contact is < 20um away"}
+    PWCO2 {return "Nearest Substrate contact is < 20um away"}
+    NWCO3 {return "Nearest NWELL contact is too far away"}
+    PWCO3 {return "Nearest Substrate contact is too far away"}
+
+    ODW1 {return "Active Width \(Device\) < 0.4 um"}
+    ODW2 {return "Active Width \(Interconnect\) < 0.5 um"}
+    ODSN1 {return "N-Active Space < 0.6 um"}
+    ODSP1 {return "P-Active Space < 0.6 um"}
+    ODC1 {return "NWELL overlap of N-Active < 0.2 um"}
+    ODC2 {return "NWELL to N-Active Space < 1.2 um"}
+    ODC4 {return "NWELL overlap of P-Active < 1.2 um"}
+    ODC5 {return "NWELL to P-Active Space < 0.2 um"}
+    ODCN6 {return "Poly Edge to N-Active Space < 0.45 um"}
+    ODCP6 {return "Poly Edge to P-Active Space < 0.45 um"}
+    ODS2 {return "P-Active to N-Active Space < 0.6 um"}
+
+    POW1 {return "FET Gate Length < 0.35 um"}
+    POW2 {return "POLY Width < 0.35 um"}
+    POS1 {return "Poly on Active Space < 0.65 um"}
+    POS2 {return "Poly on Field Space < 0.45 um"}
+    POC1 {return "Poly on Field to Active Space < 0.2 um"}
+    POC2 {return "Poly to Related Active Space < 0.6 um"}
+    POO1 {return "Poly Overlap onto Field < 0.4 um"}
+
+    PPW1 {return "P-Plus Width < 0.6 um"}
+    PPS1 {return "P-Plus Space < 0.6 um"}
+    PPC1 {return "P-Plus to Active Space < 0.35 um"}
+    PPC3 {return "P-Plus to P-FET Gate Space < 0.45 um"}
+    PPO1 {return "Active Clearance to P-PLUS Edge < 0.45 um"}
+    PNE1 {return "P-Plus Overlap of Active < 0.25 um"}
+    PPC5 {return "P-Plus to N-Plus Space on Poly < 0.25 um"}
+    PPC6 {return "P-Plus to N-Plus Space on Active < 0.0 um"}
+
+    NPW1 {return "N-Plus Width < 0.6 um"}
+    NPS1 {return "N-Plus Space < 0.6 um"}
+    NPC1 {return "N-Plus to Active Space < 0.35 um"}
+    NPC3 {return "N-Plus to N-FET Gate Space < 0.45 um"}
+    NPO1 {return "Active Clearance to N-PLUS Edge < 0.45 um"}
+
+    COW1 {return "Contact Width < 0.4 um"}
+    COWM1 {return "Contact Width > 0.4 um"}
+    COS1 {return "Contact Space < 0.4 um"}
+    COC1 {return "Contact to Active Space < 0.3 um"}
+    COC2 {return "Contact on POLY to Active Space < 0.4 um"}
+    COE1 {return "Active Overlap of Contact < 0.25 um"}
+    COE2 {return "POLY Overlap of Contact < 0.2 um"}
+    COE3 {return "P-PLUS Overlap of S/D Contact < 0.25 um"}
+    COE4 {return "N-PLUS Overlap of S/D Contact < 0.25 um"}
+    COR1 {return "Contact on Gate Not Allowed"}
+
+    M1W1 {return "Metal 1 Width < 0.5 um"}
+    M1S1 {return "Metal 1 Space < 0.45 um"}
+    M1E1 {return "Metal 1 Overlap of Contact < 0.15 um"}
+
+    VIW1 {return "VIA 1 Width < 0.5 um"}
+    VIW21 {return "VIA 1 Width > 0.5 um"}
+    VIS1 {return "VIA 1 Space < 0.45 um"}
+    VIE1 {return "Metal 1 Overlap of VIA 1 < 0.2 um"}
+
+    M2W1 {return "Metal 2 Width < 0.6 um"}
+    M2S1 {return "Metal 2 Space < 0.5 um"}
+    M2E1 {return "Metal 2 Overlap of VIA 1 < 0.15 um"}
+
+    V2W1 {return "VIA 2 Width < 0.5 um"}
+    V2W21 {return "VIA 2 Width > 0.5 um"}
+    V2S1 {return "VIA 2 Space < 0.45 um"}
+    V2E1 {return "Metal 2 Overlap of VIA 2 < 0.2 um"}
+
+    M3W1 {return "Metal 3 Width < 0.6 um"}
+    M3S1 {return "Metal 3 Space < 0.5 um"}
+    M3E1 {return "Metal 3 Overlap of VIA 2 < 0.15 um"}
+
+    V3W1 {return "VIA 3 Width < 0.5 um"}
+    V3W21 {return "VIA 3 Width > 0.5 um"}
+    V3S1 {return "VIA 3 Space < 0.45 um"}
+    V3E1 {return "Metal 3 Overlap of VIA 3 < 0.2 um"}
+
+    M4W1 {return "Metal 4 Width < 0.6 um"}
+    M4S1 {return "Metal 4 Space < 0.5 um"}
+    M4E1 {return "Metal 4 Overlap of VIA 3 < 0.15 um"}
+
+    ESDW1 {return "ESD Implant Width < 0.6 um"}
+    ESDS1 {return "ESD Implant Space < 0.6 um"}
+    ESDE1 {return "ESD Active Overlap of ESD Implant < 0.5 um"}
+    ESDE2 {return "ESD Implant Overlap of Contact < 0.5 um"}
+    ESDC1 {return "ESD Implant Space to N-FET Gate < 0.5 um"}
+    ESDC2 {return "ESD Implant Space to P-PLUS on Active < 0.0 um"}
+
+    RPW1 {return "RPO Width < 0.8 um"}
+    RPS1 {return "RPO Space < 0.8 um"}
+    RPC1 {return "RPO Space to Related Active < 0.4 um"}
+    RPC2 {return "RPO Space to Contact on Active < 0.4 um"}
+    RPC3 {return "RPO Space to POLY on Active < 0.6 um"}
+    RPC4 {return "RPO Space to Unrelated Active < 0.4 um"}
+    RPE1 {return "Active Overlap of RPO < 0.6 um"}
+
+    FOO {return "FOO FOO Stuff"}
+    default {return "Unknown Error $drc_type"}
+  }
+}
+
+proc get_drc_text_umc {drc_type} -desc {
+translates drc error name into text for umc
+} {
+
+  switch $drc_type {
+    E1Aa45 {return "E1Aa45, NMOS Width  < 0.5"}
+    E1Ab45 {return "E1Ab45, PMOS Width  < 0.5"}
+    E1Ba45 {return "E1Ba45, NDIFF Width  < 0.5"}
+    E1Bb45 {return "E1Bb45, PDIFF Width  < 0.5"}
+    E1Ca45 {return "E1Ca45, NDIFF to NDIFF Space  < 0.55"}
+    E1Cb45 {return "E1Cb45, PDIFF to PDIFF Space  < 0.55"}
+    E1Cc45 {return "E1Cc45, NDIFF to PDIFF Space  < 0.55"}
+    E1D45 {return "E1D45, NWELL to NDIFF Space  < 1.2"}
+    E1E45 {return "E1E45, NWELL overlap of NDIFF < 0.5"}
+    E1F45 {return "E1F45, NWELL to PDIFF Space < 0.5"}
+    E1G45 {return "E1G45, NWELL overlap of PDIFF < 1.2"}
+    E1H45 {return "E1H45, Min Field ISO Area < 2.0 um2"}
+    E1I45 {return "E1I45, Min Diffusion Area < 1.0 um2"}
+
+    ERR045 {return "ERR045, Some Weird NWELL Rule that I can't figure out"}
+    E2A45 {return "E2A45, NWELL Width < 1.5"}
+    E2C45 {return "E2C45, NWELL Space < 3.0"}
+
+    E4A45 {return "E4A45, Min Poly Width for NMOS < 0.35"}
+    E4B45 {return "E4B45, Min Poly Width for PMOS < 0.35"}
+    E4C45 {return "E4C45, Min Poly Width for Interconnect < 0.35"}
+    E4Da45 {return "E4Da45, Min Poly Space on Diffusion < 0.5"}
+    E4Db45 {return "E4Db45, Min Poly Space on Field < 0.4"}
+    E4E45 {return "E4E45, Min Poly Extension onto Field < 0.45"}
+    E4F45 {return "E4F45, Min Poly to Diffusion Edge Space < 0.2"}
+    E4H45 {return "E4H45, Min Poly Gate to Field Edge Space < 0.4"}
+    E4I45 {return "E4I45, Max Poly Overlap Diffusion Area > 10Kum2"}
+    E4N45 {return "E4N45, Some Weird Poly Pad Rule"}
+
+    E6A45 {return "E6A45, Min PPLUS Width < 0.8"}
+    E6B45 {return "E6B45, Min PPLUS Space < 0.8"}
+    E6Ca45 {return "E6Ca45, Min PPLUS Overlap of PDiff in NWELL < 0.4"}
+    E6Cb45 {return "E6Cb45, Min PPLUS Overlap of PDiff in PWELL < 0.15"}
+    E6Da45 {return "E6Da45, Min PPLUS Space to NDiff in PWELL < 0.4"}
+    E6Db45 {return "E6Db45, Min PPLUS Space to NDiff in NWELL < 0.15"}
+    E6F45 {return "E6F45, Min PPLUS Overlap of Diff to from PPLUS Region < 0.6"}
+    E6Ga45 {return "E6Ga45, Min Diff Extension over PPLUS to form NDIFF Region < 0.6"}
+    E6Gb45 {return "E6Gb45, Min Diff Extension over PPLUS to form NDIFF Region < 0.6"}
+    E6H45 {return "E6H45, Min Poly to PPLUS space to form N S/D Region < 0.6"}
+    E6I45 {return "E6I45, Min PPLUS extension over Poly to form P S/D Region < 0.6"}
+    E6J45 {return "E6J45, Min PPLUS overlap PPLUS Contact < 0.2"}
+    E6K45 {return "E6K45, Min PPLUS Space to NPLUS Contact < 0.2"}
+
+    E7A45 {return "E7A45, Min SAB Width < 0.8"}
+    E7B45 {return "E7B45, Min SAB Space < 0.8"}
+    E7C45 {return "E7C45, Min SAB Extension over Diffusion < 0.3"}
+    E7D45 {return "E7D45, Min SAB to Poly Space < 0.5"}
+    E7E45 {return "E7E45, Min SAB to Unrelated Diff Space < 0.25"}
+    E7F45 {return "E7F45, Min SAB Overlap of Diff Contact < 1.5"}
+    E7I45 {return "E7I45, Min SAB Extension over Poly Res < 0.5"}
+    E7J45 {return "E7J45, Min SAB to Salicide Contact Space < 0.5"}
+
+    E8Ab45 {return "E8Ab45, Contact size not 0.4 x 0.4"}
+    E80145 {return "E80145, Some Weird Contact Error"}
+    E80245 {return "E80245, Some Weird Contact Error"}
+    E80345 {return "E80345, Some Weird Contact Error"}
+    E8Aa45 {return "E8Aa45, Contact size not 0.4 x 0.4"}
+    E8B45 {return "E8B45, Contact Space < 0.5"}
+    E8C45 {return "E8C45, Diff Contact to Poly Space < 0.3"}
+    E8D45 {return "E8D45, Poly Contact to Diff Space < 0.3"}
+    E8E45 {return "E8E45, Min Poly Overlap of Contact < 0.2"}
+    E8F45 {return "E8F45, Min PDIFF Overlap of PDIFF Contact < 0.2"}
+    E8G45 {return "E8G45, Min NDIFF Overlap of NDIFF Contact < 0.2"}
+
+    E9A45 {return "E9A45, Min Metal 1 Width < 0.5"}
+    E9Ba45 {return "E9Ba45, Min Metal 1 Space < 0.45"}
+    E9Bb145 {return "E9Bb145, Min Wide Metal 1 Space < 0.65"}
+    E9Bb245 {return "E9Bb245, Min Wide Metal 1 Space < 0.65"}
+    E9C45 {return "E9C45, Max Metal 1 Space < 500"}
+    E9Dad45 {return "E9Dad45, Min Metal 1 overlap of Contact < 0.05"}
+    E9Dbc45 {return "E9Dbc45, Min Metal 1 overlap of Contact < 0.15"}
+    E9E45 {return "E9E45, Min Metal 1 Area < 1um2"}
+
+    E10Ab45 {return "E10Ab45, Via1 Size not 0.45 x 0.45"}
+    E10C145 {return "E10C145, Via1 not covered by Metal 1"}
+    E10Aa45 {return "E10Aa45, Via1 Size not 0.45 x 0.45"}
+    E10B45 {return "E10B45, Via1 Space < 0.5"}
+    E10Ca45 {return "E10Ca45, Metal 1 overlap ov Via1 < 0.2"}
+    E10Cb45 {return "E10Cb45, Wide Metal 1 overlap of Via1 < 0.4"}
+
+    E11A45 {return "E11A45, Metal 2 Width < 0.55"}
+    E11Ba45 {return "E11Ba45, Metal 2 Space < 0.5"}
+    E11Bb145 {return "E11Bb145, Wide Metal 2 Space < 0.7"}
+    E11Bb245 {return "E11Bb245, Wide Metal 2 Space < 0.7"}
+    E11C45 {return "E11C45, Max Metal 2 Space < 500"}
+    E11D45 {return "E11D45, Via1 not covered by Metal 2"}
+    E11Dad45 {return "E11Dad45, Metal 2 Overlap of Via1 < 0.05"}
+    E11Dbc45 {return "E11Dbc45, Metal 2 Overlap of Via1 < 0.15"}
+    E11E45 {return "E11E45, Min Metal 2 Area < 1um2"}
+
+    E12Ab45 {return "E12Ab45, Via2 Size not 0.45 x 0.45"}
+    E12Aa45 {return "E12Aa45, Via2 Size not 0.45 x 0.45"}
+    E12C145 {return "E12C145, Via2 not covered by Metal2"}
+    E12B45 {return "E12B45, Via2 Space < 0.5"}
+    E12Ca45 {return "E12Ca45, Metal2 overlap of Via2 < 0.2"}
+    E12Cb45 {return "E12Cb45, Wide Metal2 overlap of Via2 < 0.4"}
+
+    E13A45 {return "E13A45, Metal 3 Width < 0.55"}
+    E13Ba45 {return "E13Ba45, Metal 3 Space < 0.5"}
+    E13Bb145 {return "E13Bb145, Wide Metal 3 Space < 0.7"}
+    E13Bb245 {return "E13Bb245, Wide Metal 3 Space < 0.7"}
+    E13C45 {return "E13C45, Via2 not covered by Metal 3"}
+    E13Cad45 {return "E13Cad45, Metal 3 Overlap of Via1 < 0.05"}
+    E13Dbc45 {return "E13Dbc45, Metal 3 Overlap of Via1 < 0.15"}
+    E13D45 {return "E13D45, Min Metal 3 Area < 1um2"}
+
+    EP0A45 {return "EP0A45, Pad Without Metal 3"}
+    P1A45 {return "P1A45, Pad Must Be 90 x 90"}
+    P1B45 {return "P1B45, Pad Window Space < 25"}
+    P1D1a45 {return "P1D1a45, Pad Metal to Scribe Line Space < 20"}
+    P1D2a45 {return "P1D2a45, Pad Metal to Scribe Line Space < 20"}
+    P1D3a45 {return "P1D3a45, Pad Metal to Scribe Line Space < 20"}
+    P1D4a45 {return "P1D4a45, Pad Metal to Scribe Line Space < 20"}
+    P1D5a45 {return "P1D5a45, Pad Metal to Scribe Line Space < 20"}
+    P1D6a45 {return "P1D6a45, Pad Metal to Scribe Line Space < 20"}
+    P1E145 {return "P1E145, Pad Window to Via Space < 6"}
+    P1E245 {return "P1E245, Pad Window to Via Space < 6"}
+    P1F45 {return "P1F45, Pad Metal Overlap of Pad Window < 2"}
+    P1H145 {return "P1H145, Pad Metal Overlap of Via < 2"}
+    P1H245 {return "P1H245, Pad Metal Overlap of Via < 2"}
+    P1H345 {return "P1H345, Pad Metal Overlap of Via < 2"}
+    P1H445 {return "P1H445, Pad Metal Overlap of Via < 2"}
+
+    FOO {return "FOO FOO Stuff"}
+    default {return "Unknown Error $drc_type"}
+  }
+}

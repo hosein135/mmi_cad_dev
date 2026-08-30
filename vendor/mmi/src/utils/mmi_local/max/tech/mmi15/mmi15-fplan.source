@@ -1,0 +1,215 @@
+# This is the technology source file for mmi15 (0.15 um CMOS)
+
+# This command will preserve MAX port types by writing them out to
+# different datatypes.  Only valid if no datatypes are specified.
+#preserve_ports
+
+
+#layer	gds:dt	txt:dt	type	width	space	color
+#======	=======	=======	=======	=======	=======	=======
+nw  	3	-	-	0.73	0.73	              
+od    	6	-	gdsonly	-	-
+odp  	7	-	gdsonly	-	-
+odn  	8	-	gdsonly	-	-
+ndif	derived	-	act	0.18	0.24	66,213,66
+pdif	derived	-	act	0.18	0.24	202,160,115
+nwc	derived	ndif	act	0.18	0.24	-
+pwc	derived	pdif	act	0.18	0.24	-
+od2   	15	-	-	-	-
+poly  	17	-	poly	0.15    0.22
+n3v   	21	-	-	-	-
+pplus  	25	-	-	0.38    0.38
+nplus  	26	-	-	0.38    0.38
+ct    	30	-	via	0.18    0.21
+m1    	31	131	metal	0.19    0.20
+v12  	51	-	via	0.22    0.22
+m2    	32	132	metal	0.24    0.24
+v23  	52	-	via	0.22    0.22
+m3    	33	133	metal	0.24    0.24
+v34  	53	-	via	0.22    0.22
+m4    	34	134	metal	0.24    0.24
+v45  	54	-	via	0.22    0.22
+m5    	35	135	metal	0.24    0.24
+v56  	55	-	via	0.36    0.35
+m6    	36	136	metal	0.44    0.46
+pad   	43	-	-	-	-             
+sd   	58	-	-	-	-             
+esd   	27	-	-	-	-
+rpo   	29	-	-	-	-
+prb	68	-	-	-	-	
+text	-	255	text
+bbox	62	-	bbox
+iname	propattr 102	iname
+# Obstruction layers
+m1_obs	71	-	-	-	-	8,139,255
+m2_obs	72	-	-	-	-	182,124,222
+m3_obs	73	-	-	-	-	255,160,65
+m4_obs	74	-	-	-	-	61,122,188
+m5_obs	75	-	-	-	-	255,215,0
+m6_obs	76	-	-	-	-	200,100,100
+pl_obs	77	-	-	-	-
+# These are used for display purposes only.
+Red	-	-	-	-	-	255,0,0
+Yellow	-	-	-	-	-	255,255,0
+Green	-	-	-	-	-	0,255,0
+
+
+
+device nfet from poly ndif
+device pfet from poly pdif
+
+# for butting contacts
+connect nwc pdif
+connect pwc ndif
+
+# on output
+# if you want to write out all diffusions on the same layer, use od
+derive od from ndif,pdif,nwc,pwc
+derive odn from ndif,nwc
+derive odp from pdif,pwc
+
+# in input
+derive ndif from od and-not pplus or odn and-not nw
+derive pdif from od and pplus or odp and nw
+derive nwc from od and-not pplus or odn and nw
+derive pwc from od and pplus or odp and-not nw
+
+# automatic generation of pplus, nplus, nw
+# generation for nplus/pplus on poly everywhere
+
+derive ppoly from GDS_nw grow 0.2 and poly grow 0.2
+derive pplus from pfet grow 0.15 or pdif grow 0.16 or pwc grow 0.04 \
+	or ppoly and-not ndif and-not GDS_nplus \
+	or pplus shrink 0.16 grow 0.32 shrink 0.16
+	
+derive npoly from poly grow 0.2 and-not ppoly
+derive nplus from nfet grow 0.15 or ndif grow 0.16 or nwc grow 0.04 \
+	and-not pdif or npoly and-not pplus \
+	or nplus shrink 0.16 grow 0.32 shrink 0.16
+
+# To remove nwell generation
+#derive block from pplus and-not nw
+#derive nw from pdif grow .12 or nwc grow 0.24 or nw \
+#	and-not block shrink 0.30 grow 0.60 shrink 0.30
+
+derive nw from pdif grow .12 or nwc grow 0.24 or nw \
+	grow 0.36 shrink 0.36
+
+drc nw enc pdif 0.36
+drc nw enc nwc 0.24
+drc nw space_to ndif 0.36
+drc nw space_to pwc 0.24
+
+drc pplus enc pfet 0.35
+drc pplus enc pdif 0.20
+drc pplus enc pwc 0.04
+
+drc pplus space_to nplus 0.0
+
+drc nplus enc nfet 0.35
+drc nplus enc ndif 0.20
+drc nplus enc nwc 0.04
+
+# recommended 0.29
+drc nfet space 0.22
+drc pfet space 0.22
+
+derive tmp1 from nfet,pfet grow 0.085
+derive poly_not_fet from poly and-not tmp1
+derive all_diff from ndif,pdif,nwc,pwc
+drc poly_not_fet space_to all_diff 0.085
+
+# for < max3.0 must be on same plane
+drc poly ext nfet 0.22
+drc poly ext pfet 0.22
+
+#drc ndif ext nfet 0.27
+#drc pdif ext pfet 0.27
+# Since this conflicts with the nfet, pfet space rules
+drc ndif ext nfet 0.22
+drc pdif ext pfet 0.22
+set DRC_DATA(extend,ndif,nfet) 0.27
+set DRC_DATA(extend,pdif,pfet) 0.27
+
+drc pwc area 0.144
+drc nwc area 0.144
+
+derive ct_ndif from ct and ndif,nwc
+derive ct_pdif from ct and pdif,pwc
+drc ct_ndif space_to nfet 0.13
+drc ct_pdif space_to pfet 0.13
+
+derive ct_poly from ct and poly
+drc ct_poly space_to pfet 0.17
+drc ct_poly space_to nfet 0.17
+
+derive all_poly_dif from ndif,pdif,nwc,pwc,poly
+drc all_poly_dif enc ct 0.085
+
+DRC m1 ENC ct 0.05 0.005
+DRC m1 ENC v12 0.05 0.01
+DRC m2 ENC v12 0.05 0.01
+DRC m2 ENC v23 0.05 0.01
+DRC m3 ENC v23 0.05 0.01
+DRC m3 ENC v34 0.05 0.01
+DRC m4 ENC v34 0.05 0.01
+DRC m4 ENC v45 0.05 0.01
+DRC m5 ENC v45 0.05 0.01
+DRC m5 ENC v56 0.05 0.01
+DRC m6 ENC v56 0.09 0.01
+
+
+drc m1 area 0.144
+drc m2 area 0.144
+drc m3 area 0.144
+drc m4 area 0.144
+drc m5 area 0.144
+drc m6 area 0.562
+
+
+# add other tcl variable definitions with the set statement
+
+################################################################
+# USER DESIGN GRID
+# This is the initial value shown in the Grid menu.
+################################################################
+set GRID(resolution) 0.005
+set GRID(mask) 0.005
+
+
+################################################################
+# LAYER NAMES
+# Mapping from mmi layer names to customer tech names.
+# Change the name on the right to be the name of the specified
+# layer in this technology file.
+# Note that contact and poly could be derived from info above.
+################################################################
+
+set LAYER_NAME(pdiff) pdif
+set LAYER_NAME(ndiff) ndif
+set LAYER_NAME(nplus) nplus
+set LAYER_NAME(pplus) pplus
+set LAYER_NAME(nwell) nw
+set LAYER_NAME(poly) poly
+set LAYER_NAME(contact) ct
+
+
+set DRC_DATA(enclose,diff,ct) 0.085
+set DRC_DATA(spacing,diff) 0.24
+set DRC_DATA(space_to,poly,diff) 0.085
+set DRC_DATA(space_to,ct,gate) 0.13
+
+################################################################
+# LAYOUT GENERATOR RULES
+# Additional Rules for Layout Generator used
+# when generating standard cells.
+################################################################
+
+set LAYINFO(stdcell:cell_height) 6.2
+set LAYINFO(stdcell:dpc_router_pitch) 0.62  ;# Router pitch for m1, m2, m3, etc.
+set LAYINFO(stdcell:power_strap_width) 0.84
+# You can optionally use a smaller cell_router_pitch than
+# dpc_router_pitch.  The min poly contact pitch is .67, but in order
+# to put a .45 router landing pad in the track, it must be .68.
+set LAYINFO(stdcell:cell_router_pitch) 0.58  ;# Router pitch for poly/metal.
+

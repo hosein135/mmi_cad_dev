@@ -1,0 +1,235 @@
+SUE Frequently Asked Questions:
+
+Q: Are my SUE files corrupted if my machine crashes.
+
+A: When SUE netlists to either spice or verilog, it creates cache
+   files so that subsequent netlisting is faster.  These files can
+   get corrupted so it is a good idea to do a:
+
+	rm *.cache tclIndex
+
+   Note that is is also a good idea to delete these cache files
+   when upgrading to a new version of SUE or if something weird
+   happens when running SUE.
+
+
+Q: What do I do if I want to netlist a schematic in a directory that I
+   don't have write permission into?
+
+A: Netlisting information goes into the same directory as where the 
+   schematic came from.  Do a "change path of cell" in the "File" menu
+   to change the schematic's path to a place where you do have write
+   permission and netlist again.
+
+
+Q: Every time I bring up a certain schematic, it gives me an older 
+   version of it even though I keep fixing it and saving it out.
+   What gives?
+
+A: You probably did a unix copy of the schematic to give it another
+   name.  For example you copied foo.sue to be foo_old.sue.  Because
+   both of these files have the .sue suffix, SUE looks into both of 
+   them and sees the schematic called foo and gets confused.  
+   Solution: don't use unix cp/mv to change the name of a cell (changing
+   its directory is ok).  To see what potential problems you have
+   do a "check file system" command from the "File" menu.
+
+
+Q: When I netlist, I get the wrong syntax for one of my I/O's.  What's
+   wrong?
+
+A: You probably named one of your I/O's to be the same name as one
+   of the "user" properties.  These are the names of the headings in 
+   the "edit properties" menu that you get when you double-click on
+   an icon and they are defined in the icon view of that schematic.
+   For example, you might have called the port "M" but you have a
+   user property of "M" for the spice multiplier.  Solution:  either
+   rename the I/O or remove/rename the user property.
+
+
+Q: The Pearl static timing analyser, when running SUE DPC, gives the
+   error:
+
+	Error: possibility number must be 1:2
+
+   or similar.  What does this mean?
+
+A: Pearl has been instructed to report the top "n" (default is in
+   DPC_TIMING(paths)) critical paths.  If there are fewer than "n"
+   paths in the circuit, Pearl will give this error message.  In a
+   purely combinational circuits, Pearl thinks there are only as
+   many paths as outputs (don't ask me why).
+
+   Note: you can safely ignore this error.
+
+
+Q: The wires don't line up exactly with the icon ports in the schematic.
+   What happened and how do I fix this?
+
+A: Sometimes (usually due to a bug in SUE) the icons get "off grid".  To
+   fix this, go to the schematic with the off grid problem and type:
+
+	fix_off_grid
+
+   in the SUE command window.  This should fix the off grid icons
+   (remember to save the fixes).  Note that this fix will sometimes 
+   disconnect some wires that you need to then manually fix.
+
+
+Q: Can I run SUE in the background?
+
+A: No, SUE must run in the foreground.  Note that if you pause SUE
+   with Ctrl-Z, placing it in the background, the window won't even
+   repaint until you place it back into the foreground.  Furthermore,
+   the Ctrl-C and Ctrl-D functions in the SUE command window (now a
+   unix window) have been disabled and won't be re-enabled until you
+   exit normally from SUE.
+
+
+Q: Why do I sometimes get a SUE ERROR when netlisting or other operation?
+
+A: If you hit the hotkey for an operation twice in a row, you will get
+   an error.  Be careful not to repeat hotkeys or hold them down which
+   causes auto repeat.
+
+
+Q: SUE is producing strange, inconsistent behavior.  Sometimes libraries
+   don't get autoloaded.  What gives?
+
+A: If any of the disks that SUE accesses through any libraries are full,
+   SUE will choke since it needs to write temporary files (in particular
+   the tclIndex file).  Check if your disks are full, and if so, make some
+   room on them.
+
+
+Q: SUE seems to put out verilog syntax that my tool can't read.  What 
+   syntax is bad and why?
+
+A: The full verilog definition is incredibly complicated (some would
+   say "rich"), especially dealing with behavioral/RTL code.  Verilog
+   is often used as a structural netlist format for tools like
+   place & route and static timing analysis.  Hence any behavioral
+   code is off limits in these applications.  The question of what
+   syntax exactly is ok for these tools is, unfortunately, not
+   consistent.  The problems usually come down to two problems:
+
+	A. Use of the "assign" statement
+	B. Legal/Illegal characters in names and nets
+
+   The "assign" statement is particularly problematic.  We have
+   seen tools with some or all of the following restrictions:
+
+	1. Doesn't allow use of the assign statement at all
+	2. Doesn't allow outputs to be assigned to internal nets
+	3. Doesn't allow outputs to be assigned to inputs
+	4. Doesn't recognize the multiplier syntax, e.g.: 4{GND}
+	5. Doesn't allow left hand concatenation, e.g.:
+		assign {a,b} = c;
+
+   Most tools seem to allow 1 and 2.  Many tools break on
+   3, 4, and/or 5.  The syntax of 5 is created by the bus_split 
+   icon (might be removed from your library).  The bus_combine 
+   icon creates the most tolerant form of assign.	
+
+   Bottom line: don't use bus_split.
+
+
+Q: When trying to save a file, SUE aborts, giving me an error that says
+   there is a newer sccs version than the one I have.  How can
+   I save this file?
+
+A: SUE is trying to tell you that someone else (or possibly you in
+   a concurrent version of SUE) has modified the cell you are in and
+   saved it back.  Therefore, your version is out of date and saving
+   it will wipe out someone else's edits.
+
+   What to do?  If you are sure that you want to save this cell as is,
+   just change the version number in the sccs_title_bar (you might
+   have to add one first) to the most recent version and save again.
+
+   Otherwise, SUE copy the cell to another name.  In a unix window,
+   check out the most recent version of the cell.  In SUE, revert
+   the cell and add your changes into it, and then save.
+
+
+Q: When I try to run SUE, I get a "word too long" error and SUE doesn't come
+   up.  What went wrong?
+
+A: Your font path is too long.  To fix, type:
+
+	xset fp default
+
+
+Q: SUE's netlister isn't correctly generating buses when I use name nets.
+   What am I doing wrong?
+
+A: Don't put name nets directly on ports of instances, I/O's,
+   bus_combines, etc.  Move them off at least one grid.  This should
+   fix the problem.
+
+
+Q: What's the difference between name_net, name_net_s, and name_net_sw?
+
+A: There is no functional difference.  They just provide a different look
+   to the schematics.
+
+
+Q: SUE won't run external programs like verilog or chmod.  SUE says
+   that they aren't in my unix path, but when I check my path, they
+   are there.  Why can't SUE find them?
+
+A: Your path probably includes some non-directories in it.  There is
+   a TCL bug that if an element in the path is not a directory, it
+   barfs.  Check your path and make sure that each entry is a directory.
+
+   Another possibility is that your path is too long and that when
+   you start up SUE, you get the message:
+
+		ridiculously long path, truncating
+
+   In this case you need to shorten your path.
+
+
+Q: Is it possible to cut text out of another unix window and
+   paste it into a SUE schematic?
+
+A: You can paste into popup windows in SUE.  For example, if you 
+   double click on an icon, SUE will popup a window to edit its 
+   properties.  You can cut and paste into this window.  
+
+   You can't paste text directly into a text item in SUE, i.e. one
+   that you get to from the "add text" menu command in the "Edit" menu.
+   However, you can paste into the name of an icon, for example an
+   input icon, and then use the "duplicate text" menu command in the
+   "Edit" menu to turn it into a text item.
+
+
+Q: In SUE DPC, How do I specify to Pathmill that a node is an input
+   but that no critical paths should result from it, e.g. like the
+   scan enable pin?
+
+A: You need to add a line into the .constraint file of the form:
+
+	no_path_node scan_enable
+
+   You can't use the line:
+
+	input_node scan_enable
+
+   Because DPC has already defined a source node for scan_enable:
+
+	source_node scan_enable slope=0.2 delay=0.5 clock=a r clk
+
+   since it is an input and this overrides the input_node statment
+   in Pathmill.  
+
+
+Q: How can I get SUE to stop giving me warnings during netlisting
+   on unconnected ports that I really want to be unconnected?
+
+A: Put a name_net on the port.  If you don't put a name on the
+   name_net, SUE will make one up (like net_2).  If you do put a name
+   on it like "unconnected", remember that the port will get connected to 
+   any other ports named "unconnected" -- which is probably not
+   what you want.
+

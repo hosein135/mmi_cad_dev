@@ -1,0 +1,748 @@
+<<
+/* def_lex.dlg -- DLG Description of scanner
+ *
+ * Generated from: def_parse.g
+ *
+ * Terence Parr, Will Cohen, and Hank Dietz: 1989-1999
+ * Purdue University Electrical Engineering
+ * With AHPCRC, University of Minnesota
+ * ANTLR Version 1.33MR22
+ */
+
+#define ANTLR_VERSION	13322
+#include "pcctscfg.h"
+#include "pccts_stdio.h"
+#define zzparser def
+#include "remap.h"
+
+#include <assert.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include "def2max.h"
+
+// TODO: Redefine zzsyn from $MMI_UTILS/pccts/h/err.h to provide better error messages.
+//#define USER_ZZSYN
+
+// I dont think this is needed:
+//#define ZZCOL
+
+#define ZZLEXBUFSIZE 2050	/* DEF doc says 2048 max */
+#define ZZA_STACKSIZE 400	/* way overkill */
+
+#define zzfailed_pred(_p)     def2max_failed_pred(_p);
+
+// This is a clever way to get the error routines for the parser to go to the
+// max error printer, without rewriting all the routines.
+// This must be here in the header so the .h file included by the lexer gets this too.
+#define fprintf def_parse_fprintf
+
+extern int def2max_pre_comment_mode;
+
+#define NEXT_LINE if (++zzline%10000==0) {printf("\r%d ",zzline);fflush(stdout);}
+
+  
+#include "antlr.h"
+#include "tokens.h"
+#include "dlgdef.h"
+LOOKAHEAD
+
+void
+#ifdef __USE_PROTOS
+zzerraction(void)
+#else
+zzerraction()
+#endif
+{
+	(*zzerr)("invalid token");
+	zzadvance();
+	zzskip();
+}
+>>
+
+
+%%START
+
+@
+	<<
+		NLA = 1;
+	>>
+
+[\ \t]+
+	<<
+		NLA = 2;
+		zzskip ();   
+	>>
+
+\n
+	<<
+		NLA = 3;
+		NEXT_LINE; zzskip ();   
+	>>
+
+[Aa][Nn][Aa][Ll][Oo][Gg]
+	<<
+		NLA = DEF_ANALOG;
+	>>
+
+[Bb][Aa][Ll][Aa][Nn][Cc][Ee][Dd]
+	<<
+		NLA = DEF_BALANCED;
+	>>
+
+[Bb][Uu][Ss][Bb][Ii][Tt][Cc][Hh][Aa][Rr][Ss]
+	<<
+		NLA = DEF_BUSBITCHARS;
+	>>
+
+[Bb][Yy]
+	<<
+		NLA = DEF_BY;
+	>>
+
+[Cc][Ll][Oo][Cc][Kk]
+	<<
+		NLA = DEF_CLOCK;
+	>>
+
+[Cc][Oo][Mm][Pp][Oo][Nn][Ee][Nn][Tt]
+	<<
+		NLA = DEF_COMPONENT;
+	>>
+
+[Cc][Oo][Mm][Pp][Oo][Nn][Ee][Nn][Tt][Ss]
+	<<
+		NLA = DEF_COMPONENTS;
+	>>
+
+[Cc][Oo][Vv][Ee][Rr]
+	<<
+		NLA = DEF_COVER;
+	>>
+
+[Dd][Ee][Ff][Aa][Uu][Ll][Tt]
+	<<
+		NLA = DEF_DEFAULT;
+	>>
+
+[Dd][Ee][Ss][Ii][Gg][Nn]
+	<<
+		NLA = DEF_DESIGN;
+	>>
+
+[Dd][Ii][Ee][Aa][Rr][Ee][Aa]
+	<<
+		NLA = DEF_DIEAREA;
+	>>
+
+[Dd][Ii][Rr][Ee][Cc][Tt][Ii][Oo][Nn]
+	<<
+		NLA = DEF_DIRECTION;
+	>>
+
+[Dd][Ii][Ss][Tt]
+	<<
+		NLA = DEF_DIST;
+	>>
+
+[Dd][Ii][Ss][Tt][Aa][Nn][Cc][Ee]
+	<<
+		NLA = DEF_DISTANCE;
+	>>
+
+[Dd][Ii][Vv][Ii][Dd][Ee][Rr][Cc][Hh][Aa][Rr]
+	<<
+		NLA = DEF_DIVIDERCHAR;
+	>>
+
+[Dd][Oo]
+	<<
+		NLA = DEF_DO;
+	>>
+
+[Ee][Nn][Dd]
+	<<
+		NLA = DEF_END;
+	>>
+
+[Ff][Ii][Xx][Ee][Dd]
+	<<
+		NLA = DEF_FIXED;
+	>>
+
+[Gg][Cc][Ee][Ll][Ll][Gg][Rr][Ii][Dd]
+	<<
+		NLA = DEF_GCELLGRID;
+	>>
+
+[Gg][Rr][Oo][Uu][Nn][Dd]
+	<<
+		NLA = DEF_GROUND;
+	>>
+
+[Hh][Ii][Ss][Tt][Oo][Rr][Yy]
+	<<
+		NLA = DEF_HISTORY;
+	>>
+
+[Hh][Oo][Rr][Ii][Zz][Oo][Nn][Tt][Aa][Ll]
+	<<
+		NLA = DEF_HORIZONTAL;
+	>>
+
+[Ii][Nn]
+	<<
+		NLA = DEF_IN;
+	>>
+
+[Ii][Nn][Oo][Uu][Tt]
+	<<
+		NLA = DEF_INOUT;
+	>>
+
+[Ii][Nn][Pp][Uu][Tt]
+	<<
+		NLA = DEF_INPUT;
+	>>
+
+[Ll][Aa][Yy][Ee][Rr]
+	<<
+		NLA = DEF_LAYER;
+	>>
+
+[Mm][Ii][Cc][Rr][Oo][Nn][Ss]
+	<<
+		NLA = DEF_MICRONS;
+	>>
+
+[Nn][Aa][Mm][Ee][Ss][Cc][Aa][Ss][Ee][Ss][Ee][Nn][Ss][Ii][Tt][Ii][Vv][Ee]
+	<<
+		NLA = DEF_NAMESCASESENSITIVE;
+	>>
+
+[Nn][Ee][Tt]
+	<<
+		NLA = DEF_NET;
+	>>
+
+[Nn][Ee][Tt][Ss]
+	<<
+		NLA = DEF_NETS;
+	>>
+
+[Nn][Ee][Ww]
+	<<
+		NLA = DEF_NEW;
+	>>
+
+[Oo][Ff][Ff]
+	<<
+		NLA = DEF_OFF;
+	>>
+
+[Oo][Nn]
+	<<
+		NLA = DEF_ON;
+	>>
+
+[Oo][Uu][Tt]
+	<<
+		NLA = DEF_OUT;
+	>>
+
+[Oo][Uu][Tt][Pp][Uu][Tt]
+	<<
+		NLA = DEF_OUTPUT;
+	>>
+
+[Pp][Aa][Tt][Tt][Ee][Rr][Nn]
+	<<
+		NLA = DEF_PATTERN;
+	>>
+
+[Pp][Ii][Nn]
+	<<
+		NLA = DEF_PIN;
+	>>
+
+[Pp][Ii][Nn][Ss]
+	<<
+		NLA = DEF_PINS;
+	>>
+
+[Pp][Ll][Aa][Cc][Ee][Dd]
+	<<
+		NLA = DEF_PLACED;
+	>>
+
+[Pp][Oo][Ww][Ee][Rr]
+	<<
+		NLA = DEF_POWER;
+	>>
+
+[Pp][Rr][Oo][Pp][Ee][Rr][Tt][Yy][Dd][Ee][Ff][Ii][Nn][Ii][Tt][Ii][Oo][Nn][Ss]
+	<<
+		NLA = DEF_PROPERTYDEFINITIONS;
+	>>
+
+[Rr][Ee][Cc][Tt]
+	<<
+		NLA = DEF_RECT;
+	>>
+
+[Rr][Ee][Gg][Ii][Oo][Nn][Ss]
+	<<
+		NLA = DEF_REGIONS;
+	>>
+
+[Rr][Oo][Uu][Tt][Ee][Dd]
+	<<
+		NLA = DEF_ROUTED;
+	>>
+
+[Rr][Oo][Ww]
+	<<
+		NLA = DEF_ROW;
+	>>
+
+[Rr][Oo][Ww][Ss]
+	<<
+		NLA = DEF_ROWS;
+	>>
+
+[Ss][Ii][Gg][Nn][Aa][Ll]
+	<<
+		NLA = DEF_SIGNAL;
+	>>
+
+[Ss][Ii][Tt][Ee]
+	<<
+		NLA = DEF_SITE;
+	>>
+
+[Ss][Oo][Uu][Rr][Cc][Ee]
+	<<
+		NLA = DEF_SOURCE;
+	>>
+
+[Ss][Pp][Ee][Cc][Ii][Aa][Ll]
+	<<
+		NLA = DEF_SPECIAL;
+	>>
+
+[Ss][Pp][Ee][Cc][Ii][Aa][Ll][Nn][Ee][Tt]
+	<<
+		NLA = DEF_SPECIALNET;
+	>>
+
+[Ss][Pp][Ee][Cc][Ii][Aa][Ll][Nn][Ee][Tt][Ss]
+	<<
+		NLA = DEF_SPECIALNETS;
+	>>
+
+[Ss][Tt][Aa][Rr][Tt]
+	<<
+		NLA = DEF_START;
+	>>
+
+[Ss][Tt][Ee][Ii][Nn][Ee][Rr]
+	<<
+		NLA = DEF_STEINER;
+	>>
+
+[Ss][Tt][Ee][Pp]
+	<<
+		NLA = DEF_STEP;
+	>>
+
+[Ss][Tt][Oo][Pp]
+	<<
+		NLA = DEF_STOP;
+	>>
+
+[Ss][Tt][Rr][Ii][Nn][Gg]
+	<<
+		NLA = DEF_STRING;
+	>>
+
+[Tt][Ee][Cc][Hh][Nn][Oo][Ll][Oo][Gg][Yy]
+	<<
+		NLA = DEF_TECHNOLOGY;
+	>>
+
+[Tt][Ii][Ee][Oo][Ff][Ff]
+	<<
+		NLA = DEF_TIEOFF;
+	>>
+
+[Tt][Rr][Aa][Cc][Kk][Ss]
+	<<
+		NLA = DEF_TRACKS;
+	>>
+
+[Tt][Rr][Uu][Nn][Kk]
+	<<
+		NLA = DEF_TRUNK;
+	>>
+
+[Uu][Nn][Ii][Tt][Ss]
+	<<
+		NLA = DEF_UNITS;
+	>>
+
+[Uu][Nn][Pp][Ll][Aa][Cc][Ee][Dd]
+	<<
+		NLA = DEF_UNPLACED;
+	>>
+
+[Uu][Ss][Ee]
+	<<
+		NLA = DEF_USE;
+	>>
+
+[Vv][Ee][Rr][Ii][Ll][Oo][Gg][Dd][Ee][Ss][Ii][Gg][Nn][Nn][Aa][Mm][Ee]
+	<<
+		NLA = DEF_VERILOGDESIGNNAME;
+	>>
+
+[Vv][Ee][Rr][Ss][Ii][Oo][Nn]
+	<<
+		NLA = DEF_VERSION;
+	>>
+
+[Vv][Ee][Rr][Tt][Ii][Cc][Aa][Ll]
+	<<
+		NLA = DEF_VERTICAL;
+	>>
+
+[Vv][Ii][Aa][Ss]
+	<<
+		NLA = DEF_VIAS;
+	>>
+
+[Ww][Ii][Rr][Ee][Dd][Ll][Oo][Gg][Ii][Cc]
+	<<
+		NLA = DEF_WIREDLOGIC;
+	>>
+
+[Xx]
+	<<
+		NLA = DEF_X;
+	>>
+
+[Yy]
+	<<
+		NLA = DEF_Y;
+	>>
+
+[Nn]
+	<<
+		NLA = DEF_N;
+	>>
+
+[Ss]
+	<<
+		NLA = DEF_S;
+	>>
+
+[Ee]
+	<<
+		NLA = DEF_E;
+	>>
+
+[Ww]
+	<<
+		NLA = DEF_W;
+	>>
+
+[Ff][Nn]
+	<<
+		NLA = DEF_FN;
+	>>
+
+[Ff][Ss]
+	<<
+		NLA = DEF_FS;
+	>>
+
+[Ff][Ee]
+	<<
+		NLA = DEF_FE;
+	>>
+
+[Ff][Ww]
+	<<
+		NLA = DEF_FW;
+	>>
+
+\+
+	<<
+		NLA = DEF_PLUS;
+	>>
+
+;
+	<<
+		NLA = DEF_SEMI;
+	>>
+
+(\-|[])[0-9]+
+	<<
+		NLA = DEF_NUMBER;
+	>>
+
+\"
+	<<
+		NLA = 86;
+		zzmode (STRING); zzmore ();   
+	>>
+
+[A-Za-z0-9_]+
+	<<
+		NLA = 87;
+	>>
+
+#
+	<<
+		NLA = 88;
+		zzskip ();
+		def2max_pre_comment_mode = START;
+		zzmode (COMMENT);
+	>>
+
+\-
+	<<
+		NLA = 111;
+	>>
+
+\(
+	<<
+		NLA = 112;
+	>>
+
+\)
+	<<
+		NLA = 113;
+	>>
+
+\*
+	<<
+		NLA = 114;
+	>>
+
+
+%%IDENTIFIER
+
+@
+	<<
+		NLA = 1;
+	>>
+
+[\ \t]+
+	<<
+		NLA = 89;
+		zzskip ();   
+	>>
+
+\n
+	<<
+		NLA = 90;
+		NEXT_LINE; zzskip ();   
+	>>
+
+;
+	<<
+		NLA = DEF_SEMI;
+		zzmode (START);   
+	>>
+
+~[\ \t\n]+
+	<<
+		NLA = DEF_IDENT;
+		zzmode (START);   
+	>>
+
+#
+	<<
+		NLA = 92;
+		zzskip ();
+		def2max_pre_comment_mode = IDENTIFIER;
+		zzmode (COMMENT);
+	>>
+
+
+%%IDENT_NEW_OR_PLUS
+
+@
+	<<
+		NLA = 1;
+	>>
+
+[\ \t]+
+	<<
+		NLA = 93;
+		zzskip ();   
+	>>
+
+\n
+	<<
+		NLA = 94;
+		NEXT_LINE; zzskip ();   
+	>>
+
+;
+	<<
+		NLA = DEF_SEMI;
+		zzmode (START);   
+	>>
+
+\+
+	<<
+		NLA = DEF_PLUS;
+		zzmode (START);   
+	>>
+
+NEW
+	<<
+		NLA = DEF_NEW;
+		zzmode (START);   
+	>>
+
+\(
+	<<
+		NLA = DEF_ID_OPEN;
+		zzmode (START);   
+	>>
+
+~[\ \t\n]+
+	<<
+		NLA = DEF_IDENT;
+		zzmode (START);   
+	>>
+
+#
+	<<
+		NLA = 96;
+		zzskip ();
+		def2max_pre_comment_mode = IDENT_NEW_OR_PLUS;
+		zzmode (COMMENT);
+	>>
+
+
+%%STRING
+
+@
+	<<
+		NLA = 1;
+	>>
+
+~[\\\"]+
+	<<
+		NLA = 97;
+		zzmore ();   
+	>>
+
+\\~[]
+	<<
+		NLA = 98;
+		zzmore ();   
+	>>
+
+\"
+	<<
+		NLA = DEF_QUOTED;
+		zzmode (START);   
+	>>
+
+
+%%LEX_HISTORY
+
+@
+	<<
+		NLA = 1;
+	>>
+
+[\ \t]+
+	<<
+		NLA = 100;
+		zzmore ();   
+	>>
+
+\n
+	<<
+		NLA = 101;
+		NEXT_LINE; zzmore ();   
+	>>
+
+~[\\\";]+
+	<<
+		NLA = 102;
+		zzmore ();   
+	>>
+
+\\~[]
+	<<
+		NLA = 103;
+		zzmore ();   
+	>>
+
+\"
+	<<
+		NLA = 104;
+		zzmode (LEX_HISTORY_STRING); 
+		zzmore ();
+	>>
+
+;
+	<<
+		NLA = DEF_HISTORY_LIST;
+		zzmode (START);   
+	>>
+
+
+%%LEX_HISTORY_STRING
+
+@
+	<<
+		NLA = 1;
+	>>
+
+~[\\\"]+
+	<<
+		NLA = 106;
+		zzmore ();   
+	>>
+
+\\~[]
+	<<
+		NLA = 107;
+		zzmore ();   
+	>>
+
+\"
+	<<
+		NLA = 108;
+		zzmode (LEX_HISTORY); zzmore ();   
+	>>
+
+
+%%COMMENT
+
+@
+	<<
+		NLA = 1;
+	>>
+
+~[\n]+
+	<<
+		NLA = 109;
+		zzskip ();   
+	>>
+
+\n
+	<<
+		NLA = 110;
+		NEXT_LINE;
+		zzskip ();
+		zzmode (def2max_pre_comment_mode);
+	>>
+
+%%

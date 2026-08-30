@@ -1,0 +1,167 @@
+# Like via.maxg, but keeps the center of the via at
+# the center of the first contact
+
+proc gcell_make_via_new {prop_list} -desc {
+  gcell procedure to make a contact/via
+} {
+
+  # get values out of prop_list list
+  set type [get_assoc type $prop_list]
+  set x_cuts [get_assoc x_cuts $prop_list]
+  set y_cuts [get_assoc y_cuts $prop_list]
+
+  # get the layers to draw
+  if {[lsearch [techinfo vias] $type] == -1} {
+    # special via
+    setl {via bot} [split $type _]
+  } else {
+    set via $type
+    set bot [techinfo below $via]
+  }
+  set top [techinfo above $via]
+
+  # compute extent of matrix of cuts
+  set via_width [techinfo width $via]
+  set via_space [techinfo spacing $via]
+  set via_pitch [expr $via_width + $via_space]
+
+  # compute width and height
+  #set w2 [uusnap \
+  #	      [expr ($via_width * $x_cuts + $via_space * ($x_cuts - 1)) ]]
+  #set h2 [uusnap \
+  #	      [expr ($via_width * $y_cuts + $via_space * ($y_cuts - 1)) ]]
+
+  # draw all the via cuts
+  for {set i 0} {$i < $x_cuts} {incr i} {
+    for {set j 0} {$j < $y_cuts} {incr j} {
+
+      gcell_paint $via \
+	  [expr $i * $via_pitch - $via_width/2.0] \
+	  [expr $j * $via_pitch - $via_width/2.0] \
+	  [expr $i * $via_pitch + $via_width/2.0] \
+	  [expr $j * $via_pitch + $via_width/2.0]
+    }
+  }
+
+  # draw the top and bot layers
+  foreach layer "$bot $top" {
+    set enclose [techinfo enclose $layer $via]
+    gcell_paint $layer \
+	[expr - $enclose - $via_width/2.0] \
+	[expr - $enclose - $via_width/2.0] \
+	[expr $via_pitch * ($x_cuts-1) + $enclose + $via_width/2.0] \
+	[expr $via_pitch * ($y_cuts-1) + $enclose + $via_width/2.0]
+  }
+
+  if {$x_cuts == 1 && $y_cuts == 1} {
+    return $type
+  } else {
+    return "${x_cuts}x${y_cuts} $type"
+  }
+}
+
+
+# Resize via gcell with $props based on new bbox and return new prop list
+
+proc gcell_make_props_via_new {prop_list} {
+
+  set bbox [get_assoc _BBOX_ $prop_list]
+  if {$bbox == ""} {
+    # no bbox, just punt
+    return $prop_list
+  }
+
+  # Make the via as large as will fit in the specified bbox,
+  # but no smaller than one cut.
+  # get values out of properties list
+  set type [get_assoc type $prop_list]
+
+  # get the layers to draw
+  if {[lsearch [techinfo vias] $type] == -1} {
+    # special via
+    setl {via bot} [split $type _]
+  } else {
+    set via $type
+    set bot [techinfo below $via]
+  }
+  set top [techinfo above $via]
+
+  # compute extent of matrix of cuts
+  set via_width [techinfo width $via]
+  set via_space [techinfo spacing $via]
+  set via_pitch [expr $via_width + $via_space]
+
+  # get the maximum enclosure
+  set enclose [max [techinfo enclose $bot $via] [techinfo enclose $top $via]]
+
+  # figure out how many cuts fit in the bbox
+  setl {x1 y1 x2 y2} $bbox
+  set x_cuts \
+      [expr int(($x2 - $x1 - 2*$enclose + $via_space + [res]) / $via_pitch)]
+  set y_cuts \
+      [expr int(($y2 - $y1 - 2*$enclose + $via_space + [res]) / $via_pitch)]
+
+  # don't let the user draw less than one cut
+  set x_cuts [max $x_cuts 1]
+  set y_cuts [max $y_cuts 1]
+
+  set prop_list [rm_assoc _BBOX_ $prop_list]
+  set prop_list [rm_assoc x_cuts $prop_list]
+  set prop_list [rm_assoc y_cuts $prop_list]
+  lappend prop_list [list x_cuts $x_cuts]
+  lappend prop_list [list y_cuts $y_cuts]
+
+  return $prop_list
+}
+
+proc gcell_init_via_new {} {
+    # now define it and give default arguments
+
+    # figure out what vias are in this technology
+    set via_types ""
+    set vias [techinfo vias "" "" opt]
+    if {$vias != "" && $vias != "0"} {
+      # there are some vias defined in this process
+      foreach via $vias {
+	if {[techinfo width $via "" opt] == "0"} {
+	  msg "warning: via.maxg: no width for layer $via; no via generator created\n"
+	  # no known width, skip this one
+	  continue
+	}
+
+	set bot [techinfo below $via]
+	set top [techinfo above $via]
+
+	if {[llength $bot] > 1} {
+	  # special case
+	  foreach one $bot {
+	    lappend via_types ${via}_$one
+	  }
+
+	} else {
+	  lappend via_types $via
+	}
+      }
+
+      if {$via_types != ""} {
+	# yes, there are some valid vias, define the gcell.
+
+	define_gcell via_new \
+	    [list \
+		 [list type [lindex $via_types 0] -choice "$via_types" \
+		      -help {the type of contact or via}] \
+		 [list x_cuts  1 -number 1 \
+		      -help {the number of cuts in the x direction}] \
+		 [list y_cuts  1 -number 1 \
+		      -help {the number of cuts in the y direction}] \
+		]
+      } else {
+	    msg "warning: via.maxg: tech file defined no layers for vias\n"
+      }
+    } else {
+	msg "warning: via.maxg: no vias defined in tech file, so no via generators created\n"
+    }
+}
+
+# Do it now
+gcell_init_via_new

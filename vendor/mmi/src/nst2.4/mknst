@@ -1,0 +1,46 @@
+#!/bin/csh -f
+
+echo "BEGIN "`date`
+########################################################################
+# User-configurable portion of script.
+
+# Directory where nst lives
+set NSTDIR = ..
+
+# End of user-configurable portion of script.
+########################################################################
+
+echo "Removing old tmp directory ..."
+rm -rf tmp
+mkdir tmp
+cd tmp
+
+echo "Getting tcl source from $NSTDIR ..."
+cp $NSTDIR/*.tcl .
+cp $NSTDIR/nstinit.a .
+cp $NSTDIR/nstinit.b .
+
+cp $NSTDIR/Makefile .
+cp $NSTDIR/nst.c .
+cp $NSTDIR/nstAppInit.c .
+
+# doit
+gmake
+
+cd $NSTDIR
+
+set _uname_tmp=`uname`
+if ("$_uname_tmp" == "Linux") then
+  mv tmp/nst bin.i486-linux/nst
+else if ("$_uname_tmp" == "HP-UX") then
+  mv tmp/nst bin.hppa/nst
+else if ("$_uname_tmp" == "SunOS") then
+  mv tmp/nst bin.sparc-solaris2/nst
+else
+  echo Aborting mknst, unknown architecture.
+  exit 2
+endif
+
+#make release
+
+echo "END "`date`

@@ -1,0 +1,1 @@
+../extract/MMI_AOI31A.sp

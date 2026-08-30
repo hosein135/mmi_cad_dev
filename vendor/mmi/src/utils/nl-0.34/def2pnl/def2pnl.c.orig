@@ -1,0 +1,261 @@
+#include "port.h"
+#include "stdpccts.h"
+
+
+static nl_icell top_icell = NULL;
+static nl_context current_context = NULL;
+static nl_design current_design = NULL;
+static nl_idesign current_idesign = NULL;
+static pnl_design current_pdesign = NULL;
+static char *current_hierarchy_divider = NULL;
+static int current_dx = 0;
+static int current_dy = 0;
+static pnl_orientation current_orientation = pnl_orientation_N;
+
+
+void
+def2pnl_design (char *name)
+{
+  if ( top_icell == NULL ) {
+    current_design = nl_context_get_design_by_name (current_context, name);
+
+    if ( current_design == NULL ) {
+      error ("design name in the DEF file, %s, does not exist in memory.",
+	     name);
+    }
+    current_idesign = nl_idesign_get_or_create (current_design, NULL);
+
+    nl_idesign_attr_get_by_name ("pnl design", current_idesign,
+				 &current_pdesign);
+
+    if ( current_pdesign == NULL ) {
+      current_pdesign = pnl_design_create (current_idesign);
+    }
+  }
+  else {
+    char *design_name;
+
+    current_idesign = nl_icell_down_design (top_icell);
+    current_design = nl_idesign_design (current_idesign);
+
+    design_name = nl_design_name (current_design);
+
+    if ( strcmp (design_name, name) != 0 ) {
+      error ("The design name specified in the .def file, %s, does not match "
+	     "the design name of the specified instance cell, %s.",
+	     name, design_name);
+    }
+    
+    current_pdesign = NULL;
+
+    nl_idesign_attr_get_by_name ("pnl design", current_idesign,
+				 &current_pdesign);
+
+    if ( current_pdesign == NULL ) {
+      error ("No physical design information exists for the specified "
+	     "instance cell.");
+    }
+  }
+}
+
+
+void
+def2pnl_die_area (int x0, int y0, int x1, int y1)
+{
+  pnl_design_set_die_area (current_pdesign, x0, y0, x1, y1);
+}
+
+
+void
+def2pnl_divider_char (char *divider)
+{
+  if ( current_hierarchy_divider != NULL ) {
+    FREE (current_hierarchy_divider);
+  }
+
+  if ( divider != NULL && divider[0] == 0 ) {
+    FREE (divider);
+    current_hierarchy_divider = NULL;
+  }
+  else {
+    current_hierarchy_divider = divider;
+  }
+}
+
+
+pnl_net
+def2pnl_net (char *net_name)
+{
+  ar net_array = ar_alloc (1, sizeof (nl_inet));
+  volatile pnl_net pnet;
+
+  error_unwind_protect {
+    extern int ui_find_iobject (void *, char *, char *, nl_kind, nl_idesign,
+				int, int, int, ar);
+
+    nl_inet inet;
+    int status = ui_find_iobject (NULL, net_name, current_hierarchy_divider,
+				  nl_kind_inet, current_idesign, 1, 0, 0, net_array);
+
+    if ( status != 0 || ar_size (net_array) != 1 ) {
+      def2pnl_error ("could not find a net named \"%s\".", net_name);
+    }
+
+    ar_ref (net_array, 0, &inet);
+
+    nl_inet_attr_get_by_name ("pnl net", inet, (void *) &pnet);
+  }
+  error_on_exit {
+    ar_free (net_array);
+  }
+  error_end;
+
+  return pnet;
+}
+
+
+void
+def2pnl_component (char *inst_name, char *libcell_name, pnl_loctype loctype,
+		    int x, int y, pnl_orientation orientation)
+{
+  ar cell_array = ar_alloc (1, sizeof (nl_icell));
+
+  error_unwind_protect {
+    extern int ui_find_iobject (void *, char *, char *, nl_kind, nl_idesign,
+				int, int, int, ar);
+    int status;
+    nl_icell icell;
+  
+    status = ui_find_iobject (NULL, inst_name, current_hierarchy_divider,
+			      nl_kind_icell, current_idesign, 1, 0, 0,
+			      cell_array);
+  
+    if ( status != 0 || ar_size (cell_array) != 1 ) {
+      def2pnl_error ("could not find cell named \"%s\".", inst_name);
+    }
+
+    ar_ref (cell_array, 0, &icell);
+
+    {
+      nl_reference reference = nl_icell_reference (icell);
+      char *ref_name = nl_reference_name (reference);
+      pnl_cell pcell;
+      pnl_orientation orient_eff;
+
+      if ( strcmp (ref_name, libcell_name) != 0 ) {
+	fprintf (stderr, "Error: cell name in .def file does not match stored "
+		 "netlist -> \"%s\" vs. \"%s\".\n", ref_name, libcell_name);
+      }
+
+      nl_icell_attr_get_by_name ("pnl cell", icell, &pcell);
+
+      pnl_cell_set_loctype (pcell, loctype);
+      pnl_cell_set_location (pcell, x + current_dx, y + current_dy);
+
+      orient_eff = pnl_translate_orientation (orientation, current_orientation);
+      pnl_cell_set_orientation (pcell, orient_eff);
+    }
+  }
+  error_on_exit {
+    ar_free (cell_array);
+  }
+  error_end;
+}
+
+
+void
+def2pnl_pin (char *pin_name, pnl_loctype loctype, int x, int y, 
+	      pnl_orientation orientation)
+{
+  ar port_array = ar_alloc (1, sizeof (nl_iport));
+
+  error_unwind_protect {
+    extern int ui_find_iobject (void *, char *, char *, nl_kind, nl_idesign,
+				int, int, int, ar);
+    int status;
+    nl_iport iport;
+    pnl_port pport;
+  
+    status = ui_find_iobject (NULL, pin_name, current_hierarchy_divider,
+			      nl_kind_iport, current_idesign, 1, 0, 0,
+			      port_array);
+  
+    if ( status != 0 || ar_size (port_array) != 1 ) {
+      def2pnl_error ("could not find port named \"%s\".", pin_name);
+    }
+
+    ar_ref (port_array, 0, &iport);
+
+    nl_iport_attr_get_by_name ("pnl port", iport, &pport);
+
+    pnl_port_set_loctype (pport, loctype);
+    pnl_port_set_location (pport, x, y);
+    pnl_port_set_orientation (pport, orientation);
+  }
+  error_on_exit {
+    ar_free (port_array);
+  }
+  error_end;
+}
+
+
+void
+def2pnl_tracks (int is_x, int start, int count, int step, ar layers)
+{
+  if ( is_x ) {
+    pnl_design_set_x_tracks (current_pdesign, start, count, step, layers);
+  }
+  else {
+    pnl_design_set_y_tracks (current_pdesign, start, count, step, layers);
+  }
+}
+
+
+void
+def2pnl_row_site (char *name, char *core_name, int x0, int y0,
+		   pnl_orientation orient, int count, int width, int height)
+{
+  pnl_design_add_row_site (current_pdesign, name, core_name, x0, y0, orient,
+			   count, width, height);
+}
+
+
+void
+def2pnl_distance_units (char *unit_name, int number)
+{
+  pnl_design_set_distance_units (current_pdesign, unit_name, number);
+}
+
+
+int
+def2pnl_read_def (FILE *ifp, nl_context context, nl_icell icell,
+		   int dx, int dy, pnl_orientation orient)
+{
+  void (*def2pnl_zzerr)(const char *);
+
+  current_context = context;
+  top_icell = icell;
+  current_dx = dx;
+  current_dy = dy;
+  current_orientation = orient;
+
+  def2pnl_zzerr = def2pnl_lex_error;
+  def2pnl_divider_char (STRDUP ("/"));
+
+  error_unwind_protect {
+    ANTLR (def_file(), ifp);
+  }
+  error_on_error {
+    if ( current_idesign != NULL ) {
+      nl_idesign_free (current_idesign);
+      current_pdesign = NULL;
+      current_idesign = NULL;
+    }
+  }
+  error_on_exit {
+    def2pnl_divider_char (NULL);
+  }
+  error_end;
+
+  return 1;
+}

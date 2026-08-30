@@ -1,0 +1,250 @@
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# sets up tutorials
+
+set DEFAULT_BROWSER netscape
+
+proc tutorial_popup {{default_tutorial ""}} -desc {
+  Copy max tutorial; Tied to "Tutorial" item in Help menu.
+} {
+
+  global env DEFAULT_BROWSER tutorial browser printer
+
+  set prop_list ""
+
+  set default_tutorial [string toupper $default_tutorial]
+
+  set tutorials "MAX MCC SUE DPC"
+  set tutorial [use_first default_tutorial '[lindex $tutorials 0]]
+
+  lappend prop_list [list "Which Tutorial" tutorial -radio $tutorials]
+
+  lappend prop_list [list _bogus_ "" -separator]
+
+  lappend prop_list [list "Install Tutorial..." "" \
+    -button "" -command {global tutorial ; tutorial_install $tutorial} \
+    -help {Popup for directory to install tutorial and install it there.}]
+
+  lappend prop_list [list _bogus_ "" -separator]
+
+  lappend prop_list [list "View Tutorial in Browser" "" \
+    -button "" \
+    -command {global tutorial browser ; browser_open $tutorial $browser} \
+    -help {Load the given tutorial documentation in your browser for viewing.}]
+
+  set browser [use_first env(MMI_BROWSER) env(BROWSER) DEFAULT_BROWSER]
+  lappend prop_list [list \
+    "Html Browser" browser -entry \
+    -help {html browser for tutorial documentation.}]
+
+  lappend prop_list [list _bogus_ "" -separator]
+
+  lappend prop_list [list "View Tutorial in acroread (pdf)" "" \
+    -button "" \
+    -command {global tutorial browser ; browser_open $tutorial acroread} \
+    -help {View the given pdf tutorial documentation in Acroread.}]
+
+  lappend prop_list [list _bogus_ "" -separator]
+
+  lappend prop_list [list "Print Tutorial" "" \
+    -button "" \
+    -command {global tutorial printer ; tutorial_print $tutorial $printer} \
+    -help {Print the given tutorial documentation to the given postscript printer.}]
+  set printer [use_first env(PRINTER)]
+  lappend prop_list [list \
+    "Printer" printer -entry \
+    -help {Pstscript printer name for printing tutorial documentation.}]
+
+  prop_menu2 -title "MMI Tutorial Installation" -message "Choose:" \
+      -buttons "Close==default" $prop_list
+}
+
+
+proc tutorial_print {tutorial printer} -desc {
+  print the given tutorial to the given printer
+} {
+
+  global env 
+
+  set button [tk_dialog .print "Print Tutorial" \
+		  "Are you sure you want to print the tutorial?" \
+		  "" 0 Yes Cancel]
+
+  if {$button == 1} {
+    # user hit the cancel key
+    return
+  }
+
+  set tutorial [string tolower $tutorial]
+
+  set file $env(MMI_TOOLS)/doc/$tutorial/${tutorial}_tutorial/${tutorial}_tutorial.ps
+
+  if {$printer == ""} {
+    puts "Printing $file to default printer ..."
+    exec lpr $file
+
+  } else {
+    puts "Printing $file to printer $printer ..."
+    exec lpr -P$printer $file
+  }
+}
+
+
+proc browser_open {tutorial browser} -desc {
+  open the given tutorial in the given browser
+} {
+
+  global env 
+
+  set tutorial [string tolower $tutorial]
+
+  if {$browser == "acroread"} {
+    set file $env(MMI_TOOLS)/doc/$tutorial/${tutorial}_tutorial/${tutorial}_tutorial.pdf
+
+    puts "Opening $file in $browser ..."
+
+    exec acroread $file
+    return
+  }
+
+  set file $env(MMI_TOOLS)/doc/$tutorial/${tutorial}_tutorial/${tutorial}_tutorial.html
+
+  puts "Opening $file in $browser browser ..."
+
+  # if netscape, get fancy and try popping up file in an existing browser    
+  if { $browser == "netscape" && 
+       [catch "exec $browser -remote openURL($file)" msg] == 0 } {
+    return 
+  }
+	
+  # fancy stuff didn't work, so just start up a browser on the file!
+  # If $file or $browser has tcl special chars, they might be evaluated!
+  eval exec $browser $file &
+}
+
+
+
+proc tutorial_install {tutorial} -desc {
+  popup for directory to install tutorial and install it there
+} {
+
+  global env
+
+  set prop_list ""
+
+  set tutorial [string tolower $tutorial]
+
+  # Default location for private tutorial copy.
+  set new_dir [glob ~]/mmi_private/tutorial/$tutorial
+  lappend prop_list [list "Directory" new_dir \
+    -filename "-dironly -filename $new_dir"]
+
+  set return [prop_menu2 -title "Install Tutorial" -message "Where:" \
+		  -buttons "Install=1 Cancel=0" $prop_list]
+
+  if {!$return} {
+    return ;# cancelled
+  }
+
+  # remove trailing / if there is one
+  set new_dir [string trimright $new_dir /]
+
+  if {[file isfile $new_dir]} {
+    # not good, must be a directory
+    warning "Must choose a directory for the tutorial installation.  Try again."
+
+    tutorial_install $tutorial
+    return
+  }
+
+  if {[file isdir $new_dir]} {
+    set title "Directory Check"
+    set time [clock seconds]
+
+    set message "Directory $new_dir already exists.  Replace this directory?  (Previous directory will be moved to .BAK.$time)"
+    if {[tk_dialog .dialog $title $message {} 1 Yes Cancel] != 0} {
+      return
+    }
+
+    # move this directory to .BAK
+    puts "Moving $new_dir to $new_dir.BAK.$time ..."
+
+    if {[catch "exec mv $new_dir $new_dir.BAK.$time" msg]} {
+      warning "Tutorial installation failed: $msg"
+      return
+    }
+  }
+
+  # Create all needed directories
+  util_mkdir $new_dir
+
+  # check that it is there
+  if {![file isdir $new_dir]} {
+    # didn't work
+    warning "Can't create directory $new_dir.  Check permissions and try again or choose another directory."
+
+    tutorial_install $tutorial
+    return
+  }
+
+  # untar contents of tutorial into this directory
+  set tarfile $env(MMI_TOOLS)/doc/$tutorial/${tutorial}_tutorial/tutorial.tar
+
+  if {[catch "exec csh -cf \"cd $new_dir \; tar xf $tarfile\"" msg]} {
+    warning "Tutorial Installation Failed: $msg"
+    return
+  }
+
+  set title "Tutorial Installed"
+  set message "The $tutorial tutorial has been installed in directory $new_dir.  You will need to \"cd\" to this directory to run the tutorial as described in the tutorial documentation."
+  puts $message
+  tk_dialog .dialog $title $message {} 0 OK
+}
+
+
+proc util_mkdir {dirname} -desc {
+  Create directory.  One or more path elements may not exist.
+} {
+
+  foreach string [split $dirname /] {
+    if {$string == ""} {
+      continue
+    }
+    append makedir /$string
+    
+    if {![file isdir $makedir]} {
+      # make this directory
+      catch "exec mkdir $makedir"
+    }
+  }
+}
+
+
+proc warning {msg} -type user -desc {
+Creates a popup window with the given message in it.  
+} {
+
+  global SUE_DIR
+
+  # write to warning to screen
+  puts $msg
+
+  # give user a nice dialog box to play with
+  set button [tk_dialog .warning "Warning" $msg \
+		  "" 0 {ok}]
+
+  return 1
+}
+
+
+
+# don't show wish window
+wm withdraw .
+
+# do it
+tutorial_popup $argv
+
+exit

@@ -1,0 +1,142 @@
+GrInit --
+---------
+Initialize graphics 
+called once at startup time.
+
+May cause Max restart with "-colormap new"  
+(if there were not enough color planes left in the
+shared color map)
+
+Exits on error.
+
+GrFlush:
+--------
+Flush pending graphics to display.
+
+Avoid calling unnecessarily, since it syncs up with X
+and can slow graphics down dramatically if called too
+frequently.
+
+GrTicService -
+--------------
+
+Call from time to time to keep connection to XServer active.
+
+GrRegisterWindow --
+-------------------
+
+Create a GrDrawable struct for the given tkwin
+and return an opaque pointer to it.
+
+NOTE:  if the window changes size, it shoud be unregistered
+and reregistered.
+
+GrUnregisterWindow --
+---------------------
+
+Free GrDrawable struct. 
+
+GrCreatePixmap --
+-----------------
+
+Create pixmap of specified dimensions
+Initial contents undefined.
+
+Results:	returns (opaque) pointer to GrDrawable struct for Pixmap
+
+GrFreePixmap --
+---------------
+
+Free pixmap and associated GrDrawable struct
+
+GrFreeStipple --
+----------------
+
+Free stipple and associated gr struct.
+
+GrCreateStipple -
+-----------------
+Create a stipple pattern.
+
+Results:	returns (opaque) pointer to Pixmap
+
+GrCreateStippleFromPixmapPlane -
+--------------------------------
+Create a stipple pattern.
+
+Results:	returns (opaque) pointer to Pixmap
+
+GrCreateLinePattern --
+----------------------
+
+Convert pattern string to X dash specification.
+
+GrColorMapWrite --
+------------------
+
+Set a colormap entry.
+
+GrTextBBox --
+-------------
+
+Determine bounding box of a text string in pixels 
+origin is left end of base line. 
+
+GrSetDrawable --
+----------------
+
+Set window or pixmap to direct output to.
+(Can specify translation to apply to all input coordinates.)
+
+GrSetClipRect --
+----------------
+
+Causes subsequent graphics to be clipped to specified region of 
+window.
+
+NULL arg resets clipping to entire window.
+
+Clip area expanded one pixel to left and bottom, to not clip
+rectangles that were expanded from 0 pixel width/height.
+
+GrSetFontSize --
+----------------
+
+Set text font. (size=0,1,2,3  - in order of increasing size)
+
+GrDrawText ---
+--------------
+
+Draw a text string.
+
+GrFillPolygon -
+---------------
+
+Draw a polygon as a filled region.
+
+Special case:  two point polygons specify ovals!
+
+GrCopyPixmap --
+---------------
+
+Copy rectangular region of src pixmap into current drawable.
+
+GrAdjustStippleOrigin --
+------------------------
+
+adjust stipple origin to match default stipple origin of gd
+
+NOTE: result depends on size of current stipple, so need to call AFTER
+setting stipple.
+
+GrDefaultStippleOrigin --
+-------------------------
+
+restore default origin back to default.
+
+GrCopyPlane --
+--------------
+
+Like GrCopyPixmap, but uses single plane in
+src pixmap mapping 0 and 1 bits to specified colors. 
+

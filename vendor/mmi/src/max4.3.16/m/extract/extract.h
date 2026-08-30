@@ -1,0 +1,91 @@
+// ************************************************************************
+// 
+// Copyright (c) 1995-2002 Juniper Networks, Inc. All rights reserved.
+// 
+// Permission is hereby granted, without written agreement and without
+// license or royalty fees, to use, copy, modify, and distribute this
+// software and its documentation for any purpose, provided that the
+// above copyright notice and the following three paragraphs appear in
+// all copies of this software.
+// 
+// IN NO EVENT SHALL JUNIPER NETWORKS, INC. BE LIABLE TO ANY PARTY FOR
+// DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+// ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+// JUNIPER NETWORKS, INC. HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+// DAMAGE.
+// 
+// JUNIPER NETWORKS, INC. SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+// NON-INFRINGEMENT.
+// 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND JUNIPER
+// NETWORKS, INC. HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
+// UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+// 
+// ************************************************************************
+
+
+
+/*
+ * extract.h --
+ *
+ * Defines the exported interface to the circuit extractor.
+ *
+ * rcsid "$Header: extract.h,v 1.1 90/03/28 18:04:14 stark Exp $"
+ *
+ *     ********************************************************************* 
+ *     * Copyright (C) 1985, 1990 Regents of the University of California. * 
+ *     * Permission to use, copy, modify, and distribute this              * 
+ *     * software and its documentation for any purpose and without        * 
+ *     * fee is hereby granted, provided that the above copyright          * 
+ *     * notice appear in all copies.  The University of California        * 
+ *     * makes no representations about the suitability of this            * 
+ *     * software for any purpose.  It is provided "as is" without         * 
+ *     * express or implied warranty.  Export of this software outside     * 
+ *     * of the United States of America may require an export license.    * 
+ *     *********************************************************************
+ *
+ */
+
+#ifndef _EXTRACT
+#define _EXTRACT
+
+#ifndef _LAYOUT
+#include "layout.h"
+#endif
+
+/* Extractor warnings */
+#define	EXTWARN_DUP	0x01	/* Warn if two nodes have the same name */
+#define	EXTWARN_DUPGLOBAL 0x02	/* Warn on dup names, even for global labels */
+
+#define	EXTWARN_LABELS	0x04	/* Warn if connecting to unlabelled subcell
+				 * node.
+				 */
+#define	EXTWARN_FETS	0x08	/* Warn about badly constructed fets */
+
+#define	EXTWARN_ALL	(EXTWARN_DUP|EXTWARN_DUPGLOBAL|EXTWARN_LABELS|EXTWARN_FETS)
+
+extern int ExtDoWarn;		/* Bitmask of above */
+
+/* Extractor options */
+#define	EXT_DOADJUST		0x01	/* Extract hierarchical adjustments */
+#define	EXT_DOCAPACITANCE	0x02	/* Extract capacitance */
+#define	EXT_DOCOUPLING		0x04	/* Extract coupling capacitance */
+#define	EXT_DORESISTANCE	0x08	/* Extract resistance */
+#define	EXT_DOLENGTH		0x10	/* Extract pathlengths */
+#define	EXT_DOALL		0x1f	/* ALL OF THE ABOVE */
+
+extern int ExtOptions;		/* Bitmask of above */
+
+extern void ExtInit();
+extern void ExtTclInit(Tcl_Interp *interp);
+extern bool ExtTechLine(char *sectionName, int argc, char **argv);
+extern void ExtTechFinal(void);
+extern void ExtractTest(Layout *w, int argc, char *argv[]);
+
+/* called on each invocation of the extractor */
+extern void ExtSetup(void);
+
+#endif _EXTRACT
+

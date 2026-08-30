@@ -1,0 +1,40 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "nl.h"
+#include "tcl.h"
+#include "tk.h"
+#include "ui.h"
+#include "ui_int.h"
+
+
+#(defcommand start_gui
+  "Start up TK.")
+{
+  int result = Tk_Init (interp);
+
+  Tk_MainLoop ();
+
+  return result;
+}
+
+
+
+void
+ui_cmd_register_gui_commands (Tcl_Interp *interp, char *prefix,
+			      nl_context context)
+{
+#(register-all-commands)
+}

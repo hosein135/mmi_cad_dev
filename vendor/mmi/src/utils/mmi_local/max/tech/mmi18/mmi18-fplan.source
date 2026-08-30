@@ -1,0 +1,208 @@
+# The is the technology source file for mmi18 (0.18 um CMOS)
+
+# This command will preserve MAX port types by writing them out to
+# different datatypes.  Only valid if no datatypes are specified.
+preserve_ports
+
+
+#layer	gds:dt	txt:dt	type	width	space	color
+#======	=======	=======	=======	=======	=======	=======
+m1_obs	71	-	-	-	-	8,139,255
+m2_obs	72	-	-	-	-	182,124,222
+m3_obs	73	-	-	-	-	255,160,65
+m4_obs	74	-	-	-	-	61,122,188
+m5_obs	75	-	-	-	-	255,215,0
+m6_obs	76	-	-	-	-	200,100,100
+nw  	2	-	-	0.86	0.6	              
+#hotwl 	51	-	-	-	-	              
+od    	3	-	gdsonly	-	0.28	              
+odp  	11	-	gdsonly	-	-
+odn  	12	-	gdsonly	-	-
+ndif	derived	-	act	0.22	0.28	66,213,66
+pdif	derived	-	act	0.22	0.28	202,160,115
+nwc	derived	ndif	act	0.22	0.28	-
+pwc	derived	pdif	act	0.22	0.28	-
+#od2   	4	-	-	-	0.45
+poly  	13	-	poly	0.18    0.25
+#n3v   	5	-	-	0.44    0.44
+pplus  	7	-	-	0.44    0.44
+nplus  	8	-	-	0.44    0.44
+ct    	15	-	via	0.22    0.25
+m1    	16	40	metal	0.23    0.23	8,139,255
+v12  	17	-	via	0.26    0.26
+m2    	18	41	metal	0.28    0.28	182,124,222
+v23  	27	-	via	0.26    0.26
+m3    	28	42	metal	0.28    0.28	255,160,65
+v34  	29	-	via	0.26    0.26
+m4    	31	43	metal	0.28    0.28	61,122,188
+v45  	32	-	via	0.26    0.26
+m5    	33	44	metal	0.28    0.28	255,215,0
+v56  	39	-	via	0.36    0.35
+m6    	38	45	metal	0.44    0.46	200,100,100
+pad   	19	-	-	-	-             
+#ph   	35	-	-	0.44    0.44
+#sd   	58	-	-	-	-             
+esd   	30	-	-	0.6     0.6
+rpo   	34	-	-	0.43    0.43
+#n2v   	61	-	-	0.44    0.44
+prb	68	-	-	-	-	100,100,100
+text	-	255	text
+bbox	62	-	bbox
+iname	propattr 102	iname
+
+
+
+device nfet from poly ndif
+device pfet from poly pdif
+
+# for butting contacts
+connect nwc pdif
+connect pwc ndif
+
+# on output
+# if you want to write out all diffusions on the same layer, use od
+derive od from ndif,pdif,nwc,pwc
+derive odn from ndif,nwc
+derive odp from pdif,pwc
+
+# in input
+derive ndif from od and-not pplus or odn and-not nw
+derive pdif from od and pplus or odp and nw
+derive nwc from od and-not pplus or odn and nw
+derive pwc from od and pplus or odp and-not nw
+
+# automatic generation of pplus, nplus, nw
+# NOTE: no generation for nplus/pplus on poly away from fet
+derive pplus from pfet grow 0.17 or pdif grow 0.16 or pwc grow 0.02 \
+	and-not ndif and-not nplus \
+	or pplus shrink 0.21 grow 0.43 shrink 0.22
+	
+derive nplus from nfet grow 0.17 or ndif grow 0.16 or nwc grow 0.02 \
+	and-not pdif and-not pplus \
+	or nplus shrink 0.21 grow 0.43 shrink 0.22
+
+derive nw from pdif,nwc grow 0.43 or nw \
+	grow 0.30 shrink 0.30
+
+drc nw enc pdif 0.43
+drc nw enc nwc 0.12
+drc nw space_to ndif 0.43
+drc nw space_to pwc 0.12
+
+drc pplus enc pfet 0.35
+drc pplus enc pdif 0.18
+# assumes nw overlap is 0.43
+drc pplus enc pwc 0.02
+
+# to get the layout generator to work correctly
+#drc pplus space_to nplus 0.001
+drc pplus space_to nplus 0.08
+
+drc nplus enc nfet 0.35
+drc nplus enc ndif 0.18
+# assumes nw overlap is 0.43
+drc nplus enc nwc 0.02
+
+drc nfet space 0.25
+drc pfet space 0.25
+
+derive tmp1 from nfet,pfet grow 0.1
+derive poly_not_fet from poly and-not tmp1
+derive all_diff from ndif,pdif,nwc,pwc
+drc poly_not_fet space_to all_diff 0.1
+
+# for < max3.0 must be on same plane
+drc poly ext nfet 0.25
+drc poly ext pfet 0.25
+
+#drc ndif ext nfet 0.32
+#drc pdif ext pfet 0.32
+# Since this conflicts with the nfet, pfet space rules
+drc ndif ext nfet 0.25
+drc pdif ext pfet 0.25
+set DRC_DATA(extend,ndif,nfet) 0.32
+set DRC_DATA(extend,pdif,pfet) 0.32
+
+drc pwc area 0.2025
+drc nwc area 0.2025
+
+derive ct_ndif from ct and ndif,nwc
+derive ct_pdif from ct and pdif,pwc
+drc ct_ndif space_to nfet 0.16
+drc ct_pdif space_to pfet 0.16
+
+derive ct_poly from ct and poly
+drc ct_poly space_to pfet 0.21
+drc ct_poly space_to nfet 0.21
+
+derive all_poly_dif from ndif,pdif,nwc,pwc,poly
+drc all_poly_dif enc ct 0.1
+
+
+DRC m1 ENC ct 0.06
+DRC m1 ENC v12 0.06
+DRC m2 ENC v12 0.06
+DRC m2 ENC v23 0.06
+DRC m3 ENC v23 0.06
+DRC m3 ENC v34 0.06
+DRC m4 ENC v34 0.06
+DRC m4 ENC v45 0.06
+DRC m5 ENC v45 0.06
+DRC m5 ENC v56 0.06
+DRC m6 ENC v56 0.09
+
+
+drc m1 area 0.2025
+drc m2 area 0.2025
+drc m3 area 0.2025
+drc m4 area 0.2025
+drc m5 area 0.2025
+drc m6 area 0.5625
+
+
+# add other tcl variable definitions with the set statement
+
+################################################################
+# USER DESIGN GRID
+# This is the initial value shown in the Grid menu.
+################################################################
+set GRID(resolution) 0.01
+set GRID(mask) 0.005
+
+
+################################################################
+# LAYER NAMES
+# Mapping from mmi layer names to customer tech names.
+# Change the name on the right to be the name of the specified
+# layer in this technology file.
+# Note that contact and poly could be derived from info above.
+################################################################
+
+set LAYER_NAME(pdiff) pdif
+set LAYER_NAME(ndiff) ndif
+set LAYER_NAME(nplus) nplus
+set LAYER_NAME(pplus) pplus
+set LAYER_NAME(nwell) nw
+set LAYER_NAME(poly) poly
+set LAYER_NAME(contact) ct
+
+
+set DRC_DATA(enclose,diff,ct) 0.1
+set DRC_DATA(spacing,diff) 0.28
+set DRC_DATA(space_to,poly,diff) 0.10
+set DRC_DATA(space_to,ct,gate) 0.16
+
+################################################################
+# LAYOUT GENERATOR RULES
+# Additional Rules for Layout Generator used
+# when generating standard cells.
+################################################################
+
+set LAYINFO(stdcell:cell_height) 7.4
+set LAYINFO(stdcell:dpc_router_pitch) 0.74  ;# Router pitch for m1, m2, m3, etc.
+set LAYINFO(stdcell:power_strap_width) 1.0
+# You can optionally use a smaller cell_router_pitch than
+# dpc_router_pitch.  The min poly contact pitch is .67, but in order
+# to put a .45 router landing pad in the track, it must be .68.
+set LAYINFO(stdcell:cell_router_pitch) 0.68  ;# Router pitch for poly/metal.
+

@@ -1,0 +1,164 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_FFSB {} {
+  make input -name clk -origin {-240 540}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {-10 540}
+  make inverter -WP 2.4 -WN 1.2 -origin {1050 330}
+  make output -name Q -origin {1200 330}
+  make inverter -WP 1.2 -WN 0.6 -origin {-130 700}
+  make name_net -orient RX -name clk -origin {400 150}
+  make name_net -orient RX -name clk_L -origin {400 70}
+  make global -name gnd -origin {340 270}
+  make global -orient RY -name vdd -origin {340 -50}
+  make inverter -WP 1.2 -WN 0.6 -origin {-130 540}
+  make global -name gnd -origin {790 280}
+  make global -orient RY -name vdd -origin {790 -40}
+  make input -name setn -origin {-240 700}
+  make name_net -orient RY -name setn -origin {270 370}
+  make nor2 -orient RY -WP 2.4 -WN 1.8 -origin {770 350}
+  make nmos -orient RX -W 0.36 -origin {790 240}
+  make pmos -orient RX -W 0.36 -origin {790 0}
+  make name_net -orient RX -name clk -origin {850 80}
+  make name_net -orient RX -name clk_L -origin {850 160}
+  make pmos -orient RX -W 0.6 -origin {340 -10}
+  make pmos -orient RX -W 0.6 -origin {340 70}
+  make nmos -orient RX -W 0.36 -origin {340 150}
+  make nmos -orient RX -W 0.36 -origin {340 230}
+  make pmos -orient RX -W 0.36 -origin {790 80}
+  make nmos -orient RX -W 0.36 -origin {790 160}
+  make name_net -name clk_L -origin {570 290}
+  make name_net -orient RY -name clk -origin {570 380}
+  make xgate -orient RY -WP 0.36 -WN 0.36 -origin {570 330}
+  make name_net -orient RY -name clk_L -origin {10 360}
+  make name_net -name clk -origin {10 290}
+  make xgate -orient RY -WP 0.6 -WN 0.6 -origin {10 330}
+  make global -name gnd -origin {-520 530}
+  make global -name gnd -origin {-820 530}
+  make inverter -WP 1.2 -WN 0.6 -origin {-1100 390}
+  make global -orient RY -name vdd -origin {-720 130}
+  make global -name gnd -origin {-720 530}
+  make nmos -W 1.2 -origin {-720 390}
+  make nmos -W 1.2 -origin {-820 390}
+  make nmos -W 1.2 -origin {-820 490}
+  make pmos -W 2.4 -origin {-820 270}
+  make pmos -W 2.4 -origin {-720 270}
+  make pmos -W 2.4 -origin {-820 170}
+  make pmos -W 2.4 -origin {-720 170}
+  make nmos -W 1.2 -origin {-520 490}
+  make nmos -W 1.2 -origin {-520 390}
+  make pmos -W 2.4 -origin {-520 270}
+  make pmos -W 2.4 -origin {-520 170}
+  make global -name gnd -origin {-420 530}
+  make nmos -W 1.2 -origin {-420 490}
+  make nmos -W 1.2 -origin {-420 390}
+  make pmos -W 2.4 -origin {-420 270}
+  make pmos -W 2.4 -origin {-420 170}
+  make nmos -W 1.2 -origin {-720 490}
+  make global -orient RY -name vdd -origin {-820 130}
+  make global -orient RY -name vdd -origin {-520 130}
+  make global -orient RY -name vdd -origin {-420 130}
+  make input -name scan_en -origin {-1200 390}
+  make input -name D -origin {-970 490}
+  make input -name scan_in -origin {-620 490}
+  make name_net -name scan_en_L -origin {-990 390}
+  make name_net -name set -origin {0 700}
+  make name_net -name N1 -origin {-210 330}
+  make name_net -name N2 -origin {250 110}
+  make name_net -name N3 -origin {430 -10}
+  make name_net -name N4 -origin {700 120}
+  make name_net -name N5 -origin {880 0}
+  make nand2 -WP 1.8 -WN 1.8 -origin {290 350}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.7 -date 07/19/99 -origin {-300 870}
+  make_wire -160 540 -240 540
+  make_wire 440 330 540 330
+  make_wire -160 700 -240 700
+  make_wire 440 350 440 330
+  make_wire 890 330 1020 330
+  make_wire 1100 330 1200 330
+  make_wire -80 540 -10 540
+  make_wire 400 230 440 230
+  make_wire 440 230 440 330
+  make_wire 440 -10 440 230
+  make_wire 240 110 240 330
+  make_wire 850 240 890 240
+  make_wire 890 0 890 240
+  make_wire 690 120 690 330
+  make_wire 690 330 600 330
+  make_wire 570 380 570 360
+  make_wire 750 330 690 330
+  make_wire 840 350 890 350
+  make_wire 690 370 690 700
+  make_wire 240 330 270 330
+  make_wire 360 350 440 350
+  make_wire 690 370 750 370
+  make_wire 890 240 890 330
+  make_wire 890 330 890 350
+  make_wire -820 350 -820 330
+  make_wire -820 310 -820 330
+  make_wire -820 210 -820 230
+  make_wire -520 450 -520 430
+  make_wire -520 210 -520 230
+  make_wire -520 330 -520 350
+  make_wire -820 450 -820 430
+  make_wire -520 310 -520 330
+  make_wire -620 390 -580 390
+  make_wire -580 170 -600 170
+  make_wire -600 170 -600 490
+  make_wire -600 490 -580 490
+  make_wire -600 490 -620 490
+  make_wire -920 170 -920 490
+  make_wire -1170 270 -1170 390
+  make_wire -720 350 -720 330
+  make_wire -720 310 -720 330
+  make_wire -720 210 -720 230
+  make_wire -720 450 -720 430
+  make_wire -720 330 -820 330
+  make_wire -880 170 -780 170
+  make_wire -880 490 -780 490
+  make_wire -420 450 -420 430
+  make_wire -420 210 -420 230
+  make_wire -420 330 -420 350
+  make_wire -420 310 -420 330
+  make_wire -920 490 -970 490
+  make_wire -920 490 -880 490
+  make_wire -920 170 -880 170
+  make_wire -1200 390 -1170 390
+  make_wire -1170 390 -1130 390
+  make_wire -580 270 -480 270
+  make_wire -720 330 -520 330
+  make_wire -520 330 -420 330
+  make_wire -580 170 -480 170
+  make_wire -580 390 -480 390
+  make_wire -580 490 -480 490
+  make_wire -700 270 -620 390
+  make_wire -700 390 -620 270
+  make_wire -700 390 -780 390
+  make_wire -620 270 -580 270
+  make_wire -700 270 -780 270
+  make_wire -880 390 -780 390
+  make_wire -1170 270 -880 270
+  make_wire -880 270 -780 270
+  make_wire -990 390 -1050 390
+  make_wire -990 390 -880 390
+  make_wire 0 700 -80 700
+  make_wire 0 700 690 700
+  make_wire -210 330 -420 330
+  make_wire -210 330 -20 330
+  make_wire 430 -10 400 -10
+  make_wire 430 -10 440 -10
+  make_wire 700 120 690 120
+  make_wire 700 120 790 120
+  make_wire 880 0 850 0
+  make_wire 880 0 890 0
+  make_wire 240 330 40 330
+  make_wire 240 110 250 110
+  make_wire 250 110 340 110
+  make_text -origin {-1310 -110} -text {Flipflop with asynchronous set (active low)}
+  make_text -origin {-1310 -90} -text {B Size}
+  make_text -origin {-1100 110} -text {B Size} -size large
+  make_text -origin {-1100 80} -text {inverting 2:1 mux} -size large
+  make_text -origin {-1310 -130} -text MMI_FFSB -size large
+}
+

@@ -1,0 +1,84 @@
+# SUE version MMI_SUE4.0p1
+
+proc SCHEMATIC_SHFMUX5C {} {
+  make name_net_s -name N3 -origin {660 430}
+  make name_net_s -name N2 -origin {660 340}
+  make name_net_s -name N1 -origin {660 220}
+  make output -name out -origin {970 340}
+  make input -name in0 -origin {220 170}
+  make input -name in1 -origin {220 230}
+  make input -name in2 -origin {220 290}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -origin {470 430}
+  make name_net_s -name {[0]} -origin {340 210}
+  make name_net_s -name {[1]} -origin {340 270}
+  make name_net_s -name {[2]} -origin {340 330}
+  generate MMI_AOI22 MMI_AOI22B -Size B
+  make MMI_AOI22B -origin {510 220}
+  make MMI_AOI22B -origin {510 340}
+  make input -name in3 -origin {220 350}
+  make input -name in4 -origin {220 410}
+  make name_net_s -name {[3]} -origin {340 390}
+  make name_net_s -name {[4]} -origin {340 450}
+  make input -name {sel[4:0]} -origin {220 210}
+  generate MMI_NAND3 MMI_NAND3C_ -Size C -DeMorgan 1
+  make MMI_NAND3C_ -orient RY -origin {860 340}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.5 -date 04/20/99 -origin {440 650}
+  make_wire 410 170 220 170
+  make_wire 410 230 220 230
+  make_wire 410 290 220 290
+  make_wire 920 340 970 340
+  make_wire 340 210 410 210
+  make_wire 340 270 410 270
+  make_wire 260 210 340 210
+  make_wire 260 210 220 210
+  make_wire 260 270 340 270
+  make_wire 610 340 660 340
+  make_wire 260 330 340 330
+  make_wire 340 330 410 330
+  make_wire 260 210 260 270
+  make_wire 260 270 260 330
+  make_wire 410 350 220 350
+  make_wire 410 410 220 410
+  make_wire 260 330 260 390
+  make_wire 260 390 260 450
+  make_wire 340 390 260 390
+  make_wire 340 390 410 390
+  make_wire 340 450 260 450
+  make_wire 340 450 410 450
+  make_wire 750 360 750 430
+  make_wire 750 360 800 360
+  make_wire 660 430 530 430
+  make_wire 660 430 750 430
+  make_wire 660 340 800 340
+  make_wire 750 220 750 320
+  make_wire 610 220 660 220
+  make_wire 660 220 750 220
+  make_wire 750 320 800 320
+  make_text -origin {150 -10} -text SHFMUX5C -size large
+}
+
+proc ICON_SHFMUX5C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -120} -name in0
+  icon_term -type input -origin {-60 -60} -name in1
+  icon_term -type input -origin {-60 0} -name in2
+  icon_term -type input -origin {-60 60} -name in3
+  icon_term -type input -origin {-60 120} -name in4
+  icon_term -type input -origin {0 140} -orient R270 -name {sel[4:0]}
+  icon_property -origin {-40 380} -type user -name name
+  icon_property -origin {-40 400} -type user -name M
+  icon_property -origin {-40 420} -type user -name dpc
+  icon_line -60 -60 -40 -60
+  icon_line -60 -120 -40 -120
+  icon_line -60 0 -40 0
+  icon_property -origin {-30 -120} -size small -label 0
+  icon_property -origin {0 0} -anchor center -label SC
+  icon_line 60 0 40 0
+  icon_line -40 -160 40 -120 40 120 -40 160 -40 -160
+  icon_line -60 120 -40 120
+  icon_line -60 60 -40 60
+}
+

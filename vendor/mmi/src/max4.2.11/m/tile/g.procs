@@ -1,0 +1,132 @@
+TiNewPlane --
+-------------
+
+Allocate and initialize a new tile plane.
+
+Results:
+A newly allocated Plane with all corner stitches set
+appropriately.
+
+Side effects:
+Adjusts the corner stitches of the Tile supplied to
+point to the appropriate bounding tile in the newly
+created Plane.
+
+TiFreePlane --
+--------------
+
+Free the storage associated with a tile plane.
+Only the plane itself and its four border tiles are deallocated.
+
+Results:
+None.
+
+Side effects:
+Frees memory.
+
+TiToRect --
+-----------
+
+Convert a tile to a rectangle.
+
+Results:
+None.
+
+Side effects:
+Sets *rect to the bounding box for the supplied tile.
+
+TiSplitY --
+-----------
+
+Given a tile and a Y coordinate, split the tile into two
+along a horizontal line running through the given coordinate.
+
+Results:
+Returns the new tile resulting from the splitting, which
+is the tile occupying the top half of the original
+tile.
+
+Side effects:
+Modifies the corner stitches in the database to reflect
+the presence of two tiles in place of the original one.
+
+TiSplitX_Left --
+----------------
+
+Given a tile and an X coordinate, split the tile into two
+along a line running vertically through the given coordinate.
+Intended for use when plowing to the left.
+
+Results:
+Returns the new tile resulting from the splitting, which
+is the tile occupying the left-hand half of the original
+tile.
+
+Side effects:
+Modifies the corner stitches in the database to reflect
+the presence of two tiles in place of the original one.
+
+TiSplitY_Bottom --
+------------------
+
+Given a tile and a Y coordinate, split the tile into two
+along a horizontal line running through the given coordinate.
+Used when plowing down.
+
+Results:
+Returns the new tile resulting from the splitting, which
+is the tile occupying the bottom half of the original
+tile.
+
+Side effects:
+Modifies the corner stitches in the database to reflect
+the presence of two tiles in place of the original one.
+
+TiJoinX --
+----------
+
+Given two tiles sharing an entire common vertical edge, replace
+them with a single tile occupying the union of their areas.
+
+Results:
+None.
+
+Side effects:
+The first tile is simply relinked to reflect its new size.
+The second tile is deallocated.  Corner stitches in the
+neighboring tiles are updated to reflect the new structure.
+If the hint tile pointer in the supplied plane pointed to
+the second tile, it is adjusted to point instead to the
+first.
+
+TiJoinY --
+----------
+
+Given two tiles sharing an entire common horizontal edge, replace
+them with a single tile occupying the union of their areas.
+
+Results:
+None.
+
+Side effects:
+The first tile is simply relinked to reflect its new size.
+The second tile is deallocated.  Corner stitches in the
+neighboring tiles are updated to reflect the new structure.
+If the hint tile pointer in the supplied plane pointed to
+the second tile, it is adjusted to point instead to the
+first.
+
+TiSrPoint --
+------------
+
+Search for a point.
+
+Results:
+A pointer to the tile containing the point.
+The bottom and left edge of a tile are considered part of
+the tile; the top and right edge are not.
+
+Side effects:
+Updates the hint tile in the supplied plane to point
+to the tile found.
+

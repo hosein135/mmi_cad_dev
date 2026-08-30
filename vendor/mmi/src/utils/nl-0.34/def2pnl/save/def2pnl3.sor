@@ -1,0 +1,63 @@
+#header <<
+#include "stdpccts.h"
+typedef AST SORAST;
+>>
+<<
+#include "errsupport.c"	/* define some default error routines */
+>>
+
+def_file	: ( get_design )*
+		;
+
+get_design	: #(DEF_DIVIDERCHAR str:DEF_QUOTED)
+			<< printf ("divider char is '%s'\n", str->text); >>
+		| #(DEF_DESIGN name:DEF_IDENT
+			<< printf ("design name is %s\n", name->text); >>
+			( get_pins_and_components )* )
+		| node
+		;
+
+get_pins_and_components
+	 	: #(DEF_COMPONENTS DEF_NUMBER ( get_component )*)
+		| #(DEF_PINS DEF_NUMBER ( get_pin )*)
+		| node
+		;
+
+get_component	: #(inst:DEF_IDENT ref:DEF_IDENT
+		     ( ( #(DEF_PLACED x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+		       | #(DEF_FIXED  x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+		       )
+			<< printf ("C: %s %s %d %d %s\n", 
+			       inst->text, ref->text, x->num, y->num, o->text);
+			>>
+//			<< def2pnl2_component (inst->text, ref->text,
+//					       x->num, y->num, o->text);
+//			>>
+		     | DEF_UNPLACED
+		     )
+		   )
+		;
+
+get_pin		: #(name:DEF_IDENT ( get_pin_plus [name->text] )*)
+		;
+
+
+get_pin_plus [char *name]
+		: ( #(DEF_PLACED x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+		  | #(DEF_FIXED  x:DEF_NUMBER y:DEF_NUMBER o:orientation)
+		  )	<< printf ("P: %s %d %d %s\n", 
+				name, x->num, y->num, o->text);
+			>>
+//			<< def2pnl2_pin (name, x->num, y->num, o->text);
+//			>>
+		| node
+		;
+
+orientation	: DEF_N
+		| DEF_S
+		| DEF_FN
+		| DEF_FS
+		;
+
+node		: #(. (node)* )
+		;

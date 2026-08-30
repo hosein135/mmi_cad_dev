@@ -1,0 +1,15 @@
+Whenever I make much of a change in SUE, the dpc tutorial pearl files
+must regenerated or else the incorrect paths are highlighted when
+running the tutorial in demo mode.  Thanks to Kathy's suggestion, I
+have now built a script(s) to automate this.  
+
+There are two scripts:
+
+      build   ---> creates the tutorial.tar file
+      install ---> copies tutorial.tar into build dir
+
+To run:
+
+   cd /volume/mmi/src/sue/doc/dpc_build_tutorial
+   ./build
+   ./install

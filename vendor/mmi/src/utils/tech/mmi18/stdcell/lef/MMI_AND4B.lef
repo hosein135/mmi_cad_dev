@@ -1,0 +1,126 @@
+MACRO MMI_AND4B
+	CLASS CORE ;
+	FOREIGN MMI_AND4B 0 0 ;
+	SIZE 4.44 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.82 4.81 4.16 6.57 ;
+			LAYER M1 ;
+			RECT 3.89 3.555 4.12 4.81 ;
+			LAYER M1 ;
+			RECT 3.845 3.105 4.295 3.555 ;
+			LAYER M1 ;
+			RECT 3.89 2.865 4.12 3.105 ;
+			LAYER M1 ;
+			RECT 3.78 2.025 4.12 2.865 ;
+		END
+		AntennaDiffArea 1.3248 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.885 4.19 1.335 4.295 ;
+			LAYER M1 ;
+			RECT 0.85 3.85 1.335 4.19 ;
+			LAYER M1 ;
+			RECT 0.885 3.845 1.335 3.85 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 2.19 0.5 2.53 3.11 ;
+			LAYER M1 ;
+			RECT 3.06 0.5 3.4 2.865 ;
+			LAYER M1 ;
+			RECT 0 -0.5 4.44 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.625 4.19 2.075 4.295 ;
+			LAYER M1 ;
+			RECT 1.57 3.85 2.075 4.19 ;
+			LAYER M1 ;
+			RECT 1.625 3.845 2.075 3.85 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 4.44 7.9 ;
+			LAYER M1 ;
+			RECT 0.18 4.81 0.52 6.9 ;
+			LAYER M1 ;
+			RECT 1.62 5.31 1.96 6.9 ;
+			LAYER M1 ;
+			RECT 3.1 4.81 3.44 6.9 ;
+		END
+	END VDD
+	PIN in3
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.105 3.5 3.555 3.555 ;
+			LAYER M1 ;
+			RECT 2.765 3.16 3.555 3.5 ;
+			LAYER M1 ;
+			RECT 3.105 3.105 3.555 3.16 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in3
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.145 4.19 0.595 4.295 ;
+			LAYER M1 ;
+			RECT 0.12 3.85 0.595 4.19 ;
+			LAYER M1 ;
+			RECT 0.145 3.845 0.595 3.85 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 0.9 5.04 1.24 5.65 ;
+		LAYER M1 ;
+		RECT 2.34 5.04 2.68 5.65 ;
+		LAYER M1 ;
+		RECT 0.9 4.81 2.68 5.04 ;
+		LAYER M1 ;
+		RECT 2.305 4.135 2.535 4.81 ;
+		LAYER M1 ;
+		RECT 3.25 4.135 3.59 4.19 ;
+		LAYER M1 ;
+		RECT 2.305 3.905 3.59 4.135 ;
+		LAYER M1 ;
+		RECT 2.305 3.595 2.535 3.905 ;
+		LAYER M1 ;
+		RECT 3.25 3.85 3.59 3.905 ;
+		LAYER M1 ;
+		RECT 0.29 3.365 2.535 3.595 ;
+		LAYER M1 ;
+		RECT 0.29 3.11 0.52 3.365 ;
+		LAYER M1 ;
+		RECT 0.18 1.35 0.52 3.11 ;
+	END
+END MMI_AND4B

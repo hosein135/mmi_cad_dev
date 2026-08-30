@@ -1,0 +1,161 @@
+# SUE version MMI_SUE4.2.3
+
+proc SCHEMATIC_MMI_mmatch4A {} {
+  make output -name mm_out -origin {1550 470}
+  make input -name in0 -origin {210 390}
+  make input -name in1 -origin {210 420}
+  make input -name in2 -origin {210 450}
+  make input -name in3 -origin {210 480}
+  make global -orient RXY -name vdd -origin {470 160}
+  make pmos -W 1.2 -origin {470 400}
+  make nmos -W 0.385 -origin {420 550}
+  make nmos -W 0.385 -origin {420 670}
+  make nmos -orient RX -W 0.385 -origin {540 700}
+  make global -name gnd -origin {420 710}
+  make global -name gnd -origin {540 740}
+  make pmos -W 1.2 -origin {470 280}
+  make pmos -W 1.2 -origin {470 200}
+  make pmos -orient RX -W 1.2 -origin {580 400}
+  make global -orient RXY -name vdd -origin {850 160}
+  make pmos -W 1.2 -origin {850 400}
+  make pmos -W 1.2 -origin {850 280}
+  make pmos -W 1.2 -origin {850 200}
+  make pmos -orient RX -W 1.2 -origin {960 400}
+  make nmos -W 0.385 -origin {780 550}
+  make nmos -W 0.385 -origin {780 670}
+  make nmos -orient RX -W 0.385 -origin {900 700}
+  make global -name gnd -origin {780 710}
+  make global -name gnd -origin {900 740}
+  make nmos -W 0.385 -origin {1130 550}
+  make nmos -W 0.385 -origin {1130 670}
+  make nmos -orient RX -W 0.385 -origin {1250 700}
+  make global -name gnd -origin {1130 710}
+  make global -name gnd -origin {1250 740}
+  make nmos -W 0.385 -origin {1430 540}
+  make global -orient RXY -name vdd -origin {1430 340}
+  make global -name gnd -origin {1430 580}
+  make pmos -W 0.77 -origin {1430 380}
+  make name_net_s -name in0 -origin {760 200}
+  make name_net_s -name in3 -origin {380 200}
+  make name_net_s -name in2 -origin {380 280}
+  make name_net_s -name in1 -origin {380 400}
+  make name_net_s -name in0 -origin {320 550}
+  make name_net_s -name in0 -origin {1340 700}
+  make name_net_s -name in0 -origin {660 400}
+  make name_net_s -name in1 -origin {760 280}
+  make name_net_s -name in1 -origin {330 670}
+  make name_net_s -name in1 -origin {690 550}
+  make name_net_s -name in2 -origin {760 400}
+  make name_net_s -name in2 -origin {630 700}
+  make name_net_s -name in2 -origin {690 670}
+  make name_net_s -name in2 -origin {1040 670}
+  make name_net_s -name in3 -origin {1050 400}
+  make name_net_s -name in3 -origin {980 700}
+  make name_net_s -name in3 -origin {1040 550}
+  make MMI_mmatch4A -origin {1470 180}
+  make title_bar -owner dweisner -origin {1240 1050}
+  make_wire 420 610 420 590
+  make_wire 420 610 420 630
+  make_wire 470 340 580 340
+  make_wire 580 340 580 360
+  make_wire 470 340 470 320
+  make_wire 470 340 470 360
+  make_wire 850 340 960 340
+  make_wire 960 340 960 360
+  make_wire 850 340 850 320
+  make_wire 850 340 850 360
+  make_wire 420 510 420 470
+  make_wire 1130 510 1130 470
+  make_wire 780 510 780 470
+  make_wire 470 470 420 470
+  make_wire 580 470 470 470
+  make_wire 580 470 780 470
+  make_wire 850 470 780 470
+  make_wire 960 470 850 470
+  make_wire 960 470 1130 470
+  make_wire 470 440 470 470
+  make_wire 960 440 960 470
+  make_wire 850 440 850 470
+  make_wire 580 440 580 470
+  make_wire 1370 540 1330 540
+  make_wire 1330 380 1370 380
+  make_wire 1330 470 1330 540
+  make_wire 1330 470 1330 380
+  make_wire 1430 470 1430 420
+  make_wire 1430 470 1430 500
+  make_wire 1430 470 1550 470
+  make_wire 790 400 800 400
+  make_wire 780 280 790 280
+  make_wire 780 200 790 200
+  make_wire 1070 400 1080 400
+  make_wire 540 610 540 660
+  make_wire 780 590 780 610
+  make_wire 780 610 780 630
+  make_wire 900 610 900 660
+  make_wire 1130 610 1250 610
+  make_wire 1130 590 1130 610
+  make_wire 1130 610 1130 630
+  make_wire 1250 610 1250 660
+  make_wire 780 610 900 610
+  make_wire 420 610 540 610
+  make_wire 760 200 780 200
+  make_wire 760 200 730 200
+  make_wire 320 550 360 550
+  make_wire 320 550 290 550
+  make_wire 1340 700 1310 700
+  make_wire 1340 700 1370 700
+  make_wire 660 400 700 400
+  make_wire 660 400 640 400
+  make_wire 380 400 410 400
+  make_wire 380 400 350 400
+  make_wire 760 280 780 280
+  make_wire 760 280 730 280
+  make_wire 330 670 360 670
+  make_wire 330 670 290 670
+  make_wire 690 550 720 550
+  make_wire 690 550 650 550
+  make_wire 380 280 410 280
+  make_wire 380 280 350 280
+  make_wire 760 400 790 400
+  make_wire 760 400 740 400
+  make_wire 630 700 600 700
+  make_wire 630 700 660 700
+  make_wire 690 670 720 670
+  make_wire 690 670 650 670
+  make_wire 1040 670 1070 670
+  make_wire 1040 670 1000 670
+  make_wire 380 200 410 200
+  make_wire 380 200 350 200
+  make_wire 1050 400 1070 400
+  make_wire 1050 400 1020 400
+  make_wire 980 700 960 700
+  make_wire 980 700 1020 700
+  make_wire 1040 550 1070 550
+  make_wire 1040 550 1000 550
+  make_wire 1130 470 1330 470
+  make_line 40 -160 40 1110 1770 1110 1770 -160 40 -160
+  make_text -origin {240 900} -text {Multi-match circuit for priority encoder
+mmout = (in0&in1) | (in0&in2) | (in0&in3) | (in1&in2) | (in1&in3) | (in2&in3)}
+}
+
+proc ICON_MMI_mmatch4A args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-160 -140} -name in0
+  icon_term -type input -origin {-160 -100} -name in1
+  icon_term -type input -origin {-160 -60} -name in2
+  icon_term -type input -origin {-160 -20} -name in3
+  icon_term -type output -origin {160 -80} -name mm_out
+  icon_property -origin {-50 70} -type user -name name
+  icon_property -origin {-50 90} -type user -name M
+  icon_property -origin {-50 110} -type user -name dpc
+  icon_property -origin {0 -120} -size large -anchor center -label MMI_mmatch4
+  icon_property -origin {150 -80} -anchor e -label mm_out
+  icon_property -origin {-150 -140} -label in0
+  icon_property -origin {-150 -100} -label in1
+  icon_property -origin {-150 -60} -label in2
+  icon_property -origin {-150 -20} -label in3
+  icon_property -origin {0 -80} -size large -anchor center -label A
+  icon_line -160 -160 -160 0 160 0 160 -160 -160 -160
+  icon_property -origin {-530 180} -type fixed -name verilog -text {MMI_mmatch4A [unique_name "" $name MMI_mmatch4A] (.in0($in0), .in1($in1), .in2($in2), .in3($in3), .mm_out($mm_out))\;}
+}
+

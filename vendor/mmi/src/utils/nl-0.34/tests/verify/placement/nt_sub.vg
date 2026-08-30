@@ -1,0 +1,14 @@
+module nt_sub (xxx, yyy, zzz);
+	input		xxx;
+	input		yyy;
+	output		zzz;
+ 
+	wire		net_2;
+	wire		net_1;
+ 
+	MMI_AND2B MMI_AND2B (.in0(yyy), .in1(net_2), .out(net_1));
+	MMI_BUFB MMI_BUFB (.in(net_1), .out(zzz));
+	MMI_BUFB MMI_BUFB_1 (.in(xxx), .out(net_2));
+
+endmodule		// nt_sub
+

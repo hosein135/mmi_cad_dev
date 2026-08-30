@@ -1,0 +1,13 @@
+partshifter.sue is a generator that builds partitioned shifter/rotators.
+
+it is not complete.  
+
+it performs full minimization of the shift muxes, places the correct mux 
+sizes, and correctly hooks up the data inputs and outputs.  it does not
+hook up the shift signals, since minimization of the shift control wires
+was beyond my interest.
+
+it does print out all the necessary information on the shift wire equations
+so that the user can decide how to share shift wires.  this information
+appears on the schematic, as well as in a file called 
+partshifter{options}.seldata.

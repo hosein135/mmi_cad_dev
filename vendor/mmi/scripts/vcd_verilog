@@ -1,0 +1,311 @@
+#!/usr/local/bin/perl
+
+# Reads a vcd file and acts like verilog simulating but only does the
+# subset of commands sue creates during probing.
+# Can go backward in time and jump to absolute time.
+
+die "usage: $0 vcd-file [dummy] < commands\n" unless @ARGV == 1 || @ARGV == 2;
+$vcdfile = shift(@ARGV);
+# allow sue to specify the .vh file
+shift(@ARGV) if @ARGV;
+
+@hex = (0..9, a..f);
+&read_vcd_file;
+#&dump_database;
+&exec_interactive_commands;
+exit 0;
+
+sub read_vcd_file {
+	$time = 0;
+	open(IN,$vcdfile) || die "Aborting vcd_verilog, can't read $vcdfile\n";
+	while ($cmd = &gets) {
+		if ($cmd =~ /^([01xXzZ])([!-~]+)$/) {
+			# scalar value change
+			store_event($1, $2);
+		} elsif ($cmd =~ /^([bB][01xXzZ]+)$/) {
+			# binary vector value change
+			local($bits) = $1;
+			local($id) = &gets;
+			store_event($bits, $id);
+		} elsif ($cmd =~ /^([rR][^!-~]+)$/) {
+			# real number value change
+			local($bits) = $1;
+			local($id) = &gets;
+			store_event($bits, $id);
+		} elsif ($cmd =~ /^#([0-9]+)$/) {
+			# time
+			$time = $1;
+		} elsif ($cmd eq '$var') {
+			# var definition
+			&gets; # ignore type
+			&gets; # ignore size
+			local($id) = &gets;
+			local($ref) = &gets;
+			local($ref2) = &gets;  # maybe [...], maybe $end
+			$ref .= $ref2 unless $ref2 eq '$end';
+			local($path) = join('.', @path, $ref);
+			push(@{$paths{$id}}, $path);
+			&skip_through_end unless $ref2 eq '$end';
+		} elsif ($cmd =~ /^\$dump(vars|all|off|on)$/) {
+			# dump*
+			# ignoring causes normal processing of value changes
+			# and ignoring of trailing $end
+		} elsif ($cmd eq '$scope') {
+			# push down into module, function, etc.
+			&gets; # ignore type
+			# push id onto path
+			push(@path, &gets); 
+			&skip_through_end;
+		} elsif ($cmd eq '$upscope') {
+			# pop out of module, function, etc.
+			pop(@path);
+			&skip_through_end;
+		} elsif ($cmd =~ /^\$/) {
+			# ignore unrecognized $commands
+			&skip_through_end unless $cmd eq '$end';
+		} else {
+			# but yell about any other unrecognized stuff
+			warn "ignoring $cmd\n";
+		}
+	}
+	close(IN);
+}
+
+sub store_event {
+	local($value, $id) = @_;
+	foreach $path (@{$paths{$id}}) {
+		push(@{$times{$path}}, $time);
+		push(@{$values{$path}}, $value);
+		next unless $path =~ /^(.*)\[(\d+):(\d+)\]$/;
+		local($basename, $from, $to) = ($1, $2, $3);
+		next unless $value =~ /^b/;
+# print "breaking up $path = $value\n";
+		local(@value) = split('', $value);
+		shift(@value);  # get rid of b
+		@value = reverse(@value);
+		local($top) = @value - 1;
+		for ($i = $from; $i >= $to; $i--) {
+			local($path) = "$basename\[$i\]";
+			local($value) = $i <= $top ? $value[$i] : '0';
+# print "$path = $value\n";
+			push(@{$times{$path}}, $time);
+			push(@{$values{$path}}, $value);
+		}
+	}
+}
+
+sub gets {
+	package gets_package;
+	while (!@cmds) {
+		$line = <main'IN>;
+		return 0 unless $line; # eof
+		@cmds = split(' ', $line);
+	}
+	return shift(@cmds);
+}
+
+sub skip_through_end {
+	local($cmd);
+	while ($cmd = &gets) {
+		return if $cmd eq '$end';
+	}
+	# just return if EOF before $end
+}
+
+sub dump_database {
+	foreach $id (keys %paths) {
+		foreach $path (@{$paths{$id}}) {
+			print "$id = $path\n";
+		}
+	}
+	local($i);
+	foreach $path (keys %times) {
+		local($tr) = $times{$path};
+		local($vr) = $values{$path};
+		local($lth) = 0 + @{$tr};
+		print "$path:";
+		for ($i = 0; $i < $lth; $i++) {
+			print " $vr->[$i]\@$tr->[$i]";
+		}
+		print "\n";
+	}
+}
+
+sub exec_interactive_commands {
+	$time = 0;
+	while (<>) {
+		chop;
+# print "cmd=$_\n";
+		next if /^\s*$/;  # ignore blank lines
+		next if /^\/\//;  # ignore comments
+		if (/^\$fdisplay\(tmp_channel,"(\S+)\s+(\S+)",(\S+)\);$/) {
+			# write net to file
+			local($dispnet, $fmt, $net) = ($1, $2, $3);
+			local($out) = &format($fmt, $net);
+# print "OUT: $dispnet\t$out\n";
+			print OUT "$dispnet\t$out\n";
+		} elsif (/^\$fdisplay\(tmp_channel,"(\S+)"\);$/) {
+			# write string to file
+			local($string) = ($1);
+			print OUT "$string\n";
+		} elsif (/^tmp_channel = \$fopen\("([^"]+)"\);$/) {
+			# open file to write values
+			local($file) = $1;
+			open(OUT, ">$file") || die "can't write to $file\n";
+		} elsif (/^\$fclose\(tmp_channel\);$/) {
+			# close file
+			close(OUT);
+		} elsif (/^#([0-9]+)/) {
+			# advance time
+			$time += $1;
+			print "\$stop at simulation time $time\n";
+		} elsif (/^#-([0-9]+)/) {
+			# not in verilog - run time backward
+			$time -= $1;
+			print "\$stop at simulation time $time\n";
+		} elsif (/^@([0-9]+)/) {
+			# not in verilog - absolute time
+			$time = $1;
+			print "\$stop at simulation time $time\n";
+		} elsif (/^\.$/) {
+			# just means go on simulating
+		} elsif (/^\$finish;$/) {
+			return;
+		} else {
+			warn "ignoring $_\n";
+		}
+	}
+}
+
+sub format {
+	local($fmt, $net) = @_;
+	local($val, $rad, $bits, $digsize);
+
+	# figure out value
+	$val = &getval($net);
+
+	# figure out radix
+	if ($val =~ /^[bB](.*)/) {
+		$bits = $1;
+		$rad = 'B';
+	} elsif ($val =~ /^[rR](.*)/) {
+		$bits = $1;
+		$rad = 'R';
+	} else {
+		$bits = $val;
+		$rad = 'S';
+	}
+
+	# figure out format
+	if ($fmt =~ /^%[hH]$/) {
+		$fmt = 'H';
+		$digsize = 4;
+	} elsif ($fmt =~ /^%[dD]$/) {
+		$fmt = 'D';
+	} elsif ($fmt =~ /^%[oO]$/) {
+		$fmt = 'O';
+		$digsize = 3;
+	} elsif ($fmt =~ /^%[bB]$/) {
+		$fmt = 'B';
+	} else {
+		$fmt = '?';
+	}
+
+	# now format
+	# ? if weird format
+	return 'unrecognized_format' if $fmt eq '?';
+	# no change if scalar value, real value, or binary format
+	return $bits if $rad eq 'S' || $rad eq 'R' || $fmt eq 'B';
+	if ($fmt eq 'D') {
+		# decimal - treat as one big digit in x/z testing
+		local($c) = &xz($bits);
+		return $c ? $c : &btoi($bits);
+	}
+	# octal or hex - check each digit for x's or z's.
+	local($r, $dig);
+	while (length($bits) >= $digsize) {
+		$fmt eq 'H' ? ($bits =~ /(.*)(....)/) : ($bits =~ /(.*)(...)/);
+		($bits, $dig) = ($1, $2);
+		local($c) = &xz($dig);
+		$r = ($c ? $c : $hex[&btoi($dig)]) . $r;
+	}
+	if (length($bits) > 0) {
+		local($c) = &xz($bits);
+		$r = ($c ? $c : $hex[&btoi($bits)]) . $r;
+	}
+	return $r;
+}
+
+sub getval {
+	local ($net) = @_;
+	local($timep) = $times{$net};
+	return "B$1" if $net =~ /^\d+'b([01]+)$/;
+	return &cat($1) if $net =~ /^{(.*)}$/;
+	return &buserize($net) unless $timep;
+	local($valuep) = $values{$net};
+	return 'x' if $time < $timep->[0];
+	local($bot, $top) = (0, @{$timep}-1);
+	return $valuep->[$top] if $time >= $timep->[$top];
+	# bchop; $bot <= index < $top
+	while (1) {
+		local($mid) = $bot + int(($top-$bot)/2);
+		return $valuep->[$bot] if $bot == $mid;
+		if ($time < $timep->[$mid]) {
+			$top = $mid;
+		} else {
+			$bot = $mid;
+		}
+	}
+}
+
+sub cat {
+	my($x) = @_;
+	my(@x) = split(',', $x);
+	my($y) = "";
+	foreach $x (@x) {
+		$y .= &getval($x);
+	}
+	$y =~ s/B//g;
+	$y =~ s/b//g;
+	return "B$y";
+}
+
+# unrecognized net name
+# if it's a bus, try to get elements of it
+sub buserize {
+	local($net) = @_;
+	return 'x' unless $net =~ /^(.*)\[(\d+):(\d+)\]$/;
+	local ($name, $from, $to) = ($1, $2, $3);
+	local ($r);
+	for ($i = $from; $i >= $to; $i--) {
+		local($element_name) = "${name}[$i]";
+		local($c) = getval($element_name);
+		return 'error' if $c eq 'error';
+		$r .= $c;
+	}
+	return "B$r";
+}
+
+sub xz {
+	local($bits) = @_;
+	# x if all x's
+	return 'x' if $bits =~ /^[xX]+$/;
+	# z if all z's
+	return 'z' if $bits =~ /^[zZ]+$/;
+	# X if there's an x with other stuff
+	return 'X' if $bits =~ /x/;
+	# Z if there's a z with other stuff, but no x
+	return 'Z' if $bits =~ /z/;
+	# otherwise nothing special
+	return 0;
+}
+
+sub btoi {
+	local($bits) = @_;
+	local(@bits) = split('', $bits);
+	local($r);
+	while (@bits) {
+		$r = 2 * $r + shift(@bits);
+	}
+	return $r;
+}

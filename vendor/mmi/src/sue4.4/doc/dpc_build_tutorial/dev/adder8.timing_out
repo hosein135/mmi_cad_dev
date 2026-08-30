@@ -1,0 +1,327 @@
+Pearl version 4.3-s077
+cmd> readtechnology /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/pearl/pearl.tech
+cmd> readctlf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/tlf/mmi25.ctlf
+cmd> readverilog /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.vg
+cmd> toplevelcell adder8
+Network adder8 has 59 devices and 78 nodes
+cmd> readspf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.est_dspf
+Warning: net a[0] has no driver on it.
+Warning: net a[1] has no driver on it.
+Warning: net a[2] has no driver on it.
+Warning: net a[3] has no driver on it.
+Warning: net a[4] has no driver on it.
+Warning: net a[5] has no driver on it.
+Warning: net a[6] has no driver on it.
+Warning: net a[7] has no driver on it.
+Warning: net b[0] has no driver on it.
+Warning: net b[1] has no driver on it.
+Warning: net b[2] has no driver on it.
+Warning: net b[3] has no driver on it.
+Warning: net b[4] has no driver on it.
+Warning: net b[5] has no driver on it.
+Warning: net b[6] has no driver on it.
+Warning: net b[7] has no driver on it.
+Msg: File "/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.est_dspf" does not have instance section
+cmd> setmaxpossibilities 5
+cmd> clock -domain _WAVE_ -cycle_time 3ns -create_node _input_ 0 1.5n
+cmd> input cin _input_ ^ 0 0 0 0
+cmd> inputslew cin 200ps 200ps 200ps 200ps
+cmd> input a[0] _input_ ^ 0 0 0 0
+cmd> inputslew a[0] 200ps 200ps 200ps 200ps
+cmd> input a[1] _input_ ^ 0 0 0 0
+cmd> inputslew a[1] 200ps 200ps 200ps 200ps
+cmd> input a[2] _input_ ^ 0 0 0 0
+cmd> inputslew a[2] 200ps 200ps 200ps 200ps
+cmd> input a[3] _input_ ^ 0 0 0 0
+cmd> inputslew a[3] 200ps 200ps 200ps 200ps
+cmd> input a[4] _input_ ^ 0 0 0 0
+cmd> inputslew a[4] 200ps 200ps 200ps 200ps
+cmd> input a[5] _input_ ^ 0 0 0 0
+cmd> inputslew a[5] 200ps 200ps 200ps 200ps
+cmd> input a[6] _input_ ^ 0 0 0 0
+cmd> inputslew a[6] 200ps 200ps 200ps 200ps
+cmd> input a[7] _input_ ^ 0 0 0 0
+cmd> inputslew a[7] 200ps 200ps 200ps 200ps
+cmd> input b[0] _input_ ^ 0 0 0 0
+cmd> inputslew b[0] 200ps 200ps 200ps 200ps
+cmd> input b[1] _input_ ^ 0 0 0 0
+cmd> inputslew b[1] 200ps 200ps 200ps 200ps
+cmd> input b[2] _input_ ^ 0 0 0 0
+cmd> inputslew b[2] 200ps 200ps 200ps 200ps
+cmd> input b[3] _input_ ^ 0 0 0 0
+cmd> inputslew b[3] 200ps 200ps 200ps 200ps
+cmd> input b[4] _input_ ^ 0 0 0 0
+cmd> inputslew b[4] 200ps 200ps 200ps 200ps
+cmd> input b[5] _input_ ^ 0 0 0 0
+cmd> inputslew b[5] 200ps 200ps 200ps 200ps
+cmd> input b[6] _input_ ^ 0 0 0 0
+cmd> inputslew b[6] 200ps 200ps 200ps 200ps
+cmd> input b[7] _input_ ^ 0 0 0 0
+cmd> inputslew b[7] 200ps 200ps 200ps 200ps
+cmd> setnodecapacitance cout +20fF
+cmd> setnodecapacitance sum[0] +20fF
+cmd> setnodecapacitance sum[1] +20fF
+cmd> setnodecapacitance sum[2] +20fF
+cmd> setnodecapacitance sum[3] +20fF
+cmd> setnodecapacitance sum[4] +20fF
+cmd> setnodecapacitance sum[5] +20fF
+cmd> setnodecapacitance sum[6] +20fF
+cmd> setnodecapacitance sum[7] +20fF
+cmd> setpathfilter -same_path -similar_path -node_suffix [#]
+cmd> idealclocks yes
+cmd> findpathsfrom _input_
+ 1: 1050ps Path to cout ^
+ 2: 1021ps Path to sum[7] ^
+ 3:  995ps Path to sum[6] ^
+ 4:  990ps Path to sum[5] ^
+ 5:  988ps Path to sum[4] ^
+cmd> setdelaypathformat out_delay delta_delay load_cap fanout out_rise_fall out_node device cell
+cmd> showpossibility 1 5
+Possibility 1:
+ Delay Delta Load Cap Fanout Rise/Fall Node      Device        Cell       
+ ----- ----- -------- ------ --------- ----      ------        ----       
+   0ps                     0     200ps _input_ ^                          
+   0ps   0ps     33fF      3     200ps a[0] ^    arrival                  
+ 159ps 159ps     18fF      1     129ps net_40 v  MMI_NOR2B_3   MMI_NOR2B  
+ 159ps   0ps     18fF      1     129ps net_40 v                           
+ 435ps 276ps     68fF      3     362ps net_27 ^  MMI_OAI21B__6 MMI_OAI21B 
+ 435ps   0ps     68fF      3     362ps net_27 ^                           
+ 628ps 193ps    101fF      5     217ps net_2 v   MMI_AOI21C    MMI_AOI21C 
+ 628ps   0ps    101fF      5     217ps net_2 v                            
+ 811ps 183ps     27fF      2     208ps net_8 ^   MMI_OAI21B__3 MMI_OAI21B 
+ 811ps   0ps     27fF      2     208ps net_8 ^                            
+1050ps 239ps     20fF      1     112ps cout ^    MMI_AO21B     MMI_AO21B  
+Possibility 2:
+ Delay Delta Load Cap Fanout Rise/Fall Node      Device        Cell       
+ ----- ----- -------- ------ --------- ----      ------        ----       
+   0ps                     0     200ps _input_ ^                          
+   0ps   0ps     33fF      3     200ps a[0] ^    arrival                  
+ 159ps 159ps     18fF      1     129ps net_40 v  MMI_NOR2B_3   MMI_NOR2B  
+ 159ps   0ps     18fF      1     129ps net_40 v                           
+ 435ps 276ps     68fF      3     362ps net_27 ^  MMI_OAI21B__6 MMI_OAI21B 
+ 435ps   0ps     68fF      3     362ps net_27 ^                           
+ 628ps 193ps    101fF      5     217ps net_2 v   MMI_AOI21C    MMI_AOI21C 
+ 628ps   0ps    101fF      5     217ps net_2 v                            
+ 811ps 183ps     27fF      2     208ps net_8 ^   MMI_OAI21B__3 MMI_OAI21B 
+ 811ps   0ps     27fF      2     208ps net_8 ^                            
+1021ps 210ps     20fF      1     186ps sum[7] ^  MMI_XOR2B_5   MMI_XOR2B  
+Possibility 3:
+Delay Delta Load Cap Fanout Rise/Fall Node      Device        Cell       
+----- ----- -------- ------ --------- ----      ------        ----       
+  0ps                     0     200ps _input_ ^                          
+  0ps   0ps     33fF      3     200ps a[0] ^    arrival                  
+159ps 159ps     18fF      1     129ps net_40 v  MMI_NOR2B_3   MMI_NOR2B  
+159ps   0ps     18fF      1     129ps net_40 v                           
+435ps 276ps     68fF      3     362ps net_27 ^  MMI_OAI21B__6 MMI_OAI21B 
+435ps   0ps     68fF      3     362ps net_27 ^                           
+628ps 193ps    101fF      5     217ps net_2 v   MMI_AOI21C    MMI_AOI21C 
+628ps   0ps    101fF      5     217ps net_2 v                            
+789ps 161ps     19fF      1     177ps net_25 ^  MMI_OAI21B__5 MMI_OAI21B 
+789ps   0ps     19fF      1     177ps net_25 ^                           
+995ps 206ps     20fF      1     186ps sum[6] ^  MMI_XOR2B     MMI_XOR2B  
+Possibility 4:
+Delay Delta Load Cap Fanout Rise/Fall Node      Device        Cell       
+----- ----- -------- ------ --------- ----      ------        ----       
+  0ps                     0     200ps _input_ ^                          
+  0ps   0ps     33fF      3     200ps a[0] ^    arrival                  
+159ps 159ps     18fF      1     129ps net_40 v  MMI_NOR2B_3   MMI_NOR2B  
+159ps   0ps     18fF      1     129ps net_40 v                           
+435ps 276ps     68fF      3     362ps net_27 ^  MMI_OAI21B__6 MMI_OAI21B 
+435ps   0ps     68fF      3     362ps net_27 ^                           
+628ps 193ps    101fF      5     217ps net_2 v   MMI_AOI21C    MMI_AOI21C 
+628ps   0ps    101fF      5     217ps net_2 v                            
+784ps 156ps     18fF      1     169ps net_20 ^  MMI_OAI21B__4 MMI_OAI21B 
+784ps   0ps     18fF      1     169ps net_20 ^                           
+990ps 205ps     20fF      1     187ps sum[5] ^  MMI_XOR2B_1   MMI_XOR2B  
+Possibility 5:
+Delay Delta Load Cap Fanout Rise/Fall Node      Device        Cell       
+----- ----- -------- ------ --------- ----      ------        ----       
+  0ps                     0     200ps _input_ ^                          
+  0ps   0ps     33fF      3     200ps a[0] ^    arrival                  
+159ps 159ps     18fF      1     129ps net_40 v  MMI_NOR2B_3   MMI_NOR2B  
+159ps   0ps     18fF      1     129ps net_40 v                           
+435ps 276ps     68fF      3     362ps net_27 ^  MMI_OAI21B__6 MMI_OAI21B 
+435ps   0ps     68fF      3     362ps net_27 ^                           
+628ps 193ps    101fF      5     217ps net_2 v   MMI_AOI21C    MMI_AOI21C 
+628ps   0ps    101fF      5     217ps net_2 v                            
+783ps 155ps     17fF      1     168ps net_34 ^  MMI_OAI21B_   MMI_OAI21B 
+783ps   0ps     17fF      1     168ps net_34 ^                           
+988ps 205ps     20fF      1     187ps sum[4] ^  MMI_XOR2B_2   MMI_XOR2B  
+cmd> # done
+cmd> # done
+cmd> findmincycletime
+           Domain     Cycle Time       Rise       Fall
+           ------     ----------       ----       ----
+_input_    _WAVE_         3000ps        0ps     1500ps
+
+No timing constraints were triggered
+cmd> # done
+cmd> # done
+cmd> shownodematches * > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_in
+cmd> system sed -e 's/^ /showdelays/' -e 's/^Found/#/' /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_in > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out
+cmd> include /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[7]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[6]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[5]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[4]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[3]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[2]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[1]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays a[0]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[7]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[6]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[5]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[4]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[3]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[2]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[1]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays b[0]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays cin
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays cout
+_input_ ^ -> 397ps-1050ps ^ 454ps-984ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[7]
+_input_ ^ -> 359ps-1021ps ^ 391ps-941ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[6]
+_input_ ^ -> 361ps-995ps ^ 392ps-920ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[5]
+_input_ ^ -> 370ps-990ps ^ 404ps-916ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[4]
+_input_ ^ -> 368ps-988ps ^ 402ps-915ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[3]
+_input_ ^ -> 366ps-771ps ^ 403ps-714ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[2]
+_input_ ^ -> 367ps-713ps ^ 404ps-642ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[1]
+_input_ ^ -> 357ps-663ps ^ 388ps-571ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays sum[0]
+_input_ ^ -> 365ps-535ps ^ 397ps-530ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_28
+_input_ ^ -> 120ps-134ps ^ 65ps-78ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_29
+_input_ ^ -> 309ps-340ps ^ 291ps-301ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_30
+_input_ ^ -> 231ps-502ps ^ 292ps-543ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_31
+_input_ ^ -> 124ps-139ps ^ 68ps-81ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_32
+_input_ ^ -> 261ps-278ps ^ 333ps-351ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_33
+_input_ ^ -> 259ps-318ps ^ 194ps-291ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_34
+_input_ ^ -> 243ps-783ps ^ 261ps-728ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_35
+_input_ ^ -> 262ps-322ps ^ 197ps-293ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_1
+_input_ ^ -> 335ps-371ps ^ 342ps-372ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_36
+_input_ ^ -> 186ps-201ps ^ 112ps-127ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_2
+_input_ ^ -> 474ps-605ps ^ 438ps-628ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_37
+_input_ ^ -> 445ps-541ps ^ 420ps-583ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_3
+_input_ ^ -> 261ps-436ps ^ 290ps-375ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_38
+_input_ ^ -> 336ps-502ps ^ 299ps-543ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_4
+_input_ ^ -> 94ps-103ps ^ 113ps-136ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_39
+_input_ ^ -> 273ps-332ps ^ 205ps-300ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_40
+_input_ ^ -> 119ps-128ps ^ 135ps-159ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_5
+_input_ ^ -> 340ps-370ps ^ 324ps-334ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_41
+_input_ ^ -> 163ps-172ps ^ 176ps-199ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_6
+_input_ ^ -> 174ps-183ps ^ 186ps-208ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_42
+_input_ ^ -> 170ps-186ps ^ 235ps-252ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_43
+_input_ ^ -> 518ps-557ps ^ 506ps-542ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_7
+_input_ ^ -> 272ps-331ps ^ 204ps-300ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_44
+_input_ ^ -> 271ps-330ps ^ 203ps-299ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_8
+_input_ ^ -> 446ps-811ps ^ 467ps-748ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_45
+_input_ ^ -> 425ps-516ps ^ 404ps-581ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_9
+_input_ ^ -> 163ps-172ps ^ 176ps-199ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_46
+_input_ ^ -> 124ps-139ps ^ 68ps-81ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_47
+_input_ ^ -> 124ps-138ps ^ 68ps-81ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_48
+_input_ ^ -> 170ps-185ps ^ 100ps-115ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_50
+_input_ ^ -> 220ps-393ps ^ 262ps-326ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_49
+_input_ ^ -> 271ps-330ps ^ 203ps-299ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_10
+_input_ ^ -> 131ps-141ps ^ 147ps-170ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_11
+_input_ ^ -> 184ps-356ps ^ 238ps-333ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_12
+_input_ ^ -> 472ps-530ps ^ 420ps-466ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_13
+_input_ ^ -> 285ps-343ps ^ 284ps-355ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_14
+_input_ ^ -> 326ps ^ 332ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_15
+_input_ ^ -> 124ps-139ps ^ 68ps-81ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_16
+_input_ ^ -> 164ps-174ps ^ 177ps-200ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_17
+_input_ ^ -> 447ps-524ps ^ 417ps-463ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_18
+_input_ ^ -> 267ps-326ps ^ 200ps-296ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_19
+_input_ ^ -> 153ps ^ 139ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_20
+_input_ ^ -> 538ps-784ps ^ 540ps-728ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_21
+_input_ ^ -> 163ps-172ps ^ 176ps-199ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_22
+_input_ ^ -> 200ps-215ps ^ 122ps-137ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_23
+_input_ ^ -> 261ps-320ps ^ 196ps-293ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_24
+_input_ ^ -> 322ps-367ps ^ 341ps-360ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_25
+_input_ ^ -> 422ps-789ps ^ 347ps-732ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_26
+_input_ ^ -> 224ps-255ps ^ 212ps-222ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays net_27
+_input_ ^ -> 313ps-435ps ^ 307ps-359ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays gnd
+Constant value = 0
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays vdd
+Constant value = 1
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> showdelays _input_
+_input_ v ->  1500ps v
+_input_ ^ -> 0ps ^ 
+Clock network node
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out> # 79 matches
+cmd> system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_in
+cmd> system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out
+cmd> findslownodes -limit 0.6ns > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.slow_nodes
+cmd> 

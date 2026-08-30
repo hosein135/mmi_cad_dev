@@ -1,0 +1,14 @@
+# SUE version MMI_SUE4.2.14
+
+proc ICON_preroute args {
+  icon_setup $args {{origin {0 0}} {orient R0} {layer M1} {track 0} {bit_increment 0}}
+  icon_term -type input -origin {0 0} -name p
+  icon_property -origin {-50 80} -type user -name layer -default M1 -choices {M1 M2 M3 M4 M5}
+  icon_property -origin {-50 100} -type user -name track -default 0
+  icon_property -origin {-40 -50} -label preroute
+  icon_line -70 -40 -70 -20 70 -20 70 -40 -70 -40
+  icon_line 0 0 0 -20
+  icon_property -origin {-50 120} -type user -name bit_increment -default 0
+  icon_property -origin {0 -30} -anchor center -text {$layer ($track[if {$bit_increment != 0} {concat ,$bit_increment}])}
+}
+

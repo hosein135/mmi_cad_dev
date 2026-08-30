@@ -1,0 +1,119 @@
+# Created using mapper from:
+#"MMI_KEEP {W {MMI_KEEPW {in in} {out out}}} "
+
+proc SCHEMATIC_MMI_KEEP args {
+  call_use_keyword $args {{Size "W"}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    W {
+
+  make global -name gnd -origin {630 400}
+  make global -orient RY -name vdd -origin {630 160}
+  make global -name gnd -origin {830 400}
+  make global -orient RY -name vdd -origin {830 160}
+  make pmos -W .42 -origin {830 200}
+  make pmos -W .42 -origin {630 200}
+  make nmos -W 0.42 -L '2*ln_min' -origin {830 360}
+  make nmos -W 0.42 -L '2*ln_min' -origin {630 360}
+  make inout -orient RX -name in -origin {420 280}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.8 -date 01/05/00 -origin {580 540}
+  make_wire 550 200 570 200
+  make_wire 550 360 570 360
+  make_wire 550 280 550 360
+  make_wire 550 280 550 200
+  make_wire 630 280 650 280
+  make_wire 630 280 630 240
+  make_wire 630 280 630 320
+  make_wire 750 200 770 200
+  make_wire 750 360 770 360
+  make_wire 750 280 750 360
+  make_wire 750 280 750 200
+  make_wire 830 280 830 240
+  make_wire 830 280 830 320
+  make_wire 650 280 750 280
+  make_wire 930 280 930 460
+  make_wire 930 460 470 460
+  make_wire 470 460 470 280
+  make_wire 470 280 550 280
+  make_wire 930 280 830 280
+  make_wire 420 280 470 280
+  make_text -origin {360 90} -text {Keeper for Tristate Bus}
+  make_text -origin {360 110} -text Weak
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_KEEP MMI_KEEPW -Size W -DeMorgan 0
+        make MMI_KEEPW -origin "$urx $ury"
+    }
+
+  }
+}
+
+
+proc NAME_MMI_KEEP args {
+  call_use_keyword $args {{Size "W"}}
+
+  set nom MMI_KEEP[string toupper $Size]
+
+  return $nom
+}
+
+
+proc ICON_MMI_KEEP args {
+  icon_generator $args {{Size "W" {radio W}} }
+
+  set size [string toupper $Size]
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "W")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  switch $size {
+    W {
+
+  icon_term -type inout -origin {-100 0} -orient RX -name in
+  icon_line -30 -30 -30 30 30 0 -30 -30
+  icon_arc 30 -10 50 10 -start 0 -extent 359
+  icon_line 50 0 60 0
+  icon_line -30 0 -60 0
+  icon_line 60 0 110 0
+  icon_line 50 50 50 110 -10 80 50 50
+  icon_arc -30 70 -10 90 -start 180 -extent -359
+  icon_line -30 80 -40 80
+  icon_property -origin {-10 50} -size large -anchor center -label Weak
+  icon_line -100 0 -60 0
+  icon_line -40 80 -80 80 -80 0
+  icon_line 110 0 110 80 50 80
+
+    }
+  }
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_KEEP -Size $Size]
+  set nname [NAME_MMI_KEEP -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    W {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

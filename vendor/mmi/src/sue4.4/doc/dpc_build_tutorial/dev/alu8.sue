@@ -1,0 +1,102 @@
+# SUE version MMI_SUE4.2.7
+
+proc SCHEMATIC_alu8 {} {
+  make output -name {out[7:0]} -origin {1220 130}
+  make input -name {a[7:0]} -origin {-460 -290}
+  make input -name {b[7:0]} -origin {-460 140}
+  make input -name {shift_ctrl[2:0]} -origin {-460 -50}
+  make adder8 -origin {660 100}
+  generate MMI_FFC MMI_FFCB 
+  make MMI_FFCB -name {[7:0]} -origin {1130 130}
+  make MMI_FFCB -name {[7:0]} -origin {-320 140}
+  generate MMI_XOR2 MMI_XOR2B -Size B
+  make MMI_XOR2B -name {[7:0]} -origin {290 160}
+  make MMI_FFCB -name {[7:0]} -origin {-90 -290}
+  make input -name cin -origin {-460 350}
+  make input -name subtract -origin {-460 670}
+  make MMI_FFCB -name {[7]} -origin {1130 -200}
+  make output -name status -origin {1300 -200}
+  make input -orient R270 -name clk -origin {1120 800}
+  make input -orient R270 -name clk -origin {-100 800}
+  generate MMI_BUF MMI_BUFD -Size D
+  make MMI_BUFD -name {[7:0]} -origin {150 -290}
+  make MMI_BUFD -name {[7:0]} -origin {140 140}
+  make shift8 -orient RY -origin {480 -290}
+  make dpc_control -pitch 22 -origin {790 -460}
+  generate MMI_BUF MMI_BUFE -Size E
+  make MMI_BUFE -orient R270 -origin {170 410}
+  make input -orient R270 -name bypass_sel -origin {940 800}
+  make input -orient R270 -name fctn_sel -origin {900 800}
+  make input -orient R270 -name {bypass0[7:0]} -origin {830 810}
+  make input -orient R270 -name {bypass1[7:0]} -origin {800 810}
+  generate MMI_MUX4 MMI_MUX4B 
+  make MMI_MUX4B -name {[7:0]} -origin {920 130}
+  make MMI_BUFE -orient R270 -origin {900 330}
+  make MMI_BUFE -orient R270 -origin {940 450}
+  make MMI_XOR2B -origin {290 250}
+  make MMI_FFCB -origin {-90 670}
+  make MMI_FFCB -origin {-320 350}
+  make global -name vdd -origin {-120 770}
+  make global -name vdd -origin {1100 -100}
+  make global -name vdd -origin {1100 230}
+  make global -name vdd -origin {-120 -190}
+  make global -name vdd -origin {-350 240}
+  make global -name vdd -origin {-350 450}
+  generate row_spanner row_spanner100 -width 100
+  make row_spanner100 -origin {220 760}
+  make title_bar -owner tutorial -origin {-30 960}
+  make_wire 170 180 230 180
+  make_wire 860 100 710 100
+  make_wire 1190 -200 1300 -200
+  make_wire 210 -290 230 -290
+  make_wire 1190 130 1220 130
+  make_wire 170 270 230 270
+  make_wire 170 180 170 270
+  make_wire 70 230 230 230
+  make_wire 530 -290 780 -290
+  make_wire 350 160 620 160
+  make_wire 350 250 580 250
+  make_wire -100 750 -100 800
+  make_wire 780 40 860 40
+  make_wire 780 -290 780 40
+  make_wire 580 190 620 190
+  make_wire 580 190 580 250
+  make_wire 900 250 900 270
+  make_wire 710 40 740 40
+  make_wire 200 140 230 140
+  make_wire 170 350 170 270
+  make_wire 230 -290 430 -290
+  make_wire 230 30 620 30
+  make_wire 230 -290 230 30
+  make_wire -460 670 -150 670
+  make_wire -460 350 -380 350
+  make_wire -460 140 -380 140
+  make_wire -460 -290 -150 -290
+  make_wire -330 480 -100 480
+  make_wire -100 480 -100 -210
+  make_wire -100 480 -100 750
+  make_wire -330 220 -330 430
+  make_wire -330 430 -330 480
+  make_wire 740 -200 1070 -200
+  make_wire 740 -200 740 40
+  make_wire 940 510 940 800
+  make_wire 900 390 900 800
+  make_wire 940 230 940 390
+  make_wire 800 160 800 810
+  make_wire 860 220 830 220
+  make_wire 830 220 830 810
+  make_wire 800 160 860 160
+  make_wire 1120 210 1120 -120
+  make_wire 1120 210 1120 800
+  make_wire 980 130 1070 130
+  make_wire -260 350 70 350
+  make_wire 70 230 70 350
+  make_wire -30 670 170 670
+  make_wire 170 470 170 670
+  make_wire -460 -50 470 -50
+  make_wire 470 -180 470 -50
+  make_wire -30 -290 90 -290
+  make_wire -260 140 80 140
+  make_text -origin {-520 -500} -text {Simple 8-bit ALU section Example} -size very-large
+}
+

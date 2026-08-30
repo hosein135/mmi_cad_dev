@@ -1,0 +1,42 @@
+Documentation for comparator
+----------------------------
+rev 0.3, 7/16/99:   Added NAME_comparator proc, which creates the comparator 
+                    name
+rev 0.2, 6/14/99:   Added support for Operation and OutputAssertion parameters
+rev 0.1, 6/11/99:   Initial release
+
+
+
+The comparator generator is used to derive a circuit which detects exact 
+equality between its two inputs, or to compare a single input to zero.
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS:
+    Definition: 
+      The number of bits in the input values A_H and B_H.
+    Legal values:
+      1 <= NBITS <= 128
+    Default:
+      32
+
+  Operation:
+    Definition:
+      The operation to be performed by this generator:  comparison of
+      two inputs, or zero detection on one input.
+    Legal Values:
+      Compare or ZeroDetect
+    Default:
+      Compare
+
+  OutputAssertion:
+    Definition:
+      The desired assertion level of the output signal.  The user may
+      select H (output is High (1) if the inputs are the same or if zero
+      is detected), L (output is Low (0) if the inputs are the same), 
+      or Both (both H and L signals are derived).
+    Legal Values:
+      H (high), L (low), or Both (two output signals driven)
+    Default:
+      H

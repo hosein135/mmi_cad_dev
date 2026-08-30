@@ -1,0 +1,21 @@
+# Generic site wide .maxrc for max
+# Loads in generators and adds to local menu for this site
+
+# Uncomment this line out if you have the megacell compiler
+# It will add the megacell compiler commands to the tool menu in max
+#mc_init
+
+
+# Add the "Calibre DRC..." command to the Tool menu.
+# Calibre is a Design Rule Checker (DRC) from Mentor Graphics.
+# Before using calibre, you will need to edit the drc_it.calibre
+# shell script in this directory to tell it, at minimum, which
+# machine is your license server, and where your calibre DRC deck resides.
+# If you do not own a Calibre license from Mentor Graphics,
+# you can comment this line out to remove this from the menu.
+menu_tool_cmd "Calibre DRC..." calibre_it
+
+
+# Add the extract_it command to the local menu.
+# The extract_it command is built in to max.
+menu_local_cmd "extract it" extract_it

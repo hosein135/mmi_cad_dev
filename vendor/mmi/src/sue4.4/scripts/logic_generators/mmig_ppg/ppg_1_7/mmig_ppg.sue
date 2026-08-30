@@ -1,0 +1,1208 @@
+# This is a generator for multiplier partial product generation logic.
+
+proc NAME_mmig_ppg args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned"} {B "Unsigned"} {AddExtraCSA 0} {OptimizeMulArray "None"} {PPGAlgorithm "Simple"} {ReduceInputLoad 0} {HalfHeight 0}}
+
+  # NBITS_A
+  set nom [format "mmig_ppg_%d" $NBITS_A]
+
+  # A
+  if {[string toupper $A] == "SIGNED"} {
+    set nom [format "%sSx" $nom]
+  }
+  if {[string toupper $A] == "UNSIGNED"} {
+    set nom [format "%sUx" $nom]
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set nom [format "%sBx" $nom]
+  }
+
+  # NBITS_B
+  set nom [format "%s%d" $nom $NBITS_B]
+
+  # B
+  if {[string toupper $B] == "SIGNED"} {
+    set nom [format "%sS_" $nom]
+  }
+  if {[string toupper $B] == "UNSIGNED"} {
+    set nom [format "%sU_" $nom]
+  }
+  if {[string toupper $B] == "BOTH"} {
+    set nom [format "%sB_" $nom]
+  }
+
+  # AddExtraCSA
+  if {$AddExtraCSA == 1} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # OptimizeMulArray
+  if {[string toupper $OptimizeMulArray] == "LSB"} {
+    set nom [format "%sL" $nom]
+  } 
+  if {[string toupper $OptimizeMulArray] == "MSB"} {
+    set nom [format "%sM" $nom]
+  } 
+  if {[string toupper $OptimizeMulArray] == "BOTH"} {
+    set nom [format "%sB" $nom]
+  } 
+  if {[string toupper $OptimizeMulArray] == "NONE"} {
+    set nom [format "%sN" $nom]
+  }
+
+  # PPGAlgorithm
+  if {[string toupper $PPGAlgorithm] == "SIMPLE"} {
+    set nom [format "%sS" $nom]
+  }
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX4"} {
+    set nom [format "%sB4" $nom]
+  }
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    set nom [format "%sB8" $nom]
+  }
+
+  # ReduceInputLoad
+  if {$ReduceInputLoad == 1} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  # HalfHeight
+  if {$HalfHeight == 1} {
+    set nom [format "%sY" $nom]
+  } else {
+    set nom [format "%sN" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_mmig_ppg args {
+  call_use_keyword $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned"} {B "Unsigned"} {AddExtraCSA 0} {OptimizeMulArray "None"} {PPGAlgorithm "Simple"} {ReduceInputLoad 0} {HalfHeight 0}}
+
+  set A [string toupper $A]
+  set B [string toupper $B]
+  set PPGAlgorithm [string toupper $PPGAlgorithm]
+  set OptimizeMulArray [string toupper $OptimizeMulArray]
+
+  if {($OptimizeMulArray == "LSB") || ($OptimizeMulArray == "BOTH")} {
+    set zeroopt 1
+  } else {
+    set zeroopt 0
+  }
+
+  set ext1 [generators_mul_ppg_name1 $NBITS_A $NBITS_B $A $B $OptimizeMulArray $PPGAlgorithm]
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # booth constants
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX4"} {
+    set maxselidx 3
+    set bitmultiple 2
+    set nb 2
+  }
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    set maxselidx 7
+    set bitmultiple 3
+    set nb 4
+    set NBITS_B3 [expr $NBITS_B + 2]
+    set maxb3idx [expr $NBITS_B3 - 1]
+  }
+
+  # how many output pins?
+  set npps [generators_mul_compute_npps $NBITS_A $A $PPGAlgorithm]
+
+  # generate sample ppg_slice icon in order to find out icon size etc.
+  # pick a bit with all the PP's present (for the Simple case).  Note that all bits are the
+  # same for the Booth cases.  This sample ppg_slice will be used for the Booth cases.
+  # also note that an OutputSize of C is used for the Booth cases since they have fewer rows to
+  # drive across than the Simple case, which uses an OutputSize of D.
+  set ppg_slice_name(0) [NAME_mmig_ppg_slice -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -AddExtraCSA $AddExtraCSA -OptimizeMulArray $OptimizeMulArray -PPGAlgorithm $PPGAlgorithm -HalfHeight $HalfHeight -Bit $maxaidx -OutputSize C]
+  generate mmig_ppg_slice $ppg_slice_name(0) -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -AddExtraCSA $AddExtraCSA -OptimizeMulArray $OptimizeMulArray -PPGAlgorithm $PPGAlgorithm -HalfHeight $HalfHeight -Bit $maxaidx -OutputSize C
+ 
+  # ppg_slice icon box info
+  setl {icon_x icon_y icon_left icon_bot icon_right icon_top} [generators_get_icon_size $ppg_slice_name(0)]
+  
+  # generators_get_icon_size underestimates the height of the icon box, so fix that
+  set icon_y [expr $icon_y + 140]
+  set icon_top [expr $icon_top - 70]
+  set icon_bot [expr $icon_bot + 70]
+
+  # drawing origin
+  set base_x -500
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  # The PPGAlgorithm=Simple ppg cells are generators; the PPGAlgorithm=Booth* ppg cells are
+  # hard cells.  For the Simple case, HalfHeight is implemented by passing the height limit
+  # to the ppg cell generator.  For the Booth cases, HalfHeight is implemented by staggering
+  # the ppg cells in order to place two per bit pitch.
+  if {$HalfHeight == 1} {
+    set x2 [expr $icon_x + 100]
+  } else {
+    set x2 0
+  }
+  set wire_base_x [expr $x2 + $icon_right + $ws1]
+
+  set x 0
+  set y $base_y
+  set delta_y [expr $icon_y + 2 * $ws1]
+
+  for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+    if {$HalfHeight == 1} {
+      set bitpos [expr int($bit / 2)]
+    } else {
+      set bitpos $bit
+    }
+    if {$PPGAlgorithm != "SIMPLE"} {
+      if {[expr ($bit % 2)] == 0} {
+	set x 0
+      } else {
+	set x $x2
+      }
+    }
+
+    set ppg_slice_name($bit) [NAME_mmig_ppg_slice -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -AddExtraCSA $AddExtraCSA -OptimizeMulArray $OptimizeMulArray -PPGAlgorithm $PPGAlgorithm -HalfHeight $HalfHeight -Bit $bit -OutputSize D]
+    generate mmig_ppg_slice $ppg_slice_name($bit) -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -AddExtraCSA $AddExtraCSA -OptimizeMulArray $OptimizeMulArray -PPGAlgorithm $PPGAlgorithm -HalfHeight $HalfHeight -Bit $bit -OutputSize D
+    make $ppg_slice_name($bit) -origin "$x $y" -name "\[$bitpos\]"
+
+    # record placement
+    set bsloc($bit) "$x $y"
+    set y [expr $y - $delta_y]
+  }
+
+  # finished placing the array; now wire up the outputs.
+  for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+    # find the origin of the last ppg cell
+    set origin_x [lindex $bsloc($bit) 0]
+    set origin_y [lindex $bsloc($bit) 1]
+
+    # ppg_slice icon port info
+    setl {count inpins outpins inoutpins} [generators_get_pin_info $ppg_slice_name($bit)]
+    
+    # find the Algorithm
+    set Algorithm [generators_mul_get_ppg_bitslice "ALG" $ext1 $bit]
+
+    for {set i 0} {$i < $npps} {incr i} {
+      set algbit [string index $Algorithm $i]
+      if {$zeroopt && ($algbit == 0)} {
+      } else {
+	set pname [format "PP%d_H" $i]
+	set port_ppg($i) [generators_get_pin_xy $pname $outpins]
+	set pin_x [expr $origin_x + [lindex $port_ppg($i) 0]]
+	set pin_y [expr $origin_y + [lindex $port_ppg($i) 1]]
+	set label_x [expr $pin_x + 4 * $ws1]
+	make_wire $pin_x $pin_y $label_x $pin_y
+	set wname [format "PP%d_H\[%d\]" $i $bit]
+	make output -origin "$label_x $pin_y" -name $wname
+      }
+    }
+  }
+
+
+  # now hook up the multiplier inputs
+  # set the wire positions first
+  set wire_start_x [expr $icon_left - 6 * $ws1]
+  set wire_start_y [expr ($icon_y / 2) + 2 * $ws1]
+  set wire_length [expr ($delta_y * $NRESBITS) + (2 * $ws1)]
+  # A_H
+  set a_x $wire_start_x
+
+  # B_H
+  set wire_start_x [expr $wire_start_x + 2*$ws1]
+  set b_x $wire_start_x
+
+  # ground
+  set wire_start_x [expr $wire_start_x + 2*$ws1]
+  set gnd_x $wire_start_x
+
+  if {$PPGAlgorithm == "SIMPLE"} {
+    set inflag_x $wire_start_x
+
+    for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+      # ppg_slice icon port info
+      setl {count inpins outpins inoutpins} [generators_get_pin_info $ppg_slice_name($bit)]
+
+      # location
+      set origin_x [lindex $bsloc($bit) 0]
+      set origin_y [lindex $bsloc($bit) 1]
+
+      # A
+      set abits [generators_mul_get_ppg_bitslice "A" $ext1 $bit]
+      setl {naranges aranges} [generators_mul_get_range $abits]
+      set pinnames [generators_mul_get_pinnames $naranges $aranges]
+      for {set j 0} {$j < $naranges} {incr j} {
+	setl {nbits_a arange} [lindex $aranges $j]
+	set pinname [lindex $pinnames $j]
+	if {$pinname == "msb"} {
+	  set aname Amsb_H
+	} else {
+	  set aname A_H$pinname
+	}
+	# find the pin location on mul_ppg_slice
+	setl {ppg_port_a_x ppg_port_a_y} [generators_get_pin_xy $aname $inpins]
+	set a_x [expr $origin_x + $ppg_port_a_x]
+	set a_y [expr $origin_y + $ppg_port_a_y]
+	make_wire $a_x $a_y $inflag_x $a_y
+	make input -name A_H$arange -origin "$inflag_x $a_y"
+      }
+      
+      # B 
+      set bbits [generators_mul_get_ppg_bitslice "B" $ext1 $bit]
+      setl {nbranges branges} [generators_mul_get_range $bbits]
+      set pinnames [generators_mul_get_pinnames $nbranges $branges]
+      for {set j 0} {$j < $nbranges} {incr j} {
+	setl {nbits_b brange} [lindex $branges $j]
+	set pinname [lindex $pinnames $j]
+	set bname B_H$pinname
+	# find the pin location on mul_ppg_slice
+	setl {ppg_port_b_x ppg_port_b_y} [generators_get_pin_xy $bname $inpins]
+	set b_x [expr $origin_x + $ppg_port_b_x]
+	set b_y [expr $origin_y + $ppg_port_b_y]
+	make_wire $b_x $b_y $inflag_x $b_y
+	make input -name B_H$brange -origin "$inflag_x $b_y"
+      }
+      
+      # ASigned 
+      set asigned_usage [generators_mul_get_ppg_bitslice "ASIGNED" $ext1 $bit]
+      if {$asigned_usage != 0} {
+	setl {port_asigned_x port_asigned_y} [generators_get_pin_xy "ASigned_H" $inpins]
+	set asigned_x [expr $origin_x + $port_asigned_x]
+	set asigned_y [expr $origin_y + $port_asigned_y]
+	make_wire $asigned_x $asigned_y $inflag_x $asigned_y
+	make input -origin "$inflag_x $asigned_y" -name ASigned_H
+      }
+      
+      # BSigned 
+      set bsigned_usage [generators_mul_get_ppg_bitslice "BSIGNED" $ext1 $bit]
+      if {$bsigned_usage != 0} {
+	setl {port_bsigned_x port_bsigned_y} [generators_get_pin_xy "BSigned_H" $inpins]
+	set bsigned_x [expr $origin_x + $port_bsigned_x]
+	set bsigned_y [expr $origin_y + $port_bsigned_y]
+	make_wire $bsigned_x $bsigned_y $inflag_x $bsigned_y
+	make input -origin "$inflag_x $bsigned_y" -name BSigned_H
+      }
+    }
+
+  } else {
+    # PPGAlgorithm = Booth
+
+    # hook up the PPSel inputs
+    for {set i 0} {$i < $NRESBITS} {incr i} {
+      set origin_x [lindex $bsloc($i) 0]
+      set origin_y [lindex $bsloc($i) 1]
+      # get Algorithm
+      set Algorithm [generators_mul_get_ppg_bitslice "ALG" $ext1 $i]
+      # ppg_slice icon port info
+      setl {count inpins outpins inoutpins} [generators_get_pin_info $ppg_slice_name($i)]
+      for {set j 0} {$j < $npps} {incr j} {
+	set algbit [string index $Algorithm $j]
+	if {$zeroopt && ($algbit == 0)} {
+	} else {
+	  set wname [format "PPSel%d_H\[%d:0\]" $j $maxselidx]
+	  set port_ppsel($j) [generators_get_pin_xy $wname $inpins]
+	  set pnet_x [expr $origin_x + [lindex $port_ppsel($j) 0]]
+	  set pnet_y [expr $origin_y + [lindex $port_ppsel($j) 1]]
+	  make_wire $pnet_x $pnet_y $a_x $pnet_y
+	  set wname [format "PPSel%d_H\[%d:0\]" $j $maxselidx]
+	  make input -name $wname -origin "$a_x $pnet_y"
+	}
+      }
+    }
+
+    # add nandbuf cells to condition the sign extended B_H bits if needed
+    if {$B == "BOTH"} {
+      if {$HalfHeight == 1} {
+	set x [expr $a_x - 3 * $icon_x - 100]
+	set x2 [expr $x + $icon_x + 100]
+      } else {
+	set x [expr $a_x - 1.5 * $icon_x - 100]
+	set x2 $x 
+      }
+      set label_x [expr $x2 + $icon_right + 2*$ws1]
+      # place the input control wire
+      set bsigned_x [expr $x + $icon_left - $ws1]
+      
+      # figure out how many nandbufs are needed per bit position, and place them
+      for {set j $NBITS_B} {$j < $NRESBITS} {incr j} {
+	if {$HalfHeight == 1} {
+	  set bitpos [expr int($j / 2)]
+	} else {
+	  set bitpos $j
+	}
+	if {[expr ($j % 2)] == 0} {
+	  set nb_origin_x $x
+	} else {
+	  set nb_origin_x $x2
+	}
+	set numbufs [expr ($j - $NBITS_B) + 1]
+	set origin_y [lindex $bsloc($j) 1]
+	set nname [NAME_mmig_nandbuf -NBITS $numbufs -IconHeight $NBITS_A -ReduceInputLoad $ReduceInputLoad]
+	generate mmig_nandbuf $nname -NBITS $numbufs -IconHeight $NBITS_A -ReduceInputLoad $ReduceInputLoad
+	make $nname -origin "$nb_origin_x $origin_y" -name "\[$bitpos\]"
+	
+	# get pin info
+	setl {count inpins outpins inoutpins} [generators_get_pin_info $nname]
+	
+	# wire up the B_H input
+	setl {pin_x pin_y} [generators_get_pin_xy "In1_H" $inpins]
+	set pin_x [expr $nb_origin_x + $pin_x]
+	set pin_y [expr $origin_y + $pin_y]
+	make_wire $pin_x $pin_y $bsigned_x $pin_y
+	make input -name "B_H\[$maxbidx\]" -origin "$bsigned_x $pin_y"
+	
+	# wire up the BSigned_H input
+	setl {pin_x pin_y} [generators_get_pin_xy "In0_H" $inpins]
+	set pin_x [expr $nb_origin_x + $pin_x]
+	set pin_y [expr $origin_y + $pin_y]
+	make_wire $pin_x $pin_y $bsigned_x $pin_y
+	make input -origin "$bsigned_x $pin_y" -name "BSigned_H"
+	
+	# record the origin & name
+	set nbloc($j) "$nb_origin_x $origin_y"
+	set nbname($j) $nname
+      }
+    }
+    
+    
+    # how many B vectors are there?
+    set nbvectors [expr $npps * $nb]
+    
+    # hook up B_H (multiplicand) or GND to the other nand input
+    # algorithm:  0...0||B_H
+    #             0...0||B_H||0
+    #             0...0||B_H||00
+    #             ...
+    #             B_H||0...0
+    # variant:  if B is Signed, replace the upper 0's with the msb of B_H
+    #           if B is Both, replace the upper 0's with the nandbuf output
+    # if PPGAlgorithm=BoothRadix8, skip the 3*B pins in this loop
+    set nv 0
+    for {set j 0} {$j < $nbvectors} {incr j} {
+      # init the algorithm variables
+      if {($PPGAlgorithm == "BOOTHRADIX8") && (($j % 4) == 2)} {
+	# this is a 3*B pin, skip it for now
+	continue
+      }
+      set zero_trail $nv
+      set zero_lead [expr $NBITS_B + $nv]
+      set bidx 0
+      set npp [expr int($j / $nb)]
+
+      for {set i 0} {$i < $NRESBITS} {incr i} {
+	set origin_x [lindex $bsloc($i) 0]
+	set origin_y [lindex $bsloc($i) 1]
+	# get Algorithm
+	set Algorithm [generators_mul_get_ppg_bitslice "ALG" $ext1 $i]
+	set algbit [string index $Algorithm $npp]
+	if {$zeroopt && ($algbit == 0)} {
+	} else {
+	  # ppg_slice icon port info
+	  setl {count inpins outpins inoutpins} [generators_get_pin_info $ppg_slice_name($i)]
+	  set bname [format "B_%d_H" $j]
+	  set port_b($j) [generators_get_pin_xy $bname $inpins]
+	  set bnet_x [expr $origin_x + [lindex $port_b($j) 0]]
+	  set bnet_y [expr $origin_y + [lindex $port_b($j) 1]]
+	  set label_x [expr $bnet_x - 2* $ws1]
+	  if {$i < $zero_trail} {
+	    # connect nand input to gnd
+	    make_wire $bnet_x $bnet_y $gnd_x $bnet_y
+	    make global -name gnd -origin "$gnd_x $bnet_y"
+	  } elseif {$i >= $zero_lead} {
+	    if {$B == "SIGNED"} {
+	      # connect nand input to msb of B_H
+	      make_wire $bnet_x $bnet_y $b_x $bnet_y
+	      set wname [format "B_H\[$maxbidx\]"]
+	      make input -name $wname -origin "$b_x $bnet_y"
+	    } 
+	    if {$B == "BOTH"} {
+	      # connect nand input to output of nandbuf cell
+	      # get pin info
+	      setl {count inpins outpins inoutpins} [generators_get_pin_info $nbname($i)]
+	      set pname [format "Out%d_H" $nv]
+	      setl {pin_x pin_y} [generators_get_pin_xy $pname $outpins]
+	      setl {nb_origin_x nb_origin_y} $nbloc($i)
+	      set nbpin_x [expr $nb_origin_x + $pin_x]
+	      set nbpin_y [expr $nb_origin_y + $pin_y]
+	      set nblabel_x [expr $nbpin_x + 2*$ws1]
+	      make_wire $nbpin_x $nbpin_y $nblabel_x $nbpin_y
+	      set bname [format "NB%d_%d_H\[%d\]" $nv $i $maxbidx]
+	      make name_net_s -name $bname -origin "$nblabel_x $nbpin_y"
+	      set ok [generators_wireup [list $nblabel_x $nbpin_y] [list $bnet_x $bnet_y] [expr $nblabel_x + 30 + ($nv * 10)]]
+	    }
+	    if {$B == "UNSIGNED"} {
+	      # connect nand input to gnd
+	      make_wire $bnet_x $bnet_y $gnd_x $bnet_y
+	      make global -name gnd -origin "$gnd_x $bnet_y"
+	    }
+	  } else {
+	    # connect nand input to B_H
+	    make_wire $bnet_x $bnet_y $b_x $bnet_y
+	    set wname [format "B_H\[$bidx\]"]
+	    make input -name $wname -origin "$b_x $bnet_y"
+	    incr bidx
+	  }
+	}
+	set y [expr $y - $delta_y]
+      }
+      incr nv
+    }
+    
+    # connect the 3*B input for PPGAlgorithm = BoothRadix8
+    if {$PPGAlgorithm == "BOOTHRADIX8"} {
+      # add nandbuf cells to condition the sign extended 3*B_H bits if needed
+      if {$B == "BOTH"} {
+	if {$HalfHeight == 1} {
+	  set x [expr [lindex $nbloc($maxresidx) 0] - 4 * $icon_x - 100]
+	  set x2 [expr $x + $icon_x + 100]
+	} else {
+	  set x [expr [lindex $nbloc($maxresidx) 0] - 1.5 * $icon_x - 100]
+	  set x2 $x 
+	}
+	set label_x [expr $x2 + $icon_right + 2*$ws1]
+	# place the input control wire
+	set bsigned_x [expr $x + $icon_left - $ws1]
+	
+	# figure out how many nandbufs are needed per bit position, and place them
+	for {set j [expr $NBITS_B + 2]} {$j < $NRESBITS} {incr j} {
+	  if {$HalfHeight == 1} {
+	    set bitpos [expr int($j / 2)]
+	  } else {
+	    set bitpos $j
+	  }
+	  if {[expr ($j % 2)] == 0} {
+	    set nb_origin_x $x
+	  } else {
+	    set nb_origin_x $x2
+	  }
+	  set numbufs [expr int( ($j - ($NBITS_B + 2)) / $bitmultiple) + 1]
+	  set origin_y [lindex $bsloc($j) 1]
+	  set nname [NAME_mmig_nandbuf -NBITS $numbufs -IconHeight $NBITS_A -ReduceInputLoad $ReduceInputLoad]
+	  generate mmig_nandbuf $nname -NBITS $numbufs -IconHeight $NBITS_A -ReduceInputLoad $ReduceInputLoad
+	  make $nname -origin "$nb_origin_x $origin_y" -name "\[$bitpos\]"
+	  
+	  # get pin info
+	  setl {count inpins outpins inoutpins} [generators_get_pin_info $nname]
+	  
+	  # wire up the B_H input
+	  setl {pin_x pin_y} [generators_get_pin_xy "In1_H" $inpins]
+	  set pin_x [expr $nb_origin_x + $pin_x]
+	  set pin_y [expr $origin_y + $pin_y]
+	  make_wire $pin_x $pin_y $bsigned_x $pin_y
+	  make input -name "B3_H\[$maxb3idx\]" -origin "$bsigned_x $pin_y"
+	  
+	  # wire up the BSigned_H input
+	  setl {pin_x pin_y} [generators_get_pin_xy "In0_H" $inpins]
+	  set pin_x [expr $nb_origin_x + $pin_x]
+	  set pin_y [expr $origin_y + $pin_y]
+	  make_wire $pin_x $pin_y $bsigned_x $pin_y
+	  make input -origin "$bsigned_x $pin_y" -name "BSigned_H"
+	  
+	  # wire up the outputs
+	  for {set i 0} {$i < $numbufs} {incr i} {
+	    set pname [format "Out%d_H" $i]
+	    setl {pin_x pin_y} [generators_get_pin_xy $pname $outpins]
+	    set pin_x [expr $nb_origin_x + $pin_x]
+	    set pin_y [expr $origin_y + $pin_y]
+	    set label_x [expr $pin_x + 2 * $ws1]
+	    make_wire $pin_x $pin_y $label_x $pin_y
+	    set bname [format "N3B%d_%d_H\[%d\]" $i $j $maxb3idx]
+	    make name_net_s -name $bname -origin "$label_x $pin_y"
+	  }
+	  
+	  # record the origin & name
+	  set nbloc($j) "$nb_origin_x $origin_y"
+	  set nbname($j) $nname
+	}
+      }
+      
+      
+      # how many B vectors are there?
+      set nbvectors $npps
+      
+      # hook up 3*B_H (multiplicand) or GND to the other nand input
+      # algorithm:  0...0||B_H
+      #             0...0||B_H||000
+      #             0...0||B_H||000000
+      #             ...
+      #             B_H||0...0
+      # variant:  if B is Signed, replace the upper 0's with the msb of B_H
+      #           if B is Both, replace the upper 0's with the nandbuf output
+      # Note this section is only for PPGAlgorithm=BoothRadix8, and only the 3*B pins
+      set nv 0
+      for {set j 0} {$j < $nbvectors} {incr j} {
+	# init the algorithm variables
+	set zero_trail [expr $j * $bitmultiple]
+	set zero_lead [expr $NBITS_B3 + $zero_trail]
+	set bidx 0
+	set portbidx [expr ($j * $nb) + 2]
+	
+	for {set i 0} {$i < $NRESBITS} {incr i} {
+	  set origin_x [lindex $bsloc($i) 0]
+	  set origin_y [lindex $bsloc($i) 1]
+	  # get Algorithm
+	  set Algorithm [generators_mul_get_ppg_bitslice "ALG" $ext1 $i]
+	  set algbit [string index $Algorithm $j]
+	  if {$zeroopt && ($algbit == 0)} {
+	  } else {
+	    # ppg_slice icon port info
+	    setl {count inpins outpins inoutpins} [generators_get_pin_info $ppg_slice_name($i)]
+	    set bname [format "B_%d_H" $portbidx]
+	    set port_b($portbidx) [generators_get_pin_xy $bname $inpins]
+	    set bnet_x [expr $origin_x + [lindex $port_b($portbidx) 0]]
+	    set bnet_y [expr $origin_y + [lindex $port_b($portbidx) 1]]
+	    set label_x [expr $bnet_x - 2* $ws1]
+	    if {$i < $zero_trail} {
+	      # connect nand input to gnd
+	      make_wire $bnet_x $bnet_y $gnd_x $bnet_y
+	      make global -name gnd -origin "$gnd_x $bnet_y"
+	    } elseif {$i >= $zero_lead} {
+	      if {$B == "SIGNED"} {
+		# connect nand input to msb of B_H
+		make_wire $bnet_x $bnet_y $b_x $bnet_y
+		set wname [format "B3_H\[$maxb3idx\]"]
+		make input -name $wname -origin "$b_x $bnet_y"
+	      } 
+	      if {$B == "BOTH"} {
+		# connect nand input to output of nandbuf cell via name_net
+		make_wire $bnet_x $bnet_y [expr $bnet_x - 2 * $ws1] $bnet_y
+		set bname [format "N3B%d_%d_H\[%d\]" $nv $i $maxb3idx]
+		make name_net_s -name $bname -origin "[expr $bnet_x - 2 * $ws1] $bnet_y"
+	      }
+	      if {$B == "UNSIGNED"} {
+		# connect nand input to gnd
+		make_wire $bnet_x $bnet_y $gnd_x $bnet_y
+		make global -name gnd -origin "$gnd_x $bnet_y"
+	      }
+	    } else {
+	      # connect nand input to B_H
+	      make_wire $bnet_x $bnet_y $b_x $bnet_y
+	      set wname [format "B3_H\[$bidx\]"]
+	      make input -name $wname -origin "$b_x $bnet_y"
+	      incr bidx
+	    }
+	  }
+	  set y [expr $y - $delta_y]
+	}
+	incr nv
+      }
+    }
+  }    
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr (0 + 2 * $delta_y)]" -owner emc -version 1.7 -date 06/23/00
+}
+
+
+
+proc ICON_mmig_ppg args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS_A 8} {NBITS_B 8} {A "Unsigned" {radio Signed Unsigned Both}} {B "Unsigned" {radio Signed Unsigned Both}} {AddExtraCSA 0 binary} {OptimizeMulArray "None" {radio None Lsb Msb Both}} {PPGAlgorithm "Simple" {radio Simple BoothRadix4 BoothRadix8}} {ReduceInputLoad 0 binary} {HalfHeight 0 binary}}
+
+  set A [string toupper $A]
+  set B [string toupper $B]
+  set OptimizeMulArray [string toupper $OptimizeMulArray]
+  set PPGAlgorithm [string toupper $PPGAlgorithm]
+
+  set ext1 [generators_mul_ppg_name1 $NBITS_A $NBITS_B $A $B $OptimizeMulArray $PPGAlgorithm]
+
+  # useful constants
+  set maxaidx [expr $NBITS_A - 1]
+  set maxbidx [expr $NBITS_B - 1]
+  set NRESBITS [expr ($NBITS_A + $NBITS_B)]
+  set maxresidx [expr $NRESBITS - 1]
+  if {$NBITS_A > $NBITS_B} {
+    set NBITS_max $NBITS_A
+  } else {
+    set NBITS_max $NBITS_B
+  }
+
+  # don't let the user get too crazy
+  if {$NRESBITS > 128} {
+    error "ERROR: NBITS_A + NBITS_B = $NRESBITS not supported"
+  }
+  if {$NBITS_A < 1} {
+    error "ERROR: NBITS_A ($NBITS_A) not supported"
+  }
+  if {$NBITS_B < 1} {
+    error "ERROR: NBITS_B ($NBITS_B) not supported"
+  }
+  # check for acceptable response on A query
+  if {($A != "SIGNED") &&
+      ($A != "UNSIGNED") &&
+      ($A != "BOTH")} {
+    error "ERROR: A property ($A) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on B query
+  if {($B != "SIGNED") &&
+      ($B != "UNSIGNED") &&
+      ($B != "BOTH")} {
+    error "ERROR: B property ($B) must be Signed or Unsigned or Both"
+  }
+  # check for acceptable response on AddExtraCSA query
+  if {($AddExtraCSA != 1) && ($AddExtraCSA != 0)} {
+    error "ERROR: AddExtraCSA property ($AddExtraCSA) must be 0 or 1"
+  }
+  # check for acceptable response on OptimizeMulArray query
+  if {($OptimizeMulArray != "NONE") && 
+      ($OptimizeMulArray != "LSB") &&
+      ($OptimizeMulArray != "MSB") &&
+      ($OptimizeMulArray != "BOTH")} {
+    error "ERROR: OptimizeMulArray property ($OptimizeMulArray) must be None or Lsb or Msb or Both"
+  }
+  set zeroopt 0
+  if {($OptimizeMulArray == "LSB") || ($OptimizeMulArray == "BOTH")} {
+    set zeroopt 1
+  }
+  # check for acceptable response on PPGAlgorithm query
+  if {($PPGAlgorithm != "SIMPLE") &&
+      ($PPGAlgorithm != "BOOTHRADIX4") &&
+      ($PPGAlgorithm != "BOOTHRADIX8")} {
+    error "ERROR: PPGAlgorithm property ($PPGAlgorithm) must be Simple or BoothRadix4 or BoothRadix8"
+  }
+  if {$PPGAlgorithm == "SIMPLE"} {
+    set alg_name "Simple" 
+  }
+  if {$PPGAlgorithm == "BOOTHRADIX4"} {
+    set alg_name "Booth Radix 4" 
+    set maxselidx 3
+    set bitmultiple 2
+  }
+  if {$PPGAlgorithm == "BOOTHRADIX8"} {
+    set alg_name "Booth Radix 8" 
+    set maxselidx 7
+    set bitmultiple 3
+    set NBITS_B3 [expr $NBITS_B + 2]
+    set maxb3idx [expr $NBITS_B3 - 1]
+  }
+  # check for acceptable response on ReduceInputLoad query
+  if {($ReduceInputLoad != 1) && ($ReduceInputLoad != 0)} {
+    error "ERROR: ReduceInputLoad property ($ReduceInputLoad) must be 0 or 1"
+  }
+  # check for acceptable response on HalfHeight query
+  if {($HalfHeight != 1) && ($HalfHeight != 0)} {
+    error "ERROR: HalfHeight property ($HalfHeight) must be 0 or 1"
+  }
+
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # figure out icon size
+  set cs_spacer 100
+  set pin_spacer 40
+  
+  # how many output pins?
+  set npps [generators_mul_compute_npps $NBITS_A $A $PPGAlgorithm]
+
+  set icon_y [expr ($npps * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]  
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+
+  # outputs
+  set pin_y [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $npps} {incr i} {
+    set pin_name [format "PP%d_H" $i]
+    set pin_idx [generators_mul_get_pprange $ext1 $i $zeroopt]
+    set pname [format "%s%s" $pin_name $pin_idx]
+    icon_term -type output -origin "$icon_right $pin_y" -name $pname
+    icon_property -origin "$icon_right_label $pin_y" -size small -label $pname -anchor e
+    set pin_y [expr $pin_y - $pin_spacer]
+  }
+
+  # inputs
+  # BSigned
+  if {$B == "BOTH"} {
+    icon_term -type input -origin "[expr $icon_left + $cs_spacer + $pin_spacer] $icon_bot" -orient R270 -name "BSigned_H"
+    icon_property -origin "[expr $icon_left + $cs_spacer + $pin_spacer] [expr $icon_bot - 10]" -size small -anchor center -label BSigned_H
+  }
+  if {$PPGAlgorithm == "SIMPLE"} {
+    # A
+    icon_term -type input -origin "$icon_left -20" -name "A_H\[$maxaidx:0\]"
+    icon_property -origin "$icon_left_label -20" -size small -label A_H
+    icon_property -origin "$icon_left_label -10" -size small -label "\[$maxaidx:0\]"
+    # B
+    icon_term -type input -origin "$icon_left 20" -name "B_H\[$maxbidx:0\]"
+    icon_property -origin "$icon_left_label 20" -size small -label B_H
+    icon_property -origin "$icon_left_label 30" -size small -label "\[$maxbidx:0\]"
+    # ASigned
+    if {$A == "BOTH"} {
+      icon_term -type input -origin "[expr $icon_left + $cs_spacer] $icon_bot" -orient R270 -name "ASigned_H"
+      icon_property -origin "[expr $icon_left + $cs_spacer] [expr $icon_bot - 20]" -size small -anchor center -label ASigned_H
+    }
+  } else {
+    # PPSel
+    set pin_y [expr $icon_bot - $cs_spacer]
+    for {set i 0} {$i < $npps} {incr i} {
+      set pin_name [format "PPSel%d_H" $i]
+      set pin_idx [format "\[%d:0\]" $maxselidx]
+      set pname [format "%s%s" $pin_name $pin_idx]
+      icon_term -type input -origin "$icon_left $pin_y" -name $pname
+      icon_property -origin "$icon_left_label $pin_y" -size small -label $pin_name 
+      if {$i == 0} {
+	icon_property -origin "$icon_left_label [expr $pin_y + 20]" -size small -label $pin_idx 
+      }
+      set pin_y [expr $pin_y - $pin_spacer]
+    }
+    # B
+    icon_term -type input -origin "$icon_left $pin_y" -name "B_H\[$maxbidx:0\]"
+    icon_property -origin "$icon_left_label $pin_y" -size small -label B_H
+    icon_property -origin "$icon_left_label [expr $pin_y + 10]" -size small -label "\[$maxbidx:0\]"
+    # 3*B
+    if {$PPGAlgorithm == "BOOTHRADIX8"} {
+      set pin_y [expr $pin_y - $pin_spacer]
+      set bbits [format "\[%d:0\]" $maxb3idx]
+      icon_term -type input -origin "$icon_left $pin_y" -name "B3_H$bbits"
+      icon_property -origin "$icon_left_label $pin_y" -size small -label B3_H
+      icon_property -origin "$icon_left_label [expr $pin_y + 10]" -size small -label $bbits
+    }
+  }
+
+
+  # text
+  set lname [format "%dx%dbit" $NBITS_A $NBITS_B]
+  icon_property -origin {0 -80} -size large -anchor center -label $lname
+  icon_property -origin {0 0} -size large -anchor center -label Multiplier
+  icon_property -origin {0 40} -size large -anchor center -label $alg_name
+  icon_property -origin {0 80} -size large -anchor center -label {PPG Logic}
+  if {$A == "UNSIGNED"} {
+    set as "U"
+  }
+  if {$A == "SIGNED"} {
+    set as "S"
+  }
+  if {$A == "BOTH"} {
+    set as "U,S"
+  }
+  if {$B == "UNSIGNED"} {
+    set bs "U"
+  }
+  if {$B == "SIGNED"} {
+    set bs "S"
+  }
+  if {$B == "BOTH"} {
+    set bs "U,S"
+  }
+  set lname [format "%s x %s" $as $bs]
+  icon_property -origin {0 -40} -size large -anchor center -label $lname
+  set mods ""
+  if {$HalfHeight == 1} {
+    set mods " HH "
+  }
+  if {$ReduceInputLoad == 1} {
+    set mods [format "%s%s" $mods " R "]
+  }
+  icon_property -origin {0 120} -anchor center -label $mods
+
+
+  # junk
+  set junk_y [expr $icon_bot + 200]
+  icon_property -origin "0 $junk_y" -type user -name name
+  icon_property -origin "0 [expr $junk_y + 20]" -type user -name M
+  icon_property -origin "0 [expr $junk_y + 40]" -type user -name dpc
+  # this property makes a generator pop up in "Schematic" mode rather than "Verilog" mode
+  icon_property -origin "0 [expr $junk_y + 60]" -type fixed -name netlist_level -text 2000
+  icon_special -type sccs_title_bar -origin "0 [expr $junk_y + 160]" -owner emc -version 1.7 -date 06/23/00
+
+
+  # generate verilog property
+  set fname [NAME_mmig_ppg -NBITS_A $NBITS_A -NBITS_B $NBITS_B -A $A -B $B -PPGAlgorithm $PPGAlgorithm -ReduceInputLoad $ReduceInputLoad -HalfHeight $HalfHeight]
+
+  set pnames [format ".B_H(\$\{B_H\[%d:0\]\})" $maxbidx]  
+  if {$B == "BOTH"} {
+    set pnames [format "%s, .BSigned_H(\$\{BSigned_H\})" $pnames]
+  }
+  if {[string toupper $PPGAlgorithm] == "SIMPLE"} {
+    set pnames [format "%s, .A_H(\$\{A_H\[%d:0\]\})" $pnames $maxaidx]
+    if {$A == "BOTH"} {
+      set pnames [format "%s, .ASigned_H(\$\{ASigned_H\})" $pnames]
+    }
+  } else {
+    for {set i 0} {$i < $npps} {incr i} {
+      set pnames [format "%s, .PPSel%d_H(\$\{PPSel%d_H\[%d:0\]\})" $pnames $i $i $maxselidx]
+    }
+  }
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    set pnames [format "%s, .B3_H(\$\{B3_H\[%d:0\]\})" $pnames $maxb3idx]  
+  }
+  for {set i 0} {$i < $npps} {incr i} {
+    set pnames [format "%s, .PP%d_H(\$\{PP%d_H\[%d:0\]\})" $pnames $i $i $maxresidx]
+  }
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin "0 [expr $junk_y + 80]" -type fixed -name verilog -text $vprop  
+
+  # behavioral verilog code
+  set filename "$fname.vb"
+  if {[catch "open $filename w" FILE_ID]} {
+    puts "WARNING: Couldn't write file [pwd]/$filename"
+    return
+  }
+
+  # header stuff
+  puts $FILE_ID [format "// Behavioral verilog for partial product generator %s:" $fname]
+  puts $FILE_ID "//   NBITS_A = $NBITS_A"
+  puts $FILE_ID "//   NBITS_B = $NBITS_B"
+  puts $FILE_ID "//   A = $A"
+  puts $FILE_ID "//   B = $B"
+  puts $FILE_ID "//   PPGAlgorithm = $PPGAlgorithm"
+  puts $FILE_ID "//   ReduceInputLoad = $ReduceInputLoad"
+  puts $FILE_ID "//   HalfHeight = $HalfHeight"
+
+  # module declaration
+  set ppnames ""
+  if {[string toupper $PPGAlgorithm] == "SIMPLE"} {
+   if {$A == "BOTH"} {
+      set ppnames [format "%s, ASigned_H" $ppnames]
+    }
+    if {$B == "BOTH"} {
+      set ppnames [format "%s, BSigned_H" $ppnames]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s, PP%d_H" $ppnames $i]
+    }
+    set ppnames [format "A_H, B_H%s" $ppnames]
+  }
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX4"} {
+    if {$B == "BOTH"} {
+      set ppnames [format "%s, BSigned_H" $ppnames]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s, PPSel%d_H" $ppnames $i]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s, PP%d_H" $ppnames $i]
+    }
+    set ppnames [format "B_H%s" $ppnames]
+  }
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    if {$B == "BOTH"} {
+      set ppnames [format "%s, BSigned_H" $ppnames]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s, PPSel%d_H" $ppnames $i]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s, PP%d_H" $ppnames $i]
+    }
+    set ppnames [format "B_H, B3_H%s" $ppnames]
+  }
+  puts $FILE_ID [format "module %s (%s);\n" $fname $ppnames]
+
+
+  # inputs and outputs
+  set ppbitrange [format "\[%d:0\]" $maxresidx]
+  for {set i 0} {$i < $npps} {incr i} {
+    puts $FILE_ID [format "\toutput %s\tPP%d_H;" $ppbitrange $i]
+  }
+  
+  if {[string toupper $PPGAlgorithm] == "SIMPLE"} {
+    puts $FILE_ID [format "\tinput \[%d:0\]\tA_H;" $maxaidx]
+    if {$A == "BOTH"} {
+      puts $FILE_ID [format "\tinput      \tASigned_H;"]
+    }
+  }
+
+  puts $FILE_ID [format "\tinput \[%d:0\]\tB_H;" $maxbidx]
+  if {$B == "BOTH"} {
+    puts $FILE_ID [format "\tinput      \tBSigned_H;"]
+  }
+
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX4"} {
+    set ppbitrange [format "\[%d:0\]" $maxselidx]
+    for {set i 0} {$i < $npps} {incr i} {
+      puts $FILE_ID [format "\tinput %s\tPPSel%d_H;" $ppbitrange $i]
+    }
+  }
+
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    set ppbitrange [format "\[%d:0\]" $maxselidx]
+    for {set i 0} {$i < $npps} {incr i} {
+      puts $FILE_ID [format "\tinput %s\tPPSel%d_H;" $ppbitrange $i]
+    }
+    puts $FILE_ID [format "\tinput \[%d:0\]\tB3_H;" $maxb3idx]
+  }
+
+
+  # parameters
+  puts $FILE_ID [format "\n\tparameter\tinitial_value = 'b0;"]
+
+
+  # registers
+  set ppbitrange [format "\[%d:0\]" $maxresidx]
+  for {set i 0} {$i < $npps} {incr i} {
+    puts $FILE_ID [format "\treg %s\tPP%d_H;" $ppbitrange $i]
+  }
+  puts $FILE_ID [format "\treg %s\tbtemp;" $ppbitrange]
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    puts $FILE_ID [format "\treg %s\tb3temp;" $ppbitrange]
+  }
+
+
+  # initialize
+  puts $FILE_ID [format "\n\tinitial"]
+  puts $FILE_ID [format "\t  begin"]
+  for {set i 0} {$i < $npps} {incr i} {
+    puts $FILE_ID [format "\t    PP%d_H = initial_value;" $i]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+
+  # execute Simple
+  if {[string toupper $PPGAlgorithm] == "SIMPLE"} {
+    set ppnames ""
+    if {$A == "BOTH"} {
+      set ppnames [format "%s or ASigned_H" $ppnames]
+    }
+    if {$B == "BOTH"} {
+      set ppnames [format "%s or BSigned_H" $ppnames]
+    }
+    puts $FILE_ID [format "\n\talways @(A_H or B_H%s)" $ppnames]
+    puts $FILE_ID [format "\t  begin"]
+    
+    for {set i 0} {$i < $NBITS_A} {incr i} {
+      set top_bits [expr $NRESBITS - $NBITS_B - $i]
+      puts $FILE_ID [format "\n\t    if (A_H\[%d\])" $i]
+      puts $FILE_ID [format "\t      begin"]
+      
+      if {$top_bits == 0} {
+	set top_string_signed ""
+	set top_string_unsigned ""
+      } else {
+	set top_string_signed [format "%d\{B_H\[%d\]\}," $top_bits $maxbidx]
+	set top_string_unsigned [format "%d'b0," $top_bits]
+      }
+      if {$i == 0} {
+	set bot_string ""
+      } else {
+	set bot_string [format ",%d'b0" $i]
+      }
+      set bsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_signed $maxbidx $bot_string]
+      set bunsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_unsigned $maxbidx $bot_string]
+      
+      if {$B == "SIGNED"} {
+	puts $FILE_ID [format "\t        btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+      }
+      if {$B == "UNSIGNED"} {
+	puts $FILE_ID [format "\t        btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+      }
+      if {$B == "BOTH"} {
+	puts $FILE_ID [format "\t        if (BSigned_H)"]
+	puts $FILE_ID [format "\t          btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+	puts $FILE_ID [format "\t        else"]
+	puts $FILE_ID [format "\t          btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+      }
+      
+      if {$i == $maxaidx} {
+	if {$A == "SIGNED"} {
+	  puts $FILE_ID [format "\t        PP%d_H\[%d:0\] = ~btemp\[%d:0\];" $i $maxresidx $maxresidx]
+	}
+	if {$A == "UNSIGNED"} {
+	  puts $FILE_ID [format "\t        PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+	}
+	if {$A == "BOTH"} {
+	  puts $FILE_ID [format "\t        if (ASigned_H)"]
+	  puts $FILE_ID [format "\t          PP%d_H\[%d:0\] = ~btemp\[%d:0\];" $i $maxresidx $maxresidx]
+	  puts $FILE_ID [format "\t        else"]
+	  puts $FILE_ID [format "\t          PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+	}
+      } else {
+	puts $FILE_ID [format "\t        PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+      }
+      
+      puts $FILE_ID [format "\t      end"]
+      puts $FILE_ID [format "\t    else"]
+      puts $FILE_ID [format "\t      PP%d_H\[%d:0\] = 'b0;" $i $maxresidx]
+    }
+    puts $FILE_ID [format "\t  end"]
+  }
+
+
+  # execute Booth Radix 4
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX4"} {
+    set ppnames ""
+    if {$B == "BOTH"} {
+      set ppnames [format "%s or BSigned_H" $ppnames]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s or PPSel%d_H" $ppnames $i]
+    }
+    puts $FILE_ID [format "\n\talways @(B_H%s)" $ppnames]
+    puts $FILE_ID [format "\t  begin"]
+
+    for {set i 0} {$i < $npps} {incr i} {
+      set top_bits [expr $NRESBITS - $NBITS_B - ($i * $bitmultiple)]
+      if {$top_bits == 0} {
+	set top_string_signed ""
+	set top_string_unsigned ""
+      } else {
+	set top_string_signed [format "%d\{B_H\[%d\]\}," $top_bits $maxbidx]
+	set top_string_unsigned [format "%d'b0," $top_bits]
+      }
+      if {$i == 0} {
+	set bot_string ""
+      } else {
+	set bot_string [format ",%d'b0" [expr $i * $bitmultiple]]
+      }
+      set bsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_signed $maxbidx $bot_string]
+      set bunsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_unsigned $maxbidx $bot_string]
+
+      if {$B == "SIGNED"} {
+	puts $FILE_ID [format "\n\t    btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+      }
+      if {$B == "UNSIGNED"} {
+	puts $FILE_ID [format "\n\t    btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+      }
+      if {$B == "BOTH"} {
+	puts $FILE_ID [format "\n\t    if (BSigned_H)"]
+	puts $FILE_ID [format "\t      btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+	puts $FILE_ID [format "\t    else"]
+	puts $FILE_ID [format "\t      btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+      }
+
+      puts $FILE_ID [format "\n\t    case (PPSel%d_H)" $i]
+      
+      puts $FILE_ID [format "\t        0,"]
+      puts $FILE_ID [format "\t        7:  PP%d_H\[%d:0\] = 'b0;" $i $maxresidx]
+
+      puts $FILE_ID [format "\t        1,"]
+      puts $FILE_ID [format "\t        2:  PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        3:  PP%d_H\[%d:0\] = btemp\[%d:0\] << 1;" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        4:  PP%d_H\[%d:0\] = ~(btemp\[%d:0\] << 1);" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        5,"]
+      puts $FILE_ID [format "\t        6:  PP%d_H\[%d:0\] = ~btemp\[%d:0\];" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t    endcase"]      
+    }
+
+    puts $FILE_ID [format "\t  end"]
+  }
+
+
+  # execute
+  if {[string toupper $PPGAlgorithm] == "BOOTHRADIX8"} {
+    set ppnames ""
+    if {$B == "BOTH"} {
+      set ppnames [format "%s or BSigned_H" $ppnames]
+    }
+    for {set i 0} {$i < $npps} {incr i} {
+      set ppnames [format "%s or PPSel%d_H" $ppnames $i]
+    }
+    puts $FILE_ID [format "\n\talways @(B_H or B3_H%s)" $ppnames]
+    puts $FILE_ID [format "\t  begin"]
+    for {set i 0} {$i < $npps} {incr i} {
+      set top_bits [expr $NRESBITS - $NBITS_B - ($i * $bitmultiple)]
+      if {$top_bits == 0} {
+	set top_string_signed ""
+	set top_string_unsigned ""
+      } else {
+	set top_string_signed [format "%d\{B_H\[%d\]\}," $top_bits $maxbidx]
+	set top_string_unsigned [format "%d'b0," $top_bits]
+      }
+      if {$i == 0} {
+	set bot_string ""
+      } else {
+	set bot_string [format ",%d'b0" [expr $i * $bitmultiple]]
+      }
+      set bsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_signed $maxbidx $bot_string]
+      set bunsigned [format "\{%sB_H\[%d:0\]%s\}" $top_string_unsigned $maxbidx $bot_string]
+
+      set top_bits [expr $NRESBITS - $NBITS_B3 - ($i * $bitmultiple)]
+      if {$top_bits == 0} {
+	set top_string_signed ""
+	set top_string_unsigned ""
+      } else {
+	set top_string_signed [format "%d\{B3_H\[%d\]\}," $top_bits $maxb3idx]
+	set top_string_unsigned [format "%d'b0," $top_bits]
+      }
+      if {$i == 0} {
+	set bot_string ""
+      } else {
+	set bot_string [format ",%d'b0" [expr $i * $bitmultiple]]
+      }
+      set b3signed [format "\{%sB3_H\[%d:0\]%s\}" $top_string_signed $maxb3idx $bot_string]
+      set b3unsigned [format "\{%sB3_H\[%d:0\]%s\}" $top_string_unsigned $maxb3idx $bot_string]
+
+      if {$B == "SIGNED"} {
+	puts $FILE_ID [format "\n\t    btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+	puts $FILE_ID [format "\n\t    b3temp\[%d:0\] = %s;" $maxresidx $b3signed]
+      }
+      if {$B == "UNSIGNED"} {
+	puts $FILE_ID [format "\n\t    btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+	puts $FILE_ID [format "\n\t    b3temp\[%d:0\] = %s;" $maxresidx $b3unsigned]
+      }
+      if {$B == "BOTH"} {
+	puts $FILE_ID [format "\n\t    if (BSigned_H)"]
+	puts $FILE_ID [format "\t      begin"]
+	puts $FILE_ID [format "\t        btemp\[%d:0\] = %s;" $maxresidx $bsigned]
+	puts $FILE_ID [format "\t        b3temp\[%d:0\] = %s;" $maxresidx $b3signed]
+	puts $FILE_ID [format "\t      end"]
+	puts $FILE_ID [format "\t    else"]
+	puts $FILE_ID [format "\t      begin"]
+	puts $FILE_ID [format "\t        btemp\[%d:0\] = %s;" $maxresidx $bunsigned]
+	puts $FILE_ID [format "\t        b3temp\[%d:0\] = %s;" $maxresidx $b3unsigned]
+	puts $FILE_ID [format "\t      end"]
+      }
+
+      puts $FILE_ID [format "\n\t    case (PPSel%d_H)" $i]
+      
+      puts $FILE_ID [format "\t        0,"]
+      puts $FILE_ID [format "\t        15:  PP%d_H\[%d:0\] = 'b0;" $i $maxresidx]
+
+      puts $FILE_ID [format "\t        1,"]
+      puts $FILE_ID [format "\t        2:  PP%d_H\[%d:0\] = btemp\[%d:0\];" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        3,"]
+      puts $FILE_ID [format "\t        4:  PP%d_H\[%d:0\] = btemp\[%d:0\] << 1;" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        5,"]
+      puts $FILE_ID [format "\t        6:  PP%d_H\[%d:0\] = b3temp\[%d:0\];" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        7:  PP%d_H\[%d:0\] = btemp\[%d:0\] << 2;" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        8:  PP%d_H\[%d:0\] = ~(btemp\[%d:0\] << 2);" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        9,"]
+      puts $FILE_ID [format "\t        10:  PP%d_H\[%d:0\] = ~b3temp\[%d:0\];" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        11,"]
+      puts $FILE_ID [format "\t        12:  PP%d_H\[%d:0\] = ~(btemp\[%d:0\] << 1);" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t        13,"]
+      puts $FILE_ID [format "\t        14:  PP%d_H\[%d:0\] = ~btemp\[%d:0\];" $i $maxresidx $maxresidx]
+
+      puts $FILE_ID [format "\t    endcase"]      
+    }
+    puts $FILE_ID [format "\t  end"]
+  }
+
+
+
+  # done
+  puts $FILE_ID [format "\nendmodule\t\t//%s" $fname]
+  close $FILE_ID
+}

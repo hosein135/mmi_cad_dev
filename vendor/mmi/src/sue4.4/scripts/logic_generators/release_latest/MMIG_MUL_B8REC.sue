@@ -1,0 +1,221 @@
+# SUE version MMI_SUE4.1.12
+
+proc SCHEMATIC_MMIG_MUL_B8REC {} {
+  generate row_spanner row_spanner150 -width 150
+  make row_spanner150 -origin {790 -370}
+  make row_spanner150 -origin {1270 -370}
+  make input -name A3 -origin {-240 -180}
+  make input -name A2 -origin {-240 100}
+  make input -name A1 -origin {-240 380}
+  make input -name A0 -origin {-240 580}
+  generate MMI_AND2 MMI_AND2B 
+  make MMI_AND2B -origin {60 480}
+  make name_net_s -name A0xorA1 -origin {200 400}
+  make MMI_AND2B -origin {60 -160}
+  make name_net_s -name A3andA2 -origin {200 -160}
+  make name_net_s -name A3BandA2 -origin {200 -80}
+  make name_net_s -name A3andA2B -origin {200 0}
+  make name_net_s -name A3BandA2B -origin {200 80}
+  make output -name {sel[0]} -origin {1520 -160}
+  make output -name {sel[1]} -origin {1520 -80}
+  make output -name {sel[2]} -origin {1520 40}
+  make name_net_s -name A0andA1 -origin {200 480}
+  make name_net_s -name A0BandA1B -origin {200 560}
+  make output -name {sel[3]} -origin {1520 200}
+  make output -name {sel[4]} -origin {1520 320}
+  make output -name {sel[5]} -origin {1520 400}
+  make output -name {sel[6]} -origin {1520 480}
+  make output -name {sel[7]} -origin {1520 560}
+  generate MMI_INOR2 MMI_INOR2B_ -Size B -DeMorgan 1
+  make MMI_INOR2B_ -origin {60 -80}
+  make MMI_INOR2B_ -orient RY -origin {60 0}
+  generate MMI_NOR2 MMI_NOR2B_ -Size B -DeMorgan 1
+  make MMI_NOR2B_ -origin {60 80}
+  generate MMI_XOR2 MMI_XOR2B -Size B
+  make MMI_XOR2B -origin {60 400}
+  make MMI_NOR2B_ -origin {60 560}
+  make MMI_AND2B -origin {680 -160}
+  make MMI_AND2B -origin {680 -80}
+  make MMI_AND2B -origin {1160 320}
+  make MMI_AND2B -origin {1160 400}
+  make MMI_AND2B -origin {1160 480}
+  make MMI_AND2B -origin {1160 560}
+  generate MMI_BUF MMI_BUFE -Size E
+  make MMI_BUFE -origin {1390 560}
+  make MMI_BUFE -origin {1390 480}
+  make MMI_BUFE -origin {1390 400}
+  make MMI_BUFE -origin {1390 320}
+  make MMI_BUFE -origin {910 200}
+  make MMI_BUFE -origin {910 40}
+  make MMI_BUFE -origin {910 -80}
+  make MMI_BUFE -origin {910 -160}
+  generate MMI_AO22 MMI_AO22B 
+  make MMI_AO22B -origin {720 200}
+  make MMI_AO22B -origin {720 40}
+  generate MMI_INV MMI_INVD_ -Size D -DeMorgan 1
+  make MMI_INVD_ -origin {1390 720}
+  make output -name cin -origin {1520 720}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -origin {1160 720}
+  generate MMI_NAND3 MMI_NAND3A 
+  make MMI_NAND3A -origin {920 800}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.18 -date 06/08/00 -origin {660 970}
+  make_wire 200 400 120 400
+  make_wire 200 480 120 480
+  make_wire 200 560 120 560
+  make_wire -80 420 -80 460
+  make_wire -80 460 -80 580
+  make_wire -120 380 -120 500
+  make_wire -200 -20 -200 60
+  make_wire -200 -100 -200 -20
+  make_wire -200 -100 -200 -180
+  make_wire -160 -60 -160 -140
+  make_wire -160 20 -160 -60
+  make_wire 200 -160 120 -160
+  make_wire 200 -80 120 -80
+  make_wire 200 0 120 0
+  make_wire 200 80 120 80
+  make_wire 740 -160 850 -160
+  make_wire 350 -160 200 -160
+  make_wire 370 -80 200 -80
+  make_wire 370 -80 370 -240
+  make_wire 390 0 200 0
+  make_wire 390 0 390 -240
+  make_wire 410 80 200 80
+  make_wire 470 400 200 400
+  make_wire 200 480 490 480
+  make_wire 200 560 510 560
+  make_wire 740 -80 850 -80
+  make_wire 350 -160 350 -240
+  make_wire 410 -180 620 -180
+  make_wire 410 -180 410 -240
+  make_wire 350 -100 620 -100
+  make_wire 350 -100 350 -160
+  make_wire 820 40 850 40
+  make_wire 410 -10 620 -10
+  make_wire 410 -10 410 -180
+  make_wire 410 -10 410 80
+  make_wire 490 30 620 30
+  make_wire 490 30 490 -240
+  make_wire 370 50 620 50
+  make_wire 370 -80 370 50
+  make_wire 510 90 620 90
+  make_wire 820 200 850 200
+  make_wire 390 150 620 150
+  make_wire 390 150 390 0
+  make_wire 490 190 620 190
+  make_wire 490 30 490 190
+  make_wire 490 190 490 480
+  make_wire 350 210 620 210
+  make_wire 350 210 350 -100
+  make_wire 510 250 620 250
+  make_wire 510 250 510 90
+  make_wire 510 250 510 560
+  make_wire 1220 320 1330 320
+  make_wire 370 300 370 50
+  make_wire 470 340 470 400
+  make_wire 1220 400 1330 400
+  make_wire 390 150 390 380
+  make_wire 470 420 470 400
+  make_wire 1220 480 1330 480
+  make_wire 370 460 370 300
+  make_wire 490 500 490 480
+  make_wire 1220 560 1330 560
+  make_wire 390 540 390 380
+  make_wire 510 560 510 580
+  make_wire 370 460 1100 460
+  make_wire 510 580 1100 580
+  make_wire 470 420 1100 420
+  make_wire 390 380 1100 380
+  make_wire 390 540 1100 540
+  make_wire 470 340 1100 340
+  make_wire 490 500 1100 500
+  make_wire 370 300 1100 300
+  make_wire 1450 560 1520 560
+  make_wire 1450 480 1520 480
+  make_wire 1450 320 1520 320
+  make_wire 1450 400 1520 400
+  make_wire 970 -80 1520 -80
+  make_wire 970 40 1520 40
+  make_wire 970 -160 1520 -160
+  make_wire 970 200 1520 200
+  make_wire 350 640 350 210
+  make_wire 370 640 370 460
+  make_wire 390 640 390 540
+  make_wire 410 640 410 80
+  make_wire 470 640 470 420
+  make_wire 490 640 490 500
+  make_wire 510 640 510 580
+  make_wire 1450 720 1520 720
+  make_wire 1050 740 1050 800
+  make_wire 1050 740 1100 740
+  make_wire 980 800 1050 800
+  make_wire 1220 720 1330 720
+  make_wire 1100 700 -200 700
+  make_wire -200 -100 0 -100
+  make_wire -200 -20 0 -20
+  make_wire -240 -180 -200 -180
+  make_wire -200 -180 0 -180
+  make_wire -200 60 0 60
+  make_wire -200 60 -200 700
+  make_wire -160 20 0 20
+  make_wire -240 100 -160 100
+  make_wire -160 100 0 100
+  make_wire -160 -140 0 -140
+  make_wire -160 -60 0 -60
+  make_wire -80 460 0 460
+  make_wire -240 580 -80 580
+  make_wire -80 580 0 580
+  make_wire -80 420 0 420
+  make_wire -240 380 -120 380
+  make_wire -120 380 0 380
+  make_wire -120 540 0 540
+  make_wire -120 500 0 500
+  make_wire -160 820 860 820
+  make_wire -120 800 860 800
+  make_wire -160 20 -160 100
+  make_wire -160 100 -160 820
+  make_wire -120 500 -120 540
+  make_wire -120 540 -120 800
+  make_wire -80 580 -80 780
+  make_wire -80 780 860 780
+  make_wire 620 -140 470 -140
+  make_wire 470 -140 470 -240
+  make_wire 510 -240 510 90
+  make_wire 620 -60 470 -60
+  make_wire 470 -60 470 -140
+  make_wire 470 -60 470 340
+  make_text -origin {-250 -480} -text {sel[0] = sel B = (!A3.!A2) . (A1 xor A0)
+sel[1] = sel !B = (A3.A2) . (A1 xor A0)
+sel[2] = sel 2B = (!A3.!A2) .(A1 . A0) + (!A3.A2).(!A1.!A0)
+sel[3] = sel !2B = (A3.!A2).(A1.A0) + (A3.A2) .(!A1.!A0)
+sel[4] = sel 3B = (!A3.A2).(A1 xor A0)
+sel[5] = sel !3B = (A3.!A2).(A1 xor A0)
+sel[6] = sel 4B = (!A3.A2).(A1.A0)
+sel[7] = sel !4B = (A3.!A2).(!A1.!A0)}
+  make_text -origin {-240 -780} -text MMIG_MUL_B8REC -size large
+  make_text -origin {-240 -740} -text {Multiplier Recoder Logic for Booth Multiplier, Radix 8}
+}
+
+proc ICON_MMIG_MUL_B8REC args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-120 50} -orient RY -name A0
+  icon_term -type input -origin {-120 30} -orient RY -name A1
+  icon_term -type input -origin {-120 10} -orient RY -name A2
+  icon_term -type input -origin {-120 -10} -name A3
+  icon_term -type output -origin {120 80} -name {sel[7:0]}
+  icon_term -type output -origin {120 60} -name cin
+  icon_property -origin {-50 200} -type user -name name
+  icon_property -origin {-50 220} -type user -name M
+  icon_property -origin {-50 240} -type user -name dpc
+  icon_line -120 -120 -120 120 120 120 120 -120 -120 -120
+  icon_property -origin {0 -60} -size large -anchor center -label MMIG_MUL_B8REC
+  icon_property -origin {110 80} -anchor e -label {sel[7:0]}
+  icon_property -origin {-110 50} -label {A[n-1]}
+  icon_property -origin {-110 30} -label {A[n]}
+  icon_property -origin {-110 10} -label {A[n+1]}
+  icon_property -origin {-110 -10} -label {A[n+2]}
+  icon_property -origin {110 60} -anchor e -label cin
+}
+

@@ -1,0 +1,395 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="11/27/01 13:23:03">
+<title>Part 4   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+
+
+<p><table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+
+	<!-- THE FOLLOWING LINE IS THE TITLE OF THE DOCUMENT -->
+
+
+     <td> <center><font color="003366"><H1> MAX Layout Environment Tutorial </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="max_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="max_tut-Pt3BiggerHier.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+<hr align="left">
+
+ 
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 4 </font>
+</h2>
+
+
+<h2>
+  <a name="1014780"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MAX-LS</font>
+</h2>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014781"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX-LS, an entry in the chip development suite from Micro Magic Tools, includes ALL of the features included in regular MAX and several added powerful features. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1016998"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MAX-LS Features</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014783"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX-LS includes all of the standard MAX features, as well as the following additional ones:</font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014784"> </a>SUE base version, without Netlisting and Simulator interfaces.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014785"> </a>Auto-layout Generation of SUE schematics into MAX. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014786"> </a>Interactive Cross-probing between SUE and MAX. 
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1014787"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One reason for the power of MAX-LS is that both MAX and SUE have complete Tcl/Tk interfaces. This means that you can write and execute full Tcl programs in either tool. Tcl also provides a means for inter-program communication.</font>
+<p>
+<p>
+  <dt> <a name="1014788"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE and MAX use the notion of "send" commands to talk to each other. Cross-probing is one example of this inter-program communication. Automatic layout generation and fly-lines are also features gained by using both SUE and MAX.</font>
+<p>
+<p>
+  <dt> <a name="1014789"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are going to use MAX-LS for this next example. Don't worry if you haven't used SUE before. SUE and MAX are both part of the Micro Magic Tools chip design suite, so they have similar interfaces. You can also bring up the SUE tutorial if you wish to learn more about SUE.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1014790"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Automatic Layout Generation and Fly-lines</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028398"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To see how SUE and MAX can work together we are going to bring up a simple NAND gate in SUE.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028402"> </a>First, if you haven't already done so, save your previous work in MAX and then quit out of MAX using <b><code class="CodeStrong">Exit</code></b> from the <b><code class="CodeStrong">File</code></b> menu.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014793"> </a>Now bring up SUE by typing </font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">sue MyNAND</font><a name="1014794"> </a>
+</p><font face="Courier"></font><a name="1014795"> </a>
+</p></pre>
+   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1014796"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This will bring up SUE and automatically load in the <b><code class="CodeStrong">MyNAND.sue </code></b>circuit.</font>
+<p>
+<p>
+  <dt> <a name="1014800"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your SUE window should look like <a href="max_tut-Pt4MAX-LS.html#1014802">Figure 28</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014802"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 28:   SUE Schematic For "MyNAND"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong"><div align="center"><img src="images/max4_fig24.gif">
+</div></strong></b></font><a name="1029681"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014807"> </a>Go to the <b><code class="CodeStrong">Sim</code></b> menu and select <b><code class="CodeStrong">sim netlist</code></b>. It's the top choice.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1024732"> </a>If the top choice is set to something else, like <b><code class="CodeStrong">spice netlist</code></b>, then select <b><code class="CodeStrong">Change Simulation Mode</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu and click on the <b><code class="CodeStrong">Sim</code></b> box when the <b><code class="CodeStrong">Change Simulation Mode </code></b>dialog box comes up.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014810"> </a>Now go to the <b><code class="CodeStrong">Sim</code></b> menu and select <b><code class="CodeStrong">MAX Cross Probe Init.</code></b> </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014811"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Cross Probe</code></b> popup menu will appear.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1028566"> </a>If you have other copies of MAX running, be sure and select <b><code class="CodeStrong">Start a New Copy of MAX</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1028579"> </a>For <b><code class="CodeStrong">MAX Technology</code></b>, fill in <b><strong class="Strong">mmi25</strong></b>, as shown in <a href="max_tut-Pt4MAX-LS.html#1028580">Figure 29</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1028580"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 29:   Cross Probe Menu</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/cross_probe.gif">
+</div></font><a name="1028744"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1028601"> </a>Click on <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028631"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This will launch a new Xterm window, and start up MAX from that window.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1014812"> </a>You'll see a message saying there is not an existing MAX layout for <b><code class="CodeStrong">MyNAND</code></b>. Click on <b><code class="CodeStrong">new</code></b> to generate a new cell.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1014813"> </a>Now go to the <b><code class="CodeStrong">Tool</code></b> menu in MAX and select <b><code class="CodeStrong">Layout Generator</code></b><b><code class="CodeStrong">.</code></b></font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1014814"> </a>When the file select popup appears, select <b><code class="CodeStrong">MyNAND.sim</code></b> from the <b><code class="CodeStrong">Cell List</code></b>, and click on <b><code class="CodeStrong">OK</code></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014815"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Layout Generator </code></b>window should now come up. This window has several options.</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014816"> </a><b><code class="CodeStrong">Generate stdcell layers</code></b> is a shorthand for either "just give me the devices with flylines" or "give me all of the wells, well contacts, power straps, etc. needed to make a standard cell-like layout". 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014817"> </a>If you click on the <b><code class="CodeStrong">Edit Per-Cell Options</code></b><b><strong class="Strong"> </strong></b>button you have various options like using gcells or paint for fets, enable flylines, and automatically folding fets larger than a specified size. If you turn <b><code class="CodeStrong">share_contacts</code></b> on the <b><code class="CodeStrong">Layout Generator </code></b>will automatically share contacts and diffusions for you. (For now we don't want to change anything so just hit <b><code class="CodeStrong">Cancel</code></b>.) 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014818"> </a>The <b><code class="CodeStrong">Edit Stdcell Options </code></b>box gives you several options for producing standard cell-like layout. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014819"> </a>The <b><code class="CodeStrong">Edit Layers to Generate</code></b> box gives you control over what layers the <b><code class="CodeStrong">Layout Generator </code></b>will automatically generate for you. This gives YOU, the designer, the ability to control what the tool does for you and what you want total control over. 
+</li><p>
+</font>
+</ul></ul></ol>
+</dl></dl><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1014820"> </a>Once you are done looking over the many options the <b><code class="CodeStrong">Layout Generator</code></b><b><code class="CodeStrong"> </code></b>has, simply click <b><code class="CodeStrong">Done</code></b> and the layout for <b><code class="CodeStrong">MyNAND</code></b> will automatically be generated for you. It should look like <a href="max_tut-Pt4MAX-LS.html#1014825">Figure 30</a>.</font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1028959"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Don't worry if you get a MAX error popup. The <b><code class="CodeStrong">.maxrc</code></b> file for this tutorial is set up so that it automatically loads the <b><code class="CodeStrong">nand2</code></b> and <b><code class="CodeStrong">INV</code></b> cells we used in the previous section. Those cells were designed for the mmi18 process, and we're using mmi25 for this cell. Click on <b><code class="CodeStrong">Close</code></b> in the popup form.</font>
+<p>  </dl>
+</ol>
+<h4>
+  <a name="1014825"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 30:   Layout Generator Result</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong"><div align="center"><img src="images/max4_fig25.gif">
+</div></strong></b></font><a name="1029911"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014830"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the devices have already been placed and correctly sized. Where possible the <b><code class="CodeStrong">Layout Generator </code></b>has even shared contacts and diffusions for you. Also, notice that there are fly-lines that connect the various nodes together. These fly-lines tell you how to wire things up correctly.</font>
+<p>
+<p>
+  <dt> <a name="1014831"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's wire things up. First, let's wire up the left-most poly gates.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014832"> </a>First, turn off the visibility of the other layers by clicking on <b><code class="CodeStrong">other</code></b> in the <b><code class="CodeStrong">Palette</code></b> with Button-1. This will make the layout less cluttered.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014833"> </a>To draw the wire, simply hit the <b><strong class="Strong">w</strong></b> hotkey to get into <b><code class="CodeStrong">wire mode</code></b>, then click the left mouse button (Button-1) over the lower left poly gate and drag the mouse upwards.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014834"> </a>Use Button-1 to add corners where needed.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014838"> </a>Did you notice that the fly-line tracked your wire as you drew it? See <a href="max_tut-Pt4MAX-LS.html#1014840">Figure 31</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014840"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 31:   Flylines Tracking</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong"><div align="center"><img src="images/max4_fig26.gif">
+</div></strong></b></font><a name="1030103"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014845"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This feature makes it easy to hook up cells correctly. All you need to do is follow the fly-lines!</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014846"> </a>OK, now let's wire up the rest of the cell. If you ever forget any of the wiring tool options, remember the status box next to the <b><code class="CodeStrong">Help</code></b> menu will tell you what the buttons do, and you can always hit the right mouse button (Button-3) to get the<b><code class="CodeStrong"> Wire Tool</code></b> pop-up menu.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014850"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your circuit should now look something like <a href="max_tut-Pt4MAX-LS.html#1014852">Figure 32</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014852"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 32:   Wired MyNAND Gate</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong"><div align="center"><img src="images/max4_fig27.gif">
+</div></strong></b></font><a name="1030311"> </a>
+</pre>
+
+<h4>
+  <a name="1014857"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Cross-Probing with SUE</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014858"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Making sure your circuit is wired up correctly is very important. MAX-LS provides flylines to help you accomplish this. But what if you import some layout from another tool, or create the layout without the flylines and you want to make sure it's correct?</font>
+<p>
+<p>
+  <dt> <a name="1014859"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX-LS has a powerful feature known as <b><strong class="Strong">cross-probing</strong></b>. This allows you to select a piece of layout and highlight the corresponding object in the schematic, or vice versa. You can initiate cross-probing from either SUE or MAX.</font>
+<p>
+<p>
+  <dt> <a name="1014860"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To start the cross-probe from SUE you would select <b><code class="CodeStrong">MAX Cross Probe Init</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu just as you did to start up MAX. This time let's set up cross-probing from the MAX side.</font>
+<p>
+<p>
+  <dt> <a name="1014861"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To do this simply:</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014862"> </a>Select <b><code class="CodeStrong">SUE Cross Probe Init</code></b> from the <b><code class="CodeStrong">Tool</code></b> menu in MAX.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029228"> </a>Assuming you only have on SUE running, select <b><code class="CodeStrong">sue</code></b>. Don't start a new copy. Click on <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014863"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once MAX and SUE are done communicating, SUE will highlight the nodes it and MAX agree upon in blue (see <a href="max_tut-Pt4MAX-LS.html#1014868">Figure 33</a>), and MAX will highlight the same nodes in white.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014868"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 33:   Matching Nets in SUE</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong"><div align="center"><img src="images/max4_fig28.gif">
+</div></strong></b></font><a name="1030445"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014873"> </a>Now select the port labeled<b><code class="CodeStrong"> in0</code></b> in the SUE schematic and type <b><strong class="Strong">k</strong></b>, or select <b><code class="CodeStrong">MAX Cross Probe </code></b>from the <b><code class="CodeStrong">Sim</code></b> menu. Notice that the wire labeled <b><code class="CodeStrong">in0</code></b> on the MAX layout is now highlighted in white! See <a href="max_tut-Pt4MAX-LS.html#1014878">Figure 34</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014878"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 34:   Corresponding Net "in0" In MAX</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong"><div align="center"><img src="images/max4_fig29.gif">
+</div></strong></b></font><a name="1030529"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014883"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also cross-probe from MAX to SUE.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014884"> </a>Select the wire labeled <b><code class="CodeStrong">out</code></b> in MAX and then type <b><strong class="Strong">k</strong></b>, or select <b><code class="CodeStrong">SUE Cross Probe Net</code></b><b><code class="CodeStrong"> </code></b>from the <b><code class="CodeStrong">Tool</code></b> menu. Notice that the wire labeled <b><code class="CodeStrong">out</code></b> in the SUE schematic is highlighted in blue.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014885"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This is yet another way SUE and MAX help you keep track of your design.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1014886"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Advanced Features</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014887"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are several advanced features found in MAX which were NOT covered in this tutorial.</font>
+<p>
+<p>
+  <dt> <a name="1014888"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, customization is possible over a wide range, from minor user preferences (controlled by the <b><code class="CodeStrong">.maxrc</code></b> file) to megacell generators. See <b><code class="CodeStrong">MAX Manual</code></b> under the <b><code class="CodeStrong">Help</code></b> menu for more details.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1014889"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">To Learn More About MAX and SUE</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014890"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To learn more about MAX go to <b><code class="CodeStrong">MAX Manual</code></b><b><code class="CodeStrong"> </code></b>under the <b><code class="CodeStrong">Help</code></b> menu, or refer to the Micro Magic Tools MAX User Guide.</font>
+<p>
+<p>
+  <dt> <a name="1014891"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To learn more about SUE, go to the <b><code class="CodeStrong">SUE Tutorial</code></b><b><code class="CodeStrong"> </code></b>or <b><code class="CodeStrong">SUE Manual</code></b> under <b><code class="CodeStrong">Help</code></b> for on-line information, or refer to the Micro Magic Tools SUE Tutorial, and the Micro Magic Tools SUE User Guide documentation.</font>
+<p>
+<p>
+  <dt> <a name="1014892"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For additional documentation on any of the Micro Magic Tools chip design suite, use the on-line reference <b><code class="CodeStrong">MMI Documentation Guide </code></b>under the <b><code class="CodeStrong">Help </code></b>menu.</font>
+<p>
+<p>
+  <dt> <a name="1014893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">And, as always, the best way to really learn a program is to use it. We hope that the Micro Magic Tools programs SUE and MAX will help you do better designs in less time.</font>
+<p>
+<p>
+  <dt> <a name="1013715"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="right"><font size="1">
+    <b> -----  Micro Magic-----   
+  </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="max_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="max_tut-Pt3BiggerHier.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+
+</body>
+</html>

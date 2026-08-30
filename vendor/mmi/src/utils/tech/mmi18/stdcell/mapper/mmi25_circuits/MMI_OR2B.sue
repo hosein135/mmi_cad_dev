@@ -1,0 +1,37 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_OR2B {} {
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {160 140}
+  make global -orient RY -name vdd -origin {0 -140}
+  make output -name out -origin {410 50}
+  make pmos -W 2.4 -origin {0 -100}
+  make pmos -W 2.4 -origin {0 0}
+  make nmos -W 0.6 -origin {0 100}
+  make nmos -W 0.6 -origin {160 100}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {220 50}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 2.4 -WN 1.2 -origin {300 50}
+  make input -name in0 -origin {-100 0}
+  make input -name in1 -origin {-100 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.5 -date 07/19/99 -origin {60 350}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire 0 50 160 50
+  make_wire -100 0 -60 0
+  make_wire 160 60 160 50
+  make_wire -60 -100 100 -100
+  make_wire 0 -40 0 -60
+  make_wire 100 100 100 -100
+  make_wire -100 -100 -60 -100
+  make_wire 350 50 410 50
+  make_wire 220 50 160 50
+  make_wire 220 50 270 50
+  make_text -origin {-180 -210} -text {2 Input OR}
+  make_text -origin {-180 -190} -text {B Size}
+  make_text -origin {-180 -230} -text MMI_OR2B -size large
+}
+

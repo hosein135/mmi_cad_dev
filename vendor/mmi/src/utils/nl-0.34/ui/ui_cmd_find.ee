@@ -1,0 +1,788 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "nl.h"
+#include "tcl.h"
+#include "ui.h"
+#include "ui_int.h"
+
+
+#(defcommand list_designs
+   "Return a list of all designs in memory."
+   (-library boolean "list only library designs (i.e. library cells).")
+   (-hierarchy boolean "list only hierarchical (i.e. non-library) designs."))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  if ( ! library && ! hierarchy ) {
+    library = 1;
+    hierarchy = 1;
+  }
+
+  nl_context_for_all_designs (context, design) {
+    int libcell = nl_design_libcell (design);
+
+    if ( (library && libcell) || (hierarchy && !libcell) ) {
+      ui_cmd_append_object_list (interp, result, (nl_object) design, NULL);
+    }
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+struct ui_cmd_loop_data {
+  char *loop_name;
+  Tcl_Interp *interp;
+  Tcl_Obj *var_obj;
+  Tcl_Obj *body;
+  int result;
+};
+
+
+static
+nl_walk_status
+ui_cmd_loop_body_walker (nl_object obj, void *data)
+{
+  struct ui_cmd_loop_data *loop_data = data;
+  Tcl_Interp *interp = loop_data->interp;
+  Tcl_Obj *body = loop_data->body;
+  Tcl_Obj *obj_obj = ui_obj_create (obj, NULL);
+  int result;
+
+  Tcl_ObjSetVar2 (loop_data->interp, loop_data->var_obj, NULL, obj_obj, 0);
+
+  result = Tcl_EvalObj (interp, body);
+
+  if ( result == TCL_OK ) {
+    return nl_walk_status_continue;
+  }
+  else if ( result == TCL_CONTINUE ) {
+    return nl_walk_status_continue;
+  }
+  else if ( result == TCL_BREAK ) {
+    return nl_walk_status_stop;
+  }
+  else if ( result == TCL_ERROR ) {
+    char msg[100];
+
+    sprintf (msg, "\n    (\"%s\" body line %d)",
+	     loop_data->loop_name, interp->errorLine);
+    Tcl_AddObjErrorInfo (interp, msg, -1);
+    loop_data->result = TCL_ERROR;
+
+    return nl_walk_status_stop;
+  }
+  else {
+    loop_data->result = result;
+    return nl_walk_status_stop;
+  }
+}
+
+
+#(defcommand foreach_design_cell
+   "Loop over all the cells in the specified design."
+   (-hierarchy boolean "loop over only hierarchy cells")
+   (-library   boolean "loop over only instances of library cells")
+   (-unlinked  boolean "loop over only unlinked cells")
+   (-recursive boolean "recursively loop over all cells in the hierarchy")
+   (-noassign  boolean "don't include assignment buffers")
+   (-from      idesign "start at this point in the hierarchy, requires -recursive")
+   (var        string  "name of variable to which cells are bound")
+   (design     design  "loop over the cells in this design")
+   (body       tcl_object "loop body"))
+{
+  nl_idesign idesign;
+  struct ui_cmd_loop_data loop_data;
+
+  if ( from == NULL ) {
+    if ( recursive ) {
+      idesign = nl_idesign_get_or_create (design, NULL);
+    }
+    else {
+      idesign = NULL;
+    }
+  }
+  else {
+    idesign = from;
+    design = nl_idesign_design (from);
+  }
+
+  if ( !hierarchy && !library && !unlinked ) {
+    hierarchy = 1;
+    library = 1;
+    unlinked = 1;
+  }
+
+  loop_data.loop_name = "foreach_design_cell";
+  loop_data.interp = interp;
+  loop_data.var_obj = Tcl_NewStringObj (var, -1);
+  loop_data.body = body;
+  loop_data.result = TCL_OK;
+
+  Tcl_IncrRefCount (loop_data.var_obj);
+
+  nl_walk_cells (design, idesign, noassign, recursive, library, unlinked,
+		 hierarchy, ui_cmd_loop_body_walker, &loop_data);
+
+  Tcl_DecrRefCount (loop_data.var_obj);
+
+  return loop_data.result;
+}
+  
+  
+
+#(defcommand list_cells
+   ("Return a list of all the cells in the specified design."
+    "By default, all cells in the current design are listed.")
+   (-hierarchy boolean "list only hierarchy cells")
+   (-library   boolean "list only instances of library cells")
+   (-unlinked  boolean "list only unlinked cells")
+   (-recursive boolean "recursively list all cells in the hierarchy")
+   (-noassign  boolean "don't include assignment buffers")
+   (-from      idesign "start at this point in the hierarchy, requires -recursive")
+   &optional
+   (design current_design "list the cells for this design"))
+{
+  nl_idesign idesign;
+
+  if ( from == NULL ) {
+    if ( recursive ) {
+      idesign = nl_idesign_get_or_create (design, NULL);
+    }
+    else {
+      idesign = NULL;
+    }
+  }
+  else {
+    idesign = from;
+    design = nl_idesign_design (from);
+  }
+
+  if ( !hierarchy && !library && !unlinked ) {
+    hierarchy = 1;
+    library = 1;
+    unlinked = 1;
+  }
+
+  nl_walk_cells (design, idesign, noassign, recursive, library, unlinked,
+		 hierarchy, ui_cmd_append_result_walker, interp);
+
+  return TCL_OK;
+}
+
+
+#(defcommand foreach_design_net
+   "Loop over all the nets in the specified design."
+   (-hierarchy boolean "loop over all unique hierarchial nets")
+   (-recursive boolean "same as -hierarchy")
+   (-noassign  boolean "treat nets connected by assignment buffers as equivalent")
+   (-noconstant boolean "do not loop over constant nets")
+   (-noempty boolean "do not loop over nets that have no pins")
+   (-onlyconstant boolean "loop over only constant nets")
+   (var string "name of variable to which nets are bound")
+   (design design "loop over the nets in this design")
+   (body tcl_object "loop body"))
+{
+  int do_hierarchy = (hierarchy || recursive);
+  nl_idesign idesign;
+  struct ui_cmd_loop_data loop_data;
+
+  if ( do_hierarchy ) {
+    idesign = nl_idesign_get_or_create (design, NULL);
+  }
+  else {
+    idesign = NULL;
+  }
+
+  loop_data.loop_name = "foreach_design_net";
+  loop_data.interp = interp;
+  loop_data.var_obj = Tcl_NewStringObj (var, -1);
+  loop_data.body = body;
+  loop_data.result = TCL_OK;
+
+  Tcl_IncrRefCount (loop_data.var_obj);
+
+  nl_walk_nets (design, idesign, noassign, do_hierarchy, noconstant, noempty,
+		onlyconstant, ui_cmd_loop_body_walker, &loop_data);
+
+  Tcl_DecrRefCount (loop_data.var_obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_nets
+   "Return a list of all the nets in the specified design."
+   (-hierarchy boolean "list all unique hierarchial nets")
+   (-recursive boolean "same as -hierarchy")
+   (-noassign  boolean "treat nets connected by assignment buffers as equivalent")
+   (-noconstant boolean "do not include constant nets")
+   (-noempty boolean "do not include nets that have no pins")
+   (-onlyconstant boolean "list only constant nets")
+   &optional
+   (design current_design "list the nets for this design"))
+{
+  int do_hierarchy = (hierarchy || recursive);
+  nl_idesign idesign;
+
+  if ( do_hierarchy ) {
+    idesign = nl_idesign_get_or_create (design, NULL);
+  }
+  else {
+    idesign = NULL;
+  }
+
+  nl_walk_nets (design, idesign, noassign, do_hierarchy, noconstant, noempty,
+		onlyconstant, ui_cmd_append_result_walker, interp);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_references
+   "Return a list of all the references in the specified design."
+   &optional
+   (design current_design "list the references for this design"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  nl_design_for_all_references (design, reference) {
+    ui_cmd_append_object_list (interp, result, (nl_object) reference,
+			       design_path);
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand foreach_design_port
+   "Loop over all the ports in the specified design."
+   (-inputs boolean "loop over the input ports")
+   (-outputs boolean "list the output ports")
+   (-inouts boolean "list the inout ports")
+   (var string "name of variable to which to bind ports")
+   (design design "loop over the ports of this design")
+   (body tcl_object "loop body"))
+{
+  struct ui_cmd_loop_data loop_data;
+
+  if ( !inputs && !outputs && !inouts ) {
+    inputs = 1;
+    outputs = 1;
+    inouts = 1;
+  }
+
+  loop_data.loop_name = "foreach_design_cell";
+  loop_data.interp = interp;
+  loop_data.var_obj = Tcl_NewStringObj (var, -1);
+  loop_data.body = body;
+  loop_data.result = TCL_OK;
+
+  Tcl_IncrRefCount (loop_data.var_obj);
+
+  nl_design_for_all_ports (design, port) {
+    nl_direction direction = nl_port_direction (port);
+
+    if ( (inputs  && (direction == nl_direction_in)) ||
+	 (outputs && (direction == nl_direction_out)) ||
+	 (inouts  && ((direction == nl_direction_inout) ||
+		      (direction == nl_direction_unknown))) ) {
+      ui_cmd_loop_body_walker ((nl_object) port, &loop_data);
+    }
+  } nl_end_for;
+
+  Tcl_DecrRefCount (loop_data.var_obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_ports
+   "Return a list of all the ports in the specified design."
+   (-inputs boolean "list the input ports")
+   (-outputs boolean "list the output ports")
+   (-inouts boolean "list the inout ports")
+   &optional
+   (design current_design "list the ports for this design"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  if ( !inputs && !outputs && !inouts ) {
+    inputs = 1;
+    outputs = 1;
+    inouts = 1;
+  }
+
+  nl_design_for_all_ports (design, port) {
+    nl_direction direction = nl_port_direction (port);
+
+    if ( (inputs  && (direction == nl_direction_in)) ||
+	 (outputs && (direction == nl_direction_out)) ||
+	 (inouts  && ((direction == nl_direction_inout) ||
+		      (direction == nl_direction_unknown))) ) {
+      ui_cmd_append_object_list (interp, result, (nl_object) port, design_path);
+    }
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_types
+   "Return a list of all the types in the specified design."
+   &optional
+   (design current_design "list the types for this design"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  nl_design_for_all_types (design, type) {
+    ui_cmd_append_object_list (interp, result, (nl_object) type, design_path);
+  } nl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+static
+ui_find_mode
+ui_find_mode_encode (int exact, int regexp)
+{
+  if ( exact && regexp ) {
+    return ui_find_mode_regexp;
+  }
+  else if ( exact ) {
+    return ui_find_mode_exact;
+  }
+  else if ( regexp ) {
+    return ui_find_mode_subregexp;
+  }
+  else {
+    return ui_find_mode_glob;
+  }
+}
+
+
+struct ui_cmd_find_data {
+  Tcl_Interp *interp;
+  nl_context context;
+  ar path;
+  nl_kind kind;
+  nl_kind subkind;
+  ui_find_mode mode;
+  ar result;
+  ar paths;
+  int status;
+};
+
+
+static
+nl_walk_status
+ui_cmd_find_walker (nl_object object, void *ptr)
+{
+  struct ui_cmd_find_data *data = (struct ui_cmd_find_data *) ptr;
+  nl_design design = (nl_design) object;
+  int status = ui_find_object_path (data->interp, data->context, data->path,
+				    data->kind, data->subkind, design,
+				    data->mode, data->result, data->paths);
+
+  data->status = status;
+
+  if ( status == TCL_OK ) {
+    return nl_walk_status_continue;
+  }
+  else {
+    return nl_walk_status_stop;
+  }
+}
+
+
+static
+int
+ui_cmd_find_object_common (Tcl_Interp *interp, nl_context context, int exact,
+			   int regexp, int recursive, char *pattern,
+			   nl_design design, nl_kind kind, nl_kind subkind)
+{
+  char *str;
+  ar path = ui_tokenize_hierarchy_path (pattern, &str, ui_hierarchy_separator);
+  ui_find_mode mode = ui_find_mode_encode (exact, regexp);
+  ar result = ar_alloc (8, sizeof (nl_reference));
+  ar paths = NULL; /* ar_alloc (8, sizeof (ar)); */
+  struct ui_cmd_find_data data;
+  volatile int status;
+
+  data.interp = interp;
+  data.context = context;
+  data.path = path;
+  data.kind = kind;
+  data.subkind = subkind;
+  data.mode = mode;
+  data.result = result;
+  data.paths = paths;
+  data.status = TCL_OK;
+
+  error_unwind_protect {
+    if ( recursive ) {
+      nl_walk_hierarchy (design, 0, ui_cmd_find_walker, &data);
+    }
+    else {
+      ui_cmd_find_walker ((nl_object) design, &data);
+    }
+
+    status = data.status;
+
+    if ( status == TCL_OK ) {
+      ui_cmd_object_list_result (interp, result, paths);
+    }
+  }
+  error_on_exit {
+    FREE (str);
+    ar_free (path);
+
+    ar_free (result);
+
+    /*
+    ar_for_all (paths, ar, path) {
+      if ( path != NULL )
+	ar_free (path);
+    } ar_end_for;
+
+    ar_free (paths);
+    */
+  }
+  error_end;
+
+  return status;
+}  
+
+
+#(progn
+
+  (defmacro defcommand-find (name singular plural need-recursive need-current-design)
+    `(defcommand 
+       ,(intern (format "find_%s" name))
+       (,(format "Return the list of %s whose name matches the specified pattern." plural)
+	"By default the pattern is matched according to the rules of string_match,"
+	"which allows wildcards like '*', '?', and '[]'.")
+       (-exact boolean 
+	       ,(concat (format "the pattern is the name of the %s (i.e. no wildcards allowed), "
+				singular)
+			"with -regexp this option means the pattern must match the entire name"))
+       (-regexp boolean "the pattern is a TCL regular expression")
+       ,@(and need-recursive
+	      `((-recursive boolean ,(format "find the %s anywhere in the hierarchy" plural))))
+       (pattern string "pattern to match")
+       ,@(and need-current-design
+	      `(&optional 
+		(design current_design ,(format "design in which to find the %s" plural))))))
+
+  "")
+
+   
+#(defcommand-find designs "design" "designs" nil nil)
+{
+  int status = ui_cmd_find_object_common (interp, context, exact, regexp, 0,
+					  pattern, NULL, nl_kind_design, nl_kind_null);
+
+  return status;
+}  
+
+
+#(defcommand-find cells "cell" "cells" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_cell, nl_kind_null);
+  return status;
+}
+
+
+#(defcommand-find pins "pin" "pins" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_pin, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find nets "net" "nets" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_net, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find ports "port" "ports" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_port, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find net_buses "net bus" "net buses" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_bus, nl_kind_net);
+  return status;
+}  
+
+
+#(defcommand-find port_buses "port bus" "port buses" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_bus, nl_kind_port);
+  return status;
+}  
+
+
+#(defcommand-find cell_buses "cell bus" "cell buses" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_bus, nl_kind_cell);
+  return status;
+}  
+
+
+#(defcommand-find references "reference" "references" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_reference, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find refpins "refpin" "refpins" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_refpin, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find types "type" "types" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_type, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find attributes "attribute" "attributes" t t)
+{
+  int status
+    = ui_cmd_find_object_common (interp, context, exact, regexp, recursive,
+				 pattern, design, nl_kind_attr, nl_kind_null);
+  return status;
+}  
+
+
+#(defcommand-find libraries "library" "libraries" nil nil)
+{
+  int status = ui_cmd_find_object_common (interp, context, exact, regexp, 0,
+					  pattern, NULL, nl_kind_library,
+					  nl_kind_null);
+
+  return status;
+}
+
+
+#(defcommand-find libcells "libcell" "libcells" nil nil)
+{
+  int status = ui_cmd_find_object_common (interp, context, exact, regexp, 0,
+					  pattern, NULL, nl_kind_libcell,
+					  nl_kind_null);
+
+  return status;
+}
+
+
+#(defcommand-find libpins "libpin" "libpins" nil nil)
+{
+  int status = ui_cmd_find_object_common (interp, context, exact, regexp, 0,
+					  pattern, NULL, nl_kind_libpin,
+					  nl_kind_null);
+
+  return status;
+}
+
+
+struct ui_cmd_find_iobject_data {
+  Tcl_Interp *interp;
+  ar path;
+  nl_kind kind;
+  ui_find_mode mode;
+  ar result;
+  int status;
+};
+
+
+static
+nl_walk_status
+ui_cmd_find_iobject_walker (nl_object obj, void *ptr)
+{
+  nl_idesign idesign = (nl_idesign) obj;
+  struct ui_cmd_find_iobject_data *data
+    = (struct ui_cmd_find_iobject_data *) ptr;
+
+  int status = ui_find_iobject_path (data->interp, data->path, data->kind,
+				     idesign, data->mode, data->result);
+
+  data->status = status;
+
+  if ( status == TCL_OK ) {
+    return nl_walk_status_continue;
+  }
+  else {
+    return nl_walk_status_stop;
+  }
+}  
+
+
+static
+int
+ui_cmd_find_iobject_common (Tcl_Interp *interp, int exact, int regexp,
+			    int recursive, char *pattern, nl_idesign idesign,
+			    nl_kind kind)
+{
+  char *str;
+  ar path = ui_tokenize_hierarchy_path (pattern, &str, ui_hierarchy_separator);
+  ui_find_mode mode = ui_find_mode_encode (exact, regexp);
+  ar result = ar_alloc (8, sizeof (nl_port));
+  struct ui_cmd_find_iobject_data data;
+  volatile int status;
+
+  data.interp = interp;
+  data.path = path;
+  data.kind = kind;
+  data.mode = mode;
+  data.result = result;
+
+  error_unwind_protect {
+    if ( recursive ) {
+      nl_walk_idesigns (idesign, 0, ui_cmd_find_iobject_walker, &data);
+
+      status = data.status;
+    }
+    else {
+      status = ui_find_iobject_path (interp, path, kind, idesign, mode,
+				     result);
+    }
+  
+    if ( status == TCL_OK ) {
+      ui_cmd_object_list_result (interp, result, NULL);
+    }
+  }
+  error_on_exit {
+    ar_free (result);
+    FREE (str);
+    ar_free (path);
+  }
+  error_end;
+
+  return status;
+}  
+
+
+#(defcommand find_icells
+  ("Return the list of cells whose name matches the specified pattern."
+   "By default the pattern is matched according to the rules of string_match.")
+  (-exact boolean "the cell name should exactly match the pattern")
+  (-regexp boolean "the cell name should match the pattern")
+  (-recursive boolean "find the pattern anywhere in the hierarchy")
+  (pattern string "pattern to match")
+  &optional
+  (idesign current_idesign "design in which to find the cells"))
+{
+  int status = ui_cmd_find_iobject_common (interp, exact, regexp, recursive,
+					   pattern, idesign, nl_kind_icell);
+
+  return status;
+}  
+
+
+#(defcommand find_ipins
+  ("Return the list of pins whose name matches the specified pattern."
+   "By default the pattern is matched according to the rules of string_match.")
+  (-exact boolean "the pin name should exactly match the pattern")
+  (-regexp boolean "the pin name should match the pattern")
+  (-recursive boolean "find the pattern anywhere in the hierarchy")
+  (pattern string "pattern to match")
+  &optional
+  (idesign current_idesign "design in which to find the pins"))
+{
+  int status = ui_cmd_find_iobject_common (interp, exact, regexp, recursive,
+					   pattern, idesign, nl_kind_ipin);
+
+  return status;
+}  
+
+
+#(defcommand find_inets
+  ("Return the list of nets whose name matches the specified pattern."
+   "By default the pattern is matched according to the rules of string_match.")
+  (-exact boolean "the net name should exactly match the pattern")
+  (-regexp boolean "the net name should match the pattern")
+  (-recursive boolean "find the pattern anywhere in the hierarchy")
+  (pattern string "pattern to match")
+  &optional
+  (idesign current_idesign "design in which to find the nets"))
+{
+  int status = ui_cmd_find_iobject_common (interp, exact, regexp, recursive,
+					   pattern, idesign, nl_kind_inet);
+
+  return status;
+}  
+
+
+#(defcommand find_iports
+  ("Return the list of ports whose name matches the specified pattern."
+   "By default the pattern is matched according to the rules of string_match.")
+  (-exact boolean "the port name should exactly match the pattern")
+  (-regexp boolean "the port name should match the pattern")
+  (-recursive boolean "find the pattern anywhere in the hierarchy")
+  (pattern string "pattern to match")
+  &optional
+  (idesign current_idesign "design in which to find the ports"))
+{
+  int status = ui_cmd_find_iobject_common (interp, exact, regexp, recursive,
+					   pattern, idesign, nl_kind_iport);
+
+  return status;
+}
+
+
+void
+ui_cmd_register_find_commands (Tcl_Interp *interp, char *prefix, nl_context context)
+{
+#(register-all-commands)
+}

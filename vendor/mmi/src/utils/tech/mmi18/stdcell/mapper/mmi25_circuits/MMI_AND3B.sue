@@ -1,0 +1,47 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_AND3B {} {
+  make global -orient RY -name vdd -origin {0 -140}
+  make input -name in0 -origin {-100 0}
+  make global -orient RY -name vdd -origin {160 -140}
+  make input -name in1 -origin {-100 100}
+  make global -orient RY -name vdd -origin {320 -140}
+  make input -name in2 -origin {-100 200}
+  make global -name gnd -origin {0 240}
+  make output -name out -origin {570 -50}
+  make nmos -W 1.8 -origin {0 0}
+  make nmos -W 1.8 -origin {0 100}
+  make nmos -W 1.8 -origin {0 200}
+  make pmos -W 1.2 -origin {0 -100}
+  make pmos -W 1.2 -origin {160 -100}
+  make pmos -W 1.2 -origin {320 -100}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 2.4 -WN 1.2 -origin {480 -50}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {390 -50}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.7 -date 07/19/99 -origin {130 370}
+  make_wire 0 -60 0 -50
+  make_wire 0 -40 0 -50
+  make_wire -60 -100 -60 0
+  make_wire -100 0 -60 0
+  make_wire 160 -60 160 -50
+  make_wire -60 100 100 100
+  make_wire 0 40 0 60
+  make_wire 100 -100 100 100
+  make_wire -100 100 -60 100
+  make_wire 320 -60 320 -50
+  make_wire -60 200 260 200
+  make_wire 0 140 0 160
+  make_wire 260 -100 260 200
+  make_wire -100 200 -60 200
+  make_wire 530 -50 570 -50
+  make_wire 160 -50 0 -50
+  make_wire 160 -50 320 -50
+  make_wire 320 -50 390 -50
+  make_wire 390 -50 450 -50
+  make_text -origin {-160 -200} -text {3 Input AND }
+  make_text -origin {-160 -180} -text {B Size}
+  make_text -origin {-160 -220} -text MMI_AND3B -size large
+}
+

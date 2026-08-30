@@ -1,0 +1,13 @@
+technology mmi15
+power_node_name vdd 1.35
+gnd_node_name gnd
+logic_threshold  0.68
+rise_time 20-80 120PS
+SYNOPSYS_UNITS 1N 1P 1K
+TEMPERATURE 115
+PROCESS 1.0
+LIBRARY_CORNER TYP
+spice_program hspice /volume/mmi_proj/proj/tech/mmi15/library/pearl/pearl_hspice.script /volume/mmi_proj/proj/tech/mmi15/library/pearl/pearl_hspice.models
+units time 4.0ps 1e-12
+units capacitance 4.0fF 1e-15
+end_technology

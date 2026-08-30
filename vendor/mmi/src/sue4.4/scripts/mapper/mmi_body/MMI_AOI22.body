@@ -1,0 +1,62 @@
+  # MMI_AOI22 icon body
+  if {$DeMorgan} {
+    # ors
+    icon_line -88 -60 -40 -60
+    icon_line -88 0 -40 0
+    icon_arc -100 -140 10 0 -start 275 -extent 50
+    icon_arc -100 0 10 140 -start 35 -extent 50
+    icon_arc -98 -60 -78 0 -start 270 -extent 180
+    icon_line -88 0 -40 0
+    icon_line -88 60 -40 60
+    icon_arc -100 -80 10 60 -start 275 -extent 50
+    icon_arc -100 -60 10 80 -start 35 -extent 50
+    icon_arc -98 0 -78 60 -start 270 -extent 180
+    # and
+    icon_line 50 -30 0 -30 0 30 50 30
+    icon_arc 10 -30 80 30 -start 277 -extent 166
+    # bubbles
+    icon_arc -100 40 -80 60 -start 0 -extent 359
+    icon_arc -100 0 -80 20 -start 0 -extent 359
+    icon_arc -100 -20 -80 0 -start 0 -extent 359
+    icon_arc -100 -60 -80 -40 -start 0 -extent 359
+    icon_line 80 0 100 0
+    # properties
+    icon_property -origin {30 0} -size large -anchor center -label $size
+    icon_property -origin {-77 -52} -size small -label F
+    icon_property -origin {-77 8} -size small -label F
+    icon_property -origin {3 -22} -size small -label F
+  } else {
+    # or
+    icon_line -10 -30 40 -30
+    icon_line -10 30 40 30
+    icon_arc -20 -30 90 110 -start 35 -extent 50
+    icon_arc -20 -110 90 30 -start 275 -extent 50
+    icon_arc -20 -30 0 30 -start 270 -extent 180
+    # ands
+    icon_line -40 0 -80 0 -80 60 -40 60
+    icon_line -40 -60 -80 -60 -80 0 -40 0
+    icon_arc -80 0 -10 60 -start 277 -extent 166
+    icon_arc -80 -60 -10 0 -start 277 -extent 166
+    # stubs
+    icon_line -100 -50 -80 -50
+    icon_line -100 -10 -80 -10
+    icon_line -100 10 -80 10
+    icon_line -100 50 -80 50
+    icon_arc 80 -10 100 10 -start 0 -extent 359
+    # properties
+    icon_property -origin {-77 -52} -size small -label F
+    icon_property -origin {-77 8} -size small -label F
+    icon_property -origin {3 -22} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  }
+
+  # inputs
+  icon_term -type input -origin {-100 -50} -name in0
+  icon_term -type input -origin {-100 -10} -name in1
+  icon_term -type input -origin {-100 10} -name in2
+  icon_term -type input -origin {-100 50} -name in3
+
+  # outputs
+  icon_term -type output -origin {100 0} -name out
+
+

@@ -1,0 +1,89 @@
+#! /usr/local/bin/wish -f
+
+# This simple script tries to do the best type of merge it can on two
+# different versions of a SUE file.  It is meant to be called the same
+# way as rcsmerge.  It creates a new file called <filename>.golden with
+# renamed ICON_ and SCHEMATIC_ procs to contain SUFFIX.
+
+# written by Lee Tavrow, 3/96
+
+set SUFFIX ^
+
+
+# appends file2 onto file1 after renaming the functions in file2
+
+proc rename_procs {file suffix} {
+
+  # open the second file
+  if {[catch {set ID [open $file r]}] != 0} {
+    puts "Aborting suemerge, could not open file \"$file\""
+    return 0
+  }
+
+  # load in the files
+  set data [read $ID]
+
+  # close'm up
+  close $ID
+
+  # now open the file for writing to overwrite it.
+  if {[catch {set ID [open $file w]}] != 0} {
+    puts "Aborting suemerge, could not append to file \"$file1\""
+    return 0
+  }
+
+  # rename all procedures of type SCHEMATIC_<name> or ICON_<name>
+  regsub -all {proc (SCHEMATIC_|ICON_)[0-9a-zA-Z_]+} $data "&$suffix" data
+
+  puts $ID "\n\# Renamed procedures below\n"
+  puts $ID $data
+
+  close $ID
+
+  # success
+  return 1
+}
+
+# need to fix these to look for switches, etc.
+set count 0
+set golden ""
+foreach arg $argv {
+  if {[string range $arg 0 1] == "-r"} {
+    incr count
+  }
+  if {$count == 2 && $golden == ""} {
+    set golden $arg
+  }
+}
+
+# the rcs file path is the last argument
+set rcsfilepath [lindex $argv [expr $argc - 1]]
+
+# get the current filename out of the rcs file path
+set filename [file tail $rcsfilepath]
+regsub {,v$} $filename {} filename
+
+if {$filename == ""} {
+  puts "Aborting suemerge, could not find file"
+  exit 1
+}
+
+# make a new file name for the golden version
+set goldenfile "[file root $filename]$SUFFIX[file extension $filename]"
+
+# get the last golden version and put it into a temp file.
+catch {exec sh -c "exec co $golden -p $rcsfilepath > \"$goldenfile\""}
+
+# now duplicate/rename last golden file onto current file.
+set done [rename_procs $goldenfile $SUFFIX]
+
+if {$done == 1} {
+  if {$golden == ""} {
+    set golden "  <last>"
+  }
+  puts "suemerge copied \"$filename\" version [string range $golden 2 end] (cvs golden) with procs renamed to \"[file root $filename]$SUFFIX\" into \"$goldenfile\""
+} else {
+  puts "suemerge failed."
+}
+
+exit 1

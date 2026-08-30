@@ -1,0 +1,21 @@
+#!/bin/csh -f
+
+# Written by Lee Tavrow, 1997
+
+# Script for Pearl to run hspice on a remote host.
+# args: in_file out_file plt_file ctl_file
+
+set root = /volume/mmi_proj/proj/tech/mmi15
+
+# first translate the spice input file
+set filename = tmp$$
+$root/library/pearl/pearl_convert.tcl $1 >! $filename
+mv $1 $1.old
+mv $filename $1
+
+# now run spice
+spice $1
+echo done
+
+exit
+

@@ -1,0 +1,44 @@
+| units: 1.0  tech: sue  format: MIT
+A in0 input
+A in1 input
+A in2 input
+A in3 input
+A mm_out output
+| device pmos 470 400
+p in1 net_6 net_1 15 120
+| device nmos 420 550
+n in0 net_3 net_1 15 39
+| device nmos_1 420 670
+n in1 gnd net_3 15 39
+| device nmos_2 540 700
+n in2 gnd net_3 15 39
+| device pmos_1 470 280
+p in2 net_8 net_6 15 120
+| device pmos_2 470 200
+p in3 vdd net_8 15 120
+| device pmos_3 580 400
+p in0 net_6 net_1 15 120
+| device pmos_4 850 400
+p in2 net_2 net_1 15 120
+| device pmos_5 850 280
+p in1 net_7 net_2 15 120
+| device pmos_6 850 200
+p in0 vdd net_7 15 120
+| device pmos_7 960 400
+p in3 net_2 net_1 15 120
+| device nmos_3 780 550
+n in1 net_4 net_1 15 39
+| device nmos_4 780 670
+n in2 gnd net_4 15 39
+| device nmos_5 900 700
+n in3 gnd net_4 15 39
+| device nmos_6 1130 550
+n in3 net_5 net_1 15 39
+| device nmos_7 1130 670
+n in2 gnd net_5 15 39
+| device nmos_8 1250 700
+n in0 gnd net_5 15 39
+| device nmos_9 1430 540
+n net_1 gnd mm_out 15 39
+| device pmos_8 1430 380
+p net_1 vdd mm_out 15 77

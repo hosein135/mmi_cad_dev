@@ -1,0 +1,1423 @@
+/* TODO clense of fab specific info before mving to max distribution */
+/* TODO LEE = ask LEE about these. */
+
+/* -------------------------------------------------------------------
+ * g18.tech - 
+ *
+ * Process:	0.18 um CMOS process, 5 layer metal
+ * Grid: 	one-grid unit = .01 microns 
+ *
+ *  ------------------------------------------------------------------- 
+ */
+
+/* 
+ * Include m4 drc_macros.
+ *
+ * NOTE:  the drc macros expect to be run through m4 (after cpp).
+ * Thus to proerly compile this tech file, the Makefile
+ * must contain a line like this:
+ *	${CPP} -P -traditional g18.tech | ${M4} > g18.tech27
+ *
+ */
+#include "drc_macros.i"
+
+/* Multiple versions of the tech files are generated from this source file, by
+ * defining varables on the cpp command line, as follows:
+ *
+ * no define (default) (g18.tech):
+ *   Used to draw and view cells prior to automatic generation of 
+ *   nwell and pplus masks.  Nwell and pplus may be drawn explicitly, 
+ *   or deferred for automatic generation at cifout (gdsII generation) 
+ *   time.  
+ *
+ * -DPOSTGEN (g18-PG.tech):
+ *   No automatic generation of nwell, pplus.	
+ *   Useful for testing/debugging DRC rules on cif layers.
+ *   Also useful for viewing final gdsII prior to fab, and rechecking
+ *   drc (just a little Paranoid :-)
+ *
+ * -DNOA (g18-NOA.tech)
+ *   Does not check area rules.
+ */
+
+tech
+  g18
+end
+
+version
+#ifdef POSTGEN
+	version STRING_CAT(g18-PG,__TIME__,__DATE__) 
+	description "g18-PG - Post well Generation, for viewing final gdsII"
+#else
+	version STRING_CAT(g18,__TIME__,__DATE__)
+	description "g18 - 5 layer metal 0.18um CMOS process"
+#endif
+end
+
+/* NOTE:  poly on active plane so fet compose rules work. 
+ *	  fet types needed to be explicit for extractor.
+ */
+planes
+  ppls		/* pplus */
+  npls          /* nplus */
+  nw	        /* n-well */
+  act           /* active (and poly) */
+  v0     	/* contacts (active to m1) */
+  m1	        
+  v1	        /* via from m1 to m2 */
+  m2	        
+  v2	        /* via from m2 to m3 */
+  m3	        
+  v3	        /* via from m3 to m4 */
+  m4
+  v4	        /* via from m4 to m5 */
+  m5
+  fdrc           /* feedback foreign drc errors */
+  pw
+  pad
+/*  esd */
+/*  pada */
+  res
+  n2v	
+end
+
+types
+  ppls	pplus,ppls	        /* mostly auto gened at cif output time */
+  npls  nplus,npls	        /* mostly auto gened at cif output time */
+  nw	nwell,nw	        /* mostly auto gened at cif output time */
+
+  act	ndiffusion,ndif
+  act	pdiffusion,pdif
+  act	ntransistor,nfet
+  act	ptransistor,pfet
+  act	nsubstratencontact,nwc	        /* nwell tie */
+  act	psubstratepcontact,pwc	        /* substrate tie */ 
+  act	polysilicon,p1
+
+  v0	contact,v0	                /* poly/active to m1 contact */
+
+  m1	metal1,m1
+
+  v1	m2contact,v1
+
+  m2	metal2,m2
+
+  v2	m3contact,v2
+
+  m3	metal3,m3
+
+  v3	m4contact,v3
+
+  m4	metal4,m4
+
+  v4	m5contact,v4
+
+  m5	metal5,m5
+
+  fdrc	fdrc
+
+  pw    pwell,pw
+  pad   pad
+/*  esd   esd */
+/*  pada  pada */
+  res   resistor,res
+  n2v   n2v	
+end
+
+/* Not using Max contacts.  Using separate via planes instead,
+ * to allow unaligned and stacked contacts.
+ */
+contact
+end
+
+styles
+    /* wells */
+    n2v         22	
+    ppls	27
+    npls	28
+    nw		26
+
+    /* active */
+    ndif	3
+    pdif	5
+    nfet	7
+    nfet	8
+    pfet	9
+    pfet	10
+    nwc		4
+    pwc		6
+
+    /* poly */
+    p1	2
+    	
+    /* contacts (active to m1 ) */
+    v0	32	/* contact X */
+
+    /* vias */
+    v1	33
+    v1	32	 /* contact X */
+
+    v2	37
+    v2	32	 /* contact X */
+
+    v3	38
+    v3	32	 /* contact X */
+
+    v4	39
+    v4	32	 /* contact X */
+
+    /* metals */
+    m1	12
+    m2	13
+    m3	17
+    m4	16
+    m4  20 
+    m5  15
+    m5  21
+
+    /* drc errors */
+    error_p	42
+    error_s	42
+    error_ps	42
+
+    /* foreign drc error feedback */
+    fdrc 43
+
+    /* special layers - for viewing pads etc. from tsmc */
+    pwel 27
+    pad   3
+/*    esd   2 */
+/*    pada  3 */
+    res  27
+end
+
+compose
+    /* MOSFET composition rules */
+    compose	nfet	p1	ndif
+    compose	pfet	p1	pdif
+    
+#ifndef POSTGEN
+    /* These rules allow nwell to be painted over an area to
+     * flip all the pwell types to nwell types.  (used during cif read)
+     */
+    paint	ndif	nw	pdif
+    paint	nfet	nw	pfet
+    paint	pwc	nw	nwc
+
+#endif POSTGEN
+end
+
+/*---- Definitions of macros grouping types together in "layer lists" follow.
+ *     These are used throughout the rest of the tech file.
+ *     NOTE:  BE CAREFUL NOT TO INTRODUCE SPACES INTO LAYER-LISTS - a
+ *     space terminates a layer list.
+ */
+
+/* The types in the following lists connect, i.e. these defs
+ * are used to define "conductors".
+ */
+#define all_p1 p1,nfet,pfet
+#define all_ndif ndif,nwc
+#define all_pdif pdif,pwc
+
+/* Not all types in lists below connect to each other */
+#define all_dif all_ndif,all_pdif
+#define all_dif_litho all_ndif,all_pdif,nfet,pfet
+#define all_p1_no_fet p1
+#define all_active_plane all_dif_litho,all_p1_no_fet
+#define all_ndif_no_wc ndif
+#define all_pdif_no_wc pdif
+
+connect
+    all_dif		all_dif
+    all_p1		all_p1
+
+    v0		all_active_plane,m1			
+    v1		m1,m2
+    v2		m2,m3
+    v3		m3,m4
+    v4		m4,m5
+end
+
+cifoutput
+/* 
+ * CIF OUTPUT STYLE:  gen & nogen (POSTGEN)
+ *
+ * 1 max DB unit = .01 microns
+ * Dimensions with decimal point are in microns. 
+ * Dimensions with out decimal point are in internal (CIFPlane) units.
+ *
+ * Some templayers are only needed for drc checking.
+ *
+ * style gen:
+ * ==========
+ * Default cifoutput style in non POSTGEN version of tech file.
+ * For Max Layout and for generating GDSII from Max Layout.
+ * Nwell and pplus generated (anded with any explicit nwell and pplus)
+ *
+ * style nogen: 
+ * ============
+ * Default cifoutput style for POSTGEN version of this tech file.
+ * For examining preexisting gdsII (e.g. generated with style gen).
+ * Also useful for testing nwell/pplus drc rules.
+ * Nwell and pplus NOT generated (must be explicit)
+ *
+ */
+#ifdef POSTGEN
+style nogen
+#else
+style gen
+#endif 
+
+ /*  units DBRes CIFPlaneRes CIFRes GDSRes 
+  * (all resolutions specified in microns).
+  */
+  units .01 .001 .001 .001      	
+
+  charset unrestricted
+  iname propattr 102  /* output instance names as property attribute 102 */
+
+  /***** NWELL (NW) *****/
+  templayer NW_DIF pdif,pfet
+#ifdef POSTGEN
+  layer NW nw
+#else
+  layer NW nw
+#ifdef HIDE
+	/* TODO auto gen NW */ 	
+  templayer NWC_G nwc
+    grow .16    
+  layer NW NW_DIF
+    grow .60	  /* enclose pdif */
+    or NWC_G      /* enclose nwc */
+    or nw	  /* add in explicit nw */
+    grow .74	  /* Notch fill */
+    shrink .74
+#endif HIDE
+#endif 
+    calma 2 0
+
+  /***** CONTACT (V0) *****/
+
+  layer V0 v0
+#ifndef POSTGEN
+    /* squares <border> <size> <separation> [align] */
+    squares 0 .24 .32  
+#endif
+    calma 15 0
+
+  /* following contact related layers used in ppls/npls gen below and by drc */ 
+  templayer V0_NDIF V0
+	and nwc,ndif
+  templayer V0_PDIF V0
+	and pwc,pdif
+  templayer V0_NDIF_G V0_NDIF
+    grow .20                      /* npls enclosure of dif contacts */
+
+  /***** P+ (PPLS) ****/
+#ifdef POSTGEN
+  layer PPLS ppls
+#else
+  layer PPLS ppls
+#ifdef HIDE
+	  /* TODO auto gen PPLS */	
+  templayer PPLS_V0_G V0_PDIF  /* ppls enclosure of pwc contacts */
+    grow .16
+    or pwc
+    grow .04		 
+  templayer PPLS_NWC_G nwc     /* ppls space to nwc */
+    grow .14                      		
+  layer PPLS NW
+    or PPLS_V0_G       /* and in pwc's */	
+    and-not PPLS_NWC_G /* make holes for nwc's */
+    or ppls	       /* add in explicit ppls */ 	 
+    shrink .21	       /* remove undersized */
+    grow .43	       /* and Notch fill */
+    shrink .22
+#endif HIDE
+#endif
+    calma 7 0
+
+  /***** N+ (NPLS) ****/
+#ifdef POSTGEN
+  layer NPLS npls
+#else
+  layer NPLS npls
+#ifdef HIDE
+	/* TODO auto gen NPLS */ 
+  templayer NPLS_V0_G V0_NDIF  /* npls enclosure of nwc contacts */
+    grow .16
+    or nwc
+    grow .04	 
+  templayer NPLS_PWC_G pwc     /* npls space to pwc */
+    grow .14  
+  templayer NPLS_PPLS_G PPLS   /* enforce gap to ppls */
+    grow .10	
+  templayer NPLS_POLY_G p1
+	grow .10               /* bring up to npls min width. */
+  layer NPLS ndif,nfet
+    grow .60	
+    or NPLS_POLY_G
+    grow .74
+    shrink .74	         /* notch fill */
+    and-not NPLS_PPLS_G  /* gap to ppls */
+    or NPLS_V0_G         /* and in pwc's */	
+    and-not NPLS_PWC_G   /* make holes for nwc's */
+    and-not PPLS	
+    or npls	         /* add in explict npls */  	
+    grow .22	         /* Notch fill */
+    shrink .22
+#endif HIDE
+#endif
+    calma 8 0
+
+/*
+  layer 2VN NPLS
+    calma 1 0
+*/
+
+  /***** DIFFUSION (ACT) *****/
+  layer PDIF pdif,pfet,pwc
+     calma 11 0
+
+  layer NDIF ndif,nfet,nwc
+     calma 12 0
+
+  /***** POLYSILICON (P1) *****/
+  layer P1 all_p1
+    calma 13 0
+
+  /***** METAL SYSTEM *****/
+  layer M1 m1
+    calma 16 0
+
+  layer V1 v1
+#ifndef POSTGEN
+    /* squares <border> <size> <separation> [align] */
+    /* all dims divisible by .02 so result of centering will be on .01 grid */
+    squares 0 .28 .28 
+#endif
+    calma 17 0
+
+  layer M2 m2
+    calma 18 0
+
+  layer V2 v2
+#ifndef POSTGEN
+    /* squares <border> <size> <separation> [align] */
+    squares 0 .28 .28
+#endif
+    calma 27 0
+
+  layer M3 m3
+    calma 28 0
+
+  layer V3 v3
+#ifndef POSTGEN
+    /* squares <border> <size> <separation> [align] */
+    squares 0 .28 .28
+#endif
+    calma 29 0
+
+  layer M4 m4
+    calma 31 0
+
+  layer V4 v4
+#ifndef POSTGEN
+    /* squares <border> <size> <separation> [align] */
+    squares 0 .28 .56
+#endif
+    calma 32 0
+
+  layer M5 m5
+    calma 33 0
+
+  layer PAD pad
+    calma 62 0
+
+   layer M1TXT
+	labels m1
+	calma 40 0	
+
+   layer M2TXT
+	labels m2
+	calma 41 0	
+
+   layer M3TXT
+	labels m3
+	calma 42 0	
+
+   layer M4TXT
+	labels m4
+	calma 43 0	
+
+   layer M5TXT
+	labels m5
+	calma 44 0	
+
+  /***** LAYERS STRICTLY FOR DRC *****/
+
+  /* nw */
+  templayer DRC_NWC nwc
+
+  /* dif */
+  templayer DRC_ALL_PDIF all_pdif
+  templayer DRC_ALL_PDIF_NO_WC all_pdif_no_wc
+  templayer DRC_PWC pwc
+  templayer DRC_ALL_NDIF all_ndif
+  templayer DRC_ALL_NDIF_NO_WC all_ndif_no_wc
+  templayer DRC_NWC nwc
+  templayer DRC_ALL_DIF all_dif
+
+  /* poly */	
+  templayer DRC_PPOLY p1
+     and PPLS
+  templayer DRC_NPOLY p1
+     and NPLS
+
+  /* fet */	
+  templayer DRC_NFET nfet
+  templayer DRC_PFET pfet
+
+  /* n+/p+ */
+  templayer DRC_ALL_PLUS_GS PPLS,NPLS
+	  grow .05
+	  shrink .05
+
+  /* contacts */
+
+  templayer DRC_V0_P1 V0
+    and p1
+  templayer DRC_V0_ORPHAN V0
+    and-not V0_NDIF
+    and-not V0_PDIF
+    and-not DRC_V0_P1
+
+#ifndef POSTGEN
+/* CIF OUTPUT STYLE:  direct 
+ *
+ * Direct map of Max layers: no layer ops.
+ * Bounding boxes output (as boundary strucs (polygons)) 
+ * Instance names of cells output (as text (labels))
+ * Output character set is not restricted 
+ *          (e.g., "." not translated to "X")
+ */
+style direct
+
+ /*  units DBRes CIFPlaneRes CIFRes GDSRes 
+  * (all resolutions specified in microns).
+  */
+  units .01 .01 .01 .001      	
+
+  charset unrestricted		/* allow "." etc in output names */
+  bbox 	62 0			/* output bounding boxes */
+  iname 63 0			/* add text labels giving instance names */
+
+  /***** NWELL (NW) *****/
+  layer NW nwel
+    labels nwel
+    calma 2 0
+
+  /***** PPLS *****/
+  layer PPLS ppls
+     labels ppls	
+     calma 3 0
+
+  /***** NPLS *****/
+  layer NPLS npls
+     labels npls	
+     calma 6 0
+
+  /***** DIFUSION (ACT) *****/
+  layer NDIF ndif
+    labels ndif
+    calma 1 0
+  layer PDIF pdif
+    labels pdif
+    calma 2 1
+  layer NFET nfet
+    labels nfet
+    calma 3 1
+  layer PFET pfet
+    labels pfet
+    calma 4 1
+  layer NWC nwc
+    labels nwc
+    calma 5 1
+  layer PWC pwc
+    labels pwc
+    calma 6 1
+
+  /***** POLY *****/
+  layer P1 p1
+    labels p1
+    calma 5 0
+
+  /***** CONTACT (V0) *****/
+  layer V0 v0
+    calma 7 0
+
+  /***** METAL SYSTEM *****/
+  layer M1 m1
+    labels m1
+    calma 8 0
+  layer V1 v1
+    calma 9 0
+  layer M2 m2
+    labels m2
+    calma 11 0
+  layer V2 v2
+    calma 12 0
+  layer M3 m3
+    labels m3
+    calma 14 0
+  layer V3 v3
+    calma 15 0
+  layer M4 m4
+    labels m4
+    calma 17 0
+#endif ! defined POSTGEN
+end
+
+/* -------------------------------------------------------------------- *
+ * In the CIFinput section, the order of layer specifications is        *
+ * important.  The layers are painted in the order they appear.         *
+ * ---------------------------------------------------------------------*/
+cifinput
+/* 
+ * CIF INPUT STYLE:  direct
+ *
+ * gdsII input
+ * 1 max DB unit = .02 microns
+ *
+ * NOTE:  "labels" statements define direct mapping from gds layers to max
+ *        layers not just for labels but also for polygons (used for 
+ *        (non-manhattan geometries).  
+ * 
+ */
+
+style direct
+  scalefactor 1
+
+  iname 63 0 		/* instance names here (CALMA only) */
+  ignore BBOX		/* bounding box here */	    
+
+  /***** NWELL (NW) *****/
+  layer nw NW
+    labels NW
+
+  /***** PPLS *****/
+  layer ppls PPLS
+     labels PPLS	
+
+  /***** NPLS *****/
+  layer npls NPLS
+     labels NPLS	
+
+  /***** DIFUSION (ACT) *****/
+  layer ndif NDIF
+    labels NDIF
+
+  layer pdif PDIF
+    labels PDIF
+
+  layer nfet NFET
+    labels NFET
+
+  layer pfet PFET
+    labels PFET
+
+  layer nwc NWC
+    labels NWC
+
+  layer pwc PWC
+    labels PWC
+
+  /***** POLY *****/
+  layer p1 P1
+    labels P1
+
+  /***** CONTACT (V0) *****/
+  layer v0 V0
+
+  /***** METAL SYSTEM *****/
+  layer m1 M1
+    labels M1
+
+  layer v1 V1
+
+  layer m2 M2
+    labels M2
+
+  layer v2 V2
+
+  layer m3 M3
+    labels M3
+
+  layer v3 V3
+
+  layer m4 M4
+    labels M4
+
+  /* define correspondence between cif names and calma numbers */
+/*  calma FDRC	 0      *  */
+
+  calma	NDIF	 1	0
+  calma	PDIF	 2	1
+  calma	NFET	 3	1
+  calma	PFET	 4	1
+  calma	NWC	 5	1
+  calma	PWC	 6	1
+
+/*   calma	ACT	 1	0  */
+  calma	NW	 2	0
+  calma P1	 5	0	
+  calma PPLS     3	0
+  calma NPLS     6	0
+  calma V0       7	*
+  calma M1       8	*
+  calma V1       9	*
+  calma M2      11	*
+  calma V2      12	*
+  calma M3      14	*
+  calma V3      15	*
+  calma M4      17	*
+  calma BBOX    62      * /* instance bounding boxes */
+
+/* 
+ * CIF INPUT STYLE:  import_tsmc
+ *
+ *
+ * 1 max unit = .01 microns
+ *
+ * For importing layout from tsmc.
+ *
+ */
+style import_tsmc
+  scalefactor 1
+
+  iname propattr 102     /* instance names given on property attribute 102 
+	                 * (in gds SREF's)
+	                 */
+/*
+  ignore L90 	
+  ignore L91 	
+  ignore L92 	
+  ignore L93 	
+  ignore L94 	
+  ignore L95 	
+  ignore L96 	
+  ignore L97 	
+  ignore L98 	
+  ignore L99 	
+*/
+
+  layer n2v N2V
+
+  layer ppls PPLS
+    labels PPLS
+
+  layer npls NPLS
+    labels NPLS
+
+  layer nw NW  
+    labels NW
+
+  layer p1 P1
+    labels P1
+
+  layer ndif NDIF
+    and-not NW	
+    labels NDIF
+
+  layer pdif PDIF
+    and NW	
+    labels PDIF
+
+  layer nfet ndif
+    and p1
+
+  layer pfet pdif
+    and p1
+
+  layer nwc NDIF
+    and NW
+
+  layer pwc PDIF
+    and-not NW
+
+  layer v0 V0
+    labels V0
+
+  layer m1 M1
+    labels M1,M1TXT
+
+  layer v1 V1
+    labels V1
+
+  layer m2 M2
+    labels M2,M2TXT
+
+  layer v2 V2
+    labels V2
+
+  layer m3 M3
+    labels M3,M3TXT
+
+  layer v3 V3
+     labels V3
+
+  layer m4 M4
+    labels M4,M4TXT
+
+  layer v4 V4
+     labels V4
+
+  layer m5 M5
+    labels M5,M5TXT
+
+  layer fdrc FDRC
+    labels FDRC	
+
+  layer fdrc FDRC2
+    labels FDRC2
+
+  layer pad PAD
+    labels PAD 	
+
+  /* define correspondence between cif names and calma numbers */
+
+/* 
+LAYER NWELi     2       // N-Well
+LAYER OD2i      4       // active area (thick Oxide)
+LAYER N3Vi      5       // 3.3V-NLDD implant (3VN)
+LAYER PPi       7       // P+ implant (PP)
+LAYER NPi       8       // N+ implant (NP)
+LAYER PDIFi     11      // active (P)
+LAYER NDIFi     12      // active (N)
+LAYER POLYi     13      // poly
+LAYER COi       15      // contact
+LAYER M1i       16      // metal-1
+LAYER VIA1i     17      // VIA1 ( M1/VIA1/M2 )
+LAYER M2i       18      // metal-2
+LAYER CBi       19      // Passivation Window
+LAYER VIA2i     27      // VIA2 ( M2/VIA2/M3 )
+LAYER M3i       28      // metal-3
+LAYER VIA3i     29      // VIA3 ( M3/VIA3/M4 )
+LAYER ESDi      30      // ESD implant
+LAYER M4i       31      // metal-4
+LAYER VIA4i     32      // VIA4 ( M4/VIA4/M5 )
+LAYER M5i       33      // metal-5
+LAYER RPOi      34      // Resist Protection Oxide
+LAYER M1TXT     40      // metal-1 text
+LAYER M2TXT     41      // metal-2 text
+LAYER M3TXT     42      // metal-3 text
+LAYER M4TXT     43      // metal-4 text
+LAYER M5TXT     44      // metal-5 text
+LAYER ESDHi     46      // High-Volt ESD implant
+LAYER HTWLi     51      // hot N-Well
+LAYER SDI       58      // I/O ESD area
+LAYER RWDUMMY   52      // RWDUMMY NWELL resistor
+LAYER RODUMMY   53      // DUMMY resistor
+LAYER RPDUMMY   54      // RPDUMMY poly resistor
+LAYER EXCL      55      // exclude
+LAYER N2Vi      61      // 2.5V-NLDD implant (2VN)
+LAYER M1BLOCK   101     // m1 route blockage
+LAYER M2BLOCK   102     // m2 route blockage
+LAYER M3BLOCK   103     // m3 route blockage
+LAYER M4BLOCK   104     // m4 route blockage
+LAYER M5BLOCK   105     // m5 route blockage
+LAYER ram_diode 115     // antenna diode
+LAYER sram_cov  116     // sram cover for DRC
+*/
+  calma N2V      1      *
+  calma	NW	 2	*
+  calma PPLS     7	*
+  calma	NPLS	 8	*
+  calma PDIF     11	*
+  calma	NDIF	 12	*
+
+  calma P1	 13	*	
+
+  calma V0       15	*
+  calma M1       16	*
+  calma V1       17	*
+  calma M2       18	*
+  calma V2       27	*
+  calma M3       28	*
+  calma V3       29	*
+  calma M4       31	*
+  calma V4       32	*
+  calma M5       33	*
+
+  calma M1TXT    40   	*
+  calma M2TXT    41   	*
+  calma M3TXT    42   	*
+  calma M4TXT    43   	*
+  calma M5TXT    44   	*
+
+/*
+  calma L90      90     *	
+  calma L91      91     *	
+  calma L92      92     *	
+  calma L93      93     *	
+  calma L94      94     *	
+  calma L95      95     *	
+  calma L96      96     *	
+  calma L97      97     *	
+  calma L98      98     *	
+  calma L99      99     *	
+*/
+
+/*
+  calma FDRC	 55     *
+  calma FDRC2	 56     *
+*/
+
+  calma PAD    62      * 
+
+/* 
+ * CIF INPUT STYLE:  import_ibm
+ *
+ * 1 max unit = .02 microns
+ *
+ * for importing layout from ibm
+ * uses ibm gdsII layer numbers
+ *
+ */
+style import_ibm
+  scalefactor 1
+
+  iname 63 0 		/* instance names here (CALMA only) */
+  ignore BBOX		/* bounding box here */	    
+
+  /* nwell deferred, because it is used to flip ndif to pdif  */
+
+  layer ppls PPLS
+    labels PPLS
+
+  ignore NPLS
+
+/*
+  layer npls NPLS
+    and-not PPLUS
+*/
+
+  layer nwel NW  
+    labels NW
+
+  layer p1 P1
+    labels P1
+
+  layer pdif ACT
+    labels ACT
+    and PPLS
+    and NW
+
+  layer ndif ACT
+    labels ACT
+    and-not PPLS
+    and-not NW
+
+  layer nfet ndif
+    and p1
+
+  layer pfet pdif
+    and p1
+
+  layer nwc ACT
+    labels ACT
+    and-not PPLS
+    and NW
+
+  layer pwc ACT
+    labels ACT
+    and PPLS
+    and-not NW
+
+  layer v0 V0
+    labels CT
+
+  layer m1 M1
+    labels M1
+
+  layer v1 V1
+    labels V1
+
+  layer m2 M2
+    labels M2
+
+  layer v2 V2
+    labels V2
+
+  layer m3 M3
+    labels M3
+
+  layer v3 V3
+     labels V3
+
+  layer m4 M4
+    labels M4
+
+  layer pad PAD
+    labels PAD
+
+  layer fdrc FDRC
+    labels FDRC	
+
+  layer fdrc FDRC2
+    labels FDRC2
+
+  /* define correspondence between cif names and calma numbers */
+  calma FDRC	 55     *
+  calma FDRC2	 56     *
+  calma	ACT	 2	*
+  calma	NW	 4	*
+  calma P1	 7	*	
+
+  calma PPLS    10	*
+/* NOTE: ignored */
+  calma NPLS     8	*
+
+  calma V0      14	*
+  calma M1      15	*
+  calma V1      16	*
+  calma M2      17	*
+  calma V2      18	*
+  calma M3      19	*
+  calma V3      20	*
+  calma M4      25	*
+  calma PAD     28	*
+  calma BBOX    62      * /* instance bounding boxes */
+end
+
+drc
+/* Dimensions in drc section with decimal-point are in microns.
+ * Dimensions without decimal-point are in internal units (DB or CIFPlane).
+ * Use of the decimal point form (microns) is HIGHLY RECOMMENDED 
+ * for all dimensions other than 0 or 1 (minimum step).
+ */
+
+/* cif output style defining layers for "cif" checks */
+#ifdef POSTGEN 
+cifstyle nogen
+#else
+cifstyle gen
+#endif
+
+/* === NO KISSING RULES === */
+
+  /* Don't permit directly adjacent poly and DIF (unless fet formed) 
+   * (No poly DIF "kissing" may be assumed in formulation of other
+   * rules below.)
+   *
+   */
+  edge4way p1 ~(p1,pfet,nfet)/act 1 ~(all_dif_litho)/act ~(nfet,pfet)/act 1 \
+    "Non-intersecting poly and DIF may not touch"
+
+/* === FET FORM RULES === */
+
+  /*
+   * Before checking various dimensional constraints - just make
+   * sure FETS are simple poly/DIF crossings.
+   */
+  RECTANGULAR((nfet,pfet),act,
+    "FETs must be rectangular")
+  edge4way (nfet,pfet)/act ~(nfet,pfet,ndif,pdif,p1)/act 1 0 0 1 \
+    "Missing FET overlap"
+  edge4way poly (nfet,pfet)/act 1 (ndif,pdif,nfet,pfet)/act \
+    (all_active_plane,space)/act 1 \
+    "FETs must be formed by crossing poly and dif"
+  edge4way ndif,pdif (nfet,pfet)/act 1 (p1,nfet,pfet)/act \
+    (all_active_plane,space)/act 1 \
+    "FETs must be formed by crossing poly and dif"
+
+/* === NWELL RULES === */
+/* Nwell can be explicit and/or gened at cifout time.
+ * drc checks on cif layers are used extensively below to check NW (nwell) 
+ * rules for the layer that will be generated at cifout time. 
+ */
+
+  cifwidth NW 1.20 \
+    "N-well min width = 1.00 um"
+
+  cifspacing NW NW 1.0 touching_ok \
+    "nwell min spacing = 1.00 um"
+
+
+/* === DIFUSION (THIN OXIDE) RULES === */
+
+  width all_dif_litho .26 \
+    "Diffusion min width = .26 um"
+
+  spacing all_dif_litho all_dif_litho .28 touching_ok \
+    "Diffusion minimum spacing = .28 um"
+
+  CIF_ENCLOSE(DRC_NWC,NW,.26,
+    "NW minimum enclosure of nwc = 0.26 um")
+  
+  cifspacing DRC_ALL_NDIF_NO_WC NW .46 touching_illegal \
+    "NW to n-diffusion minimum spacing = .46 um" 
+
+  CIF_ENCLOSE(NW_DIF,NW,.46,
+    "NW minimum enclosure of p-diffusion = 0.46 um")
+
+  cifspacing DRC_PWC NW .26 touching_illegal \
+    "NW to pwc minimum spacing = 0.26 um"
+
+  spacing all_ndif all_pdif .30 touching_illegal \
+    "NDIF/PDIF min spacing = .30 um"
+
+/* TODO LEE  npoly/pdif and ppoly/ndif spacing ?
+  cifspacing DRC_NPOLY DRC_ALL_PDIF .33 touching_illegal \
+    "npoly to pdif min spacing = .33 um"
+
+  cifspacing DRC_PPOLY DRC_ALL_NDIF .33 touching_illegal \
+    "ppoly to ndif min spacing = .33 um"
+*/
+
+  /* TODO:  currently not allowing butted diffusion regions of opposite polarity */
+
+/* === POLYSILICON RULES === */
+
+  width all_p1 .18 \
+    "poly min width = .18 um"
+
+  spacing all_p1 all_p1 .28 touching_ok \
+    "poly min spacing = .28 um"
+
+  edge4way (all_p1_no_fet)/act space/act .12 ~(all_dif_litho)/act \
+    space/act .12 \
+    "poly to dif min spacing (when not intersecting) = .12 um"
+
+  edge4way (nfet,pfet)/act (ndif,pdif)/act .30 (all_dif_litho)/act 0 0 \
+    "dif min extension in fet = .30 um"
+
+  edge4way (nfet,pfet)/act p1/act .22 (all_p1_no_fet)/act 0 0 \
+    "poly min extension in fet = .22 um"
+
+/* TODO LEE npoly/ppoly gap? */
+  CIF_COVER(P1,DRC_ALL_PLUS_GS,	
+    "poly must be covered by  npls or ppls (except for .1 um gap)")
+
+  cifspacing DRC_PPOLY DRC_NPOLY .10 touching_illegal \
+    "min spacing between NPLS poly (NPOLY) and PPLS poly (PPOLY) = .1 um"
+
+/* TODO 2VN ? */
+
+/* === PPLUS RULES === */
+
+  cifwidth PPLS .44 \
+    "p+ min width = .44 um"
+
+  cifspacing PPLS PPLS .44 touching_ok \
+    "p+ min spacing = .44 um)"
+  
+  cifspacing PPLS DRC_ALL_NDIF_NO_WC .26 touching_illegal \
+    "p+/ndif min spacing = .26 um"
+
+  cifspacing PPLS DRC_NWC .10 touching_illegal \
+    "p+/nwc min spacing = .10 um"
+
+/* TODO LEE?  p+/nfet from page 7 PP.C3 */
+  cifspacing PPLS DRC_NFET .32 touching_illegal \
+    "p+ to nfet min spacing = .32 um"
+  
+/* TODO LEE?  p+/pfet from page 7 PP.C4 */
+  CIF_ENCLOSE(DRC_PFET,PPLS,.32,
+    "p+ min enclosure of pfet = .32 um")
+
+  CIF_ENCLOSE(DRC_ALL_PDIF_NO_WC,PPLS,.32,
+    "p+ min enclosure of pdif = .32 um")
+
+  CIF_ENCLOSE(DRC_PWC,PPLS,.08,
+    "p+ min enclosure of pwc = .08 um")
+
+/* === NPLUS RULES === */
+
+  cifwidth NPLS .44 \
+    "n+ min width = .44 um"
+
+  cifspacing NPLS NPLS .44 touching_ok \
+    "n+ min spacing = .44 um)"
+
+  cifspacing NPLS DRC_ALL_PDIF_NO_WC .26 touching_illegal \
+    "n+/pdif min spacing = .26 um"
+
+  cifspacing NPLS DRC_PWC .10 touching_illegal \
+    "n+/pwc min spacing = .10 um"
+
+/* TODO LEE?  n+/pfet from page 7 NP.C3 */
+  cifspacing NPLS DRC_PFET .32 touching_illegal \
+    "n+ to pfet min spacing = .32 um"
+  
+/* TODO LEE?  n+/nfet from page 7 PP.C4 */
+  CIF_ENCLOSE(DRC_NFET,NPLS,.32,
+    "n+ min enclosure of nfet = .32 um")
+
+  CIF_ENCLOSE(DRC_ALL_NDIF_NO_WC,NPLS,.32,
+    "n+ min enclosure of ndif = .32 um")
+
+  CIF_ENCLOSE(DRC_NWC,NPLS,.08,
+    "n+ min enclosure of nwc = .08 um")
+
+/* TODO check that p+ and n+ are disjoint? */	
+
+/* === CONTACT RULES === */
+  /* V0 generated from v0 by grow and square ops */
+
+  width v0 .24 \
+    "v0 min width = .24 um"
+
+  spacing v0 v0 .32 touching_ok \
+    "v0 minimum spacing = .32 um"
+
+  cifspacing V0 V0 .32 touching_ok \
+    "V0 minimum spacing = .32 um"
+
+  cifspacing V0_NDIF DRC_NFET .16 touching_illegal \
+    "V0 on dif / fet minimum spacing = .16 um"
+  cifspacing V0_PDIF DRC_PFET .16 touching_illegal \
+    "V0 on dif / fet minimum spacing = .16 um"
+
+  cifspacing DRC_V0_P1 DRC_ALL_DIF .18 touching_illegal \
+    "V0 on poly / diffusion minimum spacing = .18 um"
+
+  CIF_ENCLOSE(V0_NDIF,DRC_ALL_DIF,.10,
+    "dif min enclosure of V0 on dif = .10 um")
+
+  CIF_ENCLOSE(V0_PDIF,DRC_ALL_DIF,.10,
+    "dif min enclosure of V0 on dif = .10 um")
+
+  CIF_ENCLOSE(DRC_V0_P1,P1,.10,
+    "poly min enclosure of V0 on poly = .10 um")
+
+  CIF_ILLEGAL(DRC_V0_ORPHAN, 
+    "V0 must be over dif or (non-gate) poly")
+
+/* No abbuted contacts allowed */	
+
+/* === METAL1 RULES === */
+
+  width m1 .28 \
+    "Metal1 min width = .28 um"
+
+  spacing m1 m1 .28 touching_ok \
+    "Metal1 min spacing = .28 um"
+
+/*  cifarea LEE .1536 .48 "Metal1 min enclosure of contact (test)." */
+
+  ENCLOSE(v0,v0,m1,m1,.08,
+    "m1 min enclosure of v0 = .08 um")
+
+#ifndef NOA
+  /* area types minarea minedge why */
+  area m1 .2025 .28 "Metal1 min area = .2025 um2."
+#endif NOA
+
+
+  /* === VIA1 RULES (M1 TO M2) === */
+
+/*** 
+  CIF_NO_OVERLAP(V1,DRC_NFET,
+    "V1 not allowed over gate")
+  CIF_NO_OVERLAP(V1,DRC_PFET,
+    "V1 not allowed over gate")
+***/
+
+  width v1 .28 \
+    "v1 min width = .28 um"
+
+  spacing v1 v1 .28 touching_ok \
+    "v1 minimum spacing = .28 um"
+
+  cifspacing V1 V1 .28 touching_ok \
+    "V1 minimum spacing = .28 um"
+
+  ENCLOSE(v1,v1,m1,m1,.08,
+    "m1 min enclosure of v1 = .08 um")
+
+/* === METAL2 RULES === */
+
+  width m2 .28 \
+    "M2 min width = .28 um" 
+
+  spacing m2 m2 .28 touching_ok \
+    "M2 min spacing = .28 um"
+
+  ENCLOSE(v1,v1,m2,m2,.08,
+    "m2 min enclosure of v1 = .08 um")
+
+#ifndef NOA
+  /* area types minarea minedge why */
+ area m2 .2025 .28  "Metal2 min area = .2025 um2."
+#endif NOA
+
+/* === VIA2 RULES (M2 TO M3) == */
+
+  width v2 .28 \
+    "v2 min width = .28 um"
+
+  spacing v2 v2 .28 touching_ok \
+    "v2 minimum spacing = .28 um"
+
+  cifspacing V2 V2 .28 touching_ok \
+    "V2 minimum spacing = .28 um"
+
+  ENCLOSE(v2,v2,m2,m2,.08,
+    "m2 min enclosure of v2 = .08 um")
+
+/* === METAL3 RULES === */
+
+  width m3 .28 \
+    "m3 min width = .28 um"
+
+  spacing m3 m3 .28 touching_ok \
+    "m3 min spacing = .28 um"
+
+  ENCLOSE(v2,v2,m3,m3,.08,
+    "m3 min enclosure of v2 = .08 um")
+
+#ifndef NOA
+  /* area types minarea minedge why */
+  area m3 .2025 .28  "m3 min area = .2025 um2."
+#endif NOA
+
+/* === VIA3 RULES (M3 TO M4) === */
+
+  width v3 .28 \
+    "v3 min width = .28 um"
+
+  spacing v3 v3 .28 touching_ok \
+    "v3 minimum spacing = .28 um"
+
+  cifspacing V3 V3 .28 touching_ok \
+    "V3 minimum spacing = .28 um"
+
+  ENCLOSE(v3,v3,m3,m3,.08,
+    "m3 min enclosure of v3 = .08 um")
+
+/* === METAL4 RULES === */
+
+  width m4 .28 \
+    "m4 min width = .28 um"
+
+  spacing m4 m4 .28 touching_ok \
+    "m4 min spacing = .28 um"
+
+  ENCLOSE(v3,v3,m4,m4,.08,
+    "m4 min enclosure of v3 = .08 um")
+
+#ifndef NOA
+  /* area types minarea minedge why */
+  area m4 .2025 .28  "Metal4 min area = .2025 um2."
+#endif NOA
+
+
+/* === VIA4 RULES (M4 TO M5) === */
+
+  width v4 .28 \
+    "v4 min width = .28 um"
+
+  spacing v4 v4 .56 touching_ok \
+    "v4 minimum spacing = .56 um"
+
+  cifspacing V4 V4 .56 touching_ok \
+    "V4 minimum spacing = .56 um"
+
+  ENCLOSE(v4,v4,m4,m4,.08,
+    "m4 min enclosure of v4 = .08 um")
+
+/* === METAL5 RULES === */
+
+  width m5 .56 \
+    "m5 min width = .56 um"
+
+  spacing m5 m5 .56 touching_ok \
+    "m5 min spacing = .56 um"
+
+  ENCLOSE(v4,v4,m5,m5,.12,
+    "m5 min enclosure of v4 = .12 um")
+
+#ifndef NOA
+  /* area types minarea minedge why */
+  area m5 .4624 .56  "Metal5 min area = .4624 um2."
+#endif NOA
+
+
+/* === HIERARCHY RULES === /
+
+/* For extraction: 
+ *   don't allow fets to be created/destroyed by cell overlap.  
+ */
+no_overlap	pfet,nfet	pfet,nfet 
+
+/* For via generation at cifoutput time:
+ *   don't allow partial overlap between vias
+ */
+exact_overlap v0,v1,v2,v3,v4
+
+end
+
+/* TODO extraction numbers are for g25, need to convert to g18 ! */
+extract
+style lumped
+  cscale	10	/* use units of 10 attoFarads in .ext files */	
+  lambda	2	/* .02 centimicron grid */
+  step		500
+  sidehalo	0	/* no parallel coupling cap */
+
+  noplaneordering
+
+  /* resistance in milli-ohms/square */
+  resist ndif,pwc 5659 /* at 105 Celsius */
+  resist pdif,nwc 4505 /* at 105 Celsius */
+  resist poly 5712 /* at 105 Celsius (npoly value, ppoly = 5141) */
+  resist m1 113 /* at 105 Celsius */
+  resist m2 113 /* at 105 Celsius */
+  resist m3 114 /* at 105 Celsius */
+  resist m4 114 /* at 105 Celsius */
+  resist m5 112 /* at 105 Celsius */
+
+  /* INGORING via resistance! */
+
+  /* fet resistances in ohms/square (used in resistive extraction) */
+  fetresist nfet linear  7500  /*  on-resistance in ohms - guess */
+  fetresist pfet linear 15000 /* on-resistance in ohms - guess */
+
+  /* cap values correct for "dense" wiring = minimum spacing with
+   * layer above and below populated.
+   * pessimistic for other cases.
+   *
+   * Miller effect ignored :-)
+   *
+   */	
+  areacap poly 0.059
+  perimc poly space,all_dif_litho 1.234
+
+  areacap m1 0.037
+  perimc m1 space/m1 1.4
+
+  areacap m2 0.031
+  perimc m2 space/m2 1.4
+
+  areacap m3 0.030
+  perimc m3 space/m3 1.4
+
+  areacap m4 0.030
+  perimc m4 space/m4 1.4
+
+  areacap m5 0.029
+  perimc m5 space/m5 1.4
+
+  /* TODO last two parms: gscap gccap - values are (bad) guesses
+   * not sure what they are used for?
+   */
+  fet pfet all_pdif_no_wc 2 pfet Vdd! nwell 50 7
+  fet nfet all_ndif_no_wc 2 nfet GND! 50 7
+end
+
+
+
+
+

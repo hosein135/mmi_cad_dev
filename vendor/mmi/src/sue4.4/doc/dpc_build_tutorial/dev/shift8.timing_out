@@ -1,0 +1,160 @@
+Pearl version 4.3-s077
+cmd> readtechnology /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/pearl/pearl.tech
+cmd> readctlf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/tlf/mmi25.ctlf
+cmd> readverilog /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.vg
+cmd> toplevelcell shift8
+Network shift8 has 35 devices and 48 nodes
+cmd> readspf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.est_dspf
+Warning: net in[1] has no driver on it.
+Warning: net in[2] has no driver on it.
+Warning: net in[3] has no driver on it.
+Warning: net in[4] has no driver on it.
+Warning: net in[5] has no driver on it.
+Warning: net in[6] has no driver on it.
+Warning: net in[7] has no driver on it.
+Msg: File "/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.est_dspf" does not have instance section
+cmd> setmaxpossibilities 5
+cmd> clock -domain _WAVE_ -cycle_time 3ns -create_node _input_ 0 1.5n
+cmd> input in[7:0] _input_ ^ 0 0 0 0
+cmd> inputslew in[7:0] 200ps 200ps 200ps 200ps
+cmd> input shift[2:0] _input_ ^ 0 0 0 0
+cmd> inputslew shift[2:0] 200ps 200ps 200ps 200ps
+cmd> setnodecapacitance out[7:0] +20fF
+cmd> setpathfilter -same_path -similar_path -node_suffix [#]
+cmd> idealclocks yes
+cmd> findpathsfrom _input_
+ 1: 1243ps Path to out[6] v
+cmd> setdelaypathformat out_delay delta_delay load_cap fanout out_rise_fall out_node device cell
+cmd> showpossibility 1 5
+Possibility 1:
+ Delay Delta Load Cap Fanout Rise/Fall Node       Device        Cell      
+ ----- ----- -------- ------ --------- ----       ------        ----      
+   0ps                     0     200ps _input_ ^                          
+   0ps   0ps     21fF      1     200ps shift[0] ^ arrival                 
+ 224ps 224ps    211fF      8     122ps net_1 ^    MMI_BUFE      MMI_BUFE  
+ 224ps   0ps    211fF      8     122ps net_1 ^                            
+ 624ps 400ps     14fF      1     129ps net_4[6] v MMI_MUX4B$6$  MMI_MUX4B 
+ 624ps   0ps     14fF      1     129ps net_4[6] v                         
+ 828ps 204ps     56fF      2      68ps i[6] v     MMI_BUFD$6$   MMI_BUFD  
+ 828ps   0ps     56fF      2      68ps i[6] v                             
+1077ps 249ps     14fF      1      65ps net_3[6] v MMI_MUX2D$6$  MMI_MUX2D 
+1077ps   0ps     14fF      1      65ps net_3[6] v                         
+1243ps 166ps     20fF      1      40ps out[6] v   MMI_BUFD_1$6$ MMI_BUFD  
+cmd> # done
+cmd> # done
+cmd> findmincycletime
+           Domain     Cycle Time       Rise       Fall
+           ------     ----------       ----       ----
+_input_    _WAVE_         3000ps        0ps     1500ps
+
+No timing constraints were triggered
+cmd> # done
+cmd> # done
+cmd> shownodematches * > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_in
+cmd> system sed -e 's/^ /showdelays/' -e 's/^Found/#/' /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_in > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out
+cmd> include /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[7]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[6]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[5]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[4]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[3]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[2]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[1]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays in[0]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[7]
+_input_ ^ -> 578ps-1136ps ^ 657ps-1243ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[6]
+_input_ ^ -> 578ps-1136ps ^ 657ps-1243ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[5]
+_input_ ^ -> 578ps-1136ps ^ 657ps-1243ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[4]
+_input_ ^ -> 578ps-1136ps ^ 657ps-1243ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[3]
+_input_ ^ -> 578ps-1139ps ^ 657ps-1239ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[2]
+_input_ ^ -> 578ps-1139ps ^ 657ps-1239ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[1]
+_input_ ^ -> 578ps-1139ps ^ 657ps-1239ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays out[0]
+_input_ ^ -> 578ps-1139ps ^ 657ps-1239ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays shift[2]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays shift[1]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays shift[0]
+_input_ ^ -> 0ps ^ 0ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_1
+_input_ ^ -> 224ps ^ 246ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_2
+_input_ ^ -> 237ps ^ 257ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[7]
+_input_ ^ -> 498ps-784ps ^ 577ps-828ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[6]
+_input_ ^ -> 498ps-784ps ^ 576ps-828ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[5]
+_input_ ^ -> 493ps-784ps ^ 568ps-828ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[4]
+_input_ ^ -> 493ps-784ps ^ 563ps-828ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[3]
+_input_ ^ -> 471ps-762ps ^ 543ps-809ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[2]
+_input_ ^ -> 471ps-762ps ^ 543ps-809ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[1]
+_input_ ^ -> 471ps-762ps ^ 543ps-809ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays i[0]
+_input_ ^ -> 471ps-762ps ^ 543ps-809ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[7]
+_input_ ^ -> 427ps-985ps ^ 491ps-1077ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[6]
+_input_ ^ -> 427ps-985ps ^ 491ps-1077ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[5]
+_input_ ^ -> 427ps-985ps ^ 491ps-1077ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[4]
+_input_ ^ -> 427ps-985ps ^ 491ps-1077ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[3]
+_input_ ^ -> 427ps-987ps ^ 491ps-1073ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[2]
+_input_ ^ -> 427ps-987ps ^ 491ps-1073ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[1]
+_input_ ^ -> 427ps-987ps ^ 491ps-1073ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_3[0]
+_input_ ^ -> 427ps-987ps ^ 491ps-1073ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[7]
+_input_ ^ -> 316ps-600ps ^ 380ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[6]
+_input_ ^ -> 316ps-600ps ^ 378ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[5]
+_input_ ^ -> 310ps-600ps ^ 371ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[4]
+_input_ ^ -> 310ps-600ps ^ 365ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[3]
+_input_ ^ -> 310ps-600ps ^ 365ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[2]
+_input_ ^ -> 310ps-600ps ^ 365ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[1]
+_input_ ^ -> 310ps-600ps ^ 365ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_4[0]
+_input_ ^ -> 310ps-600ps ^ 365ps-624ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays net_5
+_input_ ^ -> 197ps ^ 221ps v
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays gnd
+Constant value = 0
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays vdd
+Constant value = 1
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> showdelays _input_
+_input_ v ->  1500ps v
+_input_ ^ -> 0ps ^ 
+Clock network node
+/volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out> # 49 matches
+cmd> system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_in
+cmd> system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.tmp_out
+cmd> findslownodes -limit 0.6ns > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/shift8.slow_nodes
+cmd> 

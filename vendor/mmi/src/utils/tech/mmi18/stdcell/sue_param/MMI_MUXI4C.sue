@@ -1,0 +1,155 @@
+# SUE version MMI_SUE4.1.6
+
+proc SCHEMATIC_MMI_MUXI4C {} {
+  make MMI_MUXI4C -origin {1900 -550}
+  make output -name out -origin {1900 -70}
+  make input -name sel1 -origin {1290 470}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel1_L -origin {1580 470}
+  make name_net -name N1 -origin {1460 -320}
+  make name_net -name N2 -origin {1680 -320}
+  make xgate -orient RY -WP '4*WNA' -WN '2*WNA' -origin {1580 -320}
+  make xgate -orient RY -WP '4*WNA' -WN '2*WNA' -origin {1580 150}
+  make inverter -WP '2*WNA' -WN '1*WNA' -origin {1480 470}
+  make xgate -WP '4*WNA' -WN '2*WNA' -origin {1180 -420}
+  make xgate -WP '4*WNA' -WN '2*WNA' -origin {1180 -210}
+  make input -name in0 -origin {810 -420}
+  make input -name sel0 -origin {820 -310}
+  make input -name in1 -origin {810 -210}
+  make xgate -WP '4*WNA' -WN '2*WNA' -origin {1170 50}
+  make xgate -WP '4*WNA' -WN '2*WNA' -origin {1170 260}
+  make input -name in2 -origin {800 50}
+  make input -name in3 -origin {800 260}
+  make name_net -name N3 -origin {1470 150}
+  make name_net -name sel0_L -origin {1090 -50}
+  make inverter -WP '4*WNA' -WN '2*WNA' -origin {1010 -50}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {1820 -70}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {1360 150}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {1370 -320}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {890 -420}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {920 -210}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {950 50}
+  make inverter -WP '8*WNA' -WN '4*WNA' -origin {980 260}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/08/00 -origin {1160 610}
+  make_wire 1870 -70 1900 -70
+  make_wire 1580 -390 1580 -360
+  make_wire 1740 -70 1790 -70
+  make_wire 1580 210 1580 180
+  make_wire 1520 210 1580 210
+  make_wire 1400 210 1520 210
+  make_wire 1470 150 1550 150
+  make_wire 1210 -420 1290 -420
+  make_wire 1210 -210 1290 -210
+  make_wire 1180 -310 1180 -380
+  make_wire 1180 -310 1180 -240
+  make_wire 860 -310 820 -310
+  make_wire 860 -310 1180 -310
+  make_wire 1180 -90 1180 -170
+  make_wire 1120 -470 1180 -470
+  make_wire 1120 -90 1180 -90
+  make_wire 1180 -470 1180 -450
+  make_wire 1550 -320 1460 -320
+  make_wire 1420 -320 1460 -320
+  make_wire 1340 -320 1290 -320
+  make_wire 1290 -320 1290 -210
+  make_wire 1290 -320 1290 -420
+  make_wire 1580 -80 1640 -80
+  make_wire 1200 50 1280 50
+  make_wire 1200 260 1280 260
+  make_wire 1170 160 1170 90
+  make_wire 1170 160 1170 230
+  make_wire 1170 380 1170 300
+  make_wire 1120 0 1120 380
+  make_wire 1330 150 1280 150
+  make_wire 1280 150 1280 260
+  make_wire 1280 150 1280 50
+  make_wire 1520 -390 1520 210
+  make_wire 1520 -390 1580 -390
+  make_wire 1400 210 1400 470
+  make_wire 1290 470 1400 470
+  make_wire 1400 470 1450 470
+  make_wire 1410 150 1470 150
+  make_wire 1740 -320 1740 -70
+  make_wire 1740 -70 1740 150
+  make_wire 1610 -320 1680 -320
+  make_wire 1680 -320 1740 -320
+  make_wire 1610 150 1740 150
+  make_wire 1640 -80 1640 470
+  make_wire 1530 470 1580 470
+  make_wire 1580 470 1640 470
+  make_wire 1580 -290 1580 -80
+  make_wire 1580 -80 1580 110
+  make_wire 860 160 1170 160
+  make_wire 860 -50 860 160
+  make_wire 860 -50 860 -310
+  make_wire 1120 -470 1120 -90
+  make_wire 1120 -90 1120 -50
+  make_wire 1120 380 1170 380
+  make_wire 1120 0 1170 0
+  make_wire 1170 0 1170 20
+  make_wire 1120 0 1120 -50
+  make_wire 1090 -50 1120 -50
+  make_wire 1060 -50 1090 -50
+  make_wire 860 -50 980 -50
+  make_wire 940 -420 1150 -420
+  make_wire 810 -420 860 -420
+  make_wire 810 -210 890 -210
+  make_wire 970 -210 1150 -210
+  make_wire 1000 50 1140 50
+  make_wire 800 50 920 50
+  make_wire 1030 260 1140 260
+  make_wire 800 260 950 260
+  make_text -origin {710 -560} -text {Inverting 4:1 Mux }
+  make_text -origin {710 -540} -text {C Size}
+  make_text -origin {710 -580} -text MMI_MUXI4C -size large
+}
+
+proc ICON_MMI_MUXI4C args {
+  set size C
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_MUXI4 icon body
+  icon_line -40 -130 -40 130 40 90 40 -90 -40 -130
+  if {$DeMorgan} {
+    icon_arc -60 -80 -40 -100 -start 0 -extent 359
+    icon_arc -60 -20 -40 -40 -start 0 -extent 359
+    icon_arc -60 20 -40 40 -start 0 -extent 359
+    icon_arc -60 80 -40 100 -start 0 -extent 359
+    icon_line 60 0 40 0
+  } else {
+    icon_line -60 -90 -40 -90
+    icon_line -60 -30 -40 -30
+    icon_line -60 30 -40 30
+    icon_line -60 90 -40 90
+    icon_arc 60 -10 40 10 -start 0 -extent 359
+  }
+  # properties
+  icon_property -origin {-37 -90} -size small -label 0
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  icon_property -origin {-20 112} -size small -label 0 -anchor center
+  # inputs
+  icon_term -type input -origin {-60 -90} -name in0
+  icon_term -type input -origin {-60 -30} -name in1
+  icon_term -type input -origin {-60 30} -name in2
+  icon_term -type input -origin {-60 90} -name in3
+  icon_term -type input -origin {-20 120} -orient R270 -name sel0
+  icon_term -type input -origin {20 100} -orient R270 -name sel1
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_MUXI4C
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .in2(\$\{in2\}), .in3(\$\{in3\}), .sel0(\$\{sel0\}), .sel1(\$\{sel1\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

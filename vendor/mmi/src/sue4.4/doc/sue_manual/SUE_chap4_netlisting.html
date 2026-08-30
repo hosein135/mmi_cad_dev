@@ -1,0 +1,773 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:42:01">
+<title>Netlisting, Simulation &amp; Cross-Probing</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_chap3_property_gen.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_chapt5_commands.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 4 </font>
+</h2>
+
+
+<h1>
+  <a name="1027023"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Netlisting, Simulation &amp; Cross-Probing</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1026765"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026767"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Without netlisting capability, SUE would be little more than a drawing editor. Yet netlisting, by itself, does not a design environment make. The design process involves entering and modifying the design, simulating the design to verify functionality and performance, and then iterating until satisfactory. SUE attempts to include all aspects of this process within one environment. Thus, SUE not only netlists into a variety of formats but also directly runs simulators, and either back-annotates the results onto the schematics, or instructs a waveform viewer to plot waveforms of selected nets (called cross-probing). Finally, SUE manages design documentation by tying documentation text or HTML files to schematics for easy viewing, editing, and creation. </font>
+<p>
+<p>
+  <dt> <a name="1026768"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While SUE is a graphical tool, not all of the design needs to be represented graphically to fit into the SUE environment. Typically, parts of most designs are better represented textually, for example, as Verilog modules. Furthermore, during development, higher-level models for uncompleted blocks usually must substitute for the full implementation. The user can easily instruct SUE to include textual parts of the design and specify how they interact with graphical parts. Furthermore, the user can tell SUE to ignore any sections of the design, substituting higher-level code, for example, to improve simulation speed. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026770"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Netlisting</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026771"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">How does SUE netlist a hierarchical schematic? SUE understands the basic syntax and structure (calling conventions, continuations characters, preambles, hierarchical delimiters, etc.) of a number of different netlist formats: </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026772"> </a><b><strong class="Strong">Verilog</strong></b>: 	hierarchical  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026773"> </a><b><strong class="Strong">SPICE</strong></b>:	hierarchical, aka HSPICE format  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026774"> </a><b><strong class="Strong">flat_spice</strong></b>: 	nonhierarchical, aka Berkeley SPICE format  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026775"> </a><b><strong class="Strong">sim</strong></b>:	nonhierarchical, used by IRSIM and Gemini 
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1026776"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to the formats, SUE needs to know whether an icon is a primitive element and, if so, how to netlist that object, or whether to push down through the hierarchy into that icon's schematic. </font>
+<p>
+<p>
+  <dt> <a name="1026777"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You might think that if an icon has a schematic then it can't be a primitive. However, this is not necessarily the case. Consider an inverter icon placed into a schematic. If you are netlisting to Verilog, then you want the netlister to treat the inverter as a primitive element. However, in SPICE the inverter is not a primitive whereas the nfet and pfet (assuming static CMOS) inside the inverter are the primitives. </font>
+<p>
+<p>
+  <dt> <a name="1026781"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE uses properties in icons (see <i><strong class="StrongItalic">Chapter 1, "Parameterized Icons") </strong></i>to determine whether icons are primitives and if so how to netlist them. </font>
+<p>
+<p>
+  <dt> <a name="1026782"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Therefore, to netlist a schematic, SUE needs the following information: </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026783"> </a>the netlist type  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026784"> </a>the netlist properties to use  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026785"> </a>a schematic to start netlisting from  
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1026787"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The netlist type and netlist properties are stored in the variables <b><strong class="Strong">NETLIST_TYPE</strong></b> and <b><strong class="Strong">NETLIST_PROPS</strong></b>, respectively. The default values of these variables can be set in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file. Otherwise, you can change them by clicking on <b><code class="CodeStrong">change simulation mode </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. Changing the netlisting type, either at startup or using <b><code class="CodeStrong">change simulation mode</code></b>, also changes the contents of the <b><code class="CodeStrong">Sim</code></b> menu, providing additional commands relevant only to that type. This is the only menu that ever changes in SUE. In addition to the netlist formats shown above, <b><code class="CodeStrong">verilog</code></b><b><strong class="Strong">, </strong></b><b><code class="CodeStrong">spice</code></b><b><strong class="Strong">, </strong></b><b><code class="CodeStrong">flat_spice</code></b>, and <b><code class="CodeStrong">sim</code></b>, is the <b><code class="CodeStrong">dpc</code></b><b><strong class="Strong"> </strong></b>option<b><strong class="Strong">. </strong></b>In <b><code class="CodeStrong">dpc</code></b>, SUE generates a Verilog netlist as the first part of the<b><strong class="Strong"> </strong></b>Data Path Compiler. </font>
+<p>
+<p>
+  <dt> <a name="1026795"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can easily tell what netlist type SUE will produce by looking at the title bar of the main SUE window, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">SUE: INVC S /proj/proj1/stdcell/sue/INVC.sue (verilog)</font><a name="1026796"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026797"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1026798"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Sim</code></b> menu will also display the type along with specific simulation commands for that type. </font>
+<p>
+<p>
+  <dt> <a name="1026801"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typically the netlist properties are similar to the netlist type. The default netlist properties that go with each netlist type are: </font>
+<p>
+</dl></dl>
+<a name="1028827"> </a><font face="ITC Franklin Gothic Book">Table 2:   List of Default Netlist Properties and Netlist Types<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr align="center" bgcolor="#CCCCCC">
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1026804"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Netlist Type</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1026806"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Default Netlist Property</font></font></th>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026808"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Verilog</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026810"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Verilog</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026812"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">DPC</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026814"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Verilog</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026816"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">SPICE</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026818"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">SPICE</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026820"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">flat_SPICE</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026822"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">SPICE</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026824"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">sim</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1026826"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">sim</font></font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font><dl><dl>
+<p>
+  <dt> <a name="1026829"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Thus, if you are Verilog netlisting with <i><strong class="StrongItalic">verilog</strong></i> as the netlist property, SUE looks into each icon for a Verilog property. If it finds the property, it evaluates that property and places the results into the netlist without considering whether that icon has a schematic or not or what is in it. If it finds no Verilog property, then it netlists the icon's schematic and, if there is no schematic, it ignores the icon. <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027456"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can place the icon for the given schematic into its schematic for documentation purposes. The netlister will automatically recognize this condition as illegal (recursive) and ignore the icon during netlisting. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1026831"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, the inverter discussed above might have the following property in its icon (called its <b><code class="CodeStrong">verilog property</code></b>): </font>
+<p>
+<pre>
+<font face="Courier">-type auto -name verilog -text {inverter [unique_name "" $name inverter] (.in($in), .out($out))\;}
+</font><a name="1026832"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1026834"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">but would have no SPICE property. The text in this property looks pretty complex but is very straightforward - in fact, so straightforward that the command <b><code class="CodeStrong">create verilog property</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu creates it. First, the name for this instance of this icon is sent to the SUE internal <b><code class="CodeStrong">unique_name</code></b> procedure to generate a unique name for the icon (if no name is given or the name is nil, then SUE will make up a name using the prefix "<b><code class="CodeStrong">inverter</code></b>"). The actual input and output connections to this instance will also be substituted in for <b><code class="CodeStrong">$in</code></b> and <b><code class="CodeStrong">$out</code></b>. Note that in this case, <b><code class="CodeStrong">in</code></b> and <b><code class="CodeStrong">out</code></b> are the names of the input and output terminals on this inverter. Look into some of the default icons to see other examples of Verilog and SPICE properties. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027591"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As you can see, SUE defines properties names as variables <i><strong class="StrongItalic">and</strong></i> terminals as variables during netlisting. Therefore, <i><strong class="StrongItalic">don't</strong></i> give any properties the same name as terminals in a given icon or you will get a conflict. Also, don't name any terminals "M", even if you don't have an M property since this designation is special cased. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1026837"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Lastly, SUE always assumes that the current schematic (the one on the screen) is the schematic from which to start netlisting. When you netlist, SUE will set this schematic to be the top of the hierarchy and thus you will not be able to "pop out of" it. SUE will write the netlist into the same directory as this schematic with a suffix defined by the variable <b><code class="CodeStrong">SUFFIX($NETLIST_TYPE</code></b><b><strong class="Strong">)</strong></b>. </font>
+<p>
+<p>
+  <dt> <a name="1026839"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition, one can specify more than one netlist property. </font>
+<p>
+<p>
+  <dt> <a name="1026840"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example:</font>
+<p>
+  <dl>
+<p> <dt> <a name="1026841"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you specify the netlist properties to be <b><code class="CodeStrong">switch spice</code></b>, then icons will first be searched for switch properties, and only if those don't exist will the SPICE properties be used. For instance, you might have created a switch-level HSPICE model for a given circuit block - say a VCO - and entered it into the VCO icon with the property name of "<b><code class="CodeStrong">switch</code></b>". Then, you can choose between using the switch level model, or netlisting all the way down to the transistors, by changing the SPICE properties from <b><code class="CodeStrong">switch spice</code></b> to just <b><code class="CodeStrong">spice</code></b>. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1026842"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As mentioned earlier, SUE only loads schematics when it is necessary to use or display them. Thus, to netlist, SUE first pushes into all schematics that it needs, but that haven't been loaded yet, to insure that they are available and determine the hierarchy. Then SUE netlists the circuit. Both of these processes can take a fair bit of time on big circuits. To reduce this delay, SUE caches the netlist information so that subsequent netlisting is considerably faster. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027985"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Cached netlisting only works on hierarchical netlists like <b><code class="CodeStrong">SPICE</code></b> and <b><code class="CodeStrong">Verilog</code></b> (including <b><code class="CodeStrong">DPC</code></b>), but not <b><code class="CodeStrong">sim</code></b> or <b><code class="CodeStrong">flat_spice</code></b>. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026844"> </a>To flush the netlist cache, remove the netlist cache files (usually of the form <b><code class="CodeStrong">*.cache</code></b>) from UNIX and then restart SUE. Note that the actual cache files are <b><code class="CodeStrong">*.sp.cache</code></b> or<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">*.vh.cache</code></b>.</li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1026847"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Mixing Structural and Behavioral Netlisting</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026848"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By default when netlisting a cell, SUE first looks for a fixed property in the icon with a name that is in the netlist properties list. If one is found, the value of the fixed property is used. This property usually refers to a hand-written or<b><strong class="Strong"> </strong></b><b><strong class="Strong">behavioral model</strong></b> for the cell. Otherwise, SUE netlists the schematic for that cell if there is one. We call the netlist for the schematic a<b><strong class="Strong"> structural netlist </strong></b>of the cell. </font>
+<p>
+<p>
+  <dt> <a name="1026849"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Often, we want both a behavioral and a structural netlist for a given cell in the design database, and we want to be able to choose which model to use on a case-by-case basis. </font>
+<p>
+<p>
+  <dt> <a name="1026850"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+  <dl>
+<p> <dt> <a name="1026851"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If we were designing an ALU (Arithmetic Logic Unit) of a microprocessor, it might consist of an adder, a barrel shifter, and other components. We would want to make behavioral models of the adder and shifter cells before implementing them. This would allow us to test the entire ALU before all aspects of the design are complete. </font>
+<p><p> <dt> <a name="1026852"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once we have implemented the low-level schematics for these blocks, we still want access to the behavioral models to compare the results against the structural models. </font>
+<p><p> <dt> <a name="1026853"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Furthermore, once we have tested the structural models, we may want to use the behavioral models to speed up the simulations when verifying other aspects of the design. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1026854"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE can be told to ignore the fixed properties in icons on a case-by-case basis to permit easy switching between behavioral and structural netlists. This interface is accessed through the <b><code class="CodeStrong">Display Design Hierarchy</code></b> function in the <b><code class="CodeStrong">Sim</code></b> menu. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1028026"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have not netlisted your design yet in this session of SUE, you must call <b><code class="CodeStrong">Display Design Hierarchy</code></b> from the top level cell as it will first netlist the design. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1026857"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">Display Design Hierarchy</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>pops up a window which displays the names of all unique cells in the entire design hierarchy, indenting cells which are at lower levels. </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026858"> </a>Cells which are netlisted from the fixed properties in their icons are delineated with an "I", and those netlisted by their schematics are delineated with an "S".  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026859"> </a>If an icon fixed property is used and a schematic exists, a "-" is also shown, indicating that the netlist has stopped at that icon, ignoring the schematic and hierarchy below it. This is the default case.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026860"> </a>Similarly, if the icon fixed property is present but was overridden in favor of the schematic, a "&gt;" is displayed.  
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1026861"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By clicking the mouse on a line containing either "-" or "&gt;", SUE toggles the netlist state between the structural and behavioral models for that cell only. SUE then re-netlists and displays the new design hierarchy. The netlist state for each cell is stored in the netlist cache file for the cell. Therefore, by removing all netlist caches, you will reset the SUE netlisting state so that all behavioral models are used when they exist. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027633"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have a cell with both a schematic and behavioral model that is used in more than one place in the design, toggling its netlist state toggles it for every instance. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1026863"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Whether the cell should be netlisted, or whether the netlist property should be used, is cached in the *.cache file for each cell for the given netlist type. Thus if you remove the cache files, you also remove this state and have to set it up again using the <b><code class="CodeStrong">Design Hierarchy </code></b>menu. </font>
+<p>
+<p>
+  <dt> <a name="1026864"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In some cases, you want the default state of a particular cell to be to ignore the netlist property. To get this result, add the following property to the cell's icon: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type fixed -name netlist_level -text 2000</font><a name="1026865"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1026867"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Header Files</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026869"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most simulations require header files to instantiate libraries, set up simulation conditions, include SPICE models, etc. When netlisting, SUE will look for a file with the name <b><code class="CodeStrong">&lt;top_cell&gt;$SUFFIX(&lt;verilog|spice&gt;_header)</code></b> and automatically include it if it exists. Otherwise, SUE will include the appropriate default file, a pointer to which can be set up in the file <b><code class="CodeStrong">SUE.tcl</code></b>. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027687"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">With Verilog, the header file usually defines a top level "root" module which then instantiates the <b><code class="CodeStrong">&lt;top_cell&gt;</code></b> and sets up the simulation conditions. The name of the top-level module must be known to SUE for cross-probing (see below). By default, the Verilog root module is assumed to be called "<b><code class="CodeStrong">test</code></b>". If another root name is required, you can set the <b><strong class="Strong">Tcl</strong></b> variable <b><code class="CodeStrong">verilog_root_default</code></b> with the desired module name. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1026873"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In some cases header files are not desired, for example when running LVS or formal verification. In order to tell SUE not to include header files, use the following command (either in a .suerc file or by typing it directly into the SUE command window): </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set NETLIST(no_header) 1</font><a name="1026874"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026875"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1026876"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If this variable is "true" (or equal to 1), the <b><code class="CodeStrong">.SUBCKT</code></b> call for the top-level cell in SPICE will not be commented out as it is otherwise, and the <b><code class="CodeStrong">.END </code></b>statement won't be added either. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026879"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Simulation and Cross-Probing </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026881"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to netlisting, SUE can run simulators and cross-probe results. To netlist <i><strong class="StrongItalic">and</strong></i> simulate a schematic, use the<font  face="Verdana, Arial, Helvetica, sans-serif"><b> </b></font><b><code class="CodeStrong">${NETLIST_TYPE}_it</code></b> command in the <b><code class="CodeStrong">Sim</code></b> menu. For example, in SPICE mode, you can either run <b><code class="CodeStrong">spice netlist </code></b>to netlist the schematic or run <b><code class="CodeStrong">spice it</code></b> to netlist the schematic and then run SPICE on it. Once SPICE simulation completes successfully, SUE will also bring up the waveform viewer (also known as the probe) and load the simulation results into it. (If a waveform viewer is already attached to this SUE session, then it will be reloaded.) You can also manually bring up the waveform viewer with the<b><code class="CodeStrong"> init probe</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>command. The<b><code class="CodeStrong"> ${NETLIST_TYPE}_it</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>command works for batch mode simulators, i.e. non-interactive. </font>
+<p>
+<p>
+  <dt> <a name="1026885"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For interactive simulators, you simply netlist the schematic and then run <b><code class="CodeStrong">init probe</code></b>. This is a two-step process. Running Verilog in interactive mode is an example of this. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1026889"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>SPICE/NST</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026890"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In SPICE mode, the netlister attempts to expand all buses since SPICE doesn't inherently allow buses. Also, you cannot connect I/O's together or connect a global to an I/O since this is not allowed in SPICE. Alternatively, you should place a 0V dc supply or a very small valued resistor between nets of different names to make SPICE happy. </font>
+<p>
+<p>
+  <dt> <a name="1026891"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The SPICE netlister will add SUE text into the netlist that begins with a "^". </font>
+<p>
+<p>
+  <dt> <a name="1026892"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+  <dl>
+<p> <dt> <a name="1026893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have a 6T SRAM cell that you want to initialize to be "high" or 3.3V in this example, you would put a text line in the schematic of the 6T cell that looks like: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">^.ic &lt;node&gt; 3.3V</font><a name="1026894"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026895"> </a>
+      </pre>
+      </pre>
+  </dl>
+<p>
+  <dt> <a name="1026896"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where <b><code class="CodeStrong">&lt;node&gt; </code></b>should be replaced by the named node that you want to set the initial conditions on. </font>
+<p>
+<p>
+  <dt> <a name="1026897"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A special SPICE <b><strong class="Strong">Tcl</strong></b> script has been included which attempts to farm out the SPICE job to the least loaded SPICE server. In addition, the SPICE script will send a message back to SUE when the SPICE job is completed, so that SUE can initialize the cross-probe and load the simulation results. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027741"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For the send command to succeed, you might need to set your X authorization correctly, which means "<b><code class="CodeStrong">xhost -</code></b>" and no hosts enabled. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1026899"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since your SPICE job gets farmed out to who knows where, a handy SUE command is included to track it down and kill it, if so desired. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026901"> </a><b><strong class="Strong">	</strong></b>To kill the most recently launched SPICE job, click on <b><code class="CodeStrong">Kill Spice Job</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1026903"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Cross-probing in SPICE mode is supported using the NST (New Spice Tool) analog waveform viewer from Micro Magic Tools. This tool has support for multiple panels, derived waveforms, multiple files, etc. </font>
+<p>
+<p>
+  <dt> <a name="1026904"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By selecting voltage sources and "plotting them", SUE will automatically plot the currents through them to NST. Also, SUE uses the <b><code class="CodeStrong">Plot Old Node</code></b> feature on NST which allows you to plot the waveform from the last simulation (if it is loaded) of a net for comparison. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027770"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE sometimes can't figure out what the "old" node was for a selected net if you have changed stuff connected to it. (Even changing the property of something connected to it sometimes messes it up.) So beware that SUE will sometimes give you the wrong net when using <b><code class="CodeStrong">Plot Old Node</code></b>. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026909"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Verilog</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026912"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE supports Verilog cross-probing using <i><strong class="StrongItalic">Signalscan</strong></i> (3.x and 4.x) and <i><strong class="StrongItalic">Magellan</strong></i>. Note that SUE can only add signals to <i><strong class="StrongItalic">Signalscan</strong></i> for plotting; it cannot delete named waveforms because of <i><strong class="StrongItalic">Signalscan</strong></i> limitations. On the other hand, you need a special version of <i><strong class="StrongItalic">Magellan</strong></i> that takes commands from standard input, if you want to use <i><strong class="StrongItalic">Magellan</strong></i> with SUE. Fortunately, I think SSI will be including this version in future releases. </font>
+<p>
+<p>
+  <dt> <a name="1026913"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Verilog netlister will add SUE text into the netlist that begins with a "!", just like the SPICE netlister but with a different starting character. </font>
+<p>
+<p>
+  <dt> <a name="1026915"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verilog has a new probe mode called "<i><strong class="StrongItalic">interactive</strong></i>", which is used while stepping through Verilog simulations, as opposed to viewing waveforms from <b><code class="CodeStrong">verilog.dump</code></b> files after the simulation is complete. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026916"> </a>In order to use "interactive" Verilog probing, you must add the following line to the topmost module of your Verilog netlist (presumably the "test" module): </li>
+ </font>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">integer         tmp_channel;</font><a name="1030319"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1030316"> </a>
+      </pre>
+</ul><p>
+  <dt> <a name="1026919"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you initialize the probe in Verilog interactive mode, SUE will start up Verilog using the command in the variable <b><strong class="Strong">VERILOG_PROBE_CMD</strong></b>(interactive) which was set in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file. </font>
+<p>
+<p>
+  <dt> <a name="1026921"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can then send commands to Verilog by typing: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">v {verilog_command}</font><a name="1026922"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1030315"> </a>
+      </pre>
+  <dl>
+<p> <dt> <a name="1026924"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">into the SUE command line (i.e. the SUE initialization window). Be sure to include the {} or <b><strong class="Strong">Tcl</strong></b> will try to interpret your command before sending it off to Verilog. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1026925"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if you want to step Verilog forward by 100 time units, you could type:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">v {#100 $step; .}</font><a name="1026926"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1030314"> </a>
+      </pre>
+  <dl>
+<p> <dt> <a name="1026928"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since this is a pretty common command, the command "<b><code class="CodeStrong">step</code></b>" has been defined to do this (and a hotkey is bound to it), so you can instead just type: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">step 100</font><a name="1026929"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026930"> </a>
+      </pre>
+<p> <dt> <a name="1026931"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">or, even more simply: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">step</font><a name="1026932"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026933"> </a>
+      </pre>
+<p> <dt> <a name="1026934"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where the step amount defaults to the value defined in the .suerc file with the statement: </font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set VERILOG_STEP 10</font><a name="1026936"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026937"> </a>
+      </pre>
+<p> <dt> <a name="1026938"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This value should be set based on the timescale command in Verilog and any delays you have in your Verilog models. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027799"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Similarly you can define <b><strong class="Strong">Tcl</strong></b> procedures to simplify any other commonly used functions. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>  </dl>
+<p>
+  <dt> <a name="1026940"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are three ways to cross-probe in Verilog interactive mode to make debugging easy. </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1026941"> </a>		One way, like other postprocessing cross-probes, is to select the desired net and hit<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">Plot Net </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. This will print out the current value of this net in the SUE command window. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1026944"> </a>		The second way is to click on<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">Display Term Values </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu, which will display the values of all of the terminals in the current schematic on top of those terminals. Clicking on anything in SUE will then cause them to disappear. You can change the default format from <b><strong class="Strong">hex</strong></b> (<b><code class="CodeStrong">%h</code></b>) to <b><strong class="Strong">decimal</strong></b> (<b><code class="CodeStrong">%d</code></b>) or to <b><strong class="Strong">binary</strong></b> (<b><code class="CodeStrong">%b</code></b>) by setting the <b><strong class="Strong">DISPLAY_TERMS(verilog) </strong></b>variable, for example: </font>
+</p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DISPLAY_TERMS(verilog) "%h"
+</font><a name="1026946"> </a>
+      </pre>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1026948"> </a>Finally, you can place <i><strong class="StrongItalic">flags</strong></i> on nets that you wish to monitor. A "flag" is just an icon, like <b><code class="CodeStrong">name_net</code></b><b><strong class="Strong">,</strong></b> and has two properties: <b><code class="CodeStrong">value</code></b> and <b><code class="CodeStrong">format</code></b>. You can change the format to tell Verilog how it should display the value of that particular flag using either: </font>
+</p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	%d	decimal</font><a name="1026949"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	%b	binary</font><a name="1026950"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	%h	hex
+</font><a name="1026951"> </a>
+      </pre>
+    <dl><dl>
+<p>      <dt> <a name="1026952"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE omits flags when printing.</font>
+</p>    </dl></dl>
+   </ol>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026954"> </a>To update the values on the flags, click on <b><code class="CodeStrong">Update Flags </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. This will update all of the flags in the current schematic only. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1027840"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Step</code></b> command automatically calls <b><code class="CodeStrong">Update Flags </code></b>after stepping time forward. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1026957"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>IRSIM/Analyzer</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026959"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">IRSIM is a FET switch-level simulator that uses the SIM format. <i><strong class="StrongItalic">Analyzer</strong></i> is a waveform viewer integrated into IRSIM. SUE can cross-probe to <i><strong class="StrongItalic">Analyzer</strong></i> and use the interactive features described above with Verilog. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026960"> </a>To send commands to IRSIM from SUE, use the <b><strong class="Strong">i</strong></b> command: </li>
+ </font>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">i {IRSIM_command}</font><a name="1026961"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026962"> </a>
+      </pre>
+      </pre>
+</ul>  <dl>
+<p> <dt> <a name="1026963"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">just as described above with Verilog. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1026964"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A few handy <b><strong class="Strong">Tcl</strong></b> scripts have also been added to aid in using IRSIM, which can be accessed through the <b><code class="CodeStrong">Sim</code></b> menu. These scripts can step the simulation and set the selected net either to 1, 0, or X. </font>
+<p>
+<p>
+  <dt> <a name="1026965"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SIM format does not understand parameters and hence any parameters from the schematics must be resolved during netlisting. Typical parameters are default fet channel lengths that are normally resolved in SPICE using the <b><strong class="Strong">.PARAM</strong></b> function in the SPICE header file. To tell SUE how to resolve SIM parameters during netlisting, use the <b><strong class="Strong">SUE SIM_PARAMS</strong></b> global associative array. For example, to set the minimum fet channel lengths to 0.24um, add the following lines to your <b><strong class="Strong">.suerc</strong></b> file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set SIM_PARAMS(ln_min) 0.24u</font><a name="1026966"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set SIM_PARAMS(lp_min) 0.24u</font><a name="1026967"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026968"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1026969"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Unfortunately, SIM format is not hierarchical, nor does it understand buses. SUE attempts to overcome both of these shortcomings by netlisting flat and simulating buses. However, because all nets in a flat netlist are global, SUE cannot cache netlists on a cell by cell basis which slows down the netlisting process. If you know of a switch-level simulator that uses a hierarchical netlist format, let us know!</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1013693"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"></font>
+</h3>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_chap3_property_gen.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_chapt5_commands.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,718 @@
+# This is a generator for an equality comparator.
+
+proc NAME_comparator args {
+  call_use_keyword $args {{NBITS 32} {Operation "Compare"} {OutputAssertion "H"}}
+
+  # NBITS
+  set nom [format "comparator_%d" $NBITS]
+
+  # Operation
+  if {[string toupper $Operation] == "COMPARE"} {
+    set nom [format "%sC" $nom]
+  }
+  if {[string toupper $Operation] == "ZERODETECT"} {
+    set nom [format "%sZ" $nom]
+  }
+
+  # OutputAssertion
+  if {[string toupper $OutputAssertion] == "H"} {
+    set nom [format "%sH" $nom]
+  }
+  if {[string toupper $OutputAssertion] == "L"} {
+    set nom [format "%sH" $nom]
+  }
+  if {[string toupper $OutputAssertion] == "BOTH"} {
+    set nom [format "%sB" $nom]
+  }
+
+  return $nom
+}
+
+
+proc SCHEMATIC_comparator args {
+  call_use_keyword $args {{NBITS 32} {Operation "Compare"} {OutputAssertion "H"}}
+
+  # make the arguments more digestible
+  # NBITS
+  set maxidx [expr $NBITS - 1]
+  # bitranges
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  # bitpitch = 24 microns
+  set bitpitch 24
+
+  # locations
+  set x 0
+  set y 0
+  set icon_x 120
+  set icon_y 60
+  set ws1 50
+  set xfudge [expr $icon_x + 3*$ws1]
+  set yfudge [expr $icon_y + $ws1]
+  set yfudge_orig $yfudge
+
+
+  # figure out how many rows there will be, and mark the gate type and positions
+  set done 0
+  set rowcount 0
+  set gcount $NBITS
+  set bitincr 1
+  set bitoffset 0
+  while {$done == 0} {
+    # this is the last row if there is just 1 gate in this row
+    if {$gcount == 1} {
+      set done 1
+    }
+
+    # select the gate type
+    if {$rowcount == 0} {
+      # start with XORs in every bit position
+      for {set i 0} {$i < $gcount} {incr i} {
+	set gate_type(0,$i) "MMI_XOR2B"
+      }
+    } else {
+      # then alternate NORs and NANDs (possibly ORs/ANDs for the final row)
+      set assert [string toupper $OutputAssertion]
+      if {[expr $rowcount % 2] != 0} {
+	# row with low-asserted inputs
+	if {$done == 1} {
+	  switch $assert {
+	    L {
+	      # last row, want low asserted output
+	      set gt0 "MMI_OR3B_"
+	      set gt2 "MMI_OR2B_"
+	    } 
+	    H {
+	      # last row, want high asserted output
+	      set gt0 "MMI_NOR3B_"
+	      set gt2 "MMI_NOR2B_"
+	    }
+	    BOTH {
+	      # last row, want both assertions; put the _H gates in the default position
+	      set gt0 "MMI_NOR3B_"
+	      set gt2 "MMI_NOR2B_"
+	      set gt0x "MMI_OR3B_"
+	      set gt2x "MMI_OR2B_"
+	    }
+	  }
+	} else {
+	  # internal row
+	  set gt0 "MMI_NOR3B_"
+	  set gt2 "MMI_NOR2B_"
+	  set gt1 "MMI_INVB_"
+	}
+      } else {
+	# row with high-asserted inputs
+	if {$done == 1} {
+	  switch $assert {
+	    L {
+	      # last row, want low asserted output
+	      set gt0 "MMI_NAND3B"
+	      set gt2 "MMI_NAND2B"
+	    }
+	    H {
+	      # last row, want high asserted output
+	      set gt0 "MMI_AND3B"
+	      set gt2 "MMI_AND2B"
+	    } 
+	    BOTH {
+	      # last row, want both assertions; put the _H gates in the default position
+	      set gt0 "MMI_AND3B"
+	      set gt2 "MMI_AND2B"
+	      set gt0x "MMI_NAND3B"
+	      set gt2x "MMI_NAND2B"
+	    }
+	  }
+	} else {
+	  # internal row
+	  set gt0 "MMI_NAND3B"
+	  set gt2 "MMI_NAND2B"
+	  set gt1 "MMI_INVB"
+	}
+      }
+      for {set i 0} {$i < $gcount} {incr i} {
+	set gate_type($rowcount,$i) $gt0
+      }
+      # fix up the final gate
+      set maxg [expr $gcount - 1]
+      if {$gmod == 1} {
+	set gate_type($rowcount,$maxg) $gt1
+      }
+      if {$gmod == 2} {
+	set gate_type($rowcount,$maxg) $gt2
+      }
+      
+      # mark the extra gate
+      if {($done == 1) && ([string toupper $OutputAssertion] == "BOTH")} { 
+	set gate_xtra $gt0x
+	if {$gmod == 2} {
+	  set gate_xtra $gt2x
+	}
+      }
+    }
+
+    # save the gate count
+    set ngates($rowcount) $gcount
+
+    # mark the gate drawing locations
+    set gate_x($rowcount) $x
+    for {set i 0} {$i < $gcount} {incr i} {
+      set gate_y($rowcount,$i) $y
+      set y [expr $y - $yfudge]
+    }
+
+    # mark the bit positions
+    if {$rowcount == 0} {
+      for {set i 0} {$i < $gcount} {incr i} {
+	set gname($rowcount,$i) $i
+      }
+    } else {
+      for {set i 0} {$i < $gcount} {incr i} {
+	set lgate [expr ($i * 3)]
+	set ugate [expr ($i * 3) + 2]
+	set prev_row [expr $rowcount - 1]
+	if {$ugate >= $ngates($prev_row)} {
+	  set ugate [expr $ngates($prev_row) - 1]
+	}
+	set lbit $gname($prev_row,$lgate)
+	set ubit $gname($prev_row,$ugate)
+	if {$lbit == $ubit} {
+	  # previous row held just one gate for this slice
+	  set basepos $lbit
+	} else {
+	  # previous row held 2 or 3 gates for this slice
+	  set basediv [expr ($ubit - $lbit) / 2]
+	  set basepos [expr $lbit + $basediv]
+	}
+	set bitpos [expr $basepos + $bitoffset]
+	if {$bitpos >= $NBITS} {
+	  set bitpos [expr $NBITS - 1]
+	}
+	set gname($rowcount,$i) $bitpos
+
+	# heuristics -- we will need to bump up the previous row's gate size
+	# once the distances get too large.  use distance > 20 bit positions
+	# as the rule of thumb.  note that only the upper and lower gates 
+	# would be affected, the center gate should always be close by.
+	# - XOR can't be changed because the 1st 2 rows will always be ok.
+	# - AND3, AND2, OR3, OR2 can't be changed because they only exist in the final row.
+	# - there is no MMI_NOR3C, so i had to create the cell MMIG_CMP_NOR3C
+
+	# first check the upper gate
+	if {[expr $ubit - $bitpos] > 20} {
+	  switch $gate_type($prev_row,$ugate) {
+	    MMI_NOR3B_ {set gate_type($prev_row,$ugate) "MMIG_CMP_NOR3C"}
+	    MMI_NOR2B_ {set gate_type($prev_row,$ugate) "MMI_NOR2C_"}
+	    MMI_INVB_  {set gate_type($prev_row,$ugate) "MMI_INVC_"}
+	    MMI_NAND3B {set gate_type($prev_row,$ugate) "MMI_NAND3C"}
+	    MMI_NAND2B {set gate_type($prev_row,$ugate) "MMI_NAND2C"}
+	    MMI_INVB   {set gate_type($prev_row,$ugate) "MMI_INVC"}
+	  }
+	}
+	# now the lower gate
+	if {[expr $bitpos - $lbit] > 20} {
+	  switch $gate_type($prev_row,$lgate) {
+	    MMI_NOR3B_ {set gate_type($prev_row,$lgate) "MMIG_CMP_NOR3C"}
+	    MMI_NOR2B_ {set gate_type($prev_row,$lgate) "MMI_NOR2C_"}
+	    MMI_INVB_  {set gate_type($prev_row,$lgate) "MMI_INVC_"}
+	    MMI_NAND3B {set gate_type($prev_row,$lgate) "MMI_NAND3C"}
+	    MMI_NAND2B {set gate_type($prev_row,$lgate) "MMI_NAND2C"}
+	    MMI_INVB   {set gate_type($prev_row,$lgate) "MMI_INVC"}
+	  }
+	}
+      }
+    }
+
+    # debug
+#    puts [format "Row %d: Type=%s, Count=%d" $rowcount $gate_type($rowcount,0) $gcount]
+
+    # figure out how many gates the next row needs
+    set gdiv [expr $gcount / 3]
+    set gmod [expr $gcount % 3]
+    if {$gmod != 0} {
+      set gcount [expr $gdiv + 1]
+    } else {
+      set gcount $gdiv
+    }
+ 
+    # reset variables for next row
+    set y 0
+    set yfudge [expr 3 * $yfudge]
+    set x [expr $x + $xfudge]
+    set bitincr [expr 3 * $bitincr]
+    incr rowcount
+    if {$rowcount > 1} {
+      set bitoffset 1
+    }
+  }
+
+  # add in the extra gate
+  if {[string toupper $OutputAssertion] == "BOTH"} {
+    set maxrow [expr $rowcount - 1]
+    # there is by definition just one gate in the last row (so far)
+    set gate_type($maxrow,1) $gate_xtra
+    set ngates($maxrow) [expr $ngates($maxrow) + 1]
+    set gate_y($maxrow,1) [expr $gate_y($maxrow,0) - $yfudge_orig]
+    set gname($maxrow,1) $gname($maxrow,0)
+  }
+
+  # generate all the gates
+  generate MMI_XOR2 MMI_XOR2B -Size B
+  generate MMI_NOR3 MMI_NOR3B_ -Size B -DeMorgan 1
+  generate MMI_NOR2 MMI_NOR2B_ -Size B -DeMorgan 1
+  generate MMI_NOR2 MMI_NOR2C_ -Size C -DeMorgan 1
+  generate MMI_INV MMI_INVB -Size B
+  generate MMI_INV MMI_INVC -Size C
+  generate MMI_AND3 MMI_AND3B -Size B
+  generate MMI_AND2 MMI_AND2B -Size B
+  generate MMI_NAND3 MMI_NAND3B -Size B 
+  generate MMI_NAND3 MMI_NAND3C -Size C 
+  generate MMI_NAND2 MMI_NAND2B -Size B 
+  generate MMI_NAND2 MMI_NAND2C -Size C 
+  generate MMI_INV MMI_INVB_ -Size B -DeMorgan 1
+  generate MMI_INV MMI_INVC_ -Size C -DeMorgan 1
+  generate MMI_OR3 MMI_OR3B_ -Size B -DeMorgan 1
+  generate MMI_OR2 MMI_OR2B_ -Size B -DeMorgan 1
+
+  # set wire positions
+  set inflag_x [expr -(6 * $ws1)]
+  set a_x [expr $inflag_x + $ws1]
+  set b_x [expr $a_x + $ws1]
+  set outflag_x $x
+  set rs_y 200
+
+
+  # init the layout array
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set tot_h($i) 0
+  }
+  # init the row spanner start position
+  set prev_row_start -60
+
+  # place the gates
+  for {set row 0} {$row < $rowcount} {incr row} {
+    set gcount $ngates($row)
+    # re-init the layout height array for this row
+    for {set i 0} {$i < $NBITS} {incr i} {
+      set curr_h($i) 0
+    }
+
+    for {set g 0} {$g < $gcount} {incr g} {
+
+      # gate icon info
+      switch $gate_type($row,$g) {
+	MMI_INVC -
+	MMI_INVC_ -
+	MMI_INVB -
+	MMI_INVB_ {
+	  set nports 1
+	  set port_in_y(0) 0
+	}
+	MMI_XOR2B -
+	MMI_NAND2B -
+	MMI_NAND2C -
+	MMI_NOR2B_ -
+	MMI_NOR2C_ -
+	MMI_OR2B_ -
+	MMI_AND2B {
+	  set nports 2
+	  set port_in_y(0) -20
+	  set port_in_y(1) 20
+	}
+	MMI_NAND3B -
+	MMI_NAND3C -
+	MMI_NOR3B_ -
+	MMIG_CMP_NOR3C -
+	MMI_OR3B_ -
+	MMI_AND3B {
+	  set nports 3
+	  set port_in_y(0) -20
+	  set port_in_y(1) 0
+	  set port_in_y(2) 20
+	}
+	default {error "ERROR, Unknown gate type $gate_type($row,$g) in row $row, position $g"}
+      }
+      set port_in_x -60
+      set port_out_x 60
+      set port_out_y 0
+
+      # gate layout info
+      switch $gate_type($row,$g) {
+	MMI_INVB -
+	MMI_INVB_       {set cell_h 2}
+	MMI_INVC -
+	MMI_INVC_       {set cell_h 3}
+	MMI_XOR2B       {set cell_h 10}
+	MMI_NOR2B_      {set cell_h 5}
+	MMI_NOR2C_      {set cell_h 8}
+	MMI_NOR3B_      {set cell_h 9}
+	MMIG_CMP_NOR3C  {set cell_h 18}
+	MMI_AND2B       {set cell_h 5}
+	MMI_AND3B       {set cell_h 6}
+	MMI_NAND2B      {set cell_h 3}
+	MMI_NAND2C      {set cell_h 5}
+	MMI_NAND3B      {set cell_h 6}
+	MMI_NAND3C      {set cell_h 10}
+	MMI_OR2B_       {set cell_h 5}
+	MMI_OR3B_       {set cell_h 6}
+	default {error "ERROR, Unknown gate type $gate_type($row,$g) in row $row, position $g"}
+      }
+
+      # check layout placement
+      set bitpos $gname($row,$g)
+      set curr_h($bitpos) [expr $curr_h($bitpos) + $cell_h]
+      set tot_h($bitpos) [expr $tot_h($bitpos) + $cell_h]
+      if {$tot_h($bitpos) > $bitpitch} {
+	# first try to find space in a nearby bit position
+	# rather than creating a whole new row in the layout
+	set fail 1
+	set search(0) -1
+	set search(1) 1
+	set search(2) -2
+	set search(3) 2
+	set search(4) -3
+	set search(5) 3
+	for {set i 0} {$i < 6} {incr i} {
+	  set bpos [expr $bitpos + $search($i)]
+	  set newtot [expr $tot_h($bpos) + $cell_h]
+	  if {$newtot <= $bitpitch} {
+	    # found it!
+	    # restore old values of tot_h and curr_h at first attempted placement location
+	    set curr_h($bitpos) [expr $curr_h($bitpos) - $cell_h]
+	    set tot_h($bitpos) [expr $tot_h($bitpos) - $cell_h]
+	    # new placement
+	    set bitpos $bpos
+	    set gname($row,$g) $bitpos
+	    set curr_h($bitpos) [expr $curr_h($bitpos) + $cell_h]
+	    set tot_h($bitpos) [expr $tot_h($bitpos) + $cell_h]
+	    set fail 0
+	    break
+	  }
+	}
+	if {($fail == 1)} {
+	  # we will have to start a new layout row with this drawing row
+	  
+	  # figure out where the last row ended
+	  # and drop a row spanner under the previous layout row
+	  set prev_row_end [expr $gate_x([expr $row - 1]) + $port_out_x]
+	  set prev_row_width [expr $prev_row_end - $prev_row_start]
+	  set rswidth [expr int($prev_row_width / 2)]
+	  set prev_row_center [expr $prev_row_start + $rswidth]
+	  set rsname [format "row_spanner%d" $rswidth]
+	  generate row_spanner $rsname -width $rswidth
+	  make $rsname -origin "$prev_row_center $rs_y"
+	  # reset row_start to this row
+	  set prev_row_start [expr $gate_x($row) + $port_in_x]
+	  
+	  # reset tot_h to the current row's heights
+	  for {set i 0} {$i < $NBITS} {incr i} {
+	    set tot_h($i) $curr_h($i)
+	  }
+	}
+      }
+
+      # place the gate
+      set bitname [format "\[%d\]" $bitpos]
+      # don't place the row of xors if we're doing zero detect
+      if {!(([string toupper $Operation] == "ZERODETECT") && ($row == 0))} {
+	make $gate_type($row,$g) -origin "$gate_x($row) $gate_y($row,$g)" -name $bitname
+      }
+
+      # wire up inputs
+      if {$row == 0} {
+	if {[string toupper $Operation] == "COMPARE"} {
+	  # first row:  place & connect to input pins
+	  set pin_x [expr $gate_x($row) + $port_in_x]
+	  # A input
+	  set pin_y [expr $gate_y($row,$g) + $port_in_y(0)]
+	  set stub_x [expr $pin_x - $ws1]
+	  make_wire $pin_x $pin_y $stub_x $pin_y
+	  set lname [format "\[%d\]" $g]
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname
+	  make_wire $stub_x $pin_y $a_x $pin_y
+	  if {$g == 0} {
+	    make_wire $a_x $pin_y $inflag_x $pin_y
+	    make input -origin "$inflag_x $pin_y" -name A_H$vmax_bitrange
+	  } else {
+	    make_wire $a_x $pin_y $a_x [expr $gate_y($row,[expr $g - 1]) + $port_in_y(0)]
+	  }
+	  # B input
+	  set pin_y [expr $gate_y($row,$g) + $port_in_y(1)]
+	  set stub_x [expr $pin_x - $ws1]
+	  make_wire $pin_x $pin_y $stub_x $pin_y
+	  set lname [format "\[%d\]" $g]
+	  make name_net_s -origin "$stub_x $pin_y" -name $lname
+	  make_wire $stub_x $pin_y $b_x $pin_y
+	  if {$g == 0} {
+	    make_wire $b_x $pin_y $inflag_x $pin_y
+	    make input -origin "$inflag_x $pin_y" -name B_H$vmax_bitrange
+	  } else {
+	    make_wire $b_x $pin_y $b_x [expr $gate_y($row,[expr $g - 1]) + $port_in_y(1)]
+	  }
+	} else {
+	  # zero detect:  don't place the gates, just wire up the inputs
+	  set pin_x [expr $gate_x($row) + $port_out_x]
+	  set pin_y [expr $gate_y($row,$g) + $port_out_y]
+	  set lname [format "\[%d\]" $g]
+	  make name_net_s -origin "$pin_x $pin_y" -name $lname
+	  make_wire $pin_x $pin_y $a_x $pin_y
+	  if {$g == 0} {
+	    make_wire $a_x $pin_y $inflag_x $pin_y
+	    make input -origin "$inflag_x $pin_y" -name A_H$vmax_bitrange
+	  } else {
+	    make_wire $a_x $pin_y $a_x [expr $gate_y($row,[expr $g - 1]) + $port_out_y]
+	  }
+	}
+      } else {
+	# not the first row:  wire up to previous gates
+	# set track locations
+	set track_x(0) [expr $gate_x($row) + $port_in_x - $ws1]
+	set track_x(1) [expr $track_x(0) - 20]
+	set track_x(2) [expr $track_x(1) - 20]
+	for {set port 0} {$port < $nports} {incr port} {
+	  set pin_x [expr $gate_x($row) + $port_in_x]
+	  set pin_y [expr $gate_y($row,$g) + $port_in_y($port)]
+	  if {($row == [expr $rowcount - 1]) && ($g == 1)} {
+	    # this is the extra gate to provide output of both assertions
+	    # connect to the same gates as g=0
+	    set prev_gate [expr ($nports - 1 - $port)]
+	    set xtra 1
+	  } else {
+	    set prev_gate [expr ($g * 3) + ($nports - 1 - $port)]
+	    set xtra 0
+	  }
+	  set prev_row [expr $row - 1]
+	  set prevpin_x [expr $gate_x($prev_row) + $port_out_x]
+	  set prevpin_y [expr $gate_y($prev_row,$prev_gate) + $port_out_y]
+	  make_wire $pin_x $pin_y $track_x($port) $pin_y
+	  make_wire $track_x($port) $pin_y $track_x($port) $prevpin_y
+	  if {$xtra == 0} {
+	    make_wire $track_x($port) $prevpin_y $prevpin_x $prevpin_y
+	  }
+	}
+      }
+
+      # wire up output
+      if {$row == [expr $rowcount - 1]} {
+	set pin_x [expr $gate_x($row) + $port_out_x]	
+	set pin_y [expr $gate_y($row,$g) + $port_out_y]
+	make_wire $pin_x $pin_y $outflag_x $pin_y
+	if {([string toupper $OutputAssertion] == "H") ||
+	    (([string toupper $OutputAssertion] == "BOTH") && ($g == 0))} {
+	  make output -origin "$outflag_x $pin_y" -name Equal_H
+	} else {
+	  make output -origin "$outflag_x $pin_y" -name Equal_L
+	}
+      }
+    }
+  }
+
+  # place the final row spanner
+  set this_row_end [expr $gate_x([expr $rowcount - 1]) + $port_out_x]
+  set prev_row_width [expr $this_row_end - $prev_row_start]
+  set rswidth [expr int($prev_row_width / 2)]
+  set prev_row_center [expr $prev_row_start + $rswidth]
+  set rsname [format "row_spanner%d" $rswidth]
+  generate row_spanner $rsname -width $rswidth
+  make $rsname -origin "$prev_row_center $rs_y"
+
+
+  # title bar
+  make sccs_title_bar -origin "[expr $inflag_x + 300] [expr $rs_y + 200]" -owner emc -version 0.3 -date 07/16/99
+
+}
+
+
+proc ICON_comparator args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 32} {Operation "Compare" {radio Compare ZeroDetect}} {OutputAssertion "H" {H L Both}}}
+
+  # check for acceptable response on NBITS
+  if {$NBITS < 1} {
+    error "ERROR: NBITS ($NBITS) must be greater than 0"
+  }
+  # don't let the user get too crazy
+  if {$NBITS > 128} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  set maxidx [expr $NBITS - 1]
+  # bitranges
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  # check for acceptable response on Operation
+  if {([string toupper $Operation] != "COMPARE") &&
+      ([string toupper $Operation] != "ZERODETECT")} {
+    error "ERROR: Operation ($Operation) must be Compare or ZeroDetect"
+  }
+
+  # check for acceptable response on OutputAssertion
+  if {([string toupper $OutputAssertion] != "H") &&
+      ([string toupper $OutputAssertion] != "L") &&
+      ([string toupper $OutputAssertion] != "BOTH")} {
+    error "ERROR: OutputAssertion ($OutputAssertion) must be H, L, or Both"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  icon_line -50 80 -50 -80 50 -80 50 80 -50 80
+
+  # inputs
+  if {[string toupper $Operation] == "COMPARE"} {
+    icon_term -type input -origin {-50 -20} -name A_H$vmax_bitrange
+    icon_property -origin {-40 -20} -size small -label A_H
+    icon_term -type input -origin {-50 20} -name B_H$vmax_bitrange
+    icon_property -origin {-40 20} -size small -label B_H
+  } else {
+    icon_term -type input -origin {-50 0} -name A_H$vmax_bitrange
+    icon_property -origin {-40 0} -size small -label A_H
+  }
+
+  # output
+  if {[string toupper $OutputAssertion] == "H"} {
+    icon_term -type output -origin {50 0} -name Equal_H
+    icon_property -origin {40 0} -size small -anchor e -label Equal_H
+  }
+  if {[string toupper $OutputAssertion] == "L"} {
+    icon_term -type output -origin {50 0} -name Equal_L
+    icon_property -origin {40 0} -size small -anchor e -label Equal_L
+  }
+  if {[string toupper $OutputAssertion] == "BOTH"} {
+    icon_term -type output -origin {50 -20} -name Equal_H
+    icon_property -origin {40 -20} -size small -anchor e -label Equal_H
+    icon_term -type output -origin {50 20} -name Equal_L
+    icon_property -origin {40 20} -size small -anchor e -label Equal_L
+  }
+
+  # text
+  if {[string toupper $Operation] == "COMPARE"} {
+    icon_property -origin {0 -40} -anchor center -label Comparator
+  } else {
+    icon_property -origin {0 -40} -anchor center -label "Zero Detect"
+  }
+  icon_property -origin {0 40} -anchor center -label $max_bitrange
+
+  # junk
+  icon_property -origin {-70 300} -type user -name name
+  icon_property -origin {-70 320} -type user -name M
+  icon_property -origin {-70 340} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 460} -owner emc -version 0.3 -date 07/16/99
+  # this property makes a generator pop up in "Schematic" mode rather than "Verilog" mode
+  icon_property -origin {-70 360} -type fixed -name netlist_level -text 2000
+
+  # generate verilog property
+  set fname [NAME_comparator -NBITS $NBITS -Operation $Operation -OutputAssertion $OutputAssertion]
+
+  if {[string toupper $OutputAssertion] == "H"} {
+    set ename [format ".Equal_H(\$\{Equal_H\})"]
+  }
+  if {[string toupper $OutputAssertion] == "L"} {
+    set ename [format ".Equal_L(\$\{Equal_L\})"]
+  }
+  if {[string toupper $OutputAssertion] == "BOTH"} {
+    set ename [format ".Equal_H(\$\{Equal_H\}), .Equal_L(\$\{Equal_L\})"]
+  }
+  if {[string toupper $Operation] == "COMPARE"} {
+    set pnames [format ".A_H(\$\{A_H%s\}), .B_H(\$\{B_H%s\}), %s" $vmax_bitrange $vmax_bitrange $ename]
+  } else {
+    set pnames [format ".A_H(\$\{A_H%s\}), %s" $vmax_bitrange $ename]
+  }
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin {-70 380} -type fixed -name verilog -text $vprop  
+
+  ######################################
+  # spit out the behavioral verilog code
+  set filename "$fname.vb"
+  if {[catch "open $filename w" FILE_ID]} {
+    puts "WARNING: Couldn't open file $filename"
+  }
+
+
+  # header stuff
+  puts $FILE_ID "// Behavioral verilog for comparator:"
+  puts $FILE_ID "//   NBITS = $NBITS"
+  puts $FILE_ID "//   Operation = $Operation"
+  puts $FILE_ID "//   OutputAssertion = $OutputAssertion"
+
+  if {[string toupper $OutputAssertion] == "H"} {
+    set ename [format "Equal_H"]
+  }
+  if {[string toupper $OutputAssertion] == "L"} {
+    set ename [format "Equal_L"]
+  }
+  if {[string toupper $OutputAssertion] == "BOTH"} {
+    set ename [format "Equal_H, Equal_L"]
+  }
+
+  if {[string toupper $Operation] == "COMPARE"} {
+    puts $FILE_ID [format "module %s (A_H, B_H, %s);" $fname $ename]
+  } else {
+    puts $FILE_ID [format "module %s (A_H, %s);" $fname $ename]
+  }
+
+  puts $FILE_ID [format "\n"]
+  if {([string toupper $OutputAssertion] == "H") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\toutput \t\tEqual_H;"]
+  }
+  if {([string toupper $OutputAssertion] == "L") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\toutput \t\tEqual_L;"]
+  }
+  puts $FILE_ID [format "\tinput  %s\tA_H;" $vmax_bitrange]
+  if {[string toupper $Operation] == "COMPARE"} {
+    puts $FILE_ID [format "\tinput  %s\tB_H;" $vmax_bitrange]
+  }
+
+  # initialize
+  puts $FILE_ID [format "\n\tinitial"]
+  puts $FILE_ID [format "\t  begin"]
+  if {([string toupper $OutputAssertion] == "H") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\t    Equal_H = 1'b0;"]
+  }
+  if {([string toupper $OutputAssertion] == "L") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\t    Equal_L = 1'b1;"]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+  # execute
+  if {[string toupper $Operation] == "COMPARE"} {
+    puts $FILE_ID [format "\n\talways @(A_H or B_H)"]
+  } else {
+    puts $FILE_ID [format "\n\talways @(A_H)"]
+  }
+  puts $FILE_ID [format "\t  begin"]
+  if {[string toupper $Operation] == "COMPARE"} {
+    puts $FILE_ID [format "\t    if (A_H%s === B_H%s)" $vmax_bitrange $vmax_bitrange]
+  } else {
+    puts $FILE_ID [format "\t    if (A_H%s === %d'b0)" $vmax_bitrange $NBITS]
+  }
+  if {([string toupper $OutputAssertion] == "H") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\t      Equal_H = 1'b1;"]
+  }
+  if {([string toupper $OutputAssertion] == "L") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\t      Equal_L = 1'b0;"]
+  }
+  puts $FILE_ID [format "\t    else"]
+  if {([string toupper $OutputAssertion] == "H") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\t      Equal_H = 1'b0;"]
+  }
+  if {([string toupper $OutputAssertion] == "L") || ([string toupper $OutputAssertion] == "BOTH")} {
+    puts $FILE_ID [format "\t      Equal_L = 1'b1;"]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+  # done
+  puts $FILE_ID [format "\nendmodule\t\t//%s" $fname]
+  close $FILE_ID
+}

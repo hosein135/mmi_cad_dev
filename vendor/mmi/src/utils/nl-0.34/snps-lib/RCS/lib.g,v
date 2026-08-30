@@ -1,0 +1,629 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2001.10.19.22.43.33;	author jka;	state Exp;
+branches;
+next	;
+
+
+desc
+@Experimental ANTLR parser for .lib files
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#header <<
+#include "charptr.h"
+#define AST_FIELDS   int token; char *text;
+#define zzcr_ast(tr, attr, tok, txt) { cr_ast (tr, attr, tok, txt); }
+#define zzmk_ast(tr, tok, txt)	     (AST *) mk_ast (tr, tok, txt)
+#define zzcr_attr(attr, tok, txt)
+>>
+#parser "lib"
+
+#lexclass START
+
+#token			"[\ \t]+"	<< zzskip (); >>
+#token			"\\\n"		<< zzskip ();
+					   zzline++;
+					>>
+#token			"\n"		<< zzskip ();
+					   zzline++;
+					>>
+#token			"\""		<< zzmode (GET_STRING);
+					   zzmore ();
+					>>
+#token			"/\*"		<< zzskip ();
+					   zzmode (GET_COMMENT);
+					>>
+#token FLOAT		"[0-9]+{.{[0-9]+}}"
+
+#token ADD		"\+"
+#token SUB		"\-"
+#token MUL		"\*"
+#token DIV		"/"
+
+#token AREA			"area"
+#token CAPACITANCE		"capacitance"
+#token CAPACITIVE_LOAD_UNIT	"capacitive_load_unit"
+#token CELL			"cell"
+#token CELL_FALL		"cell_fall"
+#token CELL_RISE		"cell_rise"
+#token CLEAR			"clear"
+#token CLEAR_PRESET_VAR1	"clear_preset_var1"
+#token CLEAR_PRESET_VAR2	"clear_preset_var2"
+#token CLOCK			"clock"
+#token CLOCKED_ON		"clocked_on"
+#token COMMENT			"comment"
+#token CONSTRAINED_PIN_TRANSITION "constrained_pin_transition"
+#token CURRENT_UNIT		"current_unit"
+#token DATA_IN			"data_in"
+#token DATE			"date"
+#token DEFAULT_CELL_LEAKAGE_POWER "default_cell_leakage_power"
+#token DEFAULT_FANOUT_LOAD	"default_fanout_load"
+#token DEFAULT_INOUT_PIN_CAP	"default_inout_pin_cap"
+#token DEFAULT_INOUT_PIN_FALL_RES "default_inout_pin_fall_res"
+#token DEFAULT_INOUT_PIN_RISE_RES "default_inout_pin_rise_res"
+#token DEFAULT_INPUT_PIN_CAP	"default_input_pin_cap"
+#token DEFAULT_INTRINSIC_FALL	"default_intrinsic_fall"
+#token DEFAULT_INTRINSIC_RISE	"default_intrinsic_rise"
+#token DEFAULT_MAX_FANOUT	"default_max_fanout"
+#token DEFAULT_MAX_TRANSITION	"default_max_transition"
+#token DEFAULT_MAX_CAPACITANCE	"default_max_capacitance"
+#token DEFAULT_OUTPUT_PIN_CAP	"default_output_pin_cap"
+#token DEFAULT_OUTPUT_PIN_FALL_RES "default_output_pin_fall_res"
+#token DEFAULT_OUTPUT_PIN_RISE_RES "default_output_pin_rise_res"
+#token DEFAULT_SLOPE_FALL	"default_slope_fall"
+#token DEFAULT_SLOPE_RISE	"default_slope_rise"
+#token DELAY_MODEL		"delay_model"
+#token DIRECTION		"direction"
+#token ENABLE			"enable"
+#token FALL_CONSTRAINT		"fall_constraint"
+#token FALL_RESISTANCE		"fall_resistance"
+#token FALL_TRANSITION		"fall_transition"
+#token FALLING_EDGE		"falling_edge"
+#token LIB_FALSE		"false"
+#token FANOUT_LENGTH		"fanout_length"
+#token FANOUT_LOAD		"fanout_load"
+#token FASTER_FACTOR		"faster_factor"
+#token FF			"ff"
+#token FUNCTION			"function"
+#token HOLD_FALLING		"hold_falling"
+#token HOLD_RISING		"hold_rising"
+#token INDEX_1			"index_1"
+#token INDEX_2			"index_2"
+#token INPUT			"input"
+#token INPUT_NET_TRANSITION	"input_net_transition"
+#token INPUT_VOLTAGE		"input_voltage"
+#token INOUT			"inout"
+#token INTRINSIC_FALL		"intrinsic_fall"
+#token INTRINSIC_RISE		"intrinsic_rise"
+#token K_PROCESS_DRIVE_FALL	"k_process_drive_fall"
+#token K_PROCESS_DRIVE_RISE	"k_process_drive_rise"
+#token K_PROCESS_INTRINSIC_FALL	"k_process_intrinsic_fall"
+#token K_PROCESS_INTRINSIC_RISE	"k_process_intrinsic_rise"
+#token K_PROCESS_PIN_CAP	"k_process_pin_cap"
+#token K_PROCESS_SLOPE_FALL	"k_process_slope_fall"
+#token K_PROCESS_SLOPE_RISE	"k_process_slope_rise"
+#token K_PROCESS_WIRE_CAP	"k_process_wire_cap"
+#token K_PROCESS_WIRE_RES	"k_process_wire_res"
+#token K_TEMP_DRIVE_FALL	"k_temp_drive_fall"
+#token K_TEMP_DRIVE_RISE	"k_temp_drive_rise"
+#token K_TEMP_INTRINSIC_FALL	"k_temp_intrinsic_fall"
+#token K_TEMP_INTRINSIC_RISE	"k_temp_intrinsic_rise"
+#token K_TEMP_PIN_CAP		"k_temp_pin_cap"
+#token K_TEMP_SLOPE_FALL	"k_temp_slope_fall"
+#token K_TEMP_SLOPE_RISE	"k_temp_slope_rise"
+#token K_TEMP_WIRE_CAP		"k_temp_wire_cap"
+#token K_TEMP_WIRE_RES		"k_temp_wire_res"
+#token K_VOLT_DRIVE_FALL	"k_volt_drive_fall"
+#token K_VOLT_DRIVE_RISE	"k_volt_drive_rise"
+#token K_VOLT_INTRINSIC_FALL	"k_volt_intrinsic_fall"
+#token K_VOLT_INTRINSIC_RISE	"k_volt_intrinsic_rise"
+#token K_VOLT_PIN_CAP		"k_volt_pin_cap"
+#token K_VOLT_SLOPE_FALL	"k_volt_slope_fall"
+#token K_VOLT_SLOPE_RISE	"k_volt_slope_rise"
+#token K_VOLT_WIRE_CAP		"k_volt_wire_cap"
+#token K_VOLT_WIRE_RES		"k_volt_wire_res"
+#token LATCH			"latch"
+#token LIBRARY			"library"
+#token LU_TABLE_TEMPLATE	"lu_table_template"
+#token MAX_CAPACITANCE		"max_capacitance"
+#token MAX_FANOUT		"max_fanout"
+#token MAX_TRANSITION		"max_transition"
+#token NEGATIVE_UNATE		"negative_unate"
+#token NEXT_STATE		"next_state"
+#token NOM_PROCESS		"nom_process"
+#token NOM_TEMPERATURE		"nom_temperature"
+#token NOM_VOLTAGE		"nom_voltage"
+#token OPERATING_CONDITIONS	"operating_conditions"
+#token OUTPUT			"output"
+#token OUTPUT_VOLTAGE		"output_voltage"
+#token PF			"pf"
+#token PIN			"pin"
+#token POSITIVE_UNATE		"positive_unate"
+#token PRESET			"preset"
+#token PROCESS			"process"
+#token PULLING_RESISTANCE_UNIT	"pulling_resistance_unit"
+#token RELATED_PIN		"related_pin"
+#token RELATED_PIN_TRANSITION	"related_pin_transition"
+#token RESISTANCE		"resistance"
+#token RISE_CONSTRAINT		"rise_constraint"
+#token RISE_RESISTANCE		"rise_resistance"
+#token RISE_TRANSITION		"rise_transition"
+#token RISING_EDGE		"rising_edge"
+#token SETUP_FALLING		"setup_falling"
+#token SETUP_RISING		"setup_rising"
+#token SIGNAL_TYPE		"signal_type"
+#token SLOPE			"slope"
+#token SLOPE_FALL		"slope_fall"
+#token SLOPE_RISE		"slope_rise"
+#token SLOWER_FACTOR		"slower_factor"
+#token TABLE			"table"
+#token TABLE_LOOKUP		"table_lookup"
+#token TEMPERATURE		"temperature"
+#token TIME_UNIT		"time_unit"
+#token TIMING			"timing"
+#token TIMING_RANGE		"timing_range"
+#token TIMING_SENSE		"timing_sense"
+#token TIMING_TYPE		"timing_type"
+#token TOTAL_OUTPUT_NET_CAPACITANCE "total_output_net_capacitance"
+#token TREE_TYPE		"tree_type"
+#token LIB_TRUE			"true"
+#token UF			"uf"
+#token VALUES			"values"
+#token VARIABLE_1		"variable_1"
+#token VARIABLE_2		"variable_2"
+#token VIH			"vih"
+#token VIL			"vil"
+#token VIMAX			"vimax"
+#token VIMIN			"vimin"
+#token VOH			"voh"
+#token VOL			"vol"
+#token VOLTAGE			"voltage"
+#token VOLTAGE_UNIT		"voltage_unit"
+#token VOMAX			"vomax"
+#token VOMIN			"vomin"
+
+#token LIST
+
+
+#lexclass GET_ID
+
+#token LIB_ID	"~[,\)\"\ \t\n]+"	<< zzmode (START); >>
+#token		"[\ \t]+"		<< zzskip (); >>
+#token		"\n"			<< zzskip ();
+					   zzline++;
+					>>
+#token		"\""			<< zzmode (GET_STRING); >>
+
+
+#lexclass LOG_STRING
+
+#token		"[\ \t]+"	<< zzskip (); >>
+#token		"\n"		<< zzskip ();
+				   zzline++;
+				>>
+#token		"\""		<< zzskip ();
+				   zzmode (LOG_EXPR);
+				>>
+
+
+#lexclass LOG_EXPR
+
+#token		"[\ \t]+"	<< zzskip (); >>
+#token		"\n"		<< zzskip ();
+				   zzline++;
+				>>
+#token 		"\""		<< zzskip ();
+				   zzmode (START);
+				>>
+
+#token LOGID			"[A-Za-z_][A-Za-z0-9_]*"
+#token LOGADD			"\+"
+#token LOGSUB			"\-"
+#token LOGMUL			"\*"
+#token LOGDIV			"/"
+#token LOGAND			"&"
+#token LOGOR			"\|"
+#token LOGXOR			"^"
+#token LOGNEG			"'"
+#token LOGNOT			"!"
+#token LOGOPEN			"\("
+#token LOGCLOSE			"\)"
+
+
+#lexclass GET_COMMENT
+
+#token		"~[\*\n]+"	<< zzskip (); >>
+#token		"\n"		<< zzskip ();
+				   zzline++;
+				>>
+#token		"\*~[/\n]"	<< zzskip (); >>
+#token		"\*[\n]"	<< zzskip ();	
+				   zzline++;
+				>>
+#token		"\*/"		<< zzskip ();
+				   zzmode (START);
+				>>
+
+
+#lexclass GET_STRING
+
+#token			"~[\\\"\n]+"	<< zzmore (); >>
+#token			"\\~[\n]"	<< zzmore (); >>
+#token			"\\\n"		<< zzmore ();
+					   zzline++;
+					>>
+#token			"\n"		<< zzerr (zztext); >>
+#token STRING		"\""		<< zzmode (START); >>
+
+
+#lexclass START
+
+library	: LIBRARY^ identifier
+	  "\{"!
+	  ( library_statement )*
+	  "\}"!
+	;
+
+library_statement
+	: CAPACITIVE_LOAD_UNIT^ duple semi
+	| CELL^ cell
+	| COMMENT^ ":"! STRING semi
+	| CURRENT_UNIT^ ":"! STRING semi
+	| DEFAULT_CELL_LEAKAGE_POWER^ ":"! FLOAT semi
+	| DEFAULT_FANOUT_LOAD^ ":"! FLOAT semi
+	| DEFAULT_INOUT_PIN_CAP^ ":"! FLOAT semi
+	| DEFAULT_INOUT_PIN_FALL_RES^ ":"! FLOAT semi
+	| DEFAULT_INOUT_PIN_RISE_RES^ ":"! FLOAT semi
+	| DEFAULT_INPUT_PIN_CAP^ ":"! FLOAT semi
+	| DEFAULT_INTRINSIC_FALL^ ":"! FLOAT semi
+	| DEFAULT_INTRINSIC_RISE^ ":"! FLOAT semi
+	| DEFAULT_MAX_CAPACITANCE^ ":"! FLOAT semi
+	| DEFAULT_MAX_FANOUT^ ":"! FLOAT semi
+	| DEFAULT_MAX_TRANSITION^ ":"! FLOAT semi
+	| DEFAULT_OUTPUT_PIN_CAP^ ":"! FLOAT semi
+	| DEFAULT_OUTPUT_PIN_FALL_RES^ ":"! FLOAT semi
+	| DEFAULT_OUTPUT_PIN_RISE_RES^ ":"! FLOAT semi
+	| DEFAULT_SLOPE_FALL^ ":"! FLOAT semi
+	| DEFAULT_SLOPE_RISE^ ":"! FLOAT semi
+	| DELAY_MODEL^ ":"! ( TABLE_LOOKUP ) semi
+	| input_voltage
+	| IN_PLACE_SWAP_MODE^ ":"! ( MATCH_FOOTPRINT ) semi
+	| K_PROCESS_DRIVE_FALL^ ":"! FLOAT semi
+	| K_PROCESS_DRIVE_RISE^ ":"! FLOAT semi
+	| K_PROCESS_INTRINSIC_FALL^ ":"! FLOAT semi
+	| K_PROCESS_INTRINSIC_RISE^ ":"! FLOAT semi
+	| K_PROCESS_PIN_CAP^ ":"! FLOAT semi
+	| K_PROCESS_SLOPE_FALL^ ":"! FLOAT semi
+	| K_PROCESS_SLOPE_RISE^ ":"! FLOAT semi
+	| K_PROCESS_WIRE_CAP^ ":"! FLOAT semi
+	| K_PROCESS_WIRE_RES^ ":"! FLOAT semi
+	| K_TEMP_DRIVE_FALL^ ":"! FLOAT semi
+	| K_TEMP_DRIVE_RISE^ ":"! FLOAT semi
+	| K_TEMP_INTRINSIC_FALL^ ":"! FLOAT semi
+	| K_TEMP_INTRINSIC_RISE^ ":"! FLOAT semi
+	| K_TEMP_PIN_CAP^ ":"! FLOAT semi
+	| K_TEMP_SLOPE_FALL^ ":"! FLOAT semi
+	| K_TEMP_SLOPE_RISE^ ":"! FLOAT semi
+	| K_TEMP_WIRE_CAP^ ":"! FLOAT semi
+	| K_TEMP_WIRE_RES^ ":"! FLOAT semi
+	| K_VOLT_DRIVE_FALL^ ":"! FLOAT semi
+	| K_VOLT_DRIVE_RISE^ ":"! FLOAT semi
+	| K_VOLT_INTRINSIC_FALL^ ":"! FLOAT semi
+	| K_VOLT_INTRINSIC_RISE^ ":"! FLOAT semi
+	| K_VOLT_PIN_CAP^ ":"! FLOAT semi
+	| K_VOLT_SLOPE_FALL^ ":"! FLOAT semi
+	| K_VOLT_SLOPE_RISE^ ":"! FLOAT semi
+	| K_VOLT_WIRE_CAP^ ":"! FLOAT semi
+	| K_VOLT_WIRE_RES^ ":"! FLOAT semi
+	| lu_table_template
+	| NOM_PROCESS^ ":"! FLOAT semi
+	| NOM_TEMPERATURE^ ":"! FLOAT semi
+	| NOM_VOLTAGE^ ":"! FLOAT semi
+	| operating_conditions
+	| output_voltage
+	| PULLING_RESISTANCE_UNIT^ ":"! STRING semi
+	| TIME_UNIT^ ":"! STRING semi
+	| timing_range
+	| VOLTAGE_UNIT^ ":"! STRING semi
+	;
+
+input_voltage
+	: INPUT_VOLTAGE^ identifier
+	  "\{"!
+	  ( input_voltage_statement )*
+	  "\}"!
+	;
+
+output_voltage
+	: OUTPUT_VOLTAGE^ identifier
+	  "\{"!
+	  ( output_voltage_statement )*
+	  "\}"!
+	;
+
+input_voltage_statement
+	: VIL^ ":"! FLOAT semi
+	| VIH^ ":"! FLOAT semi
+	| VIMIN^ ":"! FLOAT semi
+	| VIMAX^ ":"! expr semi
+	;
+
+output_voltage_statement
+	: VOL^ ":"! FLOAT semi
+	| VOH^ ":"! FLOAT semi
+	| VOMIN^ ":"! FLOAT semi
+	| VOMAX^ ":"! expr semi
+	;
+
+lu_table_template
+	: LU_TABLE_TEMPLATE^ identifier
+	  "\{"!
+	  ( lu_table_template_statement )*
+	  "\}"!
+	;
+
+lu_table_template_statement
+	: ( VARIABLE_1^ | VARIABLE_2^ ) ":"!
+	  ( TOTAL_OUTPUT_NET_CAPACITANCE
+          | INPUT_NET_TRANSITION
+	  | RELATED_PIN_TRANSITION
+	  | CONSTRAINED_PIN_TRANSITION
+	  )
+	  semi
+	| ( INDEX_1^ | INDEX_2^ )
+	  "\("! STRING "\)"!
+	  semi
+	;
+
+timing_range
+	: TIMING_RANGE^ identifier
+	  "\{"!
+	  ( timing_range_statement )*
+	  "\}"!
+	;
+
+timing_range_statement
+	: FASTER_FACTOR^ ":"! FLOAT semi
+	| SLOWER_FACTOR^ ":"! FLOAT semi
+	;
+
+operating_conditions
+	: OPERATING_CONDITIONS "\("! STRING "\)"!
+	  "\{"!
+	  ( operating_condition_statement )*
+	  "\}"!
+	;
+
+operating_condition_statement
+	: PROCESS^ ":"! FLOAT semi
+	| TEMPERATURE^ ":"! FLOAT semi
+	| TREE_TYPE^ ":"! STRING semi
+	| VOLTAGE^ ":"! FLOAT semi
+	;
+
+wire_load
+	: "\("! STRING "\)"!
+	  "\{"!
+	  ( wire_load_statement )*
+	  "\}"!
+	;
+
+wire_load_statement
+	: AREA^ ":"! FLOAT semi
+	| CAPACITANCE^ ":"! FLOAT semi
+	| FANOUT_LENGTH^ ":"! duple semi
+	| RESISTANCE^ ":"! FLOAT semi
+	| SLOPE^ ":"! FLOAT semi
+	;
+
+cell
+	: identifier
+	  "\{"!
+	  ( cell_statement )*
+	  "\}"!
+	;
+
+cell_statement
+	: AREA^ ":"! FLOAT semi
+	| ff
+	| latch
+	| pin
+	;
+
+ff	: FF^ identifier_list
+	  "\{"!
+	  ( ff_statement )*
+	  "\}"!
+	;
+
+ff_statement
+	: CLEAR^ ":"! << zzmode (LOG_STRING); >> logexpr semi
+	| CLEAR_PRESET_VAR1^ ":"! ( LIB_L | LIB_H ) semi
+	| CLEAR_PRESET_VAR2^ ":"! ( LIB_L | LIB_H ) semi
+	| CLOCKED_ON^ ":"! STRING semi
+	| NEXT_STATE^ ":"! STRING semi
+	| PRESET^ ":"! << zzmode (LOG_STRING); >> logexpr semi
+	;
+
+latch	: LATCH^ identifier_list
+	  "\{"!
+	  ( latch_statement )*
+	  "\}"!
+	;
+
+latch_statement
+	: CLEAR^ ":"! STRING semi
+	| DATA_IN^ ":"! STRING semi
+	| ENABLE^ ":"! STRING semi
+	;
+
+pin	: PIN^ identifier 
+	  "\{"!
+	  ( pin_statement )*
+	  "\}"!
+	;
+
+pin_statement
+	: CAPACITANCE^ ":"! FLOAT semi
+	| CLOCK^ ":"! ( LIB_TRUE | LIB_FALSE ) semi
+	| DIRECTION^ ":"! ( INPUT | OUTPUT | INOUT ) semi
+	| FANOUT_LOAD^ ":"! FLOAT semi
+	| FUNCTION^ ":"! << zzmode (LOG_STRING); >> logexpr semi
+	| MAX_CAPACITANCE^ ":"! FLOAT semi
+	| MAX_TRANSITION^ ":"! FLOAT semi
+	| MAX_FANOUT^ ":"! FLOAT semi
+	| SIGNAL_TYPE^ ":"! STRING semi
+	| TIMING^ timing
+	;
+
+test_cell
+	: "\("! "\)"!
+	  "\{"!
+	  ( cell_statement )*
+	  "\}"!
+	;
+
+statetable
+	: "\("! STRING "\)"!
+	  "\{"!
+	  ( statetable_statement )*
+	  "\}"!
+	;
+
+statetable_statement
+	: TABLE^ ":"! STRING semi
+	;
+
+timing	: "\("! "\)"!
+	  "\{"!
+	  ( timing_statement )*
+	  "\}"!
+	;
+
+timing_statement
+	: CAPACITANCE^ ":"! FLOAT semi
+	| cell_rise_fall
+	| rise_fall_transition
+	| rise_fall_constraint
+	| FALL_RESISTANCE^ ":"! FLOAT semi
+	| FANOUT_LOAD^ ":"! FLOAT semi
+	| INTRINSIC_FALL^ ":"! FLOAT semi
+	| INTRINSIC_RISE^ ":"! FLOAT semi
+	| RELATED_PIN^ ":"! STRING semi
+	| RISE_RESISTANCE^ ":"! FLOAT semi
+	| SLOPE_FALL^ ":"! FLOAT semi
+	| SLOPE_RISE^ ":"! FLOAT semi
+	| TIMING_SENSE^ ":"! ( POSITIVE_UNATE | NEGATIVE_UNATE ) semi
+	| timing_type
+	;
+
+cell_rise_fall
+	: ( CELL_RISE^ | CELL_FALL^ ) identifier
+	  "\{"!
+	  ( lu_table_statement )*
+	  "\}"!
+	;
+
+rise_fall_transition
+	: ( RISE_TRANSITION^ | FALL_TRANSITION^ ) identifier
+	  "\{"!
+	  ( lu_table_statement )*
+	  "\}"!
+	;
+
+rise_fall_constraint
+	: ( RISE_CONSTRAINT^ | FALL_CONSTRAINT^ ) identifier
+	  "\{"!
+	  ( lu_table_statement )*
+	  "\}"!
+	;
+
+lu_table_statement
+	: INDEX_1^ "\("! STRING "\)"! semi
+	| INDEX_2^ "\("! STRING "\)"! semi
+	| VALUES^ "\("! STRING ( ","! STRING )* "\)"! semi
+	;
+
+timing_type
+	: TIMING_TYPE^ ":"!
+	  ( RISING_EDGE
+	  | FALLING_EDGE
+	  | SETUP_RISING
+	  | SETUP_FALLING
+	  | HOLD_RISING
+	  | HOLD_FALLING
+	  | CLEAR
+	  | PRESET
+	  )
+	  semi
+	;
+
+identifier
+	: "\("! << zzmode (GET_ID); >> id_or_string "\)"!
+	;
+
+identifier_list
+	: "\("! << zzmode (GET_ID); >> head:id_or_string
+	    ( ","! << zzmode (GET_ID); >> id_or_string )*
+	  "\)"!
+		<< #0 = #(#[LIST, "list"], #head); >>
+	;
+
+id_or_string
+	: LIB_ID
+	| STRING
+	;
+
+expr	: ( VDD | GND | FLOAT )
+	  { ( ADD^ | SUB^ | MUL^ | DIV^ )
+	    ( VDD | GND | FLOAT ) }
+	;
+
+string_list
+	: STRING ( ","! STRING )*
+	;
+
+duple	: "\("! FLOAT^ ","! ( FF | PF | UF ) "\)"!
+	;
+
+semi	: ";"!
+	| /* empty */
+	;
+
+logexpr	: e:logexpr1 { 	( LOGADD!	<< #0 = #(#[LOGOR, "|"], #e); >>
+			| LOGOR^
+			| LOGXOR^
+			)
+			logexpr
+		     }
+	;
+
+logexpr1: e:logexpr2 { 	( LOGAND^ 
+			| LOGMUL!	<< #0 = #(#[LOGAND, "&"], #e); >>
+			| /* empty */	<< #0 = #(#[LOGAND, "&"], #e); >>
+			)
+		  	logexpr1
+		     }
+	;
+
+logexpr2: e:logexpr3 { LOGNEG!		<< #0 = #(#[LOGNOT, "!"], #e); >>
+		     }
+	| LOGNOT^ logexpr3
+	;
+
+logexpr3: LOGID
+	| LOGOPEN! logexpr LOGCLOSE!
+	;
+@

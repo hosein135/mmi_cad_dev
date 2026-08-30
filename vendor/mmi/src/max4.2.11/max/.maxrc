@@ -1,0 +1,722 @@
+#puts "disabling periodic updates"
+#	set max_periodic(period) 0
+
+#puts "disabling drc"
+#:drc off	
+
+#puts "disabling between command processing" 
+#proc i_cmd_between_undos {} {return} 
+
+puts "enabling rotated text"
+set LAY_ROTATED_TEXT 1
+
+#proc cell_load_hook {def name file} {
+#	puts stderr "DEBUG cell_load_hook, def=$def name=$name file=$file"
+#}
+
+proc bap {n} {
+	global BP_MIN_BA_POP 
+	puts "setting BP_MIN_BA_POP to $n"
+	set BP_MIN_BA_POP $n
+}
+#bap 2
+
+proc bavg {f} {
+	global BP_MIN_AVG_BIN_POP
+	puts "setting BP_MIN_AVG_POP to $f"
+	set BP_MIN_AVG_BIN_POP $f
+}
+#bavg .01
+
+proc bp {} {
+	bpn
+	bpl
+	bps
+	bpx
+	bpz
+}
+
+#puts "enabling DEBUG_0"
+#set DEBUG_0 1
+
+#puts "enabling DEBUG_1"
+#set DEBUG_1 1
+
+# stop gap proc for clearing temporary paint and labels generated
+# by netlister (will be moved to C).
+proc ntlt_clear {} {
+	undo_disable
+	set saveGroup [db_group]
+	db_group _ntl
+	# Myron need all layers in list below
+	# I'll get the right way to generate this list from Pat.
+	eval sel_area -group -layers m1,m2,m3,m4 [lay_bbox] 
+	:delete
+	undo_enable
+}
+
+proc ne {args} {
+	eval db_next_edge $args
+}
+
+proc ma {size} {
+	set space 3
+	set x 0
+	while { $x<$size } {
+		set y 0
+		while {$y<$size} {
+			db_instance m [expr $x*$space] [expr $y*$space]
+			incr y
+		}	  	
+		incr x
+	}
+}
+
+proc ma2 {size} {
+	set space 3
+	set x 0
+	while { $x<$size } {
+		set y 0
+		while {$y<$size} {
+			set xbot [expr $x*$space]
+			set xtop [expr $xbot + 1]
+			set ybot [expr $y*$space]
+			set ytop [expr $ybot + 1]
+			db_paint m2 $xbot $ybot $xtop $ytop
+			incr y
+		}	  	
+		incr x
+	}
+}
+
+proc m {} {
+	db_instance  m 0 0
+}
+
+proc boom {}	{
+	db_instance m1 0 0
+	db_instance -dup_ok m1 0 0
+	sel_cell m1_0
+	sel_move 0 0
+}
+	
+proc aext {args} {
+	eval :*extract $args
+}
+
+proc l {name} {
+	lay_layer_styles $name
+}
+
+
+proc bpn {} {
+	global BP
+	set BP [bp_new_plane]
+}
+bpn;
+
+proc bpa {x0 y0 x1 y1 {text ""}} {
+	global BP
+	bp_add -text $text $BP $x0 $y0 $x1 $y1
+} 
+
+proc bpd {x0 y0 x1 y1} {
+	global BP
+	bp_delete $BP $x0 $y0 $x1 $y1
+} 
+
+proc bpr {x0 y0 x1 y1} {
+	global BP
+	bp_search $BP $x0 $y0 $x1 $y1
+} 
+
+proc bps {} {
+	global BP
+	bp_search $BP -10000 -10000 10000 10000
+} 
+
+# box based search
+proc bpt {} {
+	global BP
+	setl {x0 y0 x1 y1} [lay_box]
+	bp_search $BP $x0 $y0 $x1 $y1
+} 
+
+
+proc bpx {} {
+	global BP
+	bp_dump $BP
+} 
+
+proc bpz {} {
+	global BP
+	bp_stat $BP
+} 
+
+proc bpl {} {
+  foreach l [db_search_l labels] {
+	setl {layer x0 y0 x1 y1 pos text} $l
+	bpa $x0 $y0 $x1 $y1 $text
+  }	
+}
+
+proc b {x0 y0 x1 y1} {
+	lay_box $x0 $y0 $x1 $y1
+}
+
+proc bbox {x0 y0 x1 y1} {
+	lay_box $x0 $y0 $x1 $y1
+}
+
+proc area {x0 y0 x1 y1} {
+	lay_box $x0 $y0 $x1 $y1
+}
+
+proc l {text} {
+  	:paint m1
+	:label $text
+}	
+
+# populate
+proc bpp {} {
+ bpa 0 0 1 1       a1
+ bpa 1 1 2 2       a2
+ bpa 4 4 5 5       a3
+ bpa 10 10 11 11   a4
+ bpa 5 0 6 1       a5
+ bpa 30 30 31 31   a6
+
+ bpa 0 0 10 10     b1
+ bpa 1 1 11 11     b2
+ bpa 0 1 10 10     b3
+ bpa 1 0 10 10     b4
+ bpa 1 1 9 9       b5
+ bpa 16 16 26 26   b6
+
+ bpa 0 0 30 30	   c1 
+ bpa 1 0 30 30     c2
+ bpa 0 1 30 30     c3
+}
+
+
+proc bx {x0 y0 x1 y1 id} {
+	global BP
+	set x0 [expr $x0 / 1000.0]
+	set y0 [expr $y0 / 1000.0]
+	set x1 [expr $x1 / 1000.0]
+	set y1 [expr $y1 / 1000.0]
+	bp_search $BP $x0 $y0 $x1 $y1
+	bp_add -text $id $BP $x0 $y0 $x1 $y1
+} 
+
+# populate for bug
+proc bpbug {} {
+ bx 6 3 7 4 e1	
+ bx 6 6 7 7 e2
+ bx 7 1 8 2 e3	
+ bx 2 6 3 7 e4	
+ bx 2 4 3 5 e5	
+}
+
+proc tg {n} {
+	time "bp_test -gold $n"
+}
+
+proc tt {n} {
+	time "bp_test -tile $n"
+}
+
+proc t {n} {
+	time "bp_test $n"
+}
+
+proc tx {} {
+	bp_test -reset
+}
+
+proc r {size} {
+	bp_test -reset 
+	bp_test $size
+} 
+
+proc rg {size} {
+	bp_test -reset
+	bp_test -gold $size
+} 
+
+proc rt {size} {
+	bp_test -reset
+	bp_test -tile $size
+} 
+
+proc at {} {
+	set cmd r 
+	puts "BPLANE"
+	puts [time "$cmd 10"]
+	puts [time "$cmd 100"]
+	puts [time "$cmd 200"]
+	puts [time "$cmd 300"]
+	puts [time "$cmd 400"]
+	puts [time "$cmd 500"]
+	puts [time "$cmd 600"]
+	puts [time "$cmd 700"]
+	puts [time "$cmd 800"]
+	puts [time "$cmd 900"]
+	puts [time "$cmd 1000"]
+} 
+
+proc at2 {} {
+	set cmd r 
+	puts [time "$cmd 5000"]
+} 
+
+proc atg {} {
+	set cmd rg 
+	puts "GOLD"
+	puts [time "$cmd 10"]
+	puts [time "$cmd 100"]
+	puts [time "$cmd 200"]
+	puts [time "$cmd 300"]
+	puts [time "$cmd 400"]
+} 
+
+proc att {} {
+	set cmd rt 
+	puts "TILE"
+	puts [time "$cmd 10"]
+	puts [time "$cmd 100"]
+	puts [time "$cmd 200"]
+	puts [time "$cmd 300"]
+	puts [time "$cmd 400"]
+	puts [time "$cmd 500"]
+	puts [time "$cmd 600"]
+	puts [time "$cmd 700"]
+	puts [time "$cmd 800"]
+	puts [time "$cmd 900"]
+	puts [time "$cmd 1000"]
+}
+
+proc arun {} {
+	atg
+	att
+	at
+}
+
+proc arun2 {} {
+	puts [time "r 2000"]
+	puts [time "r 4000"]
+	puts [time "r 8000"]
+	puts [time "rt 2000"]
+	puts [time "rt 4000"]
+	puts [time "rt 8000"]
+}
+
+
+proc arun3 {} {
+	puts [time "r 10"]
+	puts [time "r 400"]
+	puts [time "r 1000"]
+	puts [time "r 2000"]
+
+
+	puts [time "rt 10"]
+	puts [time "rt 400"]
+	puts [time "rt 1000"]
+	puts [time "rt 2000"]
+
+	puts [time "rg 10"]
+	puts [time "rg 400"]
+}
+	
+
+proc mkchunk {n} {
+	for {set row 1} {$row <= $n} {set row [expr $row + 1]} {
+	db_paint m1 [expr 0 - $row] $row $row [expr $row + 1]
+	}
+}
+
+
+proc mklabs {n} {
+	db_paint m1 0 0 [expr $n + 1] [expr $n + 1]   
+	lay_box 0 0 [expr $n + 1] [expr $n + 1]   
+	for {set row 1} {$row <= $n} {set row [expr $row + 1]} {
+		for {set col 1} {$col <= $n} {set col [expr $col + 1]} {
+			db_label m1 "${col}x${row}" $col $row
+	}
+}  
+}
+
+
+proc mkpaint {n} {
+	for {set row 1} {$row <= $n} {set row [expr $row + 1]} {
+		for {set col 1} {$col <= $n} {set col [expr $col + 1]} {
+			db_label m1 "${col}x${row}" $col $row
+	}
+}  
+}
+
+#puts "type 'w2' to create test wire path"
+proc w2 {} {
+	db_wire_path m2 1 0 0 2 0
+}
+proc w3 {} {
+	db_wire_path m3 1 0 0  2 0  2 2 3 3 3 10
+}
+proc w4 {} {
+	db_wire_path poly 1 0 0  10 0  20 4
+}
+proc w5 {} {
+	db_wire_path m5 1 0 0  10 0  0 4
+}
+
+proc w6 {} {
+	db_wire_path -half_widt m1 1 0 0  10 0  0 4
+}
+
+proc w7 {} {
+	db_wire_path -rounded m2 1 0 0  10 0  0 4
+}
+
+
+proc w8 {} {
+	db_wire_path -rounded m3 1 10 0  20 0  10 4
+}
+
+
+
+proc ww1 {} {
+	db_wire_path m1 1  -.25 0  0 0  0 5
+}
+
+#puts "disabling coarse redisplay"
+#global LAY_COARSE_RES
+#set LAY_COARSE_RES -1
+
+#puts "type 'bug' to demo drc problem"
+#proc bug {} {
+#	lay_box 0 0 4000 11000
+#	:paint m1
+#}	
+
+#puts "overlaying _pal_set_zoom_state"
+proc _pal_set_zoom_state_HIDE {zoomed_out} -desc {
+  setup for zoomed in or zoomed out redisplay
+} {
+    global PAL
+    
+    puts "zoomed_out = $zoomed_out\n"
+    flush stdout
+			
+    set PAL(zoomed_out) $zoomed_out
+    if { $zoomed_out == 1 } {
+	set zoom zo
+    } else {
+	set zoom zi
+    }
+
+    foreach entry [use_first PAL(special_entrys)] {
+	_pal_special_set_state $entry $PAL(${zoom}_state.$entry)
+    }
+}
+
+proc wp {fileName} {
+	set db [gds_info $fileName]
+	set defs [get_assoc cell_defs $db]
+	puts $defs
+}
+
+#g 1 3 4 4 12 looks good to me (mha)
+proc g {fine coarse origin fpitch cpitch} {
+	global LAY_GRID_POINT_DIAMETER_FINE
+	global LAY_GRID_POINT_DIAMETER_COARSE
+	global LAY_GRID_MIN_PIXEL_PITCH_FINE
+	global LAY_GRID_MIN_PIXEL_PITCH_COARSE
+	global LAY_GRID_ORIGIN_RADIUS
+
+	set LAY_GRID_POINT_DIAMETER_FINE $fine
+	set LAY_GRID_POINT_DIAMETER_COARSE $coarse
+	set LAY_GRID_MIN_PIXEL_PITCH_FINE $fpitch
+	set LAY_GRID_MIN_PIXEL_PITCH_COARSE $cpitch
+	set LAY_GRID_ORIGIN_RADIUS $origin
+
+	lay_style 173 077 077 0 solid 0 
+	lay_style 174 077 077 0 solid 0 
+	lay_style 175 077 077 0 solid 0 
+}
+
+#puts "drc off"
+#pal_special_off drc
+
+#puts "disabling periodic updates"
+#global max_periodic
+#set max_periodic(period) 0
+
+#puts "don't wrap commands from terminal"
+#proc i_cmd_eval_terminal args -desc {
+#process command from controling terminal
+#} {
+#    eval $args
+#}
+
+#puts "always zoomed out!"
+#zot 0
+
+#puts "never zoomed out!"
+#zot 1000000
+
+#puts "always cache!"
+#cdim 10000
+
+proc go {r} {
+	global LAY_GRID_ORIGIN_RADIUS
+	set LAY_GRID_ORIGIN_RADIUS $r
+}
+
+proc lb {} {
+	eval lay_box [eval db_largest_box -edit poly [lay_box]]
+}
+
+proc lb0 {} {
+	db_largest_box init
+	eval lay_box [eval db_largest_box poly [lay_box]]
+}
+
+proc dc {color} {
+	global PAL
+	set PAL(disabled_color) $color
+}
+
+proc sog {} {
+	source "~/max2/maxtcl/group.tcl"
+}
+
+#puts "doit to setup test annotations"
+proc doit {} {
+	mn_units internal
+	db_paint m4 0 0 4000000 4000000
+}
+
+
+proc p {} {
+	setl {x0 y0 x1 y1} [lay_box] 
+	db_polygon m1 $x0 $y0 $x0 $y1 $x1 $y1
+}
+
+
+proc w {} {
+	setl {x0 y0 x1 y1} [lay_box] 
+	db_wire_path m1 1 $x0 $y0 $x1 $y1
+}
+proc w {} {
+	after 5000
+	mn_tic 2000
+	after 1000
+}
+
+#puts "disabling GDS_WRITE_PROCESS_INTERACTIONS"
+#set GDS_WRITE_PROCESS_INTERACTIONS 0
+
+#puts "enabling GDS_WRITE_FLATTEN_GCELLS"
+#set GDS_WRITE_FLATTEN_GCELLS 1
+
+proc ww {} {
+	setl {num_malloc num_free bytes waste} [utls_malloc_stats]
+	puts "mallocs: $num_malloc  net: [expr $num_malloc - $num_free]  waste/bytes = [expr ($waste + 0.0)/$bytes]"
+}
+
+proc outnl {} {
+	puts ""
+	}
+
+proc outi {name value} {
+	global MEM
+	set out [format "$name %d" $value]
+	puts $out
+}
+
+proc outf {name value} {
+	global MEM
+	set out [format "$name %f" $value]
+	puts $out
+}
+
+proc outm {name value} {
+	global MEM
+	set percent [expr 100.0 * $value / $MEM(total)]
+	set value [expr $value / 1024.0]
+	set out [format "$name %#6.1f Kbytes (%f %%)" $value $percent]
+	puts $out
+}
+
+# return list of cell buffers
+proc mem_cells {} {
+  set list {}
+  foreach cell [split [db_cells -user] \n] {
+	set name [lindex $cell 0]
+        lappend list $name 
+  }
+
+  return $list
+} 
+
+proc mem_coarse {} {
+	global MEM
+
+	set memTot 0
+	set numTot 0
+	set spaceTot 0
+
+	set planes 0
+	
+	foreach cell [mem_cells] {
+	setl {head mem num space} [lay_stat_coarse -cell $cell]
+	if {$head == ""} continue
+	incr memTot $mem
+	incr numTot $num
+	incr spaceTot $space
+	}
+
+	outi coarse_num_tiles $numTot
+	if { $numTot == 0 } {
+		set numTot 1
+	}
+	outf coarse_percent_space [expr 100.0 * $spaceTot / $numTot ]
+	outi coarse_bytes_per_tile [expr $memTot / $numTot]
+	outm coarse_memory $memTot
+
+	set MEM(coarse) $memTot
+}
+
+proc mem_paint {} {
+	global MEM
+
+	set memTot 0
+	set numTot 0
+	set spaceTot 0
+
+	set planes 0
+	
+	foreach cell [mem_cells] {
+	setl {head mem num space} [db_stat_paint -cell $cell]
+	incr memTot $mem
+	incr numTot $num
+	incr spaceTot $space
+	}
+
+	outi num_tiles $numTot
+	if { $numTot == 0 } {
+		set numTot 1
+	}
+	outf percent_space [expr 100.0 * $spaceTot / $numTot ]
+	outi bytes_per_tile [expr $memTot / $numTot]
+	outm paint_memory $memTot
+
+	set MEM(paint) $memTot
+}
+
+
+proc mem_labels {} {
+	global MEM
+
+	set memTot 0
+	set numTot 0
+	
+	foreach cell [mem_cells] {
+	setl {head mem num} [db_stat_labels -cell $cell]
+	incr memTot $mem
+	incr numTot $num
+	}
+
+	outi num_labels $numTot
+	if { $numTot == 0 } {
+		set numTot 1
+	}
+	outi bytes_per_label [expr $memTot / $numTot]
+	outm label_memory $memTot
+
+	set MEM(labels) $memTot
+}
+
+
+proc mem_instances {} {
+	global MEM
+
+	set memTot 0
+	set numTot 0
+
+	foreach cell [mem_cells] {
+	setl {head mem num} [db_stat_instances -cell $cell]
+	incr memTot $mem
+	incr numTot $num
+	}
+
+	outi num_instances $numTot
+	if { $numTot == 0 } {
+		set numTot 1
+	}
+	outi bytes_per_instance [expr $memTot / $numTot]
+	outm instance_memory $memTot
+
+	set MEM(instances) $memTot
+}
+
+proc mem_malloc {} {
+	global MEM
+	
+	setl { mallocs frees bytes align} [utls_malloc_stats]
+	set net [expr $mallocs - $frees] 
+	set link [expr ($net * 8)]
+
+	outi num_mallocs $mallocs
+	outi num_frees   $frees
+	outi net_mallocs $net
+	outm malloc_align_overhead $align
+	outm malloc_link_overhead $link
+	outm malloc_total_overhead [expr $align + $link]
+	
+	set MEM(malloc) [expr $align + $link]
+}
+
+proc mem_stats {} {
+	global MEM
+	puts "MEMORY USE SUMMARY"
+
+	# total dynamic memory
+	set MEM(total) [utls_stat_memory]
+	outm total_dynamic_memory $MEM(total)
+
+	outnl
+
+	mem_instances
+	outnl
+
+	mem_paint
+	outnl
+
+	mem_coarse
+	outnl
+
+	mem_labels
+	outnl
+
+	mem_malloc
+	outnl
+
+	puts "SUMMARY"
+	outm total_dynamic_memory $MEM(total)
+	outm instances $MEM(instances)
+	outm paint $MEM(paint)
+	outm coarse $MEM(coarse)
+	outm labels $MEM(labels)
+	outm malloc_overhead $MEM(malloc)
+
+	set all [expr $MEM(instances) + $MEM(paint) + $MEM(coarse) + $MEM(labels) + $MEM(malloc)]
+
+	set other [expr $MEM(total) - $all]
+	outm other $other
+}
+
+proc s {n l} {
+	setl {x y x2 y2} [lay_box]
+	sel_net -point $x $y -limit $n $l	
+}

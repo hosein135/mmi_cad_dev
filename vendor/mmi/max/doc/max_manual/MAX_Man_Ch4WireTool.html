@@ -1,0 +1,514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 22:41:49">
+<title>The MAX Wire Tool</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout System User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MAX_ManualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MAX_Man_Ch3Commands.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="MAX_Man_Ch5MAX-LS.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="MAX_ManualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 4 </font>
+</h2>
+
+
+<h1>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The MAX Wire Tool</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1026718"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction To The MAX Wire Tool</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1031416"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Wire Tool facilitates drawing new wire connections. Wires can be drawn in any metal or poly layer, and include vias to switch between layers. The layers used by the Wire Tool are specified in the <b><code class="CodeStrong">MAX Technology File</code></b> (see Chapter 6, "<a href="MAX_Man_Ch6TechFiles.html"><em class="Emphasis">MAX Technology Targeting</em></a>").</font>
+<p>
+<p>
+  <dt> <a name="1031420"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Wire Tool does not modify existing wires; however, you can delete part of an existing wire and rapidly draw new wires using the Wire Tool. You can also <a href="MAX_Man_Ch3Commands.html#1083531"><b><code class="CodeStrong">Stretch </code></b> </a> a segment of the wire.</font>
+<p>
+<p>
+  <dt> <a name="1030693"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Wires are drawn one at a time by entering Wire Mode, optionally selecting the layer and/or wire width, and then using the mouse to point to the wire vertices.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1031447"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Starting a Wire</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1031454"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To create a wire, use the <b><strong class="Strong">w</strong></b> hotkey or select <a href="MAX_Man_Ch3Commands.html#1031847"><b><code class="CodeStrong">Add Wire </code></b> </a> from the <b><code class="CodeStrong">Edit Menu</code></b>. This places MAX in Wire Mode, which is indicated by the mouse cursor changing to a pointing finger, and the status message (at the top of the screen) changing to <b><code class="CodeStrong">wire mode</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1031472"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">After you enter Wire Mode, but before you start drawing the wire, you can change the layer and/or the width of the wire you will draw. If you do not select a layer, the wiring tool will use the <a href="MAX_Man_Ch2LayoutEd.html#1027648"><b><code class="CodeStrong">Active Layer </code></b> </a>. If the active layer is set to <b><code class="CodeStrong">auto</code></b>, <b><code class="CodeEmphasis">Auto Layer Selection</code></b> will be used, meaning it will pick one of the layers under the cursor when you start drawing the wire. The active layer is specified in the palette. If there is no wireable layer under the cursor and the active layer is set to <b><code class="CodeStrong">auto</code></b>, the <b><code class="CodeStrong">Default</code></b> <b><code class="CodeStrong">Layer</code></b> <a href="MAX_Man_Ch3Commands.html#1031541">(See <b><code class="CodeStrong">Wire Setup </code></b>)</a> from the <a href="MAX_Man_Ch4WireTool.html#1030766"><b><code class="CodeStrong">Wire Menu </code></b> </a> is used. Alternatively, you can select a layer in one of the following ways: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030713"> </a>Place the mouse over the desired layer in the palette and press mouse Button-3.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030714"> </a>Place the mouse over any paint in the design window, hold down Button-3 and select <b><code class="CodeStrong">choose layer: &lt;layer&gt;</code></b> from the pop-up menu. <a href="MAX_Man_Ch4WireTool.html#1030721">(See Figure 80)</a>.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030718"> </a>Change the <b><code class="CodeStrong">Active Layer</code></b> in the palette.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030719"> </a>Change the <b><code class="CodeStrong">Default Layer</code></b> in the <b><code class="CodeStrong">Wire</code></b> menu (described below). </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1030720"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The new layer will be reflected in the status message at the top of the screen.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1030721"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 80:   Wire pop-up Menu Before Wire is Started</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_popup1.gif" border="1">
+</div></font><a name="1034987"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1030727"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To change the wire width, use the <b><strong class="Strong">Shift-s</strong></b> hotkey, or select <b><code class="CodeStrong">Set Current Wire Size</code></b> from the pop-up menu that appears when you press mouse Button-3 in the MAX design window. The <b><code class="CodeStrong">Enter wire width </code></b>form will appear <a href="MAX_Man_Ch4WireTool.html#1030734">(See Figure 81)</a>. If the wire width is set to 0, it means use the default wire width for the layer. The default wire width for each layer is specified in the <a href="MAX_Man_Ch4WireTool.html#1030811"><b><code class="CodeStrong">Wiring Parameters Menu </code></b> </a> and is initialized to draw minimum width wires. You can actually change the width of the current wire segment even after you have started drawing it, but you cannot change the width of wire segments you have already completed.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1030734"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 81:   Edit Wire Width Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_width.gif" border="1">
+</div></font><a name="1034948"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1030739"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also set the wire width to match the width of the existing wiring layer, if any, under the cursor. To do this, press the <b><strong class="Strong">Shift</strong></b> key when you start the wire (using mouse Button-1).</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1030741"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Drawing a Wire</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1030742"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To actually start drawing the wire, point the mouse to the location where you want the wire to start and press mouse Button-1 (or Shift-Button-1 to match the width of the layer under the cursor). You can then move the mouse to create the wire, which will follow the mouse movements. To create a vertex (bend in the wire) press Button-1 again. Notice that the vertex slides along the previous wire segment so that you can move the mouse in any direction and the wire will follow. To prevent the vertex from sliding, press the <b><strong class="Strong">a</strong></b> key, or select <b><code class="CodeStrong">anchor vertex</code></b> from the pop-up menu that appears when you press mouse Button-3 <a href="MAX_Man_Ch4WireTool.html#1031602">(See Figure 82)</a>. </font>
+<p>
+<p>
+  <dt> <a name="1030746"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To end the wire, press mouse Button-1 over an existing metal of the same type as the wire. You can also end the wire at any time using mouse Button-2, which allows you to exit wiring mode without completing a connection. When you end the wire by completing a connection, the wire tool automatically jogs the final wire segment to make the wire align properly with the existing paint. To prevent this, end the wire by pressing the control key when you press mouse Button-1 over the wire end-point.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1031602"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 82:   Wire pop-up After Wire Has Been Started</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_popup2.gif" border="1">
+</div></font><a name="1035066"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1031608"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To change layers, drop a via using either the <b><strong class="Strong">d</strong></b> or<b><strong class="Strong"> Shift-d</strong></b> hot keys, or use the pop-up menu on mouse Button-3. To undo a wire segment or via, use the <b><strong class="Strong">u</strong></b> hot key, or select <b><code class="CodeStrong">undo</code></b> from the pop-up menu on mouse Button-3.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1030754"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 83:   Wire Tool - Dropping Vias</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_via.gif" border="1">
+</div></font><a name="1035123"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1030759"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are wiring in Met1 horizontally and drop a via down (hotkey:<b><strong class="Strong"> </strong></b><b><strong class="Strong">Shift-d</strong></b>), the via still moves in the horizontal direction <a href="MAX_Man_Ch4WireTool.html#1030754">(See Figure 83)</a>. In this case, you are wiring the two left gates. Having the via follow the mouse is helpful, for example, if you are trying to line up the vertical poly wire with a gate. You move the mouse over the gate and click with Button-2 on the gate and the wire and via automatically align. If you instead want to continue with poly in the horizontal direction, you must anchor the via. To do this move the via to the desired position and anchor the via (hotkey: <b><strong class="Strong">a</strong></b>).</font>
+<p>
+<p>
+  <dt> <a name="1030763"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By default, the Wire Tool locks the angles to 90 degrees (Manhattan-style geometry). You can toggle between 45 degree and Manhattan with the <b><strong class="Strong">f</strong></b> hotkey or by selecting the desired angle from the pop-up menu. You may also draw all-angle wires. <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1031797"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX 4.2 is only a beta release for all angle and 45 degree wires (wire paths). Interactive DRC does not work for 45 degree or all angle wires. Interactive connectivity tracing in MAX does work, but the netlist extraction does not work for 45 degree or all angle wires in this release.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1030766"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wire Menu</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1030767"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Wire Menu</code></b> can be entered using the <b><strong class="Strong">Shift-w</strong></b> hotkey, or by selecting <b><code class="CodeStrong">Wire Menu</code></b> from the MAX <b><code class="CodeStrong">Edit</code></b><b><strong class="Strong"> </strong></b>menu. It can also be entered from the pop-up menu in Wire Mode.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1030768"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 84:   Wire Menu</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_menu2.gif" border="1">
+</div></font><a name="1035286"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1030773"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Active Layer:</strong></b> If you are in Wire Mode and select a layer from the palette or the design window using mouse Button-3, the <em class="Emphasis">Active Layer</em> is updated in this menu to reflect your layer selection. </font>
+<p>
+<p>
+  <dt> <a name="1030777"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Default Layer:</strong></b> The default layer is the layer that will be used if the Active Layer is set to <b><code class="CodeStrong">auto</code></b> and if no wireable layer is under the cursor when you start the wire. </font>
+<p>
+<p>
+  <dt> <a name="1030779"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Display Spacing Box:</strong></b><b><strong class="Strong"> </strong></b>If selected, it displays a simple aid to wiring of a visible box around the wire as it is drawn <a href="MAX_Man_Ch4WireTool.html#1030787">(See Figure 85)</a>. The width of this visual box indicates the correct wire separation (as defined in the <a href="MAX_Man_Ch4WireTool.html#1030811"><b><code class="CodeStrong">Wiring Parameters Menu </code></b> </a>) for the current wiring layer. This is useful for spacing wires at more than the minimum width.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1030787"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 85:   Wire Spacing Box</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_box2.gif" border="1">
+</div></font><a name="1035376"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1030793"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Snap To Grid: </strong></b>This option constrains all wire vertices to snap to the wiring grid for the current layer. The wiring grid for each layer is specified in the <a href="MAX_Man_Ch4WireTool.html#1030811"><b><code class="CodeStrong">Wiring Parameters Menu </code></b> </a>, and defaults to a one micron grid. </font>
+<p>
+<p>
+  <dt> <a name="1030798"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Snap To Angle:</strong></b> This is the default angle constraint for wire segments, and is normally 90 degrees. </font>
+<p>
+<p>
+  <dt> <a name="1030800"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Draw Vias Using:</strong></b><b><strong class="Strong"> </strong></b>If set to <b><code class="CodeStrong">any</code></b>, the code will draw vias using the first method that works: if there is a via <b><strong class="Strong">gcell</strong></b> installed, that will be used; if there is a via sub<b><strong class="Strong">cell</strong></b> found, that will be used; as a last resort, vias will be <b><strong class="Strong">paint</strong></b>ed using rectangles. You generally want to use the <b><strong class="Strong">gcell</strong></b> option.</font>
+<p>
+<p>
+  <dt> <a name="1030802"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Via gcell name:</strong></b> Specify the name of gcell to use for vias, and default properties in the form: <code class="Code">-propname value</code>. Only used if <b><code class="CodeStrong">Draw Vias Using</code></b> is set to <b><code class="CodeStrong">any</code></b> or <b><code class="CodeStrong">gcell</code></b>. You can use this to specify default properties for the via, for example, to make vias symmetric by default, set it to:<code class="Code"> via -symmetric 1</code>. You can also change this if you have created your own via gcell for use by the wiring tool.</font>
+<p>
+<p>
+  <dt> <a name="1030804"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Flylines follow mouse:</strong></b><b><strong class="Strong"> </strong></b>If set, any flylines attached to the net being wired will follow the end of the wire. When the wire is connected, the flylines disappear.</font>
+<p>
+<p>
+  <dt> <a name="1030807"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Edit Wiring Parameters:</strong></b> Edit the parameters for the wiring tool. See <a href="MAX_Man_Ch4WireTool.html#1030811"><b><code class="CodeStrong">Wiring Parameters Menu </code></b> </a> for detailed information on the wire parameters.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1030811"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wiring Parameters Menu</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1030818"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Wiring Parameters Menu</code></b> <a href="MAX_Man_Ch4WireTool.html#1030824">(See Figure 86)</a> can be entered from the <b><code class="CodeStrong">Wire Menu</code></b> (obtained by using the <b><strong class="Strong">Shift-w</strong></b> hotkey). This menu lets you specify the default wire widths, separation, and grid for the wires on each layer. The wire width cannot be less than the minimum allowed width for the current technology, or it is silently ignored. The <b><code class="CodeStrong">grid origin</code></b><b><strong class="Strong"> </strong></b>is normally (0,0), but you can specify either a single number, for example 0.5, which would place the origin at (0.5,0.5), or two numbers separated by a space, for example ".5 0", which would place the grid origin at (0.5,0). The snap grid specifies the grid to snap to if <b><code class="CodeStrong">snap to grid</code></b> is specified in the <b><code class="CodeStrong">Wire Menu</code></b>. The <b><code class="CodeStrong">Wire Separation</code></b> is the value used for the spacing box.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1030824"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 86:   Wiring Parameters</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_param.gif" border="1">
+</div></font><a name="1035463"> </a>
+      </pre>
+
+<h3>
+  <a name="1030830"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wire Tool Hotkeys</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1030831"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Below is a summary of the hotkeys for the wiring tool. The first set of hotkeys apply <em class="Emphasis">after</em> the <b><code class="CodeStrong">Add Wire</code></b> command (hotkey: <b><strong class="Strong">w</strong></b>) and <em class="Emphasis">before</em> the wire has been started.</font>
+<p>
+</dl></dl>
+<a name="1035519"> </a><font face="ITC Franklin Gothic Book">Table 2:   Hotkeys Immediately After Wire Command<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr align="center" bgcolor="#CCCCCC">
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1035522"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Hot Key</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1035524"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Function</font></font></th>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035526"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-1</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035528"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Start a minimum width wire on the active layer. </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035530"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift- Button-1</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035532"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Start a wire is same width as geometry on the active layer.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035534"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-2</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035536"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">End Wire Mode.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035538"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-3</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035540"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Wire tool pop-up menu</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035542"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">b</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035544"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Set a spacing box to guide wiring. This is useful if your routing width is more than the minimum spacing.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035546"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">f</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035548"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Toggle between 45/90 degree angle wiring mode</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035550"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">s</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035552"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Toggle snap to grid</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035554"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift- s</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035556"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Set current wire size</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035558"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift- w</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035560"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">View the <b><code class="CodeStrong">Wire Menu </code></b></font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035562"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">ESC</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1035564"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">End Wire Mode</font></font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font><dl><dl>
+<p>
+  <dt> <a name="1035566"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The next set of hotkeys are active after the wire has been started.</font>
+<p>
+</dl></dl>
+<a name="1030975"> </a><font face="ITC Franklin Gothic Book">Table 3:   Hotkeys During Wiring Mode<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr align="center" bgcolor="#CCCCCC">
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1030888"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Hot Key</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1030890"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Function</font></font></th>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030892"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-1</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030894"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Add a wire segment. Whenever you select Button-1, a new segment (corner) is added.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030896"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-2 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030898"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">End wire, aligned. If when you press mouse Button-2, the wire overlaps another wire of the same layer in the same direction, the wire will be automatically aligned.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030900"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Ctrl- Button-2</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030902"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">End wire, unaligned. The wire will end at location specified without doing any aligning.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030904"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-3</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030906"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Wire Tool pop-up menu</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030908"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">a</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030910"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Anchor/unanchor wiring vertex or via</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030912"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">b</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030914"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Set a spacing box to guide wiring. This is useful if your routing width is more than the minimum spacing.</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030916"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">c</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030918"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Change drag via method (toggles) </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030920"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">d</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030922"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Drop a via, up one layer</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030924"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift- d</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030926"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Drop a via, down one layer</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030928"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">f</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030930"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Toggle between 45/90 degree angle wiring mode</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030932"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">r</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030934"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Rotate via, if any</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030936"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">s</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030938"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Toggle snap to grid</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030940"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift- s</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030942"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Set current wire size</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030944"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">u</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030946"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Undo last via or wire segment</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030948"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift- w</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030953"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">View the <b><code class="CodeStrong">Wire Menu</code></b></font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030955"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">x</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030957"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Rotate via, if any</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030959"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">DELETE</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030961"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Undo last via or wire segment</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030963"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">ESC</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030965"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">End Wire Mode</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030967"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">(MOTION)</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1030969"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">As you move the mouse, the end of the wire segment follows the cursor. The vertex slides to follow the mouse.</font></font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font><dl><dl>
+<p>
+  <dt> <a name="1026846"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic ] -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="MAX_ManualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="MAX_Man_Ch3Commands.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="MAX_Man_Ch5MAX-LS.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="MAX_ManualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

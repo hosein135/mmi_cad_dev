@@ -1,0 +1,85 @@
+# SUE version MMI_SUE4.2.2
+
+proc SCHEMATIC_MMIG_SHF_MUX6C {} {
+  generate MMI_AOI22 MMI_AOI22B -Size B
+  make MMI_AOI22B -origin {760 590}
+  make MMI_AOI22B -origin {480 440}
+  make MMI_AOI22B -origin {480 290}
+  generate MMI_NAND3 MMI_NAND3C_ -Size C -DeMorgan 1
+  make MMI_NAND3C_ -origin {1020 440}
+  make input -name in5 -origin {140 600}
+  make name_net_s -name {[5]} -origin {290 640}
+  make input -name {sel[5:0]} -origin {140 640}
+  make input -name in4 -origin {140 540}
+  make name_net_s -name {[4]} -origin {290 580}
+  make input -name in3 -origin {140 450}
+  make name_net_s -name {[3]} -origin {290 490}
+  make input -name in2 -origin {140 390}
+  make name_net_s -name {[2]} -origin {290 430}
+  make input -name in1 -origin {140 300}
+  make name_net_s -name {[1]} -origin {290 340}
+  make input -name in0 -origin {140 240}
+  make name_net_s -name {[0]} -origin {290 280}
+  make output -name out -origin {1160 440}
+  make row_spanner -origin {870 750}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.4 -date 08/14/00 -origin {650 940}
+  make_wire 290 640 240 640
+  make_wire 240 640 140 640
+  make_wire 290 580 240 580
+  make_wire 240 580 240 640
+  make_wire 290 490 240 490
+  make_wire 240 490 240 580
+  make_wire 290 430 240 430
+  make_wire 240 430 240 490
+  make_wire 290 340 240 340
+  make_wire 240 340 240 430
+  make_wire 290 280 240 280
+  make_wire 240 280 240 340
+  make_wire 960 460 890 460
+  make_wire 960 420 890 420
+  make_wire 1080 440 1160 440
+  make_wire 290 340 380 340
+  make_wire 290 430 380 430
+  make_wire 290 280 380 280
+  make_wire 140 450 380 450
+  make_wire 580 440 960 440
+  make_wire 140 300 380 300
+  make_wire 140 240 380 240
+  make_wire 140 390 380 390
+  make_wire 290 490 380 490
+  make_wire 580 290 890 290
+  make_wire 890 290 890 420
+  make_wire 140 540 660 540
+  make_wire 290 640 660 640
+  make_wire 860 590 890 590
+  make_wire 890 460 890 590
+  make_wire 290 580 660 580
+  make_wire 140 600 660 600
+  make_text -origin {70 90} -text MMIG_SHF_MUX6C -size large
+}
+
+proc ICON_MMIG_SHF_MUX6C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -150} -name in0
+  icon_term -type input -origin {0 170} -orient R270 -name {sel[5:0]}
+  icon_term -type input -origin {-60 -90} -name in1
+  icon_term -type input -origin {-60 -30} -name in2
+  icon_term -type input -origin {-60 30} -name in3
+  icon_term -type input -origin {-60 90} -name in4
+  icon_term -type input -origin {-60 150} -name in5
+  icon_property -origin {100 170} -type user -name name
+  icon_property -origin {100 190} -type user -name M
+  icon_property -origin {100 210} -type user -name dpc
+  icon_line -60 -30 -40 -30
+  icon_line -60 -90 -40 -90
+  icon_line -60 30 -40 30
+  icon_property -origin {0 0} -anchor center -label SC
+  icon_line 60 0 40 0
+  icon_line -60 90 -40 90
+  icon_line -60 -150 -40 -150
+  icon_line -60 150 -40 150
+  icon_line -40 -190 40 -150 40 150 -40 190 -40 -190
+}
+

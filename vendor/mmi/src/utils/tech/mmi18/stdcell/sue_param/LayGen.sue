@@ -1,0 +1,17 @@
+# SUE version MMI_SUE4.1.7
+
+proc ICON_LayGen args {
+  icon_setup $args {{origin {0 0}} {orient R0} {reverse_stacked_fets no} {routing_tracks_below_center 1} {order_devices_by position} {routing_tracks_above_center 1} {preroute_inner metal+poly} {preroute_outer metal+poly}}
+  icon_property -origin {-50 150} -type user -name reverse_stacked_fets -default no -choices {no nfets pfets nfets+pfets}
+  icon_property -origin {-50 90} -type user -name routing_tracks_below_center -default 1
+  icon_property -origin {-50 210} -type fixed -name sim -text {| LayGen -reverse_stacked_fets $reverse_stacked_fets -tracks_above $routing_tracks_above_center -tracks_below $routing_tracks_below_center -order_devices_by $order_devices_by -preroute_inner $preroute_inner -preroute_outer $preroute_outer}
+  icon_property -origin {10 -10} -label {Layout Generator Controller}
+  icon_property -origin {10 10} -label {routing_tracks: $routing_tracks_below_center + $routing_tracks_above_center}
+  icon_line 0 -30 370 -30 370 40 0 40 0 -30
+  icon_property -origin {-50 130} -type user -name order_devices_by -default position -choices {position device_name}
+  icon_property -origin {10 30} -label {order_devices_by: $order_devices_by}
+  icon_property -origin {-50 110} -type user -name routing_tracks_above_center -default 1
+  icon_property -origin {-50 170} -type user -name preroute_inner -default metal+poly -choices {no metal poly metal+poly}
+  icon_property -origin {-50 190} -type user -name preroute_outer -default metal+poly -choices {no metal poly metal+poly}
+}
+

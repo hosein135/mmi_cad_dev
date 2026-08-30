@@ -1,0 +1,133 @@
+This file is /mmi-cad/src/logic_generators/0README
+
+Welcome to the logic generators.  These generators run under sue/dpc,
+and produce a variety of (hopefully correct) logic elements.
+
+These are the files in this directory:
+
+RevHistory*		: detailed rev history for every generator
+mmig_AND/		: generates wider and stronger AND/NANDs than are in the MMI library
+mmig_AOn1/		: generates wider and stronger AOn1/AOIn1s than are in the MMI library
+mmig_MUX/		: generates wider and stronger MUX/MUXIs than are in the MMI library
+mmig_OR/		: generates wider and stronger OR/NORs than are in the MMI library
+mmig_adder/		: generates carry select or ripple adders
+mmig_comparator/	: generates zero detectors and comparators
+mmig_decode/		: generates binary decoders
+mmig_fastqueue/		: generates fast but small depth queues
+mmig_mul/		: generates multipliers
+mmig_mul_array/		: part of mmig_mul: generates 4:2 multiplier arrays
+mmig_mul_ppg_array/	: orphaned code, was part of older versions of mmig_mul
+mmig_mul_ppg_slice/	: part of mmig_ppg: generates one bitslice of ppg logic
+mmig_mul_slice/		: part of mmig_mul_array: generates one bitslice of mul array
+mmig_nandbuf/		: part of mmig_ppg: generates nandbuf structures
+mmig_partshifter/	: orphaned code, an attempt at a partitioned shifter
+mmig_ppg/		: part of mmig_mul: partial product generation
+mmig_ppg_4bit/		: part of mmig_ppg_slice: partial produce generation for 4 bits
+mmig_ppg_booth/		: part of mmig_mul: booth recoder for multiplier
+mmig_ppg_slice/		: part of mmig_ppg: generates one bitslice of mmig_ppg
+mmig_queue/		: generates deeper & slower queues (FIFOs) than mmig_fastqueue
+mmig_shifter/		: generates shifters and rotators
+mmig_stack/		: generates stacks (LIFOs)
+mmig_testCounter/	: generates test counter structure, used in testing schematics
+release1.0/		: release used for Malleable .25um tapeouts
+release_latest/		: latest release
+utilities/		: utility routines used by many generators
+
+===============================================================================================
+Some of the generators run standalone, some must be called by other generators.
+The standalone generators can be placed in a schematic by a designer, the rest
+can only be instantiated by higher level generators.  The standalone (top level)
+generators are:
+
+mmig_AND
+mmig_AOn1
+mmig_MUX
+mmig_OR
+mmig_adder
+mmig_comparator
+mmig_decode
+mmig_fastqueue
+mmig_mul
+mmig_nandbuf
+mmig_queue
+mmig_shifter
+mmig_stack
+mmig_testCounter
+
+===============================================================================================
+A note on names of files in the release area:
+
+If you look in the directory /mmi-cad/src/lgen (which points to the latest release),
+you will see several types of files:
+
+cp_mmig_*			: script to copy the latest version of this generator
+				: into the release area.  can also be used if you want
+				: to fetch only one generator not all.
+generators*_utilities.tcl 	: utility routines used by many generators
+MMIG_*.sue			: base level cells.  hand generated for mmi25, dpc pitch = 24um.
+				: may need to be reworked for other technologies or pitches.
+mmig_*.sue			: generators
+mmig_*.doc			: documentation for top-level generators
+
+
+===============================================================================================
+The multiplier, mmig_mul, is by far the most complicated.  A full multiplier is made up of
+trees of generators for various parts of the multiplier logic.  When you instantiate mmig_mul,
+and select the options, it calls all the generators it needs to create the entire multiplier.
+
+The multiplier uses global data structures to pass information between its zillions of
+parts.  These global structures are set up in mmig_mul, so most of the sub-generators cannot
+be instantiated on their own.
+
+Don't worry, the global data structures do have uniquified names, so that different instantiations
+of multipliers can be present in a single design.
+
+
+Here are the generator trees for various combinations:
+
+PPGAlgorithm=Simple, IncludePPG=0, IncludeCPA=0:
+
+  mmig_mul -+- mmig_mul_array --- mmig_mul_slice
+
+
+PPGAlgorithm=Simple, IncludePPG=1, IncludeCPA=0:
+
+  mmig_mul -+- mmig_ppg --- mmig_ppg_slice --- mmig_ppg_4bit 
+            |
+            +- mmig_mul_array --- mmig_mul_slice
+
+
+PPGAlgorithm=Simple, IncludePPG=0, IncludeCPA=0:
+
+  mmig_mul -+- mmig_mul_array --- mmig_mul_slice
+            |
+            +- mmig_adder
+
+
+PPGAlgorithm=Simple, IncludePPG=1, IntegratePPG=0, IncludeCPA=1:
+
+  mmig_mul -+- mmig_ppg --- mmig_ppg_slice --- mmig_ppg_4bit 
+            |
+            +- mmig_mul_array --- mmig_mul_slice
+            |
+            +- mmig_adder
+
+
+PPGAlgorithm=Simple, IncludePPG=1, IntegratePPG=1, IncludeCPA=1:
+
+  mmig_mul -+- mmig_mul_array --- mmig_mul_ppg_slice --- mmig_ppg_4bit
+            |
+            +- mmig_adder
+
+
+PPGAlgorithm=BoothRadix4 or BoothRadix8, IncludePPG=1, IncludeCPA=1:
+
+  mmig_mul -+- mmig_ppg_booth
+            |
+            +- mmig_ppg -+- mmig_ppg_slice
+            |            |
+            |            +- mmig_nandbuf
+            |
+            +- mmig_mul_array --- mmig_mul_slice
+            |
+            +- mmig_adder

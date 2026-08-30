@@ -1,0 +1,14 @@
+extern void def2pnl_design (char *);
+extern void def2pnl_die_area (int, int, int, int);
+extern void def2pnl_divider_char (char *);
+extern void def2pnl_component (char *, char *, pnl_loctype, int, int,
+				pnl_orientation);
+extern void def2pnl_pin (char *, pnl_loctype, int, int, pnl_orientation);
+extern pnl_net def2pnl_net (char *);
+extern void def2pnl_tracks (int, int, int, int, ar);
+extern void def2pnl_row_site (char *, char *, int, int, pnl_orientation,
+			       int, int, int);
+extern void def2pnl_distance_units (char *, int);
+
+extern void def2pnl_error (const char *format, ...);
+extern void def2pnl_lex_error (const char *);

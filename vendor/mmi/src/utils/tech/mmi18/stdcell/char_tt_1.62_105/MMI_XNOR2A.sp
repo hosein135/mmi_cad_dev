@@ -1,0 +1,1 @@
+../extract/MMI_XNOR2A.sp

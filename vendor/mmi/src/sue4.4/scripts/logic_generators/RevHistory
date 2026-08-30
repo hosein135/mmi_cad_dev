@@ -1,0 +1,482 @@
+File		Rev	Date		Comments
+===============	=======	===============	================================================================
+mmig_adder	0.1	01/26/99	Initial release, has the following options:
+ 					NBITS, Type (Ripple or CarrySelect), Partition, OutputSize (A,
+					B, or C), bitslice
+					Includes adder.doc and behavioral verilog generator
+
+		0.2	02/05/99	- Added support for HalfHeight layout
+
+		0.3	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+
+		0.4	03/09/99	- Updated to final (i hope) MMI generic icons
+					- Partitioned adder now outputs the sub-chain carry out's
+
+		0.5	03/26/99	- Added UsePrevCout to allow visibility of sub-chain msb carry-in's
+					  (useful for overflow/underflow detection)
+
+		0.6	04/30/99	- Added netlist_level property to icon, so that it will
+					  default to "schematic" (not "icon") in sue's dpc & verilog
+					  modes.
+					- Fixed bug in hookup of final carry out for partitioned
+					  adder.
+					- Fixed error checking on Partition to catch null input.
+					- Modified cells to speed up carry propagation:
+					  cs_startp_n0C_H, cs_startp_n0C_L, cs_startp_n0B_H,
+					  cs_startp_n0B_L.  Added MMI_ADDMUX3C.
+
+		0.7	05/10/99	- Changed cell names to begin with MMIG_ADD_
+
+		0.8	07/16/99	- Added NAME_adder proc, which creates the adder's name.
+
+		0.9	05/18/00	- Changed name from adder to mmig_adder
+					- Fixed fatal when attempt to open file for behavioral verilog code fails
+
+		1.0	05/23/00	- Added CustomCSAlg option
+
+		1.1	05/31/00	- Changed drawing style for faster viewing & netlisting
+
+		1.2	06/13/00	- Fixed bug in HalfHeight drawing.  
+					- Changed UsePrevCout, HalfHeight, bitslice option values from Y/N to 1/0.
+
+
+mmig_AND	0.1	01/21/00	Initial release
+					- Has the following options:
+					  NINPUTS, OutputAssertion, OutputSize, BitSlice, ReduceInputLoad
+					- Includes mmig_AND.doc
+					- Does not include auto-generated verilog
+
+		0.2	06/12/00	- Added VectorInput option
+
+
+mmig_AOn1	0.1	02/10/00	Initial release
+					- Has the following options:
+					  NAndInputs, OutputAssertion, OutputSize, BitSlice, ReduceInputLoad
+					- Includes mmig_AOn1.doc
+					- Does not include auto-generated verilog
+
+		0.2	06/12/00	- Added VectorInput option
+
+
+mmig_comparator	0.1	06/11/99	Initial release, has the following option:  NBITS
+					Includes comparator.doc and behavioral verilog generator
+
+		0.2	06/14/99	- Added support for Operation (compare or zero detect)
+					- Added support for OutputAssertion (H, L, or both)
+
+		0.3	07/16/99	- Added NAME_comparator proc, which creates the comparator's name.
+
+		0.4	02/25/00	- Updated to use generators_utilities & api calls
+
+		0.5	05/01/00	- Fixed bug in generated name
+					- Fixed fatal when attempt to open file for behavioral verilog code fails
+					- Changed name from comparator.sue to mmig_comparator.sue
+
+
+mmig_decode	0.1	02/10/00	Initial release
+					- Has the following options:
+					  NBITS, OutputSize, SpecialModes, BitSlice
+					- Includes mmig_decode.doc
+					- Does not include auto-generated verilog
+
+		0.2	05/11/00	- Fixed bug in call to mmig_AOn1
+
+		
+mmig_fastqueue 	0.1	12/7/99		Initial release
+					- Has the following options:
+					  NBITS, Depth, OutputSize
+					- Includes fastqueue.doc
+					- Does not include auto-generated verilog
+
+		0.2	02/25/00	- Updated to use generators_utilities & api calls
+
+		0.3	05/23/00	- Changed name from fastqueue to mmig_fastqueue
+
+
+mmig_mul	0.1	01/26/99	Initial release, has the following options:
+					NBITS, UseMulCin, AddExtraCSA, SignExtendInputs, IncludeCPA,
+					bitslice	
+
+		0.2	02/02/99	- Replaced NBITS with NBITS_A and NBITS_B to allow different 
+					  length inputs (not supported yet though)
+					- Split bitslice (mul_slice 0.1) into separate multiplier
+                                          array (mul_array) and partial product generation (ppg)
+                                          generators.
+                                        - Added IncludePPG option
+					- Changed mul icon shape to make Mark happy
+					- Added mul.doc
+					- Added SCCS title bar to every generated schematic
+
+		0.3	02/05/99	- Added support for HalfHeight layout
+
+		0.4	2/10/99		- Corrected handling of signed inputs
+					- Replaced SignExtendInputs with A={Signed,Unsigned,Both}
+					  and B={Signed,Unsigned,Both}
+
+		0.5	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+
+		0.6	02/22/99	- Added support for NBITS_A != NBITS_B
+					- Added support for NBITS_B not a power of 2
+
+		0.7	03/09/99	- Updated to final MMI generic icons
+					- Added support for NBITS_A not a power of 2
+					- Fixed sign_extend widget
+
+		0.8	04/30/99	- No changes to mul.sue; changes to underlying generators
+					  only.  Rev increased to reflect new links to new revs
+					  of other generators.
+
+		0.9	05/11/99	- No changes to mul.sue; changed names of base cells to
+					  MMIG_
+
+		1.0	05/25/99	- Added support for ReduceInputLoad parameter
+
+		1.1	05/27/99	- Nit changes.  Mainly just underlying generators changed.
+
+		1.2	07/16/99	- Added NAME_mul proc, which creates mul's name.
+
+		1.3	07/27/99	- Fixed calls to underlying generators
+
+		1.4	02/29/00	- Upgraded to use generators_utilities
+					- Fixed bug in icon
+
+		1.5	05/18/00	- Changed name from mul to mmig_mul
+					- Added PPGAlgorithm=Integrated option
+
+		1.6	05/23/00	- Added Optimize option (values:  None, Lsb)
+
+		1.7	06/13/00	- Added support for Booth multiplication. 
+					- Changed Optimize option name to OptimizeMulArray.  
+					- Changed the following option values from Y/N to 1/0:  UseMulCin, 
+					  AddExtraCSA, IncludePPG, IntegratePPG, ReduceInputLoad, IncludeCPA, HalfHeight.  
+					- Removed bitslice option.
+
+		1.8	06/23/00	- Added OptimizeMulArray=Msb,Both.  
+					- Improved OptimizeMulArray=Lsb.
+					- Changed global data structure names to permit coexistence of multiple
+					  instantiations of multipliers.
+
+
+mmig_mul_array	0.1	02/02/99	Initial release, has the following options:
+					NBITS_A, NBITS_B, UseMulCin, AddExtraCSA, bitslice
+					Includes behavioral verilog generator
+
+		0.2	02/05/99	- Added support for HalfHeight layout
+
+		0.3	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+
+		0.4	02/22/99	- Added support for NBITS_A != NBITS_B
+					- Added support for NBITS_B not a power of 2
+
+		0.5	03/09/99	- Updated to final MMI generic icons
+					- Added support for NBITS_A not a power of 2
+					- Fixed sign_extend widget
+
+		0.6	04/30/99	- Added netlist_level property to icon, so that it will
+					  default to "schematic" (not "icon") in sue's dpc & verilog
+					  modes.
+
+		0.7	05/11/99	- No changes to mul_array.sue; Changed base cell names
+					  to MMIG_
+
+		0.8	07/16/99	- Added NAME_mul_array proc, which creates mul_array's name.
+
+		0.9	07/27/99	- Fixed calls to underlying generators
+
+		1.0	02/29/00	- Upgraded to use generators_utilities
+
+		1.1	05/18/00	- Changed name from mul_array to mmig_mul_array
+					- Fixed bug in carry/cout hookups (introduced in 1.0)
+					- Fixed fatal when attempt to open file for behavioral verilog code fails
+
+		1.2	06/13/00	- Added support for Booth multiplication
+					- Changed Optimize option name to OptimizeMulArray.  
+					- Changed the following option values from Y/N to 1/0:  UseMulCin, 
+					  AddExtraCSA, IntegratePPG, HalfHeight.  
+					- Removed bitslice option.
+
+		1.3	06/23/00	- Added OptimizeMulArray=Msb,Both.  
+					- Improved OptimizeMulArray=Lsb.
+					- Changed global data structure names to permit coexistence of multiple
+					  instantiations of multipliers.
+
+		1.4	08/08/00	- Enhanced error detection on option combinations
+
+
+mmig_mul_ppg_array
+		0.1	05/18/00	Initial release, has the following options:
+					NBITS_A, NBITS_B, A, B, UseMulCin, AddExtraCSA, HalfHeight
+
+		0.2	05/23/00	- Added Optimize option (allowed values:  None, Lsb).
+
+		0.3	05/31/00	- Changed drawing style for faster viewing & netlisting
+
+
+mmig_mul_ppg_slice
+		0.1	05/18/00	Initial release, has the following options:
+					NBITS_A, NBITS_B, A, B, Bit, AddExtraCSA, HalfHeight
+
+		0.2	05/23/00	- Added Optimize option (allowed values:  None, Lsb).
+					- Updated to match pin name changes for MMIG_MUL_42ADD* cells
+
+		0.3	06/13/00	- Changed Optimize option name to OptimizeMulArray.  
+					- Changed the following option values from Y/N to 1/0:  
+					  AddExtraCSA, HalfHeight.  
+
+		0.4	06/23/00	- Added OptimizeMulArray=Msb,Both.  
+					- Improved OptimizeMulArray=Lsb.
+					- Changed global data structure names to permit coexistence of multiple
+					  instantiations of multipliers.
+
+
+mmig_mul_slice	0.1	01/26/99	Initial release, has the following options:
+					NBITS, AddExtraCSA
+
+		0.2	02/02/99	- Replaced NBITS with NBITS_A and NBITS_B
+					- PPG logic moved to ppg generator
+
+		0.3	02/05/99	- Added support for HalfHeight layout
+
+		0.4	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+
+		0.5	02/22/99	- Added support for NBITS_A != NBITS_B
+					- Added support for NBITS_B not a power of 2; note NBITS_A 
+					  must still be a power of 2
+
+		0.6	03/09/99	- Updated to final MMI generic icons
+					- Added support for NBITS_A not a power of 2
+
+		0.7	05/11/99	- Changed names of base cells to MMIG_MUL_
+
+		0.8	07/16/99	- Added NAME_mul_slice proc, which creates mul_slice's name.
+
+		0.9	02/29/00	- Upgraded to use generators_utilities
+
+		1.0	05/18/00	- Changed name from mul_slice to mmig_mul_slice
+
+		1.1	05/23/00	- Updated to match pin name changes for MMIG_MUL_42ADD* cells
+
+		1.2	06/13/00	- Changed input from NBITS_A/NBITS_B to NPPs
+					- Changed the following option values from Y/N to 1/0:  
+					  AddExtraCSA, HalfHeight.  
+
+		1.3	06/23/00	- Added MaxNBoxes options in order to access global data structure 
+					  names (now uniquified to permit coexistence of multiple
+					  instantiations of multipliers).
+
+
+mmig_MUX	0.1	01/20/00	Initial release
+					- Has the following options:
+					  NINPUTS, OutputAssertion, OutputSize, BitSlice, ReduceInputLoad
+					- Includes mmig_MUX.doc
+					- Does not include auto-generated verilog
+
+		0.2	06/12/00	- Added VectorInput option
+
+
+mmig_nandbuf	0.1	2/10/99		Initial release, has the following options:
+                                        NBITS, IconHeight (controls drawn height of icon)
+
+		0.2	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+
+		0.3	03/03/99	- Updated to final MMI generic icons
+
+		0.4	05/25/99	- Added support for ReduceInputLoad
+
+		0.5	05/27/99	- Rewrote to automate gate placement based on cell
+					  height and bitpitch.
+
+		0.6	07/16/99	- Added NAME_nandbuf proc, which creates nandbuf's name.
+
+		0.7	02/29/00	- Upgraded to use generators_utilities
+
+		0.8	05/18/00	- Changed name from nandbuf to mmig_nandbuf
+					- Updated calls to generators_place_cell
+
+		0.9	05/31/00	- Changed drawing style for faster viewing & netlisting
+
+		1.0	06/13/00	- Changed the following option values from Y/N to 1/0: 
+					  ReduceInputLoad
+
+
+mmig_OR		0.1	01/21/00	Initial release
+					- Has the following options:
+					  NINPUTS, OutputAssertion, OutputSize, BitSlice, ReduceInputLoad
+					- Includes mmig_OR.doc
+					- Does not include auto-generated verilog
+
+		0.2	06/12/00	- Added VectorInput option
+		
+
+mmig_ppg	0.1	02/02/99	Initial release, has the following options:
+					NBITS_A, NBITS_B, SignExtendInputs, Algorithm (Simple only), 
+					bitslice
+					Includes behavioral verilog generator
+
+		0.2	02/05/99	- Added support for HalfHeight layout
+
+		0.3	2/10/99		- Corrected handling of signed inputs
+					- Replaced SignExtendInputs with A={Signed,Unsigned,Both}
+					  and B={Signed,Unsigned,Both}
+
+		0.4	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+					- Fixed bug on HalfHeight option for nandbuf placement
+
+		0.5	02/22/99	- Added support for NBITS_A != NBITS_B
+					- Added support for NBITS_A and NBITS_B not a power of 2
+
+		0.6	03/09/99	- Updated to final MMI generic icons
+
+		0.7	04/22/99	- Fixed bug in verilog (declaration of btemp)
+
+		0.8	04/30/99	- Added netlist_level property to icon, so that it will
+					  default to "schematic" (not "icon") in sue's dpc & verilog
+					  modes.
+
+		0.9	05/25/99	- Added support for ReduceInputLoad
+					- Fixed bug in call to nandbuf (incorrect IconHeight)
+
+		1.0	05/27/99	- Nit changes.  Mainly just underlying generators changed.
+
+		1.1	07/16/99	- Added NAME_ppg proc, which creates ppg's name.
+
+		1.2	07/27/99	- Fixed calls to underlying generators
+
+		1.3	02/29/00	- Upgraded to use generators_utilities
+
+		1.4	05/18/00	- Changed name from ppg to mmig_ppg
+					- Fixed fatal when attempt to open file for behavioral verilog code fails
+					- Fixed a few drawing nits
+
+		1.5	05/31/00	- Changed drawing style for faster viewing & netlisting
+
+		1.6	06/13/00	- Added support for Booth Radix 4 and Radix 8 PPG logic.
+					- Removed bitslice option.  
+					- Renamed Algorithm option to PPGAlgorithm.  
+					- Changed HalfHeight and ReduceInputLoad option values from Y/N to 1/0.
+
+		1.7	06/23/00	- Added support for OptimizeMulArray=MSB for PPG=Simple.
+					- Changed global data structure names to permit coexistence of multiple
+					  instantiations of multipliers.
+
+		1.8	08/08/00	- Upgraded to get B usage info from global data structures
+
+
+mmig_ppg_4bit	0.1	05/18/00	Initial release, has the following options:
+					NBITS_A, NBITS_B, A, B, Bit, Chunk, Box, HalfHeight
+
+		0.2	06/13/00	- Changed HalfHeight option values from Y/N to 1/0.
+
+		0.3	06/23/00	- Added support (new circuit types) for OptimizeMulArray=Msb,Both.  
+					- Changed global data structure names to permit coexistence of multiple
+					  instantiations of multipliers.
+
+		0.4	08/08/00	- Turned debug flag off (oops)
+
+
+mmig_ppg_slice	0.1	02/02/99	Initial release, has the following options:
+					NBITS, Algorithm (Simple only)
+
+		0.2	2/10/99		- Corrected handling of signed inputs
+					- Replaced SignExtendInputs with A={Signed,Unsigned,Both}
+					  and B={Signed,Unsigned,Both}
+
+		0.3	02/19/99	- Changed from TSMC25 icons to MMI generic icons
+
+		0.4	03/09/99	- Updated to final MMI generic icons
+
+		0.5	05/25/99	- Fixed bug in cell placement for (NBITS % 4) = 3.
+					- Added smaller size devices for use with NBITS <= 12.
+					- Added support for ReduceInputLoad
+
+		0.6	05/27/99	- Rewrote to automate gate placement based on cell
+					  height and bitpitch.
+
+		0.7	07/16/99	- Added NAME_ppg_slice proc, which creates ppg_slice's name.
+
+		0.8	02/29/00	- Upgraded to use generators_utilities
+
+		0.9	05/18/00	- Changed name from ppg_slice to mmig_ppg_slice
+					- Updated calls to generators_place_cell
+
+		1.0	06/13/00	- Added support for Booth multiplication. 
+					- Changed the following option values from Y/N to 1/0: 
+					  ReduceInputLoad
+
+		1.1	06/23/00	- Added OptimizeMulArray=Msb,Both.  
+					- Improved OptimizeMulArray=Lsb.
+					- Changed global data structure names to permit coexistence of multiple
+					  instantiations of multipliers.
+					- Added OutputSize option.
+
+		1.2	08/08/00	- Upgraded to get B usage info from global data structures
+
+
+mmig_queue 	0.1	10/18/99	Initial release
+					- Has the following options:
+					  NBITS, Depth, OutputSize
+					- Includes queue.doc
+					- Does not include auto-generated verilog
+
+		0.2	11/4/99		- Tied FF scan_en and scan_in pins to gnd
+
+		0.3	02/25/00	- Updated to use generators_utilities & api calls
+
+		0.4	05/23/00	- Changed name from queue to mmig_queue
+
+
+mmig_shifter	0.1	04/19/99	Initial release
+					- Has the following options:
+					  NBITS, Operation, Direction, SignExtendRsh, NStages, CustomAlgorithm
+					- Includes auto-generated verilog and shifter.doc
+
+		0.2	04/21/99	- Bugfixes for .vb filename, and stages where shift amount > shifter width
+					- Added optimization for bidirectional shifters (final stage does right
+					  shift only)
+
+		0.3	04/22/99	- Added BidirOptimization parameter
+
+		0.4	04/30/99	- Added netlist_level property to icon, so that it will
+					  default to "schematic" (not "icon") in sue's dpc & verilog
+					  modes.
+
+		0.5	05/07/99	- Changed cell names to begin with MMIG_
+
+		0.6	07/16/99	- Added NAME_shifter proc, which creates shifter's name.
+
+		0.7	09/23/99	- Added AddSpacer parameter
+
+		0.8	02/25/00	- Updated to use generators_utilities & api calls
+	
+		0.9	05/23/00	- Changed name from shifter to mmig_shifter
+					- Fixed fatal when attempt to open file for behavioral verilog code fails
+	
+		1.0	08/15/00	- Added SignExtendRsh=S option (selectable sign extension on right shift)
+
+
+mmig_stack 	0.1	06/04/99	Initial release
+					- Has the following options:
+					  NBITS, NInputs, Depth, OutputSize
+					- Includes stack.doc
+					- Does not include auto-generated verilog
+
+		0.2	07/16/99	- Added NAME_stack proc, which creates stack's name.
+
+		0.3	10/18/99	- Fixed bug in signal names for NBITS=1
+
+		0.4	11/4/99		- Tied FF scan_en and scan_in pins to gnd
+
+		0.5	02/28/00	- Updated to use generators_utilities & api calls
+
+		0.6	05/23/00	- Changed name from stack to mmig_stack
+
+
+partshifter	0.1	05/25/99	Initial release.  Incomplete generator for partitioned
+					shifter.
+
+
+testCounter	0.1	01/26/99	Initial release, has the following option:  NBITS
+
+		0.2	02/22/99	- Replaced NBITS with NBITS_A and NBITS_B
+
+

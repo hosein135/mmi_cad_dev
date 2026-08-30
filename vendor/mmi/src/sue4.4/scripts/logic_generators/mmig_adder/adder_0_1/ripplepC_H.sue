@@ -1,0 +1,113 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_ripplepC_H {} {
+  make NAND2B -orient RY -origin {80 470}
+  make input -orient RY -name A_H -origin {-20 450}
+  make input -orient RY -name B_H -origin {-20 490}
+  make AOI21C -orient R270 -origin {670 340}
+  make INVC_ -origin {210 470}
+  make NOR2B_ -origin {60 550}
+  make output -orient R90Y -name Cout_L -origin {670 170}
+  make input -orient R90Y -name Cin_H -origin {670 1160}
+  make output -name Sum_H -origin {1480 610}
+  make name_net -name K_H -origin {340 610}
+  make name_net -name G_H -origin {340 470}
+  make name_net -name P_H -origin {810 590}
+  generate row_spanner row_spanner200 
+  make row_spanner200 -origin {820 1370}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {260 1370}
+  make name_net -name K_L -origin {340 550}
+  make INVC -origin {230 550}
+  make NOR2A_ -orient RY -origin {440 590}
+  make INVA -origin {470 700}
+  make XNOR2C_ -origin {880 610}
+  make name_net -name Cin_L -origin {810 630}
+  make INVA -origin {1150 1060}
+  make input -orient RY -name Inject_H -origin {-20 1020}
+  make AO22C -orient R90Y -origin {1440 880}
+  make name_net -name Inject_L -origin {1280 1060}
+  make input -orient RY -name C_H -origin {-20 1100}
+  make ripplepC_H -origin {30 210}
+  make row_spanner200 -origin {1300 1370}
+  make name_net -name Carry_H -origin {1280 770}
+  make sccs_title_bar -owner emc -version 1.2 -date 01/26/99 -origin {690 1500}
+  make_wire -20 490 10 490
+  make_wire 60 490 10 490
+  make_wire 30 450 -20 450
+  make_wire 30 450 60 450
+  make_wire 670 170 670 260
+  make_wire 640 430 640 470
+  make_wire 180 470 150 470
+  make_wire 710 430 710 550
+  make_wire 380 570 420 570
+  make_wire 340 610 420 610
+  make_wire 380 470 380 570
+  make_wire 170 610 340 610
+  make_wire 170 550 170 610
+  make_wire 260 470 340 470
+  make_wire 510 590 810 590
+  make_wire 810 590 840 590
+  make_wire 340 470 380 470
+  make_wire 380 470 640 470
+  make_wire 340 550 280 550
+  make_wire 340 550 710 550
+  make_wire 520 700 710 700
+  make_wire 710 700 710 630
+  make_wire 810 630 710 630
+  make_wire 810 630 840 630
+  make_wire 380 700 440 700
+  make_wire 30 530 40 530
+  make_wire 30 450 30 530
+  make_wire 130 550 170 550
+  make_wire 170 550 200 550
+  make_wire 10 570 40 570
+  make_wire 10 490 10 570
+  make_wire 1430 1020 1430 970
+  make_wire 1070 1020 1070 1060
+  make_wire 1450 970 1450 1060
+  make_wire 1070 1060 1120 1060
+  make_wire 380 700 380 770
+  make_wire 1280 1060 1200 1060
+  make_wire 1280 1060 1450 1060
+  make_wire 1440 770 1440 820
+  make_wire 670 430 670 770
+  make_wire -20 1020 1070 1020
+  make_wire 1070 1020 1430 1020
+  make_wire 380 770 670 770
+  make_wire 670 770 1280 770
+  make_wire 1280 770 1440 770
+  make_wire 670 1130 670 1160
+  make_wire 1490 970 1490 1130
+  make_wire 670 1130 1490 1130
+  make_wire 1390 970 1390 1100
+  make_wire -20 1100 1390 1100
+  make_wire 950 610 1480 610
+  make_text -origin {950 280} -text {This is the same cell as rippleC_H, with a carry in mux added 
+to allow carry injection mid-chain.}
+}
+
+proc ICON_ripplepC_H args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout_L
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin_H
+  icon_term -type input -origin {-140 70} -name Inject_H
+  icon_term -type input -origin {-140 90} -name C_H
+  icon_property -origin {-70 230} -type user -name name
+  icon_property -origin {-70 250} -type user -name M
+  icon_property -origin {-70 270} -type user -name dpc
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin_H
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_L
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label ripplepC_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {-130 70} -label Inj_H
+  icon_property -origin {-130 90} -label C_H
+}
+

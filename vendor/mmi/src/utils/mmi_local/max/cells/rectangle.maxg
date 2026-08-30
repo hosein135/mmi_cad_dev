@@ -1,0 +1,76 @@
+# Example generator cell (gcell) to make contacts/vias
+
+proc gcell_make {prop_list} -desc {
+  gcell procedure to make a stretchable rectangle
+} {
+
+  set x_size [get_assoc x_size $prop_list]
+  set y_size [get_assoc y_size $prop_list]
+
+  gcell_label bbox local prb 0 0 $x_size $y_size
+
+  setl {bx1 by1 bx2 by2} [lay_box]
+
+  return "[pp_number $x_size] x [pp_number $y_size]"
+}
+
+
+proc gcell_info {what prop_list} -desc {
+  Return info about this gcell.
+} -doc {
+  If <what> is cell_text, return the text to display on the cell.
+} {
+  if { $what == "cell_text" } {
+    return [get_assoc name $prop_list]
+  }
+}
+
+
+# Resize rectangle gcell with $props based on new bbox and return new prop list
+
+proc gcell_make_props {prop_list} {
+
+  set x_size [get_assoc x_size $prop_list]
+  set y_size [get_assoc y_size $prop_list]
+  set stretch [get_assoc _STRETCH_ $prop_list]
+  set bbox [get_assoc _BBOX_ $prop_list]
+
+  # You cant interatively stretch the gcell if its size is fixed.
+  if { $stretch != "" } {
+    # Attempt to stretch the block.
+
+    # Note: this box is in local gcell coordinates.
+    setl {x1 y1 x2 y2} $bbox
+
+    set x_size [max [res -userx] [expr abs($x2 - $x1)]]
+    set y_size [max [res -usery] [expr abs($y2 - $y1)]]
+  }
+
+  set prop_list [rm_assoc x_size $prop_list]
+  lappend prop_list [list x_size $x_size]
+  set prop_list [rm_assoc y_size $prop_list]
+  lappend prop_list [list y_size $y_size]
+  return $prop_list
+}
+
+proc gcell_init_rectangle {} {
+
+    # The _prop_array(n) is a terrible kludge to be able to use
+    # the nth-1 property (properties numbered starting at 0)
+    # in the -when clause.
+    # The problem is that this prop_list is processed by prop_menu,
+    # which does not support the -when clause.
+    set prop_list ""
+    lappend prop_list [list name "unnamed" -entry \
+	    -help {The name of the block, which must be the same as\
+	    the base name of the associated schematic.}]
+    lappend prop_list [list x_size 1 -number \
+	    -help {fixed x dimension}] 
+    lappend prop_list [list y_size 1 -number \
+	    -help {fixed y dimension}]
+
+    define_gcell rectangle $prop_list
+}
+
+# Do it now
+gcell_init_rectangle

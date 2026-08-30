@@ -1,0 +1,88 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_MUXI2B {} {
+  make global -name gnd -origin {590 530}
+  make global -name gnd -origin {290 530}
+  make input -name sel -origin {-70 390}
+  make output -name out -origin {710 330}
+  make input -name in1 -origin {490 490}
+  make input -name in0 -origin {140 490}
+  make global -orient RY -name vdd -origin {390 130}
+  make global -name gnd -origin {390 530}
+  make nmos -W 1.2 -origin {390 390}
+  make nmos -W 1.2 -origin {290 390}
+  make nmos -W 1.2 -origin {290 490}
+  make pmos -W 2.4 -origin {290 270}
+  make pmos -W 2.4 -origin {390 270}
+  make pmos -W 2.4 -origin {290 170}
+  make pmos -W 2.4 -origin {390 170}
+  make nmos -W 1.2 -origin {590 490}
+  make nmos -W 1.2 -origin {590 390}
+  make pmos -W 2.4 -origin {590 270}
+  make pmos -W 2.4 -origin {590 170}
+  make global -name gnd -origin {680 530}
+  make nmos -W 1.2 -origin {680 490}
+  make nmos -W 1.2 -origin {680 390}
+  make pmos -W 2.4 -origin {680 270}
+  make pmos -W 2.4 -origin {680 170}
+  make nmos -W 1.2 -origin {390 490}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel_L -origin {110 390}
+  make inverter -WP 2.4 -WN 1.2 -origin {0 390}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {280 670}
+  make_wire 290 350 290 330
+  make_wire 290 310 290 330
+  make_wire 290 210 290 230
+  make_wire 590 450 590 430
+  make_wire 590 210 590 230
+  make_wire 590 330 590 350
+  make_wire 290 450 290 430
+  make_wire 590 310 590 330
+  make_wire 490 390 530 390
+  make_wire 530 170 510 170
+  make_wire 510 170 510 490
+  make_wire 510 490 530 490
+  make_wire 510 490 490 490
+  make_wire 230 170 180 170
+  make_wire 180 170 180 490
+  make_wire 180 490 230 490
+  make_wire -70 390 -30 390
+  make_wire -70 270 -70 390
+  make_wire 140 490 180 490
+  make_wire 390 350 390 330
+  make_wire 390 310 390 330
+  make_wire 390 210 390 230
+  make_wire 390 450 390 430
+  make_wire 390 130 290 130
+  make_wire 390 130 590 130
+  make_wire 390 330 290 330
+  make_wire 230 170 330 170
+  make_wire 230 490 330 490
+  make_wire 390 330 590 330
+  make_wire 680 450 680 430
+  make_wire 680 210 680 230
+  make_wire 680 330 680 350
+  make_wire 680 310 680 330
+  make_wire 620 490 530 490
+  make_wire 620 390 530 390
+  make_wire 620 270 530 270
+  make_wire 620 170 530 170
+  make_wire 590 330 680 330
+  make_wire 680 330 710 330
+  make_wire 590 130 680 130
+  make_wire 230 390 330 390
+  make_wire -70 270 230 270
+  make_wire 230 270 330 270
+  make_wire 110 390 50 390
+  make_wire 110 390 230 390
+  make_wire 490 270 420 390
+  make_wire 490 270 530 270
+  make_wire 420 390 330 390
+  make_wire 490 390 420 270
+  make_wire 420 270 330 270
+  make_text -origin {-60 90} -text {B Size}
+  make_text -origin {-60 70} -text {Inverting 2:1 Mux}
+  make_text -origin {-60 50} -text MMI_MUXI2B -size large
+}
+

@@ -1,0 +1,16 @@
+To port irsim to linux I changed some makefiles and options. I also made
+some cosmetic changes to src/utils/Export/export.c, just to get it to compile.
+This release is modified to look for X11 libraries in /usr/X11R6/lib or
+/usr/X386/lib.
+
+If irsim doesn't compile/run on your machine, I try to help as much as I
+can.
+
+Installation:
+
+You have to have csh/tcsh to compile irsim. Set CAD_HOME environment
+variable to point to the place where you want the simulator installed. It
+will create $CAD_HOME/bin, $CAD_HOME/man and $CAD_HOME/doc/irsim and install
+itself there.
+
+Dmitry Teytelman ( dim@leland.stanford.edu or dmtsi@cunyvm.cuny.edu )

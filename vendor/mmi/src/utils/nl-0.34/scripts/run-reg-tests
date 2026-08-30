@@ -1,0 +1,12 @@
+#!/bin/sh
+
+PROGRAM=$1
+ROOT=$2
+LISPDIR=/homes/jka/nl/lisp
+EMACS=/homes/jka/bin/emacs
+FLAMBDA=$LISPDIR/flambda.el
+REGTEST=$LISPDIR/regtest.el
+FILES=`(cd $ROOT; find . -name "*.tcl" -print)`
+
+
+$EMACS -batch -l $FLAMBDA -l $REGTEST -f regtest-batch $PROGRAM $ROOT $FILES

@@ -1,0 +1,553 @@
+# This is a generator for a multiplier made up of 4:2 adders.
+
+proc SCHEMATIC_mul args {
+  call_use_keyword $args {{NBITS 8} {UseMulCin "N"} {AddExtraCSA "N"} {SignExtendInputs "N"} {IncludeCPA "Y"} {bitslice "Y"}}
+
+  # make the arguments more digestible
+  set addCSA 0
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set addCSA 1
+  }
+  set sxt 0
+  if {[string toupper $SignExtendInputs] == "Y"} {
+    set sxt 1
+  }
+  set includeCPA 0
+  if {[string toupper $IncludeCPA] == "Y"} {
+    set includeCPA 1
+  }
+
+
+  # bitslice icon box info
+  # figure out icon size
+  set cs_spacer 70
+  set pin_spacer 20
+  
+  # how many pins?
+  set pincount [expr 2 * $NBITS]
+
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 220
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]
+
+  # icon port info
+  set pin_pos [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set port_b($i) "$icon_left $pin_pos"
+    set pin_pos [expr $pin_pos - $pin_spacer]
+    set port_a($i) "$icon_left $pin_pos"
+    set pin_pos [expr $pin_pos - $pin_spacer]
+  }
+
+  set port_csa_a "$icon_left [expr $icon_top + 2*$pin_spacer]"
+  set port_csa_b "$icon_left [expr $icon_top + 3*$pin_spacer]"
+  
+  set port_sum "$icon_right -10"
+  set port_carry "$icon_right 10"
+
+  # figure out how many rows of 4:2 adders are needed
+  set j 2
+  for {set i 4} {$i <= $NBITS} {set i [expr $i * 2]} {
+    set log2($i) $j
+    incr j
+  }
+  set rowcount [expr $log2($NBITS) - 1]
+  
+  # figure out how many total boxes
+  set totboxcount $addCSA
+  for {set i 0} {$i < $rowcount} {incr i} {
+    set n [expr $rowcount - $i - 1]
+    set boxcount($i) [expr int(pow(2,$n))]
+    set totboxcount [expr $totboxcount + $boxcount($i)]
+  }
+  
+  set port_cin "-40 $icon_bot"
+  set port_cout "-40 $icon_top"
+  set port_carryin "40 $icon_bot"
+  set port_carryout "40 $icon_top"
+
+  # figure out how many carry wires go between the bitslices
+  set c_count [expr $totboxcount - 1]
+  set carry_count [expr $c_count - 1]
+  if {$c_count == 0} {
+    set c_bitrange ""
+  } else {
+    set c_bitrange [format "\[%d\:0\]" $c_count]
+  }
+  if {$carry_count == 0} {
+    set carry_bitrange ""
+  } else {
+    set carry_bitrange [format "\[%d\:0\]" $carry_count]
+  }
+
+  
+  # drawing origin
+  set base_x -500
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  # useful constants
+  set maxidx [expr $NBITS - 1]
+  set maxresidx [expr (2 * $NBITS) - 1]
+  set NRESBITS [expr (2 * $NBITS)]
+
+  set x 0
+  set y $base_y
+  set delta_y [expr $icon_y + 2 * $ws1]
+
+  # generate bitslice icon
+  set bname [format "mul_slice%d_%s" $NBITS $AddExtraCSA]
+  generate mul_slice $bname -NBITS $NBITS -AddExtraCSA $AddExtraCSA
+
+  for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+    if {[string toupper $bitslice] == "Y"} {
+      make $bname -origin "$x $y" -name "\[$bit\]"
+    } else {
+      make $bname -origin "$x $y" 
+    }
+    # record placement
+    set bsloc($bit) "$x $y"
+    set y [expr $y - $delta_y]
+  }
+
+  # finished placing the array; now wire the outputs together.
+  for {set bit 0} {$bit < $NRESBITS} {incr bit} {
+    # find the origin of the last adder cell
+    set origin_x [lindex $bsloc($bit) 0]
+    set origin_y [lindex $bsloc($bit) 1]
+
+    # sum
+    set port_sum_x [lindex $port_sum 0]
+    set port_sum_y [lindex $port_sum 1]
+    set sum_x [expr $origin_x + $port_sum_x]
+    set sum_y [expr $origin_y + $port_sum_y]
+    make_wire $sum_x $sum_y [expr $sum_x + $ws1] $sum_y
+    make name_net_s -name "\[$bit\]" -origin "[expr $sum_x + $ws1] $sum_y"
+    make_wire [expr $sum_x + $ws1] $sum_y [expr $sum_x + 3 * $ws1] $sum_y
+    if {$bit > 0} {
+      make_wire [expr $sum_x + 3 * $ws1] $sum_y [expr $sum_x + 3 * $ws1] [expr $sum_y + $delta_y]
+    } else {
+      set sum_wire_x [expr $sum_x + 4 * $ws1]
+      set sum_wire_y $sum_y
+      make_wire [expr $sum_x + 3 * $ws1] $sum_y $sum_wire_x $sum_y
+      if {$includeCPA == 1} {
+	make name_net -name "Sum_H\[$maxresidx:0\]" -origin "$sum_wire_x $sum_wire_y"
+      } else {
+	make output -name "Sum_H\[$maxresidx:0\]" -origin "$sum_wire_x $sum_wire_y"
+      }
+    }
+
+    # carry
+    set port_carry_x [lindex $port_carry 0]
+    set port_carry_y [lindex $port_carry 1]
+    set carry_x [expr $origin_x + $port_carry_x]
+    set carry_y [expr $origin_y + $port_carry_y]
+    make_wire $carry_x $carry_y [expr $carry_x + $ws1] $carry_y
+    make name_net_s -name "\[$bit\]" -origin "[expr $carry_x + $ws1] $carry_y" -orient RY
+    make_wire [expr $carry_x + $ws1] $carry_y [expr $carry_x + 2 * $ws1] $carry_y
+    if {$bit > 0} {
+      make_wire [expr $carry_x + 2 * $ws1] $carry_y [expr $carry_x + 2 * $ws1] [expr $carry_y + $delta_y]
+    } else {
+      set carry_wire_x [expr $carry_x + 4 * $ws1]
+      set carry_wire_y $carry_y
+      make_wire [expr $carry_x + 2 * $ws1] $carry_y $carry_wire_x $carry_y
+      if {$includeCPA == 1} {
+	make name_net -name "Carry_H\[$maxresidx:0\]" -origin "$carry_wire_x $carry_wire_y" -orient RY
+      } else {
+	make output -name "Carry_H\[$maxresidx:0\]" -origin "$carry_wire_x $carry_wire_y"
+      }
+    }
+
+    # carries between cells
+    set port_cout_x [lindex $port_cout 0]
+    set port_cout_y [lindex $port_cout 1]
+    set cout_x [expr $origin_x + $port_cout_x]
+    set cout_y [expr $origin_y + $port_cout_y]
+    make_wire $cout_x $cout_y $cout_x [expr $cout_y - $ws1 - 10]
+    set wname [format "Cout%d_L%s" $bit $c_bitrange]
+    make name_net -name $wname -origin "$cout_x [expr $cout_y - $ws1 - 10]"
+    make_wire $cout_x [expr $cout_y - $ws1 - 10] $cout_x [expr $origin_y - $delta_y + ($icon_y/2)]
+    
+    if {$c_count !=0} {
+      set port_carryout_x [lindex $port_carryout 0]
+      set port_carryout_y [lindex $port_carryout 1]
+      set carryout_x [expr $origin_x + $port_carryout_x]
+      set carryout_y [expr $origin_y + $port_carryout_y]
+      make_wire $carryout_x $carryout_y $carryout_x [expr $carryout_y - $ws1 + 10]
+      set wname [format "CarryOut%d_H%s" $bit $carry_bitrange]
+      make name_net -name $wname -origin "$carryout_x [expr $carryout_y - $ws1 + 10]"
+      make_wire $carryout_x [expr $carryout_y - $ws1 + 10] $carryout_x [expr $origin_y - $delta_y + ($icon_y/2)]
+    }
+
+  }
+
+  if {$includeCPA == 1} {
+    # insert carry propagate adder
+    set cs_origin_x [expr $carry_wire_x + 4 * $ws1]
+    set cs_origin_y [expr $sum_wire_y - (($sum_wire_y - $carry_wire_y) / 2)]
+    set addername [format "adder%d_CarrySelect_N_C_Y" $NRESBITS]
+    generate adder $addername -NBITS $NRESBITS -Type CarrySelect -Partition N -OutputSize C -bitslice Y
+    make $addername -origin "$cs_origin_x $cs_origin_y"
+    
+    # adder icon properties
+    set port_cs_a_x -50
+    set port_cs_a_y -30
+    set port_cs_b_x -50
+    set port_cs_b_y  30
+    set port_cs_sum_x 50
+    set port_cs_sum_y 0
+    set port_cs_cin_x 0
+    set port_cs_cin_y 70
+    set port_cs_cout_x 0
+    set port_cs_cout_y -70
+
+    # hook up multiplier array's sum bits to adder A input
+    set cs_a_x [expr $cs_origin_x + $port_cs_a_x]
+    set cs_a_y [expr $cs_origin_y + $port_cs_a_y]
+    make_wire $cs_a_x $cs_a_y [expr $cs_a_x - $ws1] $cs_a_y
+    make_wire [expr $cs_a_x - $ws1] $cs_a_y [expr $cs_a_x - $ws1] $sum_wire_y
+    make_wire [expr $cs_a_x - $ws1] $sum_wire_y $sum_wire_x $sum_wire_y
+    
+    # hook up multiplier array's carry bits to adder B input
+    # note we must shift the carry vector up one bit position
+    set cs_b_x [expr $cs_origin_x + $port_cs_b_x]
+    set cs_b_y [expr $cs_origin_y + $port_cs_b_y]
+    make_wire $cs_b_x $cs_b_y [expr $cs_b_x - 20] $cs_b_y
+    generate bus_combine bus_combine2 -ninputs 2
+    make bus_combine2 -origin "[expr $cs_b_x - 40] $cs_b_y"
+    make_wire [expr $cs_b_x - $ws1] [expr $cs_b_y - 10] [expr $cs_b_x - $ws1] $carry_wire_y
+    make_wire [expr $cs_b_x - $ws1] $carry_wire_y [expr $cs_b_x - $ws1 - 20] $carry_wire_y
+    set wname [format "\[%d:0\]" [expr $maxresidx - 1]]
+    make name_net_s -name $wname -origin "[expr $cs_b_x - $ws1 - 20] $carry_wire_y" -orient RY
+    make_wire [expr $cs_b_x - $ws1 - 20] $carry_wire_y $carry_wire_x $carry_wire_y
+    make global -name gnd -origin "[expr $cs_b_x - $ws1] [expr $cs_b_y + 10]"
+    
+    # hook up result output
+    set cs_sum_x [expr $cs_origin_x + $port_cs_sum_x]
+    set cs_sum_y [expr $cs_origin_y + $port_cs_sum_y]
+    make_wire $cs_sum_x $cs_sum_y [expr $cs_sum_x + 2 * $ws1] $cs_sum_y
+    make output -origin "[expr $cs_sum_x + 2 * $ws1] $cs_sum_y" -name "Result_H\[$maxresidx:0\]"
+    
+    # hook up adder carry in
+    set cs_cin_x [expr $cs_origin_x + $port_cs_cin_x]
+    set cs_cin_y [expr $cs_origin_y + $port_cs_cin_y]
+    make_wire $cs_cin_x $cs_cin_y $cs_cin_x 300
+    make input -name "ACin_H" -origin "$cs_cin_x 300" -orient R90Y
+    
+    # hook up adder carry out
+    set cs_cout_x [expr $cs_origin_x + $port_cs_cout_x]
+    set cs_cout_y [expr $cs_origin_y + $port_cs_cout_y]
+    make_wire $cs_cout_x $cs_cout_y $cs_cout_x [expr $cs_cout_y - 300]
+    make output -name "ACout_H" -origin "$cs_cout_x [expr $cs_cout_y - 300]" -orient R90Y
+  }
+  # end carry propagate adder insertion
+
+
+  # now hook up the multiplier inputs
+  # draw the wires first
+  set wire_start_x [expr $icon_left - 5 * $ws1]
+  set wire_start_y [expr ($icon_y / 2) + 2 * $ws1]
+  set wire_length [expr ($delta_y * $NRESBITS) + (2 * $ws1)]
+  # A_H
+  set a_x $wire_start_x
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y - $wire_length]
+  make_wire $wire_start_x $wire_start_y [expr $wire_start_x - $ws1] $wire_start_y
+  make input -name "A_H\[$maxidx:0\]" -origin "[expr $wire_start_x - $ws1] $wire_start_y"
+
+  # B_H
+  set wire_start_x [expr $wire_start_x + $ws1]
+  set b_x $wire_start_x
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y - $wire_length]
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y + $ws1]
+  make_wire $wire_start_x [expr $wire_start_y + $ws1] [expr $wire_start_x - $ws1] [expr $wire_start_y + $ws1] 
+  make input -name "B_H\[$maxidx:0\]" -origin "[expr $wire_start_x - $ws1] [expr $wire_start_y + $ws1]"
+
+  # ground
+  set wire_start_x [expr $wire_start_x + $ws1]
+  set gnd_x $wire_start_x
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y - $wire_length]
+  make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y + $ws1]
+  make global -name gnd -origin "$wire_start_x [expr $wire_start_y + $ws1]"
+
+  # hook up B_H inputs
+  # algorithm:  connect B[0] to B[0], B[1] to B[1], etc.; repeat for each bit position
+  for {set i 0} {$i < $NRESBITS} {incr i} {
+    set y [lindex $bsloc($i) 1]
+    for {set j 0} {$j < $NBITS} {incr j} {
+      set bnet [expr $y + [lindex $port_b($j) 1]]
+      make_wire $icon_left $bnet [expr $icon_left - $ws1] $bnet
+      make name_net_s -name "\[$j\]" -origin "[expr $icon_left - $ws1] $bnet"
+      make_wire [expr $icon_left - $ws1] $bnet $b_x $bnet
+    }
+  }
+
+  # hook up A_H or GND to the other nand input
+  # algorithm:  0...0||A_H
+  #             0...0||A_H||0
+  #             0...0||A_H||00
+  #             ...
+  #             A_H||0...0
+  # variant:  if SignExtendInputs is selected, replace the upper 0's with the msb of A_H
+  for {set j 0} {$j < $NBITS} {incr j} {
+    # init the algorithm variables
+    set zero_trail $j
+    set zero_lead [expr $NBITS + $j]
+    set aidx 0
+    set y [lindex $port_a($j) 1]
+
+    for {set i 0} {$i < $NRESBITS} {incr i} {
+      if {$i < $zero_trail} {
+	# connect nand input to gnd
+	make_wire $icon_left $y $gnd_x $y
+      } elseif {$i >= $zero_lead} {
+	if {$sxt == 1} {
+	  # connect nand input to msb of A_H
+	  make_wire $icon_left $y [expr $icon_left - 2*$ws1] $y
+	  make name_net_s -name "\[$maxidx\]" -origin "[expr $icon_left - 2*$ws1] $y" 
+	  make_wire [expr $icon_left - 2*$ws1] $y $a_x $y
+	} else {
+	  # connect nand input to gnd
+	  make_wire $icon_left $y $gnd_x $y
+	}
+      } else {
+	# connect nand input to A_H
+	make_wire $icon_left $y [expr $icon_left - 2*$ws1] $y
+	make name_net_s -name "\[$aidx\]" -origin "[expr $icon_left - 2*$ws1] $y" 
+	make_wire [expr $icon_left - 2*$ws1] $y $a_x $y
+	incr aidx
+      }
+      set y [expr $y - $delta_y]
+    }
+  }
+
+
+  # hook up optional CSA input
+  if {$addCSA == 1} {
+    # draw the wires first
+    set wire_start_x [expr $icon_left - 8 * $ws1]
+    set wire_start_y [expr ($icon_y / 2)]
+    # CSA_A_H
+    set csa_a_x $wire_start_x
+    make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y -($delta_y * $NRESBITS)]
+    make_wire $wire_start_x $wire_start_y [expr $wire_start_x - $ws1] $wire_start_y
+    make input -name "CSA_A_H\[$maxresidx:0\]" -origin "[expr $wire_start_x - $ws1] $wire_start_y"
+    # CSA_B_H
+    set wire_start_x [expr $wire_start_x + $ws1]
+    set wire_end_y [expr $wire_start_y + $ws1]
+    set csa_b_x $wire_start_x
+    make_wire $wire_start_x $wire_start_y $wire_start_x [expr $wire_start_y -($delta_y * $NRESBITS)]
+    make_wire $wire_start_x $wire_start_y $wire_start_x $wire_end_y
+    make_wire $wire_start_x $wire_end_y [expr $wire_start_x - $ws1] $wire_end_y
+    make input -name "CSA_B_H\[$maxresidx:0\]" -origin "[expr $wire_start_x - $ws1] $wire_end_y"
+
+
+    for {set i 0} {$i < $NRESBITS} {incr i} {
+      set y [lindex $bsloc($i) 1]
+
+      set anet [expr $y + [lindex $port_csa_a 1]]
+      make_wire $icon_left $anet [expr $icon_left - 2*$ws1] $anet
+      make name_net_s -name "\[$i\]" -origin "[expr $icon_left - 2*$ws1] $anet"
+      make_wire [expr $icon_left - 2*$ws1] $anet $csa_a_x $anet
+
+      set bnet [expr $y + [lindex $port_csa_b 1]]
+      make_wire $icon_left $bnet [expr $icon_left - $ws1] $bnet
+      make name_net_s -name "\[$i\]" -origin "[expr $icon_left - $ws1] $bnet"
+      make_wire [expr $icon_left - $ws1] $bnet $csa_b_x $bnet
+    }
+  }
+
+  
+  # hook up carry in's
+  set x [lindex $bsloc(0) 0]
+  set y [lindex $bsloc(0) 1]
+  set port_cin_x [expr $x + [lindex $port_cin 0]]
+  set port_cin_y [expr $y + [lindex $port_cin 1]]
+  set port_carryin_x [expr $x + [lindex $port_carryin 0]]
+  set port_carryin_y [expr $x + [lindex $port_carryin 1]]
+
+  if {[string toupper $UseMulCin] == "Y"} {
+    make_wire $port_cin_x $port_cin_y $port_cin_x [expr $port_cin_y + 3*$ws1]
+    make input -origin "$port_cin_x [expr $port_cin_y + 3*$ws1]" -orient R270 -name "MCin_L$c_bitrange"
+    if {$c_count != 0} {
+      make_wire $port_carryin_x $port_carryin_y $port_carryin_x [expr $port_carryin_y + 3*$ws1]
+      make input -origin "$port_carryin_x [expr $port_carryin_y + 3*$ws1]" -orient R270 -name "MCarry_H$carry_bitrange"
+    }
+  } else {
+    # wire up inputs to logical 0 if they're not used
+    set label_y [expr $port_cin_y + 2 * $ws1]
+    make_wire $port_cin_x $port_cin_y $port_cin_x $label_y
+    make name_net_s -origin "$port_cin_x $label_y" -name $c_bitrange
+    set end_y [expr $port_cin_y + 3 * $ws1]
+    make_wire $port_cin_x $label_y $port_cin_x $end_y
+    make sign_extend -origin "$port_cin_x [expr $end_y + 10]" -orient R270
+    make global -origin "$port_cin_x [expr $end_y + 20]" -name vdd      
+
+    if {$c_count != 0} {
+      set label_y [expr $port_carryin_y + 2 * $ws1]
+      make_wire $port_carryin_x $port_carryin_y $port_carryin_x $label_y
+      make name_net_s -origin "$port_carryin_x $label_y" -name $carry_bitrange
+      set end_y [expr $port_carryin_y + 3 * $ws1]
+      make_wire $port_carryin_x $label_y $port_carryin_x $end_y
+      make sign_extend -origin "$port_carryin_x [expr $end_y + 10]" -orient R270
+      make global -origin "$port_carryin_x [expr $end_y + 20]" -name gnd
+    }
+  }
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr (0 + 2 * $delta_y)]" -owner emc -version 0.1 -date 01/26/99
+
+  # force hookups
+  show_connects "" clean
+}
+
+
+
+proc ICON_mul args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 8} {UseMulCin "N"} {AddExtraCSA "N"} {SignExtendInputs "N"} {IncludeCPA "Y"} {bitslice "Y"}}
+
+  # don't let the user get too crazy
+  if {$NBITS > 64} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+
+  # check that NBITS is a power of 2, and greater than or equal to 4
+  if {$NBITS < 4} {
+    error "ERROR: NBITS must be at least 4"
+  }
+  set foo $NBITS
+  while {$foo > 1} {
+    set foo [expr $foo / 2]
+  }
+  if {$foo != 1} {
+    error "ERROR: NBITS must be a power of 2"
+  }
+
+  # check for acceptable response on bitslice query
+  if {([string toupper $bitslice] != "Y") && ([string toupper $bitslice] != "N")} {
+    error "ERROR: bitslice property ($bitslice) must be Y or N"
+  }
+  # check for acceptable response on UseMulCin query
+  if {([string toupper $UseMulCin] != "Y") && ([string toupper $UseMulCin] != "N")} {
+    error "ERROR: UseMulCin property ($UseMulCin) must be Y or N"
+  }
+  # check for acceptable response on AddExtraCSA query
+  if {([string toupper $AddExtraCSA] != "Y") && ([string toupper $AddExtraCSA] != "N")} {
+    error "ERROR: AddExtraCSA property ($AddExtraCSA) must be Y or N"
+  }
+  set addCSA 0
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    set addCSA 1
+  }
+  # check for acceptable response on SignExtendInputs query
+  if {([string toupper $SignExtendInputs] != "Y") && ([string toupper $SignExtendInputs] != "N")} {
+    error "ERROR: SignExtendInputs property ($SignExtendInputs) must be Y or N"
+  }
+  # check for acceptable response on IncludeCPA query
+  if {([string toupper $IncludeCPA] != "Y") && ([string toupper $IncludeCPA] != "N")} {
+    error "ERROR: IncludeCPA property ($IncludeCPA) must be Y or N"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  set maxidx [expr $NBITS - 1]
+  set maxresidx [expr (2 * $NBITS) - 1]
+
+  icon_term -type input -origin {-60 -40} -name "A_H\[$maxidx:0\]"
+  icon_term -type input -origin {-60 0} -name "B_H\[$maxidx:0\]"
+  icon_property -origin {-40 200} -type user -name name
+  icon_property -origin {-40 220} -type user -name M
+  icon_property -origin {-40 240} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-40 300} -owner emc -version 0.1 -date 01/26/99
+  icon_line -60 -60 -60 -10
+  icon_line -60 -10 -60 40
+  icon_line 60 -20 60 30
+  icon_line 60 30 60 80
+  icon_line -60 -60 -60 -90
+  icon_line 60 -50 60 -20
+  icon_property -origin {10 -20} -size large -anchor center -label Multiplier
+  icon_line 60 80 60 90
+  icon_line -60 40 -60 50
+  icon_line -60 -90 60 -50
+  icon_line -60 50 60 90
+  icon_property -origin {-50 -40} -size small -label A_H
+  icon_property -origin {-50 0} -size small -label B_H
+  icon_property -origin {-50 -30} -size small -label "\[$maxidx:0\]"
+  icon_property -origin {-50 10} -size small -label "\[$maxidx:0\]"
+
+  # if IncludeCPA == Y, then a carry propagate adder will be included, so the output is
+  # the result of the carry propagate add.  otherwise, the output is the redundant sum
+  # and carry vectors from the multiplier array.
+  if {[string toupper $IncludeCPA] == "Y"} {
+    icon_term -type output -origin {60 20} -name "Result_H\[$maxresidx:0\]"
+    icon_property -origin {50 20} -size small -anchor e -label Result_H
+    icon_property -origin {50 30} -size small -anchor e -label "\[$maxresidx:0\]"
+    icon_term -type output -origin {30 -60} -name "ACout_H" -orient R270
+    icon_term -type input -origin {30 80} -name "ACin_H" -orient R270
+    icon_property -origin {40 -50} -size small -anchor center -label ACout_H
+    icon_property -origin {40 70} -size small -anchor center -label ACin_H
+  } else {
+    icon_term -type output -origin {60 10} -name "Sum_H\[$maxresidx:0\]"
+    icon_property -origin {50 10} -size small -anchor e -label Sum_H
+    icon_property -origin {50 20} -size small -anchor e -label "\[$maxresidx:0\]"
+    icon_term -type output -origin {60 30} -name "Carry_H\[$maxresidx:0\]"
+    icon_property -origin {50 30} -size small -anchor e -label Carry_H
+  }
+
+  if {[string toupper $UseMulCin] == "Y"} {
+    # how many boxes are in a bitslice?
+    set j 2
+    for {set i 4} {$i <= $NBITS} {set i [expr $i * 2]} {
+      set log2($i) $j
+      incr j
+    }
+    set rowcount [expr $log2($NBITS) - 1]
+
+    # figure out how many total boxes
+    set totboxcount $addCSA
+    for {set i 0} {$i < $rowcount} {incr i} {
+      set n [expr $rowcount - $i - 1]
+      set boxcount($i) [expr int(pow(2,$n))]
+      set totboxcount [expr $totboxcount + $boxcount($i)]
+    }
+    
+    set c_count [expr $totboxcount - 1]
+    set carry_count [expr $c_count - 1]
+    
+    if {$c_count == 0} {
+      set c_bitrange ""
+    } else {
+      set c_bitrange [format "\[%d\:0\]" $c_count]
+    }
+    if {$carry_count == 0} {
+      set carry_bitrange ""
+    } else {
+      set carry_bitrange [format "\[%d\:0\]" $carry_count]
+    }
+
+    icon_term -type input -origin {-30 60} -name "MCin_L$c_bitrange" -orient R270
+    icon_property -origin {-30 50} -size small -anchor center -label "MCin_L$c_bitrange"
+
+    if {$c_count != 0} {
+      icon_term -type input -origin {0 70} -name "MCarry_H$carry_bitrange" -orient R270
+      icon_property -origin {0 60} -size small -anchor center -label "MCarry_H$carry_bitrange"
+    }      
+  }
+
+
+
+  if {[string toupper $AddExtraCSA] == "Y"} {
+    icon_term -type input -origin {-60 -70} -name "CSA_A_H\[$maxresidx:0\]"
+    icon_property -origin {-50 -70} -size small -label CSA_A_H
+    icon_property -origin {-50 -60} -size small -label "\[$maxresidx:0\]"
+
+    icon_term -type input -origin {-60 30} -name "CSA_B_H\[$maxresidx:0\]"
+    icon_property -origin {-50 30} -size small -label CSA_B_H
+    icon_property -origin {-50 40} -size small -label "\[$maxresidx:0\]"
+  }
+}

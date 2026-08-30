@@ -1,0 +1,96 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_MUX3C {} {
+  make global -name gnd -origin {1140 220}
+  make global -orient RY -name vdd -origin {890 -180}
+  make nmos -W 1.2 -origin {1140 80}
+  make nmos -W 1.2 -origin {1140 180}
+  make pmos -W 2.4 -origin {890 -40}
+  make pmos -W 2.4 -origin {890 -140}
+  make pmos -W 2.4 -origin {1140 -140}
+  make global -name gnd -origin {890 220}
+  make nmos -W 1.2 -origin {890 180}
+  make pmos -W 2.4 -origin {1140 -40}
+  make nmos -W 1.2 -origin {890 80}
+  make output -name out -origin {1660 100}
+  make input -name in1 -origin {1040 180}
+  make input -name in0 -origin {740 180}
+  make input -name sel0 -origin {490 80}
+  make inverter -WP 2.4 -WN 1.2 -origin {560 80}
+  make output -name out -origin {1660 100}
+  make inverter -WP 2.4 -WN 1.2 -origin {1260 470}
+  make xgate -orient RY -WP 1.2 -WN 0.6 -origin {1390 280}
+  make xgate -orient RY -WP 1.2 -WN 0.6 -origin {1390 20}
+  make inverter -WP 2.4 -WN 1.2 -origin {1200 280}
+  make input -name in2 -origin {1170 280}
+  make input -name sel1 -origin {1140 470}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel0_L -origin {680 80}
+  make name_net -name sel1_L -origin {1370 470}
+  make name_net -name in2_L -origin {1280 280}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 4.8 -WN 2.4 -origin {1580 100}
+  make name_net -name N1 -origin {1230 20}
+  make name_net -name N2 -origin {1480 20}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {980 640}
+  make_wire 890 40 890 20
+  make_wire 890 0 890 20
+  make_wire 890 -100 890 -80
+  make_wire 1140 140 1140 120
+  make_wire 1140 -100 1140 -80
+  make_wire 890 -180 1140 -180
+  make_wire 890 140 890 120
+  make_wire 1040 80 1080 80
+  make_wire 1080 -140 1060 -140
+  make_wire 1060 -140 1060 180
+  make_wire 1060 180 1080 180
+  make_wire 1060 180 1040 180
+  make_wire 830 -40 950 -40
+  make_wire 830 -140 780 -140
+  make_wire 780 -140 780 180
+  make_wire 780 180 830 180
+  make_wire 490 80 530 80
+  make_wire 490 -40 490 80
+  make_wire 740 180 780 180
+  make_wire 890 20 1140 20
+  make_wire 1140 0 1140 20
+  make_wire 1140 20 1140 40
+  make_wire 1390 -50 1390 -20
+  make_wire 1140 470 1210 470
+  make_wire 1210 470 1230 470
+  make_wire 1420 280 1500 280
+  make_wire 1500 20 1500 100
+  make_wire 1500 100 1500 280
+  make_wire 1390 160 1390 50
+  make_wire 1390 160 1390 240
+  make_wire 1450 160 1450 470
+  make_wire 1330 -50 1390 -50
+  make_wire 1390 340 1390 310
+  make_wire 1330 340 1390 340
+  make_wire 1210 340 1330 340
+  make_wire 1330 -50 1330 340
+  make_wire 1210 340 1210 470
+  make_wire 1500 100 1550 100
+  make_wire 1630 100 1660 100
+  make_wire 490 -40 830 -40
+  make_wire 680 80 610 80
+  make_wire 680 80 830 80
+  make_wire 1390 160 1450 160
+  make_wire 1370 470 1310 470
+  make_wire 1370 470 1450 470
+  make_wire 1280 280 1250 280
+  make_wire 1280 280 1360 280
+  make_wire 1230 20 1140 20
+  make_wire 1230 20 1360 20
+  make_wire 1480 20 1420 20
+  make_wire 1480 20 1500 20
+  make_wire 950 -40 1040 80
+  make_wire 1040 -40 950 80
+  make_wire 1040 -40 1080 -40
+  make_wire 950 80 830 80
+  make_text -origin {520 -180} -text {C Size}
+  make_text -origin {520 -210} -text {3:1 Mux}
+  make_text -origin {520 -240} -text MMI_MUX3C -size large
+}
+

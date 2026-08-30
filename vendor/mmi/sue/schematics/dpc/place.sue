@@ -1,0 +1,46 @@
+# Generator to make an arbitrary cell box for dpc.
+
+proc ICON_place args {
+  # This line is needed for all generators
+  icon_generator $args {{width 10} {height 10} {hier ""}}
+		
+  set scale 10
+  set width [expr $width * $scale]
+  set height [expr $height * $scale]
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {instance {}}}
+
+  icon_property -origin {-70 150} -type fixed -name primitive -text 1
+  icon_property -origin {-70 170} -type user -name name
+  icon_property -origin {-70 190} -type user -name instance
+
+  # wants to be aligned to low left hand corner
+  icon_line 0 0 $width 0 $width $height 0 $height 0 0
+
+  if {$hier == ""} {
+    # hash mark
+    icon_line 10 0 0 10
+  } else {
+    icon_property -origin {10 10} -label H -anchor c
+  }
+
+  # make the text bigger and move for larger icons
+  if {$width > 300} {
+    icon_property -origin "[expr $width/2] [expr $height/2 - 20]" \
+	-label {$name} -anchor c -size large
+    icon_property -origin "[expr $width/2] [expr $height/2 + 20]" \
+	-label {$instance} -anchor c -size large
+
+  } elseif {$width > 150} {
+    icon_property -origin "[expr $width/2] [expr $height/2 - 10]" \
+	-label {$name} -anchor c -size large
+    icon_property -origin "[expr $width/2] [expr $height/2 + 10]" \
+	-label {$instance} -anchor c
+
+  } else {
+    icon_property -origin "[expr $width/2] [expr $height/2 - 5]" \
+	-label {$name} -anchor c
+    icon_property -origin "[expr $width/2] [expr $height/2 + 10]" \
+	-label {$instance} -anchor c -size small
+  }
+}

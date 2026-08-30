@@ -1,0 +1,51 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_AO21B {} {
+  make global -name gnd -origin {220 480}
+  make global -name gnd -origin {470 580}
+  make global -orient RY -name vdd -origin {220 180}
+  make output -name out -origin {670 380}
+  make nmos -W 1.2 -origin {470 440}
+  make nmos -W 1.2 -origin {470 540}
+  make nmos -W 0.6 -origin {220 440}
+  make pmos -W 2.4 -origin {220 320}
+  make pmos -W 2.4 -origin {220 220}
+  make pmos -W 2.4 -origin {470 220}
+  make input -name in0 -origin {90 440}
+  make input -name in1 -origin {370 440}
+  make input -name in2 -origin {90 540}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 2.4 -WN 1.2 -origin {580 380}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {510 380}
+  make global -orient RY -name vdd -origin {470 180}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.8 -date 07/19/99 -origin {300 720}
+  make_wire 220 400 220 380
+  make_wire 220 360 220 380
+  make_wire 220 380 470 380
+  make_wire 220 260 220 280
+  make_wire 470 500 470 480
+  make_wire 470 260 470 280
+  make_wire 220 280 470 280
+  make_wire 130 320 160 320
+  make_wire 130 440 160 440
+  make_wire 130 440 90 440
+  make_wire 390 440 390 220
+  make_wire 390 220 410 220
+  make_wire 390 440 410 440
+  make_wire 390 440 370 440
+  make_wire 130 320 130 440
+  make_wire 110 220 160 220
+  make_wire 110 540 410 540
+  make_wire 110 540 90 540
+  make_wire 110 220 110 540
+  make_wire 470 380 470 400
+  make_wire 630 380 670 380
+  make_wire 510 380 550 380
+  make_wire 510 380 470 380
+  make_text -origin {90 110} -text MMI_AO21B -size large
+  make_text -origin {90 150} -text {B Size}
+  make_text -origin {90 130} -text {AND-OR 2,1 Gate}
+}
+

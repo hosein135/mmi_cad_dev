@@ -1,0 +1,146 @@
+#include <stdlib.h>
+#include "assert.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "nl.h"
+#include "skip-list.h"
+#include "pnl.h"
+#include "pnl_int.h"
+
+
+pnl_port
+pnl_port_create (nl_iport iport)
+{
+  pnl_port result = MALLOC (sizeof (*result));
+
+  result->kind = pnl_kind_port;
+  result->nl_rep = iport;
+  result->x = -1;
+  result->y = -1;
+  result->orientation = pnl_orientation_none;
+  result->layer = NULL;
+  result->rectangle = NULL;
+  result->loctype = pnl_loctype_null;
+
+  return result;
+}
+
+
+char *
+pnl_port_name (pnl_port pport)
+{
+  nl_iport iport = pport->nl_rep;
+  char *name = nl_iport_name (iport);
+
+  return name;
+}
+
+
+pnl_design
+pnl_port_pdesign (pnl_port pport)
+{
+  nl_iport iport = pport->nl_rep;
+  nl_idesign idesign = nl_iport_idesign (iport);
+  pnl_design pdesign = NULL;
+
+  nl_idesign_attr_get_by_name ("pnl design", idesign, &pdesign);
+
+  return pdesign;
+}
+
+
+void
+pnl_port_free (pnl_port port)
+{
+  FREE (port);
+}
+
+  
+void
+pnl_port_set_loctype (pnl_port pport, pnl_loctype loctype)
+{
+  pport->loctype = loctype;
+}
+
+  
+void
+pnl_port_set_location (pnl_port pport, int x, int y)
+{
+  pport->x = x;
+  pport->y = y;
+}
+
+
+void
+pnl_port_get_location (pnl_port port, int *x_p, int *y_p)
+{
+  *x_p = port->x;
+  *y_p = port->y;
+}
+
+
+void
+pnl_port_set_orientation (pnl_port port, pnl_orientation orientation)
+{
+  port->orientation = orientation;
+}
+
+
+void
+pnl_port_set_geometry (pnl_port pport, char *layer, int x0, int y0, int x1, int y1)
+{
+  nl_iport iport = pport->nl_rep;
+  nl_port port = nl_iport_port (iport);
+  nl_design design = nl_port_design (port);
+  mem_group group = nl_design_mem_group (design);
+  
+  if ( pport->layer != NULL ) {
+    FREE (pport->layer);
+  }
+
+  if ( pport->rectangle == NULL ) {
+    pport->rectangle = GMALLOC (sizeof (*(pport->rectangle)), group);
+  }
+
+  pport->layer = GSTRDUP (layer, group);
+
+  pport->rectangle->x0 = x0;
+  pport->rectangle->y0 = y0;
+  pport->rectangle->x1 = x1;
+  pport->rectangle->y1 = y1;
+}
+
+
+void
+pnl_port_clear_geometry (pnl_port pport)
+{
+  if ( pport->layer != NULL ) {
+    FREE (pport->layer);
+    pport->layer = NULL;
+  }
+
+  if ( pport->rectangle != NULL ) {
+    FREE (pport->rectangle);
+    pport->rectangle = NULL;
+  }
+}
+
+
+int
+pnl_port_get_geometry (pnl_port pport, char **layer, int *x0, int *y0, int *x1, int *y1)
+{
+  if ( pport->rectangle == NULL ) {
+    return 0;
+  }
+
+  ASSERT (pport->layer != NULL);
+
+  *layer = pport->layer;
+  *x0 = pport->rectangle->x0;
+  *y0 = pport->rectangle->y0;
+  *x1 = pport->rectangle->x1;
+  *y1 = pport->rectangle->y1;
+
+  return 1;
+}

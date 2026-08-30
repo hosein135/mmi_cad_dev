@@ -1,0 +1,69 @@
+# SUE version MMI_SUE4.1.12
+
+proc SCHEMATIC_MMIG_MUL_B4PPG {} {
+  generate MMI_INV MMI_INVA 
+  make MMI_INVA -orient RY -origin {220 270}
+  make MMI_INVA -orient RY -origin {220 430}
+  generate MMI_AOI22 MMI_AOI22A 
+  make MMI_AOI22A -origin {480 320}
+  make MMI_AOI22A -origin {480 480}
+  generate row_spanner row_spanner350 -width 350
+  make row_spanner350 -origin {490 770}
+  make output -name PP -origin {970 400}
+  make input -orient RY -name B2 -origin {80 430}
+  make input -orient RY -name B1 -origin {80 270}
+  generate MMI_NAND2 MMI_NAND2C_ -Size C -DeMorgan 1
+  make MMI_NAND2C_ -origin {760 400}
+  make input -orient RY -name {sel[1]} -origin {80 310}
+  make input -orient RY -name {sel[0]} -origin {80 370}
+  make input -orient RY -name {sel[3]} -origin {80 470}
+  make input -orient RY -name {sel[2]} -origin {80 530}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.10 -date 06/07/00 -origin {390 1020}
+  make_wire 820 400 970 400
+  make_wire 380 270 280 270
+  make_wire 130 270 130 330
+  make_wire 130 330 380 330
+  make_wire 130 270 160 270
+  make_wire 130 270 80 270
+  make_wire 380 430 280 430
+  make_wire 130 430 130 490
+  make_wire 130 490 380 490
+  make_wire 130 430 160 430
+  make_wire 130 430 80 430
+  make_wire 380 310 80 310
+  make_wire 380 370 80 370
+  make_wire 380 470 80 470
+  make_wire 380 530 80 530
+  make_wire 630 320 630 380
+  make_wire 630 420 700 420
+  make_wire 580 320 630 320
+  make_wire 630 380 700 380
+  make_wire 580 480 630 480
+  make_wire 630 420 630 480
+  make_text -origin {680 70} -text {sel[0]:  out = B
+sel[1]:  out = !B
+sel[2]:  out = 2*B
+sel[3]:  out = !2*B
+if sel[3:0]=0,  out = 0}
+  make_text -origin {-70 30} -text MMIG_MUL_B4PPG -size large
+  make_text -origin {-70 70} -text {PPG logic for Booth Multiplier, Radix 4}
+}
+
+proc ICON_MMIG_MUL_B4PPG args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {120 -20} -name PP
+  icon_term -type input -origin {-120 0} -name B2
+  icon_term -type input -origin {-120 -20} -name B1
+  icon_term -type input -origin {-120 80} -name {sel[3:0]}
+  icon_property -origin {-60 180} -type user -name name
+  icon_property -origin {-60 200} -type user -name M
+  icon_property -origin {-60 220} -type user -name dpc
+  icon_line -120 -120 -120 120 120 120 120 -120 -120 -120
+  icon_property -origin {-110 -20} -label {B[n]}
+  icon_property -origin {-110 0} -label {2 * B[n]}
+  icon_property -origin {-110 80} -label {sel[3:0]}
+  icon_property -origin {110 -20} -anchor e -label PP
+  icon_property -origin {0 -70} -size large -anchor center -label MMIG_MUL_B4PPG
+}
+

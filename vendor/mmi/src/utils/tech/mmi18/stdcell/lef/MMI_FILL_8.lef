@@ -1,0 +1,57 @@
+MACRO MMI_FILL_8
+	CLASS CORE ;
+	FOREIGN MMI_FILL_8 0 0 ;
+	SIZE 5.92 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.22 0.5 0.56 3.05 ;
+			LAYER M1 ;
+			RECT 0.94 0.5 1.28 4.12 ;
+			LAYER M1 ;
+			RECT 1.66 0.5 2 3.05 ;
+			LAYER M1 ;
+			RECT 2.38 0.5 2.72 3.05 ;
+			LAYER M1 ;
+			RECT 3.1 0.5 3.44 3.05 ;
+			LAYER M1 ;
+			RECT 3.82 0.5 4.16 4.12 ;
+			LAYER M1 ;
+			RECT 4.54 0.5 4.88 3.05 ;
+			LAYER M1 ;
+			RECT 5.26 0.5 5.6 3.05 ;
+			LAYER M1 ;
+			RECT 0 -0.5 5.92 0.5 ;
+		END
+	END GND
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 5.92 7.9 ;
+			LAYER M1 ;
+			RECT 0.22 4.35 0.56 6.9 ;
+			LAYER M1 ;
+			RECT 0.94 4.35 1.28 6.9 ;
+			LAYER M1 ;
+			RECT 1.66 3.38 2 6.9 ;
+			LAYER M1 ;
+			RECT 2.38 4.35 2.72 6.9 ;
+			LAYER M1 ;
+			RECT 3.1 4.35 3.44 6.9 ;
+			LAYER M1 ;
+			RECT 3.82 4.35 4.16 6.9 ;
+			LAYER M1 ;
+			RECT 4.54 3.38 4.88 6.9 ;
+			LAYER M1 ;
+			RECT 5.26 4.35 5.6 6.9 ;
+		END
+	END VDD
+	OBS
+	END
+END MMI_FILL_8

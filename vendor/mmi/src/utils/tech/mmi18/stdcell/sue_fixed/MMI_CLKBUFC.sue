@@ -1,0 +1,108 @@
+# Created using mapper from:
+#"MMI_CLKBUF {C {MMI_CLKBUFC {g_clk g_clk} {g_scan_en g_scan_en} {scan_in scan_in} {clk clk} {scan_en scan_en} {scan_out scan_out}}}"
+
+proc SCHEMATIC_MMI_CLKBUFC {} {
+  set size C
+  switch $size {
+    "C" {
+
+  make output -name clk -origin {110 -1190}
+  make input -name g_clk -origin {-360 -1190}
+  make input -orient RX -name scan_in -origin {110 -930}
+  make input -name g_scan_en -origin {-350 -1070}
+  make output -orient RX -name scan_out -origin {-340 -930}
+  make inverter -orient RX -WP 1.6 -WN 0.8 -origin {0 -930}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -orient RX -WP 4.8 -WN 2.4 -origin {-200 -930}
+  generate name_net_s name_net -cell name_net
+  make name_net -name scan_in_L -origin {-100 -930}
+  make inverter -WP 1.6 -WN 0.8 -origin {-220 -1190}
+  make inverter1 -WP 4.8 -WN 2.4 -origin {-20 -1190}
+  make inverter -WP 1.2 -WN 0.6 -origin {-220 -1070}
+  make inverter1 -WP 2.4 -WN 1.2 -origin {-20 -1070}
+  make name_net -name g_scan_en_L -origin {-100 -1070}
+  make output -name scan_en -origin {110 -1070}
+  make name_net -name g_clk_L -origin {-120 -1190}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 07/19/99 -origin {-230 -650}
+  make_wire 30 -1070 110 -1070
+  make_wire 30 -1190 110 -1190
+  make_wire -100 -930 -50 -930
+  make_wire -170 -930 -100 -930
+  make_wire -120 -1190 -170 -1190
+  make_wire -50 -1190 -120 -1190
+  make_wire -100 -1070 -50 -1070
+  make_wire -170 -1070 -100 -1070
+  make_wire -360 -1190 -250 -1190
+  make_wire -250 -1070 -350 -1070
+  make_wire 30 -930 110 -930
+  make_wire -250 -930 -340 -930
+  make_text -origin {-570 -1480} -text {Clock buffer to drive a row of FlipFlops from one end}
+  make_text -origin {-570 -1460} -text {C Size: for driving ~4-8 FFs}
+  make_text -origin {-510 -1300} -text {could eventually include a lock-up latch on scan_in}
+  make_text -origin {60 -1140} -text {local to a row of flipflops}
+  make_text -origin {-550 -1140} -text {global to all CLKBUFs}
+  make_text -origin {70 -980} -text {from q output of nearest FF}
+  make_text -origin {-580 -990} -text {to scan_in input of farthest
+FF on next row or block output}
+  make_text -origin {-570 -1420} -text {Note: User should not place this cell.  Autosizing will substitute this for a MMI_CLKBUFE}
+  make_text -origin {-570 -1500} -text MMI_CLKBUFC -size large
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        make MMI_CLKBUFC -origin "$urx $ury"
+    }
+
+  }
+}
+
+
+proc ICON_MMI_CLKBUFC args {
+  set size C
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_CLKBUF icon body
+  icon_line -60 140 -60 -140 60 -140 60 140 -60 140
+
+  # properties
+  icon_property -origin {0 -10} -size large -anchor center -label CLKBUF
+  icon_property -origin {0 10} -size large -anchor center -label $size
+  icon_property -origin {-10 130} -anchor e -rotate 1 -label g_clk
+  icon_property -origin {10 130} -anchor e -rotate 1 -label g_scan_en
+  icon_property -origin {30 130} -anchor e -rotate 1 -label scan_out
+  icon_property -origin {-10 -130} -rotate 1 -label clk
+  icon_property -origin {10 -130} -rotate 1 -label scan_en
+  icon_property -origin {30 -130} -rotate 1 -label scan_in
+
+  # inputs
+  icon_term -type input -origin {-10 140} -orient R270 -name g_clk
+  icon_term -type input -origin {10 140} -orient R270 -name g_scan_en
+  icon_term -type input -origin {30 -140} -orient R90 -name scan_in
+
+  # outputs
+  icon_term -type output -origin {-10 -140} -orient R270 -name clk
+  icon_term -type output -origin {10 -140} -orient R270 -name scan_en
+  icon_term -type output -origin {30 140} -orient R90 -name scan_out
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_CLKBUFC
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.g_clk(\$\{g_clk\}), .g_scan_en(\$\{g_scan_en\}), .scan_in(\$\{scan_in\}), .clk(\$\{clk\}), .scan_en(\$\{scan_en\}), .scan_out(\$\{scan_out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+
+}

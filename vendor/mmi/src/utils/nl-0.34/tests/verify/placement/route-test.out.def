@@ -1,0 +1,23 @@
+DIVIDERCHAR "/" ;
+
+DESIGN top ;
+
+NETS 2 ;
+- p
+  + ROUTED
+    M3 ( 700 800 )
+      VIA34 ( 900 * ) ( * 1000 )
+  + COVER
+    M2 ( 0 0 ) ( 100 * )
+      VIA23 ( * 200 )
+  + FIXED
+    M1 ( 300 400 ) ( 500 * )
+    NEW M1 ( 300 400 ) ( * 600 ) ;
+- q
+  + ROUTED
+    M5 ( 1100 1200 )
+      VIA45
+      VIA34 ( 1300 * ) ;
+END NETS
+
+END DESIGN

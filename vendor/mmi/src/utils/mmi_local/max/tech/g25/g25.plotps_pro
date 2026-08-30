@@ -1,0 +1,123 @@
+%!
+/INIT {
+ 72 exch div dup dup scale
+ div exch findfont exch scalefont /TxFont exch def
+ /BoxOutline exch def /#copies exch def
+ TxFont dup /FontBBox get exch /FontMatrix get
+ exch aload pop 4 index transform /bbhi exch def pop 3 -1 roll
+ transform /bblow exch def /bbx exch def /bbhi bbhi bblow sub def
+ 1 1 matrix defaultmatrix dtransform pop abs 72 11 mul mul 64 div ceiling cvi 
+ /nChars exch def
+ 1 1 dtransform abs dup 1 exch div /onePix exch def
+ dup /resY exch def 1 exch div /iresY exch def
+ abs dup /resX exch def 1 exch div /iresX exch def
+ /bX 64 iresX mul def /bY 64 iresY mul def
+ /pattFont StipplePattern definefont pop
+ /patterns /pattFont findfont [iresX 64 mul 0 0 iresY 64 mul 0 0] makefont def
+ /CA nChars 1 add string def
+} def
+
+/StipplePattern 45 dict def
+
+StipplePattern begin
+ /FontType 3 def
+ /FontMatrix [1 0 0 1 0 0] def
+ /FontBBox [0 0 1 1] def
+ /Encoding 256 array def
+ /PattName (P00) def
+ /tmpStr 3 string def
+ /NoPatt {<00>} def
+
+ 0 1 255 { Encoding exch /NoPatt put } for
+
+ /BuildChar {
+   1 0 0 0 1 1 setcachedevice exch begin Encoding exch get load
+   64 64 true [64 0 0 64 0 0] 5 -1 roll imagemask end
+ } def
+end
+
+/DefPatt {
+ StipplePattern begin
+  dup 16 tmpStr cvrs PattName exch 1 exch putinterval PattName cvn dup
+  Encoding exch 4 -1 roll exch put exch store
+ end
+} def
+
+/HEADER { 4 onePix mul add moveto show } def
+
+% These colors correspond to the layer definitions in <tech>.plotps_pat.  If
+% that file is changed this one must also be!!!!
+/colorarray [
+  [0.4 0.4 0.4] % NW
+  [1.0 0.0 0.0] % PPLS
+  [0.0 0.5 0.5] % NPLS
+  [0.0 1.0 0.0] % ACT
+  [1.0 0.0 0.0] % P1
+  [0.4 0.4 0.4] % V0
+  [0.0 0.5 0.7] % M1
+  [0.4 0.4 0.4] % V1
+  [0.0 0.0 1.0] % M2
+  [0.4 0.4 0.4] % V2
+  [0.1 0.8 0.1] % M3
+  [0.4 0.4 0.4] % V3
+  [0.5 0.5 0.0] % M4
+  [0.3 0.3 0.3]] def
+
+/setcolor {colorarray exch get aload pop setrgbcolor} def
+
+/SL { dup setcolor 0 1 nChars { exch dup 3 1 roll CA 3 1 roll put } for pop } def
+
+% /SL { 0 1 nChars { exch dup 3 1 roll CA 3 1 roll put } for pop } def
+
+/SP { patterns setfont 0 setlinewidth } def
+
+/ST { TxFont setfont onePix 2 mul setlinewidth } def
+
+/V { newpath moveto 0 exch rlineto stroke } def
+
+/H { newpath moveto 0 rlineto stroke } def
+
+/B {
+ /h exch def /w exch def
+ /y exch def /x exch def
+
+ gsave
+ newpath x y moveto w y lineto w h lineto x h lineto closepath clip
+ x resX mul cvi 31 not and dup iresX mul exch
+ w resX mul sub abs 63 add cvi 64 idiv /w exch def
+ y resY mul cvi 7 not and dup iresY mul exch
+ h resY mul sub abs 63 add cvi 64 idiv /h exch def
+ /CH CA 0 w getinterval def
+ /x w bY mul neg def
+ moveto h { CH show x bY rmoveto } repeat
+ grestore
+} def
+
+/L {
+ gsave newpath dup bblow add 2 index bbx add exch moveto
+ 0 bbhi rlineto
+ 2 index stringwidth pop bbx abs 2 mul add 0 rlineto
+ 0 bbhi neg rlineto
+ closepath 1.0 setgray fill grestore moveto show
+} def
+
+/BB {
+ /h exch def /w exch def
+ /y exch def /x exch def
+ grestore
+ gsave
+ newpath
+ x y moveto
+ w y lineto
+ w h lineto
+ x h lineto
+ closepath
+ BoxOutline 1 eq { gsave stroke grestore } if clip
+} def
+
+/BS {
+ 4 copy BB exch pop exch pop exch bbhi add exch bbhi sub onePix sub L
+} def
+
+/MSAV { /Mstat save def } def
+/MRES { Mstat restore } def

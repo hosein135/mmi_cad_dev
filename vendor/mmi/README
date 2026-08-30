@@ -1,0 +1,185 @@
+Micro Magic Tools Installation
+==============================
+
+***IMPORTANT***
+===============
+
+IF YOU HAVE OLDER VERSIONS OF MAX:
+
+If you read in a MAX file into the new 4.0.2 version of MAX, the will not
+be readable by older version of MAX.  You would have to write out a 
+GDSII file from MAX 4.0.2 and read the GDSII file into the older version
+of MAX.
+
+
+Installation Instructions
+=========================
+
+Terminology
+-----------
+  <release_dir> = top-level directory of the MMI release.
+		This dir has a name something like mmi_100197all
+
+  <install_dir> = directory where you are putting release_dir
+		(e.g. /usr/local/lib)
+
+
+There are 3 sets of instructions below:
+
+	First Time Installation
+	New User Setup
+	Upgrading from a Previous Release
+	
+Follow the one that applies to your situation!
+
+
+First Time Installation
+----------------------- 
+(Follow these instructions if you do not have an existing MMI release installed.)
+
+1.  Choose an install dir.
+
+    Pick a place that is logical for your site.  You will need at least
+    270 MB of free space.  You will not need root priveledges for the
+    installation unless you decide to place the installation in a
+    protected area.  There is no "standard" location.  Then cd there, e.g.:
+
+	cd <install_dir>
+
+    A common place is something like /home/cad/mmi.
+
+2.  Put the release in the install dir.
+
+	cp  <where_ever_you_put_the_release>/mmi_020515.tar.gz .
+	gtar xzvf mmi_020515.tar.gz
+
+    If you do not have access to gtar but do have gunzip, then do:
+
+	cp  <where_ever_you_put_the_release>/mmi_020515.tar.gz .
+	gunzip mmi_020515.tar.gz
+	tar xvf mmi_020515.tar
+
+    Note moving the release around with "cp -r" is not a good idea, since
+    cp can screw up symbolic links and permissions.  Just untar it where you 
+    want it to live.  If you absolutely need to copy it, use "gcp -a".
+
+3.  Make a symbolic link from <install_dir>/mmi to the <release_dir>:
+	
+	ln -s <release_dir> mmi
+
+    This allows you to refer to the release, simply as mmi.  When you wish to
+    upgrade to a new release, all you need to do is untar the new release
+    into your install_dir and then change the "mmi" link to point to 
+    the new release.
+
+4.  Create your mmi_local directory.
+
+    All site specific data is kept in <install_dir>/mmi_local.
+    That way you can upgrade to new releases without losing or having to move
+    around local data.  Create your initial mmi_local as follows:
+
+	mv mmi/mmi_local.sample mmi_local
+
+
+5.  Follow the new user setup instructions below.
+
+
+New User Setup
+--------------
+1.  Modify the users .login file to include the following:
+
+	# Setup for Micro Magic CAD tools
+	setenv MMI_TOOLS <install_dir>/mmi
+	set path=(${MMI_TOOLS}/bin.sparc-solaris2 $path)
+
+    This needs to be done for each user.  A better method is to create
+    a common file, <cad_setup>, and add the above lines, to it.  You
+    can also add the setup for other cad tools used at your site.
+    Each users .login will then need to include only the following:
+
+	# setup cad tools
+	source <cad_setup> 
+
+    If you use a common <cad_setup> file, when you add setup for new
+    tools or make site wide modifications to the setup, you only need
+    to change this one file.  Also you will know that setup is
+    consistent and up-to-date for all your users.
+	
+2.  Netscape or the web browser of your choice is used to display
+    documentation.  If you do not have Netscape installed at your
+    site, or prefer another browser, you should set the BROWSER or
+    MMI_BROWSER environment variable to it.  For example:
+
+	setenv MMI_BROWSER mosaic
+
+    This can be done on a per user basis in the .login file, or on a
+    site wide basis in the <cad_setup> file (if you are using one).
+
+4. Have the user logout and log back in, to make the setup take effect.
+
+That's it!  After completing the above steps, a good way to get started 
+is to browse the documentation, with the following command:
+
+	mmidoc
+
+
+Additional Potential Problems
+-----------------------------
+
+1.  X Window AutoRaise Option
+
+The X window managers have an "AutoRaise" option that automatically
+raises the window that the mouse is over.  This option will not work
+with MMI programs, or, for that matter, many others.  To check for
+this, look for a file called ".Xdefaults" in the user's home directory,
+and search for "AutoRaise".  If found, set the value to false.  For
+example, for a user using the open look window manager, the line should
+look like this:
+
+    olwm.AutoRaise: false
+
+If you can not find a line containing "AutoRaise", its ok, because
+the default is false.
+
+2.  Shelltool Page Mode
+
+Both the shelltool and the cmdtool have a "Page Mode" that automatically
+stops the window from scrolling when it is full (it is not 100% reliable).
+You should NOT set this option in a shelltool or cmdtool that is
+used to start max or sue.  This can result in max or sue appearing
+to "hang" when the window gets full of messages from max/sue.  What has
+happened is that max/sue is halted by the window manager, which is
+waiting for you to type the Return key in that window.  The "Page Mode"
+is typically controlled by an option menu that is accessed by pressing
+the right mouse button over the window that was used to start max/sue.
+
+
+Upgrading from a Previous Release
+---------------------------------
+
+1. Go to your sites install dir:
+
+	cd <install_dir>
+
+    (<install_dir> = $MMI_TOOLS/..) 	
+
+2. Put the new release in the install dir, as follows.
+
+	cp  <where_ever_you_put_the_release>/mmi_020515.tar.gz .
+	gtar xzvf mmi_020515.tar.gz
+
+    If you do not have access to gtar but do have gunzip, then do:
+
+	cp  <where_ever_you_put_the_release>/mmi_020515.tar.gz .
+	gunzip mmi_020515.tar.gz
+	tar xvf mmi_020515.tar
+
+3. Change the mmi pointer to the new release.
+
+	mv mmi mmi.old; ln -s <release_dir> mmi
+
+   By moving mmi to mmi.old and then linking, any users currently
+   using the tools will be unaffected.  Simply removing the mmi link
+   and then making a new one pointing to the new release can
+   cause running programs to core dump.
+   

@@ -1,0 +1,36 @@
+#!/utility/bin/perl
+
+# script to replace all old-style generator names with their new names
+
+# name translations
+$newname{"adder"} = "mmig_adder";
+$newname{"comparator"} = "mmig_comparator";
+$newname{"fastqueue"} = "mmig_fastqueue";
+$newname{"mul"} = "mmig_mul";
+$newname{"nandbuf"} = "mmig_nandbuf";
+$newname{"ppg"} = "mmig_ppg";
+$newname{"queue"} = "mmig_queue";
+$newname{"shifter"} = "mmig_shifter";
+$newname{"stack"} = "mmig_stack";
+
+
+while ($next = <*.sue>) {
+  open(FILE_ID, $next) || die "Couldn't open file $next\n";
+  open(TEMP_ID, ">fixMMItmp") || die "Couldn't open file fixMMItmp\n";
+
+  while (<FILE_ID>) {
+    while (($old,$new) = each(%newname)) {
+      if (/ $old/ && (/generate/ || /make /)) {
+	print "found $old in $next:\n";
+	print $_;
+	s/$old/$new/;
+      }
+    }
+    print TEMP_ID $_;
+  }
+
+  close(TEMP_ID);
+  close(FILE_ID);
+  unlink($next) || die "Couldn't delete file $next\n";
+  rename(fixMMItmp, $next) || die "Couldn't rename fixMMItmp to $next\n";
+}

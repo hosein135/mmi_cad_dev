@@ -1,0 +1,101 @@
+MACRO MMI_AOI21A
+	CLASS CORE ;
+	FOREIGN MMI_AOI21A 0 0 ;
+	SIZE 2.96 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.18 4.525 0.52 6.285 ;
+			LAYER M1 ;
+			RECT 0.18 3.555 0.41 4.525 ;
+			LAYER M1 ;
+			RECT 0.145 3.105 0.595 3.555 ;
+			LAYER M1 ;
+			RECT 0.18 2.87 0.41 3.105 ;
+			LAYER M1 ;
+			RECT 0.18 2.64 1.17 2.87 ;
+			LAYER M1 ;
+			RECT 0.94 2.41 1.17 2.64 ;
+			LAYER M1 ;
+			RECT 0.94 1.57 1.28 2.41 ;
+		END
+		AntennaDiffArea 1.3708 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.885 3.5 1.335 3.555 ;
+			LAYER M1 ;
+			RECT 0.885 3.445 1.52 3.5 ;
+			LAYER M1 ;
+			RECT 0.885 3.215 1.585 3.445 ;
+			LAYER M1 ;
+			RECT 0.885 3.16 1.52 3.215 ;
+			LAYER M1 ;
+			RECT 0.885 3.105 1.335 3.16 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.18 0.5 0.52 2.41 ;
+			LAYER M1 ;
+			RECT 2.09 0.5 2.43 2.41 ;
+			LAYER M1 ;
+			RECT 0 -0.5 2.96 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.97 4.195 2.815 4.295 ;
+			LAYER M1 ;
+			RECT 1.86 3.855 2.815 4.195 ;
+			LAYER M1 ;
+			RECT 1.97 3.845 2.815 3.855 ;
+		END
+		AntennaGateArea 0.4968 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 2.96 7.9 ;
+			LAYER M1 ;
+			RECT 1.62 5.005 1.96 6.9 ;
+		END
+	END VDD
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.885 4.19 1.335 4.295 ;
+			LAYER M1 ;
+			RECT 0.64 3.85 1.335 4.19 ;
+			LAYER M1 ;
+			RECT 0.885 3.845 1.335 3.85 ;
+		END
+		AntennaGateArea 0.414 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 0.9 4.755 1.24 6.285 ;
+		LAYER M1 ;
+		RECT 2.34 4.755 2.68 6.285 ;
+		LAYER M1 ;
+		RECT 0.9 4.525 2.68 4.755 ;
+	END
+END MMI_AOI21A

@@ -1,0 +1,659 @@
+
+==========================================================================
+RELEASE NOTES for MAX 4.2.10, MCC 2.1.0 SUE/DPC 4.3.5  (mmi_011231)
+==========================================================================
+
+---------
+ GENERAL
+---------
+
+All manuals and tutorials have been updated.
+
+
+----------------------
+ MAX and MAX-LS 4.2.10
+----------------------
+
+Enhancements since MAX 4.0.2
+----------------------------
+
+Significant memory improvements (generally 2X less memory)
+
+Performance improvements
+
+Added "check connectivity" option to wire tool. If set, the wire tool
+will give a warning if you are connecting two texted nets with different
+names.
+
+Enhanced cross-probing between MAX and SUE.  You now can have multiple
+SUE and MAX sessions running.  Also, you can now specify the technology
+to use if starting a new MAX for running the layout generator.
+
+File menu change: "Save and descendents" changed to "Save Multiple" with
+a sub-menu for "save all modified cell buffers".
+
+Added performance warning for "flylines follow mouse" option in wire tool.
+
+One button Calibre run from DRC Setup menu.
+
+Improved MAX DRC and Calibre DRC interface.
+
+Added ability to edit non-manhattan polygon edges.
+
+Performance improvements when flattening cells.
+
+"See Mask" menu becomes multi-column if too many layers.
+
+Box mode: Changed so that button-1 either creates or resizes box 
+depending on where you start.
+
+Modified Shift-But-1 to just create a box.
+
+File select box now shows if a file is a link
+
+Added "Toggle Read-only" to the File menu.
+
+"Dog-bone" fets can now be created with the fet gcell.
+
+Improvements to "Select Cell by Name".
+
+You can now select multiple nets with the "Select Net (add)" option.
+
+Select net by name feature added including pattern matching to 
+highlight nets.
+
+Select net for large nets (i.e. VDD,GND,Clk) asks if you want to continue
+
+If no wiring layer under cursor, select net will now trace connectivity
+of any layer under the cursor.
+
+Changes to make_tech:
+     1. Removed squaring of vias by default in make_tech.  Instead only square
+     if the line 
+
+        square_vias
+
+     is present in the tech source file.
+
+     2. If you want to specify how to netlist (using :extract) the bulk
+     terminal of a fet, you can now do it with make_tech.
+     The new syntax is:
+
+         device nfet from poly ndif -bulk_terminal <bulk_name>
+
+Fixed bug in selecting nets with close non-manhattan polygons.
+
+Max redisplay bug fixed.
+
+Max bug where paint was left in select group fixed.
+
+license bug fix: tools now check the MMI_LICENSE_FILE variable.
+
+bug fix: grid offset now works
+
+BETA release for the HP platform (GDSPLOT interface not included).
+
+
+Known Bugs
+----------
+In order to get crossprobing to work properly, you need to 
+first do a "MAX Crossprobe Init" from SUE.  If you only
+do a "SUE Crossprobe Init" from MAX, then you won't be able
+to "Crossprobe Net".  
+
+There is a Max performance bug in true-color (aka 16-bit) mode
+for some Xserver/driver combinations.  If Max graphics is painfully
+slow, and you can actually observe the window being drawn from
+top to bottom (even when zoomed in tight) - you have this problem.
+The work-around is to change your Xserver to 8-bit (pseudo-color) mode.
+
+
+
+-----------------
+SUE/DPC/NST 4.3.5
+-----------------
+
+Enhancements since SUE/DPC 4.2.7
+--------------------------------
+
+Added congestion analysis to DPC.  DPC will now compute and
+display the congestion from DPC on the placement view.  Click
+on "Help" in the popup form when you select "Sim->Congestion"
+for more details on congestion analysis.  The feature is
+currently only a beta release.
+
+Uses a new netlist database and parser.
+	- Significant performance improvements.
+	- Cell, instance and net names must now
+	  use valid Verilog syntax.
+
+New DPC feature "Display Connections" in the placement view
+which displays the connections with flylines to the selected
+instances.
+
+Added ability to place top-level pins in DPC (automatic pin placement).
+Inputs/outputs/inputs are aligned to connections in placement
+and are added to side corresponding to their orientation in
+the schematic.  To enable use: set DPC(PINS) 1.  Pins are
+shown in placement view, CP includes pins and estimated
+parasitics include pin locations.
+
+Can add a "halo" around the placement view for extra routing
+room.  Especially useful with pins to give the router room
+to route to.  Visible in DPC placement.  To enable use:
+	SET DPC(HALO) <grids_of_halo>
+Defaults to 0.
+
+Added DPC(LEF_PATH) which contains a list of paths to LEF leaf
+cell definitions.  Not required.  Wildcarding allowed.  If
+present, overrides DPC(PATH).  So, DPC can now get the cell
+sizes directly from the LEF files. 
+
+Improved primetime interface to work with newest primetime
+bug fixes (2000.11 release).  It is suggested that you 
+run with "set DPC(MIN_RC) 0ps"
+
+In DPC_TIMING(ctlf_file), If a path name includes "ctlf" in the
+name (or extension), uses readctlf in Pearl, otherwise uses readtlf.
+
+Added ability to rotate leaf cells with ports files and a
+specified orientation.  Add R90 (case sensitive) to the dpc
+property to rotate 90 degrees.  Use R90 with mirror and flip 
+to get all orientations.
+
+Changed display design hierarchy to query the user if in a
+schematic that is not in the current netlist hierarchy.  User
+can make current the new top level or switch to existing
+neltist hierarchy.
+
+Added a ruler command.  Mainly for DPC placements.
+	- Added a ruler setup command to change ruler parameters.
+	  New ruler parameter to toggle default ruler mode of
+	  either manhattan or diagonal.
+
+Show selected terms now works on hierarchical placement cells.  Also
+shows pin direction.
+
+Moved parasitic creation to time_it so DPC Netlist doesn't
+do the parasitic creation.  Note: time_it won't redo
+parasitics unless it has to.  DPC_it does DPC Netlist followed
+by time_it.
+
+Enhanced row position control for DPC.
+
+Added an option to Select Simulator menu in spice mode to
+specify the output data suffix.  For spice this defaults to
+.tr0 with the SPICE_SUFFIX(spice) variable but if running an
+ac simulation you want to change this to .ac0.
+
+Now ignores duplicate property definitions in icons.
+
+Added last modified by to title bars.
+
+Added a new "name_net" called a suggested_name.  It is part of
+the "name_net_s" generator -- i.e. just shift-double-click on
+a name_net and you will see it.  A suggested_name on a net
+will only name the net if nothing else names it -- i.e. it has
+a lower priority than either globals, I/O's or name_nets.
+Furthermore, unlike a name_net, nets with the same suggested
+name will NOT get tied together.  Instead, one of the nets
+will get a unique name.  The suggested names were added so
+that you can have unnamed nets whose name doesn't change with
+each netlisting.  To facilitate this, there is a new global
+variable called CREATE_SUGGESTED_NAMES which defaults to false
+(0) but when set to true (1) will added suggested_name icons
+to all unnamed nets after netlisting (technically after
+generating term names).  
+
+Changed "Edit Selected" to "Edit Properties..." to better explain
+function and make in line with MAX.
+
+Added Control-Button-1 in schematics list box to drop the
+corresponding icon into the current schematic.
+
+Added NETLIST(ignore_connected_outputs) to ignore errors if
+outputs are tied together. 
+
+Added more font sizes in SUE.  There are now 5 sizes.
+
+Options to starting sue are now case insensitive.  For
+example, can now do: "sue -set foo=3" or "sue -SET foo=3"
+
+Prompt, title, and icon name are now synchoronized visually
+for multiple sue sessions.  The second simultaneous sue
+session is called SUE#2, etc.
+
+Comma-delimited signals are now handled properly by
+sue2edif and edif2sue.
+
+A scalar signal into a bused input is now duplicated in verilog as was
+done in spice.  Bug fix.
+
+Added tcl coding example in $MMI_TOOLS/mmi_local.sample/sue
+
+Fixes to edif2sue and sue2edif.
+
+IRSIM now works.  There are some interem version of SUE in which 
+IRSIM was not compiled correctly.
+
+---------
+MCC 2.1.0
+---------
+
+Enhancements since MCC 2.0.5
+----------------------------
+
+        Implemented creation of a layout of the critical path as
+        agreed upon.  To use, select layout as the option in
+        MCC critical path.
+
+        There are some new switches to control the critical path
+        generation:
+
+                # set CP_TIE_INPUT(<cell_type>,<port>) <signal>
+                # set CP_TIE_INPUT(DEFAULT) <signal>
+
+                # for example,
+                # set CP_TIE_INPUT(sram_cell,wl) gnd
+                # set CP_TIE_INPUT(sram_cell,bl) vdd
+                # set CP_TIE_INPUT(sram_cell,bl_L) vdd
+                # set CP_TIE_INPUT(DEFAULT) gnd
+
+        To tie off inputs in the layout with text.
+
+                set CP_TRACE_BASIC 0 or 1
+
+        If set to 0, like the old way.  If 1, only traces the
+        outputs of receivers, not the drivers.  Will create a
+        smaller critical path circuit.
+
+        Also implemented an option to include the wires in a halo
+        around the critical path wire for better extraction.
+
+                set CP_HALO 1 or 0
+
+        CP_HALO = 1 turns feature on.
+
+        Use CP_HALO_RADIUS to specify how far the halo extends (in microns)
+
+                set CP_HALO_RADIUS <microns_of_extent>
+
+
+
+
+============================================================================
+RELEASE NOTES for MAX 4.0.2, MCC 2.0.5 SUE 4.2.7 and DPC 4.2.7  (mmi_001220)
+============================================================================
+
+There have been many enhancements added to MAX, SUE and DPC since the 
+last release (mmi_000427).  This file lists the enhancements, known limitations
+and know bugs for the mmi_001220 release.  Not every enhancement is
+listed, so please refer to the user manual for more information. 
+
+===============
+***IMPORTANT***
+===============
+
+IF YOU HAVE OLDER VERSIONS OF MAX:
+
+If you read in a MAX file into the new 4.0.2 version of MAX, the will not
+be readable by older versions of MAX.  You would have to write out a
+GDSII file from MAX 4.0.2 and read the GDSII file into the older version
+of MAX.
+
+To have access to Calibre DRC from the Tool menu, you need to update your
+$MMI_TOOLS/../mmi_local/max/.maxrc with the info in the 
+$MMI_TOOLS/mmi_local.sample/max/.maxrc file for this release.
+
+Tcl files in the $MMI_TOOLS/../mmi_local/max directory may be incompatible
+with the new version of max.  Support for extraction, lvs and calibre
+are now included inside max.  Any .tcl files for these purposes
+located in your $MMI_TOOLS/../mmi_local/max directory should be removed.
+
+Your best bet is to replace the entire contents of your
+$MMI_TOOLS/../mmi_local/max directory with the new
+$MMI_TOOLS/mmi_local.sample/max directory provided in this release.
+
+
+-----------
+ All Tools
+-----------
+
+New mmi_tutorial program creates tutorial directory. 
+
+Updated manuals and tutorials.
+
+
+----------------
+ MAX and MAX-LS
+----------------
+
+Enhancements since MAX 3.2.14
+-----------------------------
+
+Industrial Strength
+-------------------
+
+More Layers allowed for a MAX technology - over 100 layers
+
+Larger coordinates allowed 
+
+A number of big-design performance improvements
+
+New Features
+------------
+
+Added True Color Graphics Capability (no longer a limition of 8-bit
+graphics mode)
+
+Added Groups - container for arbitrary layout.
+Groups are persistent (saved in max file) and editable.
+
+Support for Artwork Conversion's GDSPLOT - Included for free with
+every copy of MAX.
+
+Added "Align" command.
+
+Added "Display Cell Doc..." command.
+
+Added "Probe" command to show what layers/cells are under a specific point.
+
+User programmable hot-keys.  
+
+Mentor Graphics' Calibre DRC support built in.
+
+New DRC feedback window - makes it easier to see both MAX internal
+and Calibire DRC feedback.
+
+Fet gcell: Added support for dog-bone fets, added support for partially 
+contacted fets.
+
+Via gcell: Added support support for assymetric vias, added support for 
+minimum size vias even if center would be off grid; it is moved on-grid.
+
+Added warp cursor - user convenience to place cursor over opened menu.
+
+Added Edit Cell Properties - can now specify the instance name
+
+Added "Zoom in" option and wild cards to select net by name.
+
+Added array pop-up form
+
+Select net command (hotkey: s) now cycles through layers under cursor
+
+
+Redisplay
+---------
+
+Multiple highlight colors support (e.g. box vs selection)
+
+More control of displayed text size for labels.
+
+Dimming labels, text and flylines and bbox outlines in non-editcell 
+(previously only paint).
+
+GDS
+---
+
+Implemented snap-to arbitrary grid on GDSII input.
+
+GDSII write now defaults to flattening gcells (which is usually what
+is wanted.)
+
+Import/Export File now in File menu, includes GDS import/export
+and "Create tech file from GDS file".  Many new GDS import/export options.
+
+
+
+Platforms and Licensing
+-----------------------
+
+Executables now work for Red Hat 6 or 7 systems, but no longer for Red Hat 5
+systems. 
+
+Update to FlexLM version 7.1, support for ~/.flexlmrc file.  FlexLM licensing
+now works for Solaris 7 and 8 machines.
+
+If license server dies, now prints warning message - don't lose any work
+
+
+Other Enhancements
+------------------
+
+GCell information saved in .max file.  If the Gcell tcl definition
+changes, the Gcell will be read in with the old information.
+
+Interactive DRC enhancement: asymetric via enclosure checks
+
+Can now drag cells over exact copies without one disappearing.
+
+If you type, "max foo.", MAX now trys to load the file "foo.max" 
+
+Added "Generate Layers" command to auto-generate nplus/pplus/well.
+
+New key bindings for some commands which are more consistent with SUE.
+Note: use legacy.keymap for old keymap.
+
+Added "Move cell origin" command, and several other move methods 
+(Move To, Move To Point, Move to Box)
+
+The rotate/flip commands align new cell origin to grid if there is just 
+one cell and the original cell origin was on grid.
+
+Added "Save As..." command.
+
+Added Manufacturing Mask grid and programmable symmetric or assymetric user 
+defined grid.  All max user commands snap to the new user grid.
+New hot-keys let users switch grids rapidly with 1, 2, 3, 4 keys.
+
+Added flatten setup menu, flatten one-level or hierarchy option,
+flatten only text command, and flatten to group.
+
+User visible tcl functions:  prop_dialog; new options to prop_menu;
+better techinfo documentation.
+
+Button-1 select now selects wire segment, not just largest piece of paint.
+
+Wire tool draws 45 wires in foundry approved manner:
+Now uses wire-paths for horizontal segments adjacent to 45 segments.
+
+Clipboard cut/paste now works between MAX sessions.
+
+Gcell directory moved from <path>/max/gcells to <path>/max/cells; 
+this directory can now contain any cells, not just gcells.
+
+Start-up file can now use either max.rc or .maxrc (but not both 
+in the same directory.)
+
+Add "unconnected label" warning to select net by name
+
+Added message to area select that indicates what, if anything, selected.
+
+Made undo/redo not switch cells without asking.
+
+Allow user to redefine their own gcells.
+Add message if user tries to define the same gcell twice.
+
+Layout Generator:
+For shared diffusion, check if flipping fets will reduce capacitance.
+Add ability to draw gcells with missing contacts, and always use gcells by default.
+Added flyline_crossing_minimization option to layout generator,
+Make vdd/gnd names programmable in stdcell generator.
+
+Added asymetric wire snap (separate X and Y snap grids).
+
+Print warning if entered wire width is less than tech file width;
+it goes ahead and uses the tech file width.
+
+Wire tool:
+Can now change via drag mode "c" before dropping via.
+Added "r" hotkey to rotate vias, "x" for assymetric vias.
+Now allow arguments to gcell via name
+
+
+
+Bug Fix Highlights
+------------------
+
+Fixed drc (hier processing) bug.
+
+Fixed netlisting (and simple extraction).
+
+Fixed intermittent wrong bounding box problem.
+
+Fixed several redisplay glitches.
+
+(Numerous other bug fixes.)
+
+
+Discontinued Features
+---------------------
+
+Fancy extractor features no longer work (e.g. shielding, and coupling)
+
+CIF Read/Write no longer supported.
+
+The :select and select_q tcl functions are no longer supported.
+These functions may be referenced in .tcl files located in the directory:
+$MMI_TOOLS/../mmi_local/max.  Tcl files that reference these functions
+should be removed, or modified to use new select functions.
+To see new select functions, invoke "Text Commands/Variables" from
+the Help menu, and search for "sel_".
+Note: Micro Magic sometimes provided lvs and calibre scripts to customers
+as tcl files that were installed in this directory.  Both lvs and calibre
+support are now included inside max, and any such files in the
+mmi_local directory should be removed.
+
+
+Known Limitations
+-----------------
+
+Interactive DRC doesn't work for all angle or 45 degree geometries
+
+Netlist extract doesn't work for all angle or 45 degree geometries
+
+Select net doesn't work for all angle or 45 degree gates
+
+Mask operations (i.e. bloats and shrinks) during GDS read/write don't 
+	work on non-manhattan data.
+
+
+
+
+------
+ SUE
+------
+
+Enhancements since SUE 4.1.11
+-----------------------------
+
+Major
+-----
+
+New Concatenated buses: buses can be named: a,b,c
+
+Significantly enhanced the SUE API.
+
+Minor
+-----
+
+Removed "flashing" of loaded cells when netlisting. 
+
+Can zoom in/out when wiring, dropping an icon, duplicating, moving, etc.
+
+Better interface for changing text size and anchor when modifying text.
+
+Can use either sue.rc or .suerc files -- if you don't like hidden files.
+
+Current hierarchy displayed in title bar.
+
+In spice netlisting, can now supply a footer with a file "<cell_name>.f"
+
+IRSIM probe now automatically make buses into irsim vectors.
+
+Instances in spice/verilog netlists have same names if you substitute [] and $.
+
+Can use Meta- in addition to Alt- for all such hotkeys. 
+
+New netlisting checks.
+
+Can name SUE logfile.
+
+Can zoom out further.
+
+Improved grid spacing menu.
+
+Improved grid to cover larger areas.
+
+Added SUE_EXECUTE variable to execute api commands after startup.
+
+In addition to anchors e,w,c added s,n,ne,nw,se,sw.
+
+Push into will push into highlighted icon if nothing is selected.
+
+Added better off-grid movement capability for fixing offgrids.
+
+Parses decimal, octal, and hex constants in addition to binary constants
+
+Added variable NETLIST_CONVERT_CONSTANT to convert all consts to binary if 1.
+
+Enhanced api_instance_data, api_get_data and api_instance_type_data
+to take an optional property argument and then return the
+value for that property only.
+
+Added Swap View Selected that swaps views but also selects the
+I/O's in the new view that were selected in the old view.  
+
+
+NST Enhancements
+----------------
+
+Changed menu and hotkeys for clarity/unity with SUE/MAX.
+
+Added text annotation capability.
+
+Added help messages to the right of menu bar.
+
+Can change waveform color/delete waveform from legend.
+
+Can choose waveform boundaries from a menu popup.
+
+Can compute power dissipated under a waveform.
+
+
+
+
+NEW TOOLS - EDIF-IN and EDIF-OUT
+--------------------------------
+
+(requires separate licenses)
+
+sue2edif        writes out edif format from sue
+edif2sue        converts edif format into .sue format
+
+
+------
+ DPC
+------
+
+Enhancements since DPC 4.1.11
+-----------------------------
+
+Major
+-----
+
+Steiner routing and DSPF file generation added to DPC (RC parasitic extraction).
+
+
+Minor
+-----
+
+Added a flip line to the DPC ports file.
+
+Added input_transition to the time_it popup in DPC.
+
+Enhanced Toggle Placement View to return to hierarchy from which you came.
+
+Added a Critical Path (CP) instances menu.
+
+

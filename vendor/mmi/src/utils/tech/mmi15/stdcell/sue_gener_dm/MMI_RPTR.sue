@@ -1,0 +1,136 @@
+# Created using mapper from:
+#"MMI_RPTR {F {MMI_RPTRF {in in} {out out}} {MMI_RPTRF_ {in in} {out out}}} "
+
+proc SCHEMATIC_MMI_RPTR args {
+  call_use_keyword $args {{Size "F"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    F {
+      if {!$DeMorgan} {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make pmos -W 24.64 -origin {550 200}
+  make nmos -W 12.32 -origin {550 360}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 12/06/99 -origin {480 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text {Inverter (for use with double width wires only)}
+  make_text -origin {360 110} -text {F Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_RPTR MMI_RPTRF -Size F -DeMorgan 0
+        make MMI_RPTRF -origin "$urx $ury"
+      } else {
+        generate MMI_RPTR MMI_RPTRF -Size F -DeMorgan 0
+        make MMI_RPTRF -origin {0 0}
+        set terms [api_terminal_data MMI_RPTRF]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_RPTRF"
+        }
+        set data [get_assoc {in} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in} -orient $orient
+        } else {
+          make $type -origin $origin -name {in}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_RPTR MMI_RPTRF_ -Size F -DeMorgan 1
+        make MMI_RPTRF_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_RPTR args {
+  call_use_keyword $args {{Size "F"} {DeMorgan 0}}
+
+  set nom MMI_RPTR[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_RPTR args {
+  icon_generator $args {{Size "F" {radio F}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "F")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  switch $size {
+    F {
+
+  icon_term -type input -origin {-60 0} -name in
+  icon_term -type output -origin {60 0} -name out
+  icon_line -30 -30 -30 30 30 0 -30 -30
+  icon_arc 30 -10 50 10 -start 0 -extent 359
+  icon_line 50 0 60 0
+  icon_line -30 0 -60 0
+  icon_property -origin {-10 0} -size large -anchor center -label F
+
+    }
+  }
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_RPTR -Size $Size]
+  set nname [NAME_MMI_RPTR -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    F {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

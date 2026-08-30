@@ -1,0 +1,77 @@
+# SUE version MMI_SUE4.2.7
+
+proc SCHEMATIC_shift8 {} {
+  make output -name {out[7:0]} -origin {1050 -1310}
+  make input -name {in[7:0]} -origin {50 -1120}
+  make shift8 -origin {1030 -1080}
+  make input -orient RY -name {shift[2:0]} -origin {150 -860}
+  make name_net_s -orient R90X -name {[0]} -origin {210 -910}
+  make name_net_s -orient R90X -name {[1]} -origin {250 -910}
+  make name_net_s -orient R90X -name {[2]} -origin {850 -910}
+  make dpc_control -pitch 22 -origin {310 -1380}
+  generate MMI_MUX4 MMI_MUX4B 
+  make MMI_MUX4B -name {[7:0]} -origin {230 -1210}
+  generate MMI_BUF MMI_BUFD -Size D
+  make MMI_BUFD -name {[7:0]} -origin {420 -1210}
+  make row_spanner -origin {290 -770}
+  generate MMI_BUF MMI_BUFE -Size E
+  make MMI_BUFE -orient R270 -origin {210 -1000}
+  make MMI_BUFE -orient R270 -origin {250 -1020}
+  make row_spanner -origin {920 -770}
+  make MMI_BUFD -name {[7:0]} -origin {990 -1310}
+  make spacer -rows 1r -origin {590 -970}
+  make MMI_BUFE -orient R270 -origin {850 -1030}
+  generate MMI_MUX2 MMI_MUX2D -Size D
+  make MMI_MUX2D -name {[7:0]} -origin {850 -1310}
+  make name_net_s -name {i[7:0]} -origin {520 -1210}
+  make name_net_s -name {4'b0,i[7:4]} -origin {710 -1340}
+  make name_net_s -name {3'b0,in[7:3]} -origin {100 -1300}
+  make name_net_s -name {2'b0,in[7:2]} -origin {100 -1240}
+  make name_net_s -name {1'b0,in[7:1]} -origin {100 -1180}
+  make title_bar -owner tutorial -origin {410 -630}
+  make_wire 650 -1280 650 -1210
+  make_wire 210 -860 150 -860
+  make_wire 210 -910 210 -860
+  make_wire 250 -910 250 -860
+  make_wire 850 -910 850 -860
+  make_wire 850 -970 850 -910
+  make_wire 850 -1090 850 -1260
+  make_wire 250 -960 250 -910
+  make_wire 250 -1080 250 -1110
+  make_wire 210 -940 210 -910
+  make_wire 210 -1060 210 -1090
+  make_wire 930 -1310 910 -1310
+  make_wire 210 -860 250 -860
+  make_wire 250 -860 850 -860
+  make_wire 650 -1340 650 -1280
+  make_wire 650 -1340 710 -1340
+  make_wire 710 -1340 790 -1340
+  make_wire 520 -1210 480 -1210
+  make_wire 520 -1210 650 -1210
+  make_wire 790 -1280 650 -1280
+  make_wire 360 -1210 290 -1210
+  make_wire 50 -1120 170 -1120
+  make_wire 100 -1240 170 -1240
+  make_wire 100 -1180 170 -1180
+  make_wire 100 -1300 170 -1300
+  make_text -origin {-10 -1450} -text {8-bit Barrel Shifter} -size large
+  make_text -origin {520 -1090} -text {Space for routing.
+Set to 0 for first
+part of tutorial.}
+}
+
+proc ICON_shift8 args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-50 0} -name {in[7:0]}
+  icon_term -type output -origin {50 0} -name {out[7:0]}
+  icon_term -type input -origin {-10 -110} -orient R90 -name {shift[2:0]}
+  icon_property -origin {-120 190} -type user -name name
+  icon_property -origin {-120 210} -type user -name M
+  icon_property -origin {-120 230} -type user -name pad
+  icon_line -50 -100 -50 -10 -50 10 -50 30 -50 130 50 90 50 -130 -50 -100
+  icon_property -origin {0 -50} -rotate 1 -label {8-bit shift}
+  icon_property -origin {40 0} -anchor center -rotate 1 -label out
+  icon_property -origin {-40 0} -anchor center -rotate 1 -label in
+  icon_property -origin {0 -90} -anchor center -label {shift[2:0]}
+}
+

@@ -1,0 +1,61 @@
+#!/bin/csh -f
+
+# Creates max technology files from a gds file and loads gds under
+# that technology file.  
+
+if ($1 == "" || $1 == "-h" || $1 == "-help") then
+  echo ""
+  echo "Usage: gds_input [-layers <layers_file> [-tech <name>] <gds_file> [-rebuild]"
+  echo ""
+  echo "where <gds_file> is the full pathname to the gds file to be loaded."
+  echo ""
+  echo 'If you specify "-rebuild" then uses your modified "layers file".'
+  echo 'Layers file defaults to "layers" and technology defaults to "test".'
+  echo ""
+  exit
+endif
+
+
+# Gather the command line switches and variables.
+
+# default technology name is test
+set tech = test
+set rebuild = 0
+set layers = layers
+
+while (${#argv})
+    switch($argv[1])
+	case -rebuild:
+		set rebuild = 1
+		breaksw
+	case -tech:
+		shift
+		set tech = $argv[1]
+		breaksw
+	case -layers:
+		shift
+		set layers = $argv[1]
+		breaksw
+	default:
+		set gdsfile = $argv[1]
+	breaksw
+    endsw
+    shift
+end
+
+
+echo "Setting up to load GDS file $gdsfile ..."
+
+if ($rebuild == 0) then
+  # create a barebones layer file from the gds
+  echo "wm iconify .win1 ; format_gds_layers $gdsfile $layers ; mn_exit" | max
+endif
+
+# make_tech.tcl must be in the same dir as gds_input
+set a = $0
+set a = $a:h
+$a/make_tech.tcl -r -file $layers -tech $tech
+
+max -tech $tech $gdsfile
+
+exit

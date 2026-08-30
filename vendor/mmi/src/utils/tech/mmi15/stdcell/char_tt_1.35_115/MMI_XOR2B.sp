@@ -1,0 +1,1 @@
+../extract/MMI_XOR2B.sp

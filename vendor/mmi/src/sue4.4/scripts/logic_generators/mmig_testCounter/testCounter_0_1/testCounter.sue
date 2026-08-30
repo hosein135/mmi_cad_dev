@@ -1,0 +1,108 @@
+# This is a generator for a counter stimulus for both spice and verilog simulation.
+
+proc SCHEMATIC_testCounter args {
+  call_use_keyword $args {{NBITS 8}}
+
+  set maxidx [expr $NBITS - 1]
+
+  set x 0
+  set y 0
+
+  # wire outA bit[0] to pulse; wire rest of outA bits to 0
+  for {set i 0} {$i < $NBITS} {incr i} {
+    make global -name GND -origin "$x $y"
+    if {$i == 0} {
+      make_wire $x $y $x [expr $y - 40]
+      make pulse -origin "$x [expr $y - 80]"
+    } else {
+      make_wire $x $y $x [expr $y - 50]
+      make dc_supply -origin "$x [expr $y - 80]"
+    }
+    make_wire $x [expr $y - 120] $x [expr $y - 170]
+    make name_net_s -name "\[$i\]" -origin "$x [expr $y - 170]"
+    make_wire $x [expr $y - 170] $x [expr $y - 220]
+    make_wire $x [expr $y - 220] [expr $x + 100] [expr $y - 220]
+    set x [expr $x - 100]    
+  }
+  make output -name "outA\[$maxidx:0\]" -origin {100 -220}
+
+  set x 0
+  set y 400
+
+  # wire outB bits to 1
+  for {set i 0} {$i < $NBITS} {incr i} {
+    make global -name GND -origin "$x $y"
+    make_wire $x $y $x [expr $y - 50]
+    make dc_supply -voltage Vddp -origin "$x [expr $y - 80]"
+    make_wire $x [expr $y - 120] $x [expr $y - 170]
+    make name_net_s -name "\[$i\]" -origin "$x [expr $y - 170]"
+    make_wire $x [expr $y - 170] $x [expr $y - 220]
+    make_wire $x [expr $y - 220] [expr $x + 100] [expr $y - 220]
+    set x [expr $x - 100]
+  }
+  make output -name "outB\[$maxidx:0\]" -origin {100 180}
+
+}
+
+proc ICON_testCounter args {
+  icon_generator $args {{NBITS 8}}
+
+  set maxidx [expr $NBITS - 1]
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}}}
+  icon_term -type output -origin {-20 50} -orient R90 -name "outA\[$maxidx:0\]"
+  icon_term -type output -origin {20 50} -orient R90 -name "outB\[$maxidx:0\]"
+  icon_property -origin {-60 200} -type user -name name
+  icon_property -origin {-60 220} -type user -name M
+  icon_line -150 -50 -150 50 150 50 150 -50 -150 -50
+  icon_property -origin {0 -20} -size large -anchor center -label testCounter
+  icon_property -origin {0 0} -anchor center -label "Width = $NBITS"
+  icon_property -origin {-20 40} -anchor center -label "A"
+  icon_property -origin {20 40} -anchor center -label "B"
+
+  # generate verilog property
+  set fname "testCounter$NBITS"
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (.outA(\$\{outA\[%d:0\]\}), .outB(\$\{outB\[%d:0\]\}))\\;" $fname $fname $maxidx $maxidx]
+  icon_property -origin {-60 240} -type fixed -name verilog -text $vprop
+
+
+  # spit out the behavioral verilog code
+  set filename "$fname.vb"
+
+  if {[catch "open $filename w" FILE_ID]} {
+    error "ERROR: Couldn't open file $filename"
+  }
+
+  # header stuff
+  puts $FILE_ID "// Behavioral verilog for $NBITS bit testCounter"
+  puts $FILE_ID "module $fname (outA, outB);"
+  puts $FILE_ID [format "\n\toutput \[%d:0\]\toutA;" $maxidx]
+  puts $FILE_ID [format "\toutput \[%d:0\]\toutB;" $maxidx]
+
+  puts $FILE_ID [format "\n\tparameter\tinitial_value = 'b 0;"]
+  puts $FILE_ID [format "\tparameter\tcycletime = 10;"]
+  puts $FILE_ID [format "\treg \[%d:0\]\toutA;" $maxidx]
+  puts $FILE_ID [format "\treg \[%d:0\]\toutB;" $maxidx]
+  puts $FILE_ID [format "\treg \[%d:0\]\tout;" [expr (2 * $NBITS) - 1]]
+
+  # initialize
+  puts $FILE_ID [format "\n\tinitial begin"]
+  puts $FILE_ID [format "\t  out = initial_value;"]
+  puts $FILE_ID [format "\t  outA = initial_value;"]
+  puts $FILE_ID [format "\t  outB = initial_value;"]
+  puts $FILE_ID [format "\tend"]
+
+  # execute
+  puts $FILE_ID [format "\n\talways begin"]
+  puts $FILE_ID [format "\t  \#cycletime begin"]
+  puts $FILE_ID [format "\t    out = out + 1;"]
+  puts $FILE_ID [format "\t    outA = out\[[expr (2 * $NBITS) - 1]:$NBITS\];"]
+  puts $FILE_ID [format "\t    outB = out\[$maxidx:0\];"]
+  puts $FILE_ID [format "\t  end"]
+  puts $FILE_ID [format "\tend"]
+
+  # done
+  puts $FILE_ID [format "\nendmodule\t\t//%s" $fname]
+  close $FILE_ID
+}
+

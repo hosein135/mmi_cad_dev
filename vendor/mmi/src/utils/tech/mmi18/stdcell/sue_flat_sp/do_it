@@ -1,0 +1,10 @@
+#!/bin/csh
+
+# JDJ Fri Jul 14 16:57:51 2000
+
+# Loop over all the .sue files an netlist them.
+# The .suerc file here sets up flat spice netlisting.
+
+foreach i (*.sue)
+   sue $i '-CMD netlist -CMD exit -ICONIFY 1'
+end

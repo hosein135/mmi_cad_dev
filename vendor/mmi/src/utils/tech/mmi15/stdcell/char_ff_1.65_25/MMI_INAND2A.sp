@@ -1,0 +1,1 @@
+../extract/MMI_INAND2A.sp

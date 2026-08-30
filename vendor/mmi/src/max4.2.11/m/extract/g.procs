@@ -1,0 +1,525 @@
+ExtSortTerminals --
+-------------------
+
+Sort the terminals of a transistor so that the terminal with the
+lowest leftmost coordinate on the plane with the lowest number is
+output first.
+
+Results:
+None
+
+Side effects:
+The tr_termnode, tr_termlen, and tr_termpos entries may change.
+
+ExtCell --
+----------
+
+Extract the cell 'def', plus all its interactions with its subcells.
+Place the result in the file named 'outName'.
+
+Results:
+None.
+
+Side effects:
+Creates the file 'outName'.ext and writes to it.
+May leave feedback information where errors were encountered.
+Upon return, extNumFatal contains the number of fatal errors
+encountered while extracting 'def', and extNumWarnings contains
+the number of warnings.
+
+ExtFindInteractions --
+----------------------
+
+Paint into the supplied tile plane 'resultPlane' TT_ERROR_P tiles
+for each area in the CellDef 'def' that must be processed for
+interactions.
+
+Each interaction arises from paint in two different subtrees
+being less than (but not equal to) 'halo' units away from
+each other.  In this definition, a subtree refers to a single
+CellUse, which may be either a single cell or an entire array.
+
+If 'bloat' is non-zero, each interaction area is bloated by
+this amount when being painted into the result plane.
+
+Results:
+None.
+
+Side effects:
+Paints into the plane 'resultPlane'.
+
+ExtSetDriver --
+---------------
+ExtSetReceiver --
+
+Add a terminal name to either the driver or the receiver table.
+
+Results:
+None.
+
+Side effects:
+Adds an entry to the hash tables extDriverHash or extReceiverHash
+respectively.  The initial value of the hash entry is 0.
+
+ExtLengthClear --
+-----------------
+
+Kill extDriverHash and extReceiverHash, and re-initialize them.
+
+Results:
+None.
+
+Side effects:
+See above.
+
+ExtInit --
+----------
+
+Initialize the technology-independent part of the extraction module.
+This procedure should be called once, after the database module has
+been initialized.
+
+Results:
+None.
+
+Side effects:
+Initializes the local variables of the extraction module.
+Registers the extractor with the debugging module.
+
+ExtSetup --
+-----------
+
+called on each invocation of extractor, 
+sets up "stepsize" etc. 
+
+ExtAll --
+---------
+
+Extract the subtree rooted at the CellDef 'rootUse->cu_def'.
+Each cell is extracted to a file in the current directory
+whose name consists of the last part of the cell's path,
+with a .ext suffix.
+
+Results:
+None.
+
+Side effects:
+Creates a number of .ext files and writes to them.
+Adds feedback information where errors have occurred.
+
+ExtUnique --
+------------
+
+For each cell in the subtree rooted at rootUse->cu_def, make
+sure that there are not two different nodes with the same label.
+If there are, and either the label ends in a '#' or allNames is
+TRUE, we generate unique names by appending a numeric suffix to
+all but one of the offending labels.  Otherwise, if the label
+doesn't end in a '!', we leave feedback.
+
+Results:
+None.
+
+Side effects:
+May modify the label lists of some of the cells rooted
+at rootUse->cu_def, and mark the cells as CDMODIFIED.
+May also leave feedback.
+
+ExtParents --
+-------------
+ExtShowParents --
+
+ExtParents extracts the cell use->cu_def and all its parents.
+ExtShowParents merely finds and prints all the parents without
+extracting them.
+
+As in ExtAll, each cell is extracted to a file in the current
+directory whose name consists of the last part of the cell's path,
+with a .ext suffix.
+
+Results:
+None.
+
+Side effects:
+Creates a number of .ext files and writes to them.
+Adds feedback information where errors have occurred.
+
+ExtParentArea --
+----------------
+
+ExtParentArea extracts the cell use->cu_def and each of its
+parents that contain geometry touching or overlapping the area
+of use->cu_def.
+
+Results:
+None.
+
+Side effects:
+Creates one or more .ext files and writes to them.
+Adds feedback information where errors have occurred.
+
+ExtIncremental --
+-----------------
+
+Starting at 'rootUse', extract all cell defs that have changed.
+Right now, we forcibly read in the entire tree before doing the
+extraction.
+
+Results:
+None.
+
+Side effects:
+Creates a number of .ext files and writes to them.
+Adds feedback information where errors have occurred.
+
+ExtFindNeighbors --
+-------------------
+
+For each tile adjacent to 'tile' that connects to it (according to
+arg->fra_connectsTo), and (if it is a contact) for tiles on other
+planes that connect to it, we recursively visit the tile, call the
+client's filter procedure (*arg->fra_each)(), if it is non-NULL.
+The tile is marked as being visited by setting it's ti_client field
+to arg->fra_region.
+
+Results:
+Returns 0 normally, or 1 if a client decided to abort the
+search, or if an interrupt was seen.
+
+Side effects:
+See comments above.
+
+ExtFindRegions --
+-----------------
+
+Find all the connected geometrical regions in a given area of a CellDef
+that will correspond to nodes or devices in the extracted circuit.
+Two procedures are supplied by the caller, 'first' and 'each'.
+
+The function 'first' must be non-NULL.  It is called for each tile
+tile found in the region.  It must return a pointer to a Region
+struct (or one of the client forms of a Region struct; see the
+comments in extractInt.h).
+
+Region *
+(*first)(tile, arg)
+Tile *tile;		/# Tile is on plane arg->fra_pNum #/
+FindRegion *arg;
+{
+}
+
+If the function 'each' is non-NULL, it is applied once to each tile found
+in the region:
+
+(*each)(tile, planeNum, arg)
+Tile *tile;
+int planeNum;	/# May be different than arg->fra_pNum #/
+FindRegion *arg;
+{
+}
+
+Results:
+Returns a pointer to the first element in the linked list
+of Region structures for this CellDef.  The Region structs
+may in fact contain more than the basic Region struct; this
+will depend on what the function 'first' allocates.
+
+Side effects:
+Each non-space tile has its ti_client field left pointing
+to a Region structure that describes the region that tile
+belongs to.
+
+Non-interruptible.  It is the caller's responsibility to check
+for interrupts.
+
+ExtLabelRegions --
+------------------
+
+Given a CellDef whose tiles have been set to point to LabRegions
+by ExtFindRegions, walk down the label list and assign labels
+to regions.  If the tile over which a label lies is still uninitialized
+ie, points to extUnInit, we skip the label.
+
+A label is attached to the LabRegion for a tile if the label's
+type and the tile's type are connected according to the table
+'connTo'.  This disambiguates the case where a label lies
+on the boundary between two tiles of different types.
+
+Results:
+None.
+
+Side effects:
+Each LabRegion has labels added to its label list.
+
+ExtLabelOneRegion --
+--------------------
+
+Same as ExtLabelRegion, but it only assigns labels to one particular
+region.
+
+Results:
+None.
+
+Side effects:
+The region has labels added to its label list.
+
+ExtResetTiles --
+----------------
+
+Given a CellDef whose tiles have been set to point to Regions
+by ExtFindRegions, reset all the tiles to uninitialized.
+
+Results:
+None.
+
+Side effects:
+All the non-space tiles in the CellDef have their ti_client
+fields set back to uninitialized.  Does not free the Region
+structs that these tiles point to; that must be done by
+ExtFreeRegions, ExtFreeLabRegions, or ExtFreeHierLabRegions.
+
+Non-interruptible.
+
+ExtFreeRegions --
+-----------------
+ExtFreeLabRegions --
+ExtFreeHierLabRegions --
+
+Free a list of Regions.
+ExtFreeLabRegions also frees the LabelLists pointed to by lreg_labels.
+ExtFreeHierLabRegions, in addition to freeing the LabelLists, frees
+the labels they point to.
+
+Results:
+None.
+
+Side effects:
+Frees memory.
+
+Non-interruptible.
+
+ExtTclInit --
+-------------
+
+Initialize extraction tcl commands.
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+
+ExtSetStyle --
+--------------
+
+Set the current extraction style to 'name', or print
+the available and current styles if 'name' is NULL.
+
+Results:
+None.
+
+Side effects:
+Just told you.
+
+ExtTechLine --
+--------------
+
+Process a line from the "extract" section of a technology file.
+
+Each line in the extract section of a technology begins
+with a keyword that identifies the format of the rest of
+the line.
+
+The following three kinds of lines are used to define the resistance
+and parasitic capacitance to substrate of each tile type:
+
+resist	 types resistance
+areacap	 types capacitance
+perimcap inside outside capacitance
+
+where 'types', 'inside', and 'outside' are comma-separated lists
+of tile types, 'resistance' is an integer giving the resistance
+per square in milli-ohms, and 'capacitance' is an integer giving
+capacitance (per square lambda for areacap, or per lambda perimeter
+for perimcap) in attofarads.
+
+The perimeter (sidewall) capacitance depends both on the types
+inside and outside the perimeter.  For a given 'perimcap' line,
+any segment of perimeter with a type in 'inside' inside the
+perimeter and a type in 'outside' ontside the perimeter will
+have the indicated capacitance.
+
+Both area and perimeter capacitance computed from the information
+above apply between a given node and the substrate beneath it, as
+determined by extSubstrate[].
+
+Contact resistances are specified by:
+
+contact	type	minsize	resistance
+
+where type is the type of contact tile, minsize is chosen so that contacts
+that are integer multiples of minsize get an additional contact cut for each
+increment of minsize, and resistance is in milliohms.
+
++++ FOR NOW, CONSIDER ALL SUBSTRATE TO BE AT GROUND +++
+
+Overlap coupling capacitance is specified by:
+
+overlap	 toptypes bottomtypes capacitance [shieldtypes]
+
+where 'toptypes' and 'bottomtypes' are comma-separated lists of tile types,
+and 'capacitance' is an integer giving capacitance in attofarads per
+square lambda of overlap.  The sets 'toptypes' and 'bottomtypes' should
+be disjoint.  Also, the union of the planes of 'toptypes' should be disjoint
+from the union of the planes of 'bottomtypes'.  If 'shieldtypes' are
+present, they should also be a comma-separated list of types, on
+planes disjoint from those of either 'toptypes' or 'bottomtypes'.
+
+Whenever a tile of a type in 'toptypes' overlaps one of a type in
+'bottomtypes', we deduct the capacitance to substrate of the 'toptypes'
+tile for the area of the overlap, and create an overlap capacitance
+between the two nodes based on 'capacitance'.  When material in
+'shieldtypes' appears over any of this overlap area, however, we
+only deduct the substrate capacitance; we don't create an overlap
+capacitor.
+
+Sidewall coupling capacitance is specified by:
+
+sidewall  intypes outtypes neartypes fartypes capacitance
+
+where 'intypes', 'outtypes', 'neartypes', and 'fartypes' are all comma-
+separated lists of types, and 'capacitance' is an integer giving capacitance
+in attofarads.  All of the tiles in all four lists should be on the same
+plane.
+
+Whenever an edge of the form i|j is seen, where 'i' is in intypes and
+'j' is in outtypes, we search on the 'j' side for a distance of
+ExtCurStyle->exts_sideCoupleHalo for edges with 'neartypes' on the
+close side and 'fartypes' on the far side.  We create a capacitance
+equal to the length of overlap, times capacitance, divided by the
+separation between the edges (poor approximation, but better than
+none).
+
+Sidewall overlap coupling capacitance is specified by:
+
+sideoverlap  intypes outtypes ovtypes capacitance
+
+where 'intypes', 'outtypes', and 'ovtypes' are comma-separated lists
+of types, and 'capacitance' is an integer giving capacitance in attofarads
+per lambda.  Both intypes and outtypes should be in the same plane, and
+ovtypes should be in a different plane from intypes and outtypes.
+
+The next kind of line describes transistors:
+
+fet	 types terminals min-#terminals names substrate gscap gccap
+
+where 'types' and 'terminals' are comma-separated lists of tile types.
+The meaning is that each type listed in 'types' is a transistor, whose
+source and drain connect to any of the types listed in 'terminals'.
+These transistors must have exactly min-#terminals terminals, in addition
+to the gate (whose connectivity is specified in the system-wide connectivity
+table in the "connect" section of the .tech file).  Currently gscap and
+gccap are unused, but refer to the gate-source (or gate-drain) capacitance
+and the gate-channel capacitance in units of attofarads per lambda and
+attofarads per square lambda respectively.
+
+The resistances of transistors is specified by:
+
+fetresist type region ohms
+
+where type is a type of tile that is a fet, region is a string ("linear"
+is treated specially), and ohms is the resistance per square of the fet
+type while operating in "region".  The values of fets in the "linear"
+region are stored in a separate table.
+
+Results:
+Returns TRUE normally, or FALSE if the line from the
+technology file is so malformed that Max should abort.
+Currently, we always return TRUE.
+
+Side effects:
+Initializes the per-technology variables that appear at the
+beginning of this file.
+
+ExtTechFinal --
+---------------
+
+Postprocess the technology specific information for extraction.
+Builds the connectivity tables exts_nodeConn[], exts_resistConn[],
+and exts_transConn[].
+
+Results:
+None.
+
+Side effects:
+Initializes the tables mentioned above.
+Leaves ExtCurStyle pointing to the first style in the list
+ExtAllStyles.
+
+ExtractTest --
+--------------
+
+Command interface for testing circuit extraction.
+Usage:
+*extract
+
+Results:
+None.
+
+Side effects:
+Extracts the current cell, writing a file named
+currentcellname.ext.
+
+ExtTimes --
+-----------
+
+Time the extractor.
+All cells in the tree rooted at 'rootUse' are extracted.
+We report the following times for each cell (seconds of CPU
+time, accurate to 10 milliseconds).
+
+Time to extract just its paint.
+Time to extract it completely.
+Time to perform incremental re-extraction if just this cell changed.
+
+In addition, we report:
+
+Fets/second paint extraction speed
+Fets/second cell extraction speed
+Fets/second hierarchical extraction speed
+Rects/second paint extraction speed
+Rects/second cell extraction speed
+Rects/second hierarchical extraction speed
+
+Also for each cell, we report the number of transistors, number
+of rectangles, and rectangles per transistor.
+
+In addition, we report the following cumulative information, as
+means, standard deviation, min, and max:
+
+Fets/second flat extraction speed
+Fets/second complete extraction speed
+Rects/second flat extraction speed
+Rects/second complete extraction speed
+Incremental extraction time after changing one cell.
+
+Results:
+None.
+
+Side effects:
+Writes to the file 'f'.
+
+ExtInterCount --
+----------------
+
+Find all interaction areas in an entire design, and count
+the fraction of the total area that is really an interaction
+area.  Report this for each cell in the design, and as a
+fraction of the total area.
+
+Results:
+None.
+
+Side effects:
+Writes to the FILE 'f'.
+

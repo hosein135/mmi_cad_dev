@@ -1,0 +1,362 @@
+# This is a generator for a bitslice of a multiplier's partial product generation logic.
+proc SCHEMATIC_ppg_slice args {
+  call_use_keyword $args {{NBITS 8} {Algorithm "Simple"} {A "Unsigned"}}
+
+  # drawing origin
+  set base_x -500
+  set base_y 0
+
+  # wire stub lengths
+  set ws1 50
+
+  # icon info
+  # MMI_NAND2
+  set nand_x 100
+  set nand_y 60
+  set nand_in0_x -50
+  set nand_in0_y -20
+  set nand_in1_x -50
+  set nand_in1_y 20
+  set nand_out_x 60
+  set nand_out_y 0
+  # MMI_NAND3
+  set nand3_in0_x -50
+  set nand3_in0_y -20
+  set nand3_in1_x -50
+  set nand3_in1_y 0
+  set nand3_in2_x -50
+  set nand3_in2_y 20
+  set nand3_out_x 60
+  set nand3_out_y 0
+  # MMI_INV
+  set inv_x 100
+  set inv_y 60
+  set inv_in_x -50
+  set inv_in_y 0
+  set inv_out_x 50
+  set inv_out_y 0
+
+  # spacings between nand-invert icon groups
+  # xfudge must be evenly divisible by 2
+  set xfudge [expr $nand_x + $inv_x + 3 * $ws1]
+  set xfudge2 [expr $xfudge / 2]
+  set yfudge $nand_y
+
+  # generate row spanners
+  set rsname [format "row_spanner%d" $xfudge2]
+  generate row_spanner $rsname -width $xfudge2
+  set rswidth [expr int(($inv_x + $ws1 + $nand_x)/2)]
+  set rsname2 [format "row_spanner%d" $rswidth]
+  generate row_spanner $rsname2 -width $rswidth
+
+  set x 0
+  set y $base_y
+
+  set inflag_x $base_x
+  set ncolumns [expr int($NBITS / 2) + ($NBITS %2)]
+  set outflag_x [expr $ncolumns * $xfudge]
+  if {[string toupper $A] == "SIGNED"} {
+    set outflag_x [expr $outflag_x + $xfudge]
+  }
+  if {[string toupper $A] == "BOTH"} {
+    set outflag_x [expr $outflag_x + 2 * $xfudge]
+  }
+
+  for {set i 0} {$i < $NBITS} {incr i} {
+
+    if {($i == [expr $NBITS - 1]) && ([string toupper $A] != "UNSIGNED")} {
+      if {[string toupper $A] == "SIGNED"} {
+	# place B's inverter
+	set binv_origin_x $x
+	generate MMI_INV MMI_INVC -Size C
+	make MMI_INVC -origin "$binv_origin_x $y"
+
+	# place nand
+	set nand_origin_x [expr $binv_origin_x + $inv_x + $ws1]
+	set nand_origin_y [expr $y + $nand_in0_y]
+	generate MMI_NAND2 MMI_NAND2D -Size D
+	make MMI_NAND2D -origin "$nand_origin_x $nand_origin_y"
+
+	# place final inv
+	set inv_origin_x [expr $nand_origin_x + $nand_x + $ws1]
+	generate MMI_INV MMI_INVE_1 -Size E -DeMorgan 1
+	make MMI_INVE_1  -origin "$inv_origin_x $nand_origin_y" 
+      
+	# hook up inputs
+	set pin_x [expr $nand_origin_x + $nand_in0_x]
+	set pin_y [expr $nand_origin_y + $nand_in0_y]
+	set pin_name [format "A_%d_H" $i]
+	make_wire $pin_x $pin_y $inflag_x $pin_y
+	make input -origin "$inflag_x $pin_y" -name $pin_name
+	set pin_x [expr $binv_origin_x + $inv_in_x]
+	set pin_y [expr $y + $inv_in_y]
+	set pin_name [format "B_%d_H" $i]
+	make_wire $pin_x $pin_y $inflag_x $pin_y
+	make input -origin "$inflag_x $pin_y" -name $pin_name
+	
+	# hook up output
+	set pin_x [expr $inv_origin_x + $inv_out_x]
+	set pin_y [expr $nand_origin_y + $inv_out_y]
+	set pin_name [format "PP%d_H" $i]
+	make_wire $pin_x $pin_y $outflag_x $pin_y
+	make output -origin "$outflag_x $pin_y" -name $pin_name
+
+	# hook up between binv & nand
+	make_wire [expr $binv_origin_x + $inv_out_x] $y [expr $nand_origin_x + $nand_in1_x] [expr $nand_origin_y + $nand_in1_y]
+
+	# hook up between nand & invert
+	make_wire [expr $nand_origin_x + $nand_out_x] $nand_origin_y [expr $inv_origin_x + $inv_in_x] $nand_origin_y
+
+	# drop row_spanner under final nand-inv
+	make $rsname -origin "[expr $inv_origin_x + $inv_in_x] [expr $base_y + 100]"
+      }
+
+      if {[string toupper $A] == "BOTH"} {
+	# increment x (for dpc placement control) if this is bit 1 of 4
+	if {[expr $i % 4] == 1} {
+	  set x [expr $x + $xfudge2]
+	}
+
+	# place B inverter
+	set binv_origin_x $x
+	set binv_origin_y $y
+	generate MMI_INV MMI_INVB -Size B
+	make MMI_INVB -origin "$binv_origin_x $binv_origin_y"
+	make_wire [expr $binv_origin_x + $inv_in_x] $binv_origin_y $inflag_x $binv_origin_y
+	set pin_name [format "B_%d_H" $i]
+	make input -origin "$inflag_x $binv_origin_y" -name $pin_name
+
+	# place ASigned inverter
+	set sinv_origin_x $binv_origin_x
+	set sinv_origin_y [expr $binv_origin_y - 2 * $nand_y]
+	generate MMI_INV MMI_INVB -Size B
+	make MMI_INVB -origin "$sinv_origin_x $sinv_origin_y"
+	make_wire [expr $sinv_origin_x + $inv_in_x] $sinv_origin_y $inflag_x $sinv_origin_y
+	make input -origin "$inflag_x $sinv_origin_y" -name "ASigned_H"
+
+	# place nands
+	set nand1_origin_x [expr $binv_origin_x + $inv_x + $ws1]
+	set nand1_origin_y [expr $binv_origin_y + $nand3_in0_y]
+	generate MMI_NAND3 MMI_NAND3B -Size B
+	make MMI_NAND3B -origin "$nand1_origin_x $nand1_origin_y" -orient RY
+	make_wire [expr $nand1_origin_x + $nand3_in2_x] [expr $nand1_origin_y + $nand3_in2_y] [expr $binv_origin_x + $inv_out_x] [expr $binv_origin_y + $inv_out_y]
+
+	set nand2_origin_x $nand1_origin_x
+	set nand2_origin_y [expr $sinv_origin_y + $nand3_in2_y]
+	generate MMI_NAND3 MMI_NAND3B -Size B
+	make MMI_NAND3B -origin "$nand2_origin_x $nand2_origin_y" 
+	make_wire [expr $nand2_origin_x + $nand3_in0_x] [expr $nand2_origin_y + $nand3_in0_y] [expr $sinv_origin_x + $inv_out_x] [expr $sinv_origin_y + $inv_out_y]
+
+	# drop row_spanner under inv-nands
+	make $rsname2 -origin "[expr $binv_origin_x + $inv_x] [expr $base_y + 100]"
+
+	# hook up inputs
+	# A
+	set pin_x [expr $nand1_origin_x + $nand3_in2_x]
+	set pin1_y [expr $nand1_origin_y + $nand3_in0_y]
+	set pin2_y [expr $nand2_origin_y + $nand3_in2_y]
+	set bend_x [expr $pin_x - 20]
+	make_wire $pin_x $pin1_y $bend_x $pin1_y
+	make_wire $pin_x $pin2_y $bend_x $pin2_y
+	make_wire $bend_x $pin1_y $bend_x $pin2_y
+	set wire_y [expr $binv_origin_y - $nand_y]
+	make_wire $bend_x $wire_y $inflag_x $wire_y
+	set pin_name [format "A_%d_H" $i]
+	make input -origin "$inflag_x $wire_y" -name $pin_name
+	# B
+	set pin_x [expr $nand2_origin_x + $nand3_in1_x]
+	set pin_y [expr $nand2_origin_y + $nand3_in1_y]
+	set bend_x [expr $binv_origin_x - $inv_x - $ws1]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	make_wire $bend_x $pin_y $bend_x $binv_origin_y
+	# ASigned
+	set pin_x [expr $nand1_origin_x + $nand3_in1_x]
+	set pin_y [expr $nand1_origin_y + $nand3_in1_y]
+	set bend_x [expr $sinv_origin_x - $inv_x - $ws1 - 20]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	make_wire $bend_x $pin_y $bend_x $sinv_origin_y
+
+	# place final nand
+	set nand3_origin_x [expr $nand1_origin_x + $nand_x + $ws1]
+	set nand3_origin_y $wire_y
+	generate MMI_NAND2 MMI_NAND2C_1 -Size C -DeMorgan 1
+	make MMI_NAND2C_1 -origin "$nand3_origin_x $nand3_origin_y"
+	set pin_x [expr $nand3_origin_x + $nand_in0_x]
+	set pin_y [expr $nand3_origin_y + $nand_in0_y]
+	set bend_x [expr $pin_x - 20]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	set pino_x [expr $nand2_origin_x + $nand3_out_x]
+	set pino_y [expr $nand2_origin_y + $nand3_out_y]
+	make_wire $bend_x $pin_y $bend_x $pino_y
+	make_wire $bend_x $pino_y $pino_x $pino_y
+	set pin_x [expr $nand3_origin_x + $nand_in1_x]
+	set pin_y [expr $nand3_origin_y + $nand_in1_y]
+	set bend_x [expr $pin_x - 20]
+	make_wire $pin_x $pin_y $bend_x $pin_y
+	set pino_x [expr $nand1_origin_x + $nand3_out_x]
+	set pino_y [expr $nand1_origin_y + $nand3_out_y]
+	make_wire $bend_x $pin_y $bend_x $pino_y
+	make_wire $bend_x $pino_y $pino_x $pino_y
+
+	# place inverters
+	set inv1_origin_x [expr $nand3_origin_x + $nand_x + $ws1]
+	set inv1_origin_y $nand3_origin_y
+	generate MMI_INV MMI_INVD -Size D
+	make MMI_INVD -origin "$inv1_origin_x $inv1_origin_y"
+	make_wire [expr $inv1_origin_x + $inv_in_x] [expr $inv1_origin_y + $inv_in_y] [expr $nand3_origin_x + $nand_out_x] [expr $nand3_origin_y + $nand_out_y]
+	set inv2_origin_x [expr $inv1_origin_x + $inv_x + $ws1]
+	set inv2_origin_y $inv1_origin_y
+	generate MMI_INV MMI_INVE_1 -Size E -DeMorgan 1
+	make MMI_INVE_1 -origin "$inv2_origin_x $inv2_origin_y"
+	make_wire [expr $inv2_origin_x + $inv_in_x] [expr $inv2_origin_y + $inv_in_y] [expr $inv1_origin_x + $inv_out_x] [expr $inv1_origin_y + $inv_out_y]
+
+	# hook up output
+	make_wire [expr $inv2_origin_x + $inv_out_x] [expr $inv2_origin_y + $inv_out_y] $outflag_x [expr $inv2_origin_y + $inv_out_y]
+	set pin_name [format "PP%d_H" $i]
+	make output -origin "$outflag_x [expr $inv2_origin_y + $inv_out_y]" -name $pin_name
+
+	# drop row_spanner under final nand-inv-inv
+	make $rsname -origin "$inv1_origin_x [expr $base_y + 100]"
+
+	# force full hookup
+	show_connects "" clean
+      }
+
+    } else {
+      # place nand
+      set nand_origin_x $x
+      generate MMI_NAND2 MMI_NAND2D -Size D
+      make MMI_NAND2D -origin "$nand_origin_x $y" 
+      
+      # place inv
+      set inv_origin_x [expr $nand_origin_x + $nand_x + $ws1]
+      generate MMI_INV MMI_INVE_1 -Size E -DeMorgan 1
+      make MMI_INVE_1  -origin "$inv_origin_x $y" 
+      
+      # hook up inputs
+      set pin_x [expr $nand_origin_x + $nand_in0_x]
+      set pin_y [expr $y + $nand_in0_y]
+      set pin_name [format "A_%d_H" $i]
+      make_wire $pin_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name $pin_name
+      set pin_x [expr $nand_origin_x + $nand_in1_x]
+      set pin_y [expr $y + $nand_in1_y]
+      set pin_name [format "B_%d_H" $i]
+      make_wire $pin_x $pin_y $inflag_x $pin_y
+      make input -origin "$inflag_x $pin_y" -name $pin_name
+      
+      # hook up output
+      set pin_x [expr $inv_origin_x + $inv_out_x]
+      set pin_y [expr $y + $inv_out_y]
+      set pin_name [format "PP%d_H" $i]
+      make_wire $pin_x $pin_y $outflag_x $pin_y
+      make output -origin "$outflag_x $pin_y" -name $pin_name
+      
+      # hook up between nand & invert
+      make_wire [expr $nand_origin_x + $nand_out_x] $y [expr $inv_origin_x + $inv_in_x] $y
+      
+      # drop row_spanner under bit 3
+      if {[expr $i % 4] == 3} {
+	make $rsname -origin "[expr $inv_origin_x + $inv_in_x] [expr $base_y + 100]"
+      }
+      
+      # increment x (for dpc placement control)
+      # next bit is bit 2 or 3:  move halfway
+      if {([expr $i % 4] == 1) || ([expr $i % 4] == 2)} {
+	set x [expr $x + $xfudge2]
+      }
+      # next bit is 0: full move
+      if {[expr $i % 4] == 3} {
+	set x [expr $x + $xfudge]
+      }
+      
+      # increment y
+      set y [expr $y - $yfudge]
+    }
+  }
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr $base_y + 200]" -owner emc -version 0.3 -date 02/19/99
+}
+
+
+proc ICON_ppg_slice args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 8} {Algorithm "Simple"} {A "Unsigned" {radio Signed Unsigned Both}}}
+  
+  # don't let the user get too crazy
+  if {$NBITS > 64} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  
+  # check for acceptable response on Algorithm query
+  if {([string toupper $Algorithm] != "SIMPLE")} {
+    error "ERROR: Algorithm property ($Algorithm) must be Simple"
+  }
+  if {[string toupper $Algorithm] == "SIMPLE"} {
+    set alg_name "Simple"
+  }
+  # check for acceptable response on A query
+  if {([string toupper $A] != "SIGNED") &&
+      ([string toupper $A] != "UNSIGNED") &&
+      ([string toupper $A] != "BOTH")} {
+    error "ERROR: A property ($A) must be Signed or Unsigned or Both"
+  }
+  
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  
+  # figure out icon size
+  set cs_spacer 70
+  set pin_spacer 20
+  
+  # how many pins?
+  set pincount [expr 2 * $NBITS]
+  
+  set icon_y [expr ($pincount * $pin_spacer) + (2 * $cs_spacer)]
+  set icon_x 400
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr ($icon_x / 2)]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr ($icon_y / 2)]
+  set icon_right_label [expr $icon_right - 10]
+  set icon_left_label [expr $icon_left + 10]
+  icon_line $icon_left $icon_top $icon_right $icon_top $icon_right $icon_bot $icon_left $icon_bot $icon_left $icon_top
+  
+  set pin_pos [expr $icon_bot - $cs_spacer]
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set wname [format "B_%d_H" $i]
+    icon_term -type input -origin "$icon_left $pin_pos" -name $wname
+    icon_property -origin "$icon_left_label $pin_pos" -size small -label $wname 
+    set pin_pos [expr $pin_pos - $pin_spacer]
+    set wname [format "A_%d_H" $i]
+    icon_term -type input -origin "$icon_left $pin_pos" -name $wname
+    icon_property -origin "$icon_left_label $pin_pos" -size small -label $wname 
+    set wname [format "PP%d_H" $i]
+    icon_term -type output -origin "$icon_right $pin_pos" -name $wname
+    icon_property -origin "$icon_right_label $pin_pos" -size small -label $wname -anchor e
+    set pin_pos [expr $pin_pos - $pin_spacer]
+  }
+
+  if {([string toupper $A] == "BOTH")} {
+    icon_term -type input -origin "$icon_left [expr $icon_top + $pin_spacer]" -name "ASigned_H"
+    icon_property -origin "$icon_left_label [expr $icon_top + $pin_spacer]" -size small -label "ASigned_H"
+  }
+  
+  set wname [format "%dbit" $NBITS]
+  icon_property -origin "0 -60" -size large -label $wname -anchor center
+  icon_property -origin "0 -20" -size large -label "Multiplier" -anchor center
+  set wname [format "%s PPG" $alg_name]
+  icon_property -origin "0 20" -size large -label $wname -anchor center
+  icon_property -origin "0 60" -size large -label "Bitslice" -anchor center
+  icon_property -origin "0 100" -size large -label {$name} -anchor center
+  
+  set prop_y $icon_y
+  icon_property -origin "-70 $prop_y" -type user -name name
+  icon_property -origin "-70 [expr $prop_y + 20]" -type user -name M
+  icon_property -origin "-70 [expr $prop_y + 40]" -type user -name dpc
+  
+  icon_special -type sccs_title_bar -origin "-70 [expr $prop_y + 140]" -owner emc -version 0.3 -date 02/19/99
+}
+
+
+ 

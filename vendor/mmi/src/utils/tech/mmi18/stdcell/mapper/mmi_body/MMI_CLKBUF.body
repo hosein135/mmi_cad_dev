@@ -1,0 +1,22 @@
+  # MMI_CLKBUF icon body
+  icon_line -60 140 -60 -140 60 -140 60 140 -60 140
+
+  # properties
+  icon_property -origin {0 -10} -size large -anchor center -label CLKBUF
+  icon_property -origin {0 10} -size large -anchor center -label $size
+  icon_property -origin {-10 130} -anchor e -rotate 1 -label g_clk
+  icon_property -origin {10 130} -anchor e -rotate 1 -label g_scan_en
+  icon_property -origin {30 130} -anchor e -rotate 1 -label scan_out
+  icon_property -origin {-10 -130} -rotate 1 -label clk
+  icon_property -origin {10 -130} -rotate 1 -label scan_en
+  icon_property -origin {30 -130} -rotate 1 -label scan_in
+
+  # inputs
+  icon_term -type input -origin {-10 140} -orient R270 -name g_clk
+  icon_term -type input -origin {10 140} -orient R270 -name g_scan_en
+  icon_term -type input -origin {30 -140} -orient R90 -name scan_in
+
+  # outputs
+  icon_term -type output -origin {-10 -140} -orient R270 -name clk
+  icon_term -type output -origin {10 -140} -orient R270 -name scan_en
+  icon_term -type output -origin {30 140} -orient R90 -name scan_out

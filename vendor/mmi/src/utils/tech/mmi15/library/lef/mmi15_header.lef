@@ -1,0 +1,392 @@
+#******
+# TECH: tsmc15
+#******                                                               
+
+VERSION 5.3 ;
+
+NAMESCASESENSITIVE ON ;
+
+UNITS
+    DATABASE MICRONS 1000  ;
+END UNITS
+
+LAYER POLY1
+    TYPE MASTERSLICE ;
+END POLY1
+
+# JDJ Sat Aug  4 13:29:33 2001
+# make the via metal large enough to allow stacked vias.
+
+# JDJ 010313:  ANTENNALENGTHFACTOR is obsolete in the SE 5.1 release.
+# Use the ANTENNAAREAFACTOR.
+#
+# TSMC main rule is (2*(wire_len+wire_width)*wire_thickness)/gate_area < 400.
+#
+# wire_width = 0.32
+# wire_thickness = 0.53 (5300A)
+#
+# change rule to 320 (- 20%) to allow some margin, ignore wire_width
+#
+# (2*(wire_len)*0.53)/gate_area < 320 
+# wire_len < gate_area * 302
+#
+# Also:
+#    ANTENNAAREAFACTOR = wire_len * wire_width
+# so: 
+#    ANTENNAAREAFACTOR/0.32 = wire_len
+#
+# Subitutuing in for wire_len from above:
+#
+#   ANTENNAAREAFACTOR/0.32 < gate_area * 302
+#   ANTENNAAREAFACTOR      < gate_area * 96.64
+#   ANTENNAAREAFACTOR = 1/96.64 = 0.010
+#
+
+LAYER M1
+    TYPE ROUTING ;
+    ANTENNAAREAFACTOR 0.010 ;
+    WIDTH 0.19 ;  # Whenever the router can use M1, let it use min width
+    SPACING 0.200 ;
+    SPACING 0.6 RANGE 10.0 100000.0 ;
+    PITCH 0.62 ;
+    DIRECTION HORIZONTAL ;
+      # (Worst case resistance model for METAL1 = 0.162 ohm/sq) = 1.6200e-01
+    RESISTANCE RPERSQ      1.6200e-01 ;
+    CAPACITANCE CPERSQDIST 1.2022e-04 ;
+    EDGECAPACITANCE        9.96645e-05 ;
+END M1
+
+LAYER VIA1
+    TYPE CUT ;
+END VIA1
+
+LAYER M2
+    TYPE ROUTING ;
+    ANTENNAAREAFACTOR 0.010 ;
+    WIDTH 0.320 ; # Min width that covers vias.
+    SPACING 0.240 ;
+    SPACING 0.6 RANGE 10.0 100000.0 ;
+    PITCH 0.62 ;
+    DIRECTION VERTICAL ;
+    RESISTANCE RPERSQ      1.0100e-01 ;
+    CAPACITANCE CPERSQDIST 6.42708e-05 ;
+    EDGECAPACITANCE        0.000107433 ;
+END M2
+
+LAYER VIA2
+    TYPE CUT ;
+END VIA2
+
+LAYER M3
+    TYPE ROUTING ;
+    ANTENNAAREAFACTOR 0.010 ;
+    WIDTH 0.320 ; # Min width that covers vias.
+    SPACING 0.240 ;
+    SPACING 0.6 RANGE 10.0 100000.0 ;
+    PITCH 0.62 ;
+    DIRECTION HORIZONTAL ;
+    RESISTANCE RPERSQ      1.0100e-01 ;
+    CAPACITANCE CPERSQDIST 5.80357e-05 ;
+    EDGECAPACITANCE        0.000107212 ;
+END M3
+
+LAYER VIA3
+    TYPE CUT ;
+END VIA3
+
+LAYER M4
+    TYPE ROUTING ;
+    ANTENNAAREAFACTOR 0.010 ;
+    WIDTH 0.320 ; # Min width that covers vias.
+    SPACING 0.240 ;
+    SPACING 0.6 RANGE 10.0 100000.0 ;
+    PITCH 0.62 ;
+    DIRECTION VERTICAL ;
+    RESISTANCE RPERSQ      1.0100e-01 ;
+    CAPACITANCE CPERSQDIST 6.19931e-05 ;
+    EDGECAPACITANCE        0.000107605 ;
+END M4
+
+LAYER VIA4
+    TYPE CUT ;
+END VIA4
+
+LAYER M5
+    TYPE ROUTING ;
+    ANTENNAAREAFACTOR 0.010 ;
+    WIDTH 0.320 ; # Min width that covers vias.
+    SPACING 0.240 ;
+    SPACING 0.6 RANGE 10.0 100000.0 ;
+    PITCH 0.62 ;
+    DIRECTION HORIZONTAL ;
+    RESISTANCE RPERSQ      1.0100e-01 ;
+    CAPACITANCE CPERSQDIST 4.72045e-05 ;
+    EDGECAPACITANCE        0.000107118 ;
+END M5
+
+LAYER VIA5
+    TYPE CUT ;
+END VIA5
+
+LAYER M6
+    TYPE ROUTING ;
+    # Top layer routing, twice the thickenss
+    ANTENNAAREAFACTOR 0.020 ; 
+    WIDTH 0.620 ; # Gives 0.62 spacing on double size grid.
+    SPACING 0.460 ;
+    SPACING 0.6 RANGE 10.0 100000.0 ;
+    PITCH 1.24 ;
+    DIRECTION VERTICAL ;
+    RESISTANCE RPERSQ      4.5000e-02 ;
+    CAPACITANCE CPERSQDIST 2.7961e-05 ;
+    EDGECAPACITANCE        0.00012852 ;
+END M6
+LAYER OVERLAP
+    TYPE OVERLAP ;
+END OVERLAP
+
+VIA via1 DEFAULT
+    RESISTANCE 8.5 ;
+    LAYER M1 ;
+        RECT -0.160 -0.160 0.160 0.160 ;
+    LAYER VIA1 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+    LAYER M2 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+END via1
+
+VIA via2 DEFAULT
+    RESISTANCE 8.5 ;
+    LAYER M2 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+    LAYER VIA2 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+    LAYER M3 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+END via2
+
+VIA via3 DEFAULT
+    RESISTANCE 8.5 ;
+    LAYER M3 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+    LAYER VIA3 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+    LAYER M4 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+END via3
+
+VIA via4 DEFAULT
+    RESISTANCE 8.5 ;
+    LAYER M4 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+    LAYER VIA4 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+    LAYER M5 ;
+        RECT -0.190 -0.190 0.190 0.190 ;
+END via4
+
+VIA via5 DEFAULT
+    RESISTANCE 2.5400e+00 ;
+    LAYER M5 ;
+        RECT -0.230 -0.190 0.230 0.190 ;
+    LAYER VIA5 ;
+        RECT -0.180 -0.180 0.180 0.180 ;
+    LAYER M6 ;
+        RECT -0.380 -0.380 0.380 0.380 ;
+END via5
+
+VIARULE via1Array GENERATE
+    LAYER M1 ;
+        DIRECTION HORIZONTAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER M2 ;
+        DIRECTION VERTICAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER VIA1 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+        SPACING 0.500 BY 0.500 ;
+END via1Array
+
+VIARULE via2Array GENERATE
+    LAYER M2 ;
+        DIRECTION VERTICAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER M3 ;
+        DIRECTION HORIZONTAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER VIA2 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+        SPACING 0.500 BY 0.500 ;
+END via2Array
+
+VIARULE via3Array GENERATE
+    LAYER M3 ;
+        DIRECTION HORIZONTAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER M4 ;
+        DIRECTION VERTICAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER VIA3 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+        SPACING 0.500 BY 0.500 ;
+END via3Array
+
+VIARULE via4Array GENERATE
+    LAYER M4 ;
+        DIRECTION VERTICAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER M5 ;
+        DIRECTION HORIZONTAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER VIA4 ;
+        RECT -0.110 -0.110 0.110 0.110 ;
+        SPACING 0.500 BY 0.500 ;
+END via4Array
+
+VIARULE via5Array GENERATE
+    LAYER M5 ;
+        DIRECTION HORIZONTAL ;
+        OVERHANG 0.050 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER M6 ;
+        DIRECTION VERTICAL ;
+        OVERHANG 0.090 ;
+        METALOVERHANG 0.000 ;
+
+    LAYER VIA5 ;
+        RECT -0.180 -0.180 0.180 0.180 ;
+        SPACING 0.710 BY 0.710 ;
+END via5Array
+
+VIARULE TURNM1 GENERATE
+    LAYER M1 ;
+        DIRECTION vertical ;
+
+    LAYER M1 ;
+        DIRECTION horizontal ;
+END TURNM1
+
+VIARULE TURNM2 GENERATE
+    LAYER M2 ;
+        DIRECTION vertical ;
+
+    LAYER M2 ;
+        DIRECTION horizontal ;
+END TURNM2
+
+VIARULE TURNM3 GENERATE
+    LAYER M3 ;
+        DIRECTION vertical ;
+
+    LAYER M3 ;
+        DIRECTION horizontal ;
+END TURNM3
+
+VIARULE TURNM4 GENERATE
+    LAYER M4 ;
+        DIRECTION vertical ;
+
+    LAYER M4 ;
+        DIRECTION horizontal ;
+END TURNM4
+
+VIARULE TURNM5 GENERATE
+    LAYER M5 ;
+        DIRECTION vertical ;
+
+    LAYER M5 ;
+        DIRECTION horizontal ;
+END TURNM5
+
+VIARULE TURNM6 GENERATE
+    LAYER M6 ;
+        DIRECTION vertical ;
+
+    LAYER M6 ;
+        DIRECTION horizontal ;
+END TURNM6
+
+SPACING
+    SAMENET M1 M1 0.200  STACK ;
+    SAMENET M2 M2 0.240  STACK ;
+    SAMENET M3 M3 0.240  STACK ;
+    SAMENET M4 M4 0.240  STACK ;
+    SAMENET M5 M5 0.240  STACK ;
+    SAMENET M6 M6 0.460  ;
+    SAMENET VIA1 VIA1 0.220 ;
+    SAMENET VIA1 VIA2 0.00 STACK ;
+    SAMENET VIA2 VIA2 0.220 ;
+    SAMENET VIA2 VIA3 0.00 STACK ;
+    SAMENET VIA3 VIA3 0.220 ;
+    SAMENET VIA3 VIA4 0.00 STACK ;
+    SAMENET VIA4 VIA4 0.220 ;
+    SAMENET VIA4 VIA5 0.00 STACK ;
+    SAMENET VIA5 VIA5 0.350 ;
+END SPACING
+
+# MINFEATURE gives the minimum feature size for the technology. Any
+# edge of a feature must lie on the grid defined by the X and Y
+# coordinates. This specification only applies to generated vias.
+
+MINFEATURE 0.005 0.005 ;
+
+# Specify the default values used by VERIFY ANTENNA as upper limits
+# for input pins, output pins, and input/output pins.
+
+# Default any unspecified input to be like a AND2B
+
+INPUTPINANTENNASIZE 0.231 ;
+
+# JDJ Tue Aug  7 14:52:01 2001
+# Adjusting OUTPUTPINANTENNASIZE
+
+# 900 micron of wire connected to a MUX2A (ANTENNASIZE 0.17325) caused
+# a violation. so make:
+#
+# ANTENNAAREAFACTOR * 900 + OUTPUTPINANTENNASIZE > ANTENNASIZE
+# 0.010*900 + OUTPUTPINANTENNASIZE > .17325
+# OUTPUTPINANTENNASIZE > .17325 - 9
+# OUTPUTPINANTENNASIZE >  -8.826
+# 
+
+# When the driver is smaller, for example MMI_FFB, also conected to a MUX2A.
+# 490 microns of wire caused a violation, so
+# ANTENNAAREAFACTOR * 490 + OUTPUTPINANTENNASIZE > ANTENNASIZE
+#  0.01*490 + OUTPUTPINANTENNASIZE > .17325
+# OUTPUTPINANTENNASIZE > .17325 - 4.9
+# OUTPUTPINANTENNASIZE >  -4.72
+
+# Try -4.5
+# JDJ Wed Aug  8 23:48:25 2001
+# Failed again, try -2.25
+
+OUTPUTPINANTENNASIZE -2.25 ;
+INOUTPINANTENNASIZE -2.25 ;
+
+SITE CORE1
+	SIZE 0.62 BY 6.2 ;
+	CLASS CORE ;
+	SYMMETRY Y ;
+END CORE1
+
+
+
+
+

@@ -1,0 +1,73 @@
+Documentation for mul_array
+---------------------------
+rev 0.1, 2/2/99
+
+The mul_array generator is used to derive a multiplier array made up of
+4:2 adder trees.
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS_A:
+    Definition:
+      The number of bits in input value A_H.  The width of the
+      multiplier's output will be NBITS_A + NBITS_B.
+    Legal Values:
+      4, 8, 16, 32, 64
+    Default:
+      8
+
+  NBITS_B:
+    Definition:
+      The number of bits in input value B_H.  The width of the
+      multiplier's output will be NBITS_A + NBITS_B.
+    Legal Values:
+      4, 8, 16, 32, 64 (note: must be the same value as NBITS_A)
+    Default:
+      8
+
+  UseMulCin:
+    Definition:
+      This argument makes the multiplier's carry in bits accessible to 
+      the user, or not.  If the user elects not to use the carry ins,
+      they will be wired to a logic 0.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+  AddExtraCSA:
+    Definition:
+      This argument allows the user to specify that an extra row of carry 
+      save (4:2) adders be included in the multiplier array.  In addition,
+      two extra input vectors (CSA_A_H and CSA_B_H), each of width NBITS_A
+      + NBITS_B, are provided as the additional inputs to this final row of 
+      adders.
+      This feature allows the user to implement a multiply-adder, or multiply-
+      accumulator.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      N
+
+  bitslice:    
+    Definition:
+      This argument directs DPC to enforce bitslice layout, or not.  
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+
+INPUT SIGNALS:
+--------------
+  PP*_H (partial product vectors)
+If AddExtraCSA = Y:
+  CSA_A_H, CSA_B_H (extra inputs to the final row of CSA's)
+If UseMulCin = Y:
+  MCin_L, MCarry_H (carry in values to multiplier array)
+
+
+OUTPUT SIGNALS:
+---------------
+  Sum_H, Carry_H (multiply array redundant outputs)

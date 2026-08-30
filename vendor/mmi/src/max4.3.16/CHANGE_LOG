@@ -1,0 +1,512 @@
+Max change log (2001)  (INST BRANCH!)
+=====================
+
+VERSION HISTORY
+---------------
+
+4/30/01 max4.1.20 
+	bplane insts.  3 pointers, hash + doubly linked list.
+	no bins.
+
+
+DATE    FILES
+----    -----
+         CHANGES
+         -------
+
+01/02/02 database.h
+	gave CD_MODIFIED and CD_INTERNAL their own bits!
+
+01/02/02 max/max_version
+        4.3.10 BETA
+
+01/02/02 netlist/
+	got Myron's latest (myron/ntl_121101.tar.gz)
+
+01/02/02 netlist/
+	malloc.h -> memory.h
+
+01/02/02 ntlHier.c ntlHier1.c ntlHier2.c ntlHier3.c
+	cu_parent -> DBCellUseParent() 
+
+01/02/02 ntlHier1.c ntlHier2.c ntlOutput.c ntlPort.c
+	DBIsArray() check before reference to array fields.
+
+01/02/02 ntlMain.c
+	CDINTERNAL -> CD_INTERNAL
+
+01/02/02 ntlTcl.c 
+	DBCellInitTempUse() -> DBCellUseNewTemp() 
+
+01/02/02 ntlMain.c
+	DBCellReadTree() -> DBReadCellTree()
+
+01/03/02 make/Makefile.module
+	updated from Pat 
+	supports MODULE_EXTRA_OBS needed by def because of antlr.
+
+01/03/02 def/ special/
+	Pat's latest!
+
+01/03/02 mnDoc.c main.h
+	added MnDocCreateObjCommand()
+
+01/03/02 netlist/
+	ran protoize
+
+01/03/02 ntlTest.c
+	rmed (was totally commented out and just copied from
+	extractor.)
+
+01/03/02 ntlLabel.c ntlTrans.c
+	removed commented out ref to ntlDebugID
+	
+01/03/02 netlistInt.h
+	rmed debug client cruft.
+
+01/03/02 netlistInt.h netlist/*
+	declaring funcs static.
+	adding function prototypes.
+	adding proper header comments.
+	fixing stray bugs.
+
+01/04/02 DBchunk.c
+	removed stray debug.
+	
+01/04/02 netlistInt.h netlist/*
+	declaring funcs static.
+	adding function prototypes.
+	adding proper header comments.
+	fixing stray bugs.
+
+01/04/02 netlist/Makefile
+	rmed permissive compile flag.
+
+01/04/02 netlist/*
+	compiles and properly extracts nfet
+	(max/ntl/g1.max)
+
+01/04/02 CHECKPOINT
+	make tar
+
+01/07/02 DBsearch.c
+	Fixed DBSrChildrenNested() to not access array fields for non-arrays!
+
+01/07/02 netlist.h ntlMain.c
+	rmed ntlOptions (not used.)
+	rmed ntlUnInit (using MINFINITY directly.)	
+	tcl linked and documented all switches.
+
+01/08/02 database.h DBtech.c selCreate.c
+	added DBSelfOnlyTbl[]
+
+01/08/02 layTcl.c
+	fixed bug in lay_cell_text (Clearing previous strings.)
+
+01/08/02 selCreate.c
+	fixed bug in SelectCell():  was copying transform directly 
+	from old use. fixes sel_cell.
+
+01/08/02 selTcl.c
+	fixed obscure bug in sel_cell (related to box positioning when
+	array is selected.
+
+TODO: remove DEBUGs.	
+	
+01/09/02 CHECKPOINT
+	make tar
+	xfering to jnpr to install as maxx.
+
+01/09/02 max/max_version
+	max4.3.12
+
+01/09/02 maxtcl/ mc/
+	make update
+
+01/09/02 netlist/
+	make compile for 'maxo'
+
+01/09/02 DBarray.c selTcl.c selCreate.c DBlabel2.c
+	rmed debugs.
+
+01/09/02 mnMain.c
+	change copyright to 1996 - 2002
+
+01/10/02 CHECKPOINT
+	make tar
+	xfering back to cafe:
+
+01/10/02 ntlTrans.c ntlTech.c netlist.h
+	ntlTech_transName -> ntlTransNameTbl
+
+01/10/02 adding ntl_fet command.
+
+01/11/02 layint.h layMain.c layDisplayGen.c
+	added LAY_SUBCELL_SHOW_UNEXPANDED
+
+01/14/02 CHECKPOINT
+	make tar
+
+01/14/02 mgcSubrs.c string.c commands.h utils.h */*
+	mv CmdIllegalChars() from mgcSubrs.c string.c
+	rename CmdIllegalChars() StrCheckChars()
+	changed to be silent if null msg passed arg.
+	Change sense of result:  now TRUE for OK.
+
+01/14/02 DBcell.c database.h
+	added DBCellNameCheck()
+
+01/14/02 DBlabel.c database.h
+	added DBLabelNameCheck()
+
+01/14/02 DBcell.c DBtcl.c
+	added DBCellName2File() and db_cell_name2file
+
+01/14/02 mnUnits.c DRCtech.c DRCcif.c cifTech.c
+	changed "approximating" messages to print high resolution on 
+	rounded number!
+
+01/15/02 path.c utils.h DBwrite.c mnMain.c
+	cleaned up tilde expansion code.
+	rmed unused code from path.c
+
+01/15/02 DBcell.c database.h
+	added DBCellOpen() (maps names)
+	
+01/15/02 DBread.c
+	converted to DBCellOpen()
+
+01/15/02 *
+	rmed second path arg from all PaOpen() calls.
+	reviewed all PaOpen() calls, mapping def name where needed.
+
+01/15/02 CHECKPOINT
+	make tar
+
+	compiles.
+
+01/16/02 CHECKPOINT
+	make tar
+
+	xfering to MMI
+
+01/16/02 DBtcl.c
+	removed stray debug.
+
+01/17/02 CHECKPOINT
+	make tar
+	xfering back to cafe.
+
+01/17/02 mgcSubrs.c mgcAD.c mgcRS.c
+	removed cdmFlushCell(), incorporated directly in CmdFlush()
+
+	removed cmdSaveCell()
+	rewrote CmdCheckPoint(), CmdSave().
+
+01/17/02 *
+	finished regularizing file opens / path searches and
+	mapping cell names to file names
+
+01/18/02 CHECKPOINT
+	compiles and reads/writes .max files :)
+	
+	make tar
+
+01/18/02 DBsearch.c DBcellSelect.c selEnum.c
+	switched tpath separator from '/' to '\0'
+
+01/18/02 DBinstance.c
+	Changed DBInstanceAdd() to not strip cell name, at '/'
+	when creating id.
+
+01/18/02 DBtcl.c
+	fixed documentation for db_instance_delete
+
+01/18/02 tpath.h tpath.c selTclWhat.c DBtclSearch.c
+	switching path output to tcl lists.
+
+01/22/02 DBlabel2.c DBlabel.c DBcellUse.c
+	mved contents of DBlabel2.c to DBlabel.c and DBcellUse.c
+	rmed DBlabel2.c
+
+01/22/02 *
+	renamed DBTreeFindUse() DBCellUseFindByPathName() 
+
+01/22/02 *
+	made sel_cell work with tcl list instance paths.
+	made db_flyline work 
+	more-or-less finished C-code conversion to 
+	tcl list instance paths. 
+
+01/22/02 maxtcl/
+	Got latest from Pat.
+
+01/22/02 select.tcl
+	cell2path
+	converting to new instance paths.
+	"f" key now works fine.
+
+TODO: edit_in_place
+
+01/23/02 CHECKPOINT
+	xfer to jnpr
+
+01/24/02 select.tcl
+	cell2path:  added back '/' prefix.
+	fixed sel_cell2 sel_cell3
+
+01/24/02 edit.tcl
+	fixed lay_path edit_push ...
+
+01/24/02 DBtclSearch.c
+	added -user_bbox option to db_search_cells
+
+01/24/02 selTclWhat.c
+	added -user_bbox option to sel_what_cells
+
+01/25/02 select.tcl edit.tcl
+	rmed DEBUGS.
+	
+01/25/02 max/max_version
+	max 4.3.13 .
+
+01/25/02 CHECKPOINT
+	make tar
+	xfer to jnpr
+	installing as maxy
+
+01/28/02 graphics1.c
+	adding Sue's many fonts.
+	 
+01/28/02 graphics.h graphics1.c layDisplay.c layAnnotate.c
+	GR_MAX_FONT_SIZE -> GrMaxFontSize
+
+01/28/02 selEnum.c
+	Fixed paths in selection enumeration.
+
+01/28/02 DBcellUse.c
+	working on DBCellUseFindByPathName()
+
+01/29/02 DBcellUse.c
+	reverted DBCellUseFindByPathName()
+
+01/29/02 DBinstance.c database.h 
+	adding DBInstanceParsePath()
+	
+01/29/02 selTcl.c
+	changed sel_cell to use DBInstanceParsePath()
+	fixes sel_cell of paths with special chars.
+
+01/29/02 mgcAD.c
+	converted cmdDumpParseArgs() to use DBInstanceParsePath()
+
+01/29/02 mgcFI.c
+	converted cmdGetcelParseArgs() to use DBInstanceParsePath()
+
+01/29/02 DBtcl.c
+	converted db_flyline to DBInstanceParsePath()
+
+01/29/02 CHECKPOINT
+	make tar
+	xfering to jnpr to install as maxy.
+	
+01/30/02 mnMain.c
+	Moved license_check definition ahead of max0 script.
+
+01/31/02 CHECKPOINT
+	make tar
+	xfering back to cafe.
+
+01/31/02 layUndo.c
+	fixed layUndoChangeEdit() to not coredump on subedits!
+
+01/31/02 layMain.c
+	tcl linked GrMaxFontSize to LAY_MAX_FONT_SIZE
+	(NOTE: hack, writable for now!)
+
+01/31/02 graphics1.c
+	made forgiving if too big a font size is requested.
+
+01/31/02 XFER
+	mv changes to jnpr, installing as maxy
+
+02/01/02 graphics1.c
+	Now searches for fonts dir in max sys path and adds to
+	xserver font path.
+
+02/02/02 layDisplayGen.c
+	fixed labels display to work properly for cell containing 
+	just a label (or multiple labels at same point)
+
+02/05/02 DBsearch.c
+	fixed path search in DBSearchLabels2()
+	fixes sel_what_labels
+
+02/05/02 max/max_version
+	4.3.14 BETA,new_names
+
+02/05/02 XFER
+	mving to jnpr, installing as maxy.
+
+02/05/02 layText.c
+	new file.
+	Beginning implementation of text styles. 
+
+2/06/02 CHECKPOINT
+	make tar
+	xfer to jnpr
+
+2/06/02 databaseInt.h DBtcl.c
+	added temp flag to layers.
+	added db_layer_temp command.
+
+2/06/02 DBtcl.c
+	modified db_paint
+
+2/07/02 CHECKPOINT
+	make tar
+	back to cafe
+
+2/07/02	database.h DBlayers.c DBtcl.c
+	Added DBTempTypesMask, DBNonTempTypesMask
+	Added DBLayerTempSet() DBLayerTempReset()
+	fixed db_layer_temp to use above.
+	added -reset option to db_layer_temp
+
+2/07/02 database.h
+	added DBAccessModifyType() DBAccessModifyMask()
+
+2/07/02 DBtcl.c 
+	fixed commands to allow modification of temp
+	layers for read-only
+
+2/07/02 DBtcl.c
+	fixed read/only checks for db_flyline
+	(were two offsetting bugs!)
+
+2/07/02 DBtcl.c mgc/*
+	fixed read/only checks to allow modification
+	of temp layers even in read-only cells.
+
+2/08/02 DBtcl.c mgcLQ.c
+	fixed compile bugs.
+
+2/08/02 DBchange.c
+	Fixed DBChangedArea() to not set CD_MODIFIED if only temp
+	layers changed.
+
+2/08/02 DBwrite.c DBpolygon. DBwriepath.c 
+	Fixed DBWriteCell() to skip temporary layers.
+
+2/12/02 layText.c layint.h layout.h
+	layText.c file added. 
+	lay_text_style implemented to read/write text styles.
+
+2/12/02 layAnnotate.c layTcl.c
+	rmed layAnnotateTextDelete()
+	rmed -delete option from lay_text
+
+2/12/02 layout.h layAnnotate.c layDisplayHL.c
+	converting text annotations to be indexed by text style.
+
+2/13/02 CHECKPOINT
+	make tar
+	xfer to jnpr
+	
+2/14/02 CHECKPOINT
+	make tar
+
+	annotations with textstyles working.
+	TODO: text styles for flylines, labels, etc.
+
+2/14/02 graphics1.c layDisplayHL.c 
+	negative font size = text off.
+
+2/19/02 CHECKPOINT
+	make tar
+	text styles including congestion control implemented
+	for annotations and flylines.
+	TODO: use text styles in labels.
+
+2/19/02 layDisplayHL.c
+	working towards using text styles for labels.
+
+2/19/02	selTclWhat.c
+	rmed sel_what_labels DEBUG.
+
+2/19/02 DBbbox.c
+	fixed bbox computation bug involving merging of userbbox
+	into bbox when one had 0 width and height (e.g contains only
+	point labels).
+
+2/19/02 max/max_version
+	max 4.3.15 BETA,new_names
+
+2/19/02 make/Makefile.main make/Makefile.module
+	added def/ and special/ to 'make update'.
+
+2/19/02 CHECKPOINT
+	make tar
+
+	xfering to jnpr to install as maxy.
+
+2/19/02 make/Makefile.module
+	fixed to make files writable (for antlr)
+
+2/21/02 CHECKPOINT
+	make tar
+
+	xfer back to mha.
+
+2/21/02 layout.h layText.c	
+	added spacing to text styles.
+
+2/21/02 layDraw.c layText. layint.h layDisplay.c layDisplayGen.c layDisplayHL.c
+	renamed layDrawText() to layTextDraw() and mved to layText.c
+ 
+2/25/02 DBread.c DBtcl.c database.h gdsReadCell.c
+	Added DBReadOpenQuiet var and linked to tcl var DB_LOAD_QUIET
+	added "cell loaded" message to dbReadOpen().
+	rmed variants of DBReadCell(), using DBReadOpenQuiet instead.
+
+2/28/02	CHECKPOINT
+	make tar
+	
+	prior to rming 3rd party proprietary code
+	and license checking.
+
+2/28/02 gdsTcl.c
+	rmed gds_plot_key
+
+2/28/02 mnMain.c mnTcl.c
+	rmed LuckyVariable, LUCKY_VARIABLE
+	rmed LicenseCheck calls.
+	rmed license_check linkage.
+
+2/28/02 mnScripts.c
+	rmed encryption/decryption of scripts.
+
+2/28/02 doc/
+	mved CHANGE_LOGs to toplevel dir.
+	mved aside other doc (contains proprietary refs)
+
+2/28/02 test/
+	mved aside (contains proprietary refs).
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

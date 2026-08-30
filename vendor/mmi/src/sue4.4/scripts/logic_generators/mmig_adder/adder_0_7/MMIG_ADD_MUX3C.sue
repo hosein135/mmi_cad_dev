@@ -1,0 +1,72 @@
+# SUE version MMI_SUE4.0p3
+
+proc SCHEMATIC_MMIG_ADD_MUX3C {} {
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -origin {480 280}
+  make MMI_NAND2B -origin {480 370}
+  make MMI_NAND2B -origin {480 460}
+  generate MMI_NAND3 MMI_NAND3C_ -Size C -DeMorgan 1
+  make MMI_NAND3C_ -orient RY -origin {730 370}
+  make output -name out -origin {830 370}
+  make input -orient R270 -name sel0 -origin {230 640}
+  make input -name in2 -origin {80 260}
+  make name_net_s -name N1 -origin {600 280}
+  make name_net_s -name N2 -origin {600 370}
+  make name_net_s -name N3 -origin {600 460}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {500 130}
+  make name_net_s -name sel0_L -origin {380 440}
+  make MMI_INV -origin {290 440}
+  make input -name in0 -origin {80 480}
+  make input -name in1 -origin {80 390}
+  make input -orient R270 -name sel1 -origin {210 640}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.4 -date 05/12/99 -origin {400 890}
+  make_wire 790 370 830 370
+  make_wire 640 280 640 350
+  make_wire 640 390 640 460
+  make_wire 420 350 230 350
+  make_wire 210 300 210 640
+  make_wire 210 300 420 300
+  make_wire 80 390 420 390
+  make_wire 80 480 420 480
+  make_wire 80 260 420 260
+  make_wire 380 440 420 440
+  make_wire 640 390 670 390
+  make_wire 640 350 670 350
+  make_wire 600 460 540 460
+  make_wire 600 460 640 460
+  make_wire 600 370 540 370
+  make_wire 600 370 670 370
+  make_wire 600 280 540 280
+  make_wire 600 280 640 280
+  make_wire 380 440 350 440
+  make_wire 230 440 230 640
+  make_wire 230 440 230 350
+  make_text -origin {0 -40} -text MMIG_ADD_MUX3C -size large
+  make_text -origin {0 20} -text {The purpose of this mux is to provide the fastest sel0 -> out timing.  It is used in the adder bit positions which
+start a partition chain.
+For logically correct operation, in0 and in1 must be anded with NOT(sel1) outside of this device.}
+}
+
+proc ICON_MMIG_ADD_MUX3C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 0} -name in1
+  icon_term -type input -origin {-60 -60} -name in0
+  icon_term -type input -origin {-60 60} -name in2
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-20 90} -orient R270 -name sel0
+  icon_term -type input -origin {20 70} -orient R270 -name sel1
+  icon_property -origin {170 130} -type user -name name
+  icon_property -origin {170 150} -type user -name M
+  icon_property -origin {170 170} -type user -name dpc
+  icon_line -40 -100 40 -60 40 60 -40 100 -40 -100
+  icon_line -60 0 -40 0
+  icon_line -60 -60 -40 -60
+  icon_line -60 60 -40 60
+  icon_property -origin {-30 -60} -size small -label 0
+  icon_property -origin {-30 80} -size small -anchor center -label 0
+  icon_property -origin {0 0} -anchor center -label ADDMUXC
+  icon_line 60 0 40 0
+}
+

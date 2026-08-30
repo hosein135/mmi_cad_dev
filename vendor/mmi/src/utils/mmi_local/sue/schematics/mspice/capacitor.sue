@@ -1,0 +1,17 @@
+# SUE version MMI_SUE4.3.6
+
+proc ICON_capacitor args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {capacitance 10fF} {M {}}}
+  icon_term -type inout -origin {0 30} -name t1
+  icon_term -type inout -origin {0 -30} -name t2
+  icon_line 0 -30 0 -5 -15 -5 15 -5
+  icon_arc -20 5 20 35 -start 45 -extent 90
+  icon_line 0 5 0 30
+  icon_property -origin {-90 80} -type user -name name
+  icon_property -origin {10 -10} -label {$capacitance}
+  icon_property -origin {-160 150} -type fixed -name spice -text {[unique_name C $name] $t1 $t2 $capacitance}
+  icon_property -origin {-160 180} -type fixed -name irsim -text {C $t1 $t2 [expr 1.0e15*[parse_pp_number $capacitance]]}
+  icon_property -origin {-90 100} -type user -name capacitance -default 10fF
+  icon_property -origin {-90 120} -type user -name M
+}
+

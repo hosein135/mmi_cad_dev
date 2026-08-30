@@ -1,0 +1,1 @@
+../ctl/MMI_XNOR2B.ctl

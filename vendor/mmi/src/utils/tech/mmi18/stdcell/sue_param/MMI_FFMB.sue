@@ -1,0 +1,153 @@
+# SUE version MMI_SUE4.1.7
+
+proc SCHEMATIC_MMI_FFMB {} {
+  make input -name clk -origin {40 -830}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {270 -830}
+  make name_net -orient RX -name clk -origin {280 -1240}
+  make name_net -orient RX -name clk_L -origin {280 -1320}
+  make global -name gnd -origin {220 -1120}
+  make global -orient RY -name vdd -origin {220 -1440}
+  make global -name gnd -origin {670 -1110}
+  make global -orient RY -name vdd -origin {670 -1430}
+  make name_net -orient RX -name clk -origin {730 -1310}
+  make name_net -orient RX -name clk_L -origin {730 -1230}
+  make name_net -orient RXY -name clk_L -origin {40 -1030}
+  make name_net -orient RX -name clk -origin {40 -1100}
+  make name_net -name clk_L -origin {450 -1100}
+  make name_net -orient RY -name clk -origin {450 -1010}
+  make global -name gnd -origin {-450 -860}
+  make global -orient RY -name vdd -origin {-450 -1280}
+  make name_net -name N2 -origin {140 -1280}
+  make name_net -name N3 -origin {370 -1060}
+  make name_net -name N4 -origin {590 -1270}
+  make name_net -name N5 -origin {760 -1390}
+  make inverter -WP '4*WNA' -WN '2*WNA' -origin {840 -1040}
+  make pmos -W '4*WNA' -origin {-450 -1120}
+  make nmos -W '2*WNA' -origin {-450 -1000}
+  make inverter -WP '2*WNA' -WN '1*WNA' -origin {150 -830}
+  make nmos -orient RX -W '1*WMIN' -origin {670 -1150}
+  make pmos -orient RX -W '1*WMIN' -origin {670 -1310}
+  make nmos -orient RX -W '1*WMIN' -origin {670 -1230}
+  make pmos -orient RX -W '1*WMIN' -origin {670 -1390}
+  make pmos -orient RX -W '1*WMIN' -origin {220 -1400}
+  make pmos -orient RX -W '1*WMIN' -origin {220 -1320}
+  make nmos -orient RX -W '1*WMIN' -origin {220 -1240}
+  make nmos -orient RX -W '1*WMIN' -origin {220 -1160}
+  make xgate -orient RY -WP '2*WNA' -WN '1*WMIN' -origin {450 -1060}
+  make xgate -orient RXY -WP '2*WNA' -WN '1*WMIN' -origin {40 -1060}
+  make inverter -WP '2*WNA' -WN '1*WMN2' -origin {660 -1040}
+  make inverter -WP '2*WNA' -WN '1*WNA' -origin {220 -1040}
+  make pmos -W '4*WNA' -origin {-450 -1200}
+  make pmos -orient RX -W '4*WNA' -origin {-330 -1120}
+  make pmos -orient RX -W '4*WNA' -origin {-330 -1200}
+  make nmos -W '2*WNA' -origin {-450 -920}
+  make nmos -orient RX -W '2*WNA' -origin {-340 -920}
+  make nmos -orient RX -W '2*WNA' -origin {-340 -1000}
+  make inverter -WP '2*WNA' -WN '1*WNA' -origin {-700 -920}
+  make output -name q -origin {910 -1040}
+  make input -name sel -origin {-780 -920}
+  make name_net_s -name sel -origin {-250 -920}
+  make name_net_s -name sel -origin {-540 -1200}
+  make name_net_s -name sel_L -origin {-590 -920}
+  make name_net_s -name sel_L -origin {-240 -1200}
+  make input -name d0 -origin {-560 -1120}
+  make input -name d1 -origin {-580 -1360}
+  make MMI_FFMB -origin {970 -1560}
+  make name_net -name N1 -origin {-110 -1060}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/09/00 -origin {-370 -590}
+  make_wire 120 -830 40 -830
+  make_wire 270 -1040 320 -1040
+  make_wire 200 -830 270 -830
+  make_wire 280 -1160 320 -1160
+  make_wire 320 -1400 320 -1160
+  make_wire 280 -1400 320 -1400
+  make_wire 730 -1150 770 -1150
+  make_wire 770 -1390 770 -1150
+  make_wire 450 -1030 450 -1010
+  make_wire 480 -1060 570 -1060
+  make_wire 70 -1060 120 -1060
+  make_wire 770 -1040 810 -1040
+  make_wire 890 -1040 910 -1040
+  make_wire -450 -1080 -450 -1060
+  make_wire 140 -1280 120 -1280
+  make_wire 140 -1280 220 -1280
+  make_wire 370 -1060 420 -1060
+  make_wire 370 -1060 320 -1060
+  make_wire 590 -1270 570 -1270
+  make_wire 590 -1270 670 -1270
+  make_wire 760 -1390 730 -1390
+  make_wire 760 -1390 770 -1390
+  make_wire -450 -1060 -450 -1040
+  make_wire -540 -1120 -540 -1000
+  make_wire -540 -1000 -510 -1000
+  make_wire -540 -1120 -510 -1120
+  make_wire -540 -1120 -560 -1120
+  make_wire 710 -1040 770 -1040
+  make_wire 570 -1040 630 -1040
+  make_wire 570 -1270 570 -1060
+  make_wire 570 -1060 570 -1040
+  make_wire 320 -1160 320 -1060
+  make_wire 320 -1060 320 -1040
+  make_wire 120 -1040 190 -1040
+  make_wire 120 -1280 120 -1060
+  make_wire 120 -1060 120 -1040
+  make_wire -450 -1260 -330 -1260
+  make_wire -330 -1260 -330 -1240
+  make_wire -450 -1260 -450 -1240
+  make_wire -450 -1260 -450 -1280
+  make_wire -330 -1080 -330 -1060
+  make_wire -340 -1040 -340 -1060
+  make_wire -340 -1060 -450 -1060
+  make_wire -450 -870 -340 -870
+  make_wire -340 -870 -340 -880
+  make_wire -450 -870 -450 -860
+  make_wire -450 -870 -450 -880
+  make_wire -540 -1200 -510 -1200
+  make_wire -570 -1200 -540 -1200
+  make_wire -250 -920 -220 -920
+  make_wire -280 -920 -250 -920
+  make_wire -280 -1000 -170 -1000
+  make_wire -780 -920 -730 -920
+  make_wire -650 -920 -590 -920
+  make_wire -240 -1200 -210 -1200
+  make_wire -270 -1200 -240 -1200
+  make_wire -170 -1120 -270 -1120
+  make_wire -170 -1360 -580 -1360
+  make_wire -510 -920 -590 -920
+  make_wire 770 -1040 770 -1150
+  make_wire -340 -1060 -330 -1060
+  make_wire -110 -1060 10 -1060
+  make_wire -330 -1060 -110 -1060
+  make_wire -170 -1360 -170 -1120
+  make_wire -170 -1120 -170 -1000
+  make_text -origin {-350 -1510} -text {Flipflop (with mux on input)}
+  make_text -origin {-350 -1480} -text {B Size}
+  make_text -origin {-350 -1540} -text MMI_FFMB -size large
+  make_text -origin {270 -700} -text {^.ic N4=0V}
+}
+
+proc ICON_MMI_FFMB args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type output -origin {60 0} -name q
+  icon_term -type input -origin {-60 30} -name sel
+  icon_term -type input -origin {-60 -20} -name d0
+  icon_term -type input -origin {-60 0} -name d1
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_property -origin {0 -50} -size large -anchor center -label FFM
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d1
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  icon_property -origin {-50 30} -label sel
+  icon_property -origin {-50 -20} -label d0
+  icon_property -origin {-40 360} -type auto -name verilog -text {MMI_FFMB [unique_name "" $name MMI_FFMB]
+(.clk($clk), .sel($sel), .d0($d0), .d1($d1), 
+.q($q))\;}
+}
+

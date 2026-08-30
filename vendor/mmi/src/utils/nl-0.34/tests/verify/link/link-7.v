@@ -1,0 +1,14 @@
+module sub (a, z);
+  input [1:0] a;
+  output [1:0] z;
+
+  MMI_INVA u1 (.in(a[0]), .out(z[0]));
+  top u2 (.in(a[1]), .out(z[1]));
+endmodule
+
+module top (in, out);
+  input in;
+  output out;
+
+  sub u1 (.a({in, in}), .z({out, out}));
+endmodule

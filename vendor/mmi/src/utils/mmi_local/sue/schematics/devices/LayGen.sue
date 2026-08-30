@@ -1,0 +1,12 @@
+# SUE version MMI_SUE4.1.5
+
+proc ICON_LayGen args {
+  icon_setup $args {{origin {0 0}} {orient R0} {reverse_stacked_fets no} {routing_tracks 3}}
+  icon_property -origin {-50 70} -type user -name reverse_stacked_fets -default no -choices {no nfets pfets nfets+pfets}
+  icon_property -origin {-50 90} -type user -name routing_tracks -default 3
+  icon_property -origin {-50 120} -type fixed -name sim -text {|LayGen -reverse_stacked_fets $reverse_stacked_fets -routing_tracks $routing_tracks -order $devorder}
+  icon_line 0 30 180 30 180 -30 0 -30 0 30
+  icon_property -origin {10 -10} -label {Layout Generator Controller}
+  icon_property -origin {10 20} -label {tracks: $routing_tracks}
+}
+

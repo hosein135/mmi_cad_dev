@@ -1,0 +1,38 @@
+#!/bin/ksh
+
+# does syn2tlf and tlfc
+
+if [ "$1" = "" ];then
+    echo "must supply a library name (minus the .lib)"
+    exit
+fi
+
+LIBNAME=$1
+# Scott modified Feb 15 '01.
+# BDIR=${LIBNAME}_lib
+LIBDIR=${LIBNAME}
+
+TECH=mmi15
+ROOT=/volume/mmi_proj/proj/tech/$TECH
+SCRIPTDIR=$ROOT/scripts
+
+echo ""
+echo "Running syn2tlf on $LIBNAME.lib ..."
+$SCRIPTDIR/syn2tlf -s 0.2 -t 0.8 $LIBNAME.lib
+cat syn2tlf.log
+echo "done."
+
+echo ""
+echo "Compiling tlf library $LIBNAME.tlf ..."
+tlfc -f $LIBNAME.tlf
+mv $LIBDIR/timing.ctlf $LIBNAME.ctlf
+rmdir $LIBDIR
+echo "done."
+
+echo ""
+echo "done"
+
+# blow
+exit
+
+} 2>&1 | tee make`date '+%y%m%d'`.jnl

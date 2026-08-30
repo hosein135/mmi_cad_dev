@@ -1,0 +1,62 @@
+DESIGN m ;
+
+TRACKS Y 310 DO 24210 STEP 620 LAYER M1 ;
+TRACKS X 310 DO 20590 STEP 620 LAYER M1 ;
+TRACKS Y 310 DO 24210 STEP 620 LAYER M2 ;
+TRACKS X 310 DO 20590 STEP 620 LAYER M2 ;
+TRACKS Y 310 DO 24210 STEP 620 LAYER M3 ;
+TRACKS X 310 DO 20590 STEP 620 LAYER M3 ;
+TRACKS Y 310 DO 24210 STEP 620 LAYER M4 ;
+TRACKS X 310 DO 20590 STEP 620 LAYER M4 ;
+TRACKS Y 310 DO 24210 STEP 620 LAYER M5 ;
+TRACKS X 310 DO 20590 STEP 620 LAYER M5 ;
+TRACKS Y 620 DO 12105 STEP 1240 LAYER M6 ;
+TRACKS X 620 DO 10295 STEP 1240 LAYER M6 ;
+
+COMPONENTS 4 ;
+- sub0/u1 MMI_NOR2A + PLACED ( 0 1 ) N ;
+- sub1/u1 MMI_NOR2A + PLACED ( 2 3 ) S ;
+- sub0/u2 MMI_FILL_1 + FIXED ( 4 5 ) E ;
+- sub1/u2 MMI_FILL_1 + FIXED ( 6 7 ) W ;
+- sub0/u3 MMI_FILL_2 + FIXED ( 8 9 ) FN ;
+END COMPONENTS
+
+SPECIALNETS 3 ;
+- GND ( * GND ) + FIXED M1 840 ( 20 30 ) ( 30 * ) ( * 20 ) + USE GROUND ;
+- VDD ( * VDD ) + FIXED M2 420 ( 40 50 ) ( 50 * ) ( * 40 ) + USE POWER ;
+- v2t           + FIXED M3 100 ( 60 70 ) ( 70 * ) ( * 60 ) + USE CLOCK ;
+- a[0]          + FIXED M2 200 ( 1 2 ) ( 3 * ) ( * 4 ) + USE SIGNAL ;
+END SPECIALNETS
+
+PINS 6 ;
+- a[0] + NET a[0] + DIRECTION INPUT + USE SIGNAL ;
+- a[1] + NET a[1] + DIRECTION INPUT + USE SIGNAL ;
+- b[0] + NET b[0] + DIRECTION INPUT + USE SIGNAL ;
+- b[1] + NET b[1] + DIRECTION INPUT + USE SIGNAL ;
+- z[0] + NET z[0] + DIRECTION OUTPUT + USE SIGNAL ;
+- z[1] + NET z[1] + DIRECTION OUTPUT + USE SIGNAL ;
+END PINS
+
+NETS 6 ;
+- v2t + FIXED M1 ( 100 100 ) ( 200 * ) ( * 300 ) ;
+- a[0]
+    ( PIN a[0] )
+    ( sub0/u1 in0 ) ;
+- a[1]
+    ( PIN a[1] )
+    ( sub1/u1 in0 ) ;
+- b[0]
+    ( PIN b[0] )
+    ( sub0/u1 in1 ) ;
+- b[1]
+    ( PIN b[1] )
+    ( sub1/u1 in1 ) ;
+- z[0]
+    ( sub0/u1 out )
+    ( PIN z[0] ) ;
+- z[1]
+    ( sub1/u1 out )
+    ( PIN z[1] ) ;
+END NETS
+
+END DESIGN

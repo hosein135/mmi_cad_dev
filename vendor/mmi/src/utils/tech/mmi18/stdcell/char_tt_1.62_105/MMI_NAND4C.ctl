@@ -1,0 +1,1 @@
+../ctl/MMI_NAND4C.ctl

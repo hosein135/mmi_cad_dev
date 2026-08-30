@@ -1,0 +1,79 @@
+Documentation for mmig_MUX
+--------------------------
+rev 0.1, 01/20/00:   Initial release
+rev 0.2, 06/12/00:   Added VectorInput option
+
+
+This generator is used to derive muxes.  These muxes differ from the
+standard cell library muxes in that they assume fully decoded select
+inputs.  In general, they have faster D->Q times than the standard
+cell muxes; thus they can be more useful in datapath applications,
+in situations where the select signals are set up prior to the arrival
+of the data.
+
+This generator is also useful in creating muxes much wider than those
+existing in the standard cell library.
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NINPUTS:
+    Definition: 
+      The number of data inputs.
+    Legal values:
+      2 <= NINPUTS <= 128
+    Default:
+      8
+
+  OutputAssertion:
+    Definition:
+      The desired assertion level of the output signal.  The user may
+      select H or L.  Inputs are always assumed to be high asserted.
+    Legal Values:
+      H (high) or L (low)
+    Default:
+      H
+
+  OutputSize:
+    Definition:
+      The desired output drive strength.
+    Legal Values:
+      B, C, D, E
+    Default:
+      B
+
+  VectorInput:
+    Definition:
+      The user may choose to compress all of the input pins into a
+      vector, rather than having an individual pin per input.
+    Legal Values:
+      0 or 1
+    Default:
+      0
+
+  BitSlice:
+    Definition:
+      The user may choose to force the gates to be placed within one
+      bit pitch (BitSlice = 1) or to allow the gates to be placed
+      within one row, in as many bit pitches as necessary (BitSlice = 
+      0).  The former is more useful for datapath applications, the
+      latter is more useful for control sections.
+    Legal Values:
+      0 or 1
+    Default:
+      0
+
+  ReduceInputLoad:
+    Definition:
+      This parameter causes the default size for the input gates to
+      be changed from B to A, if possible.  
+
+      Note that there are some combinations of OutputSize, OutputAssertion,
+      and NINPUTS which make reduction of the input gate size impossible.
+
+      Selecting ReduceInputLoad=1 may result in a slower circuit than if
+      ReduceInputLoad=0.
+    Legal Values:
+      0 or 1
+    Default:
+      0

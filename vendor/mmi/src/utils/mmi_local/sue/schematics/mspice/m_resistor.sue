@@ -1,0 +1,14 @@
+# SUE version MMI_SUE3.0
+
+proc ICON_m_resistor args {
+  icon_setup $args {{origin {0 0}} {orient R0} {length 100} {width 0.9}}
+  icon_term -type inout -origin {-40 0} -orient R90 -name t1
+  icon_term -type inout -origin {40 0} -orient R90 -name t2
+  icon_property -origin {-390 170} -type fixed -name spice -text {[unique_name R] $t1 $t2 [expr round(0.06*[parse_pp_number $length]/[parse_pp_number $width])]}
+  icon_property -origin {0 -20} -anchor center -label {$length/$width}
+  icon_line 40 0 30 0 20 -10 10 10 0 -10 -10 10 -20 -10 -30 0 -40 0
+  icon_property -origin {-340 100} -type user -name length -default 100
+  icon_property -origin {-340 120} -type user -name width -default 0.9
+  icon_property -origin {0 20} -anchor center -text {[expr round(0.06*[parse_pp_number $length]/[parse_pp_number $width])]\ nom}
+}
+

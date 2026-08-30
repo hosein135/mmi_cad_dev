@@ -1,0 +1,228 @@
+Documentation for mul
+---------------------
+rev 0.3, 2/5/99:  Added support for HalfHeight layout
+rev 0.4, 2/10/99:  Corrected to support all flavors of {unsigned,signed}x{unsigned,signed}:
+                   replaced SignExtendInputs with A={Signed,Unsigned,Both} and 
+                   B={Signed,Unsigned,Both}
+rev 0.5, 2/19/99:  Changed from TSMC25 icons to MMI generic icons
+rev 0.6, 2/22/99:  Added support for NBITS_A != NBITS_B and NBITS_B != power of 2
+rev 0.7, 3/9/99:   Updated to final versions of MMI generic icons
+                   Added support for NBITS_A != power of 2
+rev 0.8, 4/30/99:  No changes to mul.sue, just to underlying generators	
+rev 0.9, 5/11/99:  No changes to mul.sue; Changed base cell names to MMIG_
+rev 1.0, 5/25/99:  Added support for ReduceInputLoad parameter
+rev 1.1, 5/27/99:  underlying generators changed
+rev 1.2, 7/16/99:  Added NAME_mul proc, which creates the mul's name
+rev 1.3, 7/27/99:  Fixed calls to underlying generators
+rev 1.4, 2/29/00:  Upgraded to use generators_utilities
+                   Fixed bug in icon where CSA_B_H and ASigned_H coincided
+
+
+The multiplier generator is used to derive a multiplier made up of 4:2 adder
+trees.
+
+The complete multiplier is made up of these three generators:  
+  ppg:  partial product generation logic
+  mul_array:  multipler array made up of 4:2 adders
+  adder:  carry propagate adder, forms the final result
+
+ppg and adder can be optionally included or excluded, to allow for substitution
+of different types of logic, or insertion of pipe latches.
+
+
+NOTE ON THE DISTINCTION BETWEEN THE A AND B INPUTS:
+---------------------------------------------------
+A is the multiplier.  B is the multiplicand.  The multiplier dictates the
+number of partial products, which controls the depth of the array.  NBITS_A 
+(the width of the multiplier) plus NBITS_B (the width of the multiplicand)
+yields the width of the partial products, and therefore the width of the
+multiplier output.
+
+If you are multiplying two numbers of unequal width, choose the number with
+the smaller width as the multiplier, in order to keep the depth of the
+multiply array (and therefore its area and delay) as small as possible.
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS_A:
+    Definition:  THE MULTIPLIER
+      The number of bits in input value A_H.  The width of the
+      multiplier's output will be NBITS_A + NBITS_B.
+    Legal Values:
+      1 <= NBITS_A <= 128
+      Does not have to equal NBITS_B.
+    Default:
+      8
+
+  NBITS_B:
+    Definition:  THE MULTIPLICAND
+      The number of bits in input value B_H.  The width of the
+      multiplier's output will be NBITS_A + NBITS_B.
+    Legal Values:
+      1 <= NBITS_B <= 128
+      Does not have to equal NBITS_A.
+    Default:
+      8
+
+  UseMulCin:
+    Definition:
+      This argument makes the multiplier's carry in bits accessible to 
+      the user, or not.  If the user elects not to use the carry ins,
+      they will be wired to a logic 0.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+  AddExtraCSA:
+    Definition:
+      This argument allows the user to specify that an extra row of carry 
+      save (4:2) adders be included in the multiplier array.  In addition,
+      two extra input vectors (CSA_A_H and CSA_B_H), each of width NBITS_A 
+      + NBITS_B, are provided as the additional inputs to this final row of 
+      adders.
+      This feature allows the user to implement a multiply-adder, or multiply-
+      accumulator.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      N
+
+  IncludePPG:
+    Definition:
+      This argument allows the user to specify whether the partial product
+      generation logic is included in the multiplier.  If IncludePPG = Y,
+      the ppg generator is used to generate simple (nand-invert) ppg logic.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+  A:
+    Definition:
+      This argument allows the user to specify whether the multiplier's A
+      (multiplier) input is signed or unsigned.  The user can choose Signed,
+      Unsigned, or Both.  If Signed is chosen, the generated multiplier will
+      always treat the A input as a signed number.  If Unsigned is chosen, the
+      generated multiplier will always treat the A input as an unsigned number.
+      If Both is chosen, logic is included to allow the A input to be treated
+      as either signed or unsigned, based on the ASigned_H control signal.
+      NOTE:  there are area and speed consequences to these choices.  
+        "Unsigned" is the smallest and fastest.  "Signed" is very slightly 
+        larger and slower.  "Both" is noticeably larger and SIGNIFICANTLY 
+        slower, and requires the use of the ASigned_H control signal which 
+        drives across the width of the multiplier.  It is highly recommended 
+        that you choose with care.
+      NOTE:  Sign extension etc. is performed only in the PPG logic, so if
+        IncludePPG = N, the value of this parameter is ignored.
+      NOTE:  If Signed or Both is chosen, the msb of MCin_L is used in order
+        to correctly perform a multiplication of a negative value of the
+        multiplier.
+    Legal Values:
+      The allowed values of this argument are "Signed", "Unsigned", and "Both".
+    Default:
+      Unsigned
+      
+  B:
+    Definition:
+      This argument allows the user to specify whether the multiplier's B
+      (multiplicand) input is signed or unsigned.  The user can choose Signed,
+      Unsigned, or Both.  If Signed is chosen, the generated multiplier will
+      always treat the B input as a signed number.  If Unsigned is chosen, the
+      generated multiplier will always treat the B input as an unsigned number.
+      If Both is chosen, logic is included to allow the B input to be treated
+      as either signed or unsigned, based on the BSigned_H control signal.
+      NOTE:  there are area and speed consequences to these choices.  
+        "Unsigned" is the smallest and fastest.  "Signed" is very slightly 
+        larger and slower.  "Both" is noticeably larger and SIGNIFICANTLY 
+        slower, and requires the use of the BSigned_H control signal which 
+        drives across the width of the multiplier.  It is highly recommended 
+        that you choose with care.
+      NOTE:  Sign extension etc. is performed only in the PPG logic, so if
+        IncludePPG = N, the value of this parameter is ignored.
+    Legal Values:
+      The allowed values of this argument are "Signed", "Unsigned", and "Both".
+    Default:
+      Unsigned
+      
+  IncludeCPA:
+    Definition:
+      This argument allows the user to specify whether the carry propagate
+      adder which forms the multiplier's final result is included in the
+      generated schematics or not.  Omitting the carry propagate adder 
+      allows the user to generate their own special purpose adder, or 
+      insert registers at the multiplier tree's output.
+      If the adder is included, a carry select adder of width NBITS_A +
+      NBITS_B is inserted at the output of the multiplier tree.  This adder 
+      is generated from the adder generator.  The adder's carry in and carry
+      out signals are accessible to the user.
+    Legal Values:
+      The allowed values of this argument are "Y" (include carry propagate
+      adder) and "N" (omit adder).
+    Default:
+      Y
+
+  ReduceInputLoad:
+    Definition:
+      This argument is passed to the ppg generator, where it causes a
+      reduction in the sizes of the gates which connect to the A and 
+      B inputs.  This may slow down the circuits; however, if the input
+      loading is too high, it may be a worthwhile tradeoff.
+      NOTE:  This parameter is ignored if IncludePPG = N.
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      N
+
+  HalfHeight:
+    Definition:
+      This argument allows the user to specify that the layout be done in
+      (NBITS_A + NBITS_B)/2 bit positions, instead of (NBITS_A + NBITS_B) 
+      bit positions.  Note that if (NBITS_A + NBITS_B)/2 is an odd number of
+      bit positions, the layout will actually fit in 
+      ((NBITS_A + NBITS_B)/2 + 1) bit positions.
+      This configuration results in a slightly slower and less area 
+      efficient design.
+    Legal Values:
+      The allowed values of this argument are "Y" (half height layout)
+      "N" (full height layout).
+    Default:
+      N
+
+  bitslice:    
+    Definition:
+      This argument directs DPC to enforce bitslice layout, or not.  
+    Legal Values:
+      The allowed values of this argument are "Y" and "N".
+    Default:
+      Y
+
+
+INPUT SIGNALS:
+--------------
+If IncludePPG = Y:
+  A_H (multiplier) and B_H (multiplicand)
+If IncludePPG = N:
+  PP*_H (partial product vectors)
+If AddExtraCSA = Y:
+  CSA_A_H, CSA_B_H (extra inputs to the final row of CSA's)
+If UseMulCin = Y:
+  MCin_L, MCarry_H (carry in values to multiplier array)
+If IncludeCPA = Y:
+  ACin_H (adder carry in)
+If A = Both:
+  ASigned_H
+If B = Both:
+  BSigned_H
+
+
+OUTPUT SIGNALS:
+---------------
+If IncludeCPA = Y:
+  Result_H (final multiply result)
+  ACout_H (adder carry out)
+If IncludeCPA = N:
+  Sum_H, Carry_H (multiply array redundant outputs)
+
+

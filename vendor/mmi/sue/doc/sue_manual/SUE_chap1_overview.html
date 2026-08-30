@@ -1,0 +1,1535 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:41:57">
+<title>Overview</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_preface.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_chap2_wires-bus.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 1 </font>
+</h2>
+
+
+<h1>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Overview</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1014140"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019570"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE is much more that just another schematic capture tool. It is a complete visual design, simulation, and documentation system. It netlists to multiple formats with the ability to swap behavioral for structural models, drives many simulators directly, displays simulation results either directly onto the schematics or onto waveform viewers, ties documentation to schematics, etc. And then there is the SUE Data Path Compiler (DPC)... </font>
+<p>
+<p>
+  <dt> <a name="1019578"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This document is meant to provide an overview of the basic concepts of SUE. It is not meant to explain all of its features, nor does it even try to. Instead, it is assumed that the best way to learn SUE is to understand the basic concepts discussed below and then to experiment with the tool itself. </font>
+<p>
+<p>
+  <dt> <a name="1019579"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+  <dl>
+<p> <dt> <a name="1019580"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you don't understand how the busing works, draw some simple schematics in SUE that have buses, netlist them, and look at the netlist files. For an even faster example, run <b><code class="CodeStrong">generate term names</code></b>, select some associated wires, and look in the <b><code class="CodeStrong">SUE message window</code></b> to see what SUE has named them. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1019584"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should also consult the <b><code class="CodeStrong">README</code></b> file, the <b><code class="CodeStrong">.suerc</code></b> file (described in the section "User Customization"), and the SUE FAQ, and run through the Micro Magic Tools SUE Tutorial. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1019606"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SUE Philosophy</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019607"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE tries to maintain a very simple, intuitive user interface. Even so, SUE provides many forms of on-line help. Most common commands have hotkeys associated with them which are displayed next to the menu item and also in the hotkey help window which pops up when you hit the <b><strong class="Strong">Space</strong></b> help key. Advanced users find that they seldom need to use the menus and typically run SUE from hotkeys and mousing, which greatly speeds design. </font>
+<p>
+<p>
+  <dt> <a name="1019614"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE also attempts to provide a completely deterministic user interface, requiring no guesswork on the user's part. For example, clicking <b><strong class="Strong">Button-1 </strong></b>will always <em class="Emphasis">select the highlighted object</em>, and thus you should never be surprised at what item gets selected. Furthermore, if the highlighted item is not the desired item, simply move the mouse until the desired item becomes highlighted. You should never need to click randomly in order to select the desired item. For this to be true, you must completely understand the next few sections about objects and selection. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1019619"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Objects in SUE</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019620"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE only permits a short list of objects to be drawn or manipulated. These are: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">instances of icons</font><a name="1019623"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">wires</font><a name="1019626"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">lines</font><a name="1019629"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">arcs</font><a name="1019632"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">text</font><a name="1019635"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1026436"> </a>
+      </pre>
+<p>
+  <dt> <a name="1019636"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While this list appears limited, after a while you will find it is sufficient for most applications. </font>
+<p>
+<p>
+  <dt> <a name="1019639"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that circles and ovals are a subset of <i><strong class="StrongItalic">arcs</strong></i> whose extent is large enough to make them appear closed. Furthermore, a rectangle is not a true object in SUE, but rather a line whose segments are configured to be a rectangle. Despite not having rectangle objects as such, SUE does allow the user to create and manipulate rectangles as if they were primitive objects. </font>
+<p>
+<p>
+  <dt> <a name="1019641"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition, three other object types sometimes appear: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">open dots</font><a name="1019643"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">solder dots</font><a name="1019645"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon origin</font><a name="1019647"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1026515"> </a>
+      </pre>
+<p>
+  <dt> <a name="1019648"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">These later objects are managed entirely by SUE and are automatically generated and not saved in output files. Dots display <em class="Emphasis">connectivity</em>. </font>
+<p>
+<p>
+  <dt> <a name="1019650"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Some SUE functions add <em class="Emphasis">temporary objects</em> to a schematic or icon. These temporary objects are a different color than any of the four states of regular objects (all colors are specified in the <b><strong class="Strong">.</strong></b><b><code class="CodeStrong">suerc</code></b> file), and disappear when any of the selection commands are invoked (for example, by clicking <b><strong class="Strong">Button-1</strong></b>). </font>
+<p>
+<p>
+  <dt> <a name="1019654"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Examples of temporary objects are <em class="Emphasis">text anchors</em>, which are visible when adding/editing text or by invoking the menu command <b><code class="CodeStrong">show text anchors</code></b>, and the zoom and selection boxes. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1019658"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>The Four States</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019660"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Objects can have one of four states, signified by different colors:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">active,</font><a name="1019662"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">selected,</font><a name="1019664"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">active/selected, or</font><a name="1019666"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">none</font><a name="1019667"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1026516"> </a>
+      </pre>
+<p>
+  <dt> <a name="1019668"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">An object's state, and hence color, is a temporary attribute and is neither saved, printed, nor does it affect operations like netlisting. Other than to signify an object's state, SUE does not use colors nor permit them for comments or other uses. Note that <em class="Emphasis">temporary</em> objects get a separate, unique color. </font>
+<p>
+<p>
+  <dt> <a name="1019670"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When the cursor moves over an object, SUE changes the color of that object to signify that it is the <em class="Emphasis">active</em> object. We say that this object is <em class="Emphasis">highlighted</em>. Only one object can be active at a given time. </font>
+<p>
+<p>
+  <dt> <a name="1019672"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Icons are treated as a single object so that if the cursor covers any part of an icon, the whole icon will become active. Therefore, if you are unsure, for example, whether a piece of text is part of the nearby icon, simply move the cursor over the text. If the entire icon is highlighted, then it is part of the icon, otherwise it isn't. <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024653"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You must move the cursor over a visible part of the icon to highlight it. You cannot simply put the cursor in the center of the object. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1022574"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Some SUE functions, like selection, operate on the active object, for example: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019676"> </a>Clicking <b><strong class="Strong">Button-1</strong></b> on the <b><strong class="Strong">active</strong></b> object will <b><strong class="Strong">select</strong></b> it. Because SUE changes the active object's color, you should never have to guess what object is nearest to the cursor if there is some ambiguity. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019677"> </a>If you are trying to select a particular object and there are nearby or overlapping objects, you might have to move the cursor around a bit to activate the desired object. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019678"> </a>If you can't find any position on or nearby the desired object that will activate it, don't despair. You can always select one or more of the nearby objects and move them away to give you a clean shot at the desired object. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019680"> </a>Alternatively, you can use the menu item <b><code class="CodeStrong">lower</code></b> in the <b><code class="CodeStrong">Edit</code></b> menu to lower the selected item to the bottom of the display list. This has the effect of placing the offending object below the desired object, which should provide you with easy access to the desired object. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1019683"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most SUE functions operate on the <b><strong class="Strong">selected</strong></b> objects as opposed to the <b><strong class="Strong">active</strong></b> objects (an object that is both<b><strong class="Strong"> </strong></b><b><strong class="Strong">active/selected</strong></b> is included in this list). Unlike the <b><strong class="Strong">active</strong></b> object, more than one object can be <b><strong class="Strong">selected</strong></b> at a time. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019684"> </a>To move a section of a schematic you might first select a number of objects and then move them all with the <b><code class="CodeStrong">move</code></b> command or <b><strong class="Strong">Button-2/3</strong></b>. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1019686"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Some commands depend on both the<i><strong class="StrongItalic"> </strong></i><b><strong class="Strong">selected and active</strong></b><i><strong class="StrongItalic"> </strong></i>objects, for example: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019687"> </a>If you click <b><strong class="Strong">Button-2</strong></b> over an <b><strong class="Strong">active/selected </strong></b>object, <em class="Emphasis">that</em> <em class="Emphasis">object and all other selected objects</em> will be moved. However, </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019688"> </a>If you click <b><strong class="Strong">Button-2</strong></b> over an <b><strong class="Strong">active</strong></b> object (not selected), <em class="Emphasis">all other objects will be deselected</em>, the active object will then be selected, and then only that object will be moved (since it is then the only selected object). </li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1019691"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Connectivity </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019692"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In SUE, what you see is what's connected. Connectivity is determined by proximity and denoted with either: </font>
+<p>
+   <ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1019695"> </a><b><strong class="Strong">a hollow square</strong></b> (<em class="Emphasis">open dot</em>) - unconnected</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1019696"> </a><b><strong class="Strong">nothing</strong></b> - two connections at the point</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1019698"> </a><b><strong class="Strong">a solid square</strong></b> (<em class="Emphasis">solder dot</em>) - more than two connections</font>
+</p>   </ul>
+<p>
+  <dt> <a name="1019700"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice the difference between the smaller solid squares that denote terminals on icons, with the larger solid squares that are solder dots. </font>
+<p>
+<p>
+  <dt> <a name="1019701"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Open dots and solder dots are not actual objects, but are computed and displayed to show the user what SUE thinks is or is not connected. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019702"> </a>If SUE draws an open dot where you think there should be a solder dot, click <b><strong class="Strong">Button-2</strong></b> over the offending wire and SUE will recompute the associated connectivity. This works the same way for solid dots. </li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1019704"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Orientations</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019705"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Icons can be flipped on both X- and Y-axes and rotated. Each of the eight possible orientations has a short moniker: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">R0 			not flipped or rotated</font><a name="1019708"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">RX 			flipped in X (around the Y axis)</font><a name="1019709"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">RY 			flipped in Y (around the X axis)</font><a name="1019710"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">RXY 			flipped in both X and Y</font><a name="1019711"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">R90 			rotated 90 degrees clockwise</font><a name="1019712"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">R270 			rotated 270 degrees clockwise</font><a name="1019713"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">R90X 			flipped in X and then rotated 90 degrees clockwise</font><a name="1019714"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">R90Y 			flipped in Y and then rotated 90 degrees clockwise</font><a name="1019715"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1019716"> </a>
+      </pre>
+<p>
+  <dt> <a name="1019719"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Selected items can be flipped and rotated with the commands <b><code class="CodeStrong">flip sideways</code></b>, <b><code class="CodeStrong">f</code></b><b><code class="CodeStrong">lip upsidedown</code></b>, and <b><code class="CodeStrong">rotate</code></b>, all of which are in the <b><code class="CodeStrong">Edit</code></b> menu. Note that flipping or rotating an object can break its connectivity, as will be apparent. Placing the icon origin at the center of the icon helps minimize this possibility. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1019722"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Default Bindings</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019723"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">Emacs</em> is the official editor of SUE. This means that whenever you are presented with a text entry opportunity in SUE, simple Emacs bindings should work, such as: </font>
+<p>
+  <dl>
+<p> <dt> <a name="1019724"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-d</strong></b> for delete next character, </font>
+<p><p> <dt> <a name="1019725"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-k</strong></b><b><strong class="Strong"> </strong></b>for kill to end of line, </font>
+<p><p> <dt> <a name="1019726"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-b</strong></b> for back one character, </font>
+<p><p> <dt> <a name="1019727"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-n</strong></b><b><strong class="Strong"> </strong></b>and <b><strong class="Strong">Ctrl-p </strong></b>for next and previous line, </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1019728"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">and so on. </font>
+<p>
+<p>
+  <dt> <a name="1019729"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition, the arrow keys, <b><strong class="Strong">Tab</strong></b>, <b><strong class="Strong">Delete</strong></b>, and <b><strong class="Strong">Back Space</strong></b> should all do the appropriate things. The <b><strong class="Strong">Escape</strong></b> key will cancel all menus as should <b><strong class="Strong">Control-c</strong></b>. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1019731"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Miscellany</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019733"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The window in which you started SUE becomes a <b><strong class="Strong">Tcl</strong></b> interpreter that allows you to directly examine and manipulate the SUE database or issue shell commands such as changing the working directory. This window is also referred to as the command line. Furthermore, SUE will post status, completion and error messages to this window, and thus it is important that this window be visible when using SUE. </font>
+<p>
+<p>
+  <dt> <a name="1019736"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have two displays (assuming you are typing into display :0.0), it is sometimes useful to start SUE with: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">sue -display :0.1</font><a name="1019737"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1019738"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1019739"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">so that the command line window is in a different display than the schematics window. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024869"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>The "<b><code class="CodeStrong">-display</code></b>" switch must be the first switch.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1019742"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Tcl</strong></b> and also SUE are case sensitive. Since SPICE converts all net names to lower case, the SPICE cross-prober in SUE will do the same. </font>
+<p>
+<p>
+  <dt> <a name="1019745"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Variables and properties in SUE often have binary values, either <em class="Emphasis">true</em> or <em class="Emphasis">false</em>. You cannot use the strings <b><code class="CodeStrong">true</code></b> or <b><code class="CodeStrong">false</code></b>; instead use the following: </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019746"> </a><b><code class="CodeStrong">true</code></b> <code class="Code">&lt;— 1</code>  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019747"> </a><b><code class="CodeStrong">false</code></b> <code class="Code">&lt;— 0</code> or "" or undefined  
+</li><p>
+</font>
+</ul></ul></ul>
+</dl></dl>
+
+<h3>
+  <a name="1019750"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">On-line Help</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019751"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE displays short messages in the upper right-hand section of the main window, which is called the <i><strong class="StrongItalic">SUE message window. </strong></i>The message window normally contains information about the selected object. When traversing the menus, the message window instead displays a short description of the menu function beneath the cursor. Finally, during operations which require multiple button clicks or key strokes, the message window displays key strokes needed to complete or abort the operation. If the message gets erased or is too long to fit into the message window, you can always hit the <b><strong class="Strong">Space</strong></b> help key, which displays the message in its entirety along with all current hotkey bindings. </font>
+<p>
+<p>
+  <dt> <a name="1019755"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If a single object is selected, SUE displays the known information about that object in the message window. </font>
+<p>
+<p>
+  <dt> <a name="1019756"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Observe that if multiple objects are selected, SUE displays the object with the lowest ID. </font>
+<p>
+<p>
+  <dt> <a name="1019757"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, the message window might contain: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">selected: nand2 R0 #10 (Xnand2_1)</font><a name="1019758"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1019759"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1019760"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where <b><code class="CodeStrong">nand2</code></b> is the name of the selected icon, <b><code class="CodeStrong">R0</code></b> is its orientation (that is, not rotated or mirrored) and <b><code class="CodeStrong">#10</code></b> is the internal ID of the object, which is a unique identifier for this schematic. If the schematic has been netlisted, the unique local instance name used in the netlist will also be displayed in parentheses; here it is <b><code class="CodeStrong">Xnand2_1</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1019761"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If a segment of a wire is selected instead, the message window might contain: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">selected: wire #139 (net_23)</font><a name="1019762"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1019763"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1019764"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, only the type (for example, <b><code class="CodeStrong">wire</code></b>), the ID, and the net name (if already netlisted) are shown. This net name is the local net name of the net and will be concatenated with its path to this point in the netlist. Nevertheless, this net name is useful in determining how SUE has named otherwise unnamed wires and determining if buses are appropriately constructed. </font>
+<p>
+<p>
+  <dt> <a name="1019765"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For SUE operations which require multiple button clicks or key strokes, the standard button assignments and hot-keys are often replaced or augmented. These complex operations are called <i><strong class="StrongItalic">modes</strong></i>. SUE has the following modes: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">wire </font><a name="1019768"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">line</font><a name="1026694"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">arc </font><a name="1026695"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">text </font><a name="1026697"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon </font><a name="1026698"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">duplication </font><a name="1026699"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">replace</font><a name="1026705"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">move </font><a name="1026707"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">select region </font><a name="1026713"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">zoom </font><a name="1026714"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">pan </font><a name="1026715"> </a>
+      </pre>
+<p>
+  <dt> <a name="1024893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In a SUE mode, the message window will describe the hotkeys and button assignments which are valid in that mode. Hitting the help key <b><strong class="Strong">Space</strong></b> will also display this message in its entirety and explicitly list all hotkey definitions that are valid. Unfortunately, you cannot zoom in or out in a mode, which might be handy when moving objects or drawing wires, for example. Instead, SUE will auto-pan the screen when you reach a border. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024905"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-c</strong></b> will always abort a mode, leaving the cell in the state it was in before you entered the mode.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1019794"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+<p>
+  <dt> <a name="1019795"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When adding lines or rectangles, the message window first contains the following line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">Button-1 starts line segments, Button-2/3 start rectangle, Ctrl-c aborts.</font><a name="1019796"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1019797"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1019798"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once <b><strong class="Strong">Button-1</strong></b> (the left mouse button) has been pressed above the desired location on the screen to start the line, the message window changes to the following: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">Button-1 starts new segment, Button-2/3 ends, Delete removes last segment, Ctrl-c aborts.</font><a name="1019799"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1019800"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1019801"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">which should be self explanatory. If the message gets erased or is too long to fit into the message window, you can always hit the <b><strong class="Strong">Space</strong></b> help key, which displays the entire message along with all current hotkey bindings. </font>
+<p>
+<p>
+  <dt> <a name="1019803"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE's cursor changes depending its status. When SUE is waiting for user input and isn't in any mode, the cursor is a <b><strong class="Strong">pointer</strong></b>. When in a mode, the cursor changes to a <b><strong class="Strong">finger</strong></b>. If SUE is busy then the cursor becomes the cartoon character <b><strong class="Strong">gumby</strong></b> to keep you company. Finally, when SUE is waiting for input from a popup menu or window, the cursor becomes a "<b><strong class="Strong">?</strong></b>"<b><strong class="Strong"> </strong></b>(question mark).</font>
+<p>
+<p>
+  <dt> <a name="1019807"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If SUE is not responding to commands, check the cursor. It is possible that SUE is waiting for you to complete a menu. Remember that if you <b><strong class="Strong">Ctrl-z</strong></b><b><strong class="Strong"> </strong></b>out of SUE, SUE will not respond until you bring it to the foreground again. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1019809"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Mousing</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1021832"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most simple commands in SUE, like selecting and moving objects, are done entirely with the mouse and may not be listed in any menu. Furthermore, these commands are context sensitive, meaning their function depends on what is highlighted. For example, pressing <b><strong class="Strong">Button-1</strong></b> when nothing is selected begins a <b><code class="CodeStrong">select region</code></b> command that lets you drag a selection box. However, pressing <b><strong class="Strong">Button-1 </strong></b>over a highlighted object simply selects that item. Finally, pressing <b><strong class="Strong">Button-1</strong></b> over an item in the <b><code class="CodeStrong">Schematic List</code></b> box goes to that schematic, while pressing <b><strong class="Strong">Button-1 </strong></b>over an item in an <b><code class="CodeStrong">Icon List</code></b> box adds an instance of that icon to the current schematic. This may sound confusing and a little bewildering to the novice user, but with a little practice becomes second nature. </font>
+<p>
+<p>
+  <dt> <a name="1019818"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">How can you decipher all combinations of button clicks, especially if they aren't listed in the menus? Use the <b><strong class="Strong">Space</strong></b> help key. You can hit the <b><strong class="Strong">Space</strong></b> help key at any time and in any place. If you hit the help key in a mode, you will see the unique bindings for that mode. If you hit the help key over the <b><code class="CodeStrong">Schematics List</code></b> box, you will see the bindings for it, etc. Remember to look for the context-sensitive bindings that are displayed in the <code class="Code">help key window</code> near the bottom. </font>
+<p>
+<p>
+  <dt> <a name="1019821"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As a starting point, listed below are some of the common mouse bindings.</font>
+<p>
+</dl></dl>
+<a name="1019952"> </a><font face="ITC Franklin Gothic Book">Table 1:   Common Mouse-Button Bindings<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr align="center" bgcolor="#CCCCCC">
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1019824"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Function</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1019826"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1019828"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Object</font></font></th>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019831"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">select </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019833"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019835"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">any </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019837"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">drag select box </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019839"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019841"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">none </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019843"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">toggle select </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019845"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">shift-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019847"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">any </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019849"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">select and move </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019851"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-2/3 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019853"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">any, not selected </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019855"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">move selected </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019857"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-2/3 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019859"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">any if selected or none </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019862"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">add select and move </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019864"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift-Button-2/3 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019866"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">any </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019869"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit icon properties </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019871"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019873"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">icon </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019876"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit generator props </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019878"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift-Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019880"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">generator </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019883"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">highlight wire </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019885"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019887"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">wire </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019889"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">highlight wire to node wire </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019891"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift-Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019893"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">wire </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019895"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">highlight wire by name </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019897"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Control-Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019899"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">wire </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019902"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit text </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019904"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019906"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">text </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019909"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit line </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019911"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019913"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">line </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019916"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit arc </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019918"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Double-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019920"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">arc </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019922"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit schematic </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019924"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019926"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Schematic menu </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019928"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit schematic's icon </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019930"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019932"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Schematic menu </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019935"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">add icon to schematic </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019937"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019939"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Icon menu </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019941"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit schematic </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019943"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Shift-Button-1 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019945"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Icon menu </font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019947"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">edit icon </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019949"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Button-2 </font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1019951"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Icon menu </font></font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font><dl><dl>
+<p>
+  <dt> <a name="1019953"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Buttons 2 and 3, as much as possible, execute the same command. This allows SUE to work nearly as well for two- as well as three-button mice. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1019956"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">User Customization</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019957"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the user-customizable options in SUE, including pointers to tools, hotkey definitions, colors, and more, are located in <b><code class="CodeStrong">.suerc</code></b> files (for <code class="Code">SUE Run Commands</code>). These files are sourced from <b><strong class="Strong">Tcl</strong></b> and thus require correct <b><strong class="Strong">Tcl</strong></b> syntax. SUE sources more than one <b><code class="CodeStrong">.suerc</code></b> file to allow for site-specific, user-specific, and project-specific customization. Since the <b><code class="CodeStrong">.suerc</code></b> files are sourced from <b><strong class="Strong">Tcl</strong></b>, you can also define <b><strong class="Strong">Tcl</strong></b> procedures in them and source your own <b><strong class="Strong">Tcl</strong></b> files from them. </font>
+<p>
+<p>
+  <dt> <a name="1019962"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">At startup, SUE first sources the file<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">${MMI_TOOLS}/sue/.suerc</code></b> (or the <b><code class="CodeStrong">system</code></b> <b><code class="CodeStrong">.suerc</code></b>). This <b><code class="CodeStrong">.suerc </code></b>file comes with every new release of the software and you should <em class="Emphasis">not</em> modify it. When you get a new version of the software, it will probably include new options that are included in this <b><code class="CodeStrong">.suerc</code></b> file. </font>
+<p>
+<p>
+  <dt> <a name="1019964"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, SUE attempts to source the file <b><code class="CodeStrong">${MMI_TOOLS}/../mmi_local/sue/.suerc </code></b>(or the <b><code class="CodeStrong">site</code></b> <b><code class="CodeStrong">.suerc</code></b>), if it exists, which will overwrite any defaults in the <b><code class="CodeStrong">system</code></b> <b><code class="CodeStrong">.suerc</code></b>. The <b><code class="CodeStrong">site</code></b> <b><code class="CodeStrong">.suerc</code></b><b><strong class="Strong"> </strong></b>should be set up to include all site-dependent options such as the commands for running tools and automatic inclusion of common libraries. </font>
+<p>
+<p>
+  <dt> <a name="1019965"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, SUE attempts to source <b><code class="CodeStrong">~/.suerc </code></b>(from the user's home directory, the <b><code class="CodeStrong">user</code></b> <b><code class="CodeStrong">.suerc</code></b>) and then <b><code class="CodeStrong">~/mmi_private/sue/.suerc</code></b> (the user's <b><code class="CodeStrong">private</code></b> <b><code class="CodeStrong">.suerc</code></b>). The <b><code class="CodeStrong">private</code></b> <b><code class="CodeStrong">.suerc</code></b> is included so users don't have to clutter up their home directories with various Micro Magic Tools files. Finally, SUE will attempt to source<b><code class="CodeStrong"> ./.suerc</code></b> (for example, from the current directory, the <b><code class="CodeStrong">local</code></b> <b><code class="CodeStrong">.suerc</code></b>) if it exists. Definitions in the most recently loaded <b><code class="CodeStrong">.suerc</code></b> file will replace any previous definitions. These latter three <b><code class="CodeStrong">.suerc</code></b> files allow users to customize their personal SUE environments. </font>
+<p>
+<p>
+  <dt> <a name="1019967"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should look through the system <b><code class="CodeStrong">.suerc</code></b> file to understand what customizations are possible. Only a small subset of the possible customizations are described in this manual. To change a particular feature, however, <em class="Emphasis">only</em> copy that feature into the <font  face="Verdana, Arial, Helvetica, sans-serif"><i>site</i></font>, <font  face="Verdana, Arial, Helvetica, sans-serif"><i>user</i></font>, <font  face="Verdana, Arial, Helvetica, sans-serif"><i>private</i></font>, or <font  face="Verdana, Arial, Helvetica, sans-serif"><i>local</i></font> <b><code class="CodeStrong">.suerc </code></b>file and then modify it.<em class="Emphasis"> Do not </em>copy the entire <b><code class="CodeStrong">.suerc</code></b> file into your <font  face="Verdana, Arial, Helvetica, sans-serif"><i>site/user/private/local </i></font>version, since then you won't automatically realize changes in the <b><strong class="Strong">system</strong></b> <b><code class="CodeStrong">.suerc</code></b> file from new releases or changes that the SUE administrator might make in the <b><strong class="Strong">site</strong></b> <b><code class="CodeStrong">.suerc</code></b>, such as redefining a tool location. </font>
+<p>
+<p>
+  <dt> <a name="1019969"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should place your personal customizations, such as SUE colors and window geometry defaults, in the <b><code class="CodeStrong">user ~/.suerc </code></b>or <b><code class="CodeStrong">private ~/mmi_private/sue/.suerc</code></b> file. Only place project customizations in the<font  face="Verdana, Arial, Helvetica, sans-serif"><i> </i></font><b><strong class="Strong">user/private</strong></b> file or possibly the <b><strong class="Strong">site .</strong></b><b><code class="CodeStrong">suerc</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"><i> </i></font>or you will be constantly duplicating this file. Good customizations here are specifying what libraries to load and autoload. For example, to autoload all of the icons in the <b><code class="CodeStrong">./icon_lib </code></b>directory, add the following line to your <b><code class="CodeStrong">./.suerc </code></b>file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">lappend AUTOLIB ./icon_lib</font><a name="1019972"> </a>
+      </pre>
+<p>
+  <dt> <a name="1025858"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025930"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It is strongly advised that you don't modify the hotkeys or, if you must, you only modify one or two. If individuals change the hotkeys indiscriminately, soon, no one will be able help anyone else on their workstation because of incompatibilities. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1019976"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to run SUE without loading all of the<b><code class="CodeStrong"> .suerc </code></b>files described, you can override the loading of any file with the UNIX environment variable <b><code class="CodeStrong">SUE_IGNORE_SUERC</code></b>. This feature is useful for debugging <b><code class="CodeStrong">.suerc</code></b> files or ignoring specific customizations. To ignore all <b><code class="CodeStrong">.suerc</code></b> files, use the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">setenv SUE_IGNORE_SUERC site,user,private,local</font><a name="1019980"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1019981"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1019982"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can use any subset of this line to ignore only specific <b><code class="CodeStrong">.suerc</code></b> files. For example to only ignore the <b><strong class="Strong">user</strong></b><b><code class="CodeStrong"> .suerc</code></b> file, set: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">setenv SUE_IGNORE_SUERC user</font><a name="1019983"> </a>
+      </pre>
+</dl></dl>
+
+<h3>
+  <a name="1019985"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Schematics and Icons</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1019988"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE understands two types of drawings: <b><strong class="Strong">schematics </strong></b>and <b><strong class="Strong">icons</strong></b>, which are sometimes called symbols in other tools. </font>
+<p>
+  <dl>
+<p> <dt> <a name="1019993"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Schematics</strong></b> can contain instances of <em class="Emphasis">icons</em>, <em class="Emphasis">wires</em>, <em class="Emphasis">lines</em>, <em class="Emphasis">arcs</em>, and <em class="Emphasis">text (</em>in other words, everything). </font>
+<p><p> <dt> <a name="1019994"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In contrast, <b><strong class="Strong">icons</strong></b> are primarily pictures. Icons placed into schematics are immutable objects that cannot be broken apart or changed. To change or create an icon, you must edit the cell's <i><strong class="StrongItalic">icon view</strong></i>, in which all of the pieces of the icon, the lines, arcs, text, terminals, etc., are separate and mutable. Basically everything that you see in the icon view will be displayed when you instantiate the icon, with the following exceptions: </font>
+<p><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019996"> </a><b><strong class="Strong">		</strong></b><b><strong class="Strong">terminals</strong></b> (representing <b><strong class="Strong">inputs</strong></b>, <b><strong class="Strong">outputs</strong></b>, and <b><strong class="Strong">inouts</strong></b>) are a special type of icon which are displayed as small squares when the icon is instantiated.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1019998"> </a><b><strong class="Strong">properties</strong></b> (that is, text beginning with a "-") which are not displayed. See "<em class="Emphasis">Chapter 1, Parameterized Icons" </em>on page XX. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020001"> </a><b><strong class="Strong">title bars </strong></b>which are only displayed in the icon view and are for documentation purposes only.  
+</li><p>
+</font>
+</ul></ul>  </dl>
+<p>
+  <dt> <a name="1020002"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All other icons placed into an icon will magically disappear when you leave the icon because they don't belong there. </font>
+<p>
+<p>
+  <dt> <a name="1020003"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+  <dl>
+<p> <dt> <a name="1020004"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you wanted to make an icon of a "<b><code class="CodeStrong">nand</code></b>" gate and you already had a respectable icon of an "<b><code class="CodeStrong">and</code></b>" gate, you wouldn't put the "<b><code class="CodeStrong">and</code></b>" gate icon into the "<b><code class="CodeStrong">nand</code></b>" gate's icon view. Instead you would go to the "<b><code class="CodeStrong">and</code></b>" gate's icon view and <b><code class="CodeStrong">copy to clipboard</code></b> the lines and arcs that make up the "<b><code class="CodeStrong">and</code></b>" gate. You would then go to the "<b><code class="CodeStrong">nand</code></b>" gate's icon view and paste those items there. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1020010"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In general, cells have both a <i><strong class="StrongItalic">schematic</strong></i> and an <i><strong class="StrongItalic">icon</strong></i>. Both the schematic and icon are automatically associated together by having the same name. </font>
+<p>
+<p>
+  <dt> <a name="1020012"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Furthermore, <b><strong class="Strong">schematic/icon pairs </strong></b>are automatically saved together in the same file. Some schematics, such as top level schematics, have no icons. In addition, some icons have no schematics, for example, primitives such as fets and capacitors. </font>
+<p>
+<p>
+  <dt> <a name="1020014"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You cannot simply rename cells in SUE. Instead, you must copy the cell to a new name and then save it out (if desired). Any reference to the original cell name must also be changed. For example, let's say you have a schematic named "<b><code class="CodeStrong">foo</code></b>" and inside of it you have instantiated an instance of "<b><code class="CodeStrong">qux</code></b>". Now let's say you want to rename "<b><code class="CodeStrong">qux</code></b>" to "<b><strong class="Strong">bar</strong></b>". You go to "<b><code class="CodeStrong">qux</code></b>" and hit <b><code class="CodeStrong">copy</code></b> in the <b><code class="CodeStrong">File</code></b> menu and enter the new name. If you now go back to "<b><code class="CodeStrong">foo</code></b>", you will see that "<b><code class="CodeStrong">qux</code></b>" is still there. Now you have to replace "<b><code class="CodeStrong">qux</code></b>" with "<b><code class="CodeStrong">bar</code></b>". Moral: name your cells carefully. </font>
+<p>
+<p>
+  <dt> <a name="1020016"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All terminals of associated schematic/icon pairs should match for correct netlisting. If they don't match, the netlister doesn't know which schematic terminals correspond to which icon terminals and will display an error telling you where the mismatch is. Otherwise, SUE is mostly oblivious to terminals. </font>
+<p>
+<p>
+  <dt> <a name="1020022"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When creating a new icon for a schematic, SUE will automatically generate <code class="Code">input</code>, <code class="Code">output</code>, and <code class="Code">inout</code> terminals in the icon to match the schematic. A magical mechanism will also try to rename and add terminals into the other view to match whatever damage you are doing. However, this mechanism is not perfect and doesn't even try to delete terminals in the other view. One simple way to break it is by trying to swap the names of two terminals. </font>
+<p>
+<p>
+  <dt> <a name="1020025"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Icons need a reference point for placement into schematics and for orientation. This reference point is called the<b><strong class="Strong"> icon origin </strong></b>(represented by a "<b><strong class="Strong">+</strong></b>" in the drawing) and is required in all icons. In contrast, schematics require no reference point and thus have no displayed origin. The icon origin can be moved but not duplicated or deleted. Thus, to move an icon relative to its origin, you can selected the icon components and move them <i><strong class="StrongItalic">or</strong></i> you can just select the icon origin and move it. The origin of the icon is displayed as a <em class="Emphasis">point</em> when the icon is instantiated in a schematic. All rotations/mirroring will occur about that point. </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020028"> </a>If you move the origin in the icon, any instantiated icons of that name in schematics will move in the schematics since their position relative to their origin has moved. If you are not careful this will reposition any existing schematics that have this icon in them, probably disconnecting its terminals from the schematic's wires.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020030"> </a>If you substitute one icon for a different type using the command<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">replace instance</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>in the <b><code class="CodeStrong">Edit</code></b> menu, the origin of the new icon will be placed where the origin of the old icon was. Therefore, try to maintain consistent origin placement in icons.  
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1020031"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Terminals</strong></b> placed in icons will appear as <em class="Emphasis">small solid squares</em> when that icon is instantiated. These terminals, along with wires, will display connection information as described above. </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020033"> </a>For icon terminal names to be visible when the icon is instantiated, add a text object in the icon for each terminal.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020034"> </a>If the name of the terminal is changed, the user is required to changed this text object if the different name is desired in the instantiated icon. This is <em class="Emphasis">not</em> automatic.  
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1025987"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024968"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">duplicate text</code></b> feature is very handy for placing text next to I/O's in icons. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1020039"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By using the<font  face="Verdana, Arial, Helvetica, sans-serif"><b> </b></font><b><code class="CodeStrong">show sel. term names</code></b> function in the <b><code class="CodeStrong">View</code></b> menu, you can display the true names of the terminals in the selected icon in a schematic. </font>
+<p>
+<p>
+  <dt> <a name="1020041"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All icons that SUE knows about can be found in the <b><code class="CodeStrong">Icon Library List</code></b> boxes. Icons that are in the autoload path but not yet loaded will not appear in the list box. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020043"> </a>To instantiate one of these icons into an existing schematic, just click on the icon name in the List box and that icon can then be dropped into the schematic. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020044"> </a>Another way to create an icon is to just duplicate an existing icon in a schematic. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020046"> </a>Double-clicking an instantiated icon will bring up an <b><code class="CodeStrong">Edit Properties </code></b>popup that allows you to edit the properties of that individual icon such as, for example, the width (<b><code class="CodeStrong">W</code></b>) and length (<b><code class="CodeStrong">L</code></b>) of an nfet. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020047"> </a>Click <b><strong class="Strong">Button-2</strong></b> (the middle mouse button) on an icon in the<b><code class="CodeStrong"> Icon List </code></b>box, and SUE will display the icon for editing. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020051"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">See the "<em class="Emphasis">Mousing"</em> section for a list of button actions, or hit the <b><strong class="Strong">Space</strong></b> help key in SUE. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1020053"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Icon Library List Boxes </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020057"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are three forms of <b><code class="CodeStrong">Icon Library List</code></b> boxes: <b><strong class="Strong">Flat</strong></b>, <b><strong class="Strong">Hier</strong></b>, and <b><strong class="Strong">Include</strong></b>. The type of list box used by SUE is determined by the <b><code class="CodeStrong">.suerc</code></b> file. Note that <b><strong class="Strong">Include</strong></b> is the default form and the other two may be removed in future versions of SUE. </font>
+<p>
+<p>
+  <dt> <a name="1020060"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When the<b><code class="CodeStrong"> Flat Icons List</code></b> box is selected, all icons that SUE knows about are displayed alphabetically in one list box. This approach is convenient when dealing with relatively small circuits or with few icons. </font>
+<p>
+<p>
+  <dt> <a name="1020061"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When the<i><strong class="StrongItalic"> </strong></i><b><code class="CodeStrong">Hier Icons List</code></b> box is selected, multiple icons list boxes are displayed and each list box only displays the icons that were loaded from a single directory. This directory is shown in the first line of the list box. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020062"> </a>If you click on the directory name, a menu gives you the option of adding another list box, deleting the current one, or changing which directory of icons are displayed in this list box. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020064"> </a>Use the command <b><code class="CodeStrong">raise windows</code></b> under the <b><code class="CodeStrong">File</code></b> menu to help you get them back. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020065"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition, SUE attempts to <em class="Emphasis">iconify</em> and <em class="Emphasis">deiconify</em> all windows together. </font>
+<p>
+<p>
+  <dt> <a name="1020066"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The third and default form of list box is called <b><strong class="Strong">Include</strong></b>. <b><code class="CodeStrong">Include</code></b> is identical to <b><code class="CodeStrong">Hier</code></b> except that all the List boxes are included in the main window instead of being separate top level windows. This is especially handy if you tend to "lose" list boxes because they get covered by other windows. </font>
+<p>
+<p>
+  <dt> <a name="1020067"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the commands described above for dropping icons into schematics and otherwise manipulating icons are identical between the <b><code class="CodeStrong">Flat</code></b>, <b><code class="CodeStrong">Hier</code></b>, and <b><code class="CodeStrong">Include</code></b> list boxes. </font>
+<p>
+<p>
+  <dt> <a name="1020069"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to see all of the icons from a given directory in the <b><code class="CodeStrong">Icons</code></b> <b><code class="CodeStrong">List</code></b> box, you can click on <b><code class="CodeStrong">Autoload directory</code></b> in the menu at the top of the desired icons' list box. You can get this same functionality at startup by adding the directory to the <b><code class="CodeStrong">AUTOLIB</code></b> global variable in the <b><code class="CodeStrong">.suerc</code></b> file, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">lappend <b><code class="CodeStrong">AUTOLIB</code></b> &lt;dir_name&gt;</font><a name="1020071"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1020072"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1020073"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">or starting SUE with the "<b><code class="CodeStrong">-AUTOLIB</code></b>" switch, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue <b><code class="CodeStrong">-AUTOLIB</code></b> &lt;dir_name&gt;</font><a name="1020074"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1020075"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1020077"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In contrast, only schematics that have been <em class="Emphasis">pushed into</em> (or previously viewed) are shown in the<i><strong class="StrongItalic"> </strong></i><b><code class="CodeStrong">Schematics List</code></b> box. SUE only loads cells on demand, so a circuit with a large hierarchy will still come up quickly since SUE ignores the hierarchy until it is required to do something with it, like display it or netlist it. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020079"> </a><b><strong class="Strong">		</strong></b>For example, if you load the schematic "<code class="Code">a</code>" which contains instances of icons for schematics "<b><code class="CodeStrong">b</code></b>" and "<b><code class="CodeStrong">c</code></b>", initially only the schematic "<b><code class="CodeStrong">a</code></b>" will appear in the <b><code class="CodeStrong">Schematics List </code></b>box. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1025213"> </a>Only when you push into "<code class="Code">b</code>" and see its schematic will "<code class="Code">b</code>" appear in the <b><code class="CodeStrong">Schematics List </code></b>box, and similarly for "<code class="Code">c</code>". <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025220"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">During netlisting, the netlister will first push into every schematic that it requires, which may not be all or even any of them because of disk caching. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1025222"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Changing the displayed schematic is as easy as clicking on the desired schematic in the <b><code class="CodeStrong">Schematics List </code></b>box. However, if you have a hierarchy of cells, it is best to get to cells by pushing into icons and popping out of schematics. This is especially important when cross-probing, since the hierarchical path is required to get the net name correct. Whenever you change schematics using the <b><code class="CodeStrong">Schematics List</code></b><code class="Code"> </code>box, SUE has no way of knowing the hierarchy of the current cell and thus resets it. Thus, you can never pop out of a schematic that you went to using the <b><code class="CodeStrong">Schematics List </code></b>box. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020086"> </a>When netlisting, the hierarchy is reset so that the current schematic is the root. Before netlisting, you must pop up to the desired root schematic or go directly to that schematic via the <b><code class="CodeStrong">Schematics List </code></b>box. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020087"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The title frame of the main window (or the top banner on the X window) of SUE will display certain pertinent information about the schematic or icon in that window such as its name, type (either <b><code class="CodeStrong">S</code></b> or <b><code class="CodeStrong">I</code></b> for <b><code class="CodeStrong">Schematic</code></b> or <b><code class="CodeStrong">Icon</code></b>), modification flag, written flag, full pathname, and netlisting mode in parentheses. For example, if you are currently editing the schematic "<code class="Code">foo</code>" and you have modified it but haven't saved it yet, your title frame will show: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">SUE: <code class="Code">foo</code> SM  /home/luser/circuits/foo.sue (verilog)</font><a name="1020090"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1020091"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1020094"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The current <i><strong class="StrongItalic">netlist</strong></i> type, Verilog in this case, is displayed in the title frame along with the first two items in the <b><code class="CodeStrong">Sim</code></b> menu. Furthermore, the <i><strong class="StrongItalic">modified</strong></i> flag will be displayed in front of the appropriate schematic or icon names in the<b><code class="CodeStrong"> Schematics List </code></b>and <b><code class="CodeStrong">Icons List </code></b>boxes. It is a good idea to look at the full pathname of the current cell periodically to insure that you are indeed working with the desired cell. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1020097"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SUE Files and Libraries</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020098"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE files are human readable and normally have the suffix of <b><code class="CodeStrong">.sue </code></b>as determined by the <b><code class="CodeStrong">.suerc</code></b> file. The actual <b><strong class="Strong">SUE file format</strong></b><b><strong class="Strong"> </strong></b>is described below. When saving a file over an existing file, the old one is first moved to <b><code class="CodeStrong">.BAK </code></b>before the new one is saved out. </font>
+<p>
+<p>
+  <dt> <a name="1020101"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE attempts to write files back to the same directory that it reads them from, even if you change the current working directory. You can always know where SUE will write a particular cell, since its full pathname is listed in the title frame of the X window. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020103"> </a>If you want to write the file to a different directory, first use the <b><code class="CodeStrong">Change Path</code></b><b><code class="CodeStrong"> </code></b>command in the <b><code class="CodeStrong">File</code></b> menu to change its directory and then save it. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020104"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Whenever you save a schematic in SUE, only that schematic and its associated icon (if one exists) are written to a file with the name of <b><code class="CodeStrong">.sue</code></b>. Similarly, if you are displaying an icon, then the associated schematic (if one exists) will also be saved. Icons and schematics are automatically <em class="Emphasis">associated</em> if they have the same name. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025302"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><font  face="Verdana, Arial, Helvetica, sans-serif"><br>Icons of schematics </font><em class="Emphasis">instantiated</em><font  face="Verdana, Arial, Helvetica, sans-serif"> in the current schematic are NOT saved.</font></font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1020106"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you read in a schematic, all of the instantiated icons must be available to SUE. These cells must be in files in the same directory as the schematic or in libraries (or directories) known to SUE. </font>
+<p>
+<p>
+  <dt> <a name="1020109"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE uses the automatic loading feature of <b><strong class="Strong">Tcl</strong></b> to manage libraries. In short, directories in the automatic loading path are kept in the <b><strong class="Strong">Tcl</strong></b> variable<i><strong class="StrongItalic"> </strong></i><b><code class="CodeStrong">auto_path</code></b>, which is automatically managed by SUE. In each directory, the file <b><code class="CodeStrong">tclIndex</code></b> must be maintained (also automatically managed by SUE) which associates <b><strong class="Strong">Tcl</strong></b> procedures with the files in that directory that contain them. </font>
+<p>
+<p>
+  <dt> <a name="1020111"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since SUE schematics and icons are saved as <b><strong class="Strong">Tcl</strong></b> procedures, a library then consists of simply a directory of <code class="Code">.sue</code> files. In order for SUE to recognize this library, the directory name need only be added to the <b><code class="CodeStrong">auto_path</code></b> variable. When loading a <code class="Code">.sue</code> file, SUE will automatically add the directory of that file to the <b><code class="CodeStrong">auto_path</code></b> if it isn't already there and regenerate the appropriate <code class="Code">tclIndex</code> if needed. Thus, all of the <code class="Code">.sue</code> files in that directory will then be automatically available as icons in the loaded schematic. Otherwise, libraries can be included when bringing up SUE with the <b><code class="CodeStrong">-LIB</code></b> or <b><code class="CodeStrong">-AUTOLIB</code></b> options or adding options to the <b><code class="CodeStrong">.suerc</code></b> file (see the <b><code class="CodeStrong">README</code></b>). <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025340"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE attempts to regenerate the <b><code class="CodeStrong">tclIndex</code></b> file when required using a variant of the Tcl command <b><code class="CodeStrong">auto_mkindex</code></b>. However, the <b><code class="CodeStrong">tclIndex</code></b> file can become stale if you UNIX move files into or out of directories during a SUE session.<b><strong class="Strong"> </strong></b></font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1020117"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For more information about auto loading see the <b><strong class="Strong">Tcl</strong></b> manual or online <b><strong class="Strong">Tcl</strong></b> man pages. </font>
+<p>
+<p>
+  <dt> <a name="1020118"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Because of the automatic loading feature, schematics and icons in libraries will only be loaded when they are specifically asked for. Thus even if your library is in the <b><code class="CodeStrong">auto_path</code></b> it will not be visible to you unless you <b><code class="CodeStrong">AUTOLIB</code></b> it. Alternatively, you can view all of the cells in the library by clicking on<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">Autoload directory</code></b> in the menu at the top of the desired <b><code class="CodeStrong">Icon List</code></b> boxes. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020119"> </a>For example, if you want to instantiate the <code class="Code">mux2</code> icon that's in your library into your current schematic, you will first have to explicitly load<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><code class="Code">mux2.sue</code><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>from the library directory. It will then appear in the <b><code class="CodeStrong">Icons List</code></b> box (and possibly in the <b><code class="CodeStrong">Schematics List</code></b> box if it also has a schematic). Now you can place it into your schematic. The good news is that the next time you enter SUE and bring up the same schematic, it will automatically bring in the <code class="Code">mux2</code> cell (assuming your <code class="Code">auto_path</code> is still correct). </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020120"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have two cells with the same name that are both in your <code class="Code">auto_path</code>, SUE might load the wrong one. SUE cannot handle two different cells with the same name and different paths. Since SUE automatically manages the<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><code class="Code">auto_path</code>, it is difficult to insure that the <code class="Code">auto_path</code> order will be correct. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notecaution.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+ </font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025413"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have a schematic called <b><strong class="Strong">foo</strong></b> in <b><code class="CodeStrong">foo.sue</code></b> and you UNIX copy (<em class="Emphasis">cp</em>) that file to <b><strong class="Strong">bogus.sue</strong></b>, the procedure <b><strong class="Strong">SCHEMATIC_foo </strong></b>in <b><code class="CodeStrong">bogus.sue</code></b> can shadow the schematic <b><strong class="Strong">SCHEMATIC_foo</strong></b> in <b><code class="CodeStrong">foo.sue</code></b> which is the one you really want. </font>
+<p>
+<p>
+  <dt> <a name="1026002"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A common error is to UNIX copy a file, for example, from <b><code class="CodeStrong">foo.sue</code></b> to <b><code class="CodeStrong">foo_save.sue</code></b>. Don't do this. If you want to make a special backup of the file, call it something like <b><strong class="Strong">foo.sue.save</strong></b>. Since this latter file name doesn't have the suffix <code class="Code">.sue</code>, SUE will ignore it when autoloading. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020122"> </a>To prevent this problem, always UNIX copy files to filenames with suffixes other than <b><code class="CodeStrong">.sue</code></b> or<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">.tcl</code></b>. Thus, in the previous example, you should copy <b><strong class="Strong">foo.sue</strong></b> to <b><strong class="Strong">foo.sue.bogus.</strong></b> </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020123"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To sum up, demons lurk here so BEWARE! </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020124"> </a>If you suspect that something might be loading incorrectly, or simply want to insure that your SUE file system is consistent, run the<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">check file system</code></b> command in the <b><code class="CodeStrong">File</code></b> menu. This procedure will report any discrepancies in the SUE file system to the SUE command window. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020126"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Unfortunately, you cannot rename schematics or icons by merely renaming their <b><code class="CodeStrong">.sue</code></b><code class="Code"> </code>files in UNIX. However, you can UNIX <em class="Emphasis">mv</em> or <em class="Emphasis">cp</em> (<em class="Emphasis">move</em> or <em class="Emphasis">copy</em>) them to other directories without any problems as long as you keep the file name the same. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020128"> </a>You should copy the schematic or icon in SUE using the <b><code class="CodeStrong">copy</code></b> command in the <b><code class="CodeStrong">File</code></b> menu to a new file name and then save it out. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020129"> </a>If you are intent on using Emacs (or vi) to generate new schematics/icons, then you will probably quickly see that if you want to rename <b><code class="CodeStrong">foo.sue</code></b> to be<b><strong class="Strong"> bar.sue</strong></b><code class="Code"> </code>then you will have to change the procedure names<b><strong class="Strong"> SCHEMATIC_foo</strong></b><code class="Code"> </code>and <b><strong class="Strong">ICON_foo</strong></b> in <b><code class="CodeStrong">foo.sue</code></b> to be <b><strong class="Strong">SCHEMATIC_bar</strong></b> and <b><strong class="Strong">ICON_bar</strong></b>. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020130"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">See, that's not so hard. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1020132"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Default Libraries</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020135"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Whenever you run SUE, you always want some default libraries. Of these, the <b><code class="CodeStrong">devices Library </code></b>is the most important. The<b><code class="CodeStrong"> devices Library </code></b>contains<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">I/O</code></b><code class="Code">'s</code><font  face="Verdana, Arial, Helvetica, sans-serif">, </font><b><code class="CodeStrong">globals</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">, </font><b><code class="CodeStrong">name_nets</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">, </font><b><code class="CodeStrong">title bars</code></b><font  face="Verdana, Arial, Helvetica, sans-serif">, </font>and other important special-purpose icons for use in SUE. Typically, you won't ever need to modify these icons. However, you might want to move them or add icons to them. The pathname of this library is kept in the variable<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">SCHEM_DIR(devices) </code></b>and is set, by default, to be: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set SCHEM_DIR(devices) $SUE_DIR/schematics/devices</font><a name="1020137"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1020138"> </a>
+      </pre>
+<p>
+  <dt> <a name="1020139"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typically, you need at least one more set of icons to do anything in SUE. If you are working with SPICE, this set is probably one of the <b><code class="CodeStrong">spice</code></b> or <b><code class="CodeStrong">mspice</code></b> <b><code class="CodeStrong">Libraries</code></b>. If you are working in Verilog, this might be a standard cell library. The library pathname stored in the variable <b><code class="CodeStrong">SCHEM_DIR($NETLIST_TYPE) </code></b>will also be autoloaded at startup. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025547"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All libraries other than the devices library are provided simply as examples. If you do not like the way they work, change them. They are not intrinsically a part of SUE.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1020148"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wires vs. Lines</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020152"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">Wires</em> are used for making electrical connection. <em class="Emphasis">Lines</em> are used for drawing nice pictures. Current doesn't flow in lines - don't try to make it. </font>
+<p>
+<p>
+  <dt> <a name="1020153"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can tell when you have accidentally used a line when you meant to use a wire because no connection information will appear (no <em class="Emphasis">solder dots</em> or <em class="Emphasis">opens</em>). The message window will also alert you as to the type of object which is selected if there is a doubt. Also, notice that lines can be multi-segment, but that all wires are single-segment; in other words, if you place the mouse over what you think is a wire and more than one segment highlights, then it is a line. </font>
+<p>
+<p>
+  <dt> <a name="1020154"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Using wires for drawing is less problematic but should still be avoided. Since icons are merely pictorial, wires have no place in them. Consequently, SUE will automatically convert all wires drawn in icons into lines when saving out icons. SUE will also try to prevent you from drawing wires at all in icons. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020156"> </a>Non-Manhattan wires can be generated by pressing the <b><strong class="Strong">Shift</strong></b> key when drawing the wire. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020158"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE does not restrict the drawing or editing of lines to be Manhattan (in other words, do not try the <b><strong class="Strong">Shift</strong></b> key, it doesn't help). Once you have finished drawing a line, special nodes on the vertices of the line will appear. These nodes are called <em class="Emphasis">edit markers</em>, and allow you to edit the line. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1022228"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Don't like this set of bullet points... Not enough differentiation betw. B-1 and Sh-B-1...... == KM ==</font></i>
+</align>
+</h5>
+
+
+<ul><ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020160"> </a>If a line does not show its edit marker, you can display the edit markers by double-clicking on the line. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020161"> </a>Using <b><strong class="Strong">Button-1</strong></b> you can move edit markers (and their associated vertices) around. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020162"> </a>Using<b><strong class="Strong"> </strong></b><b><strong class="Strong">Shift-Button-1</strong></b> you can move edit markers, preserving Manhattan geometries. This is especially useful for editing rectangles. </li>
+ </font>
+
+
+</ul></ul><dl><dl>
+<p>
+  <dt> <a name="1020163"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Furthermore, you can add vertices to and delete vertices from lines using <b><strong class="Strong">Button-3</strong></b>: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020164"> </a>If you click <b><strong class="Strong">Button-3</strong></b> over an line edit marker, a new vertex and its edit marker will be created offset slightly from the current vertex. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020165"> </a>If you hold down the <b><strong class="Strong">Shift</strong></b> key and hit <b><strong class="Strong">Button-3</strong></b> (<b><strong class="Strong">Shift-Button-3</strong></b>), the highlighted line edit marker and its vertex will be deleted. </li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h3>
+  <a name="1020167"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Text</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020169"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All text in a SUE icon or schematic is either part of an icon or not. If it <em class="Emphasis">is</em> part of an icon, then the entire icon will be highlighted when the cursor is placed over the text, and the text will move and rotate along with that icon. Text in icons cannot be moved or changed with respect to the icon except by editing the icon itself. Of course the contents of the text will often change when you change that icon's properties; for example, if you double-click on an instance of the <b><code class="CodeStrong">nand2</code></b> icon and change its name to <b><strong class="Strong">foo</strong></b>, you will see "<b><code class="CodeStrong">foo</code></b>" on the icon. </font>
+<p>
+<p>
+  <dt> <a name="1020171"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The only command that directly separates text from an icon is <b><code class="CodeStrong">duplicate text </code></b>in the <b><code class="CodeStrong">Edit</code></b> menu. This command is very useful in labeling icons: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020172"> </a>Select some or all of the I/O's in an icon and then execute<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">duplicate text</code></b>. Try it. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020173"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text not in icons can be edited, resized, and rotated independently and in place; that is, not in a popup window but directly on the cell. Text in SUE has the following properties associated with it: </font>
+<p>
+   <ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1020175"> </a>rotation </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1020177"> </a>size </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1020179"> </a>anchor </font>
+</p>   </ul>
+<p>
+  <dt> <a name="1020180"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text is either normal or rotated clockwise, in which case the text reads from top to bottom. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020182"> </a>Hit <b><code class="CodeStrong">rotate</code></b> in the <b><code class="CodeStrong">Edit</code></b> menu to rotate selected text. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020183"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text can only be displayed in one rotation and with no flipping; however, the text anchors will rotate or flip as if other orientations exist. </font>
+<p>
+<p>
+  <dt> <a name="1020185"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text is presently limited to three sizes: small, standard (the default), and large. The relative sizes of the small and large fonts can be manipulated in the <b><code class="CodeStrong">.suerc</code></b> file. </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020187"> </a>The text size can be changed using <b><strong class="Strong">Shift-Button-1,2,3</strong></b><b><code class="CodeStrong"> </code></b>(small, medium, large) when editing text (once you have double-clicked on it).  
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1020189"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to the text size, the text anchor can be changed from west (w), to east (e), to center (c) in icons. This is handy for making icons of the form: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1020190"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 1:   Demonstration of Text Anchor</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/text_anchors.gif" border="1">
+</div></font><a name="1027449"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1020195"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the above case, you would want the text on the left (<b><code class="CodeStrong">in1</code></b> and <b><code class="CodeStrong">in2</code></b>) to be anchored on the west side (the default) and the text on the right (<b><code class="CodeStrong">out1</code></b> and <b><code class="CodeStrong">out2</code></b>) to be anchored on the east side. The icon name <b><code class="CodeStrong">FOO</code></b> probably wants its text anchor to be center. These anchors are displayed in the figure above, with the "^" character. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020196"> </a>When editing text, an anchor mark is displayed and can be moved using <b><strong class="Strong">Ctrl-Button-1,2,3</strong></b> for <b><code class="CodeStrong">w</code></b>(est), <b><code class="CodeStrong">e</code></b>(ast), <b><code class="CodeStrong">c</code></b>(enter). </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020198"> </a>Also, you can display anchors for all the text in the cell with the command <b><code class="CodeStrong">Show Text Anchors</code></b>. </li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h3>
+  <a name="1020200"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Selection</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020202"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most functions operate on selected objects. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020205"> </a>An active object can be selected by clicking <b><strong class="Strong">Button-1</strong></b>, which will also deselect all other objects. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020206"> </a>Otherwise, <b><strong class="Strong">Shift-Button-1 </strong></b>will toggle the active object between selected and unselected without deselecting any other objects. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020208"> </a>A region of objects can be selected by dragging a selection box over the region. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020209"> </a>Selection boxes are generated by clicking <b><strong class="Strong">Button-1</strong></b> and holding it while dragging out a selection region. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020210"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To clearly distinguish between clicking <b><strong class="Strong">Button-1</strong></b> to select a single object and to select a region, SUE always selects the active object if there is one. If no object is active, SUE assumes you are dragging a selection region. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020211"> </a>By hitting the <b><strong class="Strong">Tab</strong></b> key when dragging a selection region, you can toggle the selection box mode. </li>
+ </font>
+
+
+</ul>  <dl>
+<p> <dt> <a name="1020212"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By default, the box is stretched with the mouse motion but the alternative mode moves the entire box. </font>
+<p>  </dl>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020213"> </a>Try hitting the <b><strong class="Strong">Tab</strong></b> key (do not hold it down) while dragging the region select box. The entire box should move without resizing. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020214"> </a>Hit the <b><strong class="Strong">Tab</strong></b> key again and now the box should again resize with the new origin. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020215"> </a>In addition, it is possible to add to the selection by holding down the Shift key while selecting either individual objects or regions. </li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1020217"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Double Clicking </em></font>
+</h4>
+
+
+<h5>
+<align="left">
+  <a name="1020219"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">On Icons </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1020220"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As described earlier, double-clicking on icons brings up an <b><code class="CodeStrong">Edit Properties </code></b>popup. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1020222"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">On Wires </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1020223"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Double-clicking</strong></b> (<b><strong class="Strong">Double-Button-1</strong></b>) on wires selects the entire net (though not nets that are connected via net names -- see below). </font>
+<p>
+<p>
+  <dt> <a name="1020226"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Shift-Double-Button-1</strong></b> selects the net up to a node. This is useful for, say, deleting offshoots of a net. </font>
+<p>
+<p>
+  <dt> <a name="1020227"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-Double-Button-1</strong></b> will highlight the entire net, including pieces that are connected by name only. Thus if you <b><strong class="Strong">Ctrl-Double-Button-1</strong></b><b><strong class="Strong"> </strong></b>(can you say that three times fast?) on the ground net, for example, you will select all sections of the ground net, even if they aren't connected together in SUE with wires. Remember to netlist or generate terminal names before using this command. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1020229"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Moving</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020230"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Moving objects is common enough that <b><strong class="Strong">Buttons-2/3</strong></b> have been dedicated to moving. The <b><code class="CodeStrong">move</code></b> command is also available in the <b><code class="CodeStrong">Edit</code></b> menu. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020232"> </a>When using<b><strong class="Strong"> Button-2/3</strong></b> to move objects, first a selection is done on the current object just as with <b><strong class="Strong">Button-1</strong></b>. </li>
+ </font>
+
+
+</ul>  <dl>
+<p> <dt> <a name="1020233"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">(If the current object is already selected, then the selection remains the same.) </font>
+<p>  </dl>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020234"> </a>Holding down the <b><strong class="Strong">Shift</strong></b> key during movement will constrain movement to either horizontal or vertical only, depending on which direction the movement would be greatest. </li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1020236"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Cutting/Pasting</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020237"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It is often desirable to copy a section of one schematic or icon into another. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020239"> </a>This can be done by first selecting the desired section, and then clicking on the <b><code class="CodeStrong">Copy to Clipboard</code></b> function in the <b><code class="CodeStrong">Edit</code></b> menu. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020241"> </a>Next, go to the desired schematic or icon and click the <b><code class="CodeStrong">Paste</code></b> function in the <b><code class="CodeStrong">Edit</code></b> menu, and it's that simple. Note that you now need to move the pasted items to their final resting places just as if you had just used the <b><code class="CodeStrong">duplicate</code></b> command. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020245"> </a>In addition to the hotkeys, the <b><strong class="Strong">Copy</strong></b> and <b><strong class="Strong">Paste</strong></b> keys on most keyboards are bound to these functions. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1020246"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The SUE clipboard is separate from the standard UNIX clipboard because it must be able to accept SUE graphical objects. The clipboard contents are saved in the file pointed at by the variable<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">CLIPBOARD_FILE</code></b> in the <b><code class="CodeStrong">.suerc</code></b> file (the default is <b><code class="CodeStrong">~/.clipboard.sue</code></b>). Thus, items may be pasted into different SUE sessions than from where they originated. Beware that other SUE sessions must have access to the same icon libraries for this to work correctly. Finally, note that this clipboard is only one deep. </font>
+<p>
+<p>
+  <dt> <a name="1020249"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text in popup windows such as <b><code class="CodeStrong">Edit Properties</code></b> can be cut from and pasted to using the standard UNIX cut and paste mechanism. At present, you cannot cut and paste into text objects in schematics or icons. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1020251"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Undo</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1020253"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE implements near infinite undo capability (the default undo stack is set to 100 by the variable<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">UNDO_LEVEL</code></b>, but can be changed in the <b><code class="CodeStrong">.suerc</code></b>). Each separate schematic and icon have their own independent undo stacks. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1025653"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE only undoes local changes to schematics or icons. It does not undo zooming or selections that do not create changes. It does not undo global changes like changes to generators or underlying icons. Finally, even if you undo a schematic to the point where it was last saved, undo will not remove the modified flag.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1020257"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">At present, redo has not been implemented. </font>
+<p>
+<p>
+  <dt> <a name="1013715"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_preface.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_chap2_wires-bus.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

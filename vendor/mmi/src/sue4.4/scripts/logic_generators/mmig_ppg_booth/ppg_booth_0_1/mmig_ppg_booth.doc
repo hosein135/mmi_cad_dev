@@ -1,0 +1,73 @@
+Documentation for mmig_ppg_booth
+--------------------------------
+rev 0.1, 6/13/00:   Initial release, includes options:  NBITS_A, A,
+                    PPGAlgorithm, HalfHeight
+
+
+This generator creates the multiplier recoding logic needed to implement
+Booth multiplication.  The following base cells are used:
+
+  MMIG_MUL_B4REC:  Booth radix 4 recoding
+  MMIG_MUL_B8REC:  Booth radix 8 recoding
+
+
+GENERATOR ARGUMENTS:
+--------------------
+  NBITS_A:
+    Definition:
+      The number of bits in the multiplier.
+    Legal Values:
+      1 <= NBITS_A <= 128
+    Default:
+      8
+
+  A:
+    Definition:
+      This argument allows the user to specify whether the multiplier's A
+      (multiplier) input is signed or unsigned.  The user can choose Signed,
+      Unsigned, or Both.  If Signed is chosen, the generated multiplier will
+      always treat the A input as a signed number.  If Unsigned is chosen, the
+      generated multiplier will always treat the A input as an unsigned number.
+      If Both is chosen, logic is included to allow the A input to be treated
+      as either signed or unsigned, based on the ASigned_H control signal.
+    Legal Values:
+      The allowed values of this argument are "Signed", "Unsigned", and "Both".
+    Default:
+      Unsigned
+
+  PPGAlgorithm:
+    Definition:
+      Selects which type of Booth recoding is done.
+    Legal Values:
+      BoothRadix4 or BoothRadix8
+    Default:
+      BoothRadix4
+
+  HalfHeight:
+    Definition:
+      This argument allows the user to specify that the layout be done in
+      (NBITS_A + NBITS_B)/2 bit positions, instead of (NBITS_A + NBITS_B) 
+      bit positions.  Note that if (NBITS_A + NBITS_B)/2 is an odd number of
+      bit positions, the layout will actually fit in 
+      ((NBITS_A + NBITS_B)/2 + 1) bit positions.
+      This configuration results in a slightly slower and less area 
+      efficient design.
+    Legal Values:
+      The allowed values of this argument are 1 (half height layout)
+      0 (full height layout).
+    Default:
+      0
+
+
+INPUT SIGNALS:
+--------------
+A_H (multiplier)
+
+If A = BOTH:
+  ASigned_H
+
+
+OUTPUT SIGNALS:
+---------------
+PPSel*_H :  partial product select signals
+PPCin_H :   partial product carry in signals

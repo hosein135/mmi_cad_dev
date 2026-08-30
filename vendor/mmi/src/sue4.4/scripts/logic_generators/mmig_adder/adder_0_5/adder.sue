@@ -1,0 +1,1277 @@
+# This is a generator for either a ripple carry adder, or a single-level multi-bit carry select adder.
+
+proc SCHEMATIC_adder args {
+  call_use_keyword $args {{NBITS 32} {Type "CarrySelect"} {Partition "N"} {UsePrevCout "N"} {OutputSize "C"} {HalfHeight "N"} {bitslice "Y"}}
+
+  set debug 0
+
+  # make arguments more digestible
+  set cs_adder 0
+  if {[string toupper $Type] == "CARRYSELECT"} {
+    set cs_adder 1
+  }
+  set partition 0
+  set pbit 0
+  if {([string toupper $Partition] != "N")} {
+    set partition 1
+    set nparts [llength $Partition]
+  }
+  set halfheight 0
+  if {([string toupper $HalfHeight] == "Y")} {
+    set halfheight 1
+  }
+  set useprevcout 0
+  set cbit 0
+  if {([string toupper $UsePrevCout] == "Y")} {
+    set useprevcout 1
+  }
+
+  # bitranges
+  set maxidx [expr $NBITS - 1]
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+  }
+  if {$partition == 1} {
+    if {$nparts == 1} {
+      set inj_bitrange [format "\[0\]"]
+    } else {
+      set inj_bitrange [format "\[%d:0\]" [expr $nparts - 1]]
+    }
+    set cout_bitrange [format "\[%d:0\]" $nparts]
+  }
+    
+
+  # verilog declaration bitrange: [0] is illegal, must use null string in those cases
+  if {$NBITS == 1} {
+    set vmax_bitrange ""
+  } else {
+    set vmax_bitrange $max_bitrange
+  }
+  if {($partition == 1)} {
+    if {($nparts == 1)} {
+      set vinj_bitrange ""
+    } else {
+      set vinj_bitrange $inj_bitrange
+    }
+  }
+
+  # icon box info
+  set icon_x 280
+  set icon_y 240
+  set icon_left [expr -($icon_x / 2)]
+  set icon_right [expr $icon_x / 2]
+  set icon_top [expr -($icon_y / 2)]
+  set icon_bot [expr $icon_y / 2]
+
+  # icon port info
+  set port_a_y -10
+  set port_a_x $icon_left
+  set port_b_y 10
+  set port_b_x $icon_left
+  set port_sum_y 0
+  set port_sum_x $icon_right
+  set port_cin_y $icon_bot
+  set port_cin_x -40
+  set port_cout_y $icon_top
+  set port_cout_x -40
+  set port_cin0_y $icon_bot
+  set port_cin0_x -20
+  set port_cout0_y $icon_top
+  set port_cout0_x -20
+  set port_sels_in_y 100
+  set port_sels_in_x $icon_right
+  set port_sels_out_y -100
+  set port_sels_out_x $icon_right
+  set port_selCI_y 80
+  set port_selCI_x $icon_right
+  set port_selCO_y -80
+  set port_selCO_x $icon_right
+  set port_inject_y 70
+  set port_inject_x $icon_left
+  set port_pcout_y 20
+  set port_pcout_x $icon_right
+  set port_c_y 90
+  set port_c_x $icon_left
+
+  # set default wire stub length
+  # stub length from icon to name_net
+  set wire_stub_nnet 30     
+  # stub length from icon to B_H, SelS_H
+  set wire_stub_len1 60
+  # stub length from icon to A_H, SelC*_H
+  set wire_stub_len2 80
+  # stub length from icon to C_H, SUM_H
+  set wire_stub_len3 120
+  # stub length from icon to INJECT_H
+  set wire_stub_len4 140
+  # stub length to input flags
+  set wire_stub_flag 180
+  # stub length for carries between cells
+  set ws1 40
+
+  # choose appropriate cell size
+  if {$cs_adder == 1} {
+    if {[string toupper $OutputSize] == "C"} {
+      set cell_L "csC_L"
+      set cell_H "csC_H"
+      set cell_c_L "cscC_L"
+      set cell_c_H "cscC_H"
+      set cell_0 "cs_start_0C_H"
+      set cell_s "cs_start_n0C_H"
+      set cell_cs "cs_startc_n0C_H"
+      set cellp_s_H "cs_startp_n0C_H"
+      set cellp_s_L "cs_startp_n0C_L"
+      set cell_final_L "cs_finalC_L"
+      set cell_final_H "cs_finalC_H"
+      set cell_finalp_L "cs_finalpC_L"
+      set cell_finalp_H "cs_finalpC_H"
+      set cell_finalc_L "cs_finalcC_L"
+      set cell_finalc_H "cs_finalcC_H"
+    } elseif {[string toupper $OutputSize] == "B"} {
+      set cell_L "csB_L"
+      set cell_H "csB_H"
+      set cell_c_L "cscB_L"
+      set cell_c_H "cscB_H"
+      set cell_0 "cs_start_0B_H"
+      set cell_s "cs_start_n0B_H"
+      set cell_cs "cs_startc_n0B_H"
+      set cellp_s_H "cs_startp_n0B_H"
+      set cellp_s_L "cs_startp_n0B_L"
+      set cell_final_L "cs_finalB_L"
+      set cell_final_H "cs_finalB_H"
+      set cell_finalp_L "cs_finalpB_L"
+      set cell_finalp_H "cs_finalpB_H"
+      set cell_finalc_L "cs_finalcB_L"
+      set cell_finalc_H "cs_finalcB_H"
+    } else {
+      set cell_L "csA_L"
+      set cell_H "csA_H"
+      set cell_c_L "cscA_L"
+      set cell_c_H "cscA_H"
+      set cell_0 "cs_start_0A_H"
+      set cell_s "cs_start_n0A_H"
+      set cell_cs "cs_startc_n0A_H"
+      set cellp_s_H "cs_startp_n0A_H"
+      set cellp_s_L "cs_startp_n0A_L"
+      set cell_final_L "cs_finalA_L"
+      set cell_final_H "cs_finalA_H"
+      set cell_finalp_L "cs_finalpA_L"
+      set cell_finalp_H "cs_finalpA_H"
+      set cell_finalc_L "cs_finalcA_L"
+      set cell_finalc_H "cs_finalcA_H"
+    }
+  } else {
+    if {[string toupper $OutputSize] == "C"} {
+      set cell_L "rippleC_L"
+      set cell_H "rippleC_H"
+      set cellfinal_H "ripplefinalC_H"
+      set cell_c_L "ripplecC_L"
+      set cell_c_H "ripplecC_H"
+      set cellfinalc_H "ripplefinalcC_H"
+      set cellp_L "ripplepC_L"
+      set cellp_H "ripplepC_H"
+      set cellfinalp_H "ripplefinalpC_H"
+    } elseif {[string toupper $OutputSize] == "B"} {
+      set cell_L "rippleB_L"
+      set cell_H "rippleB_H"
+      set cellfinal_H "ripplefinalB_H" 
+      set cell_c_L "ripplecB_L"
+      set cell_c_H "ripplecB_H"
+      set cellfinalc_H "ripplefinalcB_H"
+      set cellp_L "ripplepB_L"
+      set cellp_H "ripplepB_H"
+      set cellfinalp_H "ripplefinalpB_H"
+   } else {
+      set cell_L "rippleA_L"
+      set cell_H "rippleA_H"
+      set cellfinal_H "ripplefinalA_H"
+      set cell_c_L "ripplecA_L"
+      set cell_c_H "ripplecA_H"
+      set cellfinalc_H "ripplefinalcA_H"
+      set cellp_L "ripplepA_L"
+      set cellp_H "ripplepA_H"
+      set cellfinalp_H "ripplefinalpA_H"
+    }
+  }
+
+  # partioning information
+  # initialize to no partitioning
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set pcell($i) 0
+    set ccell($i) 0
+  }
+  # mark partition cells
+  if {$partition == 1} {
+    for {set i 0} {$i < $nparts} {incr i} {
+      set part [lindex $Partition $i]
+      set pcell($part) 1
+    }
+    # recreate Partition, in ascending order (just in case the user typed in the bits out of order...)
+    set OPartition ""
+    for {set i 0} {$i < $NBITS} {incr i} {
+      if {$pcell($i) == 1} {
+	lappend OPartition $i
+      }
+    }
+  }
+
+  # intermediate carry outs visible
+  # initialize to none visible
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set ccell($i) 0
+  }
+  # mark carry out cells:  these are the cells before a partition bit, if that bit is not
+  # also a partition bit itself
+  set ccount 0
+  if {$useprevcout} {
+    for {set i 0} {$i < $maxidx} {incr i} {
+      if {($pcell([expr $i + 1]) == 1) && ($pcell($i) == 0)} {
+	set ccell($i) 1
+	incr ccount
+      }
+    }
+    # last bit is always a ccell or pcell
+    if {$pcell($maxidx) == 0} {
+      set ccell($maxidx) 1
+      incr ccount
+    }
+    # bitrange
+    if {$ccount > 1} {
+      set pcout_bitrange [format "\[%d:0\]" [expr $ccount - 1]]
+    } else {
+      set pcout_bitrange ""
+    }
+  }
+
+
+  # base cell selection algorithm
+  if {$cs_adder == 1} {
+    # carry select algorithm rules:  
+    #  - first chain length must be 1
+    #  - all chain lengths must be odd numbers
+    set cs_algorithm {1 3 7 9 11}
+    set cs_nlengths [llength $cs_algorithm]
+
+    # modify for partitioning
+    if {$partition == 1} {
+      # first, compute chain start bits for base algorithm
+      set curr_len_idx 0
+      set curr_bit 0
+      for {set i 0} {$i < $NBITS} {incr i} {
+	set curr_len [lindex $cs_algorithm $curr_len_idx]
+	incr curr_bit
+	if {$curr_bit == $curr_len} {
+	  lappend cs_alg_starts "[expr $i + 1]"
+	  if {$curr_len_idx != [expr $cs_nlengths - 1]} {
+	    incr curr_len_idx
+	  }
+	  set curr_bit 0
+	}
+      }
+      if {$debug} {
+	puts [format "cs_alg_starts=%s" $cs_alg_starts]
+      }
+
+      # now modify with partition info
+      # if a partition is requested before the next algorithmic break, force a break
+      # if a partition is requested within 2 bits after an algorithmic break, 
+      #   extend the current chain to the partition point (should be equivalent speed since
+      #   a mux is approximately the same speed as 2 adder bits)
+      # in all cases, proceed to the next algorithmically determined chain length, and try to create it
+      set cs_len_idx 0
+      set cs_bit [lindex $cs_alg_starts 0]
+
+      for {set i 0} {$i < $nparts} {incr i} {
+	set part_bit [lindex $OPartition $i]
+
+	while {$part_bit > [expr $cs_bit + 2]} {
+	  lappend ncs_alg_starts $cs_bit
+	  if {$cs_len_idx < [expr $cs_nlengths - 1]} {
+	    incr cs_len_idx
+	  }
+	  set cs_len [lindex $cs_algorithm $cs_len_idx]
+	  set cs_bit [expr $cs_bit + $cs_len]
+	}
+
+	lappend ncs_alg_starts $part_bit
+	if {$cs_len_idx < [expr $cs_nlengths - 1]} {
+	  incr cs_len_idx
+	}
+	set cs_len [lindex $cs_algorithm $cs_len_idx]
+	set cs_bit [expr $part_bit + $cs_len]
+      }
+      # tack on breaks after the last partition, if needed
+      while {$cs_bit < $NBITS} {
+
+	lappend ncs_alg_starts $cs_bit
+	if {$cs_len_idx < [expr $cs_nlengths - 1]} {
+	  incr cs_len_idx
+	}
+	set cs_len [lindex $cs_algorithm $cs_len_idx]
+	set cs_bit [expr $cs_bit + $cs_len]
+      }
+      # patch up the first bit (needed if the initial partition was at bit 2 or 3)
+      if {[lindex $ncs_alg_starts 0] != 1} {
+	set ncs_alg_starts [linsert $ncs_alg_starts 0 1]
+      }
+      if {$debug} {
+	puts [format "ncs_alg_starts=%s, csbit=%s, cslen=%s" $ncs_alg_starts $cs_bit $cs_len]
+      }
+
+      # convert back to the algorithm format (chain lengths)
+      set ncs_nalg_starts [llength $ncs_alg_starts]
+      set cstart 0
+      set cend 1
+      set cs_algorithm "1"
+      for {set i 1} {$i < $ncs_nalg_starts} {incr i} {
+	set cbstart [lindex $ncs_alg_starts $cstart]
+	set cbend [lindex $ncs_alg_starts $cend]
+	lappend cs_algorithm [expr $cbend - $cbstart]
+	incr cstart
+	incr cend
+      }
+      lappend cs_algorithm [expr $NBITS - $cbend]
+      set cs_nlengths [llength $cs_algorithm]
+      if {$debug == 1} {
+	puts [format "new cs_algorithm=%s" $cs_algorithm]
+      }
+    } 
+    # end of partition modification
+    
+    # generate carry select cell algorithm
+    set curr_len_idx 0
+    set curr_bit 0
+    for {set i 0} {$i < $NBITS} {incr i} {
+      set curr_len [lindex $cs_algorithm $curr_len_idx]
+
+      if {$curr_len_idx == 0} {
+	# the first bit is always in a chain by itself
+	set cell($i) $cell_0
+      } else {
+	# other chains follow the pattern S H L H L H L ...
+	if {$curr_bit == 0} {
+	  if {$pcell($i) == 1} {
+	    # substitute in the partition starter cell
+	    # if the previous cell was cell_H, this cell will see _L carry in's; all other cells generate _H carry in's
+	    if {$cell([expr $i - 1]) == $cell_H} {
+	      set cell($i) $cellp_s_L
+	    } else {
+	      set cell($i) $cellp_s_H
+	    }
+	  } else {
+	    set cell($i) $cell_s
+	  }
+	} else {
+	  if {[expr $curr_bit %2] == 1} {
+	    set cell($i) $cell_H
+	  } else {
+	    set cell($i) $cell_L
+	  }
+	}
+      }
+
+      # next bit in chain, or next chain
+      incr curr_bit
+      if {$curr_bit == $curr_len} {
+	# if we're at the end of the algorithm, stay there
+	# otherwise move to next chain length
+	if {$curr_len_idx != [expr $cs_nlengths - 1]} {
+	  incr curr_len_idx
+	}
+	set curr_bit 0
+      }
+      if {$debug == 1} {
+	puts [format "cell($i)=%s" $cell($i)]
+      }
+    }
+
+
+    # modify for actual chain length
+    # algorithm:
+    #   - replace cell_H with cell_final_H (cell_finalp_H if partitioned at this bit)
+    #   - replace cell_L with cell_final_L (cell_finalp_L)
+    #   - replace cell_s:
+    #       if previous bit was cell_L, replace cell_s with cell_final_H (cell_finalp_H)
+    #       if previous bit was cell_H, replace cell_s with cell_final_L (cell_finalp_L)
+    if {$cell($maxidx) == $cell_H} {
+      set cell_final $cell_final_H
+    } elseif {$cell($maxidx) == $cell_L} {
+      set cell_final $cell_final_L
+    } else {
+      # must be cell_s
+      if {$cell([expr $maxidx - 1]) == $cell_L} {
+	set cell_final $cell_final_H
+      } else {
+	set cell_final $cell_final_L
+      }
+    }
+    # patch in the correct cell if we are partioning at the last bit
+    if {($pcell($maxidx) == 1)} {
+      if {$cell_final == $cell_final_H} {
+	set cell_final $cell_finalp_H
+      } else {
+	set cell_final $cell_finalp_L
+      }
+    }
+    set cell($maxidx) $cell_final
+
+
+    # modify to make the carry-in visible 
+    if {$useprevcout} {
+      for {set i 0} {$i < $NBITS} {incr i} {
+	if {$ccell($i) == 1} {
+	  if {$cell($i) == $cell_H} {
+	    set cell($i) $cell_c_H
+	  }
+	  if {$cell($i) == $cell_L} {
+	    set cell($i) $cell_c_L
+	  }
+	  if {$cell($i) == $cell_final_H} {
+	    set cell($i) $cell_finalc_H
+	  }
+	  if {$cell($i) == $cell_final_L} {
+	    set cell($i) $cell_finalc_L 
+	  }
+	  if {$cell($i) == $cell_s} {
+	    set cell($i) $cell_cs
+	  }
+	}
+      }
+    }
+    
+  } else {
+    for {set i 0} {$i < $NBITS} {incr i} {
+      # ripple carry cell selection algorithm:
+      # if the bit number is odd, use cell_L
+      # if the bit number is even:
+      #   and this is the last bit, use cellfinal_H
+      #   otherwise use cell_H
+      if {[expr $i % 2] == 1} {
+	set cell($i) $cell_L
+      } elseif {($i == [expr $NBITS - 1])} {
+	set cell($i) $cellfinal_H
+      } else {
+	set cell($i) $cell_H
+      }
+    }
+    # modify for partitioning
+    if {$partition == 1} {
+      for {set i 0} {$i < $NBITS} {incr i} {
+	if {$pcell($i) == 1} {
+	  if {$cell($i) == $cell_L} {
+	    set cell($i) $cellp_L
+	  }
+	  if {$cell($i) == $cell_H} {
+	    set cell($i) $cellp_H
+	  }
+	  if {$cell($i) == $cellfinal_H} {
+	    set cell($i) $cellfinalp_H
+	  }
+	}
+      }
+    }
+    # modify for visible carry out
+    if {$useprevcout} {
+      for {set i 0} {$i < $NBITS} {incr i} {
+	if {$ccell($i) == 1} {
+	  if {$cell($i) == $cell_L} {
+	    set cell($i) $cell_c_L
+	  }
+	  if {$cell($i) == $cell_H} {
+	    set cell($i) $cell_c_H
+	  }
+	  if {$cell($i) == $cellfinal_H} {
+	    set cell($i) $cellfinalc_H
+	  }
+	}
+      }
+    }
+  }
+
+
+
+  # init drawing location
+  set x 0
+  set y 0
+  set yfudge [expr 4 * $ws1]
+  set delta_y [expr $icon_y + $yfudge]
+  if {$halfheight == 1} {
+    set x2 [expr $icon_x + 100]
+  } else {
+    set x2 0
+  }
+  
+  # wire placement
+  set b_x [expr $icon_left - (2*$ws1)]
+  set a_x [expr $icon_left - (3*$ws1)]
+  set c_x [expr $icon_left - (5*$ws1)]
+  set i_x [expr $icon_left - (6*$ws1)]
+  set inflag_x [expr $a_x - $wire_stub_flag]
+
+  set selc_x  [expr $x2 + $icon_right + 2*$ws1]
+  set sels_x  [expr $x2 + $icon_right + 3*$ws1]
+  set sum_x   [expr $x2 + $icon_right + 5*$ws1]
+  set partcout_x [expr $x2 + $icon_right + 6*$ws1]
+  set prevcout_x [expr $x2 + $icon_right + 7*$ws1]
+  set outflag_x [expr $partcout_x + $wire_stub_flag]
+  
+
+
+  for {set i 0} {$i < $NBITS} {incr i} {
+    if {[string toupper $HalfHeight] == "Y"} {
+      set bitpos [expr int($i / 2)]
+    } else {
+      set bitpos $i
+    }
+    if {$NBITS > 1} {
+      set bitname "\[$bitpos\]"
+    } else {
+      set bitname ""
+    }
+
+    if {[expr ($i % 2)] == 0} {
+      set x 0
+    } else {
+      set x $x2
+    }
+
+    # add bit position if we want to enforce bitslice layout
+    if {[string toupper $bitslice] == "Y"} {
+      make $cell($i) -origin "$x $y" -name "\[$bitpos\]"
+    } else {
+      make $cell($i) -origin "$x $y" 
+    }
+    set cell_loc($i) "$x $y"
+
+    # locate edges of icon
+    set icon_top_y [expr $y + $icon_top]
+    set icon_bot_y [expr $y + $icon_bot]
+    set icon_r_x [expr $x + $icon_right]
+    set icon_l_x [expr $x + $icon_left]
+    set cell_top_y [expr $y + $icon_top - $yfudge]
+    
+    # hook up carry out's to next cell
+    if {$i != $maxidx} {
+      set icon_pin_y [expr $port_cout_y + $y]
+      set icon_pin_x [expr $port_cout_x + $x]
+      set stub_end_y [expr $icon_pin_y - 2*$ws1]
+      make_wire $icon_pin_x $icon_pin_y $icon_pin_x $stub_end_y
+      if {$cs_adder == 1} {
+	if {($cell($i) == $cell_H) || ($cell($i) == $cell_c_H)} {
+	  make name_net -name "Cout1_L\[$i\]" -origin "$icon_pin_x $stub_end_y"
+	} else {
+	  make name_net -name "Cout1_H\[$i\]" -origin "$icon_pin_x $stub_end_y"
+	}
+      } else {
+	# ripple adder
+	if {($cell($i) == $cell_L) || ($cell($i) == $cellp_L)} {
+	  make name_net -name "Cout_H\[$i\]" -origin "$icon_pin_x $stub_end_y"
+	} else {
+	  make name_net -name "Cout_L\[$i\]" -origin "$icon_pin_x $stub_end_y"
+	}
+      }
+      
+      if {$cs_adder == 1} {
+	set icon_pin_y [expr $port_cout0_y + $y]
+	set icon_pin_x [expr $port_cout0_x + $x]
+	set stub_end_y [expr $icon_pin_y - $ws1]
+	make_wire $icon_pin_x $icon_pin_y $icon_pin_x $stub_end_y
+	if {($cell($i) == $cell_H) || ($cell($i) == $cell_c_H)} {
+	  make name_net -name "Cout0_L\[$i\]" -origin "$icon_pin_x $stub_end_y"
+	} else {
+	  make name_net -name "Cout0_H\[$i\]" -origin "$icon_pin_x $stub_end_y"
+	}
+      }
+    }
+
+    # hook up carry in's to previous cell
+    if {$i != 0} {
+      set cin_y [expr $port_cin_y + $y]
+      set cin_x [expr $port_cin_x + $x]
+      set prev_x [lindex $cell_loc([expr $i - 1]) 0]
+      set prev_y [lindex $cell_loc([expr $i - 1]) 1]
+      set cout_x [expr $port_cout_x + $prev_x]
+      set cout_y [expr $port_cout_y + $prev_y]
+      set label_y [expr $cout_y - 2*$ws1]
+      make_wire $cout_x $label_y $cin_x $label_y
+      make_wire $cin_x $label_y $cin_x $cin_y
+
+      if {$cs_adder == 1} {
+	set cin_y [expr $port_cin0_y + $y]
+	set cin_x [expr $port_cin0_x + $x]
+	set cout_x [expr $port_cout0_x + $prev_x]
+	set cout_y [expr $port_cout0_y + $prev_y]
+	set label_y [expr $cout_y - $ws1]
+	make_wire $cout_x $label_y $cin_x $label_y
+	make_wire $cin_x $label_y $cin_x $cin_y
+      }
+    }
+    
+    # wire stub to SUM_H
+    set icon_pin_y [expr $port_sum_y + $y]
+    set icon_pin_x [expr $port_sum_x + $x]
+    set name_net_x [expr $icon_pin_x + $wire_stub_nnet]
+    make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+    make name_net_s -name $bitname -origin "$name_net_x $icon_pin_y"
+    make_wire $name_net_x $icon_pin_y $sum_x $icon_pin_y
+    if {$i > 0} {
+      make_wire $sum_x $icon_pin_y $sum_x [expr $icon_pin_y + $delta_y]
+    }
+
+    # wire stub to A_H
+    set icon_pin_y [expr $port_a_y + $y]
+    set icon_pin_x [expr $port_a_x + $x]
+    set name_net_x [expr $icon_pin_x - $wire_stub_nnet]
+    make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+    make name_net_s -name $bitname -origin "$name_net_x $icon_pin_y"
+    make_wire $name_net_x $icon_pin_y $a_x $icon_pin_y
+    if {$i > 0} {
+      make_wire $a_x $icon_pin_y $a_x [expr $icon_pin_y + $delta_y]
+    }
+
+    # wire stub to B_H
+    set icon_pin_y [expr $port_b_y + $y]
+    set icon_pin_x [expr $port_b_x + $x]
+    set name_net_x [expr $icon_pin_x - $wire_stub_nnet]
+    make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+    make name_net_s -name $bitname -origin "$name_net_x $icon_pin_y" -orient RY
+    make_wire $name_net_x $icon_pin_y $b_x $icon_pin_y
+    if {$i > 0} {
+      make_wire $b_x $icon_pin_y $b_x [expr $icon_pin_y + $delta_y]
+    }
+
+    # wire stubs to Inject_H, C_H, Cout_H
+    if {$pcell($i) == 1} {
+      set pbitname "\[$pbit\]"
+
+      set icon_pin_y [expr $port_inject_y + $y]
+      set icon_pin_x [expr $port_inject_x + $x]
+      set name_net_x [expr $icon_pin_x - $wire_stub_nnet]
+      make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+      make name_net_s -name $pbitname -origin "$name_net_x $icon_pin_y" 
+      make_wire $name_net_x $icon_pin_y $i_x $icon_pin_y
+
+      set icon_pin_y [expr $port_c_y + $y]
+      set icon_pin_x [expr $port_c_x + $x]
+      set name_net_x [expr $icon_pin_x - $wire_stub_nnet]
+      make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+      make name_net_s -name $pbitname -origin "$name_net_x $icon_pin_y" -orient RY
+      make_wire $name_net_x $icon_pin_y $c_x $icon_pin_y
+
+      set icon_pin_y [expr $port_pcout_y + $y]
+      set icon_pin_x [expr $port_pcout_x + $x]
+      set name_net_x [expr $icon_pin_x + $wire_stub_nnet]
+      make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+      make name_net_s -name $pbitname -origin "$name_net_x $icon_pin_y" -orient RY
+      make_wire $name_net_x $icon_pin_y $partcout_x $icon_pin_y
+
+      incr pbit
+    }
+
+    # wire stubs to PCout_H
+    if {$ccell($i) == 1} {
+      if {$ccount > 1} {
+	set cbitname "\[$cbit\]"
+      } else {
+	set cbitname ""
+      }
+
+      set icon_pin_y [expr $port_pcout_y + $y]
+      set icon_pin_x [expr $port_pcout_x + $x]
+      set name_net_x [expr $icon_pin_x + $wire_stub_nnet]
+      make_wire $icon_pin_x $icon_pin_y $name_net_x $icon_pin_y
+      make name_net_s -name $cbitname -origin "$name_net_x $icon_pin_y" -orient RY
+      make_wire $name_net_x $icon_pin_y $prevcout_x $icon_pin_y
+
+      incr cbit
+    }
+
+    if {$cs_adder == 1} {
+      # wire stub to SelS_H
+      if {($cell($i) == $cell_s) || ($cell($i) == $cellp_s_H) || ($cell($i) == $cellp_s_L)} {
+	set icon_pin_y [expr $port_sels_out_y + $y]
+	set icon_pin_x [expr $port_sels_out_x + $x]
+	make_wire $icon_pin_x $icon_pin_y $sels_x $icon_pin_y
+	# hookup to next cell, if it's not a starter cell (note that a cell_s can't be the last cell, so i+1 must exist)
+	if {($cell([expr $i + 1]) != $cell_s) && ($cell([expr $i + 1]) != $cellp_s_H) && ($cell([expr $i + 1]) != $cellp_s_L)} {
+	  make_wire $sels_x $icon_pin_y $sels_x $cell_top_y
+	}
+	# label
+	make_wire $sels_x $icon_pin_y $outflag_x $icon_pin_y
+	make name_net_s -name "Sel_Sum_H\[$i\]" -origin "$outflag_x $icon_pin_y"
+      }
+      if {($cell($i) == $cell_L) || ($cell($i) == $cell_H) ||
+	  ($cell($i) == $cell_c_L) || ($cell($i) == $cell_c_H) ||
+	  ($cell($i) == $cell_final_L) || ($cell($i) == $cell_final_H) ||
+	  ($cell($i) == $cell_finalc_L) || ($cell($i) == $cell_finalc_H) ||
+	  ($cell($i) == $cell_finalp_L) || ($cell($i) == $cell_finalp_H)} {
+	set icon_pin_y [expr $port_sels_in_y + $y]
+	set icon_pin_x [expr $port_sels_in_x + $x]
+	make_wire $icon_pin_x $icon_pin_y $sels_x $icon_pin_y
+	# hookup to previous cell
+	make_wire $sels_x $icon_pin_y $sels_x $icon_bot_y
+	# hookup to next cell if this wire continues to that cell
+	set nextidx [expr $i + 1]
+	if {($i != $maxidx) && 
+	    (($cell($nextidx) == $cell_L) || ($cell($nextidx) == $cell_H) ||
+	     ($cell($nextidx) == $cell_c_L) || ($cell($nextidx) == $cell_c_H) ||
+	     ($cell($nextidx) == $cell_final_L) || ($cell($nextidx) == $cell_final_H) ||
+	     ($cell($nextidx) == $cell_finalc_L) || ($cell($nextidx) == $cell_finalc_H) ||
+	     ($cell($nextidx) == $cell_finalp_L) || ($cell($nextidx) == $cell_finalp_H))} {
+	  make_wire $sels_x $icon_pin_y $sels_x $cell_top_y
+	}
+      }
+    }
+    
+    if {$cs_adder == 1} {
+      # wire stub to SelCO_H
+      if {($cell($i) == $cell_0) || ($cell($i) == $cell_s) || ($cell($i) == $cellp_s_H) || ($cell($i) == $cellp_s_L)} {
+	set icon_pin_y [expr $port_selCO_y + $y]
+	set icon_pin_x [expr $port_selCO_x + $x]
+	make_wire $icon_pin_x $icon_pin_y $selc_x $icon_pin_y
+	# hookup
+	make_wire $selc_x $icon_pin_y $selc_x $cell_top_y
+	# label
+	make_wire $selc_x $icon_pin_y $outflag_x $icon_pin_y
+	make name_net_s -name "Sel_Carry_H\[$i\]" -origin "$outflag_x $icon_pin_y"
+      } 
+      if {($cell($i) == $cell_L) || ($cell($i) == $cell_H) || ($cell($i) == $cell_c_L) || ($cell($i) == $cell_c_H)} {
+	# pass thru
+	make_wire $selc_x $icon_bot_y $selc_x $cell_top_y 
+      }
+    }
+
+    if {$cs_adder == 1} {
+      # wire stub to SelCI_H
+      if {($cell($i) == $cell_s) || ($cell($i) == $cellp_s_H) || ($cell($i) == $cellp_s_L) || 
+	  ($cell($i) == $cell_final_L) || ($cell($i) == $cell_final_H) ||
+	  ($cell($i) == $cell_finalc_L) || ($cell($i) == $cell_finalc_H) ||
+	  ($cell($i) == $cell_finalp_L) || ($cell($i) == $cell_finalp_H)} {
+	set icon_pin_y [expr $port_selCI_y + $y]
+	set icon_pin_x [expr $port_selCI_x + $x]
+	make_wire $icon_pin_x $icon_pin_y $selc_x $icon_pin_y
+	# hookup
+	make_wire $selc_x $icon_pin_y $selc_x $icon_bot_y
+      }
+    }
+
+    set y [expr $y - $delta_y]
+  }
+  set y [expr $y + $delta_y]
+
+  # add input and output flags
+  # first A, B, and SUM
+  make input  -origin "$inflag_x $port_a_y" -name "A_H$vmax_bitrange"
+  make_wire $inflag_x $port_a_y $a_x $port_a_y
+  make input  -origin "$inflag_x $port_b_y" -name "B_H$vmax_bitrange"
+  make_wire $inflag_x $port_b_y $b_x $port_b_y
+  make output -origin "$outflag_x $port_sum_y" -name "SUM_H$vmax_bitrange"
+  make_wire $outflag_x $port_sum_y $sum_x $port_sum_y
+
+  # now CIN
+  make input  -origin "$inflag_x [expr $port_cin_y + $wire_stub_len1]" -name {CIN_H}
+  make_wire $port_cin_x $port_cin_y $port_cin_x [expr $port_cin_y + $wire_stub_len1]
+  make_wire $inflag_x [expr $port_cin_y + $wire_stub_len1] $port_cin_x [expr $port_cin_y + $wire_stub_len1]
+
+  # now COUT
+  set pcout_x [expr $x + $port_cout_x]
+  set name_net_x [expr $x + $icon_right + $wire_stub_nnet]
+  set name_net_y [expr $port_cout_y + $y - $wire_stub_len1]
+  make_wire $pcout_x [expr $port_cout_y + $y] $pcout_x $name_net_y
+  make_wire $pcout_x $name_net_y $name_net_x $name_net_y
+  if {$partition} {
+    set pbitname "\[$pbit\]"
+    make name_net_s -name $pbitname -origin "$name_net_x $name_net_y" 
+    make_wire $name_net_x $name_net_y $partcout_x $name_net_y
+  } else {
+    make_wire $name_net_x $name_net_y $outflag_x $name_net_y
+    make output -origin "$outflag_x $name_net_y" -name COUT_H
+  }
+
+  # now partition flags
+  if {$partition == 1} {
+    set pfirst -1
+    for {set i 0} {$i < $NBITS} {incr i} {
+      if {$pcell($i) == 1} {
+	if {$pfirst == -1} {
+	  set pfirst $i
+	}
+	set plast $i
+      }
+    }
+
+    for {set i $pfirst} {$i < $NBITS} {incr i} {
+      set y [expr -($i * $delta_y)]
+      set pin_i_y [expr $port_inject_y + $y]
+      set pin_c_y [expr $port_c_y + $y]
+      set pin_pcout_y [expr $port_pcout_y + $y]
+
+      if {$i == $pfirst} {
+	# Inject pin
+	make input -origin "$inflag_x $pin_i_y" -name "INJECT_H$vinj_bitrange"
+	make_wire $inflag_x $pin_i_y $i_x $pin_i_y
+
+	# C_H pin
+	make input -origin "$inflag_x $pin_c_y" -name "C_H$vinj_bitrange"
+	make_wire $inflag_x $pin_c_y $c_x $pin_c_y
+
+	# Cout_H pin
+	make output -origin "$outflag_x $pin_pcout_y" -name "COUT_H$cout_bitrange"
+	make_wire $outflag_x $pin_pcout_y $partcout_x $pin_pcout_y
+      }
+      if {($i > $pfirst) && ($i <= $plast)} {
+	make_wire $i_x $pin_i_y $i_x [expr $pin_i_y + $delta_y]
+	make_wire $c_x $pin_c_y $c_x [expr $pin_c_y + $delta_y]
+      }
+      if {$i > $pfirst} {
+	# note: leave out smidges so that we don't get false connections to PCOUT_H
+	make_wire $partcout_x [expr $pin_pcout_y + 10] $partcout_x [expr $pin_pcout_y + $delta_y - 10]
+      }
+    }
+
+    # final COUT_H hookup
+    make_wire $partcout_x $name_net_y $partcout_x $pin_pcout_y
+  }
+
+  # now intermediate carry out flags
+  if {$useprevcout == 1} {
+    set cfirst -1
+    for {set i 0} {$i < $NBITS} {incr i} {
+      if {$ccell($i) == 1} {
+	if {$cfirst == -1} {
+	  set cfirst $i
+	}
+	set clast $i
+      }
+    }
+    # just draw the vertical parts of the wire now
+    for {set i $cfirst} {$i <= $clast} {incr i} {
+      set y [expr -($i * $delta_y)]
+      set pin_pcout_y [expr $port_pcout_y + $y]
+
+      if {$i == $cfirst} {
+	make_wire $outflag_x $pin_pcout_y $prevcout_x $pin_pcout_y
+	make output -origin "$outflag_x $pin_pcout_y" -name "PCOUT_H$pcout_bitrange"
+      } else {
+	# make vertical wire
+	# note: leave out smidges so that we don't get false connections to COUT_H
+	make_wire $prevcout_x [expr $pin_pcout_y + 10] $prevcout_x [expr $pin_pcout_y + $delta_y - 10]
+      }
+    }
+  }
+
+  # final vertical hookup of the COUT_H, PCOUT_H wires
+  # COUT_H
+  if {$partition} {
+    for {set i $pfirst} {$i <= $plast} {incr i} {
+      set y [expr -($i * $delta_y)]
+      set pin_pcout_y [expr $port_pcout_y + $y]
+
+      if {$pcell($i) == 1} {
+	if {$i != $pfirst} {
+	  make_wire $partcout_x $pin_pcout_y $partcout_x [expr $pin_pcout_y + 10]
+	}
+	if {$i != $plast} {
+	  make_wire $partcout_x $pin_pcout_y $partcout_x [expr $pin_pcout_y - 10]
+	}
+      } else {
+	# not a partition cell
+	make_wire $partcout_x [expr $pin_pcout_y - 10] $partcout_x [expr $pin_pcout_y + 10]
+      }
+    }
+  }
+  # PCOUT_H
+  if {$useprevcout} {
+    for {set i $cfirst} {$i <= $clast} {incr i} {
+      set y [expr -($i * $delta_y)]
+      set pin_pcout_y [expr $port_pcout_y + $y]
+
+      if {$ccell($i) == 1} {
+	if {$i != $cfirst} {
+	  make_wire $prevcout_x $pin_pcout_y $prevcout_x [expr $pin_pcout_y + 10]
+	}
+	if {$i != $clast} {
+	  make_wire $prevcout_x $pin_pcout_y $prevcout_x [expr $pin_pcout_y - 10]
+	}
+      } else {
+	# not a carry out cell
+	make_wire $prevcout_x [expr $pin_pcout_y - 10] $prevcout_x [expr $pin_pcout_y + 10]
+      }
+    }
+  }
+
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr (0 + $delta_y)]" -owner emc -version 0.5 -date 03/26/99
+}
+
+
+proc ICON_adder args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 32} {Type "CarrySelect" {radio CarrySelect Ripple}} {Partition "N"} {UsePrevCout "N"} {OutputSize "C"} {HalfHeight "N"} {bitslice "Y"}}
+
+  # check for acceptable response on type
+  if {([string toupper $Type] != "CARRYSELECT") && ([string toupper $Type] != "RIPPLE")} {
+    error "ERROR: Type property ($Type) must be CarrySelect or Ripple"
+  }
+  set cs_adder 0
+  if {[string toupper $Type] == "CARRYSELECT"} {
+    set cs_adder 1
+  }
+
+  # check for acceptable response on Partition
+  set partition 0
+  # initialize to no partitioning
+  for {set i 0} {$i < $NBITS} {incr i} {
+    set pcell($i) 0
+  }
+  if {([string toupper $Partition] != "N")} {
+    set partition 1
+    set nparts [llength $Partition]
+    for {set i 0} {$i < $nparts} {incr i} {
+      set part [lindex $Partition $i]
+      set found 0
+      # check for legal bit values
+      for {set j 1} {$j < $NBITS} {incr j} {
+	if {[string compare "$j" $part] == 0} {
+	  set found 1
+	}
+      }
+      if {$found == 0} {
+	error "ERROR: Partition bit ($part) not in range; response must be N or a list of bit positions separated by spaces"
+      }
+    }
+    # mark partition cells
+    for {set i 0} {$i < $nparts} {incr i} {
+      set part [lindex $Partition $i]
+      set pcell($part) 1
+    }
+  }
+
+  # carry select not useful for less than 4 bits
+  if {$cs_adder == 1} {
+    if {$NBITS < 4} {
+      error "ERROR: NBITS ($NBITS) too small; use ripple_adder"
+    }
+  } else {
+    if {$NBITS < 1} {
+      error "ERROR: NBITS ($NBITS) not supported"
+    }
+  }
+  # don't let the user get too crazy
+  if {$NBITS > 128} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  set maxidx [expr $NBITS - 1]
+
+  # check for acceptable response on UsePrevCout
+  if {([string toupper $UsePrevCout] != "Y") && ([string toupper $UsePrevCout] != "N")} {
+    error "ERROR: UsePrevCout property ($UsePrevCout) must be Y or N"
+  }
+  set useprevcout 0
+  if {([string toupper $UsePrevCout] == "Y")} {
+    set useprevcout 1
+    # initialize to no carry out cells
+    for {set i 0} {$i < $NBITS} {incr i} {
+      set ccell($i) 0
+    }
+    # mark carry out cells
+    set ccount 0
+    for {set i 0} {$i < $maxidx} {incr i} {
+      if {($pcell([expr $i + 1]) == 1) && ($pcell($i) == 0)} {
+	set ccell($i) 1
+	incr ccount
+      }
+    }
+    # last bit is always a ccell or pcell
+    if {$pcell($maxidx) == 0} {
+      set ccell($maxidx) 1
+      incr ccount
+    }
+    # bitrange
+    if {$ccount > 1} {
+      set pcout_bitrange [format "\[%d:0\]" [expr $ccount - 1]]
+    } else {
+      set pcout_bitrange ""
+    }
+  }
+
+  # check for supported output driver sizes
+  if {([string toupper $OutputSize] != "C") &&
+      ([string toupper $OutputSize] != "B") &&
+      ([string toupper $OutputSize] != "A")} {
+    error "ERROR: OutputSize $OutputSize not supported"
+  }
+  # check for acceptable response on HalfHeight query
+  if {([string toupper $HalfHeight] != "Y") && ([string toupper $HalfHeight] != "N")} {
+    error "ERROR: HalfHeight property ($HalfHeight) must be Y or N"
+  }
+  # check for acceptable response on bitslice query
+  if {([string toupper $bitslice] != "Y") && ([string toupper $bitslice] != "N")} {
+    error "ERROR: bitslice property ($bitslice) must be Y or N"
+  }
+
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # bitranges
+
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+  }
+  if {$partition == 1} {
+    if {$nparts == 1} {
+      set inj_bitrange [format "\[0\]"]
+    } else {
+      set inj_bitrange [format "\[%d:0\]" [expr $nparts - 1]]
+    }
+    set cout_bitrange [format "\[%d:0\]" $nparts]
+  } else {
+    set cout_bitrange ""
+  }
+
+  # verilog declaration bitrange: [0] is illegal, must use null string in those cases
+  if {$NBITS == 1} {
+    set vmax_bitrange ""
+  } else {
+    set vmax_bitrange $max_bitrange
+  }
+  if {($partition == 1)} {
+    if {($nparts == 1)} {
+      set vinj_bitrange ""
+    } else {
+      set vinj_bitrange $inj_bitrange
+    }
+  }
+
+  # icon body
+  icon_line -50 10 -40 0 -50 -10
+  icon_line 50 -30 50 30
+  icon_line 50 30 50 50 -50 90 -50 70
+  icon_line 50 -30 50 -50 -50 -90 -50 -70
+  icon_line -50 10 -50 70
+  icon_line -50 -10 -50 -70
+
+  # inputs
+  icon_term -type input -origin {-50 -30} -name "A_H$vmax_bitrange"
+  icon_property -origin {-40 -30} -size small -label A_H
+  icon_term -type input -origin {-50 30} -name "B_H$vmax_bitrange"
+  icon_property -origin {-40 30} -size small -label B_H
+  icon_term -type input -origin {0 70} -orient R270 -name CIN_H
+  icon_property -origin {0 60} -size small -anchor center -label CIN_H
+
+  # outputs
+  icon_term -type output -origin {50 0} -name "SUM_H$vmax_bitrange"
+  icon_property -origin {40 0} -size small -anchor e -label SUM_H
+  icon_term -type output -origin {0 -70} -orient R270 -name "COUT_H$cout_bitrange"
+  icon_property -origin {10 -60} -size small -anchor e -label COUT_H
+  if {$useprevcout} {
+    icon_line 20 -62 20 -70
+    icon_term -type output -origin {20 -70} -orient R270 -name "PCOUT_H$pcout_bitrange"
+    icon_property -origin {10 -50} -size small -anchor w -label PCOUT_H
+  }
+
+  # text
+  if {$cs_adder == 1} {
+    set aname "CS"
+  } else {
+    set aname "Ripple"
+  }
+  icon_property -origin {0 -20} -anchor center -label "$aname Adder $OutputSize"
+  icon_property -origin {0 20} -anchor center -label "$max_bitrange"
+  if {[string toupper $HalfHeight] == "Y"} {
+    icon_property -origin {0 40} -anchor center -label "HH"
+  }
+
+  # junk
+  icon_property -origin {-70 200} -type user -name name
+  icon_property -origin {-70 220} -type user -name M
+  icon_property -origin {-70 240} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 340} -owner emc -version 0.5 -date 03/26/99
+
+  # If adder is partitioned, add the "INJECT_H", "C_H" pins
+  if {$partition == 1} {
+    icon_term -type input -origin {-50 50} -name "INJECT_H$vinj_bitrange"
+    icon_property -origin {-40 50} -size small -label Inj_H
+    icon_term -type input -origin {-50 70} -name "C_H$vinj_bitrange"
+    icon_property -origin {-40 70} -size small -label C_H
+  }
+
+
+
+  # generate verilog property
+  set pstring ""
+  if {$partition == 1} {
+    for {set i 0} {$i < $nparts} {incr i} {
+      if {$i != 0} {
+	set pstring [format "%s_" $pstring]
+      }
+      set pstring [format "%s%s" $pstring [lindex $Partition $i]]
+    }
+  } else {
+    set pstring $Partition
+  }
+  set fname [format "adder%d_%s_%s_%s_%s_%s_%s" $NBITS $Type $pstring $UsePrevCout $OutputSize $HalfHeight $bitslice]
+  set pnames [format ".A_H(\$\{A_H%s\}), .B_H(\$\{B_H%s\}), .CIN_H(\$\{CIN_H\}), .SUM_H(\$\{SUM_H%s\}), .COUT_H(\$\{COUT_H%s\})" $vmax_bitrange $vmax_bitrange $vmax_bitrange $cout_bitrange]
+  if {$partition == 1} {
+    set pnames [format "%s, .INJECT_H(\$\{INJECT_H%s\}), .C_H(\$\{C_H%s\})" $pnames $vinj_bitrange $vinj_bitrange]
+  } 
+  if {$useprevcout == 1} {
+    set pnames [format "%s, .PCOUT_H(\$\{PCOUT_H%s\})" $pnames $pcout_bitrange]
+  }
+  set vprop [format "%s \[unique_name \"\" \$name %s\] (%s)\\;" $fname $fname $pnames]
+  icon_property -origin {-70 280} -type fixed -name verilog -text $vprop  
+
+  ######################################
+  # spit out the behavioral verilog code
+  set filename "$fname.vb"
+  if {[catch "open $filename w" FILE_ID]} {
+    puts "WARNING: Couldn't open file $filename"
+  }
+
+
+  # header stuff
+  puts $FILE_ID "// Behavioral verilog for adder:"
+  puts $FILE_ID "//   NBITS = $NBITS"
+  puts $FILE_ID "//   Type = $Type"
+  puts $FILE_ID "//   Partition = $Partition"
+  puts $FILE_ID "//   UsePrevCout = $UsePrevCout"
+  puts $FILE_ID "//   OutputSize = $OutputSize"
+  puts $FILE_ID "//   HalfHeight = $HalfHeight"
+  puts $FILE_ID "//   bitslice = $bitslice"
+  
+  set mline ""
+  if {$partition == 1} {
+    set mline [format "%s, INJECT_H, C_H" $mline]
+  }
+  if {$useprevcout == 1} {
+    set mline [format "%s, PCOUT_H" $mline]
+  }
+  puts $FILE_ID [format "module %s (A_H, B_H, CIN_H, SUM_H, COUT_H%s);" $fname $mline]
+
+  puts $FILE_ID [format "\n\toutput %s\tSUM_H;" $vmax_bitrange]
+  puts $FILE_ID [format "\toutput %s\tCOUT_H;" $cout_bitrange]
+  if {$useprevcout == 1} {
+    puts $FILE_ID [format "\toutput %s\tPCOUT_H;" $pcout_bitrange]
+  }
+  puts $FILE_ID [format "\tinput  %s\tA_H;" $vmax_bitrange]
+  puts $FILE_ID [format "\tinput  %s\tB_H;" $vmax_bitrange]
+  puts $FILE_ID [format "\tinput  \t\tCIN_H;"]
+  if {$partition == 1} {
+    puts $FILE_ID [format "\tinput  %s\tINJECT_H;" $vinj_bitrange]
+    puts $FILE_ID [format "\tinput  %s\tC_H;" $vinj_bitrange]
+  }
+
+  puts $FILE_ID [format "\n\tparameter\tinitial_value = 'b 0;"]
+  puts $FILE_ID [format "\tparameter\tdelay = 0.1;"]
+
+  puts $FILE_ID [format "\n\treg %s\tSUM_H;" $vmax_bitrange]
+  puts $FILE_ID [format "\treg %s\tCOUT_H;" $cout_bitrange]
+  if {$useprevcout == 1} {
+    puts $FILE_ID [format "\treg %s\tPCOUT_H;" $pcout_bitrange]
+  }
+  puts $FILE_ID [format "\treg \[%d:0\]\tfullsum;" $NBITS]
+  if {$partition == 1} {
+    puts $FILE_ID [format "\treg \t\tcin;"]
+  }
+
+  # initialize
+  puts $FILE_ID [format "\n\tinitial"]
+  puts $FILE_ID [format "\t  begin"]
+  puts $FILE_ID [format "\t    SUM_H = initial_value;"]
+  puts $FILE_ID [format "\t    COUT_H = initial_value;"]
+  if {$useprevcout == 1} {
+    puts $FILE_ID [format "\t    PCOUT_H = initial_value;"]
+  }
+  puts $FILE_ID [format "\t    fullsum = initial_value;"]
+  if {$partition == 1} {
+    puts $FILE_ID [format "\t    cin = initial_value;"]
+  }
+  puts $FILE_ID [format "\t  end"]
+
+  # execute
+  set maxminus1 [expr $maxidx - 1]
+  set ccidx 0
+  if {$partition == 0} {
+    puts $FILE_ID [format "\n\talways @(A_H or B_H or CIN_H)"]
+    puts $FILE_ID [format "\t  begin"]
+
+    if {$useprevcout == 1} {
+      puts $FILE_ID [format "\t    \#delay fullsum = \{2'b0,A_H\[%d:0\]\} + \{2'b0,B_H\[%d:0\]\} + \{$maxidx'b0,CIN_H\};" $maxminus1 $maxminus1]
+      puts $FILE_ID [format "\t    PCOUT_H = fullsum\[%d\];" $maxidx]
+    }
+
+    puts $FILE_ID [format "\t    \#delay fullsum = \{1'b0,A_H\} + \{1'b0,B_H\} + \{$maxidx'b0,CIN_H\};"]
+    puts $FILE_ID [format "\t    SUM_H = fullsum%s;" $max_bitrange]
+    puts $FILE_ID [format "\t    COUT_H = fullsum\[%d\];" $NBITS]
+    puts $FILE_ID [format "\t  end"]
+  } else {
+    puts $FILE_ID [format "\n\talways @(A_H or B_H or INJECT_H or C_H or CIN_H)"]
+    puts $FILE_ID [format "\t  begin"]
+    puts $FILE_ID [format "\t    \#delay cin = CIN_H;"]
+    set k 0
+    set lb $k
+    set part 0
+    for {set i 1} {$i < $NBITS} {incr i} {
+      if {($i == $maxidx) || ($pcell([expr $i + 1]) == 1)} {
+	# found a break point
+	set ub $i
+	if {$ub == $lb} {
+	  set br [format "\[%d\]" $ub]
+	} else {
+	  set br [format "\[%d:%d\]" $ub $lb]
+	}
+	set sbr [format "\[%d:%d\]" [expr $ub + 1] $lb]
+	set wid [expr $ub - $lb + 1]
+
+	if {($useprevcout == 1) && ($ccell($i) == 1)} {
+	  if {$ub == [expr $lb + 1]} {
+	    set cbr [format "\[%d\]" $lb]
+	  } else {
+	    set cbr [format "\[%d:%d\]" [expr $ub - 1] $lb]
+	  }
+	  if {$ccount == 1} {
+	    set cidx ""
+	  } else {
+	    set cidx [format "\[%d\]" $ccidx]
+	    incr ccidx
+	  }
+	  puts $FILE_ID [format "\t    fullsum$sbr = \{2'b0,A_H$cbr\} + \{2'b0,B_H$cbr\} + \{$wid'b0,cin\};"]	
+	  puts $FILE_ID [format "\t    PCOUT_H%s = fullsum\[%d\];" $cidx $ub]
+	}
+
+	puts $FILE_ID [format "\t    fullsum$sbr = \{1'b0,A_H$br\} + \{1'b0,B_H$br\} + \{$wid'b0,cin\};"]	
+
+#	puts $FILE_ID "\$display(\"a=\%d, b=\%d, cin=\%d, fullsum=\%d, sum=\%d\", A_H$br, B_H$br, cin, fullsum$sbr, fullsum);"
+
+	if {$nparts == 1} {
+	  set vidx ""
+	} else {
+	  set vidx [format "\[%d\]" $part]
+	}
+	if {$i != $maxidx} {
+	  puts $FILE_ID [format "\n\t    COUT_H%s = fullsum\[[expr $ub + 1]\];" [format "\[%d\]" $part]]
+	  puts $FILE_ID [format "\t    if (INJECT_H%s)" $vidx]
+	  puts $FILE_ID [format "\t      cin = C_H%s;" $vidx]
+	  puts $FILE_ID [format "\t    else"]
+	  puts $FILE_ID [format "\t      cin = COUT_H%s;" $vidx]
+	}
+
+	set lb [expr $i + 1]
+	incr part
+      }
+    }
+    puts $FILE_ID [format "\n\t    SUM_H = fullsum%s;" $vmax_bitrange]
+    set vidx [format "\[%d\]" $nparts]
+    puts $FILE_ID [format "\t    COUT_H%s = fullsum\[%d\];" $vidx $NBITS]
+    puts $FILE_ID [format "\t  end"]
+  }
+
+  # done
+  puts $FILE_ID [format "\nendmodule\t\t//%s" $fname]
+  close $FILE_ID
+}

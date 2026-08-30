@@ -1,0 +1,2145 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 22:41:43">
+<title>MAX Technology Targeting</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout System User Guide </H1></font></center></td>
+   </tr>
+</table>
+
+<table ALIGN=RIGHT BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="331" >
+<tr>
+<td><a href="MAX_ManualTOC.html"><img SRC="images/navtoc.gif" ALT="TOC" BORDER=0 height=23 width=84></a></td>
+
+<td><a href="MAX_Man_Ch5MAX-LS.html"><img SRC="images/navprev.gif" ALT="PREV" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="apndxa.html"><img SRC="images/navnext.gif" ALT="NEXT" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="MAX_ManualIX.html"><img SRC="images/navidx.gif" ALT="INDEX" BORDER=0 height=23 width=85></a></td>
+</tr>
+</table>
+
+<hr align="left">
+<blockquote>
+<h2>
+<a NAME="1013100"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Chapter
+6</font></font></h2>
+
+<h1>
+<a NAME="1019269"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">MAX
+Technology Targeting</font></font></h1>
+
+<hr>
+<h3>
+<a NAME="1026718"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Introduction
+To MAX Technology Files</font></font></h3>
+
+<dl>
+<dl><a NAME="1027514"></a><font face="Verdana, Arial, Helvetica, sans-serif">MAX
+technology files are created from a <i>source</i> file which includes layer
+definitions, GDS layer number assignments, and, optionally, DRC rules and
+colors. This source file must be converted to MAX'S internal technology
+files using the <b><tt><a href="MAX_Man_Ch6TechFiles.html#1027536">make_tech
+</a></tt></b>program
+before running MAX.</font>
+<p><a NAME="1027518"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+MAX source file consists of two parts:</font>
+<br>&nbsp;
+<ol type="1">
+<li class="SmartList2" value="1">
+<a NAME="1027519"></a><font face="Verdana, Arial, Helvetica, sans-serif">A
+table of layer definitions.</font></li>
+
+<li class="SmartList2" value="2">
+<a NAME="1027520"></a><font face="Verdana, Arial, Helvetica, sans-serif">A
+list of commands that derive layers, add additional DRC rules, add information
+needed for Gcells, the wire tool and the layout generator.</font></li>
+
+<br>&nbsp;</ol>
+<a NAME="1027521"></a><font face="Verdana, Arial, Helvetica, sans-serif">Only
+the Layer Definition table is required to create a technology. The additional
+statements after the Layer Definition table are only used to improve MAX's
+interactive DRC coverage of your layout, to derive any new layers and to
+add the commands necessary for Gcells, the Wire Tool and the Layout Generator.</font>
+<p><a NAME="1027523"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+Layer Definition table can be created by one of three ways:</font>
+<br>&nbsp;
+<ol type="1">
+<li class="SmartList2" value="1">
+<a NAME="1030609"></a><font face="Verdana, Arial, Helvetica, sans-serif">By
+hand using a text editor. You can also use the <b><tt>mmi18.source</tt></b>
+and <b><tt>mmi25.source</tt></b> files as starting points. These are the
+example technologies provided with MAX. They can be found in <b><tt>$MMI_TOOLS/max/tech</tt></b>.</font></li>
+
+<li class="SmartList2" value="2">
+<a NAME="1027528"></a><font face="Verdana, Arial, Helvetica, sans-serif">From
+a <i>Dracula</i> DRC deck using the Micro Magic Tools <b><tt><a href="MAX_Man_Ch6TechFiles.html#1027648">drac_convert
+</a></tt></b>program.</font></li>
+
+<li class="SmartList2" value="3">
+<a NAME="1027532"></a><font face="Verdana, Arial, Helvetica, sans-serif">From
+a GDS file using <b><tt><a href="MAX_Man_Ch6TechFiles.html#1027575">gds_input
+</a></tt></b>program
+from Micro Magic Tools.</font></li>
+</ol>
+</dl>
+</dl>
+
+<h3>
+<a NAME="1027536"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">make_tech</font></font></h3>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027537"></a><font face="Verdana, Arial, Helvetica, sans-serif">Once
+you have created the source file, you must run it through <b><tt>make_tech</tt></b>
+which is a stand-alone program included with the MMT software. <b><tt>make_tech</tt></b>
+has the following syntax:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">make_tech -file &lt;source_file> [-tech &lt;tech_name>] [-r] [-install]</font><a NAME="1027538"></a></pre>
+
+<dt>
+<a NAME="1027539"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you don't specify the technology name, <b><tt>make_tech</tt></b> will default
+to the technology "test". Also, if you want to overwrite an existing technology
+of the same name, you have to use the "<b><tt>-r</tt></b>" option to replace
+the existing technology files.</font></dt>
+
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr>
+<td>
+<table BORDER=0 CELLPADDING=10 >
+<tr>
+<td ALIGN=CENTER WIDTH="60"><img SRC="images/note.gif" ></td>
+
+<td VALIGN=CENTER></td>
+</tr>
+</table>
+</td>
+
+<td>
+<dl>
+<dl>
+<dt>
+<a NAME="1029206"></a><font face="Verdana, Arial, Helvetica, sans-serif">Use
+the <b><tt>-r</tt></b> option with care! Changing the layer names in a
+technology can lead to lost data by making existing <b><tt>.max</tt></b>
+files partially or wholly unreadable.</font></dt>
+</dl>
+</dl>
+</td>
+</tr>
+</table></center>
+
+<p><a NAME="1027541"></a><font face="Verdana, Arial, Helvetica, sans-serif">By
+default, <b><tt>make_tech</tt></b> will install the technology into your
+private area (typically <b><tt>~/mmi_private/max/tech/&lt;tech_name></tt></b>).
+This will not change or make this technology available for any one else.
+If you want to install it for everyone's use, use the <b><tt>-install</tt></b>
+option which will place it in:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Verdana, Arial, Helvetica, sans-serif">$MMI_LOCAL/max/tech/&lt;tech_name></font><a NAME="1027542"></a><a NAME="1027543"></a></pre>
+</dl>
+</dl>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027544"></a><font face="Verdana, Arial, Helvetica, sans-serif">or
+if you haven't defined <b><tt>MMI_LOCAL</tt></b>:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Verdana, Arial, Helvetica, sans-serif">$MMI_TOOLS/../mmi_local/max/tech/&lt;tech_name></font><a NAME="1027545"></a><a NAME="1027546"></a></pre>
+</dl>
+</dl>
+
+<dl>
+<dl><a NAME="1027547"></a><font face="Verdana, Arial, Helvetica, sans-serif"><b><tt>make_tech</tt></b>
+will also copy the technology source file into the technology directory
+so you will always have it. The technology source file will be renamed
+to <b><tt>&lt;tech_name>.source</tt></b>.</font>
+<p><a NAME="1027548"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>make_tech</tt></b>
+program will also allow users to make technology variations which are of
+the form:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">&lt;tech_name> = &lt;base_name>-&lt;variation></font><a NAME="1027550"></a><a NAME="1027551"></a></pre>
+</dl>
+</dl>
+
+<dl>
+<dl><a NAME="1027552"></a><font face="Verdana, Arial, Helvetica, sans-serif">When
+MAX saves layout into <b><tt>.max</tt></b> files, it also saves the base
+technology name used to create them. MAX will only let you read <b><tt>.max</tt></b>
+files if the base technology name inside the <b><tt>.max</tt></b> file
+corresponds to the current MAX base technology. Otherwise, you might load
+a layout with incorrect layer names and other problems.</font>
+<p><a NAME="1027553"></a><font face="Verdana, Arial, Helvetica, sans-serif">Sometimes
+you may want to have two different technologies that are virtually the
+same but have minor differences. In this case, you do want to be able to
+load <b>.<tt>max</tt></b> files into different technologies. MAX solves
+this problem with technology variations. Technology variations have the
+same base technology name followed by a dash (-) and then a technology
+variation. Only the base technology name is saved into the <b>.<tt>max</tt></b>
+files and checked on read in.</font>
+<p><a NAME="1027554"></a><font face="Verdana, Arial, Helvetica, sans-serif">One
+example of a technology variation might be a process with the choice of
+different numbers of layers of metal. In one case the technology might
+have 3 layers of metal and in the other case, 4. Thus you might have two
+technology variations:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">my_tech-tlm <b>and</b>&nbsp;<a NAME="1027555"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">my_tech-flm</font><a NAME="1027556"></a></pre>
+</dl>
+</dl>
+<a NAME="1027557"></a>
+<dl>
+<dl><a NAME="1027558"></a><font face="Verdana, Arial, Helvetica, sans-serif">Note
+that you should not include a dash (-) in a technology name unless you
+want to create a technology variation.</font>
+<p><a NAME="1027559"></a><font face="Verdana, Arial, Helvetica, sans-serif">Once
+you have run <b><tt>make_tech</tt></b>, you can use this technology by
+starting MAX with the following line:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">max -tech &lt;tech_name><a NAME="1027560"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1030394"></a></pre>
+
+<dt>
+<a NAME="1027561"></a><font face="Verdana, Arial, Helvetica, sans-serif">Alternatively,
+you can set the UNIX environment variable <b><tt>MAX_DEFAULT_TECH</tt></b>to
+be the desired technology and then every time you start MAX, it will default
+to that technology:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv MAX_DEFAULT_TECH &lt;tech_name>&nbsp;<a NAME="1027563"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">max</font><a NAME="1027564"></a></pre>
+</dl>
+</dl>
+
+<h3>
+<a NAME="1027566"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Reading
+in GDSII Files</font></font></h3>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027567"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+there is an existing technology file which matches the GDSII file, you
+can use the <b><tt><a href="MAX_Man_Ch3Commands.html#1031358">Import File
+</a></tt></b>command.
+Otherwise, you can use the <b><tt>gds_input</tt></b> command which finds
+all the layers in the GDSII file and creates a technology file for the
+cell.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1027575"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">gds_input</font></font></i></h4>
+
+<dl>
+<dl><a NAME="1027576"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>gds_input</tt></b>
+program is meant for importing arbitrary GDS files directly into MAX without
+first requiring a technology file. <b><tt>gds_input</tt></b> will first
+parse the GDS file (using MAX) and determine what GDS layers are in the
+file. It will then create a simple technology source file as described
+below, assigning arbitrary names and colors to each layer. It then runs
+<b><tt>make_tech</tt></b>
+on the source file to create a new MAX technology. Finally, it will run
+MAX with the new technology and import the GDS file.</font>
+<p><a NAME="1027577"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+syntax for <b><tt>gds_input</tt></b> is</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">gds_input [-file &lt;source_file>] [-tech &lt;name>] &lt;gds_file> [-rebuild]<a NAME="1027578"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027579"></a></pre>
+<a NAME="1027580"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you don't specify the <b><tt>source_file</tt></b>, it will default to the
+file <b><tt>test.source</tt></b>. If you don't specify the technology,
+it will default to <b><tt>test</tt></b>. The <b><tt>&lt;gds_file></tt></b>
+is the full pathname to the GDS file to be loaded.</font>
+<p><a NAME="1027581"></a><font face="Verdana, Arial, Helvetica, sans-serif">Thus,
+if you just want to view the GDS file called <b><tt>aaa.strm</tt></b>,
+you can simply run:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">gds_input aaa.strm<a NAME="1027582"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027583"></a></pre>
+
+<dt>
+<a NAME="1027584"></a><font face="Verdana, Arial, Helvetica, sans-serif">That's
+it!</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1027585"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Synopsis</font></font></h4>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">gds_input [-file &lt;source_file>] [-tech &lt;tech_name>] [-h | -help] &lt;gds_file> [-rebuild]</font><a NAME="1027586"></a></pre>
+
+<h4>
+<a NAME="1027587"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Description</font></font></h4>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027588"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+will run the <b><tt>gds_input</tt></b> script. It will first load the <b><tt>gds_file</tt></b>
+into MAX and find all GDS layers which are used in the file. It then creates
+a technology template file and runs <b><tt>make_tech</tt></b>. Once the
+technology files have been created, <b><tt>gds_input</tt></b> brings up
+the <b><tt>gds_file</tt></b> in MAX using the new technology file.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+<a NAME="1027589"></a><font face="ITC Franklin Gothic Book">Table 4: Options</font>
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr ALIGN=CENTER BGCOLOR="#CCCCCC">
+<th><a NAME="1027592"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>Option</font></font></font></th>
+
+<th><a NAME="1027594"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>Description</font></font></font></th>
+</tr>
+
+<tr>
+<td><a NAME="1027596"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-file
+&lt;source_file></font></font></td>
+
+<td><a NAME="1027598"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>The
+source file is the file which contains the GDSII layer-number-to-layer-name
+mapping. The name of source_file defaults to &lt;tech>.source. Refer to
+<b><tt><a href="MAX_Man_Ch6TechFiles.html#1027660">Technology
+Source Files
+</a></tt></b>for the syntax of the source file.</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027603"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-tech
+&lt;tech_name></font></font></td>
+
+<td><a NAME="1027605"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>Specify
+the name of the technology to be created. tech_name defaults to "test".
+The new technology files will be put in: <b>~/mmi_private/max/tech/&lt;tech_name></b></font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027607"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-h
+| -help</font></font></td>
+
+<td><a NAME="1027609"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>Prints
+out the syntax of the <b>gds_input</b> command</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027611"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>gds_file</font></font></td>
+
+<td><a NAME="1027613"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>The
+name of the GDSII file from which the new technology will be created. You
+should select a cell or block which contains all or at least most of the
+layers, or the entire chip.</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027615"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-rebuild</font></font></td>
+
+<td><a NAME="1027617"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>Take
+the &lt;tech_name>.source file as input and run <b>make_tech</b>, and then
+load the GDSII file. This allows you to edit the technology source file
+created by a previous run of <b>gds_input</b>, change layer names, colors,
+etc. and rebuild the MAX technology.</font></font></td>
+</tr>
+</table></center>
+
+<h4>
+<a NAME="1027620"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Environment</font></font></i></h4>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027621"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+following are the environment variables which are used by <b><tt>gds_input</tt></b>.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1027624"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">MMI_TOOLS</font></font></h4>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027625"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+environment variable <b><tt>MMI_TOOLS</tt></b> must be set to the directory
+where the Micro Magic Tools programs were installed. All of the Micro Magic
+Tools programs are installed under a single directory.</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setenv MMI_TOOLS /usr/tools/mmi</font><a NAME="1027627"></a></pre>
+</dl>
+</dl>
+
+<h4>
+<a NAME="1027628"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">More
+on "gds_input"</font></font></i></h4>
+
+<dl>
+<dl><a NAME="1027629"></a><font face="Verdana, Arial, Helvetica, sans-serif">Typically,
+once you have run <b><tt>gds_input</tt></b>, you want to assign meaningful
+layer names to the layers, specify the correct <b><tt><a href="MAX_Man_Ch6TechFiles.html#1027715">layer
+type </a></tt></b>, order the layers <a href="MAX_Man_Ch6TechFiles.html#1027715">(See
+<b><tt>layer
+type </tt></b>)</a>, and possibly tell MAX to ignore some layers or merge
+other layers. To do this, simply edit the technology source file that <b><tt>gds_input</tt></b>
+creates and then rerun <b><tt>gds_input</tt></b> with the <b><tt>-rebuild</tt></b>
+option. With <b><tt>-rebuild</tt></b>,
+<b><tt>gds_input</tt></b> will skip
+parsing the GDS file and use the specified source file, run <b><tt>make_tech</tt></b>,
+and then load the GDS file into MAX with the new technology. Otherwise,
+you could simply run <b><tt>make_tech</tt></b> yourself and then start
+MAX with the appropriate technology and <b><tt>import</tt></b> the file.</font>
+<p><a NAME="1027636"></a><font face="Verdana, Arial, Helvetica, sans-serif"><b><tt>gds_input</tt></b>
+can't determine where instance names are hidden in the GDS file (if they
+are there at all). If your GDS file has instance names, and you want MAX
+to read them, you have to add the <b><tt>iname</tt></b> type to the technology
+source file as described in the <b><tt><a href="MAX_Man_Ch6TechFiles.html#1027715">layer
+type </a></tt></b>section.</font>
+<p><a NAME="1027640"></a><font face="Verdana, Arial, Helvetica, sans-serif">Note
+that <b><tt>gds_input</tt></b> does not use the <b><tt>-install</tt></b>
+option to <b><tt>make_tech</tt></b> so you will need to run <b><tt>make_tech</tt></b>
+to install this technology for other people to use. This also prevents
+you from conflicting with other people trying to run <b><tt>gds_input</tt></b>
+simultaneously. However, you will overwrite any local technology that you
+already have with the same name (for example, it calls <b><tt>make_tech</tt></b>
+with the <b><tt>-r</tt></b> option).</font>
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;</dl>
+</dl>
+
+<h3>
+<a NAME="1027643"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Converting
+a Dracula DRC File</font></font></h3>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027644"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>drac_convert</tt></b>
+script will take a <i>Dracula</i> DRC file and convert the layer information,
+some of the basic layer generation and the basic DRC rules into a <b><tt>layers_file</tt></b>
+used by <b><tt>make_tech</tt></b>. This is an alternative to creating the
+technology source file by hand or running <b><tt>gds_input</tt></b>.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1027648"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">drac_convert</font></font></i></h4>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027649"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>drac_convert</tt></b>program
+will attempt to parse a <i>Dracula</i> DRC deck and create a technology
+source file from it for use by <b><tt>make_tech</tt></b>. The syntax of
+<b><tt>drac_convert</tt></b> is:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drac_convert &lt;dracula_command_file> > &lt;source_file><a NAME="1027650"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027651"></a></pre>
+
+<dt>
+<a NAME="1027652"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+example, if you had a <i>Dracula</i> DRC deck for the xxx25 technology,
+you might run:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drac_convert xxx25.drac > xxx25.source<a NAME="1027653"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027654"></a></pre>
+<a NAME="1027655"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+can then run <b><tt>make_tech</tt></b> on <b><tt>xxx25.source</tt></b>.
+You might want to first edit <b><tt>xxx25.source</tt></b> to change layer
+names and add additional rules.</font>
+<p><a NAME="1027656"></a><font face="Verdana, Arial, Helvetica, sans-serif"><b><tt>drac_convert</tt></b>,
+presently, will find most width, spacing, and overlap rules to add to your
+technology source file. It is not guaranteed to find all rules but is only
+meant to shorten technology creation times.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h3>
+<a NAME="1027660"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Technology
+Source Files</font></font></h3>
+
+<dl>
+<dl><a NAME="1027661"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+technology source file has the following basic characteristics:</font>
+<br>&nbsp;
+<ul>
+<li>
+<a NAME="1027662"></a><font face="Verdana, Arial, Helvetica, sans-serif">Comment
+lines are lines which contain a pound sign (#) as the first non-white-space
+character.</font></li>
+
+<li>
+<a NAME="1027663"></a><font face="Verdana, Arial, Helvetica, sans-serif">Blank
+lines are ignored.</font></li>
+
+<li>
+<a NAME="1027664"></a><font face="Verdana, Arial, Helvetica, sans-serif">Lines
+may be continued by ending the line with a backslash (\) character.</font></li>
+
+<ul>
+<ul>&nbsp;
+<br>&nbsp;</ul>
+</ul>
+</ul>
+
+<dt>
+<a NAME="1027665"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+technology source file for the mmi25 technology is in:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">$MMI_TOOS/max/tech/mmi25/mmi25.source</font><a NAME="1027666"></a></pre>
+</dl>
+</dl>
+<a NAME="1027667"></a>
+<dl>
+<dl><a NAME="1027668"></a><font face="Verdana, Arial, Helvetica, sans-serif">There
+is an example of a very basic technology source file at the end of this
+chapter. It has the minimum information needed for reading and writing
+GDSII, using MAX Gcells, and the Wiring Tool. This example does not contain
+all of the information needed for the layout generator or all of the DRC
+rules.</font>
+<p><a NAME="1027669"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+Layer Definition table is a list of white-space separated fields, one per
+each layer to be defined. White spaces are either spaces or tabs. Generally,
+layers are ordered from lowest mask layer down to highest mask layer. Each
+column defines a separate attribute of the layers which in brief are, from
+left to right:</font>
+<br>&nbsp;
+<ul>
+<li>
+<a NAME="1027670"></a><font face="Verdana, Arial, Helvetica, sans-serif">Layer
+name</font></li>
+
+<li>
+<a NAME="1027671"></a><font face="Verdana, Arial, Helvetica, sans-serif">GDS
+layer number and datatype</font></li>
+
+<li>
+<a NAME="1027672"></a><font face="Verdana, Arial, Helvetica, sans-serif">GDS
+text layer number and datatype (optional)</font></li>
+
+<li>
+<a NAME="1027673"></a><font face="Verdana, Arial, Helvetica, sans-serif">Type
+of layer (optional)</font></li>
+
+<li>
+<a NAME="1027674"></a><font face="Verdana, Arial, Helvetica, sans-serif">Minimum
+width of that layer in microns (optional)</font></li>
+
+<li>
+<a NAME="1027675"></a><font face="Verdana, Arial, Helvetica, sans-serif">Minimum
+space from that layer to itself in microns (optional)</font></li>
+
+<li>
+<a NAME="1027676"></a><font face="Verdana, Arial, Helvetica, sans-serif">Desired
+color of that layer (optional)</font></li>
+
+<ul>
+<ul>&nbsp;
+<br>&nbsp;</ul>
+</ul>
+</ul>
+<a NAME="1027677"></a><font face="Verdana, Arial, Helvetica, sans-serif">Where
+a field is optional and you do not wish to specify a value for it, use
+the dash character (-) to specify that you have not set the field. Do not
+simply add spaces. If you do, the parser will then use the next field instead.
+You can only omit the dash if no other fields to the right of it are defined
+on that line.</font>
+<p><a NAME="1027678"></a><font face="Verdana, Arial, Helvetica, sans-serif">Each
+column of the Layer Definition table is now described in detail.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1027681"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">layer
+name</font></font></i></align></h5>
+
+<dl>
+<dl><a NAME="1027682"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+layer name is the unique means by which MAX will refer to this layer. MAX
+saves all layouts with specific reference to this name and NOT to the GDS
+layer number or any other parameter. Thus, if you change this name, for
+example, from <b><tt>MET1</tt></b> to <b><tt>M1</tt></b>, and run <b><tt>make_tech</tt></b>,
+all existing MAX files that use this technology file will not read correctly
+into MAX. If you do need to change this name, you will need to export all
+of your existing MAX layouts to GDS, then change the name in the technology
+source file and run <b><tt>make_tech</tt></b>. Finally, import the GDS
+layouts back into MAX and save them back out to MAX format.</font>
+<p><a NAME="1027683"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you create the Layer Definition table from either the <b><tt>drac_convert</tt></b>
+program or the <b><tt>gds_input</tt></b> program, you will probably want
+to edit the layer names. Make sure you do this before saving out any MAX
+files.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1027686"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">gds
+layer number and datatype</font></font></i></align></h5>
+
+<dl>
+<dl><a NAME="1027687"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+field specifies the GDS layer numbers and datatype for both importing and
+exporting GDS into and out of MAX. At present you cannot easily specify
+a different GDS mapping between input and output. You can do so on a limited
+basis by deriving new layers with different GDS layer numbers.</font>
+<p><a NAME="1027688"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+format of this column is:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">&lt;gds_num> or<a NAME="1027689"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">&lt;gds_num>,&lt;gds_num>[,...] or<a NAME="1027690"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">&lt;gds_num>:&lt;data_types> or&nbsp;<a NAME="1027691"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">&lt;gds_num>[:&lt;data_types>];&lt;gds_num>[:&lt;data_types>][;...]<a NAME="1027692"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027693"></a></pre>
+<a NAME="1027694"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+no data type is given, then it defaults to all data types on input (or
+`*') and data type 0 on output. Data types can be any comma-separated list
+of numbers or ranges of numbers (for instance,<b><tt> &lt;begin>-&lt;end></tt></b>).
+Furthermore, if more than one GDS layer number or data type is given, then
+the first GDS layer, data type pair are used for output. Here are some
+legal examples:</font>
+<p><a NAME="1027695"></a><font face="Verdana, Arial, Helvetica, sans-serif">Imports
+geometries from layer 12, all data types, and exports to layers 12, datatype
+0.</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> 12<a NAME="1027696"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027697"></a></pre>
+
+<dt>
+<a NAME="1027698"></a><font face="Verdana, Arial, Helvetica, sans-serif">Imports
+geometries from GDS layers 12 and 13, all data types, but only exports
+them out to layer 12, datatype 0:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> 12,13<a NAME="1027699"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027700"></a></pre>
+
+<dt>
+<a NAME="1027701"></a><font face="Verdana, Arial, Helvetica, sans-serif">Imports
+geometries from GDS layer 12, datatypes 1, 3, and 5. Exports to layer 12,
+datatype 1:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> 12:1,3,5<a NAME="1027702"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027703"></a></pre>
+
+<dt>
+<a NAME="1027704"></a><font face="Verdana, Arial, Helvetica, sans-serif">Imports
+geometries from GDS layer 12, datatypes 1-3, and 5, layer 13 all datatypes,
+and layer 14 datatype 1. Exports to layer 12, datatype 1:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> 12:1-3,5;13;14:1<a NAME="1027705"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027706"></a></pre>
+
+<dt>
+<a NAME="1027707"></a><font face="Verdana, Arial, Helvetica, sans-serif">Remember
+not to put any spaces in any of the GDS layer designations since the space
+is the column separator.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1027710"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">text
+layer number and datatype</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027711"></a><font face="Verdana, Arial, Helvetica, sans-serif">By
+default, text (also called <i>labels</i> in MAX) will be imported/exported
+from/to the same GDS layer number as the geometry that it is attached to.
+By specifying this field, you can instruct MAX to import/export text from/to
+different GDS layers. The format of this field is identical to the format
+of the GDS layer numbers as described above.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1027715"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">layer
+type</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027716"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+optional parameter helps MAX to better build a technology file. The valid
+types are:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">act, poly, metal, via, ignore, gdsonly, bbox, iname, other (default)<a NAME="1027717"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1027718"></a></pre>
+<a NAME="1027719"></a><font face="Verdana, Arial, Helvetica, sans-serif">It
+is recommended that all conducting layers be given a type of either <b><tt>act</tt></b>,
+<b><tt>poly</tt></b>,
+<b><tt>metal</tt></b>,
+or <b><tt>via</tt></b>. Specify all diffusions as
+<b><tt>act</tt></b> (for
+active layer) and all poly layers as <b><tt>poly</tt></b>. Metal layers
+should be <b><tt>metal</tt></b> and contacts/vias should be
+<b><tt>via</tt></b>.</font>
+<p><a NAME="1027720"></a><font face="Verdana, Arial, Helvetica, sans-serif">MAX
+uses these types to determine connectivity and build fets. (If MAX cannot
+recognize a fet it will think that the source and drain are connected).</font>
+<p><a NAME="1027721"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+order of the <b><tt>via</tt></b> and <b><tt>metal</tt></b> layers in the
+Layer Definition table determines the order in which they get connected.
+The first <b><tt>via</tt></b> layer becomes the contact and connects to
+all of the <b><tt>act</tt></b> and <b><tt>poly</tt></b> layers. It is also
+connected to the next <b><tt>metal</tt></b> layer. The next <b><tt>metal</tt></b>
+layer is then connected to the following <b><tt>via</tt></b> layer and
+so on. For example, for the following technology, you would need this line
+order for the <b><tt>via</tt></b> and <b><tt>metal</tt></b> types in the
+technology source file to get connected properly:</font>
+<br>&nbsp;</dl>
+</dl>
+<a NAME="1029973"></a><font face="ITC Franklin Gothic Book">Table 5: Layer
+Type</font>
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr ALIGN=CENTER BGCOLOR="#CCCCCC">
+<th><a NAME="1027725"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>#
+layer&nbsp;</font></font></font></th>
+
+<th><a NAME="1027727"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>gds:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1027729"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>txt:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1027731"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>type&nbsp;</font></font></font></th>
+
+<th><a NAME="1027733"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>width&nbsp;</font></font></font></th>
+
+<th><a NAME="1027735"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>space&nbsp;</font></font></font></th>
+
+<th><a NAME="1027737"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>color&nbsp;</font></font></font></th>
+</tr>
+
+<tr>
+<td><a NAME="1027767"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>ct&nbsp;</font></font></td>
+
+<td><a NAME="1027769"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>15&nbsp;</font></font></td>
+
+<td><a NAME="1027771"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1027773"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>via&nbsp;</font></font></td>
+
+<td><a NAME="1027775"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.30&nbsp;</font></font></td>
+
+<td><a NAME="1027777"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.30&nbsp;</font></font></td>
+
+<td><a NAME="1027779"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027781"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>m1&nbsp;</font></font></td>
+
+<td><a NAME="1027783"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>16&nbsp;</font></font></td>
+
+<td><a NAME="1027785"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>40&nbsp;</font></font></td>
+
+<td><a NAME="1027787"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>metal&nbsp;</font></font></td>
+
+<td><a NAME="1027789"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.32&nbsp;</font></font></td>
+
+<td><a NAME="1027791"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.32&nbsp;</font></font></td>
+
+<td><a NAME="1027793"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>8,139,255&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027795"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>v12&nbsp;</font></font></td>
+
+<td><a NAME="1027797"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>17&nbsp;</font></font></td>
+
+<td><a NAME="1027799"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1027801"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>via&nbsp;</font></font></td>
+
+<td><a NAME="1027803"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.36&nbsp;</font></font></td>
+
+<td><a NAME="1027805"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.35&nbsp;</font></font></td>
+
+<td><a NAME="1027807"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027809"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>m2&nbsp;</font></font></td>
+
+<td><a NAME="1027811"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>18&nbsp;</font></font></td>
+
+<td><a NAME="1027813"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>41</font></font></td>
+
+<td><a NAME="1027815"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>metal&nbsp;</font></font></td>
+
+<td><a NAME="1027817"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1027819"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1027821"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>182,134,222&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027823"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>v23&nbsp;</font></font></td>
+
+<td><a NAME="1027825"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>27&nbsp;</font></font></td>
+
+<td><a NAME="1027827"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1027829"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>via&nbsp;</font></font></td>
+
+<td><a NAME="1027831"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.36&nbsp;</font></font></td>
+
+<td><a NAME="1027833"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.35&nbsp;</font></font></td>
+
+<td><a NAME="1027835"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027837"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>m3&nbsp;</font></font></td>
+
+<td><a NAME="1027839"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>28&nbsp;</font></font></td>
+
+<td><a NAME="1027841"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>42&nbsp;</font></font></td>
+
+<td><a NAME="1027843"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>metal&nbsp;</font></font></td>
+
+<td><a NAME="1027845"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1027847"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1027849"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>255,160,65&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1027851"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...</font></font></td>
+
+<td><a NAME="1027853"></a></td>
+
+<td><a NAME="1027855"></a></td>
+
+<td><a NAME="1027857"></a></td>
+
+<td><a NAME="1027859"></a></td>
+
+<td><a NAME="1027861"></a></td>
+
+<td><a NAME="1027863"></a></td>
+</tr>
+</table></center>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027864"></a><font face="Verdana, Arial, Helvetica, sans-serif">Any
+other order and MAX would not get the connectivity correct. For example,
+if you specified the layers in the order <b><tt>ct,v12,v23,m1,m2,m3,</tt></b>
+MAX would not understand connectivity. You need to alternate layers starting
+from <tt>via</tt> (which will become the contact layer) just as in the
+above example.</font></dt>
+
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr>
+<td>
+<table BORDER=0 CELLPADDING=10 >
+<tr>
+<td ALIGN=CENTER WIDTH="60"><img SRC="images/note.gif" ></td>
+
+<td VALIGN=CENTER></td>
+</tr>
+</table>
+</td>
+
+<td>
+<dl>
+<dl>
+<dt>
+<a NAME="1029686"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+order of all layers other than the <b>via</b> or <b>metal</b> layers is
+unimportant.</font></dt>
+</dl>
+</dl>
+</td>
+</tr>
+</table></center>
+
+<p><a NAME="1027867"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+there are layers in your GDS input file that you want to <i>ignore</i>,
+specify them with the type <b><tt>ignore</tt></b>. Otherwise you will get
+warnings that they are not defined when you import them (if you have enabled
+GDS warnings in the <b><tt>import GDS</tt></b> dialog).</font>
+<p><a NAME="1027868"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>gdsonly</tt></b>
+type is a special type for layers that you don't want to see directly in
+MAX, but that you want to derive other layers from. For example, in MAX,
+you can carve up the diffusion layer during GDS, then importing into ndif
+and pdif using the derive command described below.</font>
+<p><a NAME="1027869"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>bbox</tt></b>
+type is a special type to specify the <b>bounding box</b> of cell instances.
+Only the GDS layer and data type are significant in the <b><tt>bbox</tt></b>
+layer line, and there should only be one <b><tt>bbox</tt></b> layer line
+in the Layer Definition table. MAX uses this layer data to display the
+cell boundaries, until a cell is viewed at which time MAX recomputes the
+bounding box from the cell layout itself. MAX will also output the bounding
+box to this GDS layer for other tools.</font>
+<p><a NAME="1027870"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>iname</tt></b>
+type is a special type to specify where <b>instance names</b> are stored
+in the GDS file. Not all tools write out instance names to GDS files. Only
+the GDS layer and data type are significant in the <b><tt>iname</tt></b>
+layer line, and there should only be one <b><tt>iname</tt></b> layer line
+in the Layer Definition table. There are two forms of <b><tt>iname</tt></b>
+types, depending on your GDS input file or how you wish to write a GDS
+output file:</font>
+<br>&nbsp;</dl>
+</dl>
+<a NAME="1027942"></a><font face="ITC Franklin Gothic Book">Table 6: Two
+Forms of "iname" types</font>
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr ALIGN=CENTER BGCOLOR="#CCCCCC">
+<th><a NAME="1030070"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>#
+layer&nbsp;</font></font></font></th>
+
+<th><a NAME="1030072"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>gds:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1030074"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>txt:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1030076"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>type&nbsp;</font></font></font></th>
+
+<th><a NAME="1030078"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>width&nbsp;</font></font></font></th>
+
+<th><a NAME="1030080"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>space&nbsp;</font></font></font></th>
+
+<th><a NAME="1030082"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>color&nbsp;</font></font></font></th>
+</tr>
+
+<tr>
+<td><a NAME="1030098"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...&nbsp;</font></font></td>
+
+<td><a NAME="1030100"></a></td>
+
+<td><a NAME="1030102"></a></td>
+
+<td><a NAME="1030104"></a></td>
+
+<td><a NAME="1030106"></a></td>
+
+<td><a NAME="1030108"></a></td>
+
+<td><a NAME="1030110"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1030112"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>.iname&nbsp;</font></font></td>
+
+<td><a NAME="1030114"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>63</font></font></td>
+
+<td><a NAME="1030116"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1030118"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>iname&nbsp;</font></font></td>
+
+<td><a NAME="1030120"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1030122"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1030124"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1030126"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...</font></font></td>
+
+<td><a NAME="1030128"></a></td>
+
+<td><a NAME="1030130"></a></td>
+
+<td><a NAME="1030132"></a></td>
+
+<td><a NAME="1030134"></a></td>
+
+<td><a NAME="1030136"></a></td>
+
+<td><a NAME="1030138"></a></td>
+</tr>
+</table></center>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1027943"></a><font face="Verdana, Arial, Helvetica, sans-serif">OR</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+<a NAME="1028015"></a>
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr ALIGN=CENTER BGCOLOR="#CCCCCC">
+<th><a NAME="1027946"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>#
+layer&nbsp;</font></font></font></th>
+
+<th><a NAME="1027948"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>gds:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1027950"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>txt:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1027952"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>type&nbsp;</font></font></font></th>
+
+<th><a NAME="1027954"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>width&nbsp;</font></font></font></th>
+
+<th><a NAME="1027956"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>space&nbsp;</font></font></font></th>
+
+<th><a NAME="1027958"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>color&nbsp;</font></font></font></th>
+</tr>
+
+<tr>
+<td><a NAME="1027974"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...&nbsp;</font></font></td>
+
+<td><a NAME="1027976"></a></td>
+
+<td><a NAME="1027978"></a></td>
+
+<td><a NAME="1027980"></a></td>
+
+<td><a NAME="1027982"></a></td>
+
+<td><a NAME="1027984"></a></td>
+
+<td><a NAME="1027986"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1027988"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>.iname&nbsp;</font></font></td>
+
+<td><a NAME="1027990"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>propattr</font></font></td>
+
+<td><a NAME="1027992"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>102</font></font></td>
+
+<td><a NAME="1027994"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>iname&nbsp;</font></font></td>
+
+<td><a NAME="1027996"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1027998"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1028000"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1028002"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...</font></font></td>
+
+<td><a NAME="1028004"></a></td>
+
+<td><a NAME="1028006"></a></td>
+
+<td><a NAME="1028008"></a></td>
+
+<td><a NAME="1028010"></a></td>
+
+<td><a NAME="1028012"></a></td>
+
+<td><a NAME="1028014"></a></td>
+</tr>
+</table></center>
+
+<br>&nbsp;
+<dl>
+<dl><a NAME="1028016"></a><font face="Verdana, Arial, Helvetica, sans-serif">In
+the first case, the instance name is stored in <b><tt>GDS layer 63, datatype
+0</tt></b>. In the second case, the instance name is stored in <b><tt>property
+attribute 102</tt></b>. Note that in the second form, the <b><tt>102</tt></b>
+is actually in the text column.</font>
+<p><a NAME="1028017"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+rest of the layers, such as implants, should be specified as <b><tt>other</tt></b>,
+which is also the default; therefore, you can use the dash (-) for them.</font>
+<p><a NAME="1028018"></a><font face="Verdana, Arial, Helvetica, sans-serif">Every
+line in the Layer Definition table, except for those of type <b><tt>gdsonly</tt></b>,
+<b><tt>ignore</tt></b>,
+and <b><tt>bbox</tt></b>, will show up in the MAX palette.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028021"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">minimum
+width</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028022"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+optional value in microns will create a DRC rule for the MAX interactive
+DRC checker for the minimum width of the layer.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028025"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">minimum
+space</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028026"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+optional value in microns will create a DRC rule for the MAX interactive
+DRC checker for the minimum space of the layer to itself.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028029"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">color</font></font></i></align></h5>
+
+<dl>
+<dl><a NAME="1028030"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+optional parameter will set the default color for this layer in the layout.
+Note that the stipple pattern (also called the fill pattern) and outline
+style must be specified through the color/stipple editor <a href="MAX_Man_Ch2LayoutEd.html#1027642">(See
+<b><tt>Palette
+</tt></b>)</a>
+in MAX, and can be saved for subsequent MAX sessions. The stipple patterns
+are selected initially to be reasonable for the type of layer - this is
+another reason why you should specify the layer types.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028034"></a><font face="Verdana, Arial, Helvetica, sans-serif">Colors
+can be specified in one of two ways, either by specifying the RGB triplet
+of the form <b><tt>red,green,blue</tt></b> (comma separated with no spaces)
+with each value in the range of 0-255. Otherwise, you can specify a color
+name using the names provided in the file<b><tt> rgb.txt</tt></b> that
+is provided with the X window system. Note that MAX has its own version
+of <b><tt>rgb.txt</tt></b> that it refers to which might be different than
+yours. If no color is given, MAX will choose one. Remember, these colors
+can always be changed inside of MAX using the color editor and saved for
+subsequent use.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1028036"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Additional
+Statements</font></font></i></h4>
+
+<dl>
+<dl><a NAME="1028037"></a><font face="Verdana, Arial, Helvetica, sans-serif">Following
+the Layer Definition table, you can specify additional statements that
+will define devices, create derived layers, add further connection information,
+and add more DRC rules. The statements are all single lines and must start
+with one of the following keywords:</font>
+<br><font face="Verdana, Arial, Helvetica, sans-serif"></font>&nbsp;
+<ul>
+<li>
+<a NAME="1028038"></a><font face="Verdana, Arial, Helvetica, sans-serif">device</font></li>
+
+<li>
+<a NAME="1028039"></a><font face="Verdana, Arial, Helvetica, sans-serif">connect</font></li>
+
+<li>
+<a NAME="1028040"></a><font face="Verdana, Arial, Helvetica, sans-serif">derive</font></li>
+
+<li>
+<a NAME="1028041"></a><font face="Verdana, Arial, Helvetica, sans-serif">drc</font></li>
+
+<ul>
+<ul>&nbsp;</ul>
+</ul>
+</ul>
+</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028043"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">device</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028044"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+connectivity tracing and extraction, it is important that MAX understand
+what constitutes a device. Presently, only fets are supported. Fets are
+defined using the device statement. If you do not specify any devices but
+you specify an <b><tt>act</tt></b> layer type and a <b><tt>poly</tt></b>
+layer type, MAX will automatically create a fet device from the intersection
+of those layers. If you want to define your own fets, use the following
+syntax:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> device &lt;device_name> from &lt;poly_layer> &lt;diffusion_layer><a NAME="1028045"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1030597"></a></pre>
+
+<dt>
+<a NAME="1028046"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+example, if you have defined a separate ndif layer and pdif layer, you
+can define an nfet and a pfet with the following lines:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">device nfet from poly ndif&nbsp;<a NAME="1028047"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">device pfet from poly pdif<a NAME="1028048"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028049"></a></pre>
+
+<dt>
+<a NAME="1028050"></a><font face="Verdana, Arial, Helvetica, sans-serif">Note
+that the nfet and pfet become layers and will show up in the MAX layer
+palette. However, MAX will not let you directly modify the colors or fill
+patterns of these layers since they are derived from the other two layers
+that make them up.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028052"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">connect</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028053"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+connectivity tracing and extraction, MAX must know what layers are conducting
+and how they connect to other layers. <b><tt>make_tech</tt></b> can derive
+most connectivity information from the order of the layer types <b><tt>metal</tt></b>
+and <b><tt>via</tt></b>, and from its knowledge of fet devices. However,
+if you want to add additional connectivity, you can do so with the connect
+statement.</font></dt>
+
+<dt>
+<a NAME="1028054"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+connect statement has the syntax:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">connect &lt;layer_1> &lt;layer_2><a NAME="1028055"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028056"></a></pre>
+
+<dt>
+<a NAME="1028057"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you want to allow butting contacts between the n-well contact (nwc) and
+the p-diffusion (pdif), for example, you would add the following line:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> connect nwc pdif</font><a NAME="1028058"></a></pre>
+</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028061"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">derive</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028062"></a><font face="Verdana, Arial, Helvetica, sans-serif">In
+MAX, you can derive a new layer from one or more other layers using any
+of the following layer operations:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">and &lt;layer>&nbsp;<a NAME="1028063"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">or &lt;layer>&nbsp;<a NAME="1028064"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">and-not &lt;layer>&nbsp;<a NAME="1028065"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">grow &lt;value>&nbsp;<a NAME="1028066"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">shrink &lt;value><a NAME="1028067"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1029740"></a></pre>
+
+<dt>
+<a NAME="1028068"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+syntax of the derive statement is as follows:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive &lt;new_layer> from &lt;starting_layer> &lt;operation> &lt;layer_or_value> [&lt;operation> &lt;layer_or_value> ...]<a NAME="1028069"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028070"></a></pre>
+
+<dt>
+<a NAME="1028071"></a><font face="Verdana, Arial, Helvetica, sans-serif">Which
+is parsed from left to right. No parentheses or grouping is allowed. Instead
+you need to define temporary layers. For example, you need to use two derive
+statements to generate the following:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive tmp1 from nplus grow 0.1&nbsp;<a NAME="1028072"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive new from nw and-not tmp1<a NAME="1028073"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028074"></a></pre>
+<a NAME="1028075"></a><font face="Verdana, Arial, Helvetica, sans-serif">In
+this case the layer "new" is derived from the "nw" layer except for where
+there is nplus grown by 0.1 microns.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028079"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+can view any layers that you derive in MAX using the <b><tt><a href="MAX_Man_Ch3Commands.html#1032222">See
+Mask </a></tt></b>command and clicking on the desired layer. That layer
+will then be overlaid on the current window in a temporary feedback layer.
+Use the <b><tt>clear</tt></b> button at the top of the <b><tt>Mask</tt></b>menu
+to remove this feedback layer. Only one layer at a time can be displayed
+in this way; for example, when you click on a second layer, it first clears
+the initial layer. Note that MAX will only draw this feedback layer to
+cover the current viewable window, so make sure that you have zoomed out
+sufficiently before running this command. This feature prevents MAX from
+potentially wasting a lot of time generating a layer for an entire chip
+when all you care about is a small section.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028080"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+may notice that some of the layers in the <b><tt>Mask</tt> </b>menu have
+the words <b><tt>GDS_</tt></b>, <b><tt>TXT_</tt></b> and <b><tt>DRC_</tt></b>
+appended to their names. This is to differentiate the layers from the internal
+MAX layer from which they are derived. Sometimes to create a DRC rule,
+as described in the next section, MAX must create a special temporary layer.
+These are the layers that begin with <b><tt>DRC_</tt></b>.</font>
+<br><font face="Verdana, Arial, Helvetica, sans-serif"></font>&nbsp;
+<dt>
+<a NAME="1028081"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you wanted to select out only those contacts that landed on poly instead
+of diffusion, you could <b><tt>derive</tt></b> a new layer, <i>poly_ct</i>,
+as follows:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive poly_ct from poly and ct<a NAME="1028082"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028083"></a></pre>
+
+<dt>
+<a NAME="1028084"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you wanted to generate the od layer from the all the different types of
+diffusion, you would do the following:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive od from ndif or pdif or nwc or pwc<a NAME="1028085"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028086"></a></pre>
+
+<dt>
+<a NAME="1028087"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+can also `<b><tt>or</tt></b>' layers together by simply separating them
+with commas, as in the following example:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive od from ndif,pdif,nwc,pwc<a NAME="1028088"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028089"></a></pre>
+
+<dt>
+<a NAME="1028090"></a><font face="Verdana, Arial, Helvetica, sans-serif">which
+is equivalent to the first example.</font></dt>
+
+<dt>
+<a NAME="1028091"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>and-not</tt></b>
+operation allows you to select parts of layers that are not coincident
+with other layers. For example, n-type diffusions are made up of diffusions
+that don't have n-well and don't have pplus over them:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive ndif from od and-not nw and-not pplus<a NAME="1028092"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028093"></a></pre>
+<a NAME="1028094"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>grow</tt></b>
+operation grows a layer by a specified amount in all directions. If two
+geometries on the same layer are separated by a distance of<i> 2x</i> and
+you grow them by a distance <i>x</i>, they will merge together. If you
+then shrink them by a distance <i>x</i>, they will stay merged together.
+This grow/shrink operation is useful for notch and gap filling.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028095"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>shrink</tt></b>
+operation is also handy for eliminating undersized geometries. Note that
+the shrink operation can sometimes yield unexpected results, in particular,
+if you have touching geometries in adjacent sub-cells. If those geometries
+are shrunk, even slightly, they will no longer touch.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028096"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+example, if you want to generate the n-well (nw) layer to be 0.6 microns
+around pdif and 0.16 microns around n-well contacts (nwc) and you want
+to notch and gap fill it, you can use the following line:</font>
+<pre>&nbsp;&nbsp;&nbsp; <font face="Courier">derive pdif_grow pdif grow 0.6&nbsp;<a NAME="1028097"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp; <font face="Courier">derive nw from nwc grow 0.16 or pdif_grow grow 0.3 \
+&nbsp;&nbsp;&nbsp; shrink 0.3<a NAME="1028098"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028099"></a></pre>
+
+<dt>
+<a NAME="1028100"></a><font face="Verdana, Arial, Helvetica, sans-serif">A
+more clever way to do this is as follows:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive nw from pdif grow 0.44 or nwc grow 0.16 \<a NAME="1029777"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">grow 0.3 shrink 0.3<a NAME="1034980"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1034963"></a></pre>
+
+<dt>
+<a NAME="1029778"></a></dt>
+
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr>
+<td>
+<table BORDER=0 CELLPADDING=10 >
+<tr>
+<td ALIGN=CENTER WIDTH="60"><img SRC="images/note.gif" ></td>
+
+<td VALIGN=CENTER></td>
+</tr>
+</table>
+</td>
+
+<td>
+<dl>
+<dl>
+<dt>
+<a NAME="1029814"></a><font face="Verdana, Arial, Helvetica, sans-serif">In
+this release of MAX, layer operations only affect manhattan geometries.</font></dt>
+</dl>
+</dl>
+</td>
+</tr>
+</table></center>
+</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028105"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">drc</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028106"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>drc</tt></b>
+line allows you to add rules beyond the simple width and spacing rules
+in the Layer Definition table. DRC rules can check layers defined in the
+Layer Definition table and also any derived layers or any combination thereof.
+The types of rules that are allowed are:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">width &lt;value>&nbsp;<a NAME="1028107"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">space &lt;value>&nbsp;<a NAME="1028108"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">space_to &lt;layer> &lt;value>&nbsp;<a NAME="1028109"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">enc &lt;layer> &lt;value>&nbsp;<a NAME="1028110"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">ext &lt;layer> &lt;value>&nbsp;<a NAME="1028111"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">area &lt;value><a NAME="1028112"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1029827"></a></pre>
+
+<dt>
+<a NAME="1028113"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+syntax of the <b><tt>drc</tt></b> line is:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc &lt;layer> &lt;operation> [&lt;layer>] &lt;value> [; &lt;comment>]<a NAME="1028114"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028115"></a></pre>
+<a NAME="1028118"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+operations <b><tt>width</tt></b> and <b><tt>space</tt></b> are the minimum
+widths and spaces of the given layer and are typically defined in the Layer
+Definition table. <b><tt>space_to</tt></b> allows you to specify the minimum
+space between two different layers. <b><tt>enc</tt></b> specifies the minimum
+enclosure or overlap of the first layer to the second layer. <b><tt>ext</tt></b>
+specifies the minimum extension past another layer and is typically used
+for specifying the poly overlap of gate, and diffusion overlap of gate
+in fets. Finally <b><tt>area</tt></b> specifies the minimum area of an
+isolated geometry of the layer.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028120"></a><font face="Verdana, Arial, Helvetica, sans-serif">All
+values are in microns, except for the area, which is in microns squared.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028121"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+example, to specify the minimum spacing between ndif and pdif at 1.2 um,
+use the following line:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc ndif space_to pdif 1.2<a NAME="1028122"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028123"></a></pre>
+
+<dt>
+<a NAME="1028124"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+MAX sees a violation of this rule in the layout, it will return a message
+of the form:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">ndif to pdif minimum spacing = 1.2 um.<a NAME="1028125"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028126"></a></pre>
+
+<dt>
+<a NAME="1028127"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you want to add any additional information to this message, do so with
+the comment line, for example:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc ndif space_to pdif 1.2 ; rule 31.2<a NAME="1028128"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028129"></a></pre>
+
+<dt>
+<a NAME="1028130"></a><font face="Verdana, Arial, Helvetica, sans-serif">which
+will lead to the error message</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">ndif to pdif minimum spacing = 1.2 um. rule 31.2<a NAME="1028131"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028132"></a></pre>
+<a NAME="1028133"></a><font face="Verdana, Arial, Helvetica, sans-serif">Note
+that you cannot use the pound sign (#) in the comment.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028134"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you want to specify the minimum enclosure of contact by Metal1, you would
+use the following rule:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m1 enc ct 0.09<a NAME="1028136"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028137"></a></pre>
+
+<dt>
+<a NAME="1028138"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you want to specify the minimum extension of poly past an nfet, use the
+following rule:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc poly ext nfet 0.36<a NAME="1028140"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028141"></a></pre>
+<a NAME="1028142"></a><font face="Verdana, Arial, Helvetica, sans-serif">Only
+the first occurrence of any rule will be used. <b><tt>make_tech</tt></b>
+will give a warning that it is ignoring any subsequent duplicate rule definitions.
+Thus, if you define the minimum width of a layer in the Layer Definition
+table and then redefine it with the DRC line, the first definition will
+be used.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028143"></a><font face="Verdana, Arial, Helvetica, sans-serif">Note
+that some rules have restrictions. For now, the <b><tt>ext</tt></b> rule
+must only apply to layers with types of <b><tt>poly</tt></b> or <b><tt>act</tt></b>.
+Also the <b><tt>area</tt></b> rule requires that the <b><tt>width</tt></b>
+of the layer is first defined.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1028145"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Advanced
+Topics</font></font></i></h4>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028146"></a><font face="Verdana, Arial, Helvetica, sans-serif">One
+way to simplify viewing and creating layout when importing from GDS is
+to separate diffusion into four different types, depending on its function
+as shown here:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive ndif from od and-not nw and-not pplus&nbsp;<a NAME="1028149"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive pdif from od and nw and pplus&nbsp;<a NAME="1028151"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive nwc from od and nw and-not pplus&nbsp;<a NAME="1028152"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive pwc from od and-not nw and pplus<a NAME="1028153"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028154"></a></pre>
+
+<dt>
+<a NAME="1028155"></a><font face="Verdana, Arial, Helvetica, sans-serif">When
+exporting, you simply od all the layers together with the line:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">derive od from ndif,pdif,nwc,pwc<a NAME="1028156"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028157"></a></pre>
+
+<dt>
+<a NAME="1028158"></a><font face="Verdana, Arial, Helvetica, sans-serif">If
+you do this, you have to add some special directives to the Layer Definition
+table as shown below:</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+<a NAME="1028287"></a><font face="ITC Franklin Gothic Book">Table 7: Special
+Directives to Layed Definition Table</font>
+<center><table BORDER CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr ALIGN=CENTER BGCOLOR="#CCCCCC">
+<th><a NAME="1028161"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>#
+layer&nbsp;</font></font></font></th>
+
+<th><a NAME="1028163"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>gds:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1028165"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>txt:dt&nbsp;</font></font></font></th>
+
+<th><a NAME="1028167"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>type&nbsp;</font></font></font></th>
+
+<th><a NAME="1028169"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>width&nbsp;</font></font></font></th>
+
+<th><a NAME="1028171"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>space&nbsp;</font></font></font></th>
+
+<th><a NAME="1028173"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366"><font size=-1>color&nbsp;</font></font></font></th>
+</tr>
+
+<tr>
+<td><a NAME="1028189"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...&nbsp;</font></font></td>
+
+<td><a NAME="1028191"></a></td>
+
+<td><a NAME="1028193"></a></td>
+
+<td><a NAME="1028195"></a></td>
+
+<td><a NAME="1028197"></a></td>
+
+<td><a NAME="1028199"></a></td>
+
+<td><a NAME="1028201"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1028203"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>od&nbsp;</font></font></td>
+
+<td><a NAME="1028205"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>4&nbsp;</font></font></td>
+
+<td><a NAME="1028207"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1028210"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>gdsonly</font></font></td>
+
+<td><a NAME="1028212"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.30&nbsp;</font></font></td>
+
+<td><a NAME="1028214"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1028216"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1028218"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>ndif</font></font></td>
+
+<td><a NAME="1028220"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>derived</font></font></td>
+
+<td><a NAME="1028222"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1028224"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>act&nbsp;</font></font></td>
+
+<td><a NAME="1028226"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028228"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028230"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>66,213,66</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1028232"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>pdif</font></font></td>
+
+<td><a NAME="1028234"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>derived</font></font></td>
+
+<td><a NAME="1028236"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+
+<td><a NAME="1028238"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>act&nbsp;</font></font></td>
+
+<td><a NAME="1028240"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028242"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028244"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>202,160,115</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1028246"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>nwc</font></font></td>
+
+<td><a NAME="1028248"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>derived</font></font></td>
+
+<td><a NAME="1028250"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>ndif</font></font></td>
+
+<td><a NAME="1028252"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>act</font></font></td>
+
+<td><a NAME="1028254"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028256"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028258"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1028260"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>pwc</font></font></td>
+
+<td><a NAME="1028262"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>derived</font></font></td>
+
+<td><a NAME="1028264"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>pdif</font></font></td>
+
+<td><a NAME="1028266"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>act</font></font></td>
+
+<td><a NAME="1028268"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028270"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-</font></font></td>
+
+<td><a NAME="1028272"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>-&nbsp;</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1028274"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font size=-1>...</font></font></td>
+
+<td><a NAME="1028276"></a></td>
+
+<td><a NAME="1028278"></a></td>
+
+<td><a NAME="1028280"></a></td>
+
+<td><a NAME="1028282"></a></td>
+
+<td><a NAME="1028284"></a></td>
+
+<td><a NAME="1028286"></a></td>
+</tr>
+</table></center>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028288"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>od</tt></b>
+layer is only used during import and export and not internally, and therefore
+is declared as "<b><tt>gdsonly</tt></b>". The `<b><tt>ndif</tt></b>', `<b><tt>pdif</tt></b>',
+`<b><tt>nwc</tt></b>', and `<b><tt>pwc</tt></b>' layers are derived on
+input - they are not explicitly part of the GDS file in this case, and
+therefore you must use the special keyword <i>derived</i> for the GDS layer
+number, as shown above. Finally, you can add an additional special keyword
+to the <b><tt>nwc</tt></b> and
+<b><tt>pwc</tt></b>, layers as shown above,
+to cause them to track the colors of the <b><tt>ndif</tt></b> and <b><tt>pdif</tt></b>
+layers.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h5>
+<align="left"><a NAME="1028289"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Other
+Commands</font></font></i></align></h5>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1028290"></a><font face="Verdana, Arial, Helvetica, sans-serif">Some
+information needed for the wire tool, Gcells and the layout generator is
+defined with the Tcl set statement. Any set statements in the technology
+source file gets transferred to the MAX technology files. See the <b><tt>mmi25.source</tt></b>
+file in <b><tt>$MMI_TOOLS/max/tech/mmi25</tt></b> for descriptions of the
+commands needed.</font></dt>
+
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1028292"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">MAX
+interactive drc limitations</font></font></i></h4>
+
+<dl>
+<dl><a NAME="1028293"></a><font face="Verdana, Arial, Helvetica, sans-serif">MAX
+cannot check what are referred to as<i> non-local</i> rules. These are
+rules that require it to look outside of the immediate vicinity of where
+any modifications to the database occur. Example of these rules are:</font>
+<br><font face="Verdana, Arial, Helvetica, sans-serif"></font>&nbsp;
+<ul>
+<li>
+<a NAME="1028294"></a><font face="Verdana, Arial, Helvetica, sans-serif">antenna
+rules</font></li>
+
+<li>
+<a NAME="1028295"></a><font face="Verdana, Arial, Helvetica, sans-serif">wide
+metal rules</font></li>
+
+<li>
+<a NAME="1028296"></a><font face="Verdana, Arial, Helvetica, sans-serif">connectivity
+based rules</font></li>
+
+<li>
+<a NAME="1028297"></a><font face="Verdana, Arial, Helvetica, sans-serif">well/substrate
+tie spacing</font></li>
+
+<ul>
+<ul>&nbsp;
+<br>&nbsp;</ul>
+</ul>
+</ul>
+<a NAME="1028298"></a><font face="Verdana, Arial, Helvetica, sans-serif">Presently,
+MAX also cannot check the new via overlap rules that many fabs are currently
+using in submicron technologies. These rules stipulate that the via overlap
+(also called the surround) can be very small in two opposite directions
+if it is larger in the two other opposite directions. If you intend on
+using these rules, you will need to set the DRC rule to be the smaller
+number and rely on an external DRC checker to test them.</font><font face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p><a NAME="1028299"></a><font face="Verdana, Arial, Helvetica, sans-serif">Also,
+at present the technology source files do not handle parasitic extraction
+data.</font>
+<br>&nbsp;</dl>
+</dl>
+
+<h3>
+<a NAME="1028300"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Basic
+Technology Source File Example</font></font></h3>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># This is a simple technology file which includes the information&nbsp;<a NAME="1028301"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># necessary for GDSII input and output, MAX Gcells and the wiring<a NAME="1028302"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># tool. Additional information is needed for the layout generator<a NAME="1028303"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># and for all DRC rules.<a NAME="1028304"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">#&nbsp;</font><a NAME="1034628"></a></pre>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1034910"></a></dt>
+
+<center><table BORDER=0 CELLSPACING=0 CELLPADDING=5 WIDTH="600" >
+<caption>&nbsp;</caption>
+
+<tr>
+<td><a NAME="1034631"></a><font size=-1><font face="Verdana, Arial, Helvetica, sans-serif">#</font><font face="Courier New,Courier">
+layer</font></font></td>
+
+<td><a NAME="1034633"></a><font face="Courier New,Courier"><font size=-1>gds:dt</font></font></td>
+
+<td><a NAME="1034635"></a><font face="Courier New,Courier"><font size=-1>txt:dt</font></font></td>
+
+<td><a NAME="1034637"></a><font face="Courier New,Courier"><font size=-1>type</font></font></td>
+
+<td><a NAME="1034639"></a><font face="Courier New,Courier"><font size=-1>width</font></font></td>
+
+<td><a NAME="1034641"></a><font face="Courier New,Courier"><font size=-1>space</font></font></td>
+
+<td><a NAME="1034643"></a><font face="Courier New,Courier"><font size=-1>color</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034645"></a><font face="Courier New,Courier"><font size=-1>nw</font></font></td>
+
+<td><a NAME="1034647"></a><font face="Courier New,Courier"><font size=-1>2</font></font></td>
+
+<td><a NAME="1034649"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034651"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034653"></a><font face="Courier New,Courier"><font size=-1>1.2</font></font></td>
+
+<td><a NAME="1034655"></a><font face="Courier New,Courier"><font size=-1>0.6</font></font></td>
+
+<td><a NAME="1034657"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034659"></a><font face="Courier New,Courier"><font size=-1>ndif</font></font></td>
+
+<td><a NAME="1034661"></a><font face="Courier New,Courier"><font size=-1>11</font></font></td>
+
+<td><a NAME="1034663"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034665"></a><font face="Courier New,Courier"><font size=-1>act</font></font></td>
+
+<td><a NAME="1034667"></a><font face="Courier New,Courier"><font size=-1>0.3</font></font></td>
+
+<td><a NAME="1034669"></a><font face="Courier New,Courier"><font size=-1>0.4</font></font></td>
+
+<td><a NAME="1034671"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034673"></a><font face="Courier New,Courier"><font size=-1>pdif</font></font></td>
+
+<td><a NAME="1034675"></a><font face="Courier New,Courier"><font size=-1>12</font></font></td>
+
+<td><a NAME="1034677"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034679"></a><font face="Courier New,Courier"><font size=-1>act</font></font></td>
+
+<td><a NAME="1034681"></a><font face="Courier New,Courier"><font size=-1>0.3</font></font></td>
+
+<td><a NAME="1034683"></a><font face="Courier New,Courier"><font size=-1>0.4</font></font></td>
+
+<td><a NAME="1034685"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034687"></a><font face="Courier New,Courier"><font size=-1>poly</font></font></td>
+
+<td><a NAME="1034689"></a><font face="Courier New,Courier"><font size=-1>13</font></font></td>
+
+<td><a NAME="1034691"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034693"></a><font face="Courier New,Courier"><font size=-1>poly</font></font></td>
+
+<td><a NAME="1034695"></a><font face="Courier New,Courier"><font size=-1>0.24&nbsp;</font></font></td>
+
+<td><a NAME="1034697"></a><font face="Courier New,Courier"><font size=-1>0.36</font></font></td>
+
+<td><a NAME="1034699"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034701"></a><font face="Courier New,Courier"><font size=-1>pplus</font></font></td>
+
+<td><a NAME="1034703"></a><font face="Courier New,Courier"><font size=-1>7</font></font></td>
+
+<td><a NAME="1034705"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034707"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034709"></a><font face="Courier New,Courier"><font size=-1>0.44&nbsp;</font></font></td>
+
+<td><a NAME="1034711"></a><font face="Courier New,Courier"><font size=-1>0.44</font></font></td>
+
+<td><a NAME="1034713"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034715"></a><font face="Courier New,Courier"><font size=-1>nplus</font></font></td>
+
+<td><a NAME="1034717"></a><font face="Courier New,Courier"><font size=-1>8</font></font></td>
+
+<td><a NAME="1034719"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034721"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034723"></a><font face="Courier New,Courier"><font size=-1>0.44&nbsp;</font></font></td>
+
+<td><a NAME="1034725"></a><font face="Courier New,Courier"><font size=-1>0.44</font></font></td>
+
+<td><a NAME="1034727"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034729"></a><font face="Courier New,Courier"><font size=-1>ct</font></font></td>
+
+<td><a NAME="1034731"></a><font face="Courier New,Courier"><font size=-1>15</font></font></td>
+
+<td><a NAME="1034733"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034735"></a><font face="Courier New,Courier"><font size=-1>via</font></font></td>
+
+<td><a NAME="1034737"></a><font face="Courier New,Courier"><font size=-1>0.30&nbsp;</font></font></td>
+
+<td><a NAME="1034739"></a><font face="Courier New,Courier"><font size=-1>0.30</font></font></td>
+
+<td><a NAME="1034741"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034743"></a><font face="Courier New,Courier"><font size=-1>m1</font></font></td>
+
+<td><a NAME="1034745"></a><font face="Courier New,Courier"><font size=-1>16</font></font></td>
+
+<td><a NAME="1034747"></a><font face="Courier New,Courier"><font size=-1>40</font></font></td>
+
+<td><a NAME="1034749"></a><font face="Courier New,Courier"><font size=-1>metal</font></font></td>
+
+<td><a NAME="1034751"></a><font face="Courier New,Courier"><font size=-1>0.32&nbsp;</font></font></td>
+
+<td><a NAME="1034753"></a><font face="Courier New,Courier"><font size=-1>0.32</font></font></td>
+
+<td><a NAME="1034755"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034757"></a><font face="Courier New,Courier"><font size=-1>v12</font></font></td>
+
+<td><a NAME="1034759"></a><font face="Courier New,Courier"><font size=-1>17</font></font></td>
+
+<td><a NAME="1034761"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034763"></a><font face="Courier New,Courier"><font size=-1>via</font></font></td>
+
+<td><a NAME="1034765"></a><font face="Courier New,Courier"><font size=-1>0.36&nbsp;</font></font></td>
+
+<td><a NAME="1034767"></a><font face="Courier New,Courier"><font size=-1>0.35</font></font></td>
+
+<td><a NAME="1034769"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034771"></a><font face="Courier New,Courier"><font size=-1>m2</font></font></td>
+
+<td><a NAME="1034773"></a><font face="Courier New,Courier"><font size=-1>18</font></font></td>
+
+<td><a NAME="1034775"></a><font face="Courier New,Courier"><font size=-1>41</font></font></td>
+
+<td><a NAME="1034777"></a><font face="Courier New,Courier"><font size=-1>metal</font></font></td>
+
+<td><a NAME="1034779"></a><font face="Courier New,Courier"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1034781"></a><font face="Courier New,Courier"><font size=-1>0.40</font></font></td>
+
+<td><a NAME="1034783"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034785"></a><font face="Courier New,Courier"><font size=-1>v23</font></font></td>
+
+<td><a NAME="1034787"></a><font face="Courier New,Courier"><font size=-1>27</font></font></td>
+
+<td><a NAME="1034789"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034791"></a><font face="Courier New,Courier"><font size=-1>via</font></font></td>
+
+<td><a NAME="1034793"></a><font face="Courier New,Courier"><font size=-1>0.36&nbsp;</font></font></td>
+
+<td><a NAME="1034795"></a><font face="Courier New,Courier"><font size=-1>0.35</font></font></td>
+
+<td><a NAME="1034797"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034799"></a><font face="Courier New,Courier"><font size=-1>m3</font></font></td>
+
+<td><a NAME="1034801"></a><font face="Courier New,Courier"><font size=-1>28</font></font></td>
+
+<td><a NAME="1034803"></a><font face="Courier New,Courier"><font size=-1>42</font></font></td>
+
+<td><a NAME="1034805"></a><font face="Courier New,Courier"><font size=-1>metal</font></font></td>
+
+<td><a NAME="1034807"></a><font face="Courier New,Courier"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1034809"></a><font face="Courier New,Courier"><font size=-1>0.40</font></font></td>
+
+<td><a NAME="1034811"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034813"></a><font face="Courier New,Courier"><font size=-1>v34</font></font></td>
+
+<td><a NAME="1034815"></a><font face="Courier New,Courier"><font size=-1>29</font></font></td>
+
+<td><a NAME="1034817"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034819"></a><font face="Courier New,Courier"><font size=-1>via</font></font></td>
+
+<td><a NAME="1034821"></a><font face="Courier New,Courier"><font size=-1>0.36&nbsp;</font></font></td>
+
+<td><a NAME="1034823"></a><font face="Courier New,Courier"><font size=-1>0.35</font></font></td>
+
+<td><a NAME="1034825"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034827"></a><font face="Courier New,Courier"><font size=-1>m4</font></font></td>
+
+<td><a NAME="1034829"></a><font face="Courier New,Courier"><font size=-1>31</font></font></td>
+
+<td><a NAME="1034831"></a><font face="Courier New,Courier"><font size=-1>43</font></font></td>
+
+<td><a NAME="1034833"></a><font face="Courier New,Courier"><font size=-1>metal</font></font></td>
+
+<td><a NAME="1034835"></a><font face="Courier New,Courier"><font size=-1>0.40&nbsp;</font></font></td>
+
+<td><a NAME="1034837"></a><font face="Courier New,Courier"><font size=-1>0.40</font></font></td>
+
+<td><a NAME="1034839"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+</tr>
+
+<tr>
+<td><a NAME="1034841"></a></td>
+
+<td><a NAME="1034843"></a></td>
+
+<td><a NAME="1034845"></a></td>
+
+<td><a NAME="1034847"></a></td>
+
+<td><a NAME="1034849"></a></td>
+
+<td><a NAME="1034851"></a></td>
+
+<td><a NAME="1034853"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1034855"></a><font face="Courier New,Courier"><font size=-1>prb</font></font></td>
+
+<td><a NAME="1034857"></a><font face="Courier New,Courier"><font size=-1>65</font></font></td>
+
+<td><a NAME="1034859"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034861"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034863"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034865"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034867"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1034869"></a><font face="Courier New,Courier"><font size=-1>text</font></font></td>
+
+<td><a NAME="1034871"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034873"></a><font face="Courier New,Courier"><font size=-1>255</font></font></td>
+
+<td><a NAME="1034875"></a><font face="Courier New,Courier"><font size=-1>text</font></font></td>
+
+<td><a NAME="1034877"></a></td>
+
+<td><a NAME="1034879"></a></td>
+
+<td><a NAME="1034881"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1034883"></a><font face="Courier New,Courier"><font size=-1>bbox</font></font></td>
+
+<td><a NAME="1034885"></a><font face="Courier New,Courier"><font size=-1>62</font></font></td>
+
+<td><a NAME="1034887"></a><font face="Courier New,Courier"><font size=-1>-</font></font></td>
+
+<td><a NAME="1034889"></a><font face="Courier New,Courier"><font size=-1>bbox</font></font></td>
+
+<td><a NAME="1034891"></a></td>
+
+<td><a NAME="1034893"></a></td>
+
+<td><a NAME="1034895"></a></td>
+</tr>
+
+<tr>
+<td><a NAME="1034897"></a><font face="Courier New,Courier"><font size=-1>iname</font></font></td>
+
+<td><a NAME="1034899"></a><font face="Courier New,Courier"><font size=-1>propattr&nbsp;</font></font></td>
+
+<td><a NAME="1034901"></a><font face="Courier New,Courier"><font size=-1>102</font></font></td>
+
+<td><a NAME="1034903"></a><font face="Courier New,Courier"><font size=-1>iname</font></font></td>
+
+<td><a NAME="1034905"></a></td>
+
+<td><a NAME="1034907"></a></td>
+
+<td><a NAME="1034909"></a></td>
+</tr>
+</table></center>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1034911"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># define fet devices<a NAME="1028603"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">device nfet from poly ndif<a NAME="1028604"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">device pfet from poly pdif<a NAME="1028605"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028606"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc nfet space 0.5<a NAME="1028607"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc pfet space 0.5<a NAME="1028608"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028609"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># until max4 must be on same plane<a NAME="1028610"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># for fet Gcell generator<a NAME="1028611"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc poly ext nfet 0.36<a NAME="1028612"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc poly ext pfet 0.36<a NAME="1028613"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc ndif ext nfet 0.44<a NAME="1028614"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc pdif ext pfet 0.44<a NAME="1028615"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028616"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># DRC rules needed for via Gcell<a NAME="1028617"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m1 enc ct 0.09<a NAME="1028618"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m1 enc v12 0.09<a NAME="1028619"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028620"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m2 enc v12 0.09<a NAME="1028621"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m2 enc v23 0.1<a NAME="1028622"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028623"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m3 enc v23 0.09<a NAME="1028624"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m3 enc v34 0.09<a NAME="1028625"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028626"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">drc m4 enc v34 0.09<a NAME="1028627"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028628"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># add other tcl variable definitions with the set statement<a NAME="1028629"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028630"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># for wire tool<a NAME="1028631"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set ROUTE(order) “m4 m3 m2 m1 poly ndif pdif”<a NAME="1028632"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set ROUTE(default_layer) m1<a NAME="1028633"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028634"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">###############################################################<a NAME="1028635"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># USER DESIGN GRID<a NAME="1028636"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># This is the initial value shown in the Grid menu.<a NAME="1028637"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">###############################################################<a NAME="1028638"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set GRID(resolution) 0.01<a NAME="1028639"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028640"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">###############################################################<a NAME="1028641"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># ADDITIONAL DRC RULES<a NAME="1028642"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Additional rules that are not specified in the technology information table.<a NAME="1028643"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Needed for the fet and via Gcell generators<a NAME="1028644"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">###############################################################<a NAME="1028645"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set DRC_DATA(space_to,ct,nfet) 0.22<a NAME="1028646"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set DRC_DATA(space_to,ct,pfet) 0.22<a NAME="1028647"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set DRC_DATA(enclose,ndif,ct) 0.14<a NAME="1028648"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set DRC_DATA(enclose,pdif,ct) 0.14<a NAME="1028649"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set DRC_DATA(enclose,poly,ct) 0.14<a NAME="1028650"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1028651"></a></pre>
+<a NAME="1034985"></a></dl>
+</dl>
+</blockquote>
+
+<hr>
+<table ALIGN=LEFT BORDER=0 CELLSPACING=0 CELLPADDING=0 >
+<tr>
+<td ALIGN=LEFT><b><font size=-2>----- Micro Magic  ----- 
+</font></b></td>
+</tr>
+</table>
+
+<table ALIGN=RIGHT BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="331" >
+<tr>
+<td><a href="MAX_ManualTOC.html"><img SRC="images/navtoc.gif" ALT="TOC" BORDER=0 height=23 width=84></a></td>
+
+<td><a href="MAX_Man_Ch5MAX-LS.html"><img SRC="images/navprev.gif" ALT="PREV" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="apndxa.html"><img SRC="images/navnext.gif" ALT="NEXT" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="MAX_ManualIX.html"><img SRC="images/navidx.gif" ALT="INDEX" BORDER=0 height=23 width=85></a></td>
+</tr>
+</table>
+
+</body>
+</html>

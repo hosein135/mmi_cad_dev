@@ -1,0 +1,7 @@
+set NETLIST_CACHE(xgate,cells) {{icon nmos {}} {icon pmos {}}}
+set netlist_props spice
+set netlist_level 1000
+set NETLIST_CACHE(xgate,version) MMI_SUE4.2.15
+set NETLIST_CACHE(xgate) {{.SUBCKT xgate in in_L t1 t2 WP=2 WN=1} {M_0 t2 in_L t1 vdd p W='WP*1u' L=lp_min ad='areap(WP,sdd)' } {+ as='areap(WP,sdd)' pd='perip(WP,sdd)' ps='perip(WP,sdd)' } {M_1 t2 in t1 gnd n W='WN*1u' L=ln_min ad='arean(WN,sdd)' as='arean(WN,sdd)' } {+ pd='perin(WN,sdd)' ps='perin(WN,sdd)' } {.ENDS	$ xgate} {}}
+set NETLIST_CACHE(xgate,names) {{590 280 {1 t2}} {480 310 {0 t1}} {520 190 {1 in} {2 in}} {520 370 {0 in_L} {2 in_L}} {520 250 {0 M_1}} {560 250 {0 t2}} {520 310 {0 M_0}} {480 250 {0 t1}} {450 280 {1 t1}} {560 310 {0 t2}}}
+set NETLIST_CACHE(xgate,wires) {{450 310 480 310 t1} {450 250 480 250 t1} {560 250 590 250 t2} {560 310 590 310 t2} {590 280 590 310 t2} {590 250 590 280 t2} {450 250 450 280 t1} {450 280 450 310 t1}}

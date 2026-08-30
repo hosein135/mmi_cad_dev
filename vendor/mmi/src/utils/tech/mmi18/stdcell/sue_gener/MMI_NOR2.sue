@@ -1,0 +1,451 @@
+# Created using mapper from:
+#"MMI_NOR2 {A {MMI_NOR2A {in0 in0} {in1 in1} {out out}} {MMI_NOR2A_ {in0 in0} {in1 in1} {out out}}} {B {MMI_NOR2B {in0 in0} {in1 in1} {out out}} {MMI_NOR2B_ {in0 in0} {in1 in1} {out out}}} {C {MMI_NOR2C {in0 in0} {in1 in1} {out out}} {MMI_NOR2C_ {in0 in0} {in1 in1} {out out}}} {D {MMI_NOR2D {in0 in0} {in1 in1} {out out}} {MMI_NOR2D_ {in0 in0} {in1 in1} {out out}}} "
+
+proc SCHEMATIC_MMI_NOR2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    A {
+      if {!$DeMorgan} {
+
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {160 140}
+  make global -orient RY -name vdd -origin {0 -140}
+  make output -name out -origin {320 50}
+  make input -name in1 -origin {-100 -100}
+  make input -name in0 -origin {-100 0}
+  make nmos -W 0.46 -origin {0 100}
+  make nmos -W 0.46 -origin {160 100}
+  make pmos -W 1.84 -origin {0 0}
+  make pmos -W 1.84 -origin {0 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {50 300}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire 0 50 160 50
+  make_wire -100 0 -60 0
+  make_wire 160 60 160 50
+  make_wire -60 -100 100 -100
+  make_wire 0 -40 0 -60
+  make_wire 100 100 100 -100
+  make_wire 160 50 320 50
+  make_wire -100 -100 -60 -100
+  make_text -origin {-180 -200} -text {2 Input NOR}
+  make_text -origin {-180 -180} -text {A Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_NOR2 MMI_NOR2A -Size A -DeMorgan 0
+        make MMI_NOR2A -origin "$urx $ury"
+      } else {
+        generate MMI_NOR2 MMI_NOR2A -Size A -DeMorgan 0
+        make MMI_NOR2A -origin {0 0}
+        set terms [api_terminal_data MMI_NOR2A]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_NOR2A"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_NOR2 MMI_NOR2A_ -Size A -DeMorgan 1
+        make MMI_NOR2A_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    B {
+      if {!$DeMorgan} {
+
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {160 140}
+  make global -orient RY -name vdd -origin {30 -140}
+  make output -name out -origin {320 50}
+  make input -name in1 -origin {-100 -100}
+  make input -name in0 -origin {-100 0}
+  make nmos -W .92 -origin {0 100}
+  make nmos -W .92 -origin {160 100}
+  make pmos -W 1.84 -origin {0 0}
+  make pmos -W 1.84 -origin {70 0}
+  make pmos -W 1.84 -origin {0 -100}
+  make pmos -W 1.84 -origin {70 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {80 300}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire -100 0 -60 0
+  make_wire 160 60 160 50
+  make_wire 0 -40 0 -60
+  make_wire 100 100 100 -100
+  make_wire 160 50 320 50
+  make_wire -100 -100 -60 -100
+  make_wire 10 -100 -60 -100
+  make_wire 10 -100 100 -100
+  make_wire 70 -40 70 -60
+  make_wire 70 40 70 50
+  make_wire 70 50 0 50
+  make_wire 70 50 160 50
+  make_wire 10 0 -60 0
+  make_wire 0 -140 30 -140
+  make_wire 30 -140 70 -140
+  make_text -origin {-180 -200} -text {2 Input NOR}
+  make_text -origin {-180 -180} -text {B Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_NOR2 MMI_NOR2B -Size B -DeMorgan 0
+        make MMI_NOR2B -origin "$urx $ury"
+      } else {
+        generate MMI_NOR2 MMI_NOR2B -Size B -DeMorgan 0
+        make MMI_NOR2B -origin {0 0}
+        set terms [api_terminal_data MMI_NOR2B]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_NOR2B"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_NOR2 MMI_NOR2B_ -Size B -DeMorgan 1
+        make MMI_NOR2B_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    C {
+      if {!$DeMorgan} {
+
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {370 140}
+  make global -orient RY -name vdd -origin {30 -140}
+  make output -name out -origin {390 50}
+  make global -orient RY -name vdd -origin {170 -140}
+  make input -name in0 -origin {-100 0}
+  make input -name in1 -origin {-100 -100}
+  make nmos -W 1.84 -origin {0 100}
+  make nmos -W 1.84 -origin {370 100}
+  make pmos -W 1.84 -origin {0 0}
+  make pmos -W 1.84 -origin {70 0}
+  make pmos -W 1.84 -origin {140 0}
+  make pmos -W 1.84 -origin {210 0}
+  make pmos -W 1.84 -origin {210 -100}
+  make pmos -W 1.84 -origin {140 -100}
+  make pmos -W 1.84 -origin {70 -100}
+  make pmos -W 1.84 -origin {0 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {40 350}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire -100 0 -60 0
+  make_wire 370 60 370 50
+  make_wire 0 -40 0 -60
+  make_wire 310 100 310 -100
+  make_wire 370 50 390 50
+  make_wire -100 -100 -60 -100
+  make_wire 70 -40 70 -60
+  make_wire 70 50 0 50
+  make_wire 0 -140 30 -140
+  make_wire 30 -140 70 -140
+  make_wire -60 -100 10 -100
+  make_wire 70 40 70 50
+  make_wire 140 40 140 50
+  make_wire 140 -40 140 -60
+  make_wire 210 -40 210 -60
+  make_wire 150 0 80 0
+  make_wire 140 -140 170 -140
+  make_wire 170 -140 210 -140
+  make_wire 210 40 210 50
+  make_wire 10 -100 80 -100
+  make_wire 80 -100 150 -100
+  make_wire 150 -100 310 -100
+  make_wire 70 50 140 50
+  make_wire 140 50 210 50
+  make_wire 210 50 370 50
+  make_wire 10 0 -60 0
+  make_wire 10 0 80 0
+  make_text -origin {-180 -200} -text {2 Input NOR}
+  make_text -origin {-180 -180} -text {C Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_NOR2 MMI_NOR2C -Size C -DeMorgan 0
+        make MMI_NOR2C -origin "$urx $ury"
+      } else {
+        generate MMI_NOR2 MMI_NOR2C -Size C -DeMorgan 0
+        make MMI_NOR2C -origin {0 0}
+        set terms [api_terminal_data MMI_NOR2C]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_NOR2C"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_NOR2 MMI_NOR2C_ -Size C -DeMorgan 1
+        make MMI_NOR2C_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    D {
+      if {!$DeMorgan} {
+
+  make global -name gnd -origin {0 140}
+  make global -orient RY -name vdd -origin {0 -140}
+  make output -name out -origin {570 50}
+  make global -name gnd -origin {500 140}
+  make input -name in1 -origin {-100 -100}
+  make input -name in0 -origin {-100 0}
+  make nmos -W 3.68 -origin {500 100}
+  make nmos -W 3.68 -origin {0 100}
+  make pmos -W 4.9 -origin {0 -100}
+  make pmos -W 4.9 -origin {0 0}
+  make pmos -W 4.9 -origin {150 0}
+  make pmos -W 4.9 -origin {150 -100}
+  make pmos -W 4.9 -origin {280 0}
+  make pmos -W 4.9 -origin {280 -100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 04/27/00 -origin {200 370}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire 0 -40 0 -60
+  make_wire -60 0 -100 0
+  make_wire -60 -100 -100 -100
+  make_wire 500 60 500 50
+  make_wire -60 0 -60 100
+  make_wire 90 -100 -60 -100
+  make_wire 0 -140 150 -140
+  make_wire 150 40 150 50
+  make_wire 150 50 0 50
+  make_wire 150 -60 150 -40
+  make_wire -60 0 90 0
+  make_wire 440 -100 440 100
+  make_wire 500 50 570 50
+  make_wire 280 40 280 50
+  make_wire 280 -60 280 -40
+  make_wire 220 -100 440 -100
+  make_wire 220 -100 90 -100
+  make_wire 280 50 500 50
+  make_wire 280 50 150 50
+  make_wire 150 -140 280 -140
+  make_wire 90 0 220 0
+  make_text -origin {-180 -200} -text {2 Input NOR}
+  make_text -origin {-180 -180} -text {D Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_NOR2 MMI_NOR2D -Size D -DeMorgan 0
+        make MMI_NOR2D -origin "$urx $ury"
+      } else {
+        generate MMI_NOR2 MMI_NOR2D -Size D -DeMorgan 0
+        make MMI_NOR2D -origin {0 0}
+        set terms [api_terminal_data MMI_NOR2D]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_NOR2D"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_NOR2 MMI_NOR2D_ -Size D -DeMorgan 1
+        make MMI_NOR2D_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_NOR2 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_NOR2[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_NOR2 args {
+  icon_generator $args {{Size "A" {radio A B C D}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B") && ($size != "C") && ($size != "D")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_NOR2 icon body
+  if {$DeMorgan} {
+    icon_arc -30 -30 40 30 -start 277 -extent 166
+    icon_line 10 -30 -40 -30 -40 30 10 30
+    icon_line 40 0 60 0
+    icon_arc -60 10 -40 30 -start 0 -extent 359
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc -60 -30 50 110 -start 35 -extent 50
+    icon_arc -60 -110 50 30 -start 275 -extent 50
+    icon_arc -58 -30 -38 30 -start 270 -extent 180
+    icon_line -48 -30 0 -30
+    icon_line -48 30 0 30
+    icon_line -40 -20 -60 -20
+    icon_line -40 20 -60 20
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+  }
+
+  # properties
+  icon_property -origin {-37 -22} -size small -label F
+  icon_property -origin {0 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 20} -name in1
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_NOR2 -Size $Size]
+  set nname [NAME_MMI_NOR2 -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    A {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+    B {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+    C {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+    D {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

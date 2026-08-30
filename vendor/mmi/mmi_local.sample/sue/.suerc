@@ -1,0 +1,46 @@
+# Customize site-wide SUE settings here.
+
+# Set this up for your company name., e.g.
+#set TITLE_BAR_STRING "Micro Magic Inc., Confidential and Proprietary"
+
+# Set up your simulator name and where to look for verilog libraries.
+#set VERILOG_PROBE_CMD(interactive) {verilog -s +libext+.vb+.v -y . -y lib.v}
+#set VERILOG_CMD {verilog +libext+.vb+.v -y . -y lib.v}
+
+# for vcs
+# Note: due to a limitation of the vcs cli, you cannot use interactive
+# if your verilog uses the $fopen command.
+# For version 4.1 or earlier use +cli+2
+#set VERILOG_PROBE_CMD(interactive) "vcs -s +cli -O0 -R +libext+.vb+.v -y ."
+#set VERILOG_CMD "vcs -R +libext+.vb+.v -y ."
+
+# filename of default header (.h) file for spice and verilog
+set DEFAULT_SPICE_HEADER \
+	$env(MMI_TOOLS)/../mmi_local/sue/default_spice_header.h
+#set DEFAULT_VERILOG_HEADER \
+	$env(MMI_TOOLS)/../mmi_local/sue/default_verilog_header.h
+
+# List of possible spice hosts to look for spice jobs on so we can kill
+# them if desired.
+#set SPICEHOSTS "mmifs3"
+
+
+# Uncomment this line out to get the generic stdcell library icons
+#lappend AUTOLIB $env(MMI_TOOLS)/sue/schematics/stdcell
+
+
+# Uncomment this line if you have a edit license to add to SUE menu.
+#menu_add -menu file -label "Write EDIF" -command edif_write -position 10 \
+#	-help "Writes the EDIF for the given schematic and descendents."
+
+
+
+# add a function to local menu
+
+# Uncomment out the following lines to add the command "What
+# Instances" to the SUE Local Menu.  This is an example of using
+# the SUE API -- see what_instances.tcl.
+
+#source $env(MMI_TOOLS)/../mmi_local/sue/what_instances.tcl
+#menu_add -menu local -label "What Instances" -command what_instances \
+	-help "Popup a list of instances in the current schematic.  Click on an instance to select."

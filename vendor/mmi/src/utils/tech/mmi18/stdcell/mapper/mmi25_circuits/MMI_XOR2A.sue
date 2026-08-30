@@ -1,0 +1,62 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_XOR2A {} {
+  make global -name gnd -origin {670 560}
+  make global -orient RY -name vdd -origin {370 160}
+  make nmos -W 1.2 -origin {670 420}
+  make nmos -W 1.2 -origin {670 520}
+  make pmos -W 2.4 -origin {370 300}
+  make pmos -W 2.4 -origin {370 200}
+  make pmos -W 2.4 -origin {670 200}
+  make global -name gnd -origin {370 560}
+  make nmos -W 1.2 -origin {370 520}
+  make pmos -W 2.4 -origin {670 300}
+  make nmos -W 1.2 -origin {370 420}
+  make output -name out -origin {770 360}
+  make inverter -WP 1.2 -WN 0.6 -origin {470 520}
+  make inverter -WP 1.2 -WN 0.6 -origin {120 300}
+  make input -name in1 -origin {30 520}
+  make global -orient RY -name vdd -origin {670 160}
+  make input -name in0 -origin {30 420}
+  generate name_net_s name_net -cell name_net
+  make name_net -name in0_L -origin {210 300}
+  make name_net -name in1_L -origin {550 520}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 07/19/99 -origin {350 740}
+  make_wire 370 380 370 360
+  make_wire 370 340 370 360
+  make_wire 370 240 370 260
+  make_wire 670 480 670 460
+  make_wire 670 240 670 260
+  make_wire 670 360 670 380
+  make_wire 370 480 370 460
+  make_wire 670 340 670 360
+  make_wire 570 420 610 420
+  make_wire 610 200 590 200
+  make_wire 590 200 590 520
+  make_wire 590 520 610 520
+  make_wire 310 200 260 200
+  make_wire 260 200 260 520
+  make_wire 40 300 40 420
+  make_wire 440 520 310 520
+  make_wire 90 300 40 300
+  make_wire 30 420 40 420
+  make_wire 40 420 310 420
+  make_wire 310 300 430 300
+  make_wire 30 520 260 520
+  make_wire 260 520 310 520
+  make_wire 210 300 170 300
+  make_wire 210 300 310 300
+  make_wire 370 360 670 360
+  make_wire 670 360 770 360
+  make_wire 550 520 520 520
+  make_wire 550 520 590 520
+  make_wire 430 300 570 420
+  make_wire 570 300 430 420
+  make_wire 570 300 610 300
+  make_wire 430 420 310 420
+  make_text -origin {20 90} -text {Exclusive OR}
+  make_text -origin {20 110} -text {A Size}
+  make_text -origin {20 70} -text MMI_XOR2A -size large
+}
+

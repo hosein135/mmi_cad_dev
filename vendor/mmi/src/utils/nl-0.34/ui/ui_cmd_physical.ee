@@ -1,0 +1,2258 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+	(concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "skip-list.h"
+#include "nl.h"
+#include "pnl.h"
+#include "tcl.h"
+#include "tsp.h"
+#include "pl.h"
+#include "ui.h"
+#include "ui_int.h"
+     
+
+int ui_x_grid_size;
+int ui_y_grid_size;
+
+
+static
+int
+ui_convert_to_x_grids (int x)
+{
+  if ( x < 0 ) {
+    return (x - (ui_x_grid_size + 1) / 2 + 1) / ui_x_grid_size;
+  }
+  else {
+    return (x + ui_x_grid_size / 2) / ui_x_grid_size;
+  }
+}
+     
+
+static
+int
+ui_convert_to_y_grids (int y)
+{
+  if ( y < 0 ) {
+    return (y - (ui_y_grid_size + 1) / 2 + 1) / ui_y_grid_size;
+  }
+  else {
+    return (y + ui_y_grid_size / 2) / ui_y_grid_size;
+  }
+}
+     
+
+static
+int
+ui_convert_from_x_grids (int x)
+{
+  return x * ui_x_grid_size;
+}
+     
+
+static
+int
+ui_convert_from_y_grids (int y)
+{
+  return y * ui_y_grid_size;
+}
+     
+
+static
+pnl_design
+ui_cmd_get_pdesign_for_design (nl_design design)
+{
+  pnl_design pdesign = NULL;
+
+  nl_design_attr_get_by_name ("pnl design", design, &pdesign);
+
+  if ( pdesign == NULL ) {
+    error ("Design %s does not have any physical information.",
+	   nl_design_name (design));
+  }
+
+  return pdesign;
+}
+
+
+static
+pnl_idesign
+ui_cmd_get_pidesign_or_null (nl_design design)
+{
+  int num_idesigns = nl_design_num_idesigns (design);
+
+  if ( num_idesigns == 0 ) {
+    return NULL;
+  }
+  else {
+    nl_dll_head idesign_head = nl_design_idesigns (design);
+    nl_idesign idesign = (nl_idesign) nl_dll_gen_first (idesign_head);
+    pnl_idesign pidesign = NULL;
+
+    ASSERT (idesign != NULL);
+
+    nl_idesign_attr_get_by_name ("pnl idesign", idesign, &pidesign);
+
+    return pidesign;
+  }
+}
+
+
+static
+pnl_icell
+ui_cmd_get_picell_for_icell (nl_icell icell)
+{
+  pnl_idesign pidesign = NULL;
+  nl_idesign idesign = nl_icell_idesign (icell);
+
+  nl_idesign_attr_get_by_name ("pnl idesign", idesign, &pidesign);
+
+  if ( pidesign == NULL ) {
+    error ("Cell %s does not have any physical information.",
+	   nl_icell_name (icell));
+  }
+  else {
+    pnl_icell picell = pnl_idesign_get_icell (pidesign, icell);
+
+    return picell;
+  }
+}
+
+
+static pnl_cell ui_cmd_get_pcell_for_cell (nl_cell) UNUSED;
+
+static
+pnl_cell
+ui_cmd_get_pcell_for_cell (nl_cell cell)
+{
+  pnl_design pdesign = NULL;
+  nl_design design = nl_cell_design (cell);
+
+  nl_design_attr_get_by_name ("pnl design", design, &pdesign);
+
+  if ( pdesign == NULL ) {
+    error ("Cell %s does not have any physical information.",
+	   nl_cell_name (cell));
+  }
+  else {
+    pnl_cell pcell = pnl_design_get_cell (pdesign, cell);
+
+    return pcell;
+  }
+}
+
+
+static
+pnl_object
+ui_cmd_get_pnl_for_cell_or_icell (nl_object cell_or_icell)
+{
+  nl_kind kind = nl_object_kind (cell_or_icell);
+  pnl_object result;
+
+  if ( kind == nl_kind_icell ) {
+    nl_icell icell = (nl_icell) cell_or_icell;
+
+    result = (pnl_object) ui_cmd_get_picell_for_icell (icell);
+  }
+  else if ( kind == nl_kind_cell ) {
+    nl_cell cell = (nl_cell) cell_or_icell;
+    nl_design design = nl_cell_design (cell);
+    pnl_idesign pidesign = ui_cmd_get_pidesign_or_null (design);
+
+    if ( pidesign == NULL ) {
+      pnl_design pdesign = ui_cmd_get_pdesign_for_design (design);
+
+      result = (pnl_object) pnl_design_get_cell (pdesign, cell);
+    }
+    else {
+      nl_idesign idesign = pnl_idesign_nl_rep (pidesign);
+      nl_icell icell = nl_idesign_get_icell (idesign, cell);
+
+      result = (pnl_object) pnl_idesign_get_icell (pidesign, icell);
+    }
+  }
+  else {
+    ASSERT (0);
+  }
+
+  return result;
+}
+
+
+static
+pnl_inet
+ui_cmd_get_pinet_for_inet (nl_inet inet)
+{
+  pnl_idesign pidesign = NULL;
+  nl_idesign idesign = nl_inet_idesign (inet);
+
+  nl_idesign_attr_get_by_name ("pnl idesign", idesign, &pidesign);
+
+  if ( pidesign == NULL ) {
+    error ("Net %s does not have any physical information.",
+	   nl_inet_name (inet));
+  }
+  else {
+    pnl_inet pinet = pnl_idesign_get_inet (pidesign, inet);
+
+    return pinet;
+  }
+}
+
+
+static
+pnl_port
+ui_cmd_get_pport_for_port (nl_port port)
+{
+  pnl_design pdesign = NULL;
+  nl_design design = nl_port_design (port);
+
+  nl_design_attr_get_by_name ("pnl design", design, &pdesign);
+
+  if ( pdesign == NULL ) {
+    error ("Port %s does not have any physical information.",
+	   nl_port_name (port));
+  }
+  else {
+    pnl_port pport = pnl_design_get_port (pdesign, port);
+
+    return pport;
+  }
+}
+
+
+static
+pnl_libcell
+ui_cmd_get_plibcell_for_libcell (nl_libcell libcell)
+{
+  nl_library library = nl_libcell_library (libcell);
+  pnl_library plibrary;
+  pnl_libcell plibcell;
+
+  nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+  if ( plibrary == NULL ) {
+    error ("library %s does not contain any physical information",
+	   nl_library_name (library));
+  }
+  
+  plibcell = pnl_library_get_libcell (plibrary, libcell);
+
+  return plibcell;
+}
+
+
+static
+pnl_libpin
+ui_cmd_get_plibpin_for_libpin (nl_libpin libpin)
+{
+  nl_libcell libcell = nl_libpin_libcell (libpin);
+  nl_library library = nl_libcell_library (libcell);
+  pnl_library plibrary;
+  pnl_libpin plibpin;
+
+  nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+  if ( plibrary == NULL ) {
+    error ("library %s does not contain any physical information",
+	   nl_library_name (library));
+  }
+  
+  plibpin = pnl_library_get_libpin (plibrary, libpin);
+
+  return plibpin;
+}
+
+
+#(defcommand create_pdesign
+   "Create a pdesign based on the specified design."
+   (-nohierarchy boolean "do not create a hierarchical pdesign")
+   &optional
+   (design current_design "top level design of the pdesign"))
+{
+  pnl_design pdesign = NULL;
+
+  nl_design_attr_get_by_name ("pnl design", design, &pdesign);
+
+  if ( pdesign == NULL ) {
+    pnl_design_create (design);
+  }
+
+  if ( !nohierarchy ) {
+    nl_idesign idesign = nl_idesign_get_or_create (design, NULL);
+
+    if ( idesign == NULL ) {
+      error ("an idesign for %s could not be created.",
+	     nl_design_name (design));
+    }
+
+    pnl_idesign_fill (idesign);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand update_cell_locations
+   "Update the flat cell locations based on hierarchical cell locations."
+   &optional
+   (design current_design "top level design of the pdesign"))
+{
+  pnl_idesign pidesign = NULL;
+  nl_idesign idesign = nl_idesign_get_or_create (design, NULL);
+
+  nl_idesign_attr_get_by_name ("pnl idesign", idesign, &pidesign);
+
+  if ( pidesign == NULL ) {
+    pidesign = pnl_idesign_create (idesign);
+  }
+
+  pnl_idesign_update_locations (idesign, 0, 0, pnl_orientation_N,
+				pnl_loctype_null);
+
+  return TCL_OK;
+}
+
+
+#(defcommand create_plibrary
+   "Create a physical library (plibrary) based on the specified library."
+   (library library "create a plibrary for this library"))
+{
+  pnl_library_create (library);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_die_area
+   "Return the die area, xmin, ymin, xmax, and ymax, as a list."
+   (-grids boolean "return the result in grid units")
+   &optional
+   (pdesign current_pdesign "return the die area of this design"))
+{
+  int x0;
+  int y0;
+  int x1;
+  int y1;
+  Tcl_Obj *result;
+  int flag = pnl_design_get_die_area (pdesign, &x0, &y0, &x1, &y1);
+
+  if ( grids ) {
+    x0 = ui_convert_to_x_grids (x0);
+    y0 = ui_convert_to_y_grids (y0);
+    x1 = ui_convert_to_x_grids (x1);
+    y1 = ui_convert_to_y_grids (y1);
+  }
+
+  if ( flag ) {
+    Tcl_Obj *objv[4];
+
+    objv[0] = Tcl_NewIntObj (x0);
+    objv[1] = Tcl_NewIntObj (y0);
+    objv[2] = Tcl_NewIntObj (x1);
+    objv[3] = Tcl_NewIntObj (y1);
+
+    result = Tcl_NewListObj (4, objv);
+  }
+  else {
+    result = Tcl_NewListObj (0, NULL);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_die_area
+    "Set the die area to the specified values."
+    (-grids boolean "set the die area in grid units")
+    (list integer_list "a list of the form {xmin, ymin, xmax, ymax} or {}")
+    &optional
+    (pdesign current_pdesign "return the die area of this design"))
+{
+  int size = ar_size (list);
+
+  if ( pdesign == NULL ) {
+    error ("there is no pdesign for the specified design (or current design)");
+  }
+
+  if ( size == 0 ) {
+    pnl_design_clear_die_area (pdesign);
+  }
+  else if ( size == 4 ) {
+    int x0 = AR_REF (list, int, 0);
+    int y0 = AR_REF (list, int, 1);
+    int x1 = AR_REF (list, int, 2);
+    int y1 = AR_REF (list, int, 3);
+
+    if ( grids ) {
+      x0 = ui_convert_from_x_grids (x0);
+      y0 = ui_convert_from_y_grids (y0);
+      x1 = ui_convert_from_x_grids (x1);
+      y1 = ui_convert_from_y_grids (y1);
+    }
+
+    pnl_design_set_die_area (pdesign, x0, y0, x1, y1);
+  }
+  else {
+    error ("list argument has %d element%s, it should have either "
+	   "zero or four elements.", size, (size == 1) ? "" : "s");
+  }
+  
+  return TCL_OK;
+}
+
+
+#(defcommand set_distance_units
+   "Set the DEF distance units for the current design."
+   (unit_name string "name of the distance unit (e.g. MICRONS)")
+   (number integer "number of design units in the distance unit")
+   &optional
+   (pdesign current_pdesign "set the distance units for this design"))
+{
+  pnl_design_set_distance_units (pdesign, unit_name, number);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_distance_units
+   "Get the distance units for the current design as a list: {unit_name number}"
+   &optional
+   (pdesign current_pdesign "get the distance units for this design"))
+{
+  char *str;
+  int number;
+
+  pnl_design_get_distance_units (pdesign, &str, &number);
+
+  if ( str != NULL ) {
+    Tcl_Obj *str_obj = Tcl_NewStringObj (str, -1);
+    Tcl_Obj *num_obj = Tcl_NewIntObj (number);
+    Tcl_Obj *objv[2];
+    Tcl_Obj *result;
+
+    objv[0] = str_obj;
+    objv[1] = num_obj;
+
+    result = Tcl_NewListObj (2, objv);
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+static
+Tcl_Obj *
+ui_cmd_tracks_obj (Tcl_Interp *interp, pnl_tracks tracks)
+{
+  int start = pnl_tracks_start (tracks);
+  int count = pnl_tracks_count (tracks);
+  int step = pnl_tracks_step (tracks);
+  ar layers = pnl_tracks_layers (tracks);
+  Tcl_Obj *start_obj = Tcl_NewIntObj (start);
+  Tcl_Obj *count_obj = Tcl_NewIntObj (count);
+  Tcl_Obj *step_obj = Tcl_NewIntObj (step);
+  Tcl_Obj *layers_obj = Tcl_NewListObj (0, NULL);
+
+  ar_for_all_indexed (layers, char *, layer_name, index) {
+    Tcl_Obj *elt = Tcl_NewStringObj (layer_name, -1);
+
+    Tcl_ListObjAppendElement (interp, layers_obj, elt);
+  } ar_end_for;
+
+  {
+    Tcl_Obj *objv[4];
+    Tcl_Obj *result;
+
+    objv[0] = start_obj;
+    objv[1] = count_obj;
+    objv[2] = step_obj;
+    objv[3] = layers_obj;
+
+    result = Tcl_NewListObj (4, objv);
+
+    return result;
+  }
+}
+
+
+#(defcommand get_x_tracks
+    "Return the X tracks as a list: start, number, step, and layers."
+    &optional
+    (pdesign current_pdesign "return the X tracks of this design"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  pnl_design_for_all_x_tracks (pdesign, tracks) {
+    Tcl_Obj *tracks_obj = ui_cmd_tracks_obj (interp, tracks);
+
+    Tcl_ListObjAppendElement (interp, result, tracks_obj);
+  } pnl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_y_tracks
+    "Return the Y tracks as a list: start, number, step, and layers."
+    &optional
+    (pdesign current_pdesign "return the Y tracks of this design"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  pnl_design_for_all_y_tracks (pdesign, tracks) {
+    Tcl_Obj *tracks_obj = ui_cmd_tracks_obj (interp, tracks);
+
+    Tcl_ListObjAppendElement (interp, result, tracks_obj);
+  } pnl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand add_x_tracks
+   "Set the X tracks of the specified design."
+   (start integer "starting coordinate of the tracks")
+   (number integer "the number of tracks")
+   (step integer "the track separation")
+   (layers string_list "the layers involved")
+   &optional
+   (pdesign current_pdesign "set the X tracks for this design"))
+{
+  pnl_design_add_x_tracks (pdesign, start, number, step, layers);
+
+  return TCL_OK;
+}
+
+
+#(defcommand clear_x_tracks 
+   "Remove all X tracks from the specified design."
+   &optional
+   (pdesign current_pdesign "clear the X tracks of this design"))
+{
+  pnl_design_free_x_tracks (pdesign);
+
+  return TCL_OK;
+}
+
+
+#(defcommand clear_y_tracks 
+   "Remove all Y tracks from the specified design."
+   &optional
+   (pdesign current_pdesign "clear the Y tracks of this design"))
+{
+  pnl_design_free_y_tracks (pdesign);
+
+  return TCL_OK;
+}
+
+
+#(defcommand add_y_tracks
+   "Set the Y tracks of the specified design."
+   (start integer "starting coordinate of the tracks")
+   (number integer "the number of tracks")
+   (step integer "the track separation")
+   (layers string_list "the layers involved")
+   &optional
+   (pdesign current_pdesign "set the Y tracks for this design"))
+{
+  pnl_design_add_y_tracks (pdesign, start, number, step, layers);
+
+  return TCL_OK;
+}
+
+
+#(defcommand clear_row_sites
+   "Remove all the row sites from the specified design."
+   &optional
+   (pdesign current_pdesign "remove the row sites from this design"))
+{
+  pnl_design_free_row_sites (pdesign);
+
+  return TCL_OK;
+}
+
+
+#(defcommand add_row_site
+   "Add a row site to the specified design."
+   (name string "the name of the row")
+   (core string "the name of the core site")
+   (x0 integer "the x coordinate of the lower left corner of the row")
+   (y0 integer "the y coordinate of the lower left corner of the row")
+   (orient string "the orientation of the row")
+   (count integer "the number of sites in the row")
+   (step integer "the width of the sites")
+   (height integer "the height of the sites")
+   &optional
+   (pdesign current_pdesign "add the row site to this design"))
+{
+  pnl_orientation orientation = pnl_string_to_orientation (orient);
+
+  if ( orientation == pnl_orientation_null ) {
+    error ("could not convert %s to an orientation, "
+	   "must be either N, S, E, W, FN, FS, FE, or FW.", orient);
+  }
+
+  pnl_design_add_row_site (pdesign, name, core, x0, y0, orientation,
+			   count, step, height);
+
+  return TCL_OK;
+}
+
+
+#(defcommand list_row_sites 
+   ("Return a list of the row sites, each in the following form:"
+    "{name core x0 y0 orientation count width height}")
+   &optional
+   (pdesign current_pdesign "return the row sites for this design"))
+{
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+  ar row_sites = pnl_design_row_sites (pdesign);
+
+  if ( row_sites == NULL ) {
+    return TCL_OK;
+  }
+
+  ar_for_all (row_sites, pnl_row_site, site) {
+    char *name = pnl_row_site_name (site);
+    char *core = pnl_row_site_core (site);
+    int x0 = pnl_row_site_x0 (site);
+    int y0 = pnl_row_site_y0 (site);
+    pnl_orientation orientation = pnl_row_site_orientation (site);
+    const char *orient_str = pnl_orientation_to_string (orientation);
+    int count = pnl_row_site_count (site);
+    int step = pnl_row_site_step (site);
+    int height = pnl_row_site_height (site);
+    Tcl_Obj *name_obj = Tcl_NewStringObj (name, -1);
+    Tcl_Obj *core_obj = Tcl_NewStringObj (core, -1);
+    Tcl_Obj *x0_obj = Tcl_NewIntObj (x0);
+    Tcl_Obj *y0_obj = Tcl_NewIntObj (y0);
+    Tcl_Obj *orient_obj = Tcl_NewStringObj ((char *) orient_str, -1);
+    Tcl_Obj *count_obj = Tcl_NewIntObj (count);
+    Tcl_Obj *step_obj = Tcl_NewIntObj (step);
+    Tcl_Obj *height_obj = Tcl_NewIntObj (height);
+    Tcl_Obj *objv[8];
+    Tcl_Obj *element;
+
+    objv[0] = name_obj;
+    objv[1] = core_obj;
+    objv[2] = x0_obj;
+    objv[3] = y0_obj;
+    objv[4] = orient_obj;
+    objv[5] = count_obj;
+    objv[6] = step_obj;
+    objv[7] = height_obj;
+
+    element = Tcl_NewListObj (8, objv);
+
+    Tcl_ListObjAppendElement (interp, result, element);
+  } ar_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_location
+   ("Return the location of the specified cell.  By default this location is"
+    "that of the lower-left corner.")
+   (-origin boolean "return the location of the origin of the cell (not LL corener)")
+   (-grids boolean "return the location in grid units")
+   (cell_or_icell cell_or_icell "return the location of this cell"))
+{
+  pnl_object pobj = ui_cmd_get_pnl_for_cell_or_icell (cell_or_icell);
+  pnl_kind pkind = pnl_object_kind (pobj);
+  int has_loc;
+
+  if ( pkind == pnl_kind_cell ) {
+    has_loc = pnl_cell_has_location ((pnl_cell) pobj);
+  }
+  else if ( pkind == pnl_kind_icell ) {
+    has_loc = pnl_icell_has_location ((pnl_icell) pobj);
+  }
+  else {
+    ASSERT (0);
+  }
+
+  if ( has_loc ) {
+    int x;
+    int y;
+
+    if ( pkind == pnl_kind_cell ) {
+      pnl_cell pcell = (pnl_cell) pobj;
+
+      pnl_cell_get_location (pcell, origin, &x, &y);
+    }
+    else if ( pkind == pnl_kind_icell ) {
+      pnl_icell picell = (pnl_icell) pobj;
+
+      pnl_icell_get_location (picell, origin, &x, &y);
+    }
+    else {
+      ASSERT (0);
+    }
+
+    if ( grids ) {
+      x = ui_convert_to_x_grids (x);
+      y = ui_convert_to_y_grids (y);
+    }
+
+    {
+      Tcl_Obj *x_obj = Tcl_NewIntObj (x);
+      Tcl_Obj *y_obj = Tcl_NewIntObj (y);
+      Tcl_Obj *xy_obj[2];
+      Tcl_Obj *result;
+
+      xy_obj[0] = x_obj;
+      xy_obj[1] = y_obj;
+
+      result = Tcl_NewListObj (2, xy_obj);
+
+      Tcl_SetObjResult (interp, result);
+    }
+  }
+  
+  return TCL_OK;
+}
+
+
+#(defcommand set_cell_location
+   ("Set the location of the specified cell.  By default, this location is"
+    "that of the lower-left corner.")
+   (-origin boolean "the location is the origin of the cell (not LL corner)")
+   (-type string "the type of the location: PLACED (default), FIXED, or COVER.")
+   (-grids boolean "set the location in grid units")
+   (cell_or_icell cell_or_icell "return the location of this cell")
+   (x_coord integer "x coordinate of the location")
+   (y_coord integer "y coordinate of the location"))
+{
+  pnl_object pobj = ui_cmd_get_pnl_for_cell_or_icell (cell_or_icell);
+  pnl_loctype loctype;
+
+  if ( type == NULL ) {
+    loctype = pnl_loctype_PLACED;
+  }
+  else {
+    loctype = pnl_string_to_loctype (type);
+
+    if ( loctype == pnl_loctype_null || loctype == pnl_loctype_UNPLACED ) {
+      error ("%s is not a valid location type.  Should be "
+	     "PLACED, FIXED, or COVER.", type);
+    }
+  }
+
+  if ( grids ) {
+    x_coord = ui_convert_from_x_grids (x_coord);
+    y_coord = ui_convert_from_y_grids (y_coord);
+  }
+
+  if ( pnl_object_kind (pobj) == pnl_kind_cell ) {
+    pnl_cell pcell = (pnl_cell) pobj;
+
+    pnl_cell_set_location (pcell, origin, x_coord, y_coord);
+    pnl_cell_set_loctype (pcell, loctype);
+  }
+  else if ( pnl_object_kind (pobj) == pnl_kind_icell ) {
+    pnl_icell picell = (pnl_icell) pobj;
+
+    pnl_icell_set_location (picell, origin, x_coord, y_coord);
+    pnl_icell_set_loctype (picell, loctype);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_pin_location
+   "Return the location of the specified pin."
+   (-grids boolean "return the location in grid units")
+   (pin_or_ipin pin_or_ipin "get the location of this pin"))
+{
+  nl_kind kind = nl_object_kind (pin_or_ipin);
+  nl_object owner;
+  int x;
+  int y;
+  nl_kind owner_kind;
+  nl_pin pin;
+
+  if ( kind == nl_kind_pin ) {
+    pin = (nl_pin) pin_or_ipin;
+
+    owner = (nl_object) nl_pin_owner (pin);
+  }
+  else if ( kind == nl_kind_ipin ) {
+    nl_ipin ipin = (nl_ipin) pin_or_ipin;
+
+    pin = nl_ipin_pin (ipin);
+    owner = (nl_object) nl_ipin_owner (ipin);
+
+    if ( nl_object_kind (owner) == nl_kind_iport ) {
+      nl_iport iport = (nl_iport) owner;
+
+      owner = (nl_object) nl_iport_port (iport);
+    }
+  }
+  else {
+    ASSERT (0);
+  }
+
+  owner_kind = nl_object_kind (owner);
+
+  if ( owner_kind == nl_kind_port ) {
+    nl_port port = (nl_port) owner;
+    pnl_port pport = ui_cmd_get_pport_for_port (port);
+
+    pnl_port_get_location (pport, &x, &y);
+  }
+  else if ( owner_kind == nl_kind_cell || owner_kind == nl_kind_icell ) {
+    pnl_object powner = ui_cmd_get_pnl_for_cell_or_icell (owner);
+    pnl_kind powner_kind = pnl_object_kind (powner);
+
+    if ( powner_kind == pnl_kind_icell ) {
+      pnl_icell picell = (pnl_icell) powner;
+      
+      pnl_icell_get_pin_location (picell, pin, &x, &y);
+    }
+    else if ( powner_kind == pnl_kind_cell ) {
+      nl_pin pin = (nl_pin) pin_or_ipin;
+      pnl_cell pcell = (pnl_cell) powner;
+      
+      pnl_cell_get_pin_location (pcell, pin, &x, &y);
+    }
+    else {
+      ASSERT (0);
+    }
+  }
+  else {
+    ASSERT (0);
+  }
+
+  if ( grids ) {
+    x = ui_convert_to_x_grids (x);
+    y = ui_convert_to_y_grids (y);
+  }
+
+  {
+    Tcl_Obj *x_obj = Tcl_NewIntObj (x);
+    Tcl_Obj *y_obj = Tcl_NewIntObj (y);
+    Tcl_Obj *objv[2];
+    Tcl_Obj *result;
+
+    objv[0] = x_obj;
+    objv[1] = y_obj;
+
+    result = Tcl_NewListObj (2, objv);
+
+    Tcl_SetObjResult (interp, result);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand get_port_location
+   "Return the location of the specified port."
+   (-grids boolean "return the location in grid units")
+   (port port "return the location of this port"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_loctype loctype = pnl_port_loctype (pport);
+
+  if ( loctype == pnl_loctype_null || loctype == pnl_loctype_UNPLACED ) {
+    return TCL_OK;
+  }
+  else {
+    int x;
+    int y;
+
+    pnl_port_get_location (pport, &x, &y);
+
+    if ( grids ) {
+      x = ui_convert_to_x_grids (x);
+      y = ui_convert_to_y_grids (y);
+    }
+
+    {
+      Tcl_Obj *x_obj = Tcl_NewIntObj (x);
+      Tcl_Obj *y_obj = Tcl_NewIntObj (y);
+      Tcl_Obj *xy_obj[2];
+      Tcl_Obj *result;
+
+      xy_obj[0] = x_obj;
+      xy_obj[1] = y_obj;
+      result = Tcl_NewListObj (2, xy_obj);
+
+      Tcl_SetObjResult (interp, result);
+
+      return TCL_OK;
+    }
+  }
+}
+
+
+#(defcommand set_port_location
+   "Return the location of the specified port."
+   (-fixed boolean "mark the location as FIXED (otherwise it is PLACED)")
+   (-grids boolean "set the location in grid units")
+   (port port "set the location of this port")
+   (x_coord integer "x coordinate of the location")
+   (y_coord integer "y coordinate of the location"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+
+
+  if ( grids ) {
+    x_coord = ui_convert_from_x_grids (x_coord);
+    y_coord = ui_convert_from_y_grids (y_coord);
+  }
+  
+  pnl_port_set_location (pport, x_coord, y_coord);
+
+  if ( fixed ) {
+    pnl_port_set_loctype (pport, pnl_loctype_FIXED);
+  }
+  else {
+    pnl_port_set_loctype (pport, pnl_loctype_PLACED);
+  }
+
+  Tcl_SetResult (interp, "", TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_geometry
+   "Return the geometry of the specified port as a list: {layer x0 y0 x1 y1}"
+   (port port "get the geometry of this port"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  char *layer;
+  int x0;
+  int y0;
+  int x1;
+  int y1;
+  int flag = pnl_port_get_geometry (pport, &layer, &x0, &y0, &x1, &y1);
+  Tcl_Obj *result;
+
+  if ( flag ) {
+    Tcl_Obj *objv1[2];
+    Tcl_Obj *objv2[4];
+
+    objv2[0] = Tcl_NewIntObj (x0);
+    objv2[1] = Tcl_NewIntObj (y0);
+    objv2[2] = Tcl_NewIntObj (x1);
+    objv2[3] = Tcl_NewIntObj (y1);
+
+    objv1[0] = Tcl_NewStringObj (layer, -1);
+    objv1[1] = Tcl_NewListObj (4, objv2);
+
+    result = Tcl_NewListObj (2, objv1);
+  }
+  else {
+    result = Tcl_NewListObj (0, NULL);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_port_geometry
+   "Set the geometry of the specified port as a list."
+   (port port "set the geometry of this port")
+   (layer string "the layer of the port")
+   (list integer_list "a list of the form {x0, y0, x1, y1}"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  int size = ar_size (list);
+
+  if ( size == 0 ) {
+    pnl_port_clear_geometry (pport);
+  }
+  else if ( size == 4 ) {
+    int x0 = AR_REF (list, int, 0);
+    int y0 = AR_REF (list, int, 1);
+    int x1 = AR_REF (list, int, 2);
+    int y1 = AR_REF (list, int, 3);
+
+    pnl_port_set_geometry (pport, layer, x0, y0, x1, y1);
+  }
+  else {
+    error ("list argument has %d element%s, it should have either "
+	   "zero or four elements.", size, (size == 1) ? "" : "s");
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_orientation
+   "Return the orientation (in DEF format) of the specified cell."
+   (-max boolean "return the orientation in MAX format")
+   (-sue boolean "return the orientation in SUE format")
+   (cell_or_icell cell_or_icell "get the orientation of this cell"))
+{
+  pnl_object pobj = ui_cmd_get_pnl_for_cell_or_icell (cell_or_icell);
+  pnl_kind pkind = pnl_object_kind (pobj);
+  pnl_orientation orient;
+  const char *result;
+
+  if ( sue && max ) {
+    error ("only one of -sue and -max may be specified");
+  }
+
+  if ( pkind == pnl_kind_cell ) {
+    orient = pnl_cell_orientation ((pnl_cell) pobj);
+  }
+  else if ( pkind == pnl_kind_icell ) {
+    orient = pnl_icell_orientation ((pnl_icell) pobj);
+  }
+  else {
+    ASSERT (0);
+  }
+
+  if ( max )
+    result = pnl_orientation_to_max_string (orient);
+  else if ( sue )
+    result = pnl_orientation_to_sue_string (orient);
+  else 
+    result = pnl_orientation_to_string (orient);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_orientation
+   "Return the orientation (in DEF format) of the specified port."
+   (-max boolean "return the orientation in MAX format")
+   (-sue boolean "return the orientation in SUE format")
+   (port port "get the orientation of this port"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_orientation orient = pnl_port_orientation (pport);
+  const char *result;
+
+  if ( sue && max ) {
+    error ("only one of -sue and -max may be specified");
+  }
+
+  if ( max )
+    result = pnl_orientation_to_max_string (orient);
+  else if ( sue )
+    result = pnl_orientation_to_sue_string (orient);
+  else 
+    result = pnl_orientation_to_string (orient);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_cell_orientation
+   "Set the orientation of the specified cell."
+   (cell_or_icell cell_or_icell "set the orientation of this cell")
+   (orient string "set the orientation to this (N, S, E, W, FN, FS, FE, or FW)"))
+{
+  pnl_object pobj = ui_cmd_get_pnl_for_cell_or_icell (cell_or_icell);
+  pnl_orientation orientation = pnl_any_string_to_orientation (orient);
+
+  if ( orientation == pnl_orientation_null ) {
+    error ("invalid orientation (%s), must be either "
+	   "N, S, E, W, FN, FS, FE, or FW", orient);
+  }
+  else {
+    pnl_kind pkind = pnl_object_kind (pobj);
+
+    if ( pkind == pnl_kind_cell ) {
+      pnl_cell_set_orientation ((pnl_cell) pobj, orientation);
+    }
+    else if ( pkind == pnl_kind_icell ) {
+      pnl_icell_set_orientation ((pnl_icell) pobj, orientation);
+    }
+    else {
+      ASSERT (0);
+    }
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand set_port_orientation
+   "Set the orientation of the specified port."
+   (port port "set the orientation of this port")
+   (orient string "set the orientation to this (N, S, E, W, FN, FS, FE, or FW)"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_orientation orientation = pnl_any_string_to_orientation (orient);
+
+  if ( orientation == pnl_orientation_null ) {
+    error ("invalid orientation (%s), must be either "
+	   "N, S, E, W, FN, FS, FE, or FW", orient);
+  }
+  else {
+    pnl_port_set_orientation (pport, orientation);
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_loctype
+   ("Return the location type (UNPLACED, PLACED, or FIXED) "
+    "of the specified cell.")
+   (cell_or_icell cell_or_icell "return the location type of this cell"))
+{
+  pnl_object pobj = ui_cmd_get_pnl_for_cell_or_icell (cell_or_icell);
+  pnl_kind pkind = pnl_object_kind (pobj);
+  pnl_loctype loctype;
+  const char *result;
+
+  if ( pkind == pnl_kind_cell ) {
+    loctype = pnl_cell_loctype ((pnl_cell) pobj);
+  }
+  else if ( pkind == pnl_kind_icell ) {
+    loctype = pnl_icell_loctype ((pnl_icell) pobj);
+  }
+  else {
+    ASSERT (0);
+  }
+
+  result = pnl_loctype_to_string (loctype);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_loctype
+   ("Return the location type (UNPLACED, PLACED, or FIXED) "
+    "of the specified port.")
+   (port port "get the location type of this port"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_loctype loctype = pnl_port_loctype (pport);
+  const char *result = pnl_loctype_to_string (loctype);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_cell_loctype
+   "Set the location type of the specified cell."
+   (cell_or_icell cell_or_icell "set the location type of this cell")
+   (str string "set the loctype to this (UNPLACED, PLACED, or FIXED)"))
+{
+  pnl_object pobj = ui_cmd_get_pnl_for_cell_or_icell (cell_or_icell);
+  pnl_loctype loctype = pnl_string_to_loctype (str);
+
+  if ( loctype == pnl_loctype_null ) {
+    error ("invalid loctype (%s), must be either UNPLACED, PLACED, or FIXED.",
+	   str);
+  }
+  else {
+    pnl_kind pkind = pnl_object_kind (pobj);
+
+    if ( pkind == pnl_kind_cell ) {
+      pnl_cell_set_loctype ((pnl_cell) pobj, loctype);
+    }
+    else if ( pkind == pnl_kind_icell ) {
+      pnl_icell_set_loctype ((pnl_icell) pobj, loctype);
+    }
+    else {
+      ASSERT (0);
+    }
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand set_port_loctype
+   "Set the location type of the specified port."
+   (port port "set the location type of this port")
+   (str string "set the loctype to this (UNPLACED, PLACED, or FIXED)"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_loctype loctype = pnl_string_to_loctype (str);
+
+  if ( loctype == pnl_loctype_null ) {
+    error ("invalid loctype (%s), must be either UNPLACED, PLACED, or FIXED.",
+	   str);
+  }
+  else {
+    pnl_port_set_loctype (pport, loctype);
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand is_special
+   "Return 1 if the specified net is a DEF special net."
+   (inet inet "return the special net status of this net"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  int special = pnl_inet_special (pinet);
+  Tcl_Obj *result = Tcl_NewIntObj (special);
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_special
+   "Set the DEF special net flag of the specified net to the specified value."
+   (inet inet "set the special net status of this net")
+   (value integer "set the special net flag to this value (1 or 0)"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+
+  pnl_inet_set_special (pinet, value);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_routes
+   "Return a list of all the routes for the specified net."
+   (-special boolean "only get special (non-minimum-width) routes")
+   (-nonspecial boolean "only get non-special routes")
+   (inet inet "get the routes for this net."))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  if ( !special && !nonspecial ) {
+    special = nonspecial = 1;
+  }
+
+  pnl_inet_for_all_routes (pinet, route) {
+    Tcl_Obj *route_obj = NULL;
+    pnl_routekind routekind = pnl_route_kind (route);
+    const char *routekind_str = pnl_routekind_to_string (routekind);
+    int first = 1;
+
+    pnl_route_for_all_branches (route, branch) {
+      int width = pnl_branch_width (branch);
+
+      if ( (!special && width >= 0) ||
+	   (!nonspecial && width < 0) ) {
+	continue;
+      }
+      else {
+	Tcl_Obj *branch_obj = Tcl_NewListObj (0, NULL);
+	char *layer = pnl_branch_layer (branch);
+	Tcl_Obj *layer_obj = Tcl_NewStringObj (layer, -1);
+	int x0 = pnl_branch_x0 (branch);
+	Tcl_Obj *x0_obj = Tcl_NewIntObj (x0);
+	int y0 = pnl_branch_y0 (branch);
+	Tcl_Obj *y0_obj = Tcl_NewIntObj (y0);
+	Tcl_Obj *width_obj = Tcl_NewIntObj (width);
+	Tcl_Obj *xy_objv[3];
+	Tcl_Obj *point0_obj;
+	
+	xy_objv[0] = x0_obj;
+	xy_objv[1] = y0_obj;
+	xy_objv[2] = width_obj;
+
+	point0_obj = Tcl_NewListObj (3, xy_objv);
+
+	Tcl_ListObjAppendElement (interp, branch_obj, layer_obj);
+	Tcl_ListObjAppendElement (interp, branch_obj, point0_obj);
+
+	pnl_branch_for_all_segments (branch, segment) {
+	  pnl_segmentkind kind = pnl_segment_kind (segment);
+
+	  switch ( kind ) {
+	  case pnl_segmentkind_x: {
+	    pnl_x_segment x_seg = (pnl_x_segment) segment;
+	    int x = pnl_x_segment_x (x_seg);
+	    Tcl_Obj *star_obj = Tcl_NewStringObj ("*", -1);
+	    Tcl_Obj *x_obj = Tcl_NewIntObj (x);
+	    Tcl_Obj *objv[2];
+	    Tcl_Obj *point_obj;
+
+	    objv[0] = x_obj;
+	    objv[1] = star_obj;
+	    point_obj = Tcl_NewListObj (2, objv);
+
+	    Tcl_ListObjAppendElement (interp, branch_obj, point_obj);
+	    
+	    break;
+	  }
+
+	  case pnl_segmentkind_y: {
+	    pnl_y_segment y_seg = (pnl_y_segment) segment;
+	    int y = pnl_y_segment_y (y_seg);
+	    Tcl_Obj *star_obj = Tcl_NewStringObj ("*", -1);
+	    Tcl_Obj *y_obj = Tcl_NewIntObj (y);
+	    Tcl_Obj *objv[2];
+	    Tcl_Obj *point_obj;
+
+	    objv[0] = star_obj;
+	    objv[1] = y_obj;
+
+	    point_obj = Tcl_NewListObj (2, objv);
+
+	    Tcl_ListObjAppendElement (interp, branch_obj, point_obj);
+
+	    break;
+	  }
+
+	  case pnl_segmentkind_via: {
+	    pnl_via via = (pnl_via) segment;
+	    char *via_name = pnl_via_name (via);
+	    Tcl_Obj *via_obj = Tcl_NewStringObj (via_name, -1);
+
+	    Tcl_ListObjAppendElement (interp, branch_obj, via_obj);
+
+	    break;
+	  }
+	  default:
+	    error ("internal error: got a funky segmentkind.");
+	  }
+	} pnl_end_for;
+
+	if ( first ) {
+	  route_obj = Tcl_NewListObj (0, NULL);
+
+	  {
+	    Tcl_Obj *routekind_obj
+	      = Tcl_NewStringObj ((char *) routekind_str, -1);
+	    Tcl_ListObjAppendElement (interp, route_obj, routekind_obj);
+	  }
+	  first = 0;
+	}
+
+	ASSERT (route_obj != NULL);
+
+	Tcl_ListObjAppendElement (interp, route_obj, branch_obj);
+      }
+    } pnl_end_for;
+
+    if ( first == 0 ) {
+      Tcl_ListObjAppendElement (interp, result, route_obj);
+    }
+  } pnl_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand add_net_route
+   "Add a route to the specified net.  The default route type is ROUTED."
+   (-type string "the type of the route: ROUTED (default), FIXED, or COVER.")
+   (inet inet "add the route to this net")
+   (list tcl_object "route to add"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  pnl_routekind routekind;
+
+  if ( type == NULL ) {
+    routekind = pnl_routekind_ROUTED;
+  }
+  else {
+    routekind = pnl_string_to_routekind (type);
+
+    if ( routekind == pnl_routekind_null ) {
+      error ("%s is not a valid route type.  Should be "
+	     "ROUTED, FIXED, or COVER.", type);
+    }
+  }
+
+  {
+    volatile pnl_route route = pnl_route_create (routekind);
+    volatile pnl_branch branch = NULL;
+    volatile pnl_segment segment = NULL;
+
+    error_unwind_protect {
+      int list_len;
+      Tcl_Obj **list_elts;
+      int status = Tcl_ListObjGetElements (interp, list,
+					   &list_len, &list_elts);
+
+      if ( status != TCL_OK ) {
+	error ("cannot convert second argument to a list.");
+      }
+      else {
+	int i;
+
+	for ( i = 0; i < list_len; i++ ) {
+	  Tcl_Obj *branch_obj = list_elts[i];
+	  int branch_len;
+	  Tcl_Obj **branch_elts;
+
+	  status = Tcl_ListObjGetElements (interp, branch_obj,
+					   &branch_len, &branch_elts);
+
+	  if ( status != TCL_OK ) {
+	    error ("cannot convert the %dth element of the "
+		   "second argument to a list.", i);
+	  }
+	  else {
+	    Tcl_Obj *layer_obj = branch_elts[0];
+	    Tcl_Obj *first_pt = branch_elts[1];
+	    char *layer = Tcl_GetStringFromObj (layer_obj, NULL);
+	    int x0;
+	    int y0;
+	    int j;
+
+	    {
+	      int pt_len;
+	      Tcl_Obj **pt_elts;
+
+	      status = Tcl_ListObjGetElements (interp, first_pt,
+					       &pt_len, &pt_elts);
+
+	      if ( status != TCL_OK ) {
+		error ("could not convert the first point of the %dth branch "
+		       "to a list.", i);
+	      }
+
+	      status = Tcl_GetIntFromObj (interp, pt_elts[0], &x0);
+
+	      if ( status != TCL_OK ) {
+		error ("could not convert the x coord of the first point "
+		       "of the %dth branch to a list.", i);
+	      }
+
+	      status = Tcl_GetIntFromObj (interp, pt_elts[1], &y0);
+
+	      if ( status != TCL_OK ) {
+		error ("could not convert the y coord of the first point "
+		       "of the %dth branch to a list.", i);
+	      }
+	    }
+
+	    branch = pnl_branch_create (layer, x0, y0, -1);
+
+	    for ( j = 2; j < branch_len; j++ ) {
+	      Tcl_Obj *seg_obj = branch_elts[j];
+	      int seg_len;
+	      Tcl_Obj **seg_elts;
+	      int status = Tcl_ListObjGetElements (interp, seg_obj,
+						   &seg_len, &seg_elts);
+	      pnl_segment segment;
+
+	      if ( status != TCL_OK ) {
+		error ("could not convert the %dth element of the %dth "
+		       "element of the second arg to a list.", j, i);
+	      }
+
+	      if ( seg_len == 1 ) {
+		/* Must be a via. */
+		char *via_name = Tcl_GetStringFromObj (seg_elts[0], NULL);
+		segment = pnl_segment_create_via (via_name);
+	      }
+	      else if ( seg_len == 2 ) {
+		/* Must be a point. */
+		char *x_str = Tcl_GetStringFromObj (seg_elts[0], NULL);
+		char *y_str = Tcl_GetStringFromObj (seg_elts[1], NULL);
+
+		if ( strcmp (x_str, "*") == 0 &&
+		     strcmp (y_str, "*") != 0 ) {
+		  int y;
+		  status = Tcl_GetIntFromObj (interp, seg_elts[1], &y);
+
+		  if ( status != TCL_OK ) {
+		    error ("cannot convert the second elt of the %dth segment "
+			   "of the %dth branch to an integer.", j, i);
+		  }
+
+		  segment = pnl_segment_create_y_segment (y);
+		}
+		else if ( strcmp (x_str, "*") != 0 &&
+			  strcmp (y_str, "*") == 0 ) {
+		  int x;
+		  status = Tcl_GetIntFromObj (interp, seg_elts[0], &x);
+
+		  if ( status != TCL_OK ) {
+		    error ("cannot convert the first elt of the %dth segment "
+			   "of the %dth branch to an integer.", j, i);
+		  }
+
+		  segment = pnl_segment_create_x_segment (x);
+		}
+		else {
+		  char *str = Tcl_GetStringFromObj (seg_obj, NULL);
+		  error ("segment point must have exactly one star (*), "
+			 "not this -> \"%s\"", str);
+		}
+	      }
+	      else {
+		error ("the %dth segment of the %dth branch is no good.",
+		       j-2, i);
+	      }
+
+	      pnl_branch_add_segment (branch, segment);
+	      segment = NULL;
+	    }
+	  }
+
+	  pnl_route_add_branch (route, branch);
+	  branch = NULL;
+	}
+      }
+    }
+    error_on_error {
+      pnl_route_free (route);
+
+      if ( branch != NULL ) {
+	pnl_branch_free (branch);
+      }
+
+      if ( segment != NULL ) {
+	pnl_segment_free (segment);
+      }
+    }
+    error_end;
+
+    pnl_inet_add_route (pinet, route);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand set_port_use
+   "Set the DEF USE clause of the specified port."
+   (port port "set the USE of this port")
+   (str string "set the USE clause to this (SIGNAL, POWER, GROUND, CLOCK, "
+    "TIEOFF, or ANALOG)"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_use use = pnl_string_to_use (str);
+
+  if ( use == pnl_use_null ) {
+    error ("invalid use value (%s), must be either SIGNAL, POWER, GROUND, "
+	   "CLOCK, TIEOFF, or ANALOG", str);
+  }
+  else {
+    pnl_port_set_use (pport, use);
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand get_port_use
+   ("Return the DEF USE clause (SIGNAL, POWER, GROUND, CLOCK, TIEOFF, or"
+    " ANALOG) for the specified port.")
+   (port port "get the USE clause of this port"))
+{
+  pnl_port pport = ui_cmd_get_pport_for_port (port);
+  pnl_use use = pnl_port_use (pport);
+  const char *result = pnl_use_to_string (use);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_net_use
+   "Set the DEF USE clause of the specified net."
+   (inet inet "set the USE of this net")
+   (str string "set the USE clause to this (SIGNAL, POWER, GROUND, CLOCK, "
+    "TIEOFF, or ANALOG)"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  pnl_use use = pnl_string_to_use (str);
+
+  if ( use == pnl_use_null ) {
+    error ("invalid use value (%s), must be either SIGNAL, POWER, GROUND, "
+	   "CLOCK, TIEOFF, or ANALOG", str);
+  }
+  else {
+    pnl_inet_set_use (pinet, use);
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_use
+   ("Return the DEF USE clause (SIGNAL, POWER, GROUND, CLOCK, TIEOFF, or"
+    " ANALOG) for the specified net.")
+   (inet inet "return the USE clause of this net"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  pnl_use use = pnl_inet_use (pinet);
+  const char *result = pnl_use_to_string (use);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_net_pattern
+   "Set the DEF PATTERN clause of the specified net."
+   (inet inet "set the PATTERN of this net")
+   (str string "set the PATTERN clause to this (STEINER, BALANCED, "
+    "WIREDLOGIC, or TRUNK)"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  pnl_pattern pattern = pnl_string_to_pattern (str);
+
+  if ( pattern == pnl_pattern_null ) {
+    error ("invalid pattern value (%s), must be either STEINER, BALANCED,"
+	   " WIREDLOGIC, or TRUNK", str);
+  }
+  else {
+    pnl_inet_set_pattern (pinet, pattern);
+  }
+    
+  return TCL_OK;
+}
+
+
+#(defcommand get_net_pattern
+   ("Return the DEF PATTERN clause (STEINER, BALANCED, WIREDLOGIC, or ANALOG)"
+    "for the specified net.")
+   (inet inet "return the PATTERN clause of this net"))
+{
+  pnl_inet pinet = ui_cmd_get_pinet_for_inet (inet);
+  pnl_pattern pattern = pnl_inet_pattern (pinet);
+  const char *result = pnl_pattern_to_string (pattern);
+
+  Tcl_SetResult (interp, (char *) result, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(if t
+     ""
+(defcommand report_rows
+   "Write out the cells in each rows of the placement."
+   &optional
+   (pdesign current_pdesign "report the rows of this design."))
+)
+#if 0
+{
+  int i = 0;
+  skip_list rows = pnl_design_rows (pdesign);
+
+  if ( rows != NULL ) {
+    sl_for_all_entries (rows, y, skip_list, row) {
+      i++;
+      printf ("Row %2d (y=%6d):", i, y);
+
+      sl_for_all_entries (row, x, pnl_cell, pcell) {
+	char *name = pnl_cell_name (pcell);
+	printf ("  %s(x=%d)", name, x);
+      } sl_end_for;
+
+      printf ("\n");
+    } sl_end_for;
+
+    printf ("\n");
+  }
+
+  return TCL_OK;
+}
+#endif
+
+
+#(defcommand get_def_history
+   "Get a list of all the strings in the DEF history for the specified design."
+   &optional
+   (pdesign current_pdesign "get the DEF history for this design"))
+{
+  ar history = pnl_design_history (pdesign);
+
+  if ( history != NULL ) {
+    Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+    ar_for_all (history, char *, str) {
+      Tcl_Obj *str_obj = Tcl_NewStringObj (str, -1);
+
+      Tcl_ListObjAppendElement (interp, result, str_obj);
+    } ar_end_for;
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand add_def_history
+   "Add a string to the DEF history for the specified design."
+   (str string "add this string to the history")
+   &optional
+   (pdesign current_pdesign "get the DEF history for this design"))
+{
+  pnl_design_add_history (pdesign, str);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_size
+  "Return the size of the specified libcell."
+  (-grids boolean "return the size in grid units")
+  (libcell libcell "return the size of this libcell"))
+{
+  pnl_library plibrary;
+  nl_library library = nl_libcell_library (libcell);
+  pnl_libcell plibcell;
+  
+  nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+  plibcell = pnl_library_get_libcell (plibrary, libcell);
+
+  if ( plibcell != NULL ) {
+    int x = pnl_libcell_sizex (plibcell);
+    int y = pnl_libcell_sizey (plibcell);
+
+    if ( grids ) {
+      x = ui_convert_to_x_grids (x);
+      y = ui_convert_to_y_grids (y);
+    }
+
+    {
+      Tcl_Obj *x_obj = Tcl_NewIntObj (x);
+      Tcl_Obj *y_obj = Tcl_NewIntObj (y);
+      Tcl_Obj *objv[2];
+      Tcl_Obj *result;
+
+      objv[0] = x_obj;
+      objv[1] = y_obj;
+      result = Tcl_NewListObj (2, objv);
+
+      Tcl_SetObjResult (interp, result);
+    }
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_libcell_size
+  "Set the size of the specified libcell."
+  (-grids boolean "set the size in grid units")
+  (libcell libcell "return the size of this libcell")
+  (width integer "the width of the libcell")
+  (height integer "the height of the libcell"))  
+{
+  pnl_library plibrary;
+  nl_library library = nl_libcell_library (libcell);
+  pnl_libcell plibcell;
+  
+  nl_library_attr_get_by_name ("pnl library", library, &plibrary);
+
+  plibcell = pnl_library_get_libcell (plibrary, libcell);
+
+  if ( plibcell != NULL ) {
+    if ( grids ) {
+      width = ui_convert_from_x_grids (width);
+      height = ui_convert_from_y_grids (height);
+    }
+
+    pnl_libcell_set_size (plibcell, width, height);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_class
+   ("Return the LEF CLASS (COVER, RING, BLOCK, PAD, CORE, or ENDCAP) of the"
+    "specified libcell.")
+   (libcell libcell "get the class of this libcell"))
+{
+  pnl_libcell plibcell = ui_cmd_get_plibcell_for_libcell (libcell);
+  pnl_cellclass cellclass = pnl_libcell_class (plibcell);
+  const char *class_str = pnl_cellclass_to_string (cellclass);
+
+  Tcl_SetResult (interp, (char *) class_str, TCL_STATIC);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_site
+   "Return the LEF SITE (a string) of the specified libcell."
+   (libcell libcell "get the site of this libcell"))
+{
+  pnl_libcell plibcell = ui_cmd_get_plibcell_for_libcell (libcell);
+  char *site_str = pnl_libcell_site (plibcell);
+
+  Tcl_SetResult (interp, site_str, TCL_VOLATILE);
+
+  return TCL_OK;
+}
+
+
+static
+void
+ui_cmd_geometry_list_result (Tcl_Interp *interp, ar geometries)
+{
+  Tcl_Obj *result_obj = Tcl_NewListObj (0, NULL);
+
+  if ( geometries != NULL ) {
+    ar_for_all (geometries, pnl_geometry, geom) {
+      pnl_geometryclass class = pnl_geometry_class (geom);
+      char *layer = pnl_geometry_name (geom);
+      Tcl_Obj *layer_obj = Tcl_NewStringObj (layer, -1);
+      Tcl_Obj *objv[1];
+      Tcl_Obj *geom_obj;
+      ar points = pnl_geometry_points (geom);
+      Tcl_Obj *points_obj = NULL;
+      int num_points;
+
+      objv[0] = layer_obj;
+      geom_obj = Tcl_NewListObj (1, objv);
+
+      if ( class == pnl_geometryclass_layer ) {
+	num_points = 0;
+      }
+      else if ( class == pnl_geometryclass_via ) {
+	num_points = 2;
+      }
+      else {
+	ASSERT (0);
+      }
+
+      ar_for_all (points, int, elt) {
+	if ( num_points == 0 ) {
+	  num_points = elt;
+	}
+	else {
+	  Tcl_Obj *xy_obj = Tcl_NewIntObj (elt);
+
+	  if ( points_obj == NULL ) 
+	    points_obj = Tcl_NewListObj (0, NULL);
+
+	  Tcl_ListObjAppendElement (interp, points_obj, xy_obj);
+	  num_points--;
+
+	  if ( num_points == 0 ) {
+	    Tcl_ListObjAppendElement (interp, geom_obj, points_obj);
+	    points_obj = NULL;
+	  }
+	}
+      } ar_end_for;
+
+      ASSERT (num_points == 0);
+
+      Tcl_ListObjAppendElement (interp, result_obj, geom_obj);
+    } ar_end_for;
+
+    Tcl_SetObjResult (interp, result_obj);
+  }
+}
+
+
+#(defcommand get_libcell_obstructions
+   "Return the LEF OBS (obstructions) for the specified libcell."
+   (libcell libcell "get the obstructions for this libcell"))
+{
+  pnl_libcell plibcell = ui_cmd_get_plibcell_for_libcell (libcell);
+  ar obs = pnl_libcell_obstructions (plibcell);
+
+  ui_cmd_geometry_list_result (interp, obs);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libcell_symmetry
+   "Return the LEF SYMMETRY for the spefied libcell."
+   (libcell libcell "get the symmetry of this libcell"))
+{
+  pnl_libcell plibcell = ui_cmd_get_plibcell_for_libcell (libcell);
+  int x_sym   = pnl_libcell_get_symmetry (plibcell, pnl_symmetry_X);
+  int y_sym   = pnl_libcell_get_symmetry (plibcell, pnl_symmetry_Y);
+  int r90_sym = pnl_libcell_get_symmetry (plibcell, pnl_symmetry_R90);
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  if ( x_sym ) {
+    Tcl_Obj *x_obj = Tcl_NewStringObj ("X", -1);
+    Tcl_ListObjAppendElement (interp, result, x_obj);
+  }
+  
+  if ( y_sym ) {
+    Tcl_Obj *y_obj = Tcl_NewStringObj ("Y", -1);
+    Tcl_ListObjAppendElement (interp, result, y_obj);
+  }
+
+  if ( r90_sym ) {
+    Tcl_Obj *r90_obj = Tcl_NewStringObj ("R90", -1);
+    Tcl_ListObjAppendElement (interp, result, r90_obj);
+  }
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_location
+   "Return the location (center of mass) of the specified libpin."
+   (-grids boolean "return the location in grid units")
+   (libpin libpin "get the location of this libpin"))
+{
+  pnl_libpin plibpin = ui_cmd_get_plibpin_for_libpin (libpin);
+  int x = pnl_libpin_x (plibpin);
+  int y = pnl_libpin_y (plibpin);
+
+  if ( grids ) {
+    x = ui_convert_to_x_grids (x);
+    y = ui_convert_to_y_grids (y);
+  }
+
+  {
+    Tcl_Obj *x_obj = Tcl_NewIntObj (x);
+    Tcl_Obj *y_obj = Tcl_NewIntObj (y);
+    Tcl_Obj *objv[2];
+    Tcl_Obj *result;
+
+    objv[0] = x_obj;
+    objv[1] = y_obj;
+    result = Tcl_NewListObj (2, objv);
+
+    Tcl_SetObjResult (interp, result);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand set_libpin_location
+   "Set the location (center of mass) of the specified libpin."
+   (-grids boolean "set the location in grid units")
+   (libpin libpin "set the location of this libpin")
+   (x integer "x coordinate of the location")
+   (y integer "y coordinate of the location"))
+{
+  pnl_libpin plibpin = ui_cmd_get_plibpin_for_libpin (libpin);
+
+  if ( grids ) {
+    x = ui_convert_from_x_grids (x);
+    y = ui_convert_from_y_grids (y);
+  }
+
+  pnl_libpin_set_location (plibpin, x, y);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_port 
+   "Return the port geometry of the specified libpin."
+   (libpin libpin "get the geometry of this libpin"))
+{
+  pnl_libpin plibpin = ui_cmd_get_plibpin_for_libpin (libpin);
+  ar ports = pnl_libpin_ports (plibpin);
+
+  ui_cmd_geometry_list_result (interp, ports);
+  
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_antennadiffarea
+   ("Return the LEF ANTENNADIFFAREA (in square millimicrons) of the "
+    "specified libpin.")
+   (libpin libpin "get the ANTENNADIFFAREA of this libpin"))
+{
+  pnl_libpin plibpin = ui_cmd_get_plibpin_for_libpin (libpin);
+  int area = pnl_libpin_antennadiffarea (plibpin);
+  Tcl_Obj *area_obj = Tcl_NewIntObj (area);
+
+  Tcl_SetObjResult (interp, area_obj);
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_libpin_antennagatearea
+   ("Return the LEF ANTENNAGATEAREA (in square millimicrons) of the specified "
+    "libpin.")
+   (libpin libpin "get the ANTENNAGATEAREA of this libpin"))
+{
+  pnl_libpin plibpin = ui_cmd_get_plibpin_for_libpin (libpin);
+  int area = pnl_libpin_antennagatearea (plibpin);
+  Tcl_Obj *area_obj = Tcl_NewIntObj (area);
+
+  Tcl_SetObjResult (interp, area_obj);
+
+  return TCL_OK;
+}
+
+
+static
+int
+ui_cmd_picell_distance (void *ptr1, void *ptr2)
+{
+  pnl_icell picell1 = (pnl_icell) ptr1;
+  pnl_icell picell2 = (pnl_icell) ptr2;
+  int x1, y1;
+  int x2, y2;
+
+  pnl_icell_get_location (picell1, 0, &x1, &y1);
+  pnl_icell_get_location (picell2, 0, &x2, &y2);
+
+  return abs (x1 - x2) + abs (y1 - y2);
+}
+
+  
+static
+int
+ui_cmd_picell_distance_sq (void *ptr1, void *ptr2)
+{
+  pnl_icell picell1 = (pnl_icell) ptr1;
+  pnl_icell picell2 = (pnl_icell) ptr2;
+  int x1, y1;
+  int x2, y2;
+
+  pnl_icell_get_location (picell1, 0, &x1, &y1);
+  pnl_icell_get_location (picell2, 0, &x2, &y2);
+
+  {
+    float dx = abs (x1 - x2) / 1000.0;
+    float dy = abs (y1 - y2) / 1000.0;
+    float cost = (dx + dy) * (dx + dy);
+    int icost = cost;
+
+    ASSERT (icost >= 0);
+
+    return icost;
+  }
+}
+
+  
+#(defcommand order_scan_chain
+   ("Return a list of the specified cells that are ordered so as to"
+    "minimize a scan chain running through them.")
+   (-limit integer "limit on the nuber of TSP solver iterations")
+   (-silent boolean "don't print status messages as the chain is being optimized")
+   (-sumsq boolean "minimize the sum-of-squares rather than the linear sum")
+   (icells icell_list "list of cells to order"))
+{
+  int size = ar_size (icells);
+  ar tour = ar_alloc (size, sizeof (pnl_icell));
+  tsp_problem prob = tsp_problem_create (sumsq ? ui_cmd_picell_distance_sq : ui_cmd_picell_distance);
+  int cost;
+
+  ar_for_all (icells, nl_icell, icell) {
+    pnl_icell picell = ui_cmd_get_picell_for_icell (icell);
+
+    tsp_problem_add_point (prob, (void *) picell);
+  } ar_end_for;
+
+  cost = tsp_solve (prob, limit, silent, tour);
+
+  tsp_problem_free (prob);
+
+  ar_for_all (tour, pnl_icell, picell) {
+    nl_icell icell = pnl_icell_nl_rep (picell);
+    
+    ui_cmd_append_result_walker ((nl_object) icell, (void *) interp);
+  } ar_end_for;
+
+  ar_free (tour);
+
+  return TCL_OK;
+}
+
+
+#(defcommand place_design
+  "Place the specified design."
+  (-randomly boolean "place the cells randomly")
+  (-wire_weight double "weight for wire length objective")
+  (-overlap_weight double "weight for overlap objective")
+  (-boundary_weight double "weight for boundary objective")
+  (-row_weight double "weight for row objective")
+  (-distribution_weight double "weight for distribution objective")
+  (-constant_weight double "weight for constant force objective")
+  (-iterations integer "iteration limit")
+  (-displacement_limit double "displacement limit for terminating optimizer")
+  (-cell_bloat double "cell bloat factor (1.0 == no cell bloat)")
+  &optional
+  (pdesign current_pdesign "place this design"))
+{
+  if ( wire_weight == 0.0 &&
+       overlap_weight == 0.0 &&
+       boundary_weight == 0.0 &&
+       row_weight == 0.0 &&
+       distribution_weight == 0.0 &&
+       constant_weight == 0.0 ) {
+    wire_weight = 1.0;
+    overlap_weight = 1.0;
+    boundary_weight = 1.0;
+    row_weight = 1.0;
+    distribution_weight = 1.0;
+    constant_weight = 1.0;
+  }
+
+  if ( cell_bloat == 0.0 ) {
+    cell_bloat = 1.0;
+  }
+
+  if ( iterations == 0 ) {
+    iterations = 1000;
+  }
+      
+  if ( randomly ) {
+    pl_randomize_placement (pdesign);
+  }
+  else {
+    pl_place_design (pdesign, iterations, wire_weight, overlap_weight,
+		     boundary_weight, row_weight, distribution_weight,
+		     constant_weight, displacement_limit, cell_bloat);
+  }
+
+  return TCL_OK;
+}
+
+
+#(defcommand get_cell_overlaps
+   ""
+  (-brute boolean "use brute force method")
+  &optional
+  (pdesign current_pdesign "do it for this design"))
+{
+  ar overlaps = pl_get_overlaps (pdesign, brute);
+  Tcl_Obj *pair = NULL;
+  Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+
+  ar_for_all_indexed (overlaps, nl_cell, cell, i) {
+    Tcl_Obj *obj = ui_obj_create ((nl_object) cell, NULL);
+      
+    if ( i % 2 == 0 ) {
+      pair = Tcl_NewListObj (0, NULL);
+
+      Tcl_ListObjAppendElement (interp, pair, obj);
+    }
+    else {
+      Tcl_ListObjAppendElement (interp, pair, obj);
+      Tcl_ListObjAppendElement (interp, result, pair);
+      pair = NULL;
+    }
+  } ar_end_for;
+
+  Tcl_SetObjResult (interp, result);
+
+  return TCL_OK;
+}
+
+
+#(defcommand compute_objective_and_gradient
+   ""
+   (-delta double "compute a numeric gradient and use this as the delta")
+   (-wire_weight double "weight for wire length objective")
+   (-overlap_weight double "weight for overlap objective")
+   (-boundary_weight double "weight for boundary objective")
+   (-row_weight double "weight for row objective")
+   (-distribution_weight double "weight for distribution objective")
+   (-constant_weight double "weight for constant force objective")
+   (-cell_bloat double "cell bloat factor (1.0 == no cell bloat)")
+   &optional
+   (pdesign current_pdesign "do it for this design"))
+{
+  ar array;
+
+  if ( wire_weight == 0.0 &&
+       overlap_weight == 0.0 &&
+       boundary_weight == 0.0 &&
+       row_weight == 0.0 &&
+       distribution_weight == 0.0 &&
+       constant_weight == 0.0 ) {
+    wire_weight = 1.0;
+    overlap_weight = 1.0;
+    boundary_weight = 1.0;
+    row_weight = 1.0;
+    distribution_weight = 1.0;
+    constant_weight = 1.0;
+  }
+
+  if ( cell_bloat == 0.0 ) {
+    cell_bloat = 1.0;
+  }
+      
+  array = pl_compute_objective_and_gradient (pdesign, delta, wire_weight,
+					     overlap_weight, boundary_weight,
+					     row_weight, distribution_weight,
+					     constant_weight, cell_bloat);
+
+  {
+    int first = 1;
+    Tcl_Obj *result = Tcl_NewListObj (0, NULL);
+    Tcl_Obj *grad = Tcl_NewListObj (0, NULL);
+    
+    ar_for_all (array, double, x) {
+      Tcl_Obj *obj = Tcl_NewDoubleObj (x);
+
+      if ( first ) {
+	Tcl_ListObjAppendElement (interp, result, obj);
+	first = 0;
+      }
+      else {
+	Tcl_ListObjAppendElement (interp, grad, obj);
+      }
+    } ar_end_for;
+
+    Tcl_ListObjAppendElement (interp, result, grad);
+
+    Tcl_SetObjResult (interp, result);
+
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand place_get_index
+  "Debugging command."
+  (cell cell "get the index of this cell")
+  &optional
+  (pdesign current_pdesign "do it for this design"))
+{
+  int result = pl_get_index_of_cell (pdesign, cell);
+  Tcl_Obj *result_obj = Tcl_NewIntObj (result);
+
+  Tcl_SetObjResult (interp, result_obj);
+
+  return TCL_OK;
+}
+
+
+void
+ui_cmd_register_physical_commands (Tcl_Interp *interp, char *prefix,
+				   nl_context context)
+{
+#(register-all-commands)
+}

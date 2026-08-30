@@ -1,0 +1,833 @@
+head	1.14;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.14
+date	2000.10.31.07.01.39;	author pat;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2000.09.30.19.41.35;	author pat;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	2000.09.27.00.56.59;	author pat;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	2000.09.26.22.57.46;	author pat;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2000.05.15.16.48.06;	author pat;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2000.04.19.19.41.04;	author mha;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2000.04.19.19.39.59;	author mha;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2000.01.06.01.36.30;	author pat;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	99.08.24.05.11.22;	author pat;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	99.08.20.22.11.53;	author tavrow;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	99.08.19.17.28.05;	author pat;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	99.07.19.23.44.38;	author pat;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	99.07.19.23.44.19;	author pat;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	99.06.02.18.47.14;	author pat;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.14
+log
+@Via checks for cut width or cut spacing not divisible by 2*mask grid,
+and jiggles the origin to make geometry be on grid.
+@
+text
+@# Example generator cell (gcell) to make contacts/vias
+
+proc gcell_make {prop_list} -desc {
+  gcell procedure to make a contact/via
+} {
+
+  # get values out of prop_list list
+  # 9/00: Use floor in case someone asks for 1.5 cuts.
+  set type [get_assoc type $prop_list]
+  set x_cuts [expr int(floor([get_assoc x_cuts $prop_list]))]
+  set y_cuts [expr int(floor([get_assoc y_cuts $prop_list]))]
+  set symmetric [get_assoc symmetric $prop_list]
+
+  # get the layers to draw
+  if {[lsearch [techinfo vias] $type] == -1} {
+    # special via
+    setl {via bot} [split $type _]
+  } else {
+    set via $type
+    set bot [techinfo below $via]
+  }
+  set top [techinfo above $via]
+
+  # compute extent of matrix of cuts
+  set via_width [techinfo width $via]
+  set via_space [techinfo spacing $via]
+  set via_pitch [expr $via_width + $via_space]
+
+  # The center of the via is used for the origin.
+  # If number of cuts is odd, then the origin is in the middle of a cut,
+  # therefore the via cut width must be divisible by 2 * mask grid.
+  # If the number of cuts is even, then the origin is in the middle of the
+  # space between the cuts, therefore the via spacing must be
+  # divisible by 2 * mask grid.
+  # If not, jiggle the origin one grid to make the geometry come out on grid.
+  set originx 0; set originy 0
+  set mres [res -mask]
+  set mres2 [expr $mres * 2.0]
+  # We should use fmod like this: fmod($via_space,$mres2) < $mres2*1.9
+  # but fmod is apparently buggy, so do it manually:
+  set f_spacing_odd [expr { \
+      abs($via_space - round($via_space/$mres2)*$mres2) >= $mres}]
+  set f_width_odd   [expr { \
+      abs($via_width - round($via_width/$mres2)*$mres2) >= $mres}]
+
+  if { $x_cuts % 2 == 1 } {
+    if { $f_width_odd } { set originx [expr $mres/2.0] }
+  } else {
+    if { $f_spacing_odd } { set originx [expr $mres/2.0] }
+  }
+
+  if { $y_cuts % 2 == 1 } {
+    if { $f_width_odd } { set originy [expr $mres/2.0] }
+  } else {
+    if { $f_spacing_odd } { set originy [expr $mres/2.0] }
+  }
+
+  # compute half width and height since centered on origin
+  set w2 [uusnap \
+	      [expr ($via_width * $x_cuts + $via_space * ($x_cuts - 1)) / 2.0]]
+  set h2 [uusnap \
+	      [expr ($via_width * $y_cuts + $via_space * ($y_cuts - 1)) / 2.0]]
+
+  # draw all the via cuts
+  for {set i 0} {$i < $x_cuts} {incr i} {
+    for {set j 0} {$j < $y_cuts} {incr j} {
+
+      gcell_paint $via \
+	  [expr $originx - $w2 + $i * $via_pitch] \
+	  [expr $originy - $h2 + $j * $via_pitch] \
+	  [expr $originx - $w2 + $i * $via_pitch + $via_width] \
+	  [expr $originy - $h2 + $j * $via_pitch + $via_width]
+    }
+  }
+
+  # draw the top and bot layers
+  foreach layer "$bot $top" {
+    setl {enc_x enc_y} [techinfo enclose $layer $via all]
+    if { $symmetric != 0 || $enc_y == "" } { set enc_y $enc_x }
+    gcell_paint $layer \
+	[expr $originx - $w2 - $enc_x] [expr $originy - $h2 - $enc_y] \
+	[expr $originx + $w2 + $enc_x] [expr $originy + $h2 + $enc_y]
+  }
+
+  if {$x_cuts == 1 && $y_cuts == 1} {
+    return $type
+  } else {
+    return "${x_cuts}x${y_cuts} $type"
+  }
+}
+
+
+# Resize via gcell with $props based on new bbox and return new prop list
+
+proc gcell_make_props {prop_list} {
+
+  set bbox [get_assoc _BBOX_ $prop_list]
+  set symmetric [get_assoc symmetric $prop_list]
+  if {$bbox == ""} {
+    # no bbox, just punt
+    return $prop_list
+  }
+
+  # Make the via as large as will fit in the specified bbox,
+  # but no smaller than one cut.
+  # get values out of properties list
+  set type [get_assoc type $prop_list]
+
+  # get the layers to draw
+  if {[lsearch [techinfo vias] $type] == -1} {
+    # special via
+    setl {via bot} [split $type _]
+  } else {
+    set via $type
+    set bot [techinfo below $via]
+  }
+  set top [techinfo above $via]
+
+  # compute extent of matrix of cuts
+  set via_width [techinfo width $via]
+  set via_space [techinfo spacing $via]
+  set via_pitch [expr $via_width + $via_space]
+
+  # get the maximum enclosure by looking at both top and bottom layers.
+  setl {enc_x_bot enc_y_bot} [techinfo enclose $bot $via all]
+  if { $symmetric != 0 || $enc_y_bot == "" } { set enc_y_bot $enc_x_bot }
+  setl {enc_x_top enc_y_top} [techinfo enclose $top $via all]
+  if { $symmetric != 0 || $enc_y_top == "" } { set enc_y_top $enc_x_top }
+  set enc_x [max $enc_x_top $enc_x_bot]
+  set enc_y [max $enc_y_top $enc_y_bot]
+
+  # figure out how many cuts fit in the bbox
+  setl {x1 y1 x2 y2} $bbox
+  set x_cuts \
+      [expr int(($x2 - $x1 - 2*$enc_x + $via_space + [res]) / $via_pitch)]
+  set y_cuts \
+      [expr int(($y2 - $y1 - 2*$enc_y + $via_space + [res]) / $via_pitch)]
+
+  # don't let the user draw less than one cut
+  set x_cuts [max $x_cuts 1]
+  set y_cuts [max $y_cuts 1]
+
+  set prop_list [rm_assoc _BBOX_ $prop_list]
+  set prop_list [rm_assoc x_cuts $prop_list]
+  set prop_list [rm_assoc y_cuts $prop_list]
+  lappend prop_list [list x_cuts $x_cuts]
+  lappend prop_list [list y_cuts $y_cuts]
+
+  return $prop_list
+}
+
+proc gcell_init_via {} {
+    # now define it and give default arguments
+
+    # figure out what vias are in this technology
+    set via_types ""
+    set vias [techinfo vias "" "" opt]
+    if {$vias != "0"} {
+      # there are some vias defined in this process
+      foreach via $vias {
+	if {[techinfo width $via "" opt] == "0"} {
+	  msg "warning: via.maxg: no width for layer $via; no via generator created\n"
+	  # no known width, skip this one
+	  continue
+	}
+
+	set bot [techinfo below $via]
+	set top [techinfo above $via]
+
+	if {[llength $bot] > 1} {
+	  # special case
+	  foreach one $bot {
+	    lappend via_types ${via}_$one
+	  }
+
+	} else {
+	  lappend via_types $via
+	}
+      }
+
+      if {$via_types != ""} {
+	# yes, there are some valid vias, define the gcell.
+
+	define_gcell via [list \
+	    [list type [lindex $via_types 0] -choice "$via_types" \
+		-help {the type of contact or via}] \
+	    [list x_cuts  1 -number 1 \
+		-help {the number of cuts in the x direction}] \
+	    [list y_cuts  1 -number 1 \
+		-help {the number of cuts in the y direction}] \
+	    [list symmetric  0 -binary \
+		-help {if technology supports vias with a cut overlap that\
+		differs in the x and y directions, this controls whether the\
+		overlap will be the same on all sides (symmetric) or not.\
+		If set, a minimum size via will usually be square.}] \
+	    ]
+      } else {
+	    msg "warning: via.maxg: tech file defined no layers for vias\n"
+      }
+    } else {
+	msg "warning: via.maxg: no vias defined in tech file, so no via generators created\n"
+    }
+}
+
+# Do it now
+gcell_init_via
+@
+
+
+1.13
+log
+@better help only.
+@
+text
+@d10 3
+a12 3
+  set x_cuts [expr floor([get_assoc x_cuts $prop_list])]
+  set y_cuts [expr floor([get_assoc y_cuts $prop_list])]
+  set symmetric [expr floor([get_assoc symmetric $prop_list])]
+d29 29
+d69 4
+a72 4
+	  [expr -$w2 + $i * $via_pitch] \
+	  [expr -$h2 + $j * $via_pitch] \
+	  [expr -$w2 + $i * $via_pitch + $via_width] \
+	  [expr -$h2 + $j * $via_pitch + $via_width]
+d80 3
+a82 2
+    gcell_paint $layer [expr -$w2 - $enc_x] [expr -$h2 - $enc_y] \
+	[expr $w2 + $enc_x] [expr $h2 + $enc_y]
+d98 1
+a98 1
+  set symmetric [expr floor([get_assoc symmetric $prop_list])]
+d195 1
+a195 1
+		If set, all layers in a minimum size via will be square.}] \
+@
+
+
+1.12
+log
+@bug fix.  Make symmetric default to 0.
+@
+text
+@d154 13
+a166 12
+	define_gcell via \
+	    [list \
+		 [list type [lindex $via_types 0] -choice "$via_types" \
+		      -help {the type of contact or via}] \
+		 [list x_cuts  1 -number 1 \
+		      -help {the number of cuts in the x direction}] \
+		 [list y_cuts  1 -number 1 \
+		      -help {the number of cuts in the y direction}] \
+		 [list symmetric  0 -binary \
+		      -help {if technology supports assymetric vias,
+		      this controls whether via will be square or rectangular}]\
+		]
+@
+
+
+1.11
+log
+@Support assymetric vias.  Add "symmetric" option to prop list.
+Ignore fraction in cuts property.
+@
+text
+@d3 1
+a3 1
+proc gcell_make_via {prop_list} -desc {
+d65 1
+a65 1
+proc gcell_make_props_via {prop_list} {
+d68 1
+d162 1
+a162 1
+		 [list symmetric  1 -binary \
+@
+
+
+1.10
+log
+@Do not populate list boxes with all types of vias.
+@
+text
+@d8 1
+d10 3
+a12 2
+  set x_cuts [get_assoc x_cuts $prop_list]
+  set y_cuts [get_assoc y_cuts $prop_list]
+d29 5
+a33 4
+  # compute half width and height.  Modify if not centered on origin
+  set width [expr $via_width * $x_cuts + $via_space * ($x_cuts - 1)]
+  set w2 [uusnap -mask [expr $width / 2.0]]
+  set w2p [expr $width - $w2]
+a34 4
+  set height [expr $via_width * $y_cuts + $via_space * ($y_cuts - 1)]
+  set h2 [uusnap -mask [expr $height / 2.0]]
+  set h2p [expr $height - $h2]
+
+d49 4
+a52 3
+    set enclose [techinfo enclose $layer $via]
+    gcell_paint $layer [expr -$w2 - $enclose] [expr -$h2 - $enclose] \
+	[expr $w2p + $enclose] [expr $h2p + $enclose]
+d93 7
+a99 2
+  # get the maximum enclosure
+  set enclose [max [techinfo enclose $bot $via] [techinfo enclose $top $via]]
+d104 1
+a104 1
+      [expr int(($x2 - $x1 - 2*$enclose + $via_space + [res]) / $via_pitch)]
+d106 1
+a106 1
+      [expr int(($y2 - $y1 - 2*$enclose + $via_space + [res]) / $via_pitch)]
+d127 1
+a127 1
+    if {$vias != "0" && $vias != ""} {
+d153 2
+a154 1
+	set properties [list \
+d161 3
+a164 20
+	define_gcell via $properties
+
+	# If it is a newer version of max, install short-cuts
+	# for each type of via.
+	global MAX_VERSION
+	regexp {^([0-9]+\.[0-9]+)\.([0-9]+)} $MAX_VERSION junk rel_major rel_minor 
+	if { 0 && $rel_major >= 3.2 && $rel_minor >= 15 } {
+	  # Create generic procs to build the gcells.
+	  # This was not allowed in older versions of max,
+	  # because all gcell generators inhabited a single global namespace.
+	  proc gcell_make {props} { gcell_make_via $props }
+	  proc gcell_make_props {props} { gcell_make_props_via $props }
+
+	  # Register short-cut synonyms:
+	  foreach via $via_types {
+	    define_gcell [string toupper $via] [lreplace $properties 0 0 \
+		[list type $via -entry -hide]]
+	  }
+	}
+
+@
+
+
+1.9
+log
+@*** empty log message ***
+@
+text
+@d162 1
+a162 1
+	if { $rel_major >= 3.2 && $rel_minor >= 15 } {
+@
+
+
+1.8
+log
+@*** empty log message ***
+@
+text
+@d148 1
+a148 2
+	define_gcell via \
+	    [list \
+d156 20
+@
+
+
+1.7
+log
+@*** empty log message ***
+@
+text
+@d27 4
+a30 5
+  # compute half width and height since centered on origin
+  set w2 [uusnap \
+	      [expr ($via_width * $x_cuts + $via_space * ($x_cuts - 1)) / 2.0]]
+  set h2 [uusnap \
+	      [expr ($via_width * $y_cuts + $via_space * ($y_cuts - 1)) / 2.0]]
+d32 4
+d52 1
+a52 1
+	[expr $w2 + $enclose] [expr $h2 + $enclose]
+@
+
+
+1.6
+log
+@*** empty log message ***
+@
+text
+@d113 2
+d116 11
+a126 1
+# now define it and give default arguments
+d128 2
+a129 11
+# figure out what vias are in this technology
+set via_types ""
+set vias [techinfo vias "" "" opt]
+if {$vias != "0"} {
+  # there are some vias defined in this process
+  foreach via $vias {
+    if {[techinfo width $via "" opt] == "0"} {
+      msg "warning: via.maxg: no width for layer $via; no via generator created\n"
+      # no known width, skip this one
+      continue
+    }
+d131 5
+a135 2
+    set bot [techinfo below $via]
+    set top [techinfo above $via]
+d137 3
+a139 4
+    if {[llength $bot] > 1} {
+      # special case
+      foreach one $bot {
+	lappend via_types ${via}_$one
+d142 15
+d158 1
+a158 1
+      lappend via_types $via
+a159 19
+  }
+
+  if {$via_types != ""} {
+    # yes, there are some valid vias, define the gcell.
+
+    define_gcell via \
+	[list \
+	     [list type [lindex $via_types 0] -choice "$via_types" \
+		  -help {the type of contact or via}] \
+	     [list x_cuts  1 -number 1 \
+		  -help {the number of cuts in the x direction}] \
+	     [list y_cuts  1 -number 1 \
+		  -help {the number of cuts in the y direction}] \
+	    ]
+  } else {
+	msg "warning: via.maxg: tech file defined no layers for vias\n"
+  }
+} else {
+    msg "warning: via.maxg: no vias defined in tech file, so no via generators created\n"
+d162 2
+a163 1
+
+@
+
+
+1.5
+log
+@new generic
+@
+text
+@d118 9
+a126 3
+foreach via [techinfo vias] {
+  set bot [techinfo below $via]
+  set top [techinfo above $via]
+d128 11
+a138 4
+  if {[llength $bot] > 1} {
+    # special case
+    foreach one $bot {
+      lappend via_types ${via}_$one
+d140 1
+d142 12
+d155 1
+a155 1
+    lappend via_types $via
+d157 2
+a160 9
+define_gcell via \
+    [list \
+	 [list type [lindex $via_types 0] -choice "$via_types" \
+	 -help {the type of contact or via}] \
+	 [list x_cuts  1 -number 1 \
+	 -help {the number of cuts in the x direction}] \
+	 [list y_cuts  1 -number 1 \
+	 -help {the number of cuts in the y direction}] \
+     ]
+a161 1
+
+@
+
+
+1.4
+log
+@*** empty log message ***
+@
+text
+@a0 1
+
+d3 1
+a3 1
+proc gcell_make_via {properties} -desc {
+d7 4
+a10 1
+  global LAYINFO VIA
+d12 9
+a20 4
+  # get values out of properties list
+  set type [get_assoc type $properties]
+  set width_x [get_assoc width_x $properties]
+  set width_y [get_assoc width_y $properties]
+d22 4
+a25 5
+  # The layer name of the actual contact or via.
+  set contact_layer [lindex $VIA($type) 0]
+  # Min Separation between via structures.
+  set sep [uusnap [expr $LAYINFO($contact_layer,$contact_layer,sep) + \
+		$LAYINFO($contact_layer,width)]]
+d27 5
+d33 3
+a35 2
+  # NOTE: This code does not handle widths that are not divisible
+  # by max resolution, but that problem is going away soon. (pat)
+d37 6
+a42 8
+  # Draw all layers except the contacts.
+  foreach thingy {,down ,up ,other} {
+      if {[info exists VIA($type$thingy)]} {
+	  setl {layer width} $VIA($type$thingy)
+	  set xdim [uusnap [expr ($width + ($width_x - 1) * $sep)/ 2.0 ]]
+	  set ydim [uusnap [expr ($width + ($width_y - 1) * $sep)/ 2.0 ]]
+	  gcell_paint $layer [expr - $xdim] [expr - $ydim] $xdim $ydim
+      }
+d45 5
+a49 15
+  # Draw a matrix of contacts.
+  setl {layer width} $VIA($type)
+  set xdim [uusnap [expr ($width + ($width_x - 1) * $sep)/ 2.0 ]]
+  set ydim [uusnap [expr ($width + ($width_y - 1) * $sep)/ 2.0 ]]
+  set x [expr - $xdim]
+  for {set xi 0} {$xi < $width_x} {incr xi} {
+      set y [expr - $ydim]
+      for {set yi 0} {$yi < $width_y} {incr yi} {
+	  # Draw one contact/via-cut
+	  gcell_paint $layer $x $y [expr $x + $width] [expr $y + $width]
+	  # Increment y
+	  set y [expr $y + $sep]
+      }
+      # Increment x
+      set x [expr $x + $sep]
+d52 5
+a56 1
+  return $type
+d61 1
+a62 1
+  global VIA LAYINFO
+d64 6
+d71 2
+a72 1
+  # but no smaller than one contact.
+a73 2
+  set bbox [get_assoc _BBOX_ $prop_list]
+  if { $bbox == ""} { return $prop_list }
+d75 7
+a81 15
+  # The layer name of the actual contact or via.
+  set contact_layer [lindex $VIA($type) 0]
+  # Min Separation between via structures.
+  set sep [uusnap [expr $LAYINFO($contact_layer,$contact_layer,sep) + \
+		$LAYINFO($contact_layer,width)]]
+
+  # Find the largest layer.
+  set biggest 0
+  foreach thingy {"" ,down ,up ,other} {
+      if {[info exists VIA($type$thingy)]} {
+	  setl {layer width} $VIA($type$thingy)
+	  if { $width > $biggest } {
+	      set biggest $width
+	  }
+      }
+d83 1
+d85 9
+a93 2
+  # And set width_x and width_y to the largest number of vias
+  # that will fit in the specified bbox.
+d95 4
+a98 4
+  set width_x [expr 1 + int( ($x2 - $x1 - $biggest) / $sep )]
+  set width_y [expr 1 + int( ($y2 - $y1 - $biggest) / $sep )]
+  if {$width_x < 1} { set width_x 1 }
+  if {$width_y < 1} { set width_y 1 }
+d100 4
+d105 5
+a109 4
+  set prop_list [rm_assoc width_x $prop_list]
+  set prop_list [rm_assoc width_y $prop_list]
+  lappend prop_list [list width_x $width_x]
+  lappend prop_list [list width_y $width_y]
+d116 1
+d118 12
+a129 3
+foreach type [array names VIA] {
+  if {[string first , $type] == -1} {
+    lappend via_types $type
+a131 1
+set via_types [lsort -dictionary $via_types]
+a132 1
+
+d137 4
+a140 4
+	 [list width_x  1 -number 1 \
+	 -help {the number of contact holes in the x direction}] \
+	 [list width_y  1 -number 1 \
+	 -help {the number of contact holes in the y direction}] \
+@
+
+
+1.3
+log
+@New stretchable gcells.
+@
+text
+@d18 2
+a19 2
+  set sep [uusnap [expr $LAYINFO(${contact_layer}_sep) + \
+		$LAYINFO(${contact_layer}_width)]]
+d56 2
+a57 2
+# Resize via gcell with $props based on new bbox
+proc gcell_edit_bbox_via {properties bbox} {
+d62 3
+a64 1
+  set type [get_assoc type $properties]
+d69 2
+a70 2
+  set sep [uusnap [expr $LAYINFO(${contact_layer}_sep) + \
+		$LAYINFO(${contact_layer}_width)]]
+d88 9
+a96 1
+  return "-width_x $width_x -width_y $width_y"
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@a13 1
+  set bbox [get_assoc _BBOX_ $properties]
+a20 13
+  # If a bbox was specified, make the via as large as will fit in
+  # the specified bbox, but no smaller than one contact.
+  if { $bbox != "" } {
+      # Find the largest layer.
+      set biggest 0
+      foreach thingy {"" ,down ,up ,other} {
+	  if {[info exists VIA($type$thingy)]} {
+	      setl {layer width} $VIA($type$thingy)
+	      if { $width > $biggest } {
+		  set biggest $width
+	      }
+	  }
+      }
+a21 7
+      # And set width_x and width_y to the largest number of vias
+      # that will fit in the specified bbox.
+      setl {x1 y1 x2 y2} $bbox
+      set width_x [expr 1 + int( ($x2 - $x1 - $biggest) / $sep )]
+      set width_y [expr 1 + int( ($y2 - $y1 - $biggest) / $sep )]
+  }
+
+d55 34
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+d12 3
+a14 4
+  set size [get_assoc size $properties]
+  # When drawing wires with the wiring tool, the size_layer
+  # is the from_layer that we were wiring.
+  set size_layer [get_assoc size_layer $properties]
+d16 5
+a20 18
+  # If a size is specified, set diff diff to the difference
+  # between the min width size of size_layer and the specified
+  # size for size_layer, but no smaller than minimum.
+  set diff 0
+  if { $size != "" && $size != "minimum" } {
+      if { $size_layer == "" } {
+	  # Find the largest layer, and use that for size_layer.
+	  set biggest 0
+	  foreach thingy {"" ,down ,up ,other} {
+	    if {[info exists VIA($type$thingy)]} {
+		setl {layer width} $VIA($type$thingy)
+		if { $width > $biggest } {
+		    set size_layer $layer
+		    set biggest $width
+		}
+	    }
+	  }
+      }
+d22 5
+a26 2
+      # Determine the minimum width of size_layer, and set
+      # diff to the difference between the specified size and the min size.
+d28 6
+a33 7
+	if {[info exists VIA($type$thingy)]} {
+	    setl {layer width} $VIA($type$thingy)
+	    if { $layer == $size_layer } {
+		set diff [expr $size - $width]
+		break
+	    }
+	}
+d36 5
+a40 4
+      # The new size may not be smaller than minimum.
+      if { $diff < 0 } {
+	set diff 0
+      }
+d43 2
+d46 9
+a54 1
+  # draw it
+d56 15
+a70 8
+  foreach thingy {"" ,down ,up ,other} {
+    if {[info exists VIA($type$thingy)]} {
+      setl {layer width} $VIA($type$thingy)
+      # TODO fix for non even width stuff
+      set width [uusnap [expr ($width + $diff)/2.0]]
+      gcell_paint $layer \
+	  -$width -$width $width $width
+    }
+d92 4
+a95 4
+	 [list size minimum -entry \
+	 -help {the size of the via, or "minimum" for minimum size via}] \
+	 [list size_layer {} -entry \
+	 -help {optional: the name of the layer that the "size" option applies to;  eg, for a via: v1, it could be metal1 or metal2; if empty, the size applies to the via bounding box}] \
+@

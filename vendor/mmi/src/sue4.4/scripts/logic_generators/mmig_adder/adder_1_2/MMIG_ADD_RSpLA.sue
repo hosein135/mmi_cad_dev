@@ -1,0 +1,124 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_MMIG_ADD_RSpLA {} {
+  make input -orient RY -name A_H -origin {120 440}
+  make input -orient RY -name B_H -origin {120 480}
+  make output -name Sum_H -origin {1360 610}
+  make output -orient R90Y -name Cout_H -origin {880 170}
+  generate name_net_s name_net -cell name_net
+  make name_net -name G_L -origin {510 460}
+  make name_net -name P_L -origin {1150 590}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {410 1460}
+  make row_spanner300 -origin {1060 1460}
+  make name_net -name Cin_H -origin {1150 630}
+  make name_net -name K_L -origin {510 610}
+  make name_net -name K_H -origin {510 540}
+  make input -orient RY -name Inject_H -origin {120 1020}
+  make name_net -name Inject_L -origin {720 1060}
+  make input -orient RY -name C_H -origin {120 1130}
+  make input -orient R90Y -name Cin_L -origin {930 1320}
+  make name_net -name C_L -origin {720 1130}
+  make name_net -orient R90 -name Carry_L -origin {880 760}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -orient RY -origin {240 460}
+  generate MMI_NOR2 MMI_NOR2B_ -Size B -DeMorgan 1
+  make MMI_NOR2B_ -orient RY -origin {240 540}
+  generate MMI_OAI21 MMI_OAI21B_ -Size B -DeMorgan 1
+  make MMI_OAI21B_ -orient R270 -origin {880 350}
+  generate MMI_XNOR2 MMI_XNOR2A_ -DeMorgan 1
+  make MMI_XNOR2A_ -origin {1250 610}
+  generate MMI_AO22 MMI_AO22B -Size B
+  make MMI_AO22B -orient R90Y -origin {880 890}
+  generate MMI_NAND2 MMI_NAND2A -Size A
+  make MMI_NAND2A -origin {630 590}
+  generate MMI_INV MMI_INVA_ -DeMorgan 1
+  make MMI_INVA_ -origin {1080 630}
+  generate MMI_INV MMI_INVA_ -DeMorgan 1
+  make MMI_INVA_ -origin {1250 1200}
+  make output -name CinB_H -origin {1360 1200}
+  make MMIG_ADD_RSpLA -origin {220 220}
+  generate MMI_INV MMI_INVA 
+  make MMI_INVA -origin {600 1060}
+  make MMI_INVA -origin {600 1130}
+  make MMI_INVA -origin {400 610}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.7 -date 03/09/99 -origin {720 1600}
+  make_wire 120 480 150 480
+  make_wire 550 460 850 460
+  make_wire 920 540 510 540
+  make_wire 170 440 170 520
+  make_wire 150 480 150 560
+  make_wire 150 480 180 480
+  make_wire 180 560 150 560
+  make_wire 330 540 330 610
+  make_wire 550 570 570 570
+  make_wire 550 460 550 570
+  make_wire 510 1020 510 1060
+  make_wire 830 990 830 1130
+  make_wire 870 990 870 1020
+  make_wire 120 1020 510 1020
+  make_wire 510 1020 870 1020
+  make_wire 890 990 890 1060
+  make_wire 920 450 920 540
+  make_wire 880 450 880 630
+  make_wire 120 440 170 440
+  make_wire 170 440 180 440
+  make_wire 300 460 510 460
+  make_wire 510 460 550 460
+  make_wire 170 520 180 520
+  make_wire 300 540 330 540
+  make_wire 330 540 510 540
+  make_wire 460 610 510 610
+  make_wire 510 610 570 610
+  make_wire 330 610 340 610
+  make_wire 690 590 1150 590
+  make_wire 1150 590 1190 590
+  make_wire 880 170 880 250
+  make_wire 850 450 850 460
+  make_wire 1140 630 1150 630
+  make_wire 1150 630 1190 630
+  make_wire 1020 630 880 630
+  make_wire 1310 610 1360 610
+  make_wire 880 630 880 760
+  make_wire 880 760 880 790
+  make_wire 540 1130 120 1130
+  make_wire 660 1130 720 1130
+  make_wire 720 1130 830 1130
+  make_wire 540 1060 510 1060
+  make_wire 660 1060 720 1060
+  make_wire 720 1060 890 1060
+  make_wire 1310 1200 1360 1200
+  make_wire 1190 1200 930 1200
+  make_wire 930 1200 930 1320
+  make_wire 930 1200 930 990
+  make_text -origin {1190 220} -text {This is the same cell as rippleA_L, with a carry in mux added 
+to allow carry injection mid-chain.}
+}
+
+proc ICON_MMIG_ADD_RSpLA args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin_L
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout_H
+  icon_term -type input -origin {-140 70} -name Inject_H
+  icon_term -type input -origin {-140 90} -name C_H
+  icon_term -type output -origin {140 20} -name CinB_H
+  icon_property -origin {-80 220} -type user -name name
+  icon_property -origin {-80 240} -type user -name M
+  icon_property -origin {-80 260} -type user -name pad
+  icon_property -origin {-40 100} -anchor e -rotate 1 -label Cin_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor e -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label RSpLA
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {-130 70} -label Inj_H
+  icon_property -origin {-130 90} -label C_H
+  icon_property -origin {130 20} -rotate 1 -label CinB_H
+}
+

@@ -1,0 +1,81 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_rippleB_L {} {
+  make input -orient RY -name A_H -origin {120 440}
+  make input -orient RY -name B_H -origin {120 480}
+  make NAND2B -orient RY -origin {220 460}
+  make NOR2B_ -origin {200 540}
+  make output -name Sum_H -origin {1340 610}
+  make input -orient R90Y -name Cin_L -origin {880 840}
+  make output -orient R90Y -name Cout_H -origin {880 170}
+  make name_net -name G_L -origin {510 460}
+  make name_net -name P_L -origin {1150 590}
+  make rippleB_L -origin {220 220}
+  make XNOR2B_ -orient RY -origin {1230 610}
+  make INVB_ -origin {600 690}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {430 990}
+  make row_spanner300 -origin {1080 990}
+  make name_net -name Cin_H -origin {1150 630}
+  make INVA -origin {390 610}
+  make NAND2B -orient RY -origin {610 590}
+  make name_net -name K_L -origin {510 610}
+  make name_net -name K_H -origin {510 540}
+  make OAI21C_ -orient R270 -origin {880 360}
+  make sccs_title_bar -owner emc -version 1.2 -date 01/26/99 -origin {670 1120}
+  make_wire 120 480 150 480
+  make_wire 200 480 150 480
+  make_wire 880 170 880 280
+  make_wire 850 450 850 460
+  make_wire 550 570 590 570
+  make_wire 550 460 550 570
+  make_wire 920 450 920 540
+  make_wire 290 460 510 460
+  make_wire 510 460 550 460
+  make_wire 550 460 850 460
+  make_wire 1300 610 1340 610
+  make_wire 1150 590 680 590
+  make_wire 1150 590 1190 590
+  make_wire 1150 630 1190 630
+  make_wire 360 610 320 610
+  make_wire 920 540 510 540
+  make_wire 510 610 440 610
+  make_wire 510 610 590 610
+  make_wire 320 540 320 610
+  make_wire 270 540 320 540
+  make_wire 320 540 510 540
+  make_wire 170 440 170 520
+  make_wire 150 560 180 560
+  make_wire 150 480 150 560
+  make_wire 180 520 170 520
+  make_wire 120 440 170 440
+  make_wire 170 440 200 440
+  make_wire 650 690 1150 690
+  make_wire 1150 630 1150 690
+  make_wire 570 690 550 690
+  make_wire 550 690 550 740
+  make_wire 550 740 880 740
+  make_wire 880 740 880 450
+  make_wire 880 740 880 840
+}
+
+proc ICON_rippleB_L args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin_L
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout_H
+  icon_property -origin {-70 220} -type user -name name
+  icon_property -origin {-70 240} -type user -name M
+  icon_property -origin {-70 260} -type user -name pad
+  icon_property -origin {-40 100} -anchor e -rotate 1 -label Cin_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label rippleB_L
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+}
+

@@ -1,0 +1,160 @@
+Documentation for shifter
+-------------------------
+
+rev 0.1, 4/19/99:  Initial release
+rev 0.2, 4/21/99:  - Bugfix: incorrect generated verilog filename
+                   - Bugfix: incorrect bit indices generated when
+                     shift amount > shifter width
+                   - Added optimization for bidirectional shifters:
+                     no shift left in the final stage (assumes encoded
+                     shift amount with positive numbers representing
+                     a left shift)
+rev 0.3, 4/22/99:  - Added BidirOptimization parameter
+rev 0.4, 4/30/99:  - Added netlist_level property to icon, so that it will
+                     default to "schematic" (not "icon") in sue's dpc & verilog
+                     modes.
+rev 0.5, 5/7/99:   - Changed cell names to begin with MMIG_
+rev 0.6, 7/16/99:  - Added NAME_shifter proc, which creates the shifter's name
+rev 0.7, 9/23/99:  - Added AddSpacer parameter
+rev 0.8, 2/25/99:  - Updated to use generators_utilities & api calls
+
+
+The shifter generator is used to derive left, right, or bidirectional
+shifters or rotators.  The shifter/rotator is built from multiple stages of 
+fully static 2:1 or 3:1 muxes.
+
+Unidirectional shifters are constructed assuming one bit of shift control 
+per stage.  Bidirectional shifters assume 3 bits of shift control per stage:
+[0] = no shift, [1] = left shift, [2] = right shift.  Left, right, and
+bidirectional shifters all assume that the shift amount per stage is a
+power of 2, increasing from a shift by 1 in the first stage, to a shift by
+2**(NStages - 1) at the output of the shifter.
+
+The user can also customize the shift amount and direction per stage.  If
+a "Custom" direction is provided, the user enters the shift algorithm in
+the CustomAlgorithm field.  See the detailed explanation below under the
+CustomAlgorithm parameter.
+
+The cells provided with this design were optimized for NBITS=32, maximum
+shift amount <= 16.  For larger shift amounts, the rise/fall times of internal 
+nodes may be too slow.  This design should work well for NBITS up to 64;
+rise/fall time on the shift amount signals may become an issue for NBITS > 64.
+
+
+These are the input arguments:
+
+  NBITS:  
+    Definition:  
+      The number of bits in the shifter.
+    Legal Values:  
+      1 <= NBITS <= 128.
+    Default:  
+      32
+
+  Operation:
+    Definition:
+      Allows the user to select shift or rotate.
+    Legal Values:
+      Shift or Rotate
+    Default:
+      Shift
+
+  Direction:
+    Definition:
+      The user may select among the following:
+      - all stages shift left
+      - all stages shift right
+      - all stages shift in both directions
+      - custom algorithm (see CustomAlgorithm discussion below)
+    Legal Values:
+      Left, Right, Both, Custom
+    Default:
+      Left
+
+  SignExtendRsh:
+    Definition:
+      Allows the user to specify whether right shifts are sign extended 
+      or zero extended.
+    Legal Values:
+      Y (sign extend) or N (zero extend)
+    Default:
+      Y
+
+  NStages:
+    Definition:
+      Selects the number of mux stages in the shifter.  For a left or
+      right shifter, the number of stages is equal to the number of
+      (binary encoded) shift amount bits.  
+    Legal Values:
+      > 0
+    Default:
+      5
+
+  BidirOptimization:
+    Definition:
+      This parameter allows the user to request certain optimizations 
+      based on the knowledge that the shift amount for a bidirectional
+      shift is an encoded value, with positive values for a left shift
+      and negative values for a right shift.  There are three algorithms
+      available:
+      None: no optimizations done
+      Simple:  Assuming that left shifts are indicated by positive values
+        and right shifts are indicated by negative values, there can be
+        no left shift in the final stage of the shifter (since by definition
+        the maximum left shift value is 011..111).  Therefore the final
+        bidirectional stage is replaced by a right shift stage.
+      ModifyFirstStage:  The final stage of the shifter can be eliminated
+        if the initial stage is modified to perform (left shift by 1,
+        no shift, right shift by 1, or right shift by 2).  This permits
+        all the shift amounts from -2**n thru (2**n)-1 to be represented
+	(n-1) stages rather than n stages.  Note that the NStages parameter
+        must be reduced accordingly by the user.
+      This parameter is ignored if Left, Right, or Custom are selected
+      for the Direction parameter.
+    Legal Values:
+      None (no optimization), Simple, ModifyFirstStage
+    Default:
+      None
+
+  CustomAlgorithm:
+    Definition:
+      This parameter allows a user to select a customized shift algorithm.
+      Left, right, and bidirectional stages can be specified, as well
+      as non-power-of-2 shifts.  Both the shift amount and direction for 
+      each stage are specified in this field.  
+    Legal Values:
+      There must be a shift amount and direction specified for each stage
+      of the shifter/rotator.  The format for each specifier is {shift
+      amount}{direction}; specifiers must be separated by spaces.  Note
+      that there cannot be any space between the shift amount and the 
+      direction.
+      - {shift amount} must be a positive integer greater than 0
+      - {direction} must be L (left), R (right), or B (bidirectional)
+    Default:
+      ""
+    Example:
+      Type = "Shifter"
+      Direction = "Custom"
+      NStages = 5
+      CustomAlgorithm = "1B 3R 2L 8B 12R"
+      This combination specifies a 5 stage shifter, with each stage
+      performing the following operation:
+      stage 0:  bidirectional shift by 1
+      stage 1:  right shift by 3
+      stage 2:  left shift by 2
+      stage 3:  bidirectional shift by 8
+      stage 4:  right shift by 12 
+
+  AddSpacer:
+    Definition:
+      Allows the user to add extra spacer row(s) between the shifter
+      stages, including adding extra row(s) after the final stage.
+      If the user specifies AddSpacer=n (n>0), then an additional 'n'
+      spacer row(s) will be added to the right of each shifter stage.
+      These added spacer rows are in addition to those inserted by
+      the default spacer algorithm.
+    Legal Values:
+      >= 0
+    Default:
+      0 (use default spacer algorithm, do not add extra rows)
+

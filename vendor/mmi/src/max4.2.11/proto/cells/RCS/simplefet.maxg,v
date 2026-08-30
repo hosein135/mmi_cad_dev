@@ -1,0 +1,139 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2000.04.19.19.39.59;	author mha;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2000.01.06.01.36.30;	author pat;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@# Example generator cell (gcell) to draw a simple fet.
+
+# This procedure draws a simple fet given a list of properties
+
+proc gcell_make_simplefet {properties} -desc {
+  gcell procedure to make a fet
+} {
+
+  # get values out of properties list
+  set type [get_assoc type $properties]
+  set width [get_assoc width $properties]
+  set length [get_assoc length $properties]
+
+  # fet gate is vertical.  Origin is lower left corner of gate
+
+  # what layers make up this fet?
+  setl {poly diff} [techinfo device $type]
+  if {$poly == ""} {
+    puts "Aborting, Illegal fet type $type."
+    return
+  }
+
+  # get some key params
+  set poly_ext_gate [max [techinfo extend $poly $type opt] 0.1]
+  set diff_ext_gate [max [techinfo extend $diff $type opt] 0.1]
+
+  set x -$diff_ext_gate
+
+  # draw the poly
+  gcell_paint $poly 0 -$poly_ext_gate $length [expr $width + $poly_ext_gate]
+  
+  # draw the diffusion
+  gcell_paint $diff -$diff_ext_gate 0 [expr $length + $diff_ext_gate] $width
+
+  # the return string will show up when the gcell is selected
+  return "$width/$length"
+}
+
+
+# Fix up the props used to make a fet gcell.  Allow fet width only to stretch.
+
+proc gcell_make_props_simplefet {prop_list} {
+
+  # get layers and key parameters
+  set type [get_assoc type $prop_list]
+  setl {poly diff} [techinfo device $type]
+  if {$poly == ""} {
+    # illegal type
+    return $prop_list
+  }
+
+  set minwidth 0.4
+
+  if {[set bbox [get_assoc _BBOX_  $prop_list]] != ""} {
+    # compute width from bbox
+    set prop_list [rm_assoc _BBOX_ $prop_list]
+    set prop_list [rm_assoc width $prop_list]
+
+    setl {x1 y1 x2 y2} $bbox
+    set poly_ext_gate [max [techinfo extend $poly $type opt] 0.1]
+    set newwidth [expr $y2 - $y1 - 2.0 * $poly_ext_gate]
+    lappend prop_list [list width [uusnap [max $newwidth $minwidth]]]
+
+  } elseif {[set newwidth [get_assoc width $prop_list]] != ""} {
+    # Check width validity.
+    set prop_list [rm_assoc width $prop_list]
+    lappend prop_list [list width [uusnap [max $newwidth $minwidth]]]
+  }
+
+  return $prop_list
+}
+
+
+# now define it and give default arguments
+
+set fets [techinfo devices "" "" opt]
+if {$fets != "0"} {
+  # there are some devices in this technology
+
+  set properties ""
+  set default_fet [lindex $fets 0]
+  lappend properties "type $default_fet choice \{$fets\}"
+
+  #TODO: should make default width into a variable
+  lappend properties "width 1 -number -incr 0.1"
+
+  # compute minimum channel length from either the device width
+  # or the poly width, whichever is greater
+  set min_length \
+	[max [techinfo width $default_fet "" opt] \
+	     [techinfo width [lindex [techinfo device $default_fet] 0] "" opt]]
+
+  lappend properties "length $min_length -number -incr [res] -snap 0.1"
+
+  define_gcell simplefet $properties
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d83 2
+a84 1
+  #TODO: use a variable here
+d87 2
+d90 2
+a91 1
+    [techinfo width [lindex [techinfo device $default_fet] 0] "" opt]
+@

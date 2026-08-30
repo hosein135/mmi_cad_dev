@@ -1,0 +1,116 @@
+# SUE version MMI_SUE4.1.8
+
+proc SCHEMATIC_MMI_NOR3B {} {
+  make global -name gnd -origin {-10 140}
+  make global -name gnd -origin {320 140}
+  make input -name in1 -origin {-100 -100}
+  make global -name gnd -origin {460 140}
+  make global -orient RY -name vdd -origin {20 -240}
+  make output -name out -origin {510 50}
+  make global -orient RY -name vdd -origin {100 -240}
+  make global -orient RY -name vdd -origin {220 -240}
+  make input -name in0 -origin {-100 0}
+  make input -name in2 -origin {-100 -200}
+  make MMI_NOR3B -origin {610 -370}
+  make nmos -W '2*WNA' -origin {-10 100}
+  make nmos -W '2*WNA' -origin {320 100}
+  make nmos -W '2*WNA' -origin {460 100}
+  make pmos -W '4*WNA' -origin {-10 0}
+  make pmos -W '4*WNA' -origin {100 0}
+  make pmos -W '4*WNA' -origin {200 0}
+  make pmos -W '4*WNA' -origin {0 -100}
+  make pmos -W '4*WNA' -origin {100 -100}
+  make pmos -W '4*WNA' -origin {210 -100}
+  make pmos -W '4*WNA' -origin {20 -200}
+  make pmos -W '4*WNA' -origin {100 -200}
+  make pmos -W '4*WNA' -origin {220 -200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 04/13/00 -origin {110 330}
+  make_wire 260 100 260 -100
+  make_wire 460 60 460 50
+  make_wire 400 100 400 -200
+  make_wire -100 -100 -60 -100
+  make_wire 510 50 460 50
+  make_wire 100 40 100 50
+  make_wire 100 -40 100 -60
+  make_wire 100 -140 100 -160
+  make_wire 40 -100 -60 -100
+  make_wire 200 40 200 50
+  make_wire 200 50 100 50
+  make_wire 320 50 320 60
+  make_wire 320 50 460 50
+  make_wire 320 50 200 50
+  make_wire 40 0 140 0
+  make_wire 150 -100 40 -100
+  make_wire 150 -100 260 -100
+  make_wire 210 -60 210 -40
+  make_wire 200 -40 210 -40
+  make_wire 210 -160 220 -160
+  make_wire 210 -160 210 -140
+  make_wire 160 -200 40 -200
+  make_wire 160 -200 400 -200
+  make_wire -10 40 -10 50
+  make_wire -10 -60 -10 -40
+  make_wire -10 -60 0 -60
+  make_wire -100 0 -70 0
+  make_wire -70 0 40 0
+  make_wire -40 -200 -100 -200
+  make_wire -40 -200 40 -200
+  make_wire 20 -160 20 -140
+  make_wire 0 -140 20 -140
+  make_wire -10 50 -10 60
+  make_wire -10 50 100 50
+  make_wire -70 0 -70 100
+  make_text -origin {-190 -340} -text {3 Input NOR}
+  make_text -origin {-190 -320} -text {B Size}
+  make_text -origin {-190 -360} -text MMI_NOR3B -size large
+}
+
+proc ICON_MMI_NOR3B args {
+  set size B
+  set DeMorgan 0
+  # check for acceptable response on Size
+  if {($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  # MMI_NOR3 icon body
+  if {$DeMorgan} {
+    icon_arc -30 -30 40 30 -start 277 -extent 166
+    icon_line 10 -30 -40 -30 -40 30 10 30
+    icon_line 40 0 60 0
+    icon_arc -60 10 -40 30 -start 0 -extent 359
+    icon_arc -60 -10 -40 10 -start 0 -extent 359
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc -60 -30 50 110 -start 35 -extent 50
+    icon_arc -60 -110 50 30 -start 275 -extent 50
+    icon_arc -58 -30 -38 30 -start 270 -extent 180
+    icon_line -48 -30 0 -30
+    icon_line -48 30 0 30
+    icon_line -40 -20 -60 -20
+    icon_line -38 0 -60 0
+    icon_line -40 20 -60 20
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+  }
+  # properties
+  icon_property -origin {0 0} -size large -anchor center -label $size
+  icon_property -origin {-37 -22} -size small -label F
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 0} -name in1
+  icon_term -type input -origin {-60 20} -name in2
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+  # verilog property
+  if {!$DeMorgan} {
+    set fname MMI_NOR3B
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.in0(\$\{in0\}), .in1(\$\{in1\}), .in2(\$\{in2\}), .out(\$\{out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type auto -name verilog -text $vprop
+  }
+}
+

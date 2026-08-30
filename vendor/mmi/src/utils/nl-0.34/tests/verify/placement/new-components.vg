@@ -1,0 +1,19 @@
+module sub (p, q, r);
+
+  input p, q;
+  output r;
+
+  MMI_NOR2A u1 (.in0(p), .in1(q), .out(r));
+
+endmodule
+
+
+module m (a, b, z);
+
+  input [1:0] a, b;
+  output [1:0] z;
+
+  sub sub0 (.p(a[0]), .q(b[0]), .r(z[0]));
+  sub sub1 (.p(a[1]), .q(b[1]), .r(z[1]));
+
+endmodule

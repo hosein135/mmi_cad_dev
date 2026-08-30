@@ -1,0 +1,67 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	99.06.02.18.47.14;	author pat;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@# Example generator cell (gcell) to make contacts/vias
+
+proc gcell_make_via_original {properties} -desc {
+  gcell procedure to make a contact/via
+} {
+
+  global LAYINFO VIA
+
+  # get values out of properties list
+  set type [get_assoc type $properties]
+
+  # draw it
+
+  foreach thingy {"" ,down ,up ,other} {
+    if {[info exists VIA($type$thingy)]} {
+      setl {layer width} $VIA($type$thingy)
+      # TODO fix for non even width stuff
+      set width [uusnap [expr $width/2.0]]
+      gcell_paint $layer \
+	  -$width -$width $width $width
+    }
+  }
+
+  return $type
+}
+
+
+# now define it and give default arguments
+
+set via_types ""
+foreach type [array names VIA] {
+  if {[string first , $type] == -1} {
+    lappend via_types $type
+  }
+}
+set via_types [lsort -dictionary $via_types]
+
+
+define_gcell via_original \
+    [list \
+	 "type [lindex $via_types 0] choice \"$via_types\"" \
+     ]
+
+
+@

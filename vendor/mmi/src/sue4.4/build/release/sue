@@ -1,0 +1,100 @@
+#!/bin/csh -f
+
+set mmipath = ${MMI_TOOLS}/sue
+
+if (`uname -s` == "Linux") then
+  set cmdpath = $mmipath/bin.i486-linux
+else 
+  set cmdpath = $mmipath/bin.sparc-solaris2
+endif
+
+# disables eof (^D) and interrupt (^C)
+stty eof "" intr ""
+
+
+#----------------------------------------------------------------
+# add SUE fonts to font path
+#----------------------------------------------------------------
+
+# uncomment out this section if using extended font mode
+#if ($?DISPLAY && $DISPLAY != "") then
+#	if (`xset -q | grep 'sue[0-9.]*/fonts'` == "") then
+#	    xset +fp $mmipath/fonts
+#	    xset fp rehash
+#	endif
+#endif
+
+# default name for the sue log file
+set logfile = suelog.$$
+
+# does the user want a log file
+set log = 0
+if ($?SUE_LOG) then
+    if ($SUE_LOG != 0 && $SUE_LOG != 1) then
+	# logfile and use this name
+	set logfile = $SUE_LOG
+	set log = 1
+    else 
+	set log = $SUE_LOG
+    endif
+endif
+
+set next = 0
+foreach arg ($argv)
+    if ("$next" == "1") then
+	if ($arg != 0 && $arg != 1) then
+	    # logfile and use this name
+	    set logfile = $arg
+	    set log = 1
+	else
+	    set log = $arg
+	endif
+	set next = 0
+    endif
+    if ("$arg" == "-log") then
+	set next = 1
+    endif
+end
+
+# now run sue and pass it all of the command line arguments
+
+set x = $1
+
+if ("$x" == "-help" || "$x" == "-h") then
+	echo "SUE startup options:"
+	echo "  -private               Use a private colormap (must be the first option)."
+	echo "  -v or -version         Print SUE version and then exit."
+	echo "  -h or -help            Display this message (must be first option)."
+	echo "  -display <display:x.x> Run SUE on the given display."
+	echo "  -new <name>            Start SUE with a new schematic called <name>."
+	echo "  -log <1|0|filename>    Turns on/off the log.  Defaults to SUE_LOG shell"
+	echo "                         variable or off if not set."
+	echo "  -LIB <dir>             Adds <dir> to icon search path."
+	echo "  -AUTOLIB <dir>         Like LIB but loads all icons into icon lisbox."
+	echo "  -CMD <cmd>             Run SUE command on startup."
+	echo "  -SET <variable=value>  Set SUE variable on startup (no spaces allowed)."
+	echo "  -BATCH 1               Start SUE in BATCH mode.  Bypasses user confirmations."
+	echo "  -ICONIFY 1             Start SUE with the main window iconified."
+else if ("$x" == "-private") then
+	shift
+	# Gives SUE a private colormap
+	if ($log == "1") then
+	    $cmdpath/sue.exe -colormap new $* | $cmdpath/sue_tee $logfile
+	else
+	    $cmdpath/sue.exe -colormap new $*
+	endif
+else
+	if ($log == "1") then
+	    $cmdpath/sue.exe $* | $cmdpath/sue_tee $logfile
+	else
+	    $cmdpath/sue.exe $*
+	endif
+endif
+
+
+# restore eof (^D) and interrupt (^C)
+
+stty eof "^D" intr "^C"
+
+
+

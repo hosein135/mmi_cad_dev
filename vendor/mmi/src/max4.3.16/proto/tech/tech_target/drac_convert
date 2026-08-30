@@ -1,0 +1,336 @@
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# Converts dracula drc rules deck into max technology format.
+
+proc read_drac {filename} {
+
+  global XLATE
+
+  if {![file readable $filename]} {
+    puts "Aborting, Can't read file $filename\n"
+    return
+  }
+
+  if {[catch "open $filename r" FILE_ID]} {
+    # error
+    puts stderr "Aborting, $FILE_ID"
+    return
+  } 
+
+  set LAYERS ""
+
+  puts stderr "Parsing Dracula DRC deck \"$filename\" ..."
+
+  while {[gets $FILE_ID line] >= 0} {
+
+    set line [clean_line $line]
+
+    if {$line == ""} {
+      continue
+    }
+
+    # get the first word on the line
+    regexp {^(.+)($|[ ])} $line bogus word
+
+    set word [string toupper $word]
+
+    switch -exact X_$word {
+
+      X_*INPUT-LAYER {
+	# layer definition
+
+	while {[gets $FILE_ID original_line] >= 0} {
+
+	  set line [clean_line $original_line]
+
+	  if {$line == ""} {
+	    continue
+	  }
+
+	  regexp {^([^ ]+)} $line bogus word
+
+	  if {$word == "*END"} {
+	    # done with this section
+	    break
+	  }
+
+	  regexp {^([^ ]+)[ ]*=[ ]*(.+)$} $line bogus orig_layer value_string
+	  setl {value DATATYPE dtype} $value_string
+
+	  if {[catch "expr $value"]} { 
+	    # special layer ignore
+	    continue
+	  }
+
+	  set layer [string toupper $orig_layer]
+
+	  set case($layer) $orig_layer
+
+	  lappend LAYERS $layer
+
+	  if {[string toupper $DATATYPE] == "DATATYPE" && $dtype != ""} {
+	    set value "$value:$dtype"
+	  }
+
+	  set GDS_LAYERS($layer) $value
+	  set COMMENT_LAYERS($layer) [read_comment $original_line]
+	}
+      }
+
+      X_*OPERATION {
+	# drc rules
+
+	while {[gets $FILE_ID line] >= 0} {
+
+	  set line [string toupper [clean_line $line]]
+
+	  if {$line == ""} {
+	    continue
+	  }
+
+	  regexp {^([^ ]+)} $line bogus word
+
+	  # remove []
+	  set word [lindex [split $word \[] 0]
+
+	  switch -exact X_$word {
+
+	    X_NOT {
+	      regexp {^([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)} \
+		  $line bogus command a b c
+	      set LAYER_OP($c) "$a and-not $b"
+	      set XLATE($a) $c
+	      set RXLATE($c) $a
+	    }
+
+	    X_AND {
+	      regexp {^([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)} \
+		  $line bogus command a b c
+	      set LAYER_OP($c) "$a and $b"
+	    }
+
+	    X_SELECT {
+	      # is this how select works?
+	      regexp {^([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)} \
+		  $line bogus command a overlap b c
+	      set LAYER_OP($c) "$a and $b"
+	    }
+
+	    X_WIDTH {
+	      # a happy width rule
+	      # WIDTH M2 LT 0.28 OUTPUT M2W1 63
+	      # ; M2 width >= 0.28um. M2.W.1
+
+	      regexp {^([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)} \
+		  $line bogus command a b c
+
+	      if {$b == "LT"} {
+		set WIDTH_RULE($a) "$c"
+	      }
+	    }
+
+	    X_EXT {
+	      # a happy space rule
+	      # EXT[H] M2 LT 0.28 OUTPUT M2S1 63
+	      # ; M2 space >= 0.28um. M2.S.1
+
+	      regexp {^([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)} \
+		  $line bogus command a b c
+
+	      if {$b == "LT"} {
+		set SPACE_RULE($a) "$c"
+	      }
+	    }
+
+	    X_ENC {
+	      # a happy enclose rule
+	      # ENC[T] CO M1 LT 0.005 OUTPUT M1E1 63
+	      # ; M1 enclose Contact >= 0.005um. M1.E.1
+
+	      regexp {^([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)[ ]([^ ]+)} \
+		  $line bogus command a b c d
+
+	      if {$c == "LT"} {
+		lappend ENC_RULE($a) "$b $d"
+	      }
+	    }
+
+	    X_*END {
+	      # done with this section
+	      break
+	    }
+	  }
+	}
+      }
+    }
+  }
+
+  # close the file
+  close $FILE_ID
+
+  puts "\#layer\tgds:dt\ttxt:dt\ttype\twidth\tspace\tcolor"
+  puts "\#======\t=======\t=======\t=======\t=======\t=======\t======="
+
+  # make a nice table of the results
+  set overlaps ""
+  foreach layer $LAYERS {
+    
+    set gds [use_first GDS_LAYERS($layer)]
+    if {[llength $gds] > 1} {
+      # ignore
+      continue
+    }
+
+    set width [lookup_value WIDTH_RULE $layer]
+    set width [use_first width '-]
+
+    set space [lookup_value SPACE_RULE $layer]
+    set space [use_first space '-]
+
+    foreach pair [lookup_value ENC_RULE $layer] {
+      setl {olayer value} $pair
+
+      while {1} {
+	if {[lsearch $LAYERS $olayer] != -1} {
+	  lappend overlaps "DRC $olayer ENC $layer $value"
+	  break
+	}
+
+	if {![info exists RXLATE($olayer)]} {
+	  break
+	}
+
+	# try a translated layer, instead
+	set olayer $RXLATE($olayer)
+      }
+    }
+
+    # use the comment first for searching for a type
+    set nametype [string tolower [use_first COMMENT_LAYERS($layer) layer]]
+
+    if {[regexp {^[m][a-z_-]*[0-9]} $nametype tmp]} {
+      # metal
+      set type metal
+    } elseif {[regexp {^([v][a-z_-]*[0-9])|((cont|cnt))} $nametype tmp]} {
+      # via
+      set type via
+    } elseif {[regexp {^[p][oly]} [string tolower $nametype] tmp]} {
+      # poly
+      set type poly
+    } else {
+      set type "-"
+    }
+
+    puts [format "%-s\t%s\t%s\t%s\t%s\t%s\t-" \
+	      $case($layer) \
+	      $gds \
+	      - \
+	      $type \
+	      $width \
+	      $space \
+	      ]
+  }
+
+  # put in overlaps
+  puts "\n[join $overlaps \n]"
+
+#parray GDS_LAYERS
+#parray COMMENT_LAYERS
+#parray LAYER_OP
+#parray WIDTH_RULE
+#parray SPACE_RULE
+#parray ENC_RULE
+
+  puts stderr "done."
+}
+
+
+
+proc clean_line {line} {
+
+  # remove comments (; to end of line)
+  set pos [string first ";" $line]
+  if {$pos != -1} {
+    set line [string range $line 0 [expr $pos - 1]]
+  }
+
+  # remove leading and trailing white spaces
+  set line [string trim $line]
+  # convert tabs to spaces
+  regsub -all \t $line " " line
+
+  # remove duplicate spaces
+  regsub -all {[ ]+} $line " " line
+
+  return $line
+}
+
+
+proc read_comment {line} {
+
+  set pos [string first ";" $line]
+  if {$pos == -1} {
+    # no comment
+    return ""
+  }
+
+  return [string trim [string range $line $pos end] "; "]
+}
+
+
+proc lookup_value {array_name layer} {
+
+  global XLATE
+  upvar $array_name array
+
+  set value ""
+
+  while {1} {
+    if {[info exists array($layer)]} {
+      set value $array($layer)
+      break
+    }
+
+    if {![info exists XLATE($layer)]} {
+      break
+    }
+
+    # try a translated layer, instead
+    set layer $XLATE($layer)
+  }
+
+  return $value
+}
+
+
+# returns the value of the first variable name in the list that is defined
+# and not equal to "".  If the first character of the name is ' then
+# it is a literal.
+
+proc use_first args {
+  
+  foreach var $args {
+    if {[string index $var 0] == "'"} {
+      return [string range $var 1 end]
+    }
+    upvar $var name
+    if {[info exists name] && [string compare $name ""] != 0} {
+	return $name
+    }
+  }
+}
+
+# do it
+
+if {[llength $argv] != 1} {
+  puts "Usage:\n"
+  puts "\tdrac_convert <dracula_command_file>\n"
+
+} else {
+  read_drac $argv
+}
+
+exit

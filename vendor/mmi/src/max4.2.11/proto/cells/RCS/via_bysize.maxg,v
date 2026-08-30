@@ -1,0 +1,116 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	99.08.19.01.25.33;	author pat;	state Exp;
+branches;
+next	;
+
+
+desc
+@this via generator uses a prop_menu that takes the layer
+name and the size of the wire on that layer,
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@# Example generator cell (gcell) to make contacts/vias
+
+proc gcell_make_via_bysize {properties} -desc {
+  gcell procedure to make a contact/via
+} {
+
+  global LAYINFO VIA
+
+  # get values out of properties list
+  set type [get_assoc type $properties]
+  set size [get_assoc size $properties]
+  # When drawing wires with the wiring tool, the size_layer
+  # is the from_layer that we were wiring.
+  set size_layer [get_assoc size_layer $properties]
+
+  # If a size is specified, set diff diff to the difference
+  # between the min width size of size_layer and the specified
+  # size for size_layer, but no smaller than minimum.
+  set diff 0
+  if { $size != "" && $size != "minimum" } {
+      if { $size_layer == "" } {
+	  # Find the largest layer, and use that for size_layer.
+	  set biggest 0
+	  foreach thingy {"" ,down ,up ,other} {
+	    if {[info exists VIA($type$thingy)]} {
+		setl {layer width} $VIA($type$thingy)
+		if { $width > $biggest } {
+		    set size_layer $layer
+		    set biggest $width
+		}
+	    }
+	  }
+      }
+
+      # Determine the minimum width of size_layer, and set
+      # diff to the difference between the specified size and the min size.
+      foreach thingy {"" ,down ,up ,other} {
+	if {[info exists VIA($type$thingy)]} {
+	    setl {layer width} $VIA($type$thingy)
+	    if { $layer == $size_layer } {
+		set diff [expr $size - $width]
+		break
+	    }
+	}
+      }
+
+      # The new size may not be smaller than minimum.
+      if { $diff < 0 } {
+	set diff 0
+      }
+  }
+
+
+  # draw it
+
+  foreach thingy {"" ,down ,up ,other} {
+    if {[info exists VIA($type$thingy)]} {
+      setl {layer width} $VIA($type$thingy)
+      # TODO fix for non even width stuff
+      set width [uusnap [expr ($width + $diff)/2.0]]
+      gcell_paint $layer \
+	  -$width -$width $width $width
+    }
+  }
+
+  return $type
+}
+
+
+# now define it and give default arguments
+
+set via_types ""
+foreach type [array names VIA] {
+  if {[string first , $type] == -1} {
+    lappend via_types $type
+  }
+}
+set via_types [lsort -dictionary $via_types]
+
+
+define_gcell via_bysize \
+    [list \
+	 [list type [lindex $via_types 0] -choice "$via_types" \
+	 -help {the type of contact or via}] \
+	 [list size minimum -entry \
+	 -help {the size of the via, or "minimum" for minimum size via}] \
+	 [list size_layer {} -entry \
+	 -help {optional: the name of the layer that the "size" option applies to;  eg, for a via: v1, it could be metal1 or metal2; if empty, the size applies to the via bounding box}] \
+     ]
+
+
+@

@@ -1,0 +1,41 @@
+# SUE version MMI_SUE4.1.5
+
+proc SCHEMATIC_MMI_INVD {} {
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make MMI_INVD -origin {980 60}
+  make nmos -W 3.68 -origin {550 360}
+  make pmos -W 7.36 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 12/02/99 -origin {480 530}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text Inverter
+  make_text -origin {360 110} -text {D Size}
+  make_text -origin {360 70} -text MMI_INVD -size large
+}
+
+proc ICON_MMI_INVD args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type input -origin {-60 0} -name in
+  icon_term -type output -origin {60 0} -name out
+  icon_line -30 -30 -30 30 30 0 -30 -30
+  icon_arc 30 -10 50 10 -start 0 -extent 359
+  icon_line 50 0 60 0
+  icon_line -30 0 -60 0
+  icon_property -origin {-10 0} -size large -anchor center -label D
+  icon_property -origin {-60 240} -type user -name name
+  icon_property -origin {-60 260} -type user -name M
+  icon_property -origin {-60 280} -type user -name dpc
+  icon_property -origin {-60 320} -type auto -name verilog -text {MMI_INVD [unique_name "" $name MMI_INVD]
+(.in($in), .out($out))\;}
+}
+

@@ -1,0 +1,161 @@
+# .suerc for mmi15
+
+# points to the technology stuff
+#set tech /proj/tech/mmi15
+set techtype [file tail $tech]
+
+# come up in dpc mode
+set NETLIST_TYPE dpc
+set NETLIST_PROPS verilog
+
+# new icons get these properties
+set DEFAULT_PROPERTIES {{-type user -name name} {-type user -name M}
+                          {-type user -name dpc}}	
+
+# ignore these pins when reporting unconnected nets during netlisting
+set NETLIST(ignore_unconnected) "s_in s_en s_out"
+
+# pearl timing setup
+set DPC_TIMING(pearl,command) pearl
+# set DPC_TIMING(pearl,command) "rsh mmics2 cd [pwd]\\; /home/cad/pearl/tools.sun4v/bin/pearl"
+set DPC_TIMING(tech_file) $tech/library/pearl/pearl.tech
+set DPC_TIMING(ctlf_file) $tech/library/tlf/$techtype.ctlf
+set DPC_TIMING(filter) {-same_path -similar_path -node_suffix [#]}
+
+# if you want to use primetime, comment out next line
+#set DPC_TIMING(simulator) "primetime"
+set DPC_TIMING(primetime,command) pt_shell
+set DPC_TIMING(db_file) $tech/library/synopsys/$techtype.db
+set DPC_TIMING(db_time_units) 1ns
+set DPC_TIMING(db_cap_units) 1pF
+
+#set DPC_TIMING(simulator) "pathmill"
+set DPC_TIMING(pathmill,command) pathmill
+set DPC_TIMING(pathmill,tech_file) ""
+
+# Points to spice netlists of leaf cells
+set DPC_TIMING(pathmill,library) ". $tech/stdcell/extract"
+# Header file
+set DPC_TIMING(pathmill,spice_header) "$tech/stdcell/extract/include_params"
+#set DPC_TIMING(pathmill,spice_header) "$tech/stdcell/extract/include_params18"
+
+# For spice last critical path only
+set DPC_TIMING(pathmill,spice_command) read_spice_deck
+set DPC_TIMING(pathmill,spice_include) {{.lib '$tech/spice/tsmc15.mod' TT}}
+
+# optional pathmill configuration commands
+set DPC_TIMING(pathmill,cfg_options) \
+	{{pwl *} {xfer_all_pair} {log_on all} {search_structure all}}
+
+# main SUE icons
+#set SCHEM_DIR(devices) $tech/sue/devices
+#set SCHEM_DIR(spice) $tech/sue/mspice
+
+# dpc icons
+lappend AUTOLIB $SUE_DIR/schematics/dpc
+
+set DPC(LEF_PATH) $tech/library/lef/mmi15.lef
+
+# use stdcell generator icons
+if {[use_first NO_HIER_DEMORGAN env(NO_HIER_DEMORGAN)] != ""} {
+   lappend AUTOLIB $tech/stdcell/sue_gener_no_hier_dm
+} else {
+   lappend AUTOLIB $tech/stdcell/sue
+}
+
+# make sure we can use generators
+catch "source $tech/stdcell/sue/generators.tcl"
+
+# and the generators
+lappend AUTOLIB $tech/generators/release
+
+# for nl to get port names
+set DPC(VERILOG_PATH) ""
+lappend DPC(VERILOG_PATH) $tech/library/verilog/$techtype.v
+
+# stdcell size data for SUE dpc
+set DPC(PATH) ""
+lappend DPC(PATH) $tech/library/dpc/$techtype.dpc
+#lappend DPC(PATH) $tech/library/dpc/manual.dpc
+
+# Number of critical paths to remember
+set DPC_TIMING(paths) 10
+
+set DPC_TIMING(out) hidden
+
+# grid size
+set DPC(SCALE) 0.62
+
+# default bit pitch for buses (in grids)
+set DPC(PITCH) 20
+
+# Size of datapath cell not found in DPC(PATH)
+set DPC(DEFAULT_ROW_HEIGHT) 10
+set DPC(DEFAULT_COLUMN_WIDTH) 10
+
+# converts distance in microns to capacitance in fF
+# Note that for uneven grid dimensions in x and y, use a list.
+set DPC(MICRON_CAP_FACTOR) [expr 1.1 * 0.2]
+
+# Additional capacitance (in fF) added to all wires to account for port
+# positions not being ideal.  Usually only important for cells right
+# next to eachother.
+set DPC(CAP_PORT_FUDGE) [expr [lindex $DPC(MICRON_CAP_FACTOR) 0] * 6 * \
+	[lindex $DPC(SCALE) 0]]
+
+# for resistance, e.g. 110 mOhms/square / width of wire (microns)
+set DPC(MICRON_RES_FACTOR) [expr 0.11 / 0.3]
+
+# name of clock nets that control registers
+set DPC_TIMING(clk_names) "clk sclk clock"
+
+# clock period in ps for pearl 
+# cycle time = 125MHz => 8ns (ideal)
+# minus 1ns for skew etc. => 7.0ns
+set DPC_TIMING(clk_period) 7ns
+
+# default arrival time for inputs to sequential logic.
+set DPC_TIMING(arrival_time) 2n
+# default departure time before next clock for outputs to sequential
+# logic.
+set DPC_TIMING(departure_time) 2n
+# default max node rise/fall time
+set DPC_TIMING(max_gate_delay) 600ps
+
+# Place this capacitance on outputs terminals.
+set DPC_TIMING(out_cap) 20fF
+
+# Select the default driver cell for driving all primary inputs.
+# If nil, uses the default input transition time
+set DPC_TIMING(driver_cell) ""
+set DPC_TIMING(input_transition) 200ps
+
+# Example of a driver cell with a default output name of "Z"
+#set DPC_TIMING(driver_cell) "INVB Z"
+
+
+#set up which Verilog to run and where to get the libs from
+#set VERILOG_PROBE_CMD(interactive) "verilog -s +lic_ncv +libext+.vb+.v -y . -y lib.v 
+set VERILOG_PROBE_CMD(interactive) "lsn -verilog -I verilog -s +libext+.vb+.v -y . -y lib.v -v $tech/library/verilog/$techtype.v"
+
+#set VERILOG_CMD "verilog +lic_ncv +libext+.vb+.v -y . -y lib.v -v $tech/library/verilog/$techtype.v"
+set VERILOG_CMD "lsn -verilog -I verilog +libext+.vb+.v -y . -y lib.v -v $tech/library/verilog/$techtype.v"
+
+
+# When printing with leaves, don't print any schematics or icons from
+# these directories.  
+lappend PRINT(DONT_PRINT_DIRS) $tech/stdcell/sue
+
+# For creating sim files for cross-probing, LVS with max.  Need to
+# set the values for any SPICE parameters you use.
+set SIM_PARAMS(ln_min) 0.15u
+set SIM_PARAMS(lp_min) 0.15u
+#set SIM_PARAMS(WNA) 0.46
+#set SIM_PARAMS(WMIN) 0.42
+#set SIM_PARAMS(WMN2) 0.62
+
+lappend BACK_ANNOTATE_PATH $tech/stdcell/max
+set DEFAULT_SPICE_HEADER $tech/spice/default_spice_header.h
+
+# max bus width
+set MAX_BUS_WIDTH 2048

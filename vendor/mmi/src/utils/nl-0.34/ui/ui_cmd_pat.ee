@@ -1,0 +1,159 @@
+/* -*-C-*- */
+
+#(progn
+  (setq embedded-elisp-output-file
+    (concat (file-name-sans-extension embedded-elisp-source-file) ".c"))
+  (load (expand-file-name "ui_cmd.el") nil t)
+  (warning-message))
+
+#include "port.h"
+#include "error.h"
+#include "mem.h"
+#include "ar.h"
+#include "hashtab.h"
+#include "str.h"
+#include "skip-list.h"
+#include "nl.h"
+#include "pnl.h"
+#include "tcl.h"
+#include "pat.h"
+#include "ui.h"
+#include "ui_int.h"
+
+
+#(defcommand hier_set_cell_location
+  "Set cell (not icell) location"
+  (-corner boolean "if set, x,y are the lower-left corner, otherwise the origin")
+  (cell cell "cell to be placed")
+  (x integer "x coordinate")
+  (y integer "y coordinate")
+  (ori string "orientation"))
+{
+  int iori = pnl_string_to_orientation (ori);
+  Pat_location loc;
+
+  loc.x = x; loc.y = y; loc.ori = iori;
+
+  pat_set_cell_location(cell,&loc,corner);
+
+  return TCL_OK;
+}
+
+
+#(defcommand hier_get_cell_location
+  "Get cell (not icell) origin and orientation in its immediate parent as list of {x y ori}"
+  (cell cell "cell to get information for")
+  )
+{
+  Pat_location loc;
+
+  pat_get_cell_location(cell,&loc);
+
+  {
+    char *strori = (char*)pnl_orientation_to_string(loc.ori);
+    Tcl_Obj *list = Tcl_NewListObj(0,NULL);
+    Tcl_ListObjAppendElement(interp,list,Tcl_NewIntObj(loc.x));
+    Tcl_ListObjAppendElement(interp,list,Tcl_NewIntObj(loc.y));
+    Tcl_ListObjAppendElement(interp,list,Tcl_NewStringObj(strori,-1));
+
+    Tcl_SetObjResult(interp,list);
+    return TCL_OK;
+  }
+}
+
+
+#(defcommand set_design_size
+  "Set design (not icell) size"
+  (design design "design whose size is to be set")
+  (x1 integer "x1 (lower left corner, normally 0)")
+  (y1 integer "y1 (lower left corner, normally 0)")
+  (x2 integer "x2 (upper left corner)")
+  (y2 integer "y2 (upper left corner)"))
+{
+  Pat_rect box;
+  assert(design);
+  box.x1 = x1; box.y1 = y1; box.x2 = x2; box.y2 = y2;
+  pat_set_design_size (design, &box);
+
+  return TCL_OK;
+}
+
+#(defcommand get_design_size
+  "Get design (not icell) size as list of {x1 y1 x2 y2}; error if unknown"
+  (design design "design whose size is to be returned"))
+{
+  Tcl_Obj *list;
+  Pat_rect box;
+
+  assert(design);
+  pat_get_design_size (design, &box);
+
+  list = Tcl_NewListObj(0,NULL);
+  Tcl_ListObjAppendElement(interp,list,Tcl_NewIntObj(box.x1));
+  Tcl_ListObjAppendElement(interp,list,Tcl_NewIntObj(box.y1));
+  Tcl_ListObjAppendElement(interp,list,Tcl_NewIntObj(box.x2));
+  Tcl_ListObjAppendElement(interp,list,Tcl_NewIntObj(box.y2));
+  Tcl_SetObjResult(interp,list);
+  return TCL_OK;
+}
+
+static Tcl_Obj *_walk_list;
+static Tcl_Interp *_walk_interp;
+
+/* Function to accumulate cells visited by pat_hier_walk_cells into a tcl list. */
+static int _walk_tcl_func(nl_cell cell, Pat_transform *xform, char * path)
+{
+  Pat_rect box;
+  Tcl_Obj *tmp_list = Tcl_NewListObj(0,NULL);
+  char buf[1000];
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewStringObj(nl_cell_name(cell),-1));
+
+  /* Append cell bbox. */
+  if (pat_get_cell_bbox((nl_object)cell,&box)) {return -3;}
+  pat_trans_rect(xform,&box);
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewIntObj(box.x1));
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewIntObj(box.y1));
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewIntObj(box.x2));
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewIntObj(box.y2));
+
+  /* Append cell transform as a sub-list */
+  sprintf(buf,"%d %d %s",xform->x,xform->y,pnl_orientation_to_string(xform->ori));
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewStringObj(buf,-1));
+
+  /* Add cell instance path. */
+  Tcl_ListObjAppendElement(_walk_interp,tmp_list,Tcl_NewStringObj(path,-1));
+
+  /* Add in the design name, too, since it is a little hard to compute in tcl. */
+  Tcl_ListObjAppendElement( _walk_interp,tmp_list,
+	Tcl_NewStringObj( nl_design_name(nl_cell_design(cell)), -1) );
+
+  Tcl_ListObjAppendElement(_walk_interp,_walk_list,tmp_list);
+  return 0;
+}
+
+
+
+/* Here is a tcl function to invoke pat_hier_walk_cells and return all results as a list. */
+#(defcommand pat_walk_hier_cells
+  "Return a list of {cell path transform} of all leaf cells in specified nl design"
+  (design design "design whose size is to be set"))
+{
+  _walk_interp = interp;
+  _walk_list = Tcl_NewListObj(0,NULL);
+
+  pat_hier_walk_cells(design,_walk_tcl_func);
+
+  Tcl_SetObjResult(interp,_walk_list);
+  return TCL_OK;
+}
+
+
+
+
+void
+ui_cmd_register_pat_commands (Tcl_Interp *interp, char *prefix,
+			      nl_context context)
+{
+#(register-all-commands)
+}
+

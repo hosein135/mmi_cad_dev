@@ -1,0 +1,62 @@
+# Created using mapper from:
+#"MMI_CLKBUF {E {MMI_CLKBUFE {g_clk g_clk} {g_scan_en g_scan_en} {scan_in scan_in} {clk clk} {scan_en scan_en} {scan_out scan_out}}} {D {MMI_CLKBUFD {g_clk g_clk} {g_scan_en g_scan_en} {scan_in scan_in} {clk clk} {scan_en scan_en} {scan_out scan_out}}} {C {MMI_CLKBUFC {g_clk g_clk} {g_scan_en g_scan_en} {scan_in scan_in} {clk clk} {scan_en scan_en} {scan_out scan_out}}} {B {MMI_CLKBUFB {g_clk g_clk} {g_scan_en g_scan_en} {scan_in scan_in} {clk clk} {scan_en scan_en} {scan_out scan_out}}} "
+
+proc NAME_MMI_CLKBUF args {
+  call_use_keyword $args {{Size "E"}}
+
+  set nom [format "MMI_CLKBUF%s" [string toupper $Size]]
+
+  return $nom
+}
+
+
+proc ICON_MMI_CLKBUF args {
+  icon_generator $args {{Size "E" {radio E D C B}} }
+
+  set size [string toupper $Size]
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "E") && ($size != "D") && ($size != "C") && ($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_CLKBUF icon body
+  icon_line -60 140 -60 -140 60 -140 60 140 -60 140
+
+  # properties
+  icon_property -origin {0 -10} -size large -anchor center -label CLKBUF
+  icon_property -origin {0 10} -size large -anchor center -label $size
+  icon_property -origin {-10 130} -anchor e -rotate 1 -label g_clk
+  icon_property -origin {10 130} -anchor e -rotate 1 -label g_scan_en
+  icon_property -origin {30 130} -anchor e -rotate 1 -label scan_out
+  icon_property -origin {-10 -130} -rotate 1 -label clk
+  icon_property -origin {10 -130} -rotate 1 -label scan_en
+  icon_property -origin {30 -130} -rotate 1 -label scan_in
+
+  # inputs
+  icon_term -type input -origin {-10 140} -orient R270 -name g_clk
+  icon_term -type input -origin {10 140} -orient R270 -name g_scan_en
+  icon_term -type input -origin {30 -140} -orient R90 -name scan_in
+
+  # outputs
+  icon_term -type output -origin {-10 -140} -orient R270 -name clk
+  icon_term -type output -origin {10 -140} -orient R270 -name scan_en
+  icon_term -type output -origin {30 140} -orient R90 -name scan_out
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  if {!$DeMorgan} {
+    set fname [NAME_MMI_CLKBUF -Size $Size]
+    set vprop [format "%s \[unique_name \"\" \$name %s\] (.g_clk(\$\{g_clk\}), .g_scan_en(\$\{g_scan_en\}), .scan_in(\$\{scan_in\}), .clk(\$\{clk\}), .scan_en(\$\{scan_en\}), .scan_out(\$\{scan_out\}))\\;" $fname $fname]
+    icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

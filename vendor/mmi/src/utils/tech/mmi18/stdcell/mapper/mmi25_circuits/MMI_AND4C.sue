@@ -1,0 +1,71 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_AND4C {} {
+  make global -orient RY -name vdd -origin {-90 -140}
+  make input -name in0 -origin {-190 0}
+  make global -orient RY -name vdd -origin {120 -140}
+  make input -name in1 -origin {-190 100}
+  make global -orient RY -name vdd -origin {240 -140}
+  make input -name in2 -origin {-190 200}
+  make global -orient RY -name vdd -origin {370 -140}
+  make input -name in3 -origin {-190 300}
+  make global -name gnd -origin {-90 340}
+  make output -name out -origin {600 -50}
+  make pmos -W 1.6 -origin {370 -100}
+  make pmos -W 1.6 -origin {240 -100}
+  make pmos -W 1.6 -origin {120 -100}
+  make pmos -W 1.6 -origin {-90 -100}
+  make nmos -W 1.6 -origin {-90 0}
+  make nmos -W 1.6 -origin {-90 100}
+  make nmos -W 1.6 -origin {-90 200}
+  make nmos -W 1.6 -origin {-90 300}
+  make nmos -W 1.6 -origin {10 300}
+  make nmos -W 1.6 -origin {10 200}
+  make nmos -W 1.6 -origin {10 100}
+  make nmos -W 1.6 -origin {10 0}
+  make global -name gnd -origin {10 340}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 4.8 -WN 2.4 -origin {540 -50}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {440 -50}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.6 -date 07/19/99 -origin {90 550}
+  make_wire -150 -100 -150 0
+  make_wire -190 0 -150 0
+  make_wire 120 -60 120 -50
+  make_wire -90 40 -90 60
+  make_wire 240 -60 240 -50
+  make_wire -90 140 -90 160
+  make_wire 370 -60 370 -50
+  make_wire -90 240 -90 260
+  make_wire 180 -100 180 200
+  make_wire 310 -100 310 300
+  make_wire 60 -100 60 100
+  make_wire -90 -60 -90 -50
+  make_wire -90 -50 -90 -40
+  make_wire 120 -50 240 -50
+  make_wire 590 -50 600 -50
+  make_wire -190 100 -150 100
+  make_wire -190 300 -150 300
+  make_wire -190 200 -150 200
+  make_wire -50 300 -150 300
+  make_wire -50 300 310 300
+  make_wire 10 240 10 260
+  make_wire -50 200 -150 200
+  make_wire -50 200 180 200
+  make_wire 10 140 10 160
+  make_wire -50 100 -150 100
+  make_wire -50 100 60 100
+  make_wire 10 -50 -90 -50
+  make_wire 10 -50 120 -50
+  make_wire 10 -50 10 -40
+  make_wire 10 40 10 60
+  make_wire -150 0 -50 0
+  make_wire 240 -50 370 -50
+  make_wire 440 -50 370 -50
+  make_wire 440 -50 510 -50
+  make_text -origin {-250 -240} -text {4 Input AND}
+  make_text -origin {-250 -220} -text {C Size}
+  make_text -origin {-250 -260} -text MMI_AND4C -size large
+}
+

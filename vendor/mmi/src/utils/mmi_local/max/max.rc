@@ -1,0 +1,558 @@
+# MMI site wide .maxrc
+# loads in generators and adds to local menu
+
+set LAY_ROTATED_TEXT 1    ;# Enables rotated text in max.
+
+######################################################
+### The following from released mmi_local.sample   ###
+######################################################
+#vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+# Generic site wide .maxrc for max
+# Loads in generators and adds to local menu for this site
+
+# Uncomment this line out if you have the megacell compiler
+# It will add the megacell compiler commands to the tool menu in max
+mc_init
+
+
+# Add the "Calibre DRC..." command to the Tool menu.
+# Calibre is a Design Rule Checker (DRC) from Mentor Graphics.
+# Before using calibre, you will need to edit the drc_it.calibre
+# shell script in this directory to tell it, at minimum, which
+# machine is your license server, and where your calibre DRC deck resides.
+# If you do not own a Calibre license from Mentor Graphics,
+# you can comment this line out to remove this from the menu.
+menu_tool_cmd "Calibre DRC..." calibre_it
+
+
+# Add the extract_it command to the local menu.
+# The extract_it command is built in to max.
+menu_local_cmd "extract it" extract_it
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+set local_dir $MMI_LOCAL/max
+
+# make the megacell menu commands appear
+mc_init
+
+
+# add the gcells to the search path
+# SO WE GET THEM FROM THE DEFAULT
+#cell_path_add $local_dir/gcells
+
+# set up to use gcells in wire tool
+# Took this out until gcell bug is fixed!! (pat)
+# set ROUTE(type) cell
+
+source $local_dir/cap_extract.tcl
+
+source $local_dir/power_route.tcl
+
+source $local_dir/write_lef.tcl
+menu_local_cmd "write lef" write_lef
+
+source $local_dir/write_ports.tcl
+menu_local_cmd "write ports" write_ports
+
+source $local_dir/write_abstract_lef.tcl
+menu_local_cmd "write abstract lef" write_abstract_lef
+
+source $local_dir/write_simple_abstract_lef.tcl
+menu_local_cmd "write simple abstract lef" write_simple_abstract_lef
+
+#source $local_dir/write_lef.tcl.pin
+#menu_local_cmd "write lef pin" write_lef_pin
+
+# 12/11/01, from pat: Use "Read LEF" from the Chippper menu.
+#source $local_dir/view_lef.tcl
+#menu_local_cmd "view lef" view_lef
+
+# 12/11/01, from pat: Use "Read LEF" from the Chippper menu.
+# source $local_dir/lefdef.tcl
+
+# will eventually make it into other menu
+# 8/21: this is on the max Misc menu now.
+# menu_local_cmd "generate layers" "generate_layers {nplus pplus nw}"
+#source $local_dir/drc_it.tcl
+#menu_local_cmd "drc it" drc_it
+#source $local_dir/calibre.tcl
+#menu_local_cmd "Calibre it (new)" calibre_it
+
+#menu_local_cmd "Load 9/7 layout generator" "source $local_dir/stdcell_000907.tcl"
+#menu_local_cmd "Load 4/27 layout generator patch" \
+	"source $local_dir/stdcell000427patch.tcl"
+#source $local_dir/lvs_it.tcl
+#menu_local_cmd "lvs it" lvs_it
+
+menu_local_cmd "extract spice" extract_spice
+
+source $local_dir/abstract.tcl
+
+#menu_local_cmd "Install New Wiring Tool" "source $local_dir/newwire.tcl"
+
+#menu_local_cmd "load spice" load_spice
+#source $local_dir/load_sim.tcl
+#menu_local_cmd "load_sim" load_sim
+
+source $local_dir/expand_vias.tcl
+menu_local_cmd "expand VIAs" expand_vias
+
+source $local_dir/prop_pads.tcl
+menu_local_cmd "prop pads" prop_pads
+
+source $local_dir/create_clf.tcl
+menu_local_cmd "create clf" create_clf
+
+#menu_add_print_type gdsplot
+
+# set defaults
+set PRINT(gdsplot,plotters)    "ribbon magritte logger dali"
+set PRINT(gdsplot,plotter)    ribbon
+set PRINT(gdsplot,type)       "HP750C Color"
+set PRINT(gdsplot,size)       "36,10"
+
+#set PRINT(gdsplot,plotters)    "ribbon wahoo dorado hp5000n-b rainbow"
+#set PRINT(gdsplot,plotter)    ribbon
+#set PRINT(gdsplot,type)       "HP750C Color"
+#set PRINT(gdsplot,size)       "36,10"
+
+# setup for individual plotters
+set PRINT(gdsplot,type,magritte)       "HP750C Color"
+set PRINT(gdsplot,comment,magritte)    "36\" HP Plotter @ location 3.???"
+set PRINT(gdsplot,size,magritte)       "36,10"
+
+set PRINT(gdsplot,type,logger)       "HP750C Color"
+set PRINT(gdsplot,comment,logger)    "24\" HP Plotter @ location 3.111"
+set PRINT(gdsplot,size,logger)       "24,10"
+
+set PRINT(gdsplot,type,dali)   "Postscript II Color"
+set PRINT(gdsplot,comment,dali)    "A/B size color laserprint @ location 3.458"
+set PRINT(gdsplot,size,dali)   "B"
+
+# setup for individual plotters
+set PRINT(gdsplot,type,ribbon)       "HP750C Color"
+set PRINT(gdsplot,size,ribbon)       "36,10"
+
+#set PRINT(gdsplot,type,wahoo)       "Postscript II BW"
+#set PRINT(gdsplot,size,wahoo)       "A"
+
+#set PRINT(gdsplot,type,dorado)       "Postscript II BW"
+#set PRINT(gdsplot,size,dorado)       "A"
+
+#set PRINT(gdsplot,type,hp5000n-b)   "Postscript II BW"
+#set PRINT(gdsplot,size,hp5000n-b)   "B"
+
+#set PRINT(gdsplot,type,rainbow)   "Postscript II Color"
+#set PRINT(gdsplot,size,rainbow)   "A"
+
+
+# only works on selected nets
+
+proc invert_selection {} {
+
+  foreach paint [split [sel_what paint] \n] {
+    set array($paint) 1
+  }
+
+  sel_clear
+
+  eval lay_box [lay_bbox]
+  lay_internals -area
+  :select area *
+  set paints [split [sel_what paint] \n]
+
+  sel_clear
+
+  foreach paint $paints {
+    if {![info exists array($paint)]} {
+      sel_net -more -point [lindex $paint 1] [lindex $paint 2] [lindex $paint 0]
+    }
+  }
+}
+ 
+    
+proc make_gds_all {{dir ""}} {
+
+  if {$dir != ""} {
+    cd $dir
+  }
+
+  foreach cell [lsort [glob *.max]] {
+
+    cell_load_files $cell
+    eval lay_box [lay_bbox]
+    lay_internals -area
+    update
+    write_gds
+  }
+}
+
+
+set SPACING(h) 28
+set SPACING(v) 32
+set SPACING(row_width) [expr $SPACING(h) * 10]
+
+set SPACING(GRID) 1.4
+
+
+proc make_composite_cell {{cell_name all} {convert ""}} -desc {
+  creates a cell with all of the cells in the directory loaded and
+placed in it.  Will also convert bbox labels to layers if desired.
+} {
+
+  global SPACING
+
+  puts "Making cell \"$cell_name\" and filling with cells from [pwd] ..."
+
+  # make the composite cell and go to it
+  db_cell_new $cell_name
+  :load $cell_name	
+
+  set x 0
+  set y 0
+	
+  foreach instance [lsort [glob *.max]] {
+
+    set inst_name [file root $instance]
+
+    # now place cell
+    lay_box $x $y $x $y
+    if {[msg_catch ":getcell $inst_name child 0 0"]} {
+      # error
+      puts "Warning, can't find cell \"$inst_name\"."
+      continue
+    }
+
+    setl {name type x1 y1 x2 y2} [sel_what cells]
+
+    # get size of cell
+    :load $inst_name
+
+    eval lay_box [lay_bbox]
+    lay_internals -area
+    setl {x1 y1 x2 y2} [lay_bbox]
+
+    if {$convert != ""} {
+      convert_bbox
+    }
+
+    :load $cell_name
+
+    if {[expr $x2 - $x1 - 4] > $SPACING(h)} {
+      # make double wide for big cells
+      set x [expr $x + $SPACING(h)]
+    }
+    set x [expr $x + $SPACING(h)]
+
+    if {$x >= $SPACING(row_width)} {
+      set x 0
+      set y [expr $y - $SPACING(v)]
+    }
+  }
+
+  sel_clear
+
+  # zoom to fit
+  :view
+
+  # expand all subcells
+  eval lay_box [lay_bbox]
+  lay_internals -area
+
+  update
+
+  puts "Writing stream file \"$cell_name.strm\" ..."
+  :calma write $cell_name.strm
+
+  puts "done."
+}
+
+
+proc convert_bbox {} -desc {
+  converts bbox labels to layer
+} {
+
+  foreach layer "prb res fdrc xxx" {
+    if {![catch "lay_layer_styles $layer"]} {
+      # this is a good layer
+      break
+    }
+  }
+
+  if {$layer == "xxx"} {
+    puts "Skipping convert_bbox, can't find a layer to convert to"
+    return
+  }
+
+  sel_labels -text bbox
+  set labels [sel_what labels]
+  :delete
+
+  foreach label [split $labels \n] {
+    eval db_paint $layer [lrange $label 1 4]
+  }
+}
+
+
+menu_local_cmd "cut box" cut
+
+proc cut {{filename ""}} -desc {
+  cut out visible paint in box and copy to new buffer
+} {
+
+  if {$filename == ""} {
+    # ask user for a cell name
+
+    setl {dir cell ext} [_cell_file_box "New File:"]
+
+    # if nil, file selector box cancelled -- do nothing
+    if {$cell == ""} { 
+      return 
+    }
+
+  } else {
+    # use the one given
+    setl {dir cell ext} [split_file_name $filename]
+  }
+
+  if {$cell == [lay_rootcell]} {
+    puts "Aborting, must choose different cell than current one."
+    return
+  }
+
+  if {[cell_info $cell] != "__NO_SUCH_BUFFER__"} {
+    # remove it
+    db_cell_delete $cell
+  }
+
+  db_cell_new $cell $dir/$cell$ext
+
+  eval sel_area -any_cell -layers [join [dbt_visible_layers] ,] [dbt_frame]
+
+  # copy selection in here
+  db_cell_copy -source __SELECT__ $cell
+
+  :load $cell
+}
+
+
+menu_local_cmd "extract spice" extract_spice_netlist
+ 
+proc extract_spice_netlist {} {
+ 
+    # Needs megacell compiler for now
+    _mc_load
+ 
+    # Give'm parasitics
+    set MC(parasitics) 1
+ 
+    # do it
+    extract_spice
+}
+
+
+
+# For debugging
+
+menu_local_cmd "time redisplay" time_redisplay
+
+proc time_redisplay {{zoom_factor 0.5}} -desc {
+  times the redisplay speed of the current cell and various magnifications
+} {
+
+  puts "Timing redisplay:"
+
+  :zoom 0.00001
+  update
+
+  # zoom out
+  :view
+  set count 1
+
+  while {1} {
+
+    puts "$count: [pp_number [expr [lindex [time update] 0] / 1.0e6]]s"
+
+    setl {x1 y1 x2 y2} [dbt_frame]
+    if {$x2 < [expr $x1 + 1.0]} {
+      # zoomed in enough
+      break
+    }
+
+    :zoom $zoom_factor
+    incr count
+  }
+}
+
+
+# pats note: Too much fixing, wouldnt let new maxx run!!!
+#puts "WARNING: loading special utils.tcl in .maxrc.  REMOVE on next release."
+#source ~tavrow/mmi_private/max/maxtcl/interim_bug_fix.tcl
+#source /home/cad/mmi_local/max/interim_bug_fix.tcl
+
+proc _mmi_local_read_only {} {
+    catch {db_cell_read_only [expr {![db_cell_read_only]}]}
+}
+menu_local_cmd "toggle read-only bit of edit-cell" _mmi_local_read_only
+
+menu_local_cmd "Add Chipper Menu" {
+    warning "Starting the floorplanner using the menu does not\
+    set default directories or load any custom palette, etc.\
+    Use, eg: maxpat -project ibmcu11 to get the custom palette, if any."
+    fplan_init
+}
+
+
+
+# prints out the pad label and pad coords for each pad in design
+
+proc what_pads {} {
+
+  foreach paint [split [eval db_search paint -any_cell -area [lay_bbox] pad] \n] {
+
+    foreach label [split [eval db_search labels -area [lrange $paint 1 4]] \n] {
+      if {[lindex $label 7] == ""} {
+	puts "[lindex $label 6] [lrange $paint 1 4]"
+	break
+      }
+    }
+  }
+}
+
+
+proc screen_dump {printer} {
+    global max_win
+    set ori landscape
+    set prop_list [list \
+      [list "Print to printer" printer -entry] \
+      [list "Orientation" ori -choice {landscape portrait}] \
+      ]
+    if {[prop_menu2 -title "Dump screen to printer" $prop_list] == 0} {return}
+    set id [winfo id $max_win.layout]
+    exec xwd -id $id | xpr -$ori -device ps | lpr -P $printer
+}
+
+# TODO: get the list of printers from /etc/printers.conf
+menu_local_cmd "Screen print" "screen_dump fatbrain"
+
+
+menu_local_cmd "flatten cells w/prefix" flatten_cells_prefix
+
+proc flatten_cells_prefix {{delimiter \{FS\}}} -desc {
+  flattens all selected cell instances (only one level of hierarchy), prefixing instances and labels (except globals).
+} -doc {
+  
+  Prefixes all instances and labels by <cell_name><delimeter>
+  where <delimiter> defaults to {FS}
+
+  global labels do not get the prefix
+
+  Ignores flylines
+} {
+
+  warning {This function still works, but has been superceded by flatten\
+  in the max "Misc" menu - please try that and let me know if it works (pat).}
+
+  # Temporary: flatten is not working with edit-in-place,
+  # and since the code is frozen before the 12/00 release,
+  # just print a message and quit.  Fix it later.
+  # Check show_menu just in the remote chance that Lee is
+  # calling flatten_cells while in edit-in-place and it works somehow?
+  if { [lay_rootcell] != [lay_editcell]} {
+    max_error "Aborting, Can not flatten while in edit-in-place. \
+      First use Control-e to pop edit stack."
+    return
+  }
+
+  # remove the selection of everything but instances on the toplevel
+  set cells ""
+  foreach cellinfo [split [sel_what cells] \n] {
+    struct max_cell cell $cellinfo
+
+    if {${cell.path} != ""} {
+      puts "WARNING: ignoring cell ${cell.path}/${cell.id} (${cell.def}) -- not on top level."
+    } else {
+      lappend cells $cellinfo
+    }
+  }
+
+  if {[llength $cells] == 0} {
+    max_error "Aborting, No instances on the top level to flatten."
+    return ""
+  }
+
+  # first delete all instances to be flattened
+  foreach cellinfo $cells {
+    struct max_cell cell $cellinfo
+
+    # toast old instance
+    sel_cell2 ${cell.id}
+    :delete
+  }
+
+  # now go through each, flattening
+  foreach cellinfo $cells {
+    struct max_cell cell $cellinfo
+
+    sel_clear
+    :dump -instance_prefix ${cell.id}$delimiter \
+	-label_prefix ${cell.id}$delimiter \
+	${cell.def} parent ${cell.x1} ${cell.y1}
+
+    # orient it
+    set orient [orientation ${cell.transform}]
+    switch $orient {
+      "r90" {
+	:clockwise
+      }
+      "r180" {
+	:clockwise 180
+      }
+      "r270" {
+	:clockwise 270
+      }
+      "fx" {
+	:sideways
+      }
+      "fy" {
+	:upsidedown
+      }
+      "fx_r90" {
+	:sideways
+	:clockwise
+      }
+      "fy_r90" {
+	:upsidedown
+	:clockwise
+      }
+    }
+
+    # compute where to strip from
+    set pos [string length ${cell.id}$delimiter]
+
+    # now we have to fix up the global labels -- i.e. lose the prefix.
+    foreach labelinfo [split [sel_what labels] \n] {
+      struct max_label label $labelinfo
+
+      if {${label.kind} == "global" && ${label.path} == ""} {
+	# found a global, remove its prefix
+	sel_labels -kind ${label.kind} \
+	    -rect ${label.x1} ${label.y1} ${label.x2} ${label.y2} \
+	    -text ${label.text} -pos ${label.pos} -layer ${label.layer}
+	:delete
+
+	# strip prefix
+	set text [string range ${label.text} $pos end]
+
+	puts "${label.text} --> $text"
+
+
+	db_label -kind ${label.kind} -pos ${label.pos} \
+	    ${label.layer} $text \
+	    ${label.x1} ${label.y1} ${label.x2} ${label.y2}
+      }
+    }
+  }
+
+  return ""
+}

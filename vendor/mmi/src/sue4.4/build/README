@@ -1,0 +1,19 @@
+Making a new version of SUE.
+
+Note: the makefile is not executed directly (except for release).
+mkcsue copies everything into tmp and makes a clean build every time.
+
+
+Increment the version number in Makefile.
+
+go to a sun machine (not mmifs3)
+
+mkcsue
+make release
+
+go to a linux machine (not mmi48)
+
+mkcsue
+make release
+
+and viola

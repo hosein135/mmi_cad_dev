@@ -1,0 +1,96 @@
+#header <<
+#include "stdpccts.h"
+
+typedef AST SORAST;
+>>
+
+
+<<
+#include "v2nl_tokdefs.h"
+#include "errsupport.c"	/* define some default error routines */
+>>
+
+expr > [ar result]
+	: trivial_expr
+	;
+
+trivial_expr > [ar result]
+	: static_variable_ref > [result]
+	| trivial_concat > [result]
+	| trivial_repeat_concat > [result]
+	| constant > [result]
+	;
+
+static_variable_ref > [ar result]
+	: << nl_object obj; >>
+	  #( n:REF )		<< obj = nl_ref_ast_object ((nl_ref_ast) n);
+				   result = v2nl_get_net_or_bus_nets (obj);
+				>>
+	| << nl_object obj;
+	     int l;
+	  >>
+	  #( BIT n:REF number > [l] )
+				<< obj = nl_ref_ast_object ((nl_ref_ast) n);
+				   result = v2nl_get_bus_slice (obj, l, l);
+				>>
+	| << nl_object obj;
+	     int l, r;
+	  >>
+	  #( SLICE n:REF number > [l] number > [r] )
+				<< obj = nl_ref_ast_object ((nl_ref_ast) n);
+				   result = v2nl_get_bus_slice (obj, l, r);
+				>>
+	;
+
+trivial_concat > [ar result]
+	: << ar nets; >>
+	  #( CONCAT		<< result = ar_alloc (0, sizeof (nl_net)); >>
+	     ( e:trivial_expr > [nets]
+				<< ar_append (result, nets); >>
+	     )*
+	   )
+	;
+
+trivial_repeat_concat > [ar result]
+	: << int n;
+	     ar nets;
+	  >>
+	  #( REPEAT_CONCAT number > [n] trivial_expr > [nets] )
+				<< result = v2nl_repeat_concat (n, nets);
+				   ar_free (nets);
+				>>
+	;
+
+constant > [ar result]
+	: << int n; >>
+	  number > [n]		<< result = v2nl_get_integer (n); >>
+	| << int n;
+	     char *bits;
+	     char r;
+	  >>
+	  ( #( BIN_RADIX number > [n] vnum > [bits] )	<< r = 'b'; >>
+	  | #( HEX_RADIX number > [n] vnum > [bits] ) 	<< r = 'h'; >>
+	  | #( DEC_RADIX number > [n] vnum > [bits] ) 	<< r = 'd'; >>
+	  | #( OCT_RADIX number > [n] vnum > [bits] ) 	<< r = 'o'; >>
+	  )
+			<< result = v2nl_get_constant_nets (n, r, bits); >>
+	;
+
+number > [int result]
+	: #( n:NUMBER )	<< result = nl_number_ast_value ((nl_number_ast) n); >>
+	;
+
+id > [char *result]
+	: #( n:ID )	<< result = nl_id_ast_name ((nl_id_ast) n); >>
+	;
+
+vnum > [char *result]
+	: #( n:VERILOG_NUMBER )
+			<< result = nl_vnum_ast_bits ((nl_vnum_ast) n); >>
+	;
+
+// binary_op > [ar result]
+//	: << ar arg1, arg2; >>
+//	  #( op:BINARY_START..BINARY_END expr > [arg1] expr > [arg2] )
+//			<< result = v2nl_binary_op (op->token, arg1, arg2);
+//	;

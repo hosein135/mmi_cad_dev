@@ -2,9 +2,11 @@
 
 Nix FHS environment on x86_64 Linux / WSL2. CAD tools are rebuilt from the public-domain source as ELF 64-bit.
 
-Place `vendor/mmi_pd_040526.tar.gz` once. `./run.sh --prep-only` unpacks it, flattens the 2004 directory names (`max/` not `max4.2.11`, `bin/` not `bin.i486-linux`), rebuilds tools as x86_64, copies that runtime tree to `vendor/mmi`, and **deletes the tarball**.
+The extracted CAD tree is **`vendor/mmi/`** (in git). `./run.sh --prep-only` rebuilds x86_64 tools into `vendor/mmi/bin` if needed.
 
-Source stays on the Linux filesystem (`~/.cache/mmi-cad/vendor`) because the 2004 tree has names that NTFS cannot store.
+If you only have the original archive, put `vendor/mmi_pd_040526.tar.gz` here once; `./run.sh --prep-only` unpacks it into `vendor/mmi`, flattens names, and deletes the tarball.
+
+`vendor/mmi` is a case-sensitive NTFS folder so names like `aux/` work on Windows. Do not commit `vendor/result` (Nix store symlink).
 
 ## Layout
 
@@ -12,7 +14,7 @@ Source stays on the Linux filesystem (`~/.cache/mmi-cad/vendor`) because the 200
 .
 ├── flake.nix
 ├── run.sh
-├── vendor/mmi/                   # flattened runtime tree (gitignored)
+├── vendor/mmi/                   # extracted CAD tree + x64 bins
 ├── pdk/                          # MAX PDK import Tcl
 ├── nix/rebuild/                  # extract + patch + compile + install
 ├── nix/x11/                      # XLFD fonts + Xresources
@@ -29,7 +31,7 @@ chmod +x run.sh
 ./run.sh max
 ```
 
-`run.sh` uses `nix --impure` so the gitignored `vendor/mmi` tree is still found.
+`run.sh` uses `nix --impure` so local vendor paths resolve on WSL.
 
 ## Commands
 

@@ -1,0 +1,434 @@
+SelectInit --
+-------------
+
+Non-technology dependent intialization of selection stuff.
+
+Results:
+None.
+
+Side effects:
+The select cells are created if they don't already exist.
+Selection undo-ing is also initialized.
+
+SelectClear --
+--------------
+
+This procedure clears the current selection.
+
+Results:
+None.
+
+Side effects:
+All information is removed from the select cell, and selection
+information is also taken off the screen.
+
+SelectArea --
+-------------
+
+This procedure selects all information of given types that
+falls in a given area.
+
+Results:
+None.
+
+Side effects:
+The indicated information is added to the select cell, and
+outlined on the screen.  Only information of particular
+types, and in expanded cells (according to xMask) is
+selected.
+
+SelectChunk --
+--------------
+
+This procedure selects a single rectangular chunk of 
+homogeneous material, maximizing the minimum dimension.
+
+Results:
+None.
+
+Side effects:
+More material is added to the select cell and displayed
+on the screen.  This procedure finds the largest rectangular
+chunk of material "type" that contains the area given in
+in scx.  The material need not all be in one cell, but it
+must all be in cells that are expanded according to "xMask".
+If pArea is given, the rectangle it points to is filled in
+with the area of the chunk that was selected.
+
+SelectRegion --
+---------------
+
+Select an entire region of material, no matter what its
+shape.
+
+Results:
+None.
+
+Side effects:
+This procedure traces out the region consisting entirely
+of type "type", and selects all that material.  The search
+starts from "type" material under scx and continues outward
+to get all material in all cells connected to the area under
+scx by material of type "type".  If pArea is specified, then
+the rectangle that it points to is filled in with the bounding
+box of the region that was selected.
+
+SelectNet --
+------------
+
+This procedure selects an entire electrically-connected net.
+
+Results:
+None.
+
+Side effects:
+Starting from material of type "type" under scx, this procedure
+finds and highlights all material in all expanded cells that
+is electrically-connected to the starting material through a
+chain of expanded cells.  If pArea is specified, then the
+rectangle that it points to is filled in with the bounding box
+of the net that was selected.
+
+SelectCell --
+-------------
+
+Select a subcell by making a copy of it in the __SELECT__ cell.
+
+Results:
+None.
+
+Side effects:
+The given use is copied into the selection.  If replace is TRUE,
+then the last subcell to be selected via this procedure is
+deselected.
+
+SelEnumPaint --
+---------------
+
+Find all selected paint, and call the client's procedure for
+all the areas of paint that are found.  Only consider paint
+on "layers", and if "editOnly" is TRUE, then only consider
+paint that is in the edit cell.  The client procedure must
+be of the form
+
+int
+func(rect, type, clientData)
+Rect *rect;
+TileType type;
+ClientData clientData;
+{
+}
+
+The rect and type parameters identify the paint that was found,
+in root coordinates, and clientData is just the clientData
+argument passed to this	procedure.  Func should normally return
+0.  If it returns a non-zero return value, then the search
+will be aborted.
+
+Results:
+Returns 0 if the search finished normally.  Returns 1 if the
+search was aborted.
+
+Side effects:
+If foundNonEdit is non-NULL, its target is set to indicate
+whether there was selected paint from outside the edit cell.
+Otherwise, the only side effects are those of func.
+
+SelEnumCells --
+---------------
+
+Call a client-supplied procedure for each selected subcell.
+If "editOnly" is TRUE, then only consider selected subcells
+that are children of the edit cell.  The client procedure
+must be of the form
+
+int
+func(selUse, realUse, transform, clientData)
+CellUse *selUse;
+CellUse *realUse;
+Transform *transform;
+TerminalPath *tPath;
+ClientData clientData;
+{
+}
+
+SelUse is a pointer to a cellUse that's in the selection cell.
+RealUse is a pointer to the corresponding cell that's part of
+the layout.  Transform is a transform from the coordinates of
+RealUse to root coordinates.  tPath (if nonNull) is set to
+path to parent.  
+
+If the cell is an array, only one
+call is made for the entire array, and transform is the transform
+for the root element of the array (array[xlo, ylo]).  Func should
+normally return 0.  If it returns a non-zero return value, then
+the search will be aborted.
+
+NOTE:  func may safely modify the database but should not modify
+the selection.
+
+Results:
+Returns 0 if the search finished normally.  Returns 1 if the
+search was aborted.
+
+Side effects:
+If foundNonEdit is non-NULL, its target is set to indicate
+whether there were selected cells that weren't children of
+the edit cell. 	Otherwise, the only side effects are those
+of func.
+
+SelEnumLabels --
+----------------
+
+Find all selected labels, and call the client's procedure for
+each label found.  Only consider labels attached to "layers",
+and if "editOnly" is TRUE, then only consider labels that
+are in the edit cell.  The client procedure must be of the
+form
+
+int
+func(label, cellDef, transform, tpath, clientData)
+Label *label;
+CellDef *cellDef;
+Transform *transform;
+TerminalPath *tpath;   
+ClientData clientData;
+{
+}
+
+Label is a pointer to a selected label.  It refers to the label
+in cellDef, and transform gives the transform from that
+cell's coordinates to root coordinates.  Terminal path gives
+hierarchical name of the instance containing the label.
+ClientData is just
+the clientData argument passed to this procedure.  Func
+should normally return 0.  If it returns a non-zero return
+value, then the search will be aborted.
+
+NOTE:  user function may safely modify database, but should not
+modify selection during enumeration.
+
+Results:
+Returns 0 if the search finished normally.  Returns 1 if the
+search was aborted.
+
+Side effects:
+If foundNonEdit is non-NULL, its target is set to indicate
+whether there was at least one selected label that was not
+in the edit cell.  Otherwise, the only side effects are
+those of func.
+
+SelectDelete --
+---------------
+
+Delete everything in the edit cell that's selected.
+
+Results:
+None.
+
+Side effects:
+Stuff is removed from the edit cell.  If there's selected
+stuff that isn't in the edit cell, the user is warned.
+
+SelectCopy --
+-------------
+
+This procedure makes a copy of the selection.
+
+Results:
+None.
+
+Side effects:
+The selection is copied, with the copy being transformed by
+"transform" relative to the current selection.  The copy is
+made the new selection.
+
+SelectTransform --
+------------------
+
+This procedure modifies the selection by transforming
+it geometrically.
+
+Results:
+None.
+
+Side effects:
+The selection is modified and redisplayed.
+
+SelectGroupTransfer --
+----------------------
+
+Copies selection to newGroup,
+Deletes parts of selection in the activeGroup.
+Leaves ActiveGroup as newGroup!
+
+Results:
+None.
+
+Side effects:
+The selection is modified and redisplayed.  
+The activeGroup is changed
+
+SelectExpand --
+---------------
+
+Expand all of the selected cells that are unexpanded, and
+unexpand all of those that are expanded.
+
+Results:
+None.
+
+Side effects:
+The contents of the selected cells will become visible or
+invisible on the display in the indicated window(s).
+
+SelInternals --
+---------------
+
+Expand/unexpand selected cells.
+
+Results:
+None.
+
+Side effects:
+The contents of the selected cells will become visible or
+invisible on the display.
+
+SelectArray --
+--------------
+
+Array everything in the selection.  Cells get turned into
+arrays, and paint and labels get replicated.
+
+Results:
+None.
+
+Side effects:
+The edit cell is modified in a big way.  It's also redisplayed.
+
+SelectStretch --
+----------------
+
+Move the selection a given amount in x (or y).  While moving,
+erase everything that the selection passes over, and stretch
+material behind the selection.
+
+Results:
+None.
+
+Side effects:
+The edit cell is modified.  The selection is also modified
+and redisplayed.
+
+SelectDump --
+-------------
+
+Copies an area of one cell into the edit cell, selecting the
+copy so that it can be manipulated later.
+
+Results:
+None.
+
+Side effects:
+The edit cell is modified.
+
+SelTclInit --
+-------------
+
+Initialize tcl commands for this module.
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+
+SelUndoForw --
+--------------
+SelUndoBack --
+
+Called to process undo redisplay events.  The two procedures
+are identical except that each one looks at different events.
+The idea is to do the selection redisplay only AFTER the selection
+has actually been modified.
+
+Results:
+None.
+
+Side effects:
+Highlights (including the selection) are redisplayed.
+
+SelUndoInit --
+--------------
+
+Adds us as a client to the undo package.
+
+Results:
+None.
+
+Side effects:
+Adds a new client to the undo package, and sets SelUndoClientID.
+
+SelRemoveArea --
+----------------
+
+Remove a rectangular chunk of the select cell, possibly masked
+by a user-specified mask (which may include the pseudo-levels
+L_CELL and L_LABEL).
+
+Results:
+None.
+
+Side effects:
+Paint, labels, and/or cell uses may be removed from the select cell.
+The selection highlights are redrawn, and undo checkpoints are saved,
+so this thrilling process may be undone or redone.  The select cell's
+bounding box is updated.
+
+SelRemoveSel2 --
+----------------
+Run through the select2 cell, removing corresponding paint and labels
+from the select cell.
+
+Results:
+Should always return zero; returns 1 if there is a problem traversing
+select2.
+
+Side effects:
+Paint and labels (but not cell uses) may be deleted from the select
+cell.  The calling procedure is responsible for updating highlighting
+and undo information.
+
+Labels may be placed in the select2 cell; SelRemoveSel2 assumes that
+there are no labels in select2 when it is called.
+
+SelRemoveCellSearchFunc --
+--------------------------
+find the cell use in the select cell which matches a given
+cell use in the root def.
+
+Results:
+Returns 1 to abort the search if it finds a match.  Otherwise
+returns zero.
+
+Side effects:
+fills in the sel_use field of its client argument if it finds a match.
+
+SelectRemoveCellUse --
+----------------------
+remove the cell use in the select cell which matches the given
+use from the root def.
+
+Results:
+Returns 1 if no such use was found; returns zero otherwise.
+
+Side effects:
+If SelectRemoveCellUse returns 1, there are no side effects.
+Otherwise:  undo/redo markers will be created, one cell use
+will be deleted from the select cell, the select cell's bounding
+box will be recomputed, the highlights redrawn, and the area
+which had been covered by the cell use will be marked as
+changed.  If selectLastUse was pointing to the use, it will
+be set to NULL, so the select cycling code will not try
+to deselect this (now trashed) cell use.
+

@@ -1,0 +1,12 @@
+# SUE version MMI_SUE4.0x
+
+proc ICON_dpc_control args {
+  icon_setup $args {{origin {0 0}} {orient R0} {mode normal} {pitch {}}}
+  icon_property -origin {-50 80} -type user -name mode -default normal -choices {normal bit_slice}
+icon_property -origin {10 -60} -size large -label {DPC Control}
+  icon_property -origin {-50 100} -type user -name pitch
+icon_property -origin {10 -30} -label {mode = $mode}
+icon_property -origin {10 -10} -label {pitch = $pitch}
+  icon_line 0 -80 0 0 270 0 270 -40 0 -40 0 -20 270 -20 270 -80 0 -80
+}
+

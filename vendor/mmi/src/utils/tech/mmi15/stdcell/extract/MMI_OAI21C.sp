@@ -1,0 +1,52 @@
+*** Extracted spice netlist generated from MAX ***
+
+.SUBCKT MMI_OAI21C in0 in1 in2 out
+C_1 vdd gnd 3.81208fF
+C_2 in0 gnd 1.15689fF
+C_3 out gnd 2.68189fF
+C_4 in2 gnd 2.26127fF
+C_5 in1 gnd 1.72919fF
+C_6 net_5 gnd 1.85234fF
+C_7 gnd gnd 2.78038fF
+Mp_1 vdd in0 out vdd p W=1.54U L=0.15U AD=0.428633P PD=2.61U AS=0.3388P 
++ PS=1.98U
+Mp_2 out in0 vdd vdd p W=1.54U L=0.15U AD=0.3388P PD=1.98U AS=0.428633P 
++ PS=2.61U
+Mp_3 vdd in2 net_1 vdd p W=1.54U L=0.15U AD=0.428633P PD=2.61U AS=0.2464P 
++ PS=1.86U
+Mp_4 net_1 in1 out vdd p W=1.54U L=0.15U AD=0.2464P PD=1.86U AS=0.3388P 
++ PS=1.98U
+Mp_5 out in1 net_2 vdd p W=1.54U L=0.15U AD=0.3388P PD=1.98U AS=0.24255P 
++ PS=1.855U
+Mp_6 net_2 in2 vdd vdd p W=1.54U L=0.15U AD=0.24255P PD=1.855U AS=0.428633P 
++ PS=2.61U
+Mp_7 vdd in2 net_3 vdd p W=1.54U L=0.15U AD=0.428633P PD=2.61U AS=0.24255P 
++ PS=1.855U
+Mp_8 net_3 in1 out vdd p W=1.54U L=0.15U AD=0.24255P PD=1.855U AS=0.3388P 
++ PS=1.98U
+Mp_9 out in1 net_4 vdd p W=1.54U L=0.15U AD=0.3388P PD=1.98U AS=0.24255P 
++ PS=1.855U
+Mp_10 net_4 in2 vdd vdd p W=1.54U L=0.15U AD=0.24255P PD=1.855U 
++ AS=0.428633P PS=2.61U
+Mn_1 out in0 net_5 gnd n W=1.025U L=0.15U AD=0.285292P PD=1.92333U 
++ AS=0.245431P PS=1.61778U
+Mn_2 net_5 in0 out gnd n W=1.025U L=0.15U AD=0.245431P PD=1.61778U 
++ AS=0.285292P PS=1.92333U
+Mn_3 out in0 net_5 gnd n W=1.025U L=0.15U AD=0.285292P PD=1.92333U 
++ AS=0.245431P PS=1.61778U
+Mn_4 net_5 in1 gnd gnd n W=1.025U L=0.15U AD=0.245431P PD=1.61778U 
++ AS=0.2255P PS=1.465U
+Mn_5 gnd in1 net_5 gnd n W=1.025U L=0.15U AD=0.2255P PD=1.465U AS=0.245431P 
++ PS=1.61778U
+Mn_6 net_5 in1 gnd gnd n W=1.025U L=0.15U AD=0.245431P PD=1.61778U 
++ AS=0.2255P PS=1.465U
+Mn_7 gnd in2 net_5 gnd n W=1.025U L=0.15U AD=0.2255P PD=1.465U AS=0.245431P 
++ PS=1.61778U
+Mn_8 net_5 in2 gnd gnd n W=1.025U L=0.15U AD=0.245431P PD=1.61778U 
++ AS=0.2255P PS=1.465U
+Mn_9 gnd in2 net_5 gnd n W=1.025U L=0.15U AD=0.2255P PD=1.465U AS=0.245431P 
++ PS=1.61778U
+.ENDS	$ MMI_OAI21C
+
+.GLOBAL gnd vdd
+

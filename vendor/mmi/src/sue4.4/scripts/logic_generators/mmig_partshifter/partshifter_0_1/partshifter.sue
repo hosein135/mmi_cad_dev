@@ -1,0 +1,872 @@
+# This is a generator for a partitioned left/right/bidirectional shifter/rotator
+
+
+proc find_subpattern { bot top dpattern dmatch nmatches lsb msb x y FILE_ID } {
+  upvar $dpattern pattern
+  upvar $dmatch match
+  
+  # init
+  set nsubmatches 0
+  for {set k 0} {$k < $nmatches} {incr k} {
+    set subpattern($k) ""
+    set submatch($k) ""
+  }
+
+  # extract pattern bits
+  for {set p 0} {$p < $nmatches} {incr p} {
+    set compat [lrange $pattern($p) $bot $top]
+    # compare to previous matched patterns
+    set found 0
+    for {set npat 0} {$npat < $nsubmatches} {incr npat} {
+      set pmatch [string compare $compat $subpattern($npat)]
+      if {$pmatch == 0} {
+	# match
+	set submatch($npat) [format "%s %s" $submatch($npat) $match($p)]
+	set found 1
+      } 
+    }
+    if {$found == 0} {
+      # no match, add to list of patterns
+      set subpattern($nsubmatches) $compat
+      set submatch($nsubmatches) $match($p)
+      incr nsubmatches
+    }
+  }
+  # print out debug/select information
+  if {$lsb == $msb} {
+    set lname [format "\[%d\]" $lsb]
+  } else {
+    set lname [format "\[%d:%d\]" $msb $lsb]
+  }
+  puts $FILE_ID [format "Bits %s:" $lname]
+  for {set z 0} {$z < $nsubmatches} {incr z} {
+    puts $FILE_ID [format "  Pattern=%s, Match=%s" $subpattern($z) $submatch($z)]
+  }
+
+
+  # mux icon names
+  generate MMI_BUF MMI_BUFC -Size C
+  set mux(1) "MMI_BUFC"
+  set mux(2) "SHFMUX2C"
+  set mux(3) "SHFMUX3C"
+  set mux(4) "SHFMUX4C"
+  set mux(5) "SHFMUX5C"
+
+  # select the mux cell
+  set muxnum $nsubmatches
+  set muxcell $mux($muxnum)
+
+  # mux icon properties
+  switch $muxnum {
+    1 { # buf
+      set icon_mux_x 120
+      set icon_mux_y 60
+      set port_in_x(0) -60
+      set port_in_y(0) 0
+      set port_out_x 60
+      set port_out_y 0
+      set port_sel_x 0
+      set port_sel_y 0
+    }
+    2 { # mux2
+      set icon_mux_x 120
+      set icon_mux_y 140
+      set port_in_x(0) -60
+      set port_in_y(0) -30
+      set port_in_x(1) -60
+      set port_in_y(1) 30
+      set port_out_x 60
+      set port_out_y 0
+      set port_sel_x 0
+      set port_sel_y 50
+    }
+    3 { # mux3
+      set icon_mux_x 120
+      set icon_mux_y 200
+      set port_in_x(0) -60
+      set port_in_y(0) -60
+      set port_in_x(1) -60
+      set port_in_y(1) 0
+      set port_in_x(2) -60
+      set port_in_y(2) 60
+      set port_out_x 60
+      set port_out_y 0
+      set port_sel_x -10
+      set port_sel_y 90
+    }
+    4 { # mux4
+      set icon_mux_x 120
+      set icon_mux_y 260
+      set port_in_x(0) -60
+      set port_in_y(0) -90
+      set port_in_x(1) -60
+      set port_in_y(1) -30
+      set port_in_x(2) -60
+      set port_in_y(2) 30
+      set port_in_x(3) -60
+      set port_in_y(3) 90
+      set port_out_x 60
+      set port_out_y 0
+      set port_sel_x 0
+      set port_sel_y 110
+    }
+    5 { # mux5
+      set icon_mux_x 120
+      set icon_mux_y 320
+      set port_in_x(0) -60
+      set port_in_y(0) -120
+      set port_in_x(1) -60
+      set port_in_y(1) -60
+      set port_in_x(2) -60
+      set port_in_y(2) 0
+      set port_in_x(3) -60
+      set port_in_y(3) 60
+      set port_in_x(4) -60
+      set port_in_y(4) 120
+      set port_out_x 60
+      set port_out_y 0
+      set port_sel_x 0
+      set port_sel_y 140
+    }
+    6 { # mux 6
+      set icon_mux_x 120
+      set icon_mux_y 380
+      set port_in_x(0) -60
+      set port_in_y(0) -150
+      set port_in_x(1) -60
+      set port_in_y(1) -90
+      set port_in_x(2) -60
+      set port_in_y(2) -30
+      set port_in_x(3) -60
+      set port_in_y(3) 30
+      set port_in_x(4) -60
+      set port_in_y(4) 90
+      set port_in_x(5) -60
+      set port_in_y(5) 150
+      set port_out_x 60
+      set port_out_y 0
+      set port_sel_x 0
+      set port_sel_y 170
+    }
+  }
+  set icon_mux_left [expr -($icon_mux_x / 2)]
+  set icon_mux_right [expr ($icon_mux_x / 2)]
+  set icon_mux_top [expr -($icon_mux_y / 2)]
+  set icon_mux_bot [expr ($icon_mux_y / 2)]
+
+  # wire stubs
+  set ws1 50
+  
+  # wire tracks
+  set in_x [expr $x + $icon_mux_left - 4 * $ws1]
+  set gnd_x [expr $in_x + 30]
+  set out_x [expr $x + $icon_mux_right + 2 * $ws1]
+  set yfudge [expr 4 * $ws1]
+  set icon_mux5_y 380
+  set delta_y [expr $icon_mux5_y + $yfudge]
+  set sel_x [expr $x + $icon_mux_left - $ws1]
+  set sel_y [expr $y + $icon_mux_bot + $ws1]
+
+
+  if {$lsb < $msb} {
+    set lname [format "\[%d:%d\]" $msb $lsb]
+  } else {
+    set lname [format "\[%d\]" $lsb]
+  }
+  make $muxcell -origin "$x $y" -name $lname
+
+  # output
+  set pin_x [expr $x + $port_out_x]
+  set pin_y [expr $y + $port_out_y]
+  make_wire $pin_x $pin_y [expr $pin_x + $ws1] $pin_y
+  make name_net_s -origin "[expr $pin_x + $ws1] $pin_y" -name $lname
+  make_wire [expr $pin_x + $ws1] $pin_y $out_x $pin_y
+  make_wire $out_x [expr $pin_y + ($delta_y / 2)] $out_x [expr $pin_y - ($delta_y / 2)]
+
+  # input wire (is a duplicate of the output wire for every stage but the first)
+  make_wire $in_x [expr $pin_y + ($delta_y / 2)] $in_x [expr $pin_y - ($delta_y / 2)]
+
+  # in0:  unshifted data
+  set pin_x [expr $x + $port_in_x(0)]
+  set pin_y [expr $y + $port_in_y(0)]
+  make_wire $pin_x $pin_y [expr $pin_x - $ws1] $pin_y
+  make name_net_s -origin "[expr $pin_x - $ws1] $pin_y" -name $lname
+  make_wire [expr $pin_x - $ws1] $pin_y $in_x $pin_y
+  # find this pattern in the list of subpatterns, and mark it done
+  # create pattern
+  set upat $lsb
+  for {set q [expr $lsb + 1]} {$q <= $msb} {incr q} {
+    set upat [format "%s %s" $upat $q]
+  }
+  # init done flags
+  for {set q 0} {$q < $nsubmatches} {incr q} {
+    set done($q) 0
+  }
+  # search for match
+  for {set q 0} {$q < $nsubmatches} {incr q} {
+    set pmatch [string compare $upat $subpattern($q)]
+    if {$pmatch == 0} {
+      set done($q) 1
+      # print out select equation
+      set stext [format "sel\[0\] = %s" $submatch($q)]
+      make_text -origin "$sel_x $sel_y" -text $stext
+    }
+  }
+
+  # draw the gnd wire, even if it's not used in this bitslice
+  make_wire $gnd_x [expr $y - ($delta_y / 2)] $gnd_x [expr $y + ($delta_y / 2)]
+
+  # do the rest of the patterns
+  # 3 cases:
+  # - all z's
+  # - a bitrange
+  # - all repeats of a single bit
+  set pin 1
+  for {set q 0} {$q < $nsubmatches} {incr q} {
+    set zcount 0
+    set repcount 0
+    if {$done($q) == 0} {
+      set len [llength $subpattern($q)]
+      # case 1, all z's
+      if {[lindex $subpattern($q) 0] == "z"} {
+	set zcount $len
+	if {$len == 1} {
+	  set lname [format "\[0\]"]
+	} else {
+	  set lname [format "\[%d:0\]" [expr $zcount - 1]]
+	}
+      } else {
+	set thisbit [lindex $subpattern($q) 0]
+	if {$len == 1} {
+	  set lname [format "\[%d\]" $thisbit]
+	} else {
+	  set nextbit [lindex $subpattern($q) 1]
+	  if {$thisbit == $nextbit} {
+	    # case 3, all repeats of a single bit
+	    set repcount $len
+	    set lname [format "\[%d:0\]" [expr $repcount - 1]]
+	    set rlname [format "\[%d\]" $thisbit]
+	  } else {
+	    set lname [format "\[%d:%d\]" [lindex $subpattern($q) [expr $len - 1]] $thisbit]
+	  }
+	}
+      }
+
+      # print out select equation
+      set stext [format "sel\[%d\] = %s" $pin $submatch($q)]
+      make_text -origin "$sel_x [expr $sel_y + ($pin * 20)]" -text $stext
+
+      # draw the wires
+      set pin_x [expr $x + $port_in_x($pin)]
+      set pin_y [expr $y + $port_in_y($pin)]
+      make_wire $pin_x $pin_y [expr $pin_x - $ws1] $pin_y
+      make name_net_s -origin "[expr $pin_x - $ws1] $pin_y" -name $lname
+      incr pin
+
+      # z bits
+      if {$zcount != 0} {
+	make_wire [expr $pin_x - $ws1] $pin_y [expr $pin_x - 2*$ws1 + 10] $pin_y
+	make sign_extend -origin "[expr $pin_x - 2*$ws1] $pin_y"
+	make_wire [expr $pin_x - 2*$ws1 - 10] $pin_y $gnd_x $pin_y
+      }
+
+      # repeated bits
+      if {$repcount != 0} {
+	make_wire [expr $pin_x - $ws1] $pin_y [expr $pin_x - 2*$ws1 + 10] $pin_y
+	make sign_extend -origin "[expr $pin_x - 2*$ws1] $pin_y"
+	make_wire [expr $pin_x - 2*$ws1 - 10] $pin_y [expr $pin_x - 3*$ws1] $pin_y
+	make name_net_s -origin "[expr $pin_x - 3*$ws1] $pin_y" -name $rlname
+	make_wire [expr $pin_x - 3*$ws1] $pin_y $in_x $pin_y
+      }
+
+      # not-z, not-repeated bits
+      if {($zcount == 0) && ($repcount == 0)} {
+	make_wire [expr $pin_x - $ws1] $pin_y $in_x $pin_y
+      }
+    }
+  }
+}
+
+proc SCHEMATIC_partshifter args {
+  call_use_keyword $args {{NBITS 32} {Operation "Shift"} {Direction "Left"} {SignExtendRsh "Y"} {NStages 5} {Datatypes "8 16 32"} {EncodedShiftAmt "Y"}}
+
+  # make the arguments more digestible
+  # NBITS
+  set maxidx [expr $NBITS - 1]
+  # bitranges
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  # Operation
+  if {[string toupper $Operation] == "SHIFT"} {
+    set operation "shift"
+  }
+  if {[string toupper $Operation] == "ROTATE"} {
+    set operation "rotate"
+  }
+
+  # Direction
+  if {[string toupper $Direction] == "LEFT"} {
+    set direction "left"
+  }
+  if {[string toupper $Direction] == "RIGHT"} {
+    set direction "right"
+  }
+  if {[string toupper $Direction] == "BOTH"} {
+    set direction "both"
+  }
+  
+  # NStages
+  if {[string toupper $Direction] == "BOTH"} {
+    # assumes decoded controls, 3 bits per stage
+    set nshfbits [expr 3 * $NStages]
+  } else {
+    # assumes encoded controls, 1 bit per stage
+    set nshfbits $NStages
+  }
+  set maxsidx [expr $nshfbits - 1]
+  # bitranges
+  if {$maxsidx == 0} {
+    set shf_bitrange [format "\[0\]"]
+    set vshf_bitrange ""
+  } else {
+    set shf_bitrange [format "\[%d:0\]" $maxsidx]
+    set vshf_bitrange $shf_bitrange
+  }
+
+  # Datatypes
+  set partition 1
+  # put in ascending order
+  set newdtlist ""
+  foreach dt $Datatypes {
+    # weed out duplicates
+    set t [lsearch $newdtlist $dt]
+    if {$t == -1} {
+      lappend newdtlist $dt
+    }
+  }
+  # sort the list
+  set newdtlist2 [lsort -integer $newdtlist]
+  # rename 
+  set Datatypes $newdtlist2
+
+  # open output file to write the select equations
+  set dtstring [format "%s" [lindex $Datatypes 0]]
+  for {set i 1} {$i < [llength $Datatypes]} {incr i} {
+    set dtstring [format "%s_%s" $dtstring [lindex $Datatypes $i]]
+  }
+  set fname [format "partshifter%d_%s_%s_%s_%d_%s_%s" $NBITS $Operation $Direction $SignExtendRsh $NStages $dtstring $EncodedShiftAmt]
+  set filename "$fname.seldata"
+  if {[catch "open $filename w" FILE_ID]} {
+    puts "WARNING: Couldn't open file $filename"
+  } 
+
+  # worst-case mux icon properties (mux6)
+  set icon_mux_x 120
+  set icon_mux_y 380
+  set icon_mux_left [expr -($icon_mux_x / 2)]
+  set icon_mux_right [expr ($icon_mux_x / 2)]
+  set icon_mux_top [expr -($icon_mux_y / 2)]
+  set icon_mux_bot [expr ($icon_mux_y / 2)]
+
+  # wire stub length
+  set ws1 50
+  
+  # distances
+  set xfudge [expr 6 * $ws1]
+  set delta_x [expr $icon_mux_x + $xfudge]
+  set yfudge [expr 4 * $ws1]
+  set delta_y [expr $icon_mux_y + $yfudge]
+
+  # init drawing location
+  set x 0
+  set y 0
+
+  # wire tracks
+  set inflag_x [expr $x - (8 * $ws1)]
+  set outflag_x [expr $x + $icon_mux_right + ($NStages - 1) * $delta_x + (4 * $ws1)]
+  set shiftamt_y [expr $y + $delta_y]
+
+  # figure out the shift amount per stage
+  for {set i 0} {$i < $NStages} {incr i} {
+    set shiftamt($i) [expr int(pow(2,$i))]
+  }
+
+  # draw the shifter
+  for {set i 0} {$i < $NStages} {incr i} {
+
+    # compute vector per datatype and per shift direction
+    foreach dt $Datatypes {
+      set vec($dt,0) ""
+      set vec($dt,1) ""
+      set count [expr $NBITS / $dt]
+      for {set k 0} {$k < $count} {incr k} {
+	for {set l 0} { $l < $dt} {incr l} {
+	  # left shift 
+	  if {($direction == "left") || ($direction == "both")} {
+	    if {($direction == "both") && ([string toupper $EncodedShiftAmt] == "Y") && ($i == [expr $NStages - 1])} {
+	      # note:  if we assume a two's complement encoded shift amount for a bidirectional shifter,
+	      # with positive values encoding a left shift, the last stage cannot perform a left shift
+	      # since the msb of the shift amount must be zero (= no shift in the last stage).  force
+	      # the unshifted vector here.
+	      lappend vec($dt,0) [expr ($k * $dt) + $l]
+	    } else {
+	      if {$l < $shiftamt($i)} {
+		if {$operation == "shift"} {
+		  lappend vec($dt,0) "z"
+		} else {
+		  # rotate
+		  # note that rotates are modulo the datatype
+		  if {$shiftamt($i) > $dt} {
+		    set samt [expr $shiftamt($i) % $dt]
+		    if {$samt == 0} {
+		      set samt $dt
+		    }
+		  } else {
+		    set samt $shiftamt($i)
+		  } 
+		  lappend vec($dt,0) [expr ($k * $dt) + $l + ($dt - $samt)]
+		}
+	      } else {
+		lappend vec($dt,0) [expr ($k * $dt) + $l - $shiftamt($i)]
+	      }
+	    }
+	  }
+	  # right shift
+	  if {($direction == "right") || ($direction == "both")} {
+	    if {$l < [expr $dt - $shiftamt($i)]} {
+	      lappend vec($dt,1) [expr ($k * $dt) + $l + $shiftamt($i)]
+	    } else {
+	      if {$operation == "shift"} {
+		if {[string toupper $SignExtendRsh] == "Y"} {
+		  lappend vec($dt,1) [expr (($k + 1) * $dt) - 1]
+		} else {
+		  lappend vec($dt,1) "z"
+		}
+	      } else {
+		# rotate
+		# note that rotates are modulo the datatype
+		if {$shiftamt($i) > $dt} {
+		  set samt [expr $shiftamt($i) % $dt]
+		  if {$samt == 0} {
+		    set samt $dt
+		  }
+		} else {
+		  set samt $shiftamt($i)
+		} 
+		lappend vec($dt,1) [expr ($k * $dt) + $l - ($dt - $samt)]
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    # print out debug/select information
+    puts $FILE_ID ""
+    puts $FILE_ID [format "Stage=%d, Shiftamt=%d, Direction=%s, Operation=%s" $i $shiftamt($i) $direction $operation]
+    puts $FILE_ID [format "Initial patterns:"]
+    # unshifted vector
+    set uvec 0
+    for {set q 1} {$q < $NBITS} {incr q} {
+      set uvec [format "%s %s" $uvec $q]
+    }
+    puts $FILE_ID [format "  Datatype=all, unshifted, pattern=%s" $uvec]
+    # shifted vectors
+    foreach dt $Datatypes {
+      for {set q 0} {$q < 2} {incr q} {
+	if {(($q == 0) && ($direction == "right")) ||
+	    (($q == 1) && ($direction == "left"))} {
+	  continue
+	}
+	if {$q == 0} {
+	  set dirtxt "left"
+	} else {
+	  set dirtxt "right"
+	}
+	puts $FILE_ID [format "  Datatype=%d, direction=%s, pattern=%s" $dt $dirtxt $vec($dt,$q)]
+      }
+    }
+    puts $FILE_ID [format "Minimized patterns:"]
+
+
+    # figure out the intersections of the vectors, to minimize the mux widths
+    # - search only within the smallest datatype
+    # - don't compare the unshifted vector
+    set wid [lindex $Datatypes 0]
+    set count [expr $NBITS / $wid]
+
+    for {set j 0} {$j < $count} {incr j} {
+      # initialize
+      set nmatches 0
+      for {set k 0} {$k < [expr (($dt * 2) + 1)]} {incr k} {
+	set pattern($k) ""
+	set match($k) ""
+      }
+      # compare all vectors
+      foreach dt $Datatypes {
+	for {set dir 0} {$dir < 2} {incr dir} {
+	  if {($dir == 0) && ($direction == "right")} {
+	    # there are no left shift vectors to compare against
+	    continue
+	  }
+	  if {($dir == 1) && ($direction == "left")} {
+	    # there are no right shift vectors to compare against
+	    continue
+	  }
+	  if {$dir == 0} {
+	    set dirtxt "L"
+	  } else {
+	    set dirtxt "R"
+	  }
+	  # extract pattern bits
+	  set compat [lrange $vec($dt,$dir) [expr ($j * $wid)] [expr (($j + 1) * $wid) - 1]]
+	  # compare to previous matched patterns
+	  set found 0
+	  for {set npat 0} {$npat < $nmatches} {incr npat} {
+	    set pmatch [string compare $compat $pattern($npat)]
+	    if {$pmatch == 0} {
+	      # match
+	      lappend match($npat) [list $dt $dirtxt]
+	      set found 1
+	    } 
+	  }
+	  if {$found == 0} {
+	    # no match, add to list of patterns
+	    set pattern($nmatches) $compat
+	    set match($nmatches) [list [list $dt $dirtxt]]
+	    incr nmatches
+	  }
+	}
+      }
+      # add the unshifted pattern
+      for {set bit [expr ($j * $wid)]} {$bit < [expr (($j + 1) * $wid)]} {incr bit} {
+	set pattern($nmatches) [format "%s %s" $pattern($nmatches) $bit]
+      }
+      set match($nmatches) [list [list all noshift]]
+      incr nmatches
+
+
+      # pass 2:  break up the patterns within the datatype
+      # left shift has two cases:
+      # 1.  shiftamt < wid
+      #     => there are 2 segments within the datatype:
+      #        left-shift-in segment | top segment
+      #        a. LSB:  0..(shiftamt-1)
+      #        b. MSB:  (shiftamt)..max
+      # 2.  shiftamt >= wid
+      #     => there is 1 segment within the datatype:
+      #        a. LSB:  0..max
+      # right shift has two cases:
+      # 1.  shiftamt < wid
+      #     => there are 2 segments within the datatype:
+      #        bottom | right-shift-in-segment
+      #        a. LSB:  0..(max-shiftamt)
+      #        b. MSB:  (max-shiftamt+1)..max
+      # 2.  shiftamt >= wid
+      #     => there is 1 segment within the datatype:
+      #        a. LSB:  0..max
+      # bidirectional has four cases:
+      # 1.  shiftamt < wid / 2
+      #     => there are 3 segments within the datatype:
+      #        left-shift-in segment | center | right-shift-in segment
+      #        a. LSB:  0..(shiftamt-1)
+      #        b. MID:  (shiftamt)..(max-shiftamt)
+      #        c. MSB:  (max-shiftamt+1)..max
+      # 2.  shiftamt = wid / 2
+      #     => there are 2 segments within the datatype:
+      #        left-shift-in segment | right-shift-in segment
+      #        a. LSB:  0..(shiftamt-1)
+      #        b. MSB:  (shiftamt)..max
+      # 3.  (wid / 2) < shiftamt < wid
+      #     => there are 3 segments within the datatype:
+      #        left-shift-in segment | shift-overlap segment | right-shift-in segment
+      #        a. LSB:  0..(max-shiftamt+1)
+      #        b. MID:  (max-shiftamt)..(shiftamt-1)
+      #        c. MSB:  (shiftamt)..max
+      # 4.  shiftamt >= wid
+      #     => there is one segment within the datatype:
+      #        a. LSB=MSB:  0..max
+
+      # so which case is this?
+      set do_mid 0
+      set do_msb 0
+      set max [expr $wid - 1]
+      if {$direction == "both"} {
+	# bidir case 1
+	if {$shiftamt($i) < [expr ($wid / 2)]} {
+	  set lsb_bot 0
+	  set lsb_top [expr $shiftamt($i) - 1]
+	  set do_mid 1
+	  set mid_bot $shiftamt($i)
+	  set mid_top [expr $max - $shiftamt($i)]
+	  set do_msb 1
+	  set msb_bot [expr ([expr $max - $shiftamt($i)] + 1)]
+	  set msb_top $max
+	}
+	# bidir case 2
+	if {$shiftamt($i) == [expr ($wid / 2)]} {
+	  set lsb_bot 0
+	  set lsb_top [expr $shiftamt($i) - 1]
+	  set do_msb 1
+	  set msb_bot $shiftamt($i)
+	  set msb_top $max
+	}
+	# bidir case 3
+	if {([expr ($wid / 2)] < $shiftamt($i)) && ($shiftamt($i) < $wid)} {
+	  set lsb_bot 0
+	  set lsb_top [expr $max - $shiftamt($i) + 1]
+	  set do_mid 1
+	  set mid_bot [expr $max - $shiftamt($i)]
+	  set mid_top [expr $shiftamt($i) - 1]
+	  set do_msb 1
+	  set msb_bot $shiftamt($i)
+	  set msb_top $max
+	}
+	# bidir case 4
+	if {$shiftamt($i) >= $wid} {
+	  set lsb_bot 0
+	  set lsb_top $max
+	}
+      }
+      if {$direction == "left"} {
+	# left shift case 1
+	if {$shiftamt($i) < $wid} {
+	  set lsb_bot 0
+	  set lsb_top [expr $shiftamt($i) - 1]
+	  set do_msb 1
+	  set msb_bot $shiftamt($i)
+	  set msb_top $max
+	}
+	# left shift case 2
+        if {$shiftamt($i) >= $wid} {
+	  set lsb_bot 0
+	  set lsb_top $max
+	}
+      }
+      if {$direction == "right"} {
+	# right shift case 1
+	if {$shiftamt($i) < $wid} {
+	  set lsb_bot 0
+	  set lsb_top [expr $max - $shiftamt($i)]
+	  set do_msb 1
+	  set msb_bot [expr $max - $shiftamt($i) + 1]
+	  set msb_top $max
+	}
+	# right shift case 2
+	if {$shiftamt($i) >= $wid} {
+	  set lsb_bot 0
+	  set lsb_top $max
+	}
+      }
+
+      # LSB segment (always do)
+      set lsb [expr ($j * $wid) + $lsb_bot]
+      set msb [expr ($j * $wid) + $lsb_top]
+      set ok [find_subpattern $lsb_bot $lsb_top pattern match $nmatches $lsb $msb $x $y $FILE_ID]
+      set y [expr $y - $delta_y]
+
+      # MID segment
+      if {$do_mid} {
+	set lsb [expr ($j * $wid) + $mid_bot]
+	set msb [expr ($j * $wid) + $mid_top]
+	set ok [find_subpattern $mid_bot $mid_top pattern match $nmatches $lsb $msb $x $y $FILE_ID]
+	set y [expr $y - $delta_y]
+      }
+
+      # MSB segment
+      if {$do_msb} {
+	set lsb [expr ($j * $wid) + $msb_bot]
+	set msb [expr ($j * $wid) + $msb_top]
+	set ok [find_subpattern $msb_bot $msb_top pattern match $nmatches $lsb $msb $x $y $FILE_ID]
+	set y [expr $y - $delta_y]
+      }
+    }
+
+    # label the output wire
+    if {$i == [expr $NStages - 1]} {
+      set out_x [expr $x + $icon_mux_right + 2*$ws1]
+      make_wire $out_x 0 $outflag_x 0
+      set lname [format "Out_H\[%d:0\]" [expr $NBITS - 1]]
+      make output -origin "$outflag_x 0" -name $lname
+    } else {
+      set out_x [expr $x + $icon_mux_right + 2*$ws1]
+      set out_y [expr 0 + ($delta_y / 2)]
+      set lname [format "L%d_H\[%d:0\]" $i [expr $NBITS - 1]]
+      make name_net_s -origin "$out_x $out_y" -name $lname -orient R90X
+    }
+
+    # label the gnd wire
+    set gnd_x [expr $x + $icon_mux_left - 4*$ws1 + 30]
+    set gnd_y [expr 0 + ($delta_y / 2)]
+    make global -origin "$gnd_x $gnd_y" -name "gnd"
+
+    # label the input wire
+    if {$i == 0} {
+      set in_x [expr $x + $icon_mux_left - 4 * $ws1]
+      make_wire $in_x 0 $inflag_x 0
+      set lname [format "In_H\[%d:0\]" [expr $NBITS - 1]]
+      make input -origin "$inflag_x 0" -name $lname
+    }
+
+    # place the inflag for the shift amount
+    if {$i == 0} {
+      set lname [format "ShiftAmt_H\[1:0\]"]
+      make input -origin "$inflag_x $shiftamt_y" -name $lname
+      make_wire $inflag_x $shiftamt_y $outflag_x $shiftamt_y
+    }
+
+    # add comments describing the stage's function
+    set txt_x [expr $gnd_x + 2*$ws1]
+    set txt_y [expr $gnd_y + 2*$ws1]
+    if {($direction == "right") && 
+	([string toupper $Operation] == "SHIFT") &&
+	([string toupper $SignExtendRsh] == "Y")} {
+      make_text -origin "$txt_x $txt_y" -text {Sign Extended}
+    }
+    switch $direction {
+      left {set ctext "Left"}
+      right {set ctext "Right"}
+      both {set ctext "Bidirectional"}
+    }
+    if {[string toupper $Operation] == "SHIFT"} {
+      set ctext [format "%s Shift" $ctext]
+    } else {
+      set ctext [format "%s Rotate" $ctext]
+    }
+    make_text -origin "$txt_x [expr $txt_y + 20]" -text $ctext
+    set ctext [format "by %d" $shiftamt($i)]
+    make_text -origin "$txt_x [expr $txt_y + 40]" -text $ctext
+
+    set x [expr $x + $delta_x]
+    set y 0
+  }
+
+  # title bar
+  make sccs_title_bar -origin "0 [expr 0 + $delta_y + 3*$ws1]" -owner emc -version 0.0 -date 04/14/99
+
+  show_connects "" clean
+
+  flush $FILE_ID
+  close $FILE_ID
+
+}
+
+
+proc ICON_partshifter args {
+  # This line is needed for all generators
+  icon_generator $args {{NBITS 32} {Operation "Shift" {radio Shift Rotate}} {Direction "Left" {radio Left Right Both}} {SignExtendRsh "Y"} {NStages 5} {Datatypes "8 16 32"} {EncodedShiftAmt "Y"}}
+
+  # check for acceptable response on NBITS
+  if {$NBITS < 1} {
+    error "ERROR: NBITS ($NBITS) must be greater than 0"
+  }
+  # don't let the user get too crazy
+  if {$NBITS > 128} {
+    error "ERROR: NBITS ($NBITS) not supported"
+  }
+  set maxidx [expr $NBITS - 1]
+  # bitranges
+  if {$NBITS == 1} {
+    set max_bitrange [format "\[0\]"]
+    set vmax_bitrange ""
+  } else {
+    set max_bitrange [format "\[%d:0\]" $maxidx]
+    set vmax_bitrange $max_bitrange
+  }
+
+  # check for acceptable response on Operation
+  if {([string toupper $Operation] != "SHIFT") && 
+      ([string toupper $Operation] != "ROTATE")} {
+    error "ERROR: Operation ($Operation) must be Shift or Rotate"
+  }
+
+  # check for acceptable response on Direction
+  if {([string toupper $Direction] != "LEFT") &&
+      ([string toupper $Direction] != "RIGHT") &&
+      ([string toupper $Direction] != "BOTH")} {
+    error "ERROR: Direction ($Direction) must be Left, Right, or Both"
+  }
+
+  # check for acceptable response on SignExtendRsh
+  if {([string toupper $SignExtendRsh] != "N") &&
+      ([string toupper $SignExtendRsh] != "Y")} {
+    error "ERROR: SignExtendRsh ($SignExtendRsh) must be Y or N"
+  }
+
+  # check for acceptable response on NStages
+  if {$NStages < 1} {
+    error "ERROR: NStages ($NStages) must be greater than 0"
+  }
+  # bitranges
+  # no idea how many bits will be in the shift amount
+  set vshf_bitrange [format "\[1:0\]"]
+
+  # check for acceptable response on Datatypes
+  set partition 1
+  foreach dt $Datatypes {
+    if {[expr ($NBITS % $dt)] != 0} {
+      error "ERROR: Datatype ($dt) must be evenly divisible into NBITS ($NBITS)"
+    }
+    if {$dt < 0} {
+      error "ERROR: Datatype ($dt) must be greater than 0"
+    }
+    if {$dt > $NBITS} {
+      error "ERROR: Datatype ($dt) must be less than or equal to NBITS ($NBITS)"
+    }
+  }
+    
+  # check for acceptable response on EncodedShiftAmt
+  if {([string toupper $EncodedShiftAmt] != "N") &&
+      ([string toupper $EncodedShiftAmt] != "Y")} {
+    error "ERROR: EncodedShiftAmt ($EncodedShiftAmt) must be Y or N"
+  }
+
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+  # icon body
+  icon_line -50 80 -50 -80 50 -80 50 80 -50 80 
+
+  # inputs
+  icon_term -type input -origin {-50 0} -name "In_H$vmax_bitrange"
+  icon_property -origin {-40 0} -size small -label In_H
+  icon_term -type input -origin {0 80} -orient R270 -name "ShiftAmt_H$vshf_bitrange"
+  icon_property -origin {0 70} -size small -anchor center -label ShiftAmt
+
+  # outputs
+  icon_term -type output -origin {50 0} -name "Out_H$vmax_bitrange"
+  icon_property -origin {40 0} -size small -anchor e -label Out_H
+
+  # text
+  icon_property -origin {0 -60} -anchor center -label {Partitioned}
+  if {[string toupper $Direction] == "LEFT"} {
+    set dirtxt "Left"
+  }
+  if {[string toupper $Direction] == "RIGHT"} {
+    set dirtxt "Right"
+  }
+  if {[string toupper $Direction] == "BOTH"} {
+    set dirtxt "Bidir"
+  }
+  icon_property -origin {0 -40} -anchor center -label "$dirtxt"
+  if {[string toupper $Operation] == "SHIFT"} {
+    set lname "Shifter"
+  } else {
+    set lname "Rotator"
+  }
+  icon_property -origin {0 -20} -anchor center -label "$lname"
+  icon_property -origin {0 20} -anchor center -label "$max_bitrange"
+
+  # junk
+  icon_property -origin {-70 300} -type user -name name
+  icon_property -origin {-70 320} -type user -name M
+  icon_property -origin {-70 340} -type user -name dpc
+  icon_special -type sccs_title_bar -origin {-30 440} -owner emc -version 0.0 -date 04/14/99
+
+}

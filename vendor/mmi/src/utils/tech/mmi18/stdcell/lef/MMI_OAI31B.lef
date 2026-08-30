@@ -1,0 +1,174 @@
+MACRO MMI_OAI31B
+	CLASS CORE ;
+	FOREIGN MMI_OAI31B 0 0 ;
+	SIZE 8.14 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.18 4.61 0.52 6.37 ;
+			LAYER M1 ;
+			RECT 2.52 5.3 2.86 6.37 ;
+			LAYER M1 ;
+			RECT 5.68 5.3 6.02 6.37 ;
+			LAYER M1 ;
+			RECT 0.29 4.135 0.52 4.61 ;
+			LAYER M1 ;
+			RECT 1.54 5.07 6.02 5.3 ;
+			LAYER M1 ;
+			RECT 1.54 4.295 1.77 5.07 ;
+			LAYER M1 ;
+			RECT 0.885 4.135 1.77 4.295 ;
+			LAYER M1 ;
+			RECT 0.29 4.065 1.77 4.135 ;
+			LAYER M1 ;
+			RECT 0.29 3.905 1.335 4.065 ;
+			LAYER M1 ;
+			RECT 0.885 3.845 1.335 3.905 ;
+			LAYER M1 ;
+			RECT 1.01 2.4 1.24 3.845 ;
+			LAYER M1 ;
+			RECT 0.9 2.06 1.24 2.4 ;
+		END
+		AntennaDiffArea 2.8704 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 2.37 4.41 2.71 4.75 ;
+			LAYER M1 ;
+			RECT 2.48 4.165 2.71 4.41 ;
+			LAYER M1 ;
+			RECT 4.585 4.165 5.035 4.295 ;
+			LAYER M1 ;
+			RECT 2.48 4.135 5.035 4.165 ;
+			LAYER M1 ;
+			RECT 5.44 4.135 5.78 4.245 ;
+			LAYER M1 ;
+			RECT 2.48 3.935 5.78 4.135 ;
+			LAYER M1 ;
+			RECT 2.37 2.92 2.71 2.975 ;
+			LAYER M1 ;
+			RECT 4 2.92 4.23 3.935 ;
+			LAYER M1 ;
+			RECT 4.585 3.905 5.78 3.935 ;
+			LAYER M1 ;
+			RECT 4.585 3.845 5.035 3.905 ;
+			LAYER M1 ;
+			RECT 2.37 2.69 4.23 2.92 ;
+			LAYER M1 ;
+			RECT 2.37 2.635 2.71 2.69 ;
+		END
+		AntennaGateArea 1.3248 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 2.34 0.5 2.68 1.9 ;
+			LAYER M1 ;
+			RECT 3.78 0.5 4.12 1.9 ;
+			LAYER M1 ;
+			RECT 5.22 0.5 5.56 1.9 ;
+			LAYER M1 ;
+			RECT 0 -0.5 8.14 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.61 3.555 1.95 3.81 ;
+			LAYER M1 ;
+			RECT 1.61 3.47 2.075 3.555 ;
+			LAYER M1 ;
+			RECT 1.625 3.445 2.075 3.47 ;
+			LAYER M1 ;
+			RECT 3.43 3.445 3.77 3.5 ;
+			LAYER M1 ;
+			RECT 1.625 3.215 3.77 3.445 ;
+			LAYER M1 ;
+			RECT 1.625 3.105 2.075 3.215 ;
+			LAYER M1 ;
+			RECT 3.43 3.16 3.77 3.215 ;
+		END
+		AntennaGateArea 1.3248 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 8.14 7.9 ;
+			LAYER M1 ;
+			RECT 0.9 4.61 1.24 6.9 ;
+			LAYER M1 ;
+			RECT 4.1 5.56 4.44 6.9 ;
+			LAYER M1 ;
+			RECT 7.26 5.07 7.6 6.9 ;
+		END
+	END VDD
+	PIN in3
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 4 4.77 4.34 4.84 ;
+			LAYER M1 ;
+			RECT 4 4.54 7.36 4.77 ;
+			LAYER M1 ;
+			RECT 4 4.5 4.34 4.54 ;
+			LAYER M1 ;
+			RECT 6.065 3.555 6.295 4.54 ;
+			LAYER M1 ;
+			RECT 7.02 4.43 7.36 4.54 ;
+			LAYER M1 ;
+			RECT 6.065 3.105 6.515 3.555 ;
+			LAYER M1 ;
+			RECT 5.27 2.89 5.61 2.97 ;
+			LAYER M1 ;
+			RECT 6.065 2.89 6.295 3.105 ;
+			LAYER M1 ;
+			RECT 5.27 2.66 6.295 2.89 ;
+			LAYER M1 ;
+			RECT 5.27 2.63 5.61 2.66 ;
+		END
+		AntennaGateArea 1.3248 ;
+	END in3
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.145 3.5 0.595 3.555 ;
+			LAYER M1 ;
+			RECT 0.145 3.16 0.76 3.5 ;
+			LAYER M1 ;
+			RECT 0.145 3.105 0.595 3.16 ;
+		END
+		AntennaGateArea 0.6624 ;
+	END in0
+	OBS
+		LAYER M1 ;
+		RECT 0.18 1.79 0.52 2.4 ;
+		LAYER M1 ;
+		RECT 1.62 2.17 6.28 2.4 ;
+		LAYER M1 ;
+		RECT 1.62 1.79 1.96 2.17 ;
+		LAYER M1 ;
+		RECT 0.18 1.56 1.96 1.79 ;
+		LAYER M1 ;
+		RECT 3.06 1.56 3.4 2.17 ;
+		LAYER M1 ;
+		RECT 4.5 1.56 4.84 2.17 ;
+		LAYER M1 ;
+		RECT 5.94 1.56 6.28 2.17 ;
+	END
+END MMI_OAI31B

@@ -1,0 +1,586 @@
+THIS IS A LOG FILE OF STUFF CHANGED IN MAX MAXTCL CODE.
+
+prop_menu (in sharedtcl):
+	Made it accept -proptype as well proptype, for future expansion,
+	and hopefully, for use in Sue.
+
+	fixed focus to go where you click the mouse
+	(lee reported)
+
+	added -hide to disable an entry
+	(lee requested)
+
+	fixed -separator  (mha reported)
+
+	fixed bug in code that prevents prop_menu from being FullyObscured.
+	The test for [grab current] did not work.  This was probably
+	the problem with the nested dialog box, too.
+	Overhauled grab code.
+
+	added -button
+
+	made nested calls to prop_menu possible.
+
+list_box.tcl:
+	Fill em up with the directory contents.
+	Marked unread cells with "U" flag.
+	Added "Rescan Directory" button.
+TODO:	Old routine is still there, called old_list_box_fill,
+	needs to be removed.
+
+FSBox.tcl:
+	Added busy cursor.
+	Fixed bug that ignored fsPattern if file was a link.
+	(Sue uses its own FSBox, but seemed to already be fixed.)
+	Added cursor_wait
+
+cell.tcl:
+	Made cell_load accept a directory.
+	Needed to add a new cell_get like cell_load.
+	Decided both should be eliminated and combined
+	with :getcell/:loadcell, but need to clear with mha first.
+TODO:	Talk to mha about this.  In general, want to eliminate
+	duplicate procs that preserve magic compat.
+	If mha doesnt want to, maybe add a "magic_compat.tcl"
+	that customers can use.  But who cares?
+
+g18.tcl (in max/tech):
+	Fixed some params.
+
+stdcell.tcl (in mmi_local):
+	New faster fet flipping algorithm.
+	Many changes required to retarget for g18.
+	Improved pad placement.
+	Added  options: align_fets, pad_track, share_contacts,
+	put_fets_in_subcells
+	Added Routing.
+
+
+*** NEW FORMAT ***
+
+
+List of changes to maxtcl
+
+Date	Luser	Enhancement/Bug Fix, files affected
+=====	======	======================================================
+
+990312	tavrow	added cell_save_tree for save cell and descendents
+		cell.tcl, menu_bar.tcl
+
+990312	tavrow	added new edge mode for editing edges.  
+		edge.tcl (new), mode.tcl, menu_bar.tcl
+
+990316	tavrow	added hotkeys to mode box for cancel (space, control-c, escape)
+		and scroll up/down, page up/down
+
+990316	tavrow	added reload command to misc.tcl for debugging
+
+990316	tavrow	added edit in place for paint.  Changed current edit
+		in place to be edit cell in place
+		
+990317	tavrow	started making dbt_ routines (for db tcl) to do things
+		like [$max_win.layout visible], etc.
+
+990318	tavrow	restored old listbox stuff and added alphabetize.
+		should add cleverer autoload ala pat but then we have
+		to solve shadowing problem.  
+
+990318	tavrow	Replaced max's FSBox with SUE's.
+
+990322	tavrow	New selection when mouse click.  doesn't use :select
+
+990322	tavrow	move now stretches (control-button-2) and selects a
+		wire, included contacts/vias, and stretches
+
+990322	tavrow	clipboard paste now zooms to selected if larger than
+		screen and takes an option to work with drop icon and
+		other things (eventually nfet/pfet generator).
+
+990322	tavrow	find_next_error can type an optional argument "kind" that
+		will skip till it finds an error with a new kind of message.
+
+990322	tavrow	removed cursor warping after zoom box.
+
+-- max2.29 --
+
+990325	tavrow	fixed palette code so you can have uppercase layer names
+
+990329	tavrow	added hooks to palette so button2 and button3 clicks
+		on palette will do mode-specific stuff.  Fixed wire
+		so palette will choose layer.
+
+990329	tavrow	added SUE cross probing
+
+990331	tavrow	added color editor.  Tied into double click on palette
+
+990331	tavrow	wrote format_gds_layers to take output from gds_info
+		and make it suitable for make_tech
+
+990331	tavrow	change cell_load_gds to take an optional filename and
+		changed cell_load_files to assume gds if suffix and
+		not .max.
+
+990401	tavrow	added name labels so you can edit a bus of label.
+		also, can now use the palette to select a label.
+
+990402	tavrow	cleaned up doc box.  removed name filter.  set focus
+		to apropos.  removed horizontal scrollbar.
+
+990402	tavrow	updated mode box to include selectable text and other fixes
+		including added mode msg.
+
+990406	tavrow	added a ruler.
+
+990407	tavrow	added command line options and help message.
+
+990407	tavrow	fixed goto coordinates.  Fixed prop_menu.tcl bugs.
+
+990408	tavrow	added cursor message window (shows cursor position in
+		microns) and added full path in title for edit in place.
+
+990409	tavrow	cmd0 added whenever common is called in menu_add_command.
+		Removes undo_delim on common commands.
+		Also removed i_cmd_between in view_zoom_region.
+
+990409	tavrow	added global variable option in text commands with
+		same functionality as text commands.  Need to document
+		all variables in maxtcl with init_global now.		
+
+990415	tavrow	New labels now, by default, get the highest VISIBLE layer.  
+		Also, abort if you try to edit a label that isn't in
+		he edit cell.
+
+990419	tavrow	wrote lay_path to substitute for buggy lay_editcell -path
+		and replaced.
+
+990420	tavrow	added "file bug report" to the help menu.
+
+990420	tavrow	change xbot, ybot, etc. in box coords to be
+		x_lower_left, y_lower_left, etc.
+
+990420	tavrow	added new gcell.tcl and support for them in cell.tcl
+		select.tcl edit.tcl list_box.tcl
+
+990421	tavrow	added navigator zoom buttons
+
+990423	tavrow	added query to export gdsii if file on disk would 
+		be overwritten.
+
+990423	tavrow	select by name now displays labels selected.  Also
+		displaying labels includes pathname unless global
+
+990423	tavrow	changed zoom to fit cell to fit to editcell instead
+		of rootcell
+
+990428	tavrow	added new polygon interface (breaks wire paths for now)
+
+990504	tavrow	fixed zoom to selected (uses new db_bbox command)
+
+990504	tavrow	added option x,y for measure command
+
+990504	tavrow	changed 3 cell.tcl functions to use db_cell cellname.
+
+-- max2.32 --
+
+990505	tavrow	if you do a:
+			set ROUTE(type) cell
+		you will get gcells for vias/contacts when using the
+		wire tool
+
+990505	tavrow	fixed edge stretching to ignore polygons
+
+990510	tavrow	rewrote gcells to save only non-defaulted arguments in name
+
+990511	tavrow	added gcell_label for adding labels in gcells
+
+990512	tavrow	new polygon interface.  Can draw snapping to 45.  
+		Can edit 45 or all angle
+
+990517  pat	prop_menu (in sharedtcl): added prop_menu2.
+
+990602  pat
+	    Added revision numbers to all files.
+
+	    Added user grid:
+		misc.tcl:  added layt_point and layt_box
+		utils.tcl: added -user option to res and uusnap procs.
+		grid.tcl:  Modified grid menu to support user grid, multiple
+		     grids, assymetric grids, etc.
+		prop_menu.tcl: added -snap option to permit the user to use the
+		     moust to change a prop_menu number at the user resolution
+		     while still using -incr to verify number is divisible by
+		     internal resolution.
+		all tcl files: Changed all calls to lay_box to layt_box
+		     and lay_cursor to layt_cursor, except in stdcell.tcl,
+		     which always uses exact coords, and edge.tcl, which
+		     is not finished yet - edge code does not yet snap to
+		     grid in all cases.
+
+	    Fixed undo:
+		Modified all gate-keepers to use undo_to_delim instead of :undo,
+		to fix problem where undo in a submode undid the previous thing
+		done before entering the submode.
+
+	    prop_menu: new version to support morphing dialog boxes, ie,
+		an option in the dialog box can change its contents.
+		Added -snap option.
+
+	    box.tcl:   replaced several box menus with new consolidated box menu.
+
+	    FSBox.tcl, cursor.tcl:  Worked on busy cursors a little, trying
+		to get a busy in the file box while waiting.  Not done, left
+		previous code working.
+
+	    doc.tcl:  Added brackets around optional parameters to procs.
+		Added support for USAGE messages - if there is a USAGE
+		keyword in the description or documentation, then the doc
+		module will not append another USAGE description.
+		Grepped tcl files for usage messages, and made them all work.
+		In general, tcl procs that have args as a param need a USAGE,
+		but I did not do that yet.
+
+	    menu_bar.tcl: Added W hot-key for wire menu.
+		Made ruler a common-mode function.
+		Removed references to next.tcl.
+
+	    mode.tcl:  Removed erroneous "INTERNAL ERROR" message.
+
+	    ruler.tcl: Modified to use lay_line -tag, other changes so ruler
+		can be used from other sub-modes.  Added ruler_menu proc.
+		Fixed undo for ruler mode - there is nothing to undo!
+
+	    select.tcl:  Update box message with box size while dragging a box.
+
+	    utils.tcl:  Added struct/destruct functions, modified res and uusnap.
+
+	    view.tcl:  Added view_center proc, used it in wire.tcl.
+
+	    win.tcl:  Modified cursor_msg_update and box_msg_update so
+		sub-modes can modify these messages.
+		Changed global variables names to use STATUS global variable.
+
+	    wire.tcl: Pats new wiring tool, version 1.
+
+	    zoom.tcl: Use lay_line to display zoom box - lets user still see
+		current box while zooming.  Changed global variable name
+		from SAVE to ZOOM to fix bug.  Fixed undo for zoom mode -
+		nothing to undo!
+
+990603	tavrow	click on a polygon now selects it
+
+990604	tavrow	added save_selection and restore_selection
+
+990604	tavrow	improved cross probing with sue.  Don't have to run
+		in both max and sue.  Note: needs newest sue.
+
+990608	tavrow	added circle/donut drawing capability.  Moved
+		poly and circle commands to edit menu.
+
+990608	pat	Fixed wire.tcl to not create the little extra wire nubbin
+		at the wire vertex in some orientations when wire
+		width was not divisible by 2*res.
+
+990608	pat	Fixed bug in uusnap that caused it to seem to return 
+		different values for same input.
+
+990610	tavrow	fixed starting layer (tries to be either poly or metal)
+		got rid of uusnap on drawing circles
+
+990618	tavrow	changed _make_gcell_internal to take an origin -- used to
+		place at 0,0 and the caller moved to desired.  Caused
+		a problem if something was already at 0,0.
+
+990629	tavrow	added _BBOX_ property to gcells for stretching them.
+		see fet.maxg for an example.
+
+990713	pat	misc.tcl: Fixed bug in layt_box, added dummy
+		dbt_selectable_layers.  Lee then made it real.
+		win.tcl: Added drc control to bottom bar.
+		Put palette and visibility indicators in a new frame
+		(called leftsidebar) so we can put more stuff, like
+		a Mark Menu, on the left side of the display.
+		Worked on box/cursor status windows in the bottom bar
+		so you can click on them to change the box/cursor location.
+		Added status_enable so sub-modes can control
+		the box/cursor status windows.
+
+		Added tool_bar, aka Mark Menu, version 1.
+
+		Changed .maxrc file name to max.rc.
+		Added NEW_MAX function to differentiate max 2
+		from intermedate post-dac max release for demo
+		purposes.
+		
+		Added global font name variables to max.tcl
+		(LISTBOX_FONT and SMALL_FONT) making it easier
+		to change fonts.
+
+		Major rewrite of select.tcl: supports polygons,
+		select/deselect, added "Selection Probe" Menu.
+		Added code to use db_next_distance to correctly
+		select smallest chunks.  Note: this code disabled
+		pending fixes to db_next_distance.
+
+		Fixed grid bugs: visibility was not initialized properly,
+		and interaction between g and grid menu had a problem.
+
+		Fixed stretch bug: stretch using Control-Button-2
+		was leaving unselectable thingies.   (They were
+		in the wrong group.)  Unfortunately, the fix blows
+		away the undo stack because it calls save_selection.
+
+		Removed old hack to raise obscured windows,
+		and fixed it in cursor_wait so when the user sees a ?
+		they can mouse-click to raise the currently active window.
+
+		Made group names distinctive in all modules.
+
+		Checked in new wire tool version 3. (many changes)
+
+		Moved tech dependent LAYINFO stuff from stdcell.tcl
+		to tech files.
+
+		Made visibility indicators (dimNE, fastD, etc) optional,
+		controlled in View menu.
+
+		Can now setenv MAX_DEVELOPER 3 to test out the new
+		max 3 tcl code with the existing max C code.
+
+		In wire tool: Moved old Shift-mouse buttons to Control-
+		mouse buttons and made Shift-mouse buttons switch
+		to 45 mode just for the current wire segment.
+
+		Fixed bug in rewire command on Alt-Button-2 in
+		main mode in move.tcl:_select_wire.
+		Added Meta-Button-2 binding identical to Alt-Button-2
+		in main mode so people using openwin, which disables
+		the Alt-Button commands, can still use the command.
+
+
+990716	pat	Worked on doc.tcl:
+		Fixed documentation bug: cell_info and cell_in_memory
+		screwed up.  Problem was actually in doc.tcl, fixed.
+		Added "Save to File" to doc boxes.
+		Protect doc apropos search from things that begin with -.
+		Added "commands" button.
+
+		Merged Kathy's documentation changes.
+
+		Added "Save to File..." in File menu.
+
+		Added FSBoxNew that uses call_by_keyword.
+
+		Added more mode cursors for better visual
+		indication of current mode.
+
+		Changed box status window to say box: X x Y.
+
+		This version is last consistent version before
+		I rip out and replace selection.
+
+
+990805	pat	Many changes for max 3.0.
+
+		Some features were removed from the release but are
+		still in the code.  These are controlled by
+		the following global variables set in max0.tcl:
+		    MAX_MARK_MENU MAX_NEW_SELECT MAX_PROBE.
+
+990812	pat	Bug fixes to select stuff.
+		
+		Fixed some cursor warp problems where cursor was
+		warped off screen.
+
+		Added upper/lower options to gds read menu.
+
+		Added hack: to make MAX_MARK_MENU option work:
+		grep directly in the .maxrc file for it so it can
+		be set before win.tcl initialization.
+
+990816	pat	point select was not using dbt_selectable_layers
+
+		Fix sel_cell to use paths in gcell.tcl and select.tcl.
+
+		Use only db_chunk in select.tcl, so point select
+		now returns only one paint tile on each layer;
+		will fix later.
+
+		Flatten_cells now flattens hidden labels to make
+		flylines work.
+
+		Added dotted grids to grid menu.
+
+		Wire tool was deleting non-hidden labels
+		if connected to a flyline.
+
+		sel_net now selects via cells.
+
+		Removed (or commented out) features not to go out
+		in immediate release.
+
+		Added techinfo.tcl for new DRC_DATA tech data-base
+		format, but it is not used by anyone yet.
+
+990819	pat	Tried to make stdcell.tcl and wire.tcl work with
+		make_tech generated data-base.
+
+		Flyline editor works with hierarchical labels.
+		(uses tcl-coded hierarchy traverser for db_search labels)
+
+		Add "Save Configuration" and "Color Editor" menu options.
+
+		Made "l" (add_label) do something appropriate if
+		paint is already selected.
+
+990824	pat	max -dev 1 was not working.  Fixed.
+		
+		Updated grid pixel pitch.
+
+		Create gcells on grid.
+
+990825	pat	Fixed dup bug that shift-key did not align correctly.
+
+		Misc select bug fixes.
+
+		Made layout generator use "extend" keyword
+		instead of "enclose".
+
+990827	pat	wiring tool: dont delete non-hidden labels attached
+		to flylines.
+
+990828	pat	made wires snap to use design grid by default.
+		
+		init user design grid to something reasonable.
+
+		Fix duplicate bug: cells disappear if laid atop each other
+		(They can still disappear during a normal move.)
+
+990909	pat	Fix selection to work when cell names contain $
+		(bug reported by jdj)
+
+990921	pat	Add license check to stdcell generator.
+		Added laygen_init like mc_init.  Made both laygen_init
+		and mc_init print their banner only if a license exists.
+
+990927	pat	techinfo messages only come out once per command, now.
+
+		wiring mode: deselect segment when done wiring.
+
+		rewire mode was not using the design grid.
+
+		select_cursed_net and the default layer selected for
+		new labels now use the palette to determine selectable layers.
+
+		Fixed select bug when editing-in-place: when single-clicking
+		on paint, it would give you a bogus box which was the
+		result of db_chunk.
+
+		Fixed gcell edit-properties and gcell stretch of rotated gcells.
+
+		Preferences file save/restore fixed.
+		It is called <tech>.pref, lives in the tech directory,
+		and is auto-loaded on max invocation right before the
+		max.rc (uh, .maxrc) files.
+
+		techinfo vianame l1 l2 now returns the name of the via
+		between the two layers as expected by the via generator.
+		Its tricky for contacts.
+
+		flatten_cells now flattens ports, too.
+
+		restored list-box resize mechanism.
+
+		stdcell: use prb layer instead of bbox label for stdcell bbox.
+		That doesnt mean you can actually SEE the prb layer, except
+		by using the "Mask" menu, but its there.
+		Couldnt make the name programmable without changing all the
+		tech files, so unfortunately that will wait for the
+		next release.
+
+		dbt_touchingtypes fixed to use dbt_selectable
+
+		Fixed Shift-Button-2 move bug.
+
+		First cut at troff documentation output:
+		Open the Help->Text Commands window and Click the "Save To File"
+		in the bottom right of the window.
+
+		Added the vias back in to the layout generator.
+
+990928	pat	Made flatten_cells work on arrayed cells.
+		
+		Updated menu_bar help messages
+
+		Made "edit_push in_place" work again.
+
+990929	tavrow	added print_hyperplot and made the default print type.
+
+		Fixed generate_layers to not barf if no layers
+
+		rewrote listbox resize to move one char at a time
+
+990929	pat	Allow edit in place of gcells.
+
+990930	pat	Make grid update from preference file.
+		(This was done after the release.)
+
+991005	pat	Fix select_cursed_net (double-button-1) for case
+		where layer longname != shortname, which happens
+		when using old tech files.
+
+		Fix getting gcells during edit-in-place by using
+		db_instance instead of :getcell.
+		Files affected were wire.tcl and gcell.tcl
+
+991007	tavrow	wire.tcl:_wire_undraw_via wasn't undrawing gcells
+	        which caused wire tool to be very bad -- one line fix
+
+		gcell.tcl: edit gcell in edit in place was pretty broken
+		busted.  Fixed to do an edit_push (not in place)
+		if editing in place (and then pop afterwards)
+		so it worked.
+
+		stdcell.tcl: labels in layout generator were getting placed on
+		the prb layer instead of m1.  Thus they were all
+		tied together and mayhem resulted.  Fixed by moving
+		the prb layer creation to after the label creation.
+
+		cell.tcl: Enhancement -- made so the you can type 
+			max cell.
+		and it will work like if you typed
+			max cell
+		This always screwed me up (I know it is minor).
+
+		cell.tcl: Enhancement -- changed save_cell_tree to
+		take an optional argument to save cells even if not
+		modified.
+
+991008	tavrow	in sel_vias, changed sel_cell to sel_cell2 to handle
+		edit in place
+
+		disabled 45's in edit in place by changing _edit_drag
+
+991014	tavrow	changed message when a gcell is placed on an exact
+		copy of itself.
+
+	tavrow	fixed look of gds format header in format_gds_layers.
+		also changed names to be L<layer_num>.
+
+991018	tavrow	changed _techinfo_init to create ROUTE(order) and 
+		ROUTE(default_layer) for wire tool automagically.
+
+991020	mha	update idletasks so filebox menu goes away while max thinks
+
+991020	tavrow	no cell given to cell load no longer barfs
+
+991022	mha	added an update after win_new to get rid of duplicate draw
+
+991025	tavrow	put temp layers in the Mask menu into a cascaded tearoff menu
+
+991104	pat	Fixed focus bugs in label command and navigator window.
+		Removed sel_clear from gcell_load.
+
+991105	tavrow	added clear_annotations function to clear feedback and
+		lay_line, lay_text.  Added when changing cells.
+
+991108	tavrow	added array_cell command

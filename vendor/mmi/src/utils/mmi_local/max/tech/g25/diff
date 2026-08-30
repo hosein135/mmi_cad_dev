@@ -1,0 +1,82 @@
+0a1,2
+> /* TODO Add DRC and output gds of V4, M5 */
+> 
+75a78,79
+>   v4	        /* via from m4 to m5 */
+>   m5
+79,80c83,84
+<   esd
+<   pada
+---
+> /*  esd */
+> /*  pada */
+113a118,121
+>   v4	m5contact,v4
+> 
+>   m5	metal5,m5
+> 
+118,119c126,127
+<   esd   esd 
+<   pada  pada
+---
+> /*  esd   esd */
+> /*  pada  pada */
+162a171,173
+>     v4	39
+>     v4	32	 /* contact X */
+> 
+168a180,181
+>     m5  15
+>     m5  21
+181,182c194,195
+<     esd   2
+<     pada  3
+---
+> /*    esd   2 */
+> /*    pada  3 */
+230a244
+>     v4		m4,m5
+887d900
+< 
+899c912,914
+< /*  iname 40 0 	*/	/* instance names here (CALMA only) */
+---
+>   iname propattr 2      /* instance names given on property attribute 2 
+> 	                 * (in gds SREF's)
+> 	                 */
+969a985,990
+>   layer v4 V4
+>      labels V4
+> 
+>   layer m5 M5
+>     labels M5,M5TXT
+> 
+994a1016,1017
+>   calma V4       32	*
+>   calma M5       33	*
+999,1001c1022,1024
+<   /* Note: pat changed from 58 and 59.
+<    * Dont really know whats right.
+<    */
+---
+> /*  calma M4TXT    58   	*
+>   calma M5TXT    59   	*
+> */
+1541c1564
+< exact_overlap v0,v1,v2,v3
+---
+> exact_overlap v0,v1,v2,v3,v4
+1561c1584,1585
+<   resist m4 112 /* at 105 Celsius */
+---
+>   resist m4 114 /* at 105 Celsius */
+>   resist m5 112 /* at 105 Celsius */
+1571a1596
+>    * Capacitance in atto-farads and lambdas.
+1590a1616,1621
+>   /* Pats note: these m5 values are from an older g25-m5 tech file
+>    * and are probably out of date.
+>    */
+>   areacap m5 0.029
+>   perimc m5 space/m5 1.4
+> 

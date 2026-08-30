@@ -1,0 +1,20 @@
+# SUE version MMI_SUE4.3.6
+
+proc ICON_resistor args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {resistance 1K} {TC1 0} {TC2 0} {M {}}}
+  icon_term -type inout -origin {0 40} -name t1
+  icon_term -type inout -origin {0 -40} -name t2
+  icon_property -origin {10 -20} -label {$resistance}
+  icon_property -origin {-140 240} -type fixed -name spice -text {[unique_name R $name] $t1 $t2 $resistance TC1=$TC1 TC2=$TC2}
+  icon_property -origin {-140 270} -type fixed -name sim -text {r $t1 $t2 [parse_pp_number $resistance]}
+  icon_property -origin {-140 300} -type fixed -name verilog -text {assign $t1 = $t2\;}
+  icon_line 0 -40 0 -30 -10 -20 10 -10 -10 0 10 10 -10 20 0 30 0 40
+  icon_property -origin {10 0} -text {[if {$TC1 != 0} {format "TC1=%g" $TC1}]}
+  icon_property -origin {10 20} -text {[if {$TC2 != 0} {format "TC2=%g" $TC2}]}
+  icon_property -origin {-120 90} -type user -name name
+  icon_property -origin {-120 110} -type user -name resistance -default 1K
+  icon_property -origin {-120 130} -type user -name TC1 -default 0
+  icon_property -origin {-120 150} -type user -name TC2 -default 0
+  icon_property -origin {-120 170} -type user -name M
+}
+

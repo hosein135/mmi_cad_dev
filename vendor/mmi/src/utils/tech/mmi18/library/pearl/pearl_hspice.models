@@ -1,0 +1,30 @@
+* Header file for TSMC 2.5V 0.25 um logic process
+
+* used in source/drain area/perimeter calculation
+.param sdd        =  0.68
+
+.param  arean(w,sdd) = '(w*sdd*1p)'
+.param  areap(w,sdd) = '(w*sdd*1p)'
+.param  perin(w,sdd) = '(2u*(w+sdd))'
+.param  perip(w,sdd) = '(2u*(w+sdd))'
+
+.param ln_min   =  0.24u
+.param lp_min   =  0.24u
+
+*** Low voltage, High temperature ***
+
+.param gnd	  =  0.0
+.param vdd	  =  2.25
+
+VDD vdd 0 vdd
+.TEMP 105
+
+.GLOBAL vdd gnd
+
+**################################################
+* Corners are TT, SS, FF, SF, FS
+.lib '/proj/tech/mmi25/spice/tsmc25.l' TT
+.lib '/proj/tech/mmi25/spice/tsmc25.l' DIO
+**################################################
+
+*** end header ***

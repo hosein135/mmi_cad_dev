@@ -1,0 +1,461 @@
+# This fet version works with the layout generator of 3/23/00
+# Example generator cell (gcell) to draw fingered nfets and pfets.
+# 
+# 4/3/01: Make metal over ct assymetric; add "contact_style" property to control it.
+# If you specify one of the new contact_styles, it also reduces the metal drawn
+# to the minimum allowable.
+
+# This procedure draws the fet given a list of properties
+
+proc gcell_make_fet {properties} -desc {
+  gcell procedure to make a fet
+} {
+
+  # The gcell is created in its own namespace.
+  # The variable statement creates a "global" type variable
+  # but only in the current namespace, so it cannot conflict
+  # with other global variables.
+
+  # get values out of properties list
+  set type [get_assoc type $properties]
+  set width [get_assoc width $properties]
+  set length [get_assoc length $properties]
+  set fingers [get_assoc fingers $properties]
+  set contacts [get_assoc contacts $properties]
+  set left_contacts [get_assoc left_contacts $properties]
+  set right_contacts [get_assoc right_contacts $properties]
+  set contact_style [get_assoc contact_style $properties]
+
+  set mres [res -mask]
+
+  # fet gate is vertical.  Origin is lower left corner of gate
+
+  # what layers make up this fet?
+  setl {poly diff} [techinfo device $type]
+  if {$poly == ""} {
+    puts "Aborting, Illegal fet type $type."
+    return
+  }
+  set contact [techinfo above $poly]
+  set metal [techinfo above $contact]
+
+  # get some key params
+  # why are these max here? - pat
+  set poly_ext_gate [max [techinfo extend $poly $type opt] $mres]
+  set diff_ext_gate [max [techinfo extend $diff $type opt] $mres]
+  set gate_space [max [techinfo spacing $type "" opt] \
+			[techinfo spacing $poly "" opt] $mres]
+  set diff_enc_contact [max [techinfo enclose $diff $contact opt] $mres]
+  set cw [techinfo width $contact]
+
+  # Determine if it is a dog-bone fet.
+  # Min_width is min before we have to create a dog-bone.
+  # In this case, we will center the diffusion, for no good reason.
+  # Set dy1 and dy2 to top and bottom of gate.
+  set min_width [uusnap -mask [expr 2.0 * $diff_enc_contact + $cw]]
+  set dy1 0
+  if {[approx $width < $min_width]} {
+    set dy1 [uusnap -mask [expr ($min_width - $width)/2.0]]
+  }
+  set dy2 [expr $dy1 + $width]
+
+  # first, figure out the left side of the fet
+  if {[lsearch "both left all" $contacts] != -1} {
+    # put in a contact
+    set x [expr 0 - [_gcell_fet_contact 0 $width right $type $poly $diff $contact $metal $left_contacts $contact_style 0]]
+    set minx $x
+    set x [_gcell_fet_contact $x $width right $type $poly $diff $contact $metal $left_contacts $contact_style]
+  } else {
+    # no contact
+    set minx -$diff_ext_gate
+    set x 0
+  }
+
+  # put a hidden label on the poly (only on the first one)
+  set xmp [uusnap -mask [expr $x + $length / 2.0]]
+  set ymp [uusnap -mask [expr $poly_ext_gate / 2.0]]
+  gcell_label gs hidden $poly $xmp -$ymp
+  gcell_label gn hidden $poly $xmp [expr $width + $ymp]
+
+  # now draw the fingers one at a time
+  for {set i 1} {$i <= $fingers} {incr i} {
+
+    # draw the poly
+    gcell_paint $poly $x [expr $dy1 - $poly_ext_gate] \
+	[expr $x + $length] [expr $dy2 + $poly_ext_gate]
+
+    set x [expr $x + $length]
+
+    # should we put in a contact? and what type?
+    if {$i != $fingers && $contacts == "all"} {
+      # put in an intermediate contact
+      set x [_gcell_fet_contact $x $width both $type $poly $diff $contact $metal "" $contact_style]
+      
+    } elseif {$i == $fingers && [lsearch "both right all" $contacts] != -1} {
+      # put in the final contact
+      set x [_gcell_fet_contact $x $width left $type $poly $diff $contact $metal $right_contacts $contact_style]
+      
+    } else {
+      # no contact put in minimum
+      if {$i == $fingers} {
+	# last one
+	set x [expr $x + $diff_ext_gate]
+      } else {
+	# min poly space for gates
+	set x [expr $x + $gate_space]
+      }
+    }
+  }
+
+  # paint the diffusion
+  gcell_paint $diff $minx $dy1 $x $dy2
+
+  # put in hidden labels on left and right
+  set ym [uusnap -mask [expr $width / 2.0]]
+  set xm [uusnap -mask [expr $diff_enc_contact + $cw / 2.0]]
+  if {[lsearch "both left all" $contacts] != -1} {
+    # place in center of contact
+    gcell_label s hidden $diff [expr $minx + $xm] $ym
+  } else {
+    # put at edge
+    gcell_label s hidden $diff $minx $ym
+  }
+  if {[lsearch "both right all" $contacts] != -1} {
+    # place in center of contact
+    gcell_label d hidden $diff [expr $x - $xm] $ym
+  } else {
+    # put at edge
+    gcell_label d hidden $diff $x $ym
+  }
+
+
+  # the return string will show up when the gcell is selected
+  if {$fingers > 1} {
+    return "$fingers X $width/$length"
+  } else {
+    return "$width/$length"
+  }
+}
+
+
+# called by above proc.
+
+proc _gcell_fet_contact {x width type gate poly diff contact metal cnums contact_style {paint 1}} {
+  # The <gate> is the direction of the gate: "right" for a left contact,
+  # "left" for a right contact, or "both", for interior contacts.
+
+  set mres [res -mask]
+  set contact_space_to_gate [max [techinfo space_to $contact $gate] $mres]
+  set diff_enc_contact [max [techinfo enclose $diff $contact opt] $mres]
+  if {$contact_style == "" || $contact_style == "normal"} {
+    # Ask for the symetric contact overlap rule, and use in both directions.
+    set m1_enc_ct_x [techinfo enclose $metal $contact]
+    set m1_enc_ct_y $m1_enc_ct_x
+  } else {
+    # Ask for the assymetric contact overlap rule.
+    setl {m1_enc_ct_y m1_enc_ct_x} [techinfo enclose $metal $contact all]
+    if {$m1_enc_ct_x == ""} {set m1_enc_ct_x $m1_enc_ct_y}
+    if {($contact_style == "minimum_y_overlap" && $m1_enc_ct_x < $m1_enc_ct_y) || \
+        ($contact_style == "minimum_x_overlap" && $m1_enc_ct_x > $m1_enc_ct_y) } {
+      # Swap x and y.
+      set tmpe $m1_enc_ct_x
+      set m1_enc_ct_x $m1_enc_ct_y
+      set m1_enc_ct_y $tmpe
+    }
+  }
+  set cw [techinfo width $contact]
+
+  # Min fet width before having to create dog-bone.
+  set min_width [uusnap -mask [expr 2.0 * $diff_enc_contact + $cw]]
+  if { [approx $width < $min_width] } {
+    set dog_bone_sp [expr $diff_enc_contact + [techinfo sep $diff $poly]]
+    if { $dog_bone_sp > $contact_space_to_gate } {
+       set contact_space_to_gate $dog_bone_sp
+    }
+    set fat_width $min_width
+  } else {
+    set fat_width $width
+  }
+
+  switch $type {
+    left - both {
+      set x [expr $x + $contact_space_to_gate]
+    }
+    default {
+      set x [expr $x + $diff_enc_contact]
+    }
+  }
+
+  # If paint, actually paint it.  Otherwise, just compute and return size.
+  if {$paint} {
+    set cs [techinfo spacing $contact]
+
+    # Default contact y extent.
+    set cy1 $diff_enc_contact
+    set cy2 [expr $fat_width - $diff_enc_contact]
+
+    # Paint the diffusion around this row of contacts.
+    set dx1 [expr $x - $diff_enc_contact]
+    set dx2 [expr $dx1 + $cw + 2.0*$diff_enc_contact]
+    gcell_paint $diff $dx1 0 $dx2 $fat_width
+
+    # The cnums optionally specifies which contacts to provide.
+    set align_type ""
+    if { $cnums != "" } {
+      # Allow either comma or space to separate individual contact numbers.
+      regsub {,} $cnums " " cnums
+      # We dont do any error checking on cnums: assume that user
+      # specified this correctly.
+      foreach spec $cnums {
+	if {[string match {+*} $spec]} {
+	  # Eliminate $spec contacts from the bottom.
+	  set cy1 [expr $cy1 + ($spec * ($cw + $cs))]
+	  append align_type top
+	} elseif {[string match {-*} $spec]} {
+	  # Eliminate - $spec contacts from the top.
+	  set cy2 [expr $cy2 + ($spec * ($cw + $cs))]
+	  append align_type bottom
+	} else {
+	  set align_type "individually_specified"
+	  set contactn($spec) 1
+	}
+      }
+    }
+
+    # number of contacts that fit here
+    set num_ct [expr int( ($cy2 - $cy1 + $cs + [res]) / \
+			      ($cw + $cs) )]
+
+    # This is the end spacing so they center nicely
+    set offset [uusnap -floor -mask [expr ($cy2 - $cy1 - $num_ct*$cw - \
+      ($num_ct - 1)*$cs ) / 2.0 ]]
+
+    # start from bottom
+    switch $align_type {
+      "individually_specified" {
+	# Center the contacts, but draw no more metal than needed.
+	set cy1 [expr $cy1 + $offset]
+	set cy2 [expr $cy1 + $cw + ($num_ct - 1) * ($cw + $cs)]
+	set y $cy1
+      }
+      "top" {
+	set cy1 [expr $cy1 + 2 * $offset]
+	set y $cy1
+      }
+      "bottom" {
+	set cy2 [expr $cy1 + $cw + ($num_ct - 1) * ($cw + $cs)]
+	set y $cy1
+      }
+      default {
+	# No contact numbers were specified.
+	# To be backward compatible with originally released fet gcell,
+	# we must draw the m1 all the way to the edge of the fet, ie,
+	# there is more m1 than needed because m1 will overlap the contacts
+	# on the end by more than minimum.  This is not necessarily bad,
+	# because we want to make sure any wire drawn to the edge
+	# of the fet will actually touch the m1 we are drawing.
+	# 4/2/01 update: If user specifies a contact_style other
+	# than "normal" we do not have to be backward compatible,
+	# so draw only as much metal as needed.
+	if {$contact_style == "" || $contact_style == "normal"} {
+	  # Backward compatible
+	  set y [expr $cy1 + $offset]
+	} else {
+	  set cy1 [expr $cy1 + $offset]
+	  set cy2 [expr $cy1 + $cw + ($num_ct - 1) * ($cw + $cs)]
+	  set y $cy1
+	}
+      }
+    }
+
+
+    if { $align_type == "individually_specified" } {
+      set metal_y1 ""
+      for {set i 1} {$i <= $num_ct} {incr i} {
+	if {[info exists contactn($i)]} {
+	  # Draw this contact.
+	  gcell_paint $contact $x $y [expr $x + $cw] [expr $y + $cw]
+	  # Draw the metal.  If this contact is adjacent to the previous
+	  # contact, we have to extend the previous metal to avoid
+	  # a m1 min sep DRC error.
+	  if { $metal_y1 == "" } {
+	    set metal_y1 [expr $y - $m1_enc_ct_y]
+	  }
+	  set metal_y2 [expr $y + $cw + $m1_enc_ct_y]
+	  gcell_paint $metal \
+	      [expr $x - $m1_enc_ct_x] $metal_y1 \
+	      [expr $x + $cw + $m1_enc_ct_x] $metal_y2
+	  set metal_y1 $metal_y2  ;# Next contact starts where this one ended.
+	} else {
+	  set metal_y1 ""
+	}
+	set y [expr $y + $cw + $cs]
+      }
+    } else {
+
+      for {set i 0} {$i < $num_ct} {incr i} {
+	gcell_paint $contact $x $y [expr $x + $cw] [expr $y + $cw]
+	set y [expr $y + $cw + $cs]
+      }
+
+      gcell_paint $metal \
+	[expr $x - $m1_enc_ct_x] \
+	[expr $cy1 - $m1_enc_ct_y] \
+	[expr $x + $cw + $m1_enc_ct_x] \
+	[expr $cy2 + $m1_enc_ct_y]
+      }
+  }
+
+  switch $type {
+    right - both {
+      set x [expr $x + $cw + $contact_space_to_gate]
+    }
+    default {
+      set x [expr $x + $cw + $diff_enc_contact]
+    }
+  }
+
+  return $x
+}
+
+
+# Fix up the props used to make a fet gcell.  Allow fet width only to stretch.
+
+proc gcell_make_props_fet {prop_list} {
+
+  # get layers and key parameters
+  set type [get_assoc type $prop_list]
+  setl {poly diff} [techinfo device $type]
+  if {$poly == ""} {
+    # illegal type
+    return $prop_list
+  }
+  set contact [techinfo above $poly]
+  set mres [res -mask]
+  set diff_enc_contact [max [techinfo enclose $diff $contact opt] $mres]
+
+  # 10/5: dog-bone fets allow min width to be less:
+  # set minwidth [uusnap -ceil -mask [expr 2.0 * $diff_enc_contact + [techinfo width $contact]]]
+  set minwidth [uusnap -ceil -mask [techinfo width $diff]]
+
+  if {[set bbox [get_assoc _BBOX_  $prop_list]] != ""} {
+    # compute width from bbox
+    set prop_list [rm_assoc _BBOX_ $prop_list]
+    set prop_list [rm_assoc width $prop_list]
+
+    setl {x1 y1 x2 y2} $bbox
+    set poly_ext_gate [max [techinfo extend $poly $type opt] $mres]
+    set newwidth [expr $y2 - $y1 - 2.0 * $poly_ext_gate]
+    lappend prop_list [list width [uusnap -mask [max $newwidth $minwidth]]]
+
+  } elseif {[set newwidth [get_assoc width $prop_list]] != ""} {
+    # Check width validity.
+    set prop_list [rm_assoc width $prop_list]
+    if { $newwidth < $minwidth } {
+	puts "warning: specified gcell fet width: $newwidth is less than minimum width computed from tech file: $minwidth"
+    }
+    lappend prop_list [list width [uusnap -mask [max $newwidth $minwidth]]]
+  }
+
+  return $prop_list
+}
+
+
+
+# now define it and give default arguments
+
+proc gcell_init_fet {} {
+    set fets [techinfo devices "" "" opt]
+    # If techinfo devices does not exist, old techinfo used to return "0".
+    # Now it returns "".
+    if {$fets != "0" && $fets != ""} {
+      # there are some devices in this technology
+      set default_fet [lindex $fets 0]
+
+      set properties ""
+      lappend properties [list type $default_fet -choice $fets \
+	-help {specifies the type of fet that will be produced. \
+	The known types of fets that this generator can create are\
+	specified by the "device" statements in the current technology file.}]
+
+      #TODO: should default to a user specified variable?
+      lappend properties [list width 1 -number -incr 0.1 -help {\
+	the fet width.  This fet generator has a minimum fet width.\
+	of one contact width}]
+
+      # compute minimum width channel length from either the device width
+      # or the poly width, whichever is greater
+      set min_length \
+	[max [techinfo width $default_fet "" opt] \
+	     [techinfo width [lindex [techinfo device $default_fet] 0] "" opt]]
+      lappend properties "length $min_length -number -incr [res] -snap 0.1"
+
+      lappend properties {fingers 1 -number 1 -help {\
+	the number of fet gates.  If fingers > 1, a stacked fet is created.}}
+      lappend properties [list contacts both -choice {both left right all none}\
+	-help {specifies whether contacts should be placed on the "left" or\
+	"right" sides of the fet, or "both".  If "contacts" is "all" and\
+	"fingers" > 1, then a stacked fet will be created with contacts\
+	between all the gates.}]
+
+      # These specify the exact location of the metal for the
+      # source/drain contacts.  For this purpose, the source is defined
+      # as being on the left, drain on the right.
+      # These are used by the layout generator.
+      # The -hide prevents it from appearing in the popup menu.
+      lappend properties [list left_contacts {} -entry -help {\
+	specifies contact numbers for left side contact, if any.}]
+      lappend properties [list right_contacts {} -entry -help {\
+	specifies contact numbers for right side contact, if any.\
+	By default, fets are fully contacted.\
+	The "left/right_contacts" properties can be either a list of\
+	contact numbers to draw, where 1 is the bottom-most contact;\
+	or +n to eliminate n contacts from the bottom of the fet,\
+	or -n to eliminate n contacts from the top of the fet, or both.\
+	For example, assume that the fet\
+	has a "width" that is wide enough for four contacts. \
+	Specifying right_contacts as "1 4" will eliminate the\
+	middle two contacts on the right hand side of the fet.\
+	Or, specifying "+2 -1" will eliminate two\
+	contacts from the bottom and one contact from the top of the\
+	right hand side.\
+	}]
+
+      lappend properties [list contact_style normal \
+	-choice {normal minimum_x_overlap minimum_y_overlap} -help {\
+	if the technology file supports metal enclose contact rule that\
+	is assymetric, ie, that allows the enclosure to be smaller in\
+	one direction than the other,\
+	this option specifies how the metal over the contact will be drawn.\
+	If "normal", the metal enclosure of contact\
+	will be the same on all sides.  If "minimum_x_overlap" or "minimum_y_overlap",\
+	the contact will be drawn to minimize the metal in the direction\
+	corresponding to the x or y direction of the fet in standard orientation.}]
+
+      define_gcell fet $properties
+
+
+      # If it is a newer version of max, install short-cuts
+      # for each type of fet.
+      global MAX_VERSION
+      regexp {^([0-9]+\.[0-9]+)\.([0-9]+)} $MAX_VERSION junk rel_major rel_minor 
+      if {0 && $rel_major >= 3.2 && $rel_minor >= 15 } {
+	# Create generic procs to build the fets.
+	# This was not allowed in older versions of max,
+	# because all gcell generators inhabited a single global namespace.
+	proc gcell_make {props} { gcell_make_fet $props }
+	proc gcell_make_props {props} { gcell_make_props_fet $props }
+
+	# Define short-cuts to fets.
+	foreach fet $fets {
+	  define_gcell [string toupper $fet] [lreplace $properties 0 0 \
+	    [list type $fet -choice $fets -hide]]
+	}
+      }
+    } else {
+	msg "warning: fet.maxg: no devices defined in tech file, so no fet generators created\n"
+    }
+}
+
+# Do it now
+gcell_init_fet

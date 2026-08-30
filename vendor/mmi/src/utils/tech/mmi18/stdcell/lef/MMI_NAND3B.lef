@@ -1,0 +1,87 @@
+MACRO MMI_NAND3B
+	CLASS CORE ;
+	FOREIGN MMI_NAND3B 0 0 ;
+	SIZE 4.44 BY 7.4 ;
+	SYMMETRY X Y ;
+	SITE CORE1 ;
+	PIN out
+		DIRECTION output ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.85 4.41 1.19 5.94 ;
+			LAYER M1 ;
+			RECT 2.29 4.41 2.63 5.94 ;
+			LAYER M1 ;
+			RECT 0.85 4.18 2.705 4.41 ;
+			LAYER M1 ;
+			RECT 2.475 2.785 2.705 4.18 ;
+			LAYER M1 ;
+			RECT 0.875 2.445 3.555 2.785 ;
+		END
+		AntennaDiffArea 3.2016 ;
+	END out
+	PIN in1
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 0.885 3.555 1.225 3.81 ;
+			LAYER M1 ;
+			RECT 0.885 3.105 1.335 3.555 ;
+		END
+		AntennaGateArea 0.828 ;
+	END in1
+	PIN GND
+		DIRECTION inout ;
+		USE GROUND ;
+		PORT
+			LAYER M1 ;
+			RECT 0.875 0.865 3.555 1.205 ;
+			LAYER M1 ;
+			RECT 1.72 0.5 2.72 0.865 ;
+			LAYER M1 ;
+			RECT 0 -0.5 4.44 0.5 ;
+		END
+	END GND
+	PIN in2
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 3.7 3.5 4.295 3.555 ;
+			LAYER M1 ;
+			RECT 3.5 3.16 4.295 3.5 ;
+			LAYER M1 ;
+			RECT 3.7 3.105 4.295 3.16 ;
+		END
+		AntennaGateArea 0.828 ;
+	END in2
+	PIN VDD
+		DIRECTION inout ;
+		USE POWER ;
+		PORT
+			LAYER M1 ;
+			RECT 0 6.9 4.44 7.9 ;
+			LAYER M1 ;
+			RECT 1.57 4.66 1.91 6.9 ;
+			LAYER M1 ;
+			RECT 3.01 4.18 3.35 6.9 ;
+		END
+	END VDD
+	PIN in0
+		DIRECTION input ;
+		USE SIGNAL ;
+		PORT
+			LAYER M1 ;
+			RECT 1.625 3.5 2.075 3.555 ;
+			LAYER M1 ;
+			RECT 1.625 3.16 2.15 3.5 ;
+			LAYER M1 ;
+			RECT 1.625 3.105 2.075 3.16 ;
+		END
+		AntennaGateArea 0.828 ;
+	END in0
+	OBS
+	END
+END MMI_NAND3B

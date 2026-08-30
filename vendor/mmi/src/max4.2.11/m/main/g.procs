@@ -1,0 +1,417 @@
+DebugAddClient --
+-----------------
+
+Add a client to the debugging module.
+The argument 'name' is used to identify the client, and the
+argument 'maxflags' indicates the maximum number of flags
+that will be added for that client.
+
+Results:
+Returns a word of ClientData that identifies the
+client just added.  This word must be passed to
+DebugAddFlag, DebugSet(), or DebugShow() to identify
+the client being referred to.
+
+Side effects:
+Updates the list of known debugging clients.
+
+DebugAddFlag --
+---------------
+
+Add a debugging flag for a particular client.
+This flag can be set when DebugSet() is called with 'clientID',
+and will appear in the display of DebugShow().
+
+WARNING:
+The order in which flags appear for purposes of setting them
+with DebugSet(), and when being displayed with DebugShow(),
+will be the same as the order in which they are passed to
+DebugAddFlag().  To make LookupStruct() work best for DebugSet(),
+the flag names should be ordered monotonically.
+
+Results:
+Returns the index of the debugging flag in the array
+debugFlags[].
+
+Side effects:
+Updates the array debugFlags[].
+
+DebugShow --
+------------
+
+Show all the debugging flags and their values for a particular
+client.
+
+Results:
+None.
+
+Side effects:
+Writes to the terminal.
+
+DebugSet --
+-----------
+
+Allow debugging flags to be set or cleared for the client 'clientID'.
+The argument 'argv' contains an array of 'argc' string pointers,
+each of which is the name of a flag that will be set to 'value'
+(either TRUE or FALSE).
+
+Results:
+None.
+
+Side effects:
+Updates the debugging flags specified in (argc, argv).
+Will complain about any unrecognized flag names.
+
+DebugUnitsTclInit --
+--------------------
+
+Initialize debug tcl stuff
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+
+HistCreate --
+-------------
+
+Create a histogram.
+
+Results:
+None.
+
+Side effects:
+Allocates buckets for a histogram of the given size, plus coverage of
+lower and upper ranges.  Links the bucket onto a list.
+
+HistAdd --
+----------
+
+Add an entry into the named histogram.
+
+Results:
+None.
+
+Side effects:
+Searches the histogram list for the named histogram.  Adds one to the
+appropriate range in the histogram.
+
+HistPrint --
+------------
+
+Print all histograms to the named file.
+
+Results:
+None.
+
+Side effects:
+Creates a file.
+
+MsgCmdBegin
+-----------
+
+Called at beginning of tcl commands to push error context stack
+
+NOTE:  Don't call directly, use CMD_BEGIN() macro.
+
+MsgCmdEnd
+---------
+
+Called just prior to return from tcl commands.
+
+NOTE:  Don't call directly, use CMD_RETURN() macro instead.
+
+Results:
+Appropriate return code for tcl command.
+
+Side Effects:
+Pops error stack.
+If MsgErrorF called during execution, sets tcl return value to 
+error text.
+
+MsgInfoV:
+---------
+
+MsgInfoF() with var args roled into single arg.
+Called by var arg funcs to invoke MsgInfoF internally.
+See MsgInfoF below.
+
+Results:
+None.
+
+Side effects:
+See MsgInfoF
+
+MsgInfoF:
+---------
+
+Args like printf, for info messages.
+
+"Info" messages are messages during normal exectuion.
+
+Info messages go to standard out by default.
+But they can be diverted (see msg_catch and msg_map).
+
+Results:
+None.
+
+Side effects:
+See above.
+
+MsgWarnV:
+---------
+
+MsgWarnF() with var args roled into single arg.
+Called by var arg funcs to invoke MsgInfoF internally.
+See MsgInfoF below.
+
+Results:
+None.
+
+Side effects:
+See MsgWarnF
+
+MsgWarnF:
+---------
+
+Args like printf, for warning messages.
+
+"warning" are used to indicate abnormal events, when command exection is not aborted.
+
+Warn messages go to standard error by default.
+But they can be diverted (see msg_catch and msg_map).
+
+Results:
+None.
+
+Side effects:
+See above.
+
+MsgErrorV:
+----------
+
+MsgErrorF() with var args roled into single arg.
+Called by var arg funcs to invoke MsgErrorF internally.
+See MsgErrorF below.
+
+Results:
+None.
+
+Side effects:
+See MsgErrorF
+
+MsgErrorF:
+----------
+
+Args like printf, for error messages.
+Error messages inside commands indicate command is aborting.
+
+INSIDE COMMAND, collects error messages in Dynamic string.
+On command completion (txCmdEnd() called) error messages copied to
+tcl result, and command returns TCL_ERROR.
+
+NOT INSIDE COMMAND messages sent to standard error.
+
+Results:
+None.
+
+Side effects:
+See above.
+
+MsgTclInit --
+-------------
+
+Initialize tcl commands for this module.
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+
+MaxAbort --
+-----------
+
+Handle fatal errors.
+
+Args give error message.  Like printf, first arg is format, subsequent args
+to fill in "%" escapes in format.
+
+Results:
+None.
+
+Side effects:
+Backup modified cells, send error message to stderr, and abort.
+(abort normally causes coredump.)
+
+MnDocCreateCommand --
+---------------------
+
+Register Tcl Command for Max, and update documentation database
+
+MnDocVar --
+-----------
+
+Document a Tcl Variable.
+
+Used to document Tcl variables that already exist.
+
+MnDocLinkVar --
+---------------
+
+Link C and Tcl Variable, and update documentation database.
+
+MnDocSetVar --
+--------------
+
+Set (initial) Tcl Variable, and document it. 
+
+MnDocSetVar2 --
+---------------
+
+Set (initial) Tcl Variable, and document it. 
+
+SigInit:
+--------
+
+Set up signal handling for all signals.
+
+Results:
+None.
+
+Side effects:
+Signal handling is set up.
+
+MnTclInit --
+------------
+
+Set linked tcl string variable.  
+(free old value, and copy new value to freshly malloced block).
+
+Results:
+None.
+
+NOTE:  Critical to use system malloc() and free() here, for 
+compatibility with tcl.
+
+MnTechError --
+--------------
+
+This procedure is called to print out error messages during
+Tech file reading.  (Gives filename, section, and line number)
+
+Results:
+None.
+
+Side effects:
+An error message is printed.
+
+TechLoad --
+-----------
+
+Read in a tech file.
+
+Results:
+None.
+
+Side effects:
+Tech file opened and read.
+"Client" procedures called to process various lines in tech file.
+
+MainTermInit --
+---------------
+
+Setup processing of command input from controlling terminal.
+
+Results:
+None.
+
+Side effects:
+stdin filehandler registered, prompt issued.
+
+MnTicService(void)
+------------------
+
+Called at intervals (from MnTic) to perform periodically
+required operations (such as reading from the X event socket
+so the socket doesn't time out).
+
+MnTypicalWireWidth --
+---------------------
+
+Return estimate of typical wire width in current technology 
+(in database units).
+
+Results:
+estimate of typical wire width in internal units.
+
+Side effects:
+None.
+
+UnitsValidS --
+--------------
+
+Check to see if string is valid dimension.
+
+Results:
+TRUE if string is OK, else FALSE
+
+UnitsI2S --
+-----------
+
+Convert integer in internal units, to user unit string.
+
+Results:
+Pointer to string holding value in user units.
+
+Side effects:
+Modifies unitsBuf to appropriate value.
+
+UnitsS2I --
+-----------
+
+Convert user unit string to integer in internal units.
+
+Results:
+integer in internal units
+
+UnitsValidSF --
+---------------
+
+Check to see if string is valid float.
+
+Results:
+TRUE if string is OK, else FALSE
+
+UnitsF2S --
+-----------
+
+Convert float in internal units, to user unit string.
+
+Results:
+Pointer to string holding value in user units.
+
+Side effects:
+Modifies unitsBuf to appropriate value.
+
+UnitsS2F --
+-----------
+
+Convert user unit string to float in internal units.
+
+Results:
+integer in internal units
+
+MnUnitsTclInit --
+-----------------
+
+Initialize units tcl command.
+
+Results:
+None.
+
+Side effects:
+Registers command(s) with tcl.
+

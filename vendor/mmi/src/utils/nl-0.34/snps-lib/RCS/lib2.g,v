@@ -1,0 +1,183 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2001.10.19.22.43.33;	author jka;	state Exp;
+branches;
+next	;
+
+
+desc
+@Another experimental ANTLR parser for .lib files
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#header <<
+#include "charptr.h"
+#define AST_FIELDS   int token; char *text;
+#define zzcr_ast(tr, attr, tok, txt) { cr_ast (tr, attr, tok, txt); }
+#define zzmk_ast(tr, tok, txt)	     (AST *) mk_ast (tr, tok, txt)
+#define zzcr_attr(attr, tok, txt)
+>>
+#parser "lib"
+
+#token			"[\ \t]+"	<< zzskip (); >>
+#token			"\n"		<< zzskip ();
+					   zzline++;
+					>>
+#token			"\\\n"		<< zzskip ();
+					   zzline++;
+					>>
+#token			"\""		<< zzskip ();
+					   zzmode (GET_STRING);
+					>>
+#token			"/*"		<< zzskip ();
+					   zzmode (GET_COMMENT);
+					>>
+
+#token FLOAT			"[0-9]+{.{[0-9]+}}"
+
+#token ADD			"\+"
+#token SUB			"\-"
+#token MUL			"\*"
+#token DIV			"/"
+#token OPEN			"\("
+#token CLOSE			"\)"
+
+#token ID			"[A-Za-z_][A-Za-z0-9_]*"
+
+
+#lexclass LOG_STRING
+
+#token		"[\ \t]+"	<< zzskip (); >>
+#token		"\n"		<< zzskip ();
+				   zzline++;
+				>>
+#token		"\""		<< zzskip ();
+				   zzmode (LOG_EXPR);
+				>>
+
+
+#lexclass LOG_EXPR
+
+#token		"[\ \t]+"	<< zzskip (); >>
+#token		"\n"		<< zzskip ();
+				   zzline++;
+				>>
+#token 		"\""		<< zzskip ();
+				   zzmode (START);
+				>>
+
+#token LOGID			"[A-Za-z_][A-Za-z0-9_]*"
+#token ADD			"\+"
+#token SUB			"\-"
+#token MUL			"\*"
+#token DIV			"/"
+#token AND			"&"
+#token OR			"\|"
+#token XOR			"^"
+#token NEG			"'"
+#token NOT			"!"
+#token OPEN			"\("
+#token CLOSE			"\)"
+
+
+#lexclass GET_COMMENT
+
+#token		"~[\*\n]+"	<< zzskip (); >>
+#token		"\n"		<< zzskip ();
+				   zzline++;
+				>>
+#token		"\*~[/\n]"	<< zzskip (); >>
+#token		"\*[\n]"	<< zzskip ();	
+				   zzline++;
+				>>
+#token		"\*/"		<< zzskip ();
+				   zzmode (START);
+				>>
+
+
+#lexclass GET_STRING
+
+#token			"~[\\\"\n]+"	<< zzmore (); >>
+#token			"\\~[\n]"	<< zzmore (); >>
+#token			"\\\n"		<< zzmore ();
+					   zzline++;
+					>>
+#token			"\n"		<< zzerr (zztext); >>
+#token STRING		"\""		<< zzreplchar ('\0');
+					   zzmode (START);
+					>>
+
+
+#lexclass START
+
+library	: statement
+	;
+
+statement
+	: e:ID^	( ":"!		<< if ( strcmp (#e->text, "function") == 0 ) {
+				     zzmode (LOG_STRING);
+				   }
+				>>
+		  value
+		| OPEN! value_list CLOSE!
+		  { "\{"! ( statement )* "\}"! }
+		)
+	  semi
+	;
+
+value	: STRING
+	| expr
+	| logexpr
+	;
+
+expr	: ( ID | FLOAT ) { ( ADD^ | SUB^ | MUL^ | DIV^ ) ( ID | FLOAT ) }
+	;
+
+value_list
+	: { value ( ","! value )* } 
+	;
+
+duple	: OPEN! FLOAT^ ","! FLOAT CLOSE!
+	;
+
+semi	: ";"!
+	| /* empty */
+	;
+
+logexpr	: e:logexpr1 { 	( ADD^		<< #0 = #(#[OR, "|"], #e); >>
+			| OR^
+			| XOR^
+			)
+			logexpr
+		     }
+	;
+
+logexpr1: e:logexpr2 { 	( AND^ 
+			| MUL 		<< #0 = #(#[AND, "&"], #e); >>
+			| /* empty */	<< #0 = #(#[AND, "&"], #e); >>
+			)
+		  	logexpr1
+		     }
+	;
+
+logexpr2: e:logexpr3 { NEG^		<< #0 = #(#[NOT, "!"], #e); >>
+		     }
+	| NOT^ logexpr3
+	;
+
+logexpr3: LOGID
+	| OPEN! logexpr CLOSE!
+	;
+
+@

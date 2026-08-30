@@ -1,0 +1,1152 @@
+#!/bin/csh -f
+
+# pat, 6/3/02: changed from mmi_tclsh to mmi_wish, because lateset
+# nl now references Tk_Init, which is only in wish.
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish $0 $*:q ; exit
+
+set HELP {
+# usage: yav2s [options] [files]
+# 
+# options
+#     -help   (display this message)
+#     -f control-file
+#     -v vertical-space-between-instances (default 30)
+#     -h horizontal-space-between-instances (default 300)
+#     -w icon-width (default 300)
+#     -l distance-of-icon-label-from-port (default 20)
+#     -d sue-directory (default .)
+#     -i include-file (default "")
+#     -t tcl-file
+#     -V    (print version)
+#     -verilog_dir verilog-directory (default don't do it)
+#     -D    (datapath)
+#     -s stdcell_library
+#     -j output-file (default don't do it)
+# 
+# control-file
+#     verilog-file
+#     verilog-file sue-directory
+#     sue-file
+#
+# Comment characters in control-file are # and //.
+# 
+# Single-file entries in the control-file specify a sue file (ends
+# with .sue) from which to extract icon information, or it's a
+# verilog file and the default sue directory is used.
+# 
+# Double-file entries in the control-file specify a verilog file
+# to read, and the directory into which to write the resultant
+# sue files.
+# 
+# Each file on the command line (except the control-file) is either a
+# sue-file, or it's a verilog-file and the default sue directory is
+# used.
+#
+# yav2s resorts to -ports_only if it detects an error in a file.
+# It ignores the file if it still gets an error with -ports_only.
+#
+# yav2s ignores (with a warning) references to undefined modules.
+#
+# -t lets you execute tcl scripts during processing.  A personalized
+# initialization would go first in the command line, while something
+# to fiddle with the database before writing out the sue files would
+# go last in the command line.
+#
+# "-s foo" is the same as /volume/cad/proj/foo/stdcell/sue/*.sue
+#
+# -j is to check up on Jay.  It prints out nl's netlist in verilog.
+}
+
+proc init_globals {} {
+	global vsbi hsbi icon_width ll dsd incl is_datapath jay
+	set vsbi 30        ; # vertical space between instances
+	set hsbi 300       ; # horizontal space between instances
+	set icon_width 300 ; # width of icons
+	set ll 20          ; # distance of icon label from port
+	set dsd .          ; # default sue directory
+	set incl ""        ; # include file
+	set is_datapath 0  ; # is datapath
+	set jay ""         ; # verilog output
+}
+
+proc vsbi {} { global vsbi ; return $vsbi }
+proc hsbi {} { global hsbi ; return $hsbi }
+proc icon_width {} { global icon_width ; return $icon_width }
+proc half_icon_width {} { return [expr [icon_width] / 2] }
+proc ll {} { global ll ; return $ll }
+proc dsd {} { global dsd ; return $dsd }
+proc incl {} { global incl ; return $incl }
+proc is_datapath {} { global is_datapath ; return $is_datapath }
+proc jay {} { global jay ; return $jay }
+
+proc util_find_path {file {option executable}} {
+	global env
+	foreach dir [split $env(PATH) :] {
+		set filepath [file join $dir $file]
+		if [file $option $filepath] {return $filepath}
+	}
+	return ""
+}
+
+proc load_nl_shell {} {
+	global nl_version
+	# don't load nl_shell if it's already here
+	if {![catch {set nl_version}]} return
+	# Search for nl_shell.so on PATH and load it, or die.
+	set nl_shell [util_find_path nl_shell.so]
+	if {$nl_shell == ""} {
+		puts "Error: can not find nl_shell.so on PATH.  Exiting..."
+		exit 2
+	}
+	load $nl_shell
+}
+
+proc main {argv} {
+	global nl_current_design
+	init_globals
+	load_nl_shell
+	command_line $argv
+	if {[jay] != ""} { nl_write_verilog [jay] }
+	foreach nl_current_design [nl_list_designs] {
+		nl_link -silent $nl_current_design
+	}
+	foreach nl_current_design [nl_list_designs] {
+		check_for_missing_modules $nl_current_design
+	}
+	foreach nl_current_design [nl_list_designs] {
+		check_for_port_mismatch $nl_current_design
+	}
+	foreach nl_current_design [nl_list_designs] {
+		calculate_position_of_ports $nl_current_design
+	}
+	do_derivations
+	do_changes
+	foreach nl_current_design [nl_list_designs] {
+		write_sue_file $nl_current_design
+	}
+}
+
+proc check_for_missing_modules {module} {
+	global sue_of_module ignore_module
+	foreach instance [nl_list_cells] {
+		set instance_type [get_cell_name $instance]
+		if [info exists sue_of_module($instance_type)] continue
+		if [derivable $instance_type] continue
+		if {$instance_type == "*assignment*"} continue
+		if [is_other_stuff $instance_type] continue
+		if [info exists ignore_module($instance_type)] continue
+		set ignore_module($instance_type) 1
+		puts "Warning: ignoring references to $instance_type"
+	}
+}
+
+proc derivable {module} {
+	global existing_module derivation
+	if [regexp {^(MMI_.+)(.)$} $module dummy from size] {
+		if [info exists existing_module($from)] {
+			set derivation($module) "$from Size $size"
+			return 1
+		}
+	}
+	if [regexp {^(MMI_.+)(..)$} $module dummy from size] {
+		if [info exists existing_module($from)] {
+			set derivation($module) "$from Size $size"
+			return 1
+		}
+	}
+	if [regexp {^(MMI_.+)(...)$} $module dummy from size] {
+		if [info exists existing_module($from)] {
+			set derivation($module) "$from Size $size"
+			return 1
+		}
+	}
+	if [regexp {^(.+)_([A-Z])$} $module dummy from size] {
+		if [info exists existing_module($from)] {
+			set derivation($module) "$from Size $size"
+			return 1
+		}
+	}
+	if [regexp {^(JNPR_SHIFT_[^_]+)_([0-9]+)_([0-9]+)_([0-9]+)$} $module dummy from in sh out] {
+		if [info exists existing_module($from)] {
+			set derivation($module) "$from InSize $in ShSize $sh OutSize $out"
+			return 1
+		}
+	}
+	if [regexp {^(JNPR_.+)_([0-9]+)$} $module dummy from size] {
+		if [info exists existing_module($from)] {
+			set derivation($module) "$from Size $size"
+			return 1
+		}
+	}
+	return 0
+}
+
+proc do_derivations {} {
+	global derivation
+	global xmin ymin xmax ymax icon_height existing_module
+	global xport yport is_output genbusflag
+	foreach module [array names derivation] {
+		set stuff $derivation($module)
+		set from [lindex $stuff 0]
+		set sizes [lrange $stuff 1 end]
+		set xmin($module) $xmin($from)
+		set ymin($module) $ymin($from)
+		set xmax($module) $xmax($from)
+		set ymax($module) $ymax($from)
+		set icon_height($module) $icon_height($from)
+		set existing_module($module) $existing_module($from)
+		foreach modport [array names xport $from,*] {
+			setl {mod port} [split $modport ,]
+			set xport($module,$port) $xport($from,$port)
+			set yport($module,$port) $yport($from,$port)
+			set is_output($module,$port) $is_output($from,$port)
+			if [info exists genbusflag($from,$port)] {
+				set size [multi_param_extract $from $port $sizes]
+				setup_bus $module $port [expr $size - 1] 0
+			}
+			if [regexp {^JNPR_MUX([0-9]+),sel$} $modport dummy ins] {
+				set selsize [expr round(log($ins)/log(2))]
+				setup_bus $module $port [expr $selsize - 1] 0
+			}
+		}
+	}
+}
+
+proc multi_param_extract {module port sizes} {
+	if {[llength $sizes] == 2} { return [lindex $sizes 1] }
+	if ![regexp SHIFT $module] { error "internal error" }
+	setl {x xin x xsh x xout} $sizes
+	return [set x$port]
+}
+
+proc is_other_stuff {instance_type} {
+	if [regexp {\*process} $instance_type] { return 1 }
+	if [regexp {\*expression} $instance_type] { return 1 }
+	return 0
+}
+
+proc check_for_port_mismatch {module} {
+	global existing_module is_output sue_ports
+	if ![info exists existing_module($module)] return
+	set change 0
+	foreach port [nl_list_ports] {
+		set port [port_bus_check $module $port]
+		if {$port == ""} continue
+		set port [nobrackets [bus_fullname $module $port]]
+		set verilog_port($port) 1
+	}
+	foreach port $sue_ports($module) {
+		set sue_port($port) 1
+	}
+	foreach port $sue_ports($module) {
+		if [info exists verilog_port($port)] continue
+		puts "Warning: deleting port $port from $module.sue"
+		set delete_port($port) 1
+		set change 1
+	}
+	catch {unset bust}
+	foreach port [nl_list_ports] {
+		set an_element $port
+		set port [port_bus_check $module $port]
+		if {$port == ""} continue
+		set port [nobrackets [bus_fullname $module $port]]
+		if [info exists sue_port($port)] continue
+		puts "Warning: adding port $port to $module.sue"
+		set add_port($port) 1
+		if {[nl_get_port_direction $an_element] == "out"} {
+			set is_output($module,$port) 1
+		} else {
+			set is_output($module,$port) 0
+		}
+		set direction($port) [fixdir [nl_get_port_direction $an_element]]
+		set change 1
+	}
+	if $change {
+		change_icon $module delete_port add_port direction
+	}
+}
+
+proc fixdir {dir} {
+	if {$dir == "in"} {return "input"}
+	if {$dir == "out"} {return "output"}
+	return $dir
+}
+
+proc change_icon {module delete add dir} {
+	global sue_of_module xport yport is_output changed_module vpx vpy
+	upvar $delete delete_port
+	upvar $add add_port
+	upvar $add add_port
+	upvar $dir direction
+	set rfile $sue_of_module($module)
+	if {[catch {set id [open $rfile r]}] != 0} {
+		error "can't read file $rfile"
+	}
+	set lines ""
+	set iconflag 0
+	while {![eof $id]} {
+		set line [gets $id]
+		if [regexp {^proc SCHEMATIC_} $line] {
+			skipto $id $line {^\}}
+			continue
+		}
+		if [regexp {^[ \t]*icon_term } $line] {
+			if [regexp {\-name ([^ ]+)} $line dummy name] {
+				if [info exists delete_port([nobrackets $name])] continue
+			}
+		}
+		if [regexp {^[ \t]*icon_property } $line] {
+			if [regexp {\-label ([^ ]+)} $line dummy name] {
+				if [info exists delete_port([nobrackets $name])] continue
+			}
+		}
+		if [regexp {^proc ICON_} $line] {
+			set iconflag 1
+		}
+		if {[regexp {^\}} $line] && $iconflag} {
+			set iconflag 0
+			set x 0
+			set y 0
+			foreach name [array names add_port] {
+				set dir $direction($name)
+				set nfname [namefix $name]
+				lappend lines \
+					"  icon_term -type $dir -origin {$x $y} -name $nfname"
+				set xport($module,[basename $name]) $x
+				set yport($module,[basename $name]) $y
+				incr y 20
+			}
+		}
+		if [is_verilog_property $line] {
+			if [regexp { -origin {([^ ]+) ([^ ]+)}} $line dummy vpxx vpyy] {
+				skipto $id $line {\}$}
+				set line "insert verilog property here"
+			}
+		}
+		lappend lines $line
+	}
+	close $id
+	set changed_module($module) $lines
+	set vpx($module) $vpxx
+	set vpy($module) $vpyy
+}
+
+proc do_changes {} {
+	global changed_module vpx vpy
+	foreach module [array names changed_module] {
+		change_icon_write $module $changed_module($module) \
+			$vpx($module) $vpy($module)
+	}
+}
+
+proc change_icon_write {module lines vpx vpy} {
+	global suew_of_module
+	set wfile $suew_of_module($module)
+	if {[catch {set id [open $wfile w]}] != 0} {
+		error "can't write file $wfile"
+	}
+	puts "writing $wfile"
+	foreach line $lines {
+		if [regexp {^insert verilog property here$} $line] {
+			write_verilog_property $id $module $vpx $vpy
+		} else {
+			puts $id $line
+		}
+	}
+	write_schematic $module $id
+	close $id
+}
+
+proc skipto {id line pattern} {
+	if [regexp $pattern $line] return
+	while {![eof $id]} {
+		set line [gets $id]
+		if [regexp $pattern $line] return
+	}
+}
+
+proc is_verilog_property {line} {
+	if ![regexp {^[ \t]*icon_property } $line] {return 0}
+	if ![regexp { -type auto } $line] {return 0}
+	if ![regexp { -name verilog } $line] {return 0}
+	return 1
+}
+
+proc write_sue_file {module} {
+	global sue_of_module existing_module
+	if [info exists existing_module($module)] return
+	set file $sue_of_module($module)
+	puts "writing $file"
+	set id [open $file w]
+	write_icon $module $id
+	write_schematic $module $id
+	close $id
+}
+
+proc write_icon {module id} {
+	puts $id "proc ICON_$module args \{"
+	write_icon_body $module $id
+	write_icon_footer $module $id
+	puts $id "\}\n"
+}
+
+proc write_icon_body {module id} {
+	puts -nonewline $id "  icon_setup \$args \{{origin {0 0}}"
+	puts $id " {orient R0} {name {}} {dpc {}} {fplan_size {}}\}"
+	write_icon_ports $module $id input  ""           ""             [ll]
+	write_icon_ports $module $id inout  ""           " -orient RX"  [ll]
+	write_icon_ports $module $id output " -anchor e" ""            -[ll]
+}
+
+proc write_icon_ports {module id direction anchor rx xlabel} {
+	global xport yport
+	foreach port [nl_list_ports -${direction}s] {
+		set port [port_bus_check $module $port]
+		if {$port == ""} continue
+		set x $xport($module,$port)
+		set y $yport($module,$port)
+		set fport [bus_fullname $module $port]
+		puts $id "  icon_term -type $direction -origin {$x $y}$rx -name $fport"
+		incr x $xlabel
+		puts $id "  icon_property -origin {$x $y}$anchor -label $fport"
+	}
+}
+
+proc bus_fullname {module port} {
+	global bus_fullname
+	if [info exists bus_fullname($module,$port)] {
+		return [namefix $bus_fullname($module,$port)]
+	} else {
+		return $port
+	}
+}
+
+proc port_bus_check {module port} {
+	upvar bust bust
+	set bus [nl_get_port_bus $port]
+	if {$bus == ""} { return $port }
+	if [info exists bust($bus)] { return "" }
+	set bust($bus) 1
+	set type [nl_get_bus_type $bus]
+	set l [nl_get_type_left $type]
+	set r [nl_get_type_right $type]
+	setup_bus $module $bus $l $r
+	return $bus
+}
+
+proc setup_bus {module bus l r} {
+	global bus_members bus_fullname
+	if [info exists bus_members($module,$bus)] return
+	set bm ""
+	set inc [expr 2 * ($l<$r) -1]
+	for {set i $l} {$i != $r + $inc} {incr i $inc} {
+		lappend bm $bus\[$i\]
+	}
+	set bus_members($module,$bus) $bm
+	set bus_fullname($module,$bus) $bus\[$l:$r\]
+}
+
+proc write_icon_footer {module id} {
+	global icon_height bus_fullname
+	set y [expr $icon_height($module) / 2 - 20]
+	set x [expr 20 - [half_icon_width]]
+	puts $id "  icon_property -origin {$x $y} -size large -label $module"
+	set y [expr $icon_height($module) / 2]
+	set x [half_icon_width]
+	puts $id "  icon_line -$x -$y $x -$y $x $y -$x $y -$x -$y"
+	incr y 20
+	puts $id "  icon_property -origin {-$x $y} -type user -name name"
+	incr y 20
+	puts $id "  icon_property -origin {-$x $y} -type user -name dpc"
+	incr y 20
+	puts $id "  icon_property -origin {-$x $y} -type user -name fplan_size -default {0 0}"
+	if ![is_rtl $module] {
+		incr y 20
+		puts $id "  icon_property -origin {-$x $y} -type fixed -name netlist_level -text 2000"
+	}
+	incr y [expr 30 + 4 * [llength [nl_list_ports]]]
+	write_verilog_property $id $module -$x $y
+}
+
+proc write_verilog_property {id module x y} {
+	puts $id "  icon_property -origin {$x $y} -type auto -name verilog -text \{$module \[unique_name \"\" \$name $module\]"
+	set n 0
+	foreach port [nl_list_ports] {
+		set port [port_bus_check $module $port]
+		if {$port == ""} continue
+		if {$n == 0} {
+			puts -nonewline $id "("
+		} elseif {$n % 4} {
+			puts -nonewline $id ","
+		} else {
+			puts $id ","
+		}
+		set fport [bus_fullname $module $port]
+		set port [basename $port]
+		puts -nonewline $id ".$port\(\$$fport\)"
+		incr n 1
+	}
+	puts $id "\)\\;\}"
+}
+
+proc is_rtl {module} {
+	foreach instance [nl_list_cells] {
+		set instance_type [get_cell_name $instance]
+		if [is_other_stuff $instance_type] { return 1 }
+	}
+	return 0
+}
+
+proc basename {name} {
+	if {![regexp {([^\{\[]+)} $name name]} {
+		error "funny name: $name"
+	}
+	return $name
+}
+
+proc write_schematic {module id} {
+	global xmin ymin icon_height xport yport is_output
+	global ignore_module derivation merge_list
+	puts $id "proc SCHEMATIC_$module \{\} \{"
+	set schematic_height [expr [is_datapath] ? 0 : [calculate_schematic_height]]
+	set x 0
+	set y 0
+	set cells [reorder_by_line_number [nl_list_cells]]
+	foreach instance $cells {
+		catch { unset fa_bust }
+		set instance_type [get_cell_name $instance]
+		if [info exists ignore_module($instance_type)] continue
+		if [is_other_stuff $instance_type] continue
+		if {$instance_type == "*assignment*"} {
+			if {![do_assignment $id $instance $x y]} continue
+		} elseif [info exists merge_list($instance)] {
+			if {![do_array $id $instance $instance_type x y]} continue
+		} else {
+			same_line_same_row $instance x y
+			set xm $xmin($instance_type)
+			set ym $ymin($instance_type)
+			set x8 [expr $x - $xm]
+			set y8 [expr $y - $ym]
+			set nfinst [namefix $instance]
+			if [info exists derivation($instance_type)] {
+				gen_sized $id $instance_type
+			}
+			puts $id "  make $instance_type -name $nfinst -origin {$x8 $y8}"
+			foreach pin [nl_get_cell_pins $instance] {
+				formal_actual $module $instance $instance_type $pin
+				if {$formal == ""} continue
+				set x8 [expr $x + $xport($instance_type,$formal) - $xm]
+				set y8 [expr $y + $yport($instance_type,$formal) - $ym]
+				if $is_output($instance_type,$formal) {
+					set rx ""
+				} else {
+					set rx "-orient RX"
+				}
+				if {$actual == ""} {
+					set name_actual ""
+				} else {
+					set name_actual "-name $actual"
+				}
+				puts $id "  make name_net_sw $rx $name_actual -origin {$x8 $y8}"
+			}
+			incr y [expr $icon_height($instance_type) + [vsbi]]
+		}
+		if {$y >= $schematic_height} {
+			dp_back $x $y $instance
+			incr x [expr [icon_width] + [hsbi]]
+			set y 0
+		}
+	}
+	write_schematic_ports $module $id output [expr $x+[icon_width]+[hsbi]] 0
+	set y [write_schematic_ports $module $id input -[hsbi] 0]
+	write_schematic_ports $module $id inout -[hsbi] $y
+	puts $id "\}"
+}
+
+proc gen_sized {id instance_type} {
+	global derivation
+	set sizes $derivation($instance_type)
+	set from [lindex $sizes 0]
+	set sizes [lrange $sizes 1 end]
+	set gen "  generate $from $instance_type"
+	while {[llength $sizes] != 0} {
+		setl {label size} $sizes
+		set gen "$gen -$label $size"
+		set sizes [lrange $sizes 2 end]
+	}
+	puts $id $gen
+}
+
+proc dp_back {x y instance} {
+	global dp_back_x dp_back_y dp_back_line
+	if ![is_datapath] return
+	set dp_back_x $x
+	set dp_back_y $y
+	set dp_back_line [nl_get_cell_line $instance]
+}
+
+proc reorder_by_line_number {cells} {
+	if ![is_datapath] {return $cells}
+	set sortable ""
+	foreach cell $cells {
+		setl {file line_number} [split [nl_get_cell_line $cell] { }]
+		set output [output_net $cell]
+		set cell_name [get_cell_name $cell]
+		lappend sortable "$cell $cell_name $line_number $output"
+	}
+	set sorted [lsort -command sortit $sortable]
+	flag_mergables $sorted
+	set cells [lmapcar -concat car $sorted]
+	return $cells
+}
+
+proc flag_mergables {cell_list} {
+	global merge_list
+	catch { unset merge_list }
+	for {set i 0} {$i < [llength $cell_list]} {incr i} {
+		setl {a_cell a_type a_line} [lindex $cell_list $i]
+		if ![is_scalar $a_type] continue
+		for {set j [expr $i + 1]} {$j < [llength $cell_list]} {incr j} {
+			setl {b_cell b_type b_line} [lindex $cell_list $j]
+			if {$a_type != $b_type || $a_line != $b_line} break
+			lappend merge_list($a_cell) $b_cell
+			set merge_list($b_cell) {}
+		}
+		if ![info exists merge_list($a_cell)] continue
+		set i [expr $j - 1]
+	}
+}
+
+proc is_scalar {cell_name} {
+	if [regexp {^JNPR_((N?AND|X?N?OR)2|INV)$} $cell_name] { return 1 }
+	if [regexp {^JNPR_FF_} $cell_name] { return 1 }
+	return 0
+}
+
+proc output_net {cell} {
+	set cell_name [get_cell_name $cell]
+	if [regexp {^JNPR_((N?AND|X?N?OR)2|INV)$} $cell_name] {
+		set output_port out
+	} elseif [regexp {^JNPR_FF_} $cell_name] {
+		set output_port q
+	} else {
+		return dontcare
+	}
+	return [nl_get_pin_net [nl_get_cell_pin $cell $output_port]]
+}
+
+proc sortit {a b} {
+	setl {a_cell a_type a_line a_out} [split $a { }]
+	setl {b_cell b_type b_line b_out} [split $b { }]
+
+	# first sort by line number
+	if {$a_line != $b_line} { return [expr $a_line - $b_line] }
+
+	# if same line - sort by cell name
+	set st [cmp3way $a_type $b_type]
+	if {$st != 0} { return $st }
+
+	# if same cell - sort by output name
+	set st [cmp3way [basename $a_out] [basename $b_out]]
+	if {$st != 0} { return $st }
+
+	# if same name - sort by output bit position (reverse)
+	return [expr [busindex $b_out] - [busindex $a_out]]
+}
+
+proc busindex {name} {
+	if ![regexp {\[([0-9]+)\]} $name dummy index] {
+		return 0
+	}
+	return $index
+}
+
+proc cmp3way {a b} {
+	return [expr $a == $b ? 0 : $a < $b ? -1 : 1 ]
+}
+
+proc car {list} { return [lindex $list 0] }
+proc cadr {list} { return [lindex $list 1] }
+
+proc do_array {id instance instance_type _x _y} {
+	upvar $_x x
+	upvar $_y y
+	global xmin ymin icon_height sue_ports xport yport is_output merge_list
+	if {[llength $merge_list($instance)] == 0} { return 0 }
+	same_line_same_row $instance x y
+	set xm $xmin($instance_type)
+	set ym $ymin($instance_type)
+	set x8 [expr $x - $xm]
+	set y8 [expr $y - $ym]
+	set from [llength $merge_list($instance)]
+	set cell [namefix $instance\[$from:0\]]
+	puts $id "  make $instance_type -name $cell -origin {$x8 $y8}"
+	foreach formal $sue_ports($instance_type) {
+		set actuals ""
+		foreach cell [concat $instance $merge_list($instance)] {
+			lappend actuals [nl_get_pin_net [nl_get_cell_pin $cell $formal]]
+		}
+		set actual [bus_compress $actuals]
+		set actual [bitablebus $actual]
+		set x8 [expr $x + $xport($instance_type,$formal) - $xm]
+		set y8 [expr $y + $yport($instance_type,$formal) - $ym]
+		if $is_output($instance_type,$formal) {
+			set rx ""
+		} else {
+			set rx "-orient RX"
+		}
+		if {$actual == ""} {
+			set name_actual ""
+		} else {
+			set name_actual "-name $actual"
+		}
+		puts $id "  make name_net_sw $rx $name_actual -origin {$x8 $y8}"
+	}
+	incr y [expr $icon_height($instance_type) + [vsbi]]
+	return 1
+}
+
+proc bitablebus {bus} {
+	if ![regexp {^\{([^,]+),} $bus dummy bit] { return $bus }
+	if ![regexp "^\{${bit}(,$bit)+\}$" $bus] { return $bus }
+	return \{$bit\}
+}
+
+proc same_line_same_row {instance _x _y} {
+	upvar $_x x
+	upvar $_y y
+	global dp_back_x dp_back_y dp_back_line
+	if {[info exists dp_back_line] && 
+			$dp_back_line == [nl_get_cell_line $instance]} {
+		set x $dp_back_x
+		set y $dp_back_y
+	}
+}
+
+proc do_assignment {id instance x yname} {
+	upvar $yname y
+	upvar ass_bust ass_bust
+	set bus [nl_get_cell_bus $instance]
+	if [info exists ass_bust($bus)] { return 0 }
+	set ass_bust($bus) 1
+	set members [nl_get_bus_members $bus]
+	set in [bus_compress [reverse [lmapcar in_assign $members]]]
+	set out [bus_compress [reverse [lmapcar out_assign $members]]]
+	set xll $x
+	set xrr [expr $x + [icon_width]]
+	set xc [expr ($xll + $xrr) >> 1]
+	set xl [expr $xc - 10]
+	set xr [expr $xc + 20]
+	puts $id "  generate bus_combine bus_combine1 -ninputs 1"
+	puts $id "  make bus_combine1 -orient RY -origin {$xc $y}"
+	puts $id "  make name_net_s -name $in -origin {$xll $y}"
+	puts $id "  make_wire $xll $y $xl $y"
+	puts $id "  make_wire $xr $y $xrr $y"
+	puts $id "  make name_net_s -name $out -origin {$xrr $y}"
+	incr y [vsbi]
+	return 1
+}
+
+proc reverse {list} {
+	set newlist ""
+	for {set i [expr [llength $list] - 1]} {$i >= 0} {incr i -1} {
+		lappend newlist [lindex $list $i]
+	}
+	return $newlist
+}
+
+proc in_assign {instance} {
+	return [nl_get_pin_net [lindex [nl_get_cell_pins -inputs $instance] 0]]
+}
+
+proc out_assign {instance} {
+	return [nl_get_pin_net [lindex [nl_get_cell_pins -outputs $instance] 0]]
+}
+
+proc formal_actual {module instance instance_type pin} {
+	global bus_members
+	upvar formal formal
+	upvar actual actual
+	upvar fa_bust fa_bust
+	set formal [basename [nl_get_pin_name $pin]]
+	set actual [namefix [nl_get_pin_net $pin]]
+	if {![info exists bus_members($instance_type,$formal)]} return
+	if [info exists fa_bust($formal)] { set formal "" ; set actual "" ; return }
+	set fa_bust($formal) 1
+	set actuals ""
+	foreach member $bus_members($instance_type,$formal) {
+		lappend actuals [nl_get_pin_net [nl_get_cell_pin $instance $member]]
+	}
+	set actual [bus_compress $actuals]
+}
+
+proc bus_compress {nets} {
+	set r ""
+	set prevname ""
+	set prevfrom -1
+	set prevto -1
+	foreach net $nets {
+		set p [string first "\[" $net]
+		if {$p == -1} {
+			set r [bus_compress_append $r $prevname $prevfrom $prevto]
+			set prevname $net
+			set prevfrom -1
+			set prevto -1
+		} else {
+			set name [string range $net 0 [expr $p-1]]
+			set indx [string range $net \
+				[expr $p+1] \
+				[expr [string length $net] -2]]
+			if [mergable $prevname $prevfrom $prevto $name $indx] {
+				set prevto $indx
+			} else {
+				set r [bus_compress_append $r $prevname $prevfrom $prevto]
+				set prevname $name
+				set prevfrom $indx
+				set prevto $indx
+			}
+		}
+	}
+	set r [bus_compress_append $r $prevname $prevfrom $prevto]
+	set r [join $r ,]
+	set r [namefix $r]
+	return $r
+}
+
+proc mergable {prevname prevfrom prevto name indx} {
+	if {$prevname != $name} { return 0 }
+	if {$prevfrom >= $prevto && $prevto == $indx + 1} { return 1 }
+	if {$prevfrom <= $prevto && $prevto == $indx - 1} { return 1 }
+	return 0
+}
+
+proc bus_compress_append {r name from to} {
+	if {$name == ""} { return $r }
+	if {$from == -1} {
+		lappend r $name
+	} elseif {$from == $to} {
+		lappend r $name\[$from\]
+	} else {
+		lappend r $name\[$from:$to\]
+	}
+	return $r
+}
+
+proc write_schematic_ports {module id direction x y} {
+	foreach port [nl_list_ports -${direction}s $module] {
+		set port [port_bus_check $module $port]
+		if {$port == ""} continue
+		set port [bus_fullname $module $port]
+		puts $id "  make $direction -name $port -origin {$x $y}"
+		incr y 20
+	}
+	return $y
+}
+
+proc calculate_schematic_height {} {
+	global icon_height ignore_module
+	set total_y 0
+	foreach instance [nl_list_cells] {
+		set instance_type [get_cell_name $instance]
+		if [info exists ignore_module($instance_type)] continue
+		if [is_other_stuff $instance_type] continue
+		if {$instance_type == "*assignment*"} {
+			incr total_y [vsbi]
+		} else {
+			incr total_y [expr $icon_height($instance_type) + [vsbi]]
+		}
+	}
+	return [expr int(sqrt($total_y * ([icon_width] + [hsbi])))]
+}
+
+proc calculate_position_of_ports {module} {
+	global icon_height existing_module xmin ymin
+	if [info exists existing_module($module)] return
+	# two passes through the ports:
+	# (pass through ports instead of counting because of buses)
+	# first pass gets height of icon
+	set y1 [calc_ports 0 $module [nl_list_ports -inputs -inouts]]
+	set y2 [calc_ports 0 $module [nl_list_ports -outputs]]
+	set icon_height($module) [expr 40 + [imax $y1 $y2]]
+	# second pass through ports sets correct y locations
+	set y0 [expr 20 - $icon_height($module) / 2]
+	calc_ports $y0 $module [nl_list_ports -inputs -inouts]
+	calc_ports $y0 $module [nl_list_ports -outputs]
+	set xmin($module) -[half_icon_width]
+	set ymin($module) [expr -$icon_height($module) / 2]
+}
+
+proc calc_ports {y module ports} {
+	global xport yport is_output
+	foreach port $ports {
+		set dir [nl_get_port_direction $port]
+		set port [port_bus_check $module $port]
+		if {$port == ""} continue
+		set yport($module,$port) $y
+		if {$dir == "out"} {
+			set is_output($module,$port) 1
+			set xport($module,$port) [half_icon_width]
+		} else {
+			set is_output($module,$port) 0
+			set xport($module,$port) -[half_icon_width]
+		}
+		incr y 20
+	}
+	return $y
+}
+
+proc imin {a b} {
+	return [expr $a < $b ? $a : $b]
+}
+
+proc imax {a b} {
+	return [expr $a > $b ? $a : $b]
+}
+
+proc command_line {argv} {
+	global HELP vsbi hsbi icon_width ll dsd incl verdure is_datapath jay
+	for {set i 0} {$i < [llength $argv]} {incr i 1} {
+		set arg [lindex $argv $i]
+		switch -- $arg {
+			-help { puts $HELP; exit 0 }
+			-v { set vsbi [lindex $argv [++ i]] ; continue }
+			-h { set hsbi [lindex $argv [++ i]] ; continue }
+			-w { set icon_width [lindex $argv [++ i]] ; continue }
+			-l { set ll [lindex $argv [++ i]] ; continue }
+			-f { read_control_file [lindex $argv [++ i]] ; continue }
+			-d { set dsd [lindex $argv [++ i]] ; continue }
+			-i { set incl [lindex $argv [++ i]] ; continue }
+			-t { uplevel #0 "source [lindex $argv [++ i]]" ; continue }
+			-V { version ; continue }
+			-verilog_dir { set verdure [lindex $argv [++ i]] ; continue }
+			-D { set is_datapath 1 ; continue }
+			-s { read_tech [lindex $argv [++ i]] ; continue }
+			-j { set jay [lindex $argv [++ i]] ; continue }
+		}
+		if {[is_sue_file $arg] != ""} {
+			get_existing_sue_file $arg
+		} else {
+			read_verilog $arg [dsd]
+		}
+	}
+}
+
+proc ++ {varname} {
+	upvar $varname i 
+	incr i 1 
+	return $i 
+}
+
+proc read_tech {tech} {
+	foreach sue_file [glob /volume/cad/proj/$tech/stdcell/sue/*.sue] {
+		get_existing_sue_file $sue_file
+	}
+}
+
+proc version {} {
+	global nl_version
+	puts "nl version: $nl_version"
+	# dollar Revision: dollar automagically updated by RCS
+	puts "yav2s version: [extract_revision \$Revision: 1.98 $]"
+}
+
+proc extract_revision {dummy rev dummy} {
+	return $rev
+}
+
+proc read_control_file {file} {
+	if {[catch {set id [open $file r]}] != 0} {
+		error "can't read file $file"
+	}
+	while {![eof $id]} {
+		set line [gets $id]
+		regexp {(.*)#} $line dummy line
+		regexp {(.*)//} $line dummy line
+		set line [string trim $line]
+		regsub -all "\[ \t\]+" $line { } line 
+		set list [split $line]
+		set lth [llength $list]
+		if {$lth < 1} continue
+		if {$lth > 2} { error "line in $file has too many fields: $line" }
+		if {$lth == 1} {
+			set sue [lindex $list 0]
+			if {[is_sue_file $sue] == ""} {
+				read_verilog [lindex $list 0] [dsd]
+			} else {
+				get_existing_sue_file $sue
+			}
+		} else {
+			read_verilog [lindex $list 0] [lindex $list 1]
+		}
+	}
+	close $id
+}
+
+proc read_verilog {file dir} {
+	global sue_of_module verdure nl_current_design
+	if [info exists verdure] {
+		puts "copying $file to $verdure"
+		catch {exec cp $file $verdure}
+	}
+	set files "[incl] $file"
+	puts "reading $files"
+	if [is_datapath] {
+		set cmd "nl_read_verilog -rtl $files"
+	} else {
+		set cmd "nl_read_verilog $files"
+	}
+	if {[catch $cmd status] != 0} {
+		puts $status
+		puts "Warning: reading $file in ports_only mode"
+		if {[catch {nl_read_verilog -ports_only $files} status] != 0} {
+			puts $status
+			puts "Warning: ignoring contents of $files"
+		}
+	}
+	foreach module [nl_list_designs] {
+		if {![info exists sue_of_module($module)]} {
+			set sue_of_module($module) $dir/$module.sue
+			set nl_current_design $module
+			if [is_datapath] {
+				nl_apply_rewrites
+				nl_map_design
+# below is temp until fixed in nl
+				nl_remove_assigns
+# above is temp until fixed in nl
+			}
+		}
+	}
+}
+
+proc get_existing_sue_file {file} {
+	global existing_module xmin ymin icon_height xport yport is_output
+	global sue_of_module xmax ymax sue_ports genbusflag suew_of_module
+	set module [is_sue_file $file]
+	if {$module == ""} {
+		error "bad sue file name: $file"
+	}
+	if {[catch {set id [open $file r]}] != 0} {
+		error "can't read file $file"
+	}
+	set sue_of_module($module) $file
+	set suew_of_module($module) [dsd]/[file_basename $file]
+	set xlist ""
+	set ylist ""
+	while {![eof $id]} {
+		set line [gets $id]
+		if [regexp {icon_line (.*)} $line dummy coords] {
+			while {[llength $coords] > 0} {
+				lappend xlist [lindex $coords 0]
+				lappend ylist [lindex $coords 1]
+				set coords [lreplace $coords 0 1]
+			}
+			continue
+		}
+		if ![regexp {[ \t]*icon_term } $line] continue
+		if ![regexp { -type ([^ ]+)} $line dummy type] continue
+		if ![regexp { -origin {([^ ]+) ([^ ]+)}} $line dummy x y] continue
+		if ![regexp { -name ([^ ]+)} $line dummy name] continue
+		if {[string first \$ $name] != -1} {
+			setl {name size} [split $name \$]
+			if {$size != ""} {
+				set genbusflag($module,$name) 1
+			}
+		}
+		lappend sue_ports($module) [nobrackets $name]
+		regexp {^\{(.+)\[(.+):(.+)\]\}$} $name dummy name l r
+		set xport($module,$name) $x
+		set yport($module,$name) $y
+		if {$type == "output"} {
+			set is_output($module,$name) 1
+		} else {
+			set is_output($module,$name) 0
+		}
+		lappend xlist $x
+		lappend ylist $y
+	}
+	close $id
+	puts "using icon from $file"
+	set existing_module($module) 1
+	set xmin($module) [ilmin $xlist]
+	set ymin($module) [ilmin $ylist]
+	set xmax($module) [ilmax $xlist]
+	set ymax($module) [ilmax $ylist]
+	set icon_height($module) [expr [ilmax $ylist] - [ilmin $ylist] + 60]
+}
+
+proc nobrackets {name} {
+	regexp {^{(.+)}$} $name dummy name
+	return $name
+}
+
+proc is_sue_file {file} {
+	if {[regexp {([^/]+)\.sue$} $file dummy module]} {
+		return $module
+	} else {
+		return ""
+	}
+}
+
+proc ilmin {list} {
+	set r [lindex $list 0]
+	foreach entry $list {
+		set r [imin $entry $r]
+	}
+	return $r
+}
+
+proc ilmax {list} {
+	set r 0
+	foreach entry $list {
+		set r [imax $entry $r]
+	}
+	return $r
+}
+
+proc namefix {name} {
+	# remove trailing [0:0]
+	regexp {^(.+)\[0:0\]$} $name dummy name
+	# netlister doesn't seem to like dollar signs
+	regsub -all {\$} $name _ name
+	# why not just throw brackets around all the time?
+	return \{$name\}
+}
+
+proc setl {names values} {
+  set i 0
+  foreach name $names {
+    #uplevel [list set $name [lindex $values $i]]
+    upvar $name x
+    set x [lindex $values $i]
+    incr i
+  }
+  # returns number of variables set
+  return $i
+}
+
+proc get_cell_name {cell} {
+	set it [nl_get_reference_name [nl_get_cell_reference $cell]]
+# below is temp until fixed in nl
+	if {$it == "JNPF_FF_F"} {return JNPR_FF_F}
+# above is temp until fixed in nl
+	if [regexp {^(JNPR_.+)#\(([0-9]+)\)$} $it dummy a b] {
+		return ${a}_$b
+	}
+	if [regexp {^(JNPR_.+)#\(([0-9]+),([0-9]+),([0-9]+)\)$} $it dummy a b c d] {
+		return ${a}_${b}_${c}_$d
+	}
+	return $it
+}
+
+proc file_basename {path} {
+	if [regexp {.*/(.*)} $path dummy basename] {
+		return $basename
+	} else {
+		return $path
+	}
+}
+
+main $argv
+exit

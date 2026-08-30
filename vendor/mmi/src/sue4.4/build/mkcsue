@@ -1,0 +1,54 @@
+#!/bin/csh -f
+
+echo "BEGIN "`date`
+########################################################################
+# User-configurable portion of script.
+
+# Directory where sue lives (original source is in $SUEDIR/src).
+set SUEDIR = ../..
+
+set CSUEDIR = ..
+
+# End of user-configurable portion of script.
+########################################################################
+
+echo "Removing old tmp directory ..."
+rm -rf tmp
+mkdir tmp
+chmod g+rw tmp
+cd tmp
+
+echo "Getting tcl source from $SUEDIR ..."
+cp $SUEDIR/src/*.tcl .
+
+cp $CSUEDIR/sueInit.tcl .
+cp $CSUEDIR/sueInitA.tcl .
+cp $CSUEDIR/sueInitB.tcl .
+cp $CSUEDIR/Makefile .
+cp $CSUEDIR/sueAppInit.c .
+cp $CSUEDIR/mmiInterrupt.c .
+#cp $CSUEDIR/steiner.cc .
+cp $CSUEDIR/steiner.c .
+cp $CSUEDIR/gr.c .
+cp $CSUEDIR/nl_include.h .
+
+gmake sueInit
+gmake sue
+
+cd $CSUEDIR
+
+set _uname_tmp=`uname`
+if ("$_uname_tmp" == "Linux") then
+  mv tmp/sue release/bin.i486-linux/sue.exe
+else if ("$_uname_tmp" == "HP-UX") then
+  mv tmp/sue release/bin.hppa/sue.exe
+else if ("$_uname_tmp" == "SunOS") then
+  mv tmp/sue release/bin.sparc-solaris2/sue.exe
+else
+  echo Aborting mkcsue, unknown architecture.
+  exit 2
+endif
+
+#gmake release
+
+echo "END "`date`

@@ -1,0 +1,66 @@
+readtechnology /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/pearl/pearl.tech
+readctlf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/mmi25/library/tlf/mmi25.ctlf
+readverilog /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.vg
+toplevelcell adder8
+readspf /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.est_dspf
+setmaxpossibilities 5
+clock -domain _WAVE_ -cycle_time 3ns -create_node _input_ 0 1.5n
+input cin _input_ ^ 0 0 0 0
+inputslew cin 200ps 200ps 200ps 200ps
+input a[0] _input_ ^ 0 0 0 0
+inputslew a[0] 200ps 200ps 200ps 200ps
+input a[1] _input_ ^ 0 0 0 0
+inputslew a[1] 200ps 200ps 200ps 200ps
+input a[2] _input_ ^ 0 0 0 0
+inputslew a[2] 200ps 200ps 200ps 200ps
+input a[3] _input_ ^ 0 0 0 0
+inputslew a[3] 200ps 200ps 200ps 200ps
+input a[4] _input_ ^ 0 0 0 0
+inputslew a[4] 200ps 200ps 200ps 200ps
+input a[5] _input_ ^ 0 0 0 0
+inputslew a[5] 200ps 200ps 200ps 200ps
+input a[6] _input_ ^ 0 0 0 0
+inputslew a[6] 200ps 200ps 200ps 200ps
+input a[7] _input_ ^ 0 0 0 0
+inputslew a[7] 200ps 200ps 200ps 200ps
+input b[0] _input_ ^ 0 0 0 0
+inputslew b[0] 200ps 200ps 200ps 200ps
+input b[1] _input_ ^ 0 0 0 0
+inputslew b[1] 200ps 200ps 200ps 200ps
+input b[2] _input_ ^ 0 0 0 0
+inputslew b[2] 200ps 200ps 200ps 200ps
+input b[3] _input_ ^ 0 0 0 0
+inputslew b[3] 200ps 200ps 200ps 200ps
+input b[4] _input_ ^ 0 0 0 0
+inputslew b[4] 200ps 200ps 200ps 200ps
+input b[5] _input_ ^ 0 0 0 0
+inputslew b[5] 200ps 200ps 200ps 200ps
+input b[6] _input_ ^ 0 0 0 0
+inputslew b[6] 200ps 200ps 200ps 200ps
+input b[7] _input_ ^ 0 0 0 0
+inputslew b[7] 200ps 200ps 200ps 200ps
+setnodecapacitance cout +20fF
+setnodecapacitance sum[0] +20fF
+setnodecapacitance sum[1] +20fF
+setnodecapacitance sum[2] +20fF
+setnodecapacitance sum[3] +20fF
+setnodecapacitance sum[4] +20fF
+setnodecapacitance sum[5] +20fF
+setnodecapacitance sum[6] +20fF
+setnodecapacitance sum[7] +20fF
+setpathfilter -same_path -similar_path -node_suffix [#]
+idealclocks yes
+findpathsfrom _input_
+setdelaypathformat out_delay delta_delay load_cap fanout out_rise_fall out_node device cell
+showpossibility 1 5
+# done
+# done
+findmincycletime
+# done
+# done
+shownodematches * > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_in
+system sed -e 's/^ /showdelays/' -e 's/^Found/#/' /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_in > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out
+include /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out
+system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_in
+system rm -f /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.tmp_out
+findslownodes -limit 0.6ns > /volume/mmi/src/sue4.3/doc/dpc_build_tutorial/dev/adder8.slow_nodes

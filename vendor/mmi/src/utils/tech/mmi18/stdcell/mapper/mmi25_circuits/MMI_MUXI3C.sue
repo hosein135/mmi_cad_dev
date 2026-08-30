@@ -1,0 +1,115 @@
+# SUE version MMI_SUE4.0p5
+
+proc SCHEMATIC_MMI_MUXI3C {} {
+  make global -name gnd -origin {1140 220}
+  make global -orient RY -name vdd -origin {890 -180}
+  make nmos -W 1.2 -origin {1140 80}
+  make nmos -W 1.2 -origin {1140 180}
+  make pmos -W 2.4 -origin {890 -40}
+  make pmos -W 2.4 -origin {890 -140}
+  make pmos -W 2.4 -origin {1140 -140}
+  make global -name gnd -origin {890 220}
+  make nmos -W 1.2 -origin {890 180}
+  make pmos -W 2.4 -origin {1140 -40}
+  make nmos -W 1.2 -origin {890 80}
+  make output -name out -origin {2130 20}
+  make input -name in1 -origin {1040 180}
+  make input -name in0 -origin {740 180}
+  make input -name sel0 -origin {510 80}
+  make inverter -WP 2.4 -WN 1.2 -origin {1340 80}
+  make inverter -WP 2.4 -WN 1.2 -origin {580 80}
+  make inverter -WP 2.4 -WN 1.2 -origin {1780 180}
+  make input -name in2 -origin {1750 180}
+  make input -name sel1 -origin {1290 80}
+  make global -name gnd -origin {1910 220}
+  make global -orient RY -name vdd -origin {1660 -180}
+  make nmos -W 1.2 -origin {1910 80}
+  make nmos -W 1.2 -origin {1910 180}
+  make pmos -W 2.4 -origin {1660 -40}
+  make pmos -W 2.4 -origin {1660 -140}
+  make pmos -W 2.4 -origin {1910 -140}
+  make global -name gnd -origin {1660 220}
+  make nmos -W 1.2 -origin {1660 180}
+  make pmos -W 2.4 -origin {1910 -40}
+  make nmos -W 1.2 -origin {1660 80}
+  generate name_net_s name_net -cell name_net
+  make name_net -name sel0_L -origin {700 80}
+  make name_net -name sel1_L -origin {1440 80}
+  make name_net -orient R270 -name in2_L -origin {1830 -90}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 4.8 -WN 2.4 -origin {2050 20}
+  make name_net -name N1 -origin {1430 -140}
+  make name_net -name N2 -origin {1980 20}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 07/19/99 -origin {1190 400}
+  make_wire 890 40 890 20
+  make_wire 890 0 890 20
+  make_wire 890 -100 890 -80
+  make_wire 1140 140 1140 120
+  make_wire 1140 -100 1140 -80
+  make_wire 890 140 890 120
+  make_wire 1040 80 1080 80
+  make_wire 1080 -140 1060 -140
+  make_wire 1060 -140 1060 180
+  make_wire 1060 180 1080 180
+  make_wire 1060 180 1040 180
+  make_wire 2100 20 2130 20
+  make_wire 830 -40 950 -40
+  make_wire 830 -140 780 -140
+  make_wire 780 -140 780 180
+  make_wire 780 180 830 180
+  make_wire 510 80 550 80
+  make_wire 510 -40 510 80
+  make_wire 740 180 780 180
+  make_wire 1140 0 1140 20
+  make_wire 1140 20 1140 40
+  make_wire 1660 40 1660 20
+  make_wire 1660 0 1660 20
+  make_wire 1660 -100 1660 -80
+  make_wire 1910 140 1910 120
+  make_wire 1910 -100 1910 -80
+  make_wire 1660 140 1660 120
+  make_wire 1810 80 1850 80
+  make_wire 1850 -140 1830 -140
+  make_wire 1550 -140 1550 180
+  make_wire 1550 180 1600 180
+  make_wire 1910 0 1910 20
+  make_wire 1910 20 1910 40
+  make_wire 1300 -40 1300 80
+  make_wire 1300 80 1290 80
+  make_wire 1300 80 1310 80
+  make_wire 1230 20 1230 -140
+  make_wire 1850 180 1830 180
+  make_wire 510 -40 830 -40
+  make_wire 890 -180 1140 -180
+  make_wire 1140 -180 1660 -180
+  make_wire 1660 -180 1910 -180
+  make_wire 1550 -140 1600 -140
+  make_wire 890 20 1140 20
+  make_wire 1140 20 1230 20
+  make_wire 1300 -40 1600 -40
+  make_wire 1600 -40 1720 -40
+  make_wire 1660 20 1910 20
+  make_wire 700 80 630 80
+  make_wire 700 80 830 80
+  make_wire 1440 80 1390 80
+  make_wire 1440 80 1600 80
+  make_wire 1430 -140 1230 -140
+  make_wire 1430 -140 1550 -140
+  make_wire 1980 20 1910 20
+  make_wire 1980 20 2020 20
+  make_wire 950 -40 1040 80
+  make_wire 1040 -40 950 80
+  make_wire 1040 -40 1080 -40
+  make_wire 950 80 830 80
+  make_wire 1720 -40 1810 80
+  make_wire 1810 -40 1720 80
+  make_wire 1810 -40 1850 -40
+  make_wire 1720 80 1600 80
+  make_wire 1830 -90 1830 -140
+  make_wire 1830 -90 1830 180
+  make_text -origin {480 -260} -text {Inverting 3:1 Mux }
+  make_text -origin {480 -240} -text {C Size}
+  make_text -origin {480 -280} -text MMI_MUXI3C -size large
+}
+

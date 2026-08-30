@@ -1,0 +1,240 @@
+# This generator will create any and-or-invert gate.
+# Takes a list of numbers of series nfets.  Optionally takes
+# a list of lists with the first element being the number
+# of series nfets, the second number being the WN multiplier
+# for that series (defaults to 1) and the third number being
+# the WP multiplier for the pfets (defaults to 1).
+
+proc SCHEMATIC_aoi args {
+  call_use_keyword $args {{inputs {1 2}} {name aoi} {demorgan 0}}
+
+  set dx 250
+  set x 0
+  set py -60
+  set column 0
+  set max_y 0
+  set input_last [expr [llength $inputs] + 1]
+  set max_px 0
+
+  foreach list $inputs {
+    set input [lindex $list 0]
+    set y 60
+    set px 0
+    set wn [lindex $list 1]
+    if {$wn == ""} {
+      set wn 1
+    }
+    set wp [lindex $list 2]
+    if {$wp == ""} {
+      set wp 1
+    }
+
+    for {set i 0} {$i < $input} {incr i} {
+      # make a column of series connected nfets
+      if {$wn == 1} {
+	make nmos -origin "$x $y" -W WN
+      } else {
+	make nmos -origin "$x $y" -W "'$wn*WN'"
+      }
+      make input -origin "[expr $x-60] $y" -name "in_${column}_$i"
+      make_wire $x [expr $y-40] $x [expr $y-60]
+      incr y 100
+
+      # make a row of parallel connected pfets
+      if {$wp == 1} {
+	make pmos -origin "$px $py" -W WP
+      } else {
+	make pmos -origin "$px $py" -W "'$wp*WP'"
+      }
+      make input -origin "[expr $px-60] $py" -name "in_${column}_$i"
+      make_wire $px [expr $py+40] $px [expr $py+60]
+
+      if {$i > 0} {
+	make_wire [expr $px-$dx] [expr $py-40] $px [expr $py-40]
+      }
+      if {$i >= $input_last} {
+	make_wire [expr $px-$dx] [expr $py+60] $px [expr $py+60]
+      }
+
+      incr px $dx
+    }
+
+    if {$max_px == 0} {
+      set max_px [expr $px - $dx]
+    }
+
+    set input_last $input
+    set max_y [max $max_y $y]
+    make global -origin "$x [expr $y - 60]" -name gnd
+    make_wire $x 0 [incr x $dx] 0
+    incr column
+    incr py -100
+  }
+
+  make global -origin "0 [expr $py+60]" -orient RY -name vdd
+
+  make $name -origin "[max $x $max_px] [expr $max_y/2]"
+  make output -origin "[max $x $max_px] 0" -name out
+}
+
+
+proc ICON_aoi args {
+  # This line is needed for all generators
+  icon_generator $args {{inputs {1 2}} {demorgan 0 binary}}
+
+  # If you want defaults to change, must do it here.
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}}
+    {WN 2} {WP 2}}
+
+  set y 0
+  set column 0
+  set ycfirst -100
+  set exp ""
+
+  if {!$demorgan} {
+    set xoff 0
+  } else {
+    set xoff 20
+  }
+
+  foreach list $inputs {
+    set input [lindex $list 0]
+    # don't let the user go too crazy
+    if {$input < 1 || $input > 10} {
+      error "ERROR: \"inputs\" out of bounds in GENERATOR aoi"
+    }
+
+    if {$input == 1} {
+      set yc $y
+      set step 20
+    } elseif {$input == 2} {
+      set yc [expr $y+30]
+      incr y 10
+      set step 40
+    } elseif {$input == 2*(floor($input/2))} {
+      # even
+      set yc [expr $y+$input*10]
+      incr y 10
+      set step 20
+      if {$input > 4} {
+	set len [expr ($input/2-2)*$step]
+	icon_line $xoff $y $xoff [expr $y+$len]
+	set yend [expr $y+$len+3*$step]
+	icon_line $xoff $yend $xoff [expr $yend+$len]
+      }
+    } else {
+      # odd
+      set yc [expr $y+$input*10]
+      incr y 10
+      set step 20
+      if {$input > 3} {
+	set len [expr (($input-5)/2)*$step+$step/2]
+	icon_line $xoff $y $xoff [expr $y+$len]
+	set yend [expr $y+$len+3*$step]
+	icon_line $xoff $yend $xoff [expr $yend+$len]
+      }
+    }
+
+    if {$ycfirst == -100} {
+      set ycfirst $yc
+    }
+
+    # draw each and gate if there is one
+    if {!$demorgan} {
+      if {$input == 1} {		
+	icon_line 0 $yc 70 $yc
+      } else {
+	icon_arc 0 [expr $yc-30] 70 [expr $yc+30] -start 277 -extent 166
+	icon_line 40 [expr $yc-30] 0 [expr $yc-30] 0 [expr $yc+30] \
+	    40 [expr $yc+30]
+	icon_property -origin "3 [expr $yc-22]" -label F -size small	
+      }
+    } else {
+      # demorgan
+      if {$input == 1} {
+	icon_line 0 $yc 80 $yc
+	icon_arc 80 [expr $y-10] 100 [expr $y+10] -start 0 -extent 359
+      } else {
+	icon_arc 0 [expr $yc-30] 110 [expr $yc+110] -start 35 -extent 50
+	icon_arc 10 [expr $yc-30] 30 [expr $yc+30] -start 270 -extent 180
+	icon_line 20 [expr $yc-30] 60 [expr $yc-30]
+	icon_line 20 [expr $yc+30] 60 [expr $yc+30]
+	icon_arc 0 [expr $yc-110] 110 [expr $yc+30] -start 275 -extent 50
+	icon_property -origin "30 [expr $yc-22]" -label F -size small	
+      }
+    }
+
+    if {$exp != ""} {
+      set exp "$exp ||"
+    }
+
+    for {set i 0} {$i < $input} {incr i} {
+      icon_term -type input -origin "0 $y" -name in_${column}_$i
+      if {$input != 1 && $demorgan} {
+	icon_arc 0 [expr $y-10] 20 [expr $y+10] -start 0 -extent 359
+      }
+
+      if {$i != 0} {
+	set exp "$exp &&"
+      }
+      set exp "$exp \$in_${column}_$i"
+
+      incr y $step
+    }
+
+    incr column
+
+  }
+
+  set yclast $yc
+
+  set yc [expr floor(($y-$step)/20.0)*10]
+
+  if {!$demorgan} {
+    # the extensions on the or gate (if needed)
+    if {$yclast > [expr $yc+30] } {
+      icon_line 70 [expr $yc+30] 70 $yclast
+    }
+    if {$ycfirst < [expr $yc-30] } {
+      icon_line 70 $ycfirst 70 [expr $yc-30]
+    }
+
+    icon_term -type output -origin "170 $yc" -name out
+
+    # draw the nor gate
+    icon_arc 50 [expr $yc-30] 160 [expr $yc+110] -start 35 -extent 50
+    icon_arc 60 [expr $yc-30] 80 [expr $yc+30] -start 270 -extent 180
+    icon_line 70 [expr $yc-30] 110 [expr $yc-30]
+    icon_line 70 [expr $yc+30] 110 [expr $yc+30]
+    icon_arc 50 [expr $yc-110] 160 [expr $yc+30] -start 275 -extent 50
+    icon_arc 150 [expr $yc-10] 170 [expr $yc+10] -start 0 -extent 359
+
+    icon_property -origin "90 [expr $yc-20]" -label {P:$WP}
+    icon_property -origin "90 [expr $yc+20]" -label {N:$WN}
+    icon_property -origin "80 [expr $yc-22]" -label F -size small
+  } else {
+    # demorgan
+    # the bar on the and gate
+    icon_line 100 $yclast 100 $ycfirst
+
+    icon_term -type output -origin "170 $yc" -name out
+
+    # draw the and gate
+    icon_arc 100 [expr $yc-30] 170 [expr $yc+30] -start 277 -extent 166
+    icon_line 140 [expr $yc-30] 100 [expr $yc-30] 100 [expr $yc+30] \
+	140 [expr $yc+30]
+
+    icon_property -origin "110 [expr $yc-20]" -label {P:$WP}
+    icon_property -origin "110 [expr $yc+20]" -label {N:$WN}
+    icon_property -origin "100 [expr $yc-22]" -label F -size small
+  }
+
+  icon_property -origin {300 100} -type user -name name
+  icon_property -origin {300 120} -type user -name M
+  icon_property -origin {300 140} -type user -name WP -default 2
+  icon_property -origin {300 180} -type user -name WN -default 2
+
+  icon_property -origin {300 240} -type fixed -name verilog \
+      -text [backquote {assign $out = !( $$exp )\;}]
+}
+

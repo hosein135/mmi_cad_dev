@@ -1,0 +1,116 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_MMIG_ADD_CFLC {} {
+  make output -orient RY -name Sum_H -origin {1350 690}
+  make input -orient RY -name A_H -origin {-30 420}
+  make input -orient RY -name B_H -origin {-30 460}
+  make input -orient R90Y -name Cin1_L -origin {490 850}
+  make input -orient R90Y -name Cin0_L -origin {830 850}
+  generate row_spanner row_spanner100 -width 100
+  make row_spanner100 -origin {1320 1010}
+  make input -orient R90Y -name SelS_H -origin {1290 860}
+  make output -orient RY -name Cout_H -origin {1350 200}
+  make input -orient R90Y -name SelCI_H -origin {1290 420}
+  generate name_net_s name_net -cell name_net
+  make name_net -name Cout1_H -origin {490 170}
+  make name_net -name Cout0_H -origin {830 230}
+  generate row_spanner row_spanner150 -width 150
+  make row_spanner150 -origin {930 1010}
+  make row_spanner150 -origin {590 1010}
+  make name_net -name Sum1_H -origin {1130 660}
+  make name_net -name Sum0_H -origin {1130 720}
+  make name_net -name G_L -origin {370 440}
+  make name_net -name K_H -origin {370 520}
+  make name_net -name P_L -origin {370 590}
+  generate row_spanner row_spanner300 -width 300
+  make row_spanner300 -origin {70 1010}
+  make MMIG_ADD_CFLC -origin {170 190}
+  generate MMI_NAND2 MMI_NAND2C -Size C
+  make MMI_NAND2C -orient RY -origin {90 440}
+  generate MMI_NOR2 MMI_NOR2C_1 -Size C -DeMorgan 1
+  make MMI_NOR2C_1 -origin {90 520}
+  generate MMI_INAND2 MMI_INAND2B -Size B
+  make MMI_INAND2B -origin {260 590}
+  generate MMI_OAI21 MMI_OAI21B_1 -Size B -DeMorgan 1
+  make MMI_OAI21B_1 -orient R270 -origin {490 320}
+  make MMI_OAI21B_1 -orient R270 -origin {830 340}
+  generate MMI_INV MMI_INVA_1 -DeMorgan 1
+  make MMI_INVA_1 -origin {550 680}
+  make MMI_INVA_1 -origin {890 740}
+  generate MMI_MUX2 MMI_MUX2C -Size C
+  make MMI_MUX2C -orient RY -origin {1290 200}
+  make MMI_MUX2C -orient RY -origin {1290 690}
+  make MMI_XNOR2 -orient RY -origin {670 660}
+  make MMI_XNOR2 -orient RY -origin {1010 720}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.6 -date 03/08/99 -origin {590 1130}
+  make_wire -30 460 0 460
+  make_wire 460 440 460 420
+  make_wire 160 520 160 610
+  make_wire 160 610 200 610
+  make_wire 0 460 0 540
+  make_wire 0 540 30 540
+  make_wire 190 440 190 570
+  make_wire 20 420 20 500
+  make_wire 530 420 530 520
+  make_wire 0 460 30 460
+  make_wire 490 680 490 850
+  make_wire 490 680 490 420
+  make_wire 370 440 460 440
+  make_wire 460 440 800 440
+  make_wire 870 440 870 520
+  make_wire 370 520 530 520
+  make_wire 530 520 870 520
+  make_wire 830 740 830 850
+  make_wire 830 740 830 440
+  make_wire 830 230 1230 230
+  make_wire 490 170 1230 170
+  make_wire -30 420 20 420
+  make_wire 20 420 30 420
+  make_wire 150 440 190 440
+  make_wire 190 440 370 440
+  make_wire 20 500 30 500
+  make_wire 150 520 160 520
+  make_wire 160 520 370 520
+  make_wire 190 570 200 570
+  make_wire 320 590 370 590
+  make_wire 490 170 490 220
+  make_wire 830 230 830 240
+  make_wire 610 590 610 640
+  make_wire 730 660 1130 660
+  make_wire 1130 660 1230 660
+  make_wire 950 590 950 700
+  make_wire 370 590 610 590
+  make_wire 610 590 950 590
+  make_wire 1070 720 1130 720
+  make_wire 1130 720 1230 720
+  make_wire 1290 150 1290 420
+  make_wire 1290 640 1290 860
+}
+
+proc ICON_MMIG_ADD_CFLC args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin1_L
+  icon_term -type input -origin {-20 120} -orient R270 -name Cin0_L
+  icon_term -type input -origin {140 100} -orient RXY -name SelS_H
+  icon_term -type output -origin {-40 -120} -orient R90Y -name Cout_H
+  icon_term -type input -origin {140 80} -orient RX -name SelCI_H
+  icon_property -origin {-130 210} -type user -name name
+  icon_property -origin {-130 230} -type user -name M
+  icon_property -origin {-130 250} -type user -name pad
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin1_L
+  icon_property -origin {-20 110} -anchor e -rotate 1 -label Cin0_L
+  icon_property -origin {-40 -110} -rotate 1 -label Cout_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 10} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label CFLC
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {130 100} -anchor e -label SelS_H
+  icon_property -origin {130 80} -anchor e -label SelCI_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+}
+

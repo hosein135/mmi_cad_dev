@@ -1,0 +1,108 @@
+# SUE version MMI_SUE4.1.12
+
+proc SCHEMATIC_MMIG_MUL_B8PPG {} {
+  generate MMI_INV MMI_INVA 
+  make MMI_INVA -orient RY -origin {-20 270}
+  make MMI_INVA -orient RY -origin {-20 430}
+  generate MMI_AOI22 MMI_AOI22A 
+  make MMI_AOI22A -origin {560 320}
+  make MMI_AOI22A -origin {240 480}
+  make input -orient RY -name B2 -origin {-160 430}
+  make input -orient RY -name B1 -origin {-160 270}
+  make MMI_INVA -orient RY -origin {-20 590}
+  make MMI_AOI22A -origin {240 640}
+  make MMI_INVA -orient RY -origin {-20 750}
+  make MMI_AOI22A -origin {560 800}
+  make input -orient RY -name B3 -origin {-160 590}
+  make input -orient RY -name {sel[1]} -origin {-160 310}
+  make input -orient RY -name {sel[0]} -origin {-160 370}
+  make input -orient RY -name {sel[3]} -origin {-160 470}
+  make input -orient RY -name {sel[2]} -origin {-160 530}
+  make input -orient RY -name {sel[5]} -origin {-160 630}
+  make input -orient RY -name {sel[4]} -origin {-160 690}
+  make input -orient RY -name B4 -origin {-160 750}
+  make input -orient RY -name {sel[7]} -origin {-160 790}
+  make input -orient RY -name {sel[6]} -origin {-160 850}
+  generate MMI_NAND4 MMI_NAND4C_ -Size C -DeMorgan 1
+  make MMI_NAND4C_ -origin {840 560}
+  make output -name PP -origin {960 560}
+  generate row_spanner row_spanner200 
+  make row_spanner200 -origin {680 130}
+  make row_spanner200 -origin {140 130}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.6 -date 06/02/00 -origin {320 1090}
+  make_wire -110 270 -80 270
+  make_wire -110 270 -160 270
+  make_wire -110 430 -80 430
+  make_wire -110 430 -160 430
+  make_wire -110 590 -80 590
+  make_wire -110 590 -160 590
+  make_wire -110 750 -80 750
+  make_wire -110 750 -160 750
+  make_wire 780 590 700 590
+  make_wire 900 560 960 560
+  make_wire 700 530 780 530
+  make_wire 670 570 780 570
+  make_wire 670 550 780 550
+  make_wire -110 650 140 650
+  make_wire -110 590 -110 650
+  make_wire -160 470 140 470
+  make_wire 40 590 140 590
+  make_wire -160 530 140 530
+  make_wire -160 690 140 690
+  make_wire 340 480 670 480
+  make_wire 670 480 670 550
+  make_wire -160 630 140 630
+  make_wire 340 640 670 640
+  make_wire 670 570 670 640
+  make_wire -110 490 140 490
+  make_wire -110 430 -110 490
+  make_wire 40 430 140 430
+  make_wire 40 270 460 270
+  make_wire 40 750 460 750
+  make_wire -160 850 460 850
+  make_wire -110 810 460 810
+  make_wire -110 750 -110 810
+  make_wire -160 370 460 370
+  make_wire -110 330 460 330
+  make_wire -110 270 -110 330
+  make_wire -160 310 460 310
+  make_wire -160 790 460 790
+  make_wire 660 320 700 320
+  make_wire 700 320 700 530
+  make_wire 660 800 700 800
+  make_wire 700 590 700 800
+  make_text -origin {-240 -50} -text MMIG_MUL_B8PPG -size large
+  make_text -origin {-240 -10} -text {PPG logic for Booth Multiplier, Radix 8}
+  make_text -origin {790 870} -text {sel[0] = sel B 
+sel[1] = sel !B 
+sel[2] = sel 2B 
+sel[3] = sel !2B 
+sel[4] = sel 3B 
+sel[5] = sel !3B 
+sel[6] = sel 4B
+sel[7] = sel !4B 
+if sel[7:0] = 0, PP = 0}
+}
+
+proc ICON_MMIG_MUL_B8PPG args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {120 -20} -name PP
+  icon_term -type input -origin {-120 0} -name B2
+  icon_term -type input -origin {-120 -20} -name B1
+  icon_term -type input -origin {-120 20} -name B3
+  icon_term -type input -origin {-120 40} -name B4
+  icon_term -type input -origin {-120 80} -name {sel[7:0]}
+  icon_property -origin {-60 180} -type user -name name
+  icon_property -origin {-60 200} -type user -name M
+  icon_property -origin {-60 220} -type user -name dpc
+  icon_line -120 -120 -120 120 120 120 120 -120 -120 -120
+  icon_property -origin {-110 -20} -label {B[n]}
+  icon_property -origin {-110 0} -label {2 * B[n]}
+  icon_property -origin {-110 80} -label {sel[7:0]}
+  icon_property -origin {110 -20} -anchor e -label PP
+  icon_property -origin {0 -70} -size large -anchor center -label MMIG_MUL_B8PPG
+  icon_property -origin {-110 20} -label {3 * B[n]}
+  icon_property -origin {-110 40} -label {4 * B[n]}
+}
+

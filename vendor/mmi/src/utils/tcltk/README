@@ -1,0 +1,23 @@
+
+
+This is the version(s) of Tcl/Tk used by Max/Sue.
+
+MMI (specifically, pat) made a number of custom
+modifications to this version of Tcl/Tk.  The modified
+files are in the directory mmi_custom.
+There are symbolic links to these modified files in the
+tcl/tk release directories, for example tk8.0.4/generic.
+
+Do NOT delete mmi_custom!!!!!
+
+The original releases build all unix objects in the "unix"
+subdirectories of tcl8.0 and tk8.0.  Since we support multiple
+versions, the objects are now built in sub-directories
+with the OS name, and everything else is symlinked back
+to the unix sub-directory.
+
+To build everything, cd /mmi-cad/utils; make
+
+The install.* dir was made by Lee to help with blt compile.
+
+- pat -

@@ -1,0 +1,220 @@
+# Created using mapper from:
+#"MMI_TSBUF {C {MMI_TSBUFC {in in} {en en} {enb enb} {out out}}} {E {MMI_TSBUFE {in in} {en en} {enb enb} {out out}}} "
+
+proc SCHEMATIC_MMI_TSBUF args {
+  call_use_keyword $args {{Size "C"}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    C {
+
+  make global -name gnd -origin {560 430}
+  make global -orient RY -name vdd -origin {560 70}
+  make global -name gnd -origin {970 370}
+  make global -orient RY -name vdd -origin {970 130}
+  make output -name out -origin {1010 250}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {870 330}
+  make pmos -W 3.68 -origin {970 170}
+  make nmos -W 1.84 -origin {970 330}
+  make global -name gnd -origin {740 430}
+  make global -orient RY -name vdd -origin {740 70}
+  make input -name in -origin {440 110}
+  make input -name enb -origin {440 320}
+  make input -name en -origin {450 10}
+  make input -orient RX -name in -origin {800 390}
+  make name_net -name N2 -origin {870 170}
+  make pmos -orient RX -W 0.84 -origin {740 110}
+  make pmos -W 0.84 -origin {560 250}
+  make nmos -orient RX -W .42 -origin {740 250}
+  make nmos -W .42 -origin {560 390}
+  make pmos -W 1.68 -origin {560 110}
+  make nmos -orient RX -W .84 -origin {740 390}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.8 -date 01/20/00 -origin {590 540}
+  make_wire 970 250 970 210
+  make_wire 970 250 970 290
+  make_wire 560 330 560 350
+  make_wire 560 290 560 330
+  make_wire 480 390 500 390
+  make_wire 480 250 500 250
+  make_wire 560 170 560 150
+  make_wire 560 170 560 210
+  make_wire 740 350 740 330
+  make_wire 740 330 560 330
+  make_wire 740 150 740 170
+  make_wire 560 170 740 170
+  make_wire 740 170 740 210
+  make_wire 740 290 740 330
+  make_wire 500 110 440 110
+  make_wire 440 320 480 320
+  make_wire 480 320 480 250
+  make_wire 480 320 480 390
+  make_wire 800 250 840 250
+  make_wire 840 250 840 110
+  make_wire 840 110 800 110
+  make_wire 450 10 840 10
+  make_wire 840 10 840 110
+  make_wire 970 250 1010 250
+  make_wire 870 170 740 170
+  make_wire 870 170 910 170
+  make_wire 740 330 870 330
+  make_wire 870 330 910 330
+  make_text -origin {350 -100} -text {Tristate Buffer}
+  make_text -origin {350 -80} -text {C Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_TSBUF MMI_TSBUFC -Size C -DeMorgan 0
+        make MMI_TSBUFC -origin "$urx $ury"
+    }
+
+    E {
+
+  make global -name gnd -origin {580 430}
+  make global -orient RY -name vdd -origin {580 70}
+  make global -name gnd -origin {990 370}
+  make global -orient RY -name vdd -origin {990 130}
+  make output -name out -origin {1030 250}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {890 330}
+  make global -name gnd -origin {760 430}
+  make global -orient RY -name vdd -origin {760 70}
+  make input -name in -origin {460 110}
+  make input -name enb -origin {460 320}
+  make input -name en -origin {470 10}
+  make input -orient RX -name in -origin {820 390}
+  make name_net -name N2 -origin {890 170}
+  make pmos -W 14.72 -origin {990 170}
+  make nmos -W 7.36 -origin {990 330}
+  make nmos -orient RX -W 2.48 -origin {760 390}
+  make nmos -W 1.24 -origin {580 390}
+  make pmos -orient RX -origin {760 110}
+  make pmos -origin {580 250}
+  make pmos -W 4 -origin {580 110}
+  make nmos -orient RX -W 1.24 -origin {760 250}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.5 -date 12/14/99 -origin {590 540}
+  make_wire 990 250 990 210
+  make_wire 990 250 990 290
+  make_wire 580 330 580 350
+  make_wire 580 290 580 330
+  make_wire 500 390 520 390
+  make_wire 500 250 520 250
+  make_wire 580 170 580 150
+  make_wire 580 170 580 210
+  make_wire 760 350 760 330
+  make_wire 760 330 580 330
+  make_wire 760 150 760 170
+  make_wire 580 170 760 170
+  make_wire 760 170 760 210
+  make_wire 760 290 760 330
+  make_wire 520 110 460 110
+  make_wire 460 320 500 320
+  make_wire 500 320 500 250
+  make_wire 500 320 500 390
+  make_wire 820 250 860 250
+  make_wire 860 250 860 110
+  make_wire 860 110 820 110
+  make_wire 470 10 860 10
+  make_wire 860 10 860 110
+  make_wire 990 250 1030 250
+  make_wire 890 170 760 170
+  make_wire 890 170 930 170
+  make_wire 760 330 890 330
+  make_wire 890 330 930 330
+  make_text -origin {350 -100} -text {Tristate Buffer}
+  make_text -origin {350 -80} -text {E Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_TSBUF MMI_TSBUFE -Size E -DeMorgan 0
+        make MMI_TSBUFE -origin "$urx $ury"
+    }
+
+  }
+}
+
+
+proc NAME_MMI_TSBUF args {
+  call_use_keyword $args {{Size "C"}}
+
+  set nom MMI_TSBUF[string toupper $Size]
+
+  return $nom
+}
+
+
+proc ICON_MMI_TSBUF args {
+  icon_generator $args {{Size "C" {radio C E}} }
+
+  set size [string toupper $Size]
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "C") && ($size != "E")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  switch $size {
+    C {
+
+  icon_term -type input -origin {-60 0} -name in
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -70} -name enb
+  icon_term -type input -origin {-60 60} -name en
+  icon_line 30 0 60 0
+  icon_line -30 0 -60 0
+  icon_property -origin {-10 0} -size large -anchor center -label C
+  icon_line -60 60 -10 60 0 60 0 20
+  icon_arc -10 -40 10 -20 -start 0 -extent 359
+  icon_line -60 -70 0 -70 0 -40
+  icon_line 30 0 -30 40 -30 -30 -30 -40 30 0
+
+    }
+    E {
+
+  icon_term -type input -origin {-60 0} -name in
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -70} -name enb
+  icon_term -type input -origin {-60 60} -name en
+  icon_line 30 0 60 0
+  icon_line -30 0 -60 0
+  icon_property -origin {-10 0} -size large -anchor center -label E
+  icon_line -60 60 -10 60 0 60 0 20
+  icon_arc -10 -40 10 -20 -start 0 -extent 359
+  icon_line -60 -70 0 -70 0 -40
+  icon_line 30 0 -30 40 -30 -30 -30 -40 30 0
+
+    }
+  }
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_TSBUF -Size $Size]
+  set nname [NAME_MMI_TSBUF -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    C {
+    set pnames ".in(\$in), .en(\$en), .enb(\$enb), .out(\$out)"
+    }
+    E {
+    set pnames ".in(\$in), .en(\$en), .enb(\$enb), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}
