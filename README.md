@@ -1,23 +1,34 @@
 # Micro Magic CAD (Nix, native x86_64)
 
-Nix FHS environment on x86_64 Linux / WSL2. CAD tools are rebuilt from the public-domain source as ELF 64-bit.
+Reproducible Nix FHS environment on **x86_64 Linux**: bare metal, a VM, or WSL2. CAD tools are rebuilt from the public-domain sources as ELF 64-bit. **GUI uses a Nix-built TigerVNC X server**. View the desktop in a browser via noVNC.
 
-The extracted CAD tree is **`vendor/mmi/`** (in git). `./run.sh --prep-only` rebuilds x86_64 tools into `vendor/mmi/bin` if needed.
+nixpkgs is **NixOS 25.05**, locked by git revision + `narHash` in `flake.lock`. Evaluation is **pure** (`nix run` / `nix build` without `--impure`).
 
-If you only have the original archive, put `vendor/mmi_pd_040526.tar.gz` here once; `./run.sh --prep-only` unpacks it into `vendor/mmi`, flattens names, and deletes the tarball.
+The CAD tree is **`vendor/mmi/`** (in git, sources only). Binaries are not committed; they live in the Nix store.
 
-`vendor/mmi` is a case-sensitive NTFS folder so names like `aux/` work on Windows. Do not commit `vendor/result` (Nix store symlink).
+## Requirements
+
+| Need | Notes |
+|------|--------|
+| x86_64 Linux | NixOS, Debian, Ubuntu, Fedora, etc. — install, VM, or **WSL2** |
+| Nix (flakes) | [Install Nix](https://nixos.org/download.html); NixOS already has it |
+| User namespaces | Needed by bubblewrap. Ubuntu 24.04+: if `nix run` fails, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` |
+| Not WSL1 | WSL1 has no real kernel userns. `wsl --set-version <distro> 2` |
+
+Windows-native is not a run target. Clone on Windows if you want, then run inside WSL2 or a Linux VM.
 
 ## Layout
 
 ```
 .
-├── flake.nix
+├── flake.nix / flake.lock
 ├── run.sh
-├── vendor/mmi/                   # extracted CAD tree + x64 bins
-├── pdk/                          # MAX PDK import Tcl
-├── nix/rebuild/                  # extract + patch + compile + install
-├── nix/x11/                      # XLFD fonts + Xresources
+├── vendor/mmi/                   # CAD sources + data (no store ELFs)
+├── pdk/                          # MAX import Tcl + Magic rc files
+├── nix/rebuild/                  # patch + compile + install
+├── nix/x11/                      # fonts, Xresources, Xvnc helper
+├── nix/pdk/                      # assemble flake-locked PDKs
+├── nix/host-linux.sh             # distro/VM/WSL2 preflight
 ├── nix/launch.sh
 └── data/{pdks,workspace,home}
 ```
@@ -25,23 +36,33 @@ If you only have the original archive, put `vendor/mmi_pd_040526.tar.gz` here on
 ## Quick start
 
 ```bash
-# vendor/mmi_pd_040526.tar.gz must be present the first time
-chmod +x run.sh
-./run.sh --prep-only    # extract, delete .tar.gz, compile
-./run.sh max
+chmod +x run.sh scripts/setup-git.sh
+./scripts/setup-git.sh   # once: LF line endings in this clone
+./run.sh --prep-only     # optional: warm the Nix store
+./run.sh max             # starts Nix Xvnc + noVNC, then MAX
 ```
 
-`run.sh` uses `nix --impure` so local vendor paths resolve on WSL.
+Open the printed URL (default `http://127.0.0.1:6080/vnc.html?autoconnect=1`).
+
+On Windows (checkout only): `powershell -File scripts/setup-git.ps1`, then run `./run.sh` from **WSL2**.
 
 ## Commands
 
 | Command | Action |
 |---------|--------|
-| `./run.sh` | CAD shell |
+| `./run.sh` | CAD shell (Nix X + noVNC) |
 | `./run.sh max` | Start MAX |
 | `./run.sh sue` | Start SUE |
 | `./run.sh nst` | Start NST |
-| `./run.sh --prep-only` | Extract (if needed) and build |
+| `./run.sh --prep-only` | Build into the Nix store |
+| `nix flake check` | Verify required binaries |
+
+| Environment | Action |
+|-------------|--------|
+| `MMI_NO_X=1` | Do not start Xvnc |
+| `MMI_USE_HOST_X=1` | Use host `DISPLAY` instead of Nix X |
+| `MMI_OPEN_BROWSER=0` | Do not auto-open noVNC |
+| `MMI_CAD_ROOT=` | Writable overlay root (default: repo dir, or `~/.local/state/mmi-cad` for `nix run`) |
 
 ## Inside the FHS sandbox
 
@@ -49,8 +70,17 @@ chmod +x run.sh
 |------|----------|
 | `/mmi-vendor/mmi` | Rebuilt 64-bit CAD + scripts/tech |
 | `/mmi-bundle` | From `pdk/` |
-| `/mmi-magic` | Magic VLSI (nixpkgs) |
-| `/mmi-pdks` | `data/pdks` |
+| `/mmi-magic` | Magic VLSI (nixpkgs 25.05) |
+| `/mmi-pdks-nix` | Flake-locked PDK sources + Magic tech |
+| `/mmi-pdks` | Writable overlay (`data/pdks`; seeded from Nix) |
+| `/mmi-xfonts` | Bitmap fonts for Nix Xvnc |
 | `/mmi-home` | `data/home` |
 
-If a tool failed to compile, `nix build .#mmi-vendor --impure` prints which binary is missing.
+## Reproducibility
+
+- nixpkgs is `github:NixOS/nixpkgs/nixos-25.05`, locked to a commit + `narHash` (not a moving `nixos-unstable.tar.gz` URL).
+- Vendor CAD sources are the git tree (`vendor/mmi`); the Nix derivation excludes `vendor/mmi/bin`.
+- `SOURCE_DATE_EPOCH=315532800`, `LC_ALL=C`, `-frandom-seed=mmi-cad-040526`, deterministic `ar rcsD`, sorted `tar` and font indexes (`fonts.dir`).
+- `.gitattributes` marks archives/images as binary; `scripts/setup-git.sh` disables `core.autocrlf` so Windows/WSL checkouts do not rewrite sources.
+
+`nix build --rebuild --check .#mmi-vendor` on x86_64 Linux should reproduce the same output path.

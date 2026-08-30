@@ -10,10 +10,26 @@ export MMI_UTILS="${UTILS}"
 export PATH="${PATH}"
 
 : "${CC:=gcc}"
-export CC
-export CFLAGS="${CFLAGS:--std=gnu89 -fcommon -fno-strict-aliasing -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0} -Wno-error -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-return-type -Wno-unused -Wno-old-style-definition -Wno-declaration-after-statement -include float.h -DCLK_TCK=100"
+: "${CXX:=g++}"
+export CC CXX
+: "${SOURCE_DATE_EPOCH:=315532800}"
+export SOURCE_DATE_EPOCH
+export CFLAGS="${CFLAGS:--std=gnu89 -fcommon -fno-strict-aliasing -O2 -frandom-seed=mmi-cad-040526 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0} -Wno-error -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-return-type -Wno-unused -Wno-old-style-definition -Wno-declaration-after-statement -include float.h -DCLK_TCK=100"
+
+export LC_ALL=C
+export LANG=C
+export TZ=UTC
+DATE_STR="$(date -u -d "@${SOURCE_DATE_EPOCH}" "+%b %e %Y" 2>/dev/null || date -u -r "${SOURCE_DATE_EPOCH}" "+%b %e %Y")"
+TIME_STR="$(date -u -d "@${SOURCE_DATE_EPOCH}" "+%H:%M:%S" 2>/dev/null || date -u -r "${SOURCE_DATE_EPOCH}" "+%H:%M:%S")"
+CFLAGS="${CFLAGS} -Wno-builtin-macro-redefined -D__DATE__=\"${DATE_STR}\" -D__TIME__=\"${TIME_STR}\""
+
+# Deterministic GNU ar (zero uid/gid/mtime in archive members).
+mmi_ar_rcs() { ar -D rcs "$@"; }
+export AR="ar -D rc"
+export RANLIB="${RANLIB:-ranlib}"
+
 export NIX_CFLAGS_COMPILE="${NIX_CFLAGS_COMPILE:-} ${CFLAGS}"
-HOST_TCLSH="$(command -v tclsh || true)"
+HOST_TCLSH="$(command -v tclsh)"
 
 LIBDIR="${UTILS}/lib.x86_64-linux"
 mkdir -p "${LIBDIR}"
@@ -29,7 +45,7 @@ build_tcl() {
   rm -f config.cache config.status
   bash ./configure --disable-shared --disable-load --enable-gcc \
     --cache-file=/dev/null --prefix="${UTILS}/tcltk/install-x64"
-  make -e -j1 CFLAGS="${CFLAGS}" || make -e -j1
+  make -e -j1 CFLAGS="${CFLAGS}"
   cp -f libtcl8.0.a "${LIBDIR}/" || cp -f *.a "${LIBDIR}/libtcl8.0.a"
   if [ -x tclsh ]; then
     mkdir -p "${UTILS}/bin.x86_64-linux"
@@ -49,8 +65,8 @@ build_tk() {
     --cache-file=/dev/null \
     --with-tcl="${UTILS}/tcltk/tcl8.0.4/unix" \
     --prefix="${UTILS}/tcltk/install-x64"
-  make -e -j1 CFLAGS="${CFLAGS}" || make -e -j1
-  cp -f libtk8.0.a "${LIBDIR}/" || true
+  make -e -j1 CFLAGS="${CFLAGS}"
+  cp -f libtk8.0.a "${LIBDIR}/"
   if [ -x wish ]; then
     mkdir -p "${UTILS}/bin.x86_64-linux"
     cp -f wish "${UTILS}/bin.x86_64-linux/wish"
@@ -112,22 +128,20 @@ EOF
   # Nix sets AR=ar which breaks BLT's "AR = ar rc" + "$(AR) $@ $(OBJS)" recipe.
   (
     cd src
-    make AR="ar rc" RANLIB=ranlib EXTRA_CFLAGS= \
+    make AR="${AR}" RANLIB="${RANLIB}" EXTRA_CFLAGS= \
       CFLAGS="${CFLAGS} ${inc}" \
       INCLUDES="-I. -I.. ${inc}" \
       -j1 all
-  ) || {
-    log "BLT src make failed; assembling libBLT.a from objects if any"
-  }
-  mkdir -p src
-  if ls src/*.o >/dev/null 2>&1; then
-    ( cd src && rm -f libBLT.a && ar rcs libBLT.a ./*.o && ranlib libBLT.a )
-  fi
+    mapfile -t blt_objs < <(LC_ALL=C find . -maxdepth 1 -name '*.o' | LC_ALL=C sort)
+    rm -f libBLT.a
+    mmi_ar_rcs libBLT.a "${blt_objs[@]}"
+    "${RANLIB}" libBLT.a
+  )
   if [ ! -f src/libBLT.a ]; then
     log "ERROR: libBLT.a not built (NST requires BLT)"
     exit 1
   fi
-  file src/libBLT.a || true
+  file src/libBLT.a
   cd "${ROOT}"
 }
 
@@ -138,27 +152,27 @@ build_tclmods() {
   mkdir -p o/x86_64-linux
   # Do not use find(1) — vendor tree ships 32-bit libtclmods8.0.a under o/i486-linux*.
   make -j1 MMI_UTILS="${UTILS}" TARGET=x86_64-linux \
-    CC="${CC:-gcc}" CFLAGS="${CFLAGS}" AR="ar rc" RANLIB=ranlib
+    CC="${CC:-gcc}" CFLAGS="${CFLAGS}" AR="${AR}" RANLIB="${RANLIB}"
   local built="o/x86_64-linux/libtclmods8.0.a"
   if [ ! -f "$built" ]; then
-    objs=$(find o/x86_64-linux -maxdepth 1 -name '*.o' | tr '\n' ' ')
-    if [ -n "${objs}" ]; then
-      ar rcs "$built" ${objs}
-      ranlib "$built"
+    mapfile -t objs < <(LC_ALL=C find o/x86_64-linux -maxdepth 1 -name '*.o' | LC_ALL=C sort)
+    if [ "${#objs[@]}" -gt 0 ]; then
+      mmi_ar_rcs "$built" "${objs[@]}"
+      "${RANLIB}" "$built"
     fi
   fi
   if [ ! -f "$built" ]; then
     log "ERROR: libtclmods8.0.a not built in o/x86_64-linux"
     exit 1
   fi
-  sample=$(find o/x86_64-linux -maxdepth 1 -name '*.o' | head -1)
+  sample=$(LC_ALL=C find o/x86_64-linux -maxdepth 1 -name '*.o' | LC_ALL=C sort | head -1)
   if [ -n "$sample" ] && ! file "$sample" | grep -q 'ELF 64-bit'; then
     log "ERROR: tclmods objects are not ELF 64-bit ($sample)"
-    file "$sample" >&2 || true
+    file "$sample" >&2
     exit 1
   fi
   cp -f "$built" "${LIBDIR}/libtclmods8.0.a"
-  file "${LIBDIR}/libtclmods8.0.a" || true
+  file "${LIBDIR}/libtclmods8.0.a"
   cd "${ROOT}"
 }
 
@@ -196,37 +210,64 @@ build_max() {
 build_aux() {
   log "MAX maxaux (ext2spice, ext2sim, gemini, irsim, anXhelper)"
   local max="${SRC}/max4.3.16"
-  mkdir -p "${max}/o/linux/aux"
-  make -C "${max}/maxaux" -e -k -j1 || true
+  mkdir -p "${max}/o/linux/maxaux/ext/utils" \
+    "${max}/o/linux/maxaux/ext/extflat" \
+    "${max}/o/linux/maxaux/ext/ext2sim" \
+    "${max}/o/linux/maxaux/ext/ext2spice" \
+    "${max}/o/linux/maxaux/gemini" \
+    "${max}/o/linux/maxaux/irsim/irsim" \
+    "${max}/o/linux/maxaux/irsim/anXhelper" \
+    "${max}/o/linux/maxaux/irsim/ana11" \
+    "${max}/o/linux/aux/ext/utils" \
+    "${max}/o/linux/aux/ext/extflat" \
+    "${max}/o/linux/aux/ext/ext2sim" \
+    "${max}/o/linux/aux/ext/ext2spice" \
+    "${max}/o/linux/aux/gemini" \
+    "${max}/o/linux/aux/irsim/irsim" \
+    "${max}/o/linux/aux/irsim/anXhelper" \
+    "${max}/o/linux/aux/irsim/ana11"
+  find "${max}/o/linux/maxaux" "${max}/o/linux/aux" -type d -exec touch {}/depend \;
+  make -C "${max}/maxaux" -e -j1
+  local aux found
+  for aux in ext2spice ext2sim gemini irsim anXhelper; do
+    found="$(LC_ALL=C find "${max}/o" -type f -name "$aux" | LC_ALL=C sort | head -1)"
+    if [ -z "$found" ] || [ ! -x "$found" ]; then
+      log "ERROR: maxaux did not produce $aux"
+      exit 1
+    fi
+    if ! file -L "$found" | grep -q 'ELF 64-bit'; then
+      log "ERROR: $aux is not ELF 64-bit"
+      file -L "$found" >&2
+      exit 1
+    fi
+  done
   cd "${ROOT}"
 }
 
 build_edif2sue() {
-  log "edif2sue (optional)"
+  log "edif2sue"
   local d="${SRC}/edif2sue1.2.12"
-  [ -d "$d" ] || return 0
+  [ -d "$d" ] || { log "ERROR: edif2sue sources missing"; exit 1; }
   cd "$d"
-  if make MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux -j1; then
-    cd "${ROOT}"
-    return 0
+  if ! make MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux \
+      CC="${CXX:-g++}" CXX="${CXX:-g++}" \
+      CFLAGS="-fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -fpermissive -Wno-write-strings -Wno-error" \
+      -j1; then
+    log "edif2sue make failed, compiling with g++"
+    shopt -s nullglob
+    local srcs=(./*.cc)
+    shopt -u nullglob
+    if [ "${#srcs[@]}" -eq 0 ]; then
+      log "ERROR: edif2sue sources missing"
+      exit 1
+    fi
+    ${CXX:-g++} -fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
+      -fpermissive -Wno-write-strings -I. -DE2S_VERSION='"1.2.12"' -c "${srcs[@]}"
+    ${CXX:-g++} -o edif2sue.linux ./*.o -lm
   fi
-  log "edif2sue make failed, trying g++"
-  shopt -s nullglob
-  local srcs=(./*.cc)
-  shopt -u nullglob
-  if [ "${#srcs[@]}" -eq 0 ]; then
-    log "WARN: edif2sue sources missing; skipping"
-    cd "${ROOT}"
-    return 0
-  fi
-  if ! ${CXX:-g++} -fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
-      -Wno-write-strings -I. -DE2S_VERSION='"1.2.12"' -c "${srcs[@]}"; then
-    log "WARN: edif2sue compile failed; skipping"
-    cd "${ROOT}"
-    return 0
-  fi
-  if ! ${CXX:-g++} -o edif2sue.linux ./*.o -lm; then
-    log "WARN: edif2sue link failed; skipping"
+  if [ ! -x edif2sue.linux ] && [ ! -x edif2sue ]; then
+    log "ERROR: edif2sue binary not produced"
+    exit 1
   fi
   cd "${ROOT}"
 }
@@ -236,7 +277,7 @@ build_sue_tee() {
   mkdir -p "${SRC}/sue4.4/bin.linux"
   # sue_tee.c uses // comments (not valid gnu89).
   gcc -O2 -fcommon -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
-    "${SRC}/sue4.4/build/sue_tee.c" -o "${SRC}/sue4.4/bin.linux/sue_tee" || true
+    "${SRC}/sue4.4/build/sue_tee.c" -o "${SRC}/sue4.4/bin.linux/sue_tee"
   cd "${ROOT}"
 }
 
@@ -282,13 +323,14 @@ verify_tools() {
   for f in \
     "${SRC}/max4.3.16/o/linux/max" \
     "${SRC}/sue4.4/bin.linux/sue.exe" \
-    "${SRC}/nst2.4/bin.linux/nst"; do
+    "${SRC}/nst2.4/bin.linux/nst" \
+    "${SRC}/sue4.4/bin.linux/sue_tee"; do
     if [ ! -x "$f" ]; then
       log "ERROR: missing $f"
       ok=1
     elif ! file -L "$f" | grep -q 'ELF 64-bit'; then
       log "ERROR: not ELF 64-bit: $f"
-      file -L "$f" >&2 || true
+      file -L "$f" >&2
       ok=1
     fi
   done

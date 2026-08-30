@@ -5,6 +5,10 @@ ROOT="${1:?extracted tree}"
 OUT="${2:?nix $out}"
 LAYOUT="${LAYOUT_SH:-$(cd "$(dirname "$0")" && pwd)/layout.sh}"
 
+export LC_ALL=C
+export LANG=C
+export TZ=UTC
+
 max_bin="$ROOT/src/max4.3.16/o/linux/max"
 sue_bin="$ROOT/src/sue4.4/bin.linux/sue.exe"
 nst_bin="$ROOT/src/nst2.4/bin.linux/nst"
@@ -27,10 +31,15 @@ if [ "$missing" != 0 ]; then
 fi
 
 mkdir -p "$OUT/mmi"
-# Data/scripts/tech only — not source.
-( cd "$ROOT" && tar -cf - \
+# Data/scripts/tech only — not source, not prebuilt bindir ELFs.
+epoch="${SOURCE_DATE_EPOCH:-315532800}"
+( cd "$ROOT" && tar --sort=name \
+    --mtime="@${epoch}" \
+    --owner=0 --group=0 --numeric-owner \
     --exclude='./src' \
+    --exclude='./bin' \
     --exclude='./.x64-bin' \
+    -cf - \
     . ) | ( cd "$OUT/mmi" && tar -xf - )
 
 bash "$LAYOUT" "$OUT/mmi"
@@ -75,23 +84,53 @@ if [ -d "$fonts_src" ]; then
   cp -a "$fonts_src"/. "$OUT/mmi/max/fonts/"
   if command -v mkfontdir >/dev/null 2>&1; then
     (cd "$OUT/mmi/max/fonts" && mkfontdir . 2>/dev/null || true)
+    if [ -n "${SORT_FONT_INDEX_SH:-}" ] && [ -f "${SORT_FONT_INDEX_SH}" ]; then
+      bash "${SORT_FONT_INDEX_SH}" "$OUT/mmi/max/fonts"
+    fi
   fi
   echo "install: max fonts -> $OUT/mmi/max/fonts"
 fi
 
-for aux in ext2spice ext2sim gemini irsim anXhelper make_tech; do
-  found=$(find "$ROOT/src/max4.3.16/o" -type f -name "$aux" 2>/dev/null | head -1 || true)
-  [ -n "$found" ] && install_bin "$found" "$bindir/$aux"
-done
-
-for e2s in "$ROOT/src/edif2sue1.2.12/edif2sue.linux" "$ROOT/src/edif2sue1.2.12/edif2sue"; do
-  if [ -x "$e2s" ]; then
-    install_bin "$e2s" "$bindir/edif2sue"
-    break
+for aux in ext2spice ext2sim gemini irsim anXhelper; do
+  found=$(LC_ALL=C find "$ROOT/src/max4.3.16/o" -type f -name "$aux" | LC_ALL=C sort | head -1)
+  if [ -z "$found" ]; then
+    echo "install: missing maxaux binary $aux" >&2
+    exit 1
+  fi
+  install_bin "$found" "$bindir/$aux"
+  if [ ! -x "$bindir/$aux" ]; then
+    echo "install: failed to install $aux" >&2
+    exit 1
   fi
 done
 
+e2s=""
+for cand in "$ROOT/src/edif2sue1.2.12/edif2sue.linux" "$ROOT/src/edif2sue1.2.12/edif2sue"; do
+  if [ -x "$cand" ]; then
+    e2s="$cand"
+    break
+  fi
+done
+if [ -z "$e2s" ]; then
+  echo "install: missing edif2sue" >&2
+  exit 1
+fi
+install_bin "$e2s" "$bindir/edif2sue"
+
 install_bin "$ROOT/src/sue4.4/bin.linux/sue_tee" "$bindir/sue_tee"
+if [ ! -x "$bindir/sue_tee" ]; then
+  echo "install: missing sue_tee" >&2
+  exit 1
+fi
+
+if [ -f "$OUT/mmi/max/tech/tech_target/make_tech" ]; then
+  ln -sfn ../max/tech/tech_target/make_tech "$bindir/make_tech"
+elif [ -f "$ROOT/src/max4.3.16/proto/tech/tech_target/make_tech" ]; then
+  install -Dm755 "$ROOT/src/max4.3.16/proto/tech/tech_target/make_tech" "$bindir/make_tech"
+else
+  echo "install: missing make_tech" >&2
+  exit 1
+fi
 
 if [ -x "$ROOT/src/utils/bin.x86_64-linux/tclsh" ]; then
   install_bin "$ROOT/src/utils/bin.x86_64-linux/tclsh" "$bindir/mmi_tclsh"

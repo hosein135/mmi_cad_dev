@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Micro Magic CAD — Nix launcher (x86_64 Linux / WSL2).
+# Micro Magic CAD — Nix launcher for x86_64 Linux (bare metal, VM, or WSL2).
 set -euo pipefail
 
 info()  { printf '%s\n' "[run] $*"; }
@@ -9,6 +9,9 @@ error() { printf '%s\n' "[run] ERROR: $*" >&2; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SCRIPT_DIR}"
 
+# shellcheck source=nix/host-linux.sh
+. "${SCRIPT_DIR}/nix/host-linux.sh"
+
 CMD_ARGS=()
 PREP_ONLY=false
 CLEAN=false
@@ -17,19 +20,23 @@ for arg in "$@"; do
   case "$arg" in
     --help|-h)
       cat <<'EOF'
-Micro Magic CAD — run via Nix flake.
+Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
 
-  ./run.sh              CAD shell
+  ./run.sh              CAD shell (Nix Xvnc + browser noVNC)
   ./run.sh max          start MAX
-  ./run.sh --prep-only  extract tarball (once), delete it, and build
+  ./run.sh --prep-only  build vendor + wrapper into the Nix store
   ./run.sh --clean      remove data/home (CAD overlay)
+
+Needs x86_64 Linux: bare metal, a VM, or WSL2 (not WSL1, not Windows-native).
+GUI uses the Nix TigerVNC X server. Open the printed http://127.0.0.1:6080 URL.
+Host X instead: MMI_USE_HOST_X=1 DISPLAY=:0 ./run.sh max
 EOF
       exit 0
       ;;
     --prep-only) PREP_ONLY=true ;;
     --clean) CLEAN=true ;;
     *.tar|*.tar.gz|*.tgz)
-      warn "Ignoring $arg — put the tarball in vendor/."
+      warn "Ignoring $arg — vendor sources are in git (vendor/mmi)."
       ;;
     *) CMD_ARGS+=("$arg") ;;
   esac
@@ -37,112 +44,46 @@ done
 
 [ ${#CMD_ARGS[@]} -eq 0 ] && CMD_ARGS=("/bin/bash")
 
-source_nix() {
-  if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-    # shellcheck source=/dev/null
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-  elif [ -f "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]; then
-    # shellcheck source=/dev/null
-    . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
-  elif [ -f /etc/profile.d/nix.sh ]; then
-    # shellcheck source=/dev/null
-    . /etc/profile.d/nix.sh
-  fi
-  export NIX_CONFIG="${NIX_CONFIG:-}
-experimental-features = nix-command flakes
-"
-}
-
-check_host() {
-  local os arch
-  os="$(uname -s)"
-  arch="$(uname -m)"
-  case "${os}" in
-    Linux)
-      if [ "${arch}" != "x86_64" ] && [ "${arch}" != "amd64" ]; then
-        error "Need x86_64 Linux (or WSL2), not ${arch}."
-        exit 1
-      fi
-      if grep -qi microsoft /proc/version 2>/dev/null; then
-        if ! uname -r | grep -qiE 'microsoft-standard|WSL2'; then
-          warn "WSL1 detected — bubblewrap needs WSL2."
-        fi
-      fi
-      ;;
-    *)
-      error "Unsupported OS: ${os}. Use x86_64 Linux or WSL2."
-      exit 1
-      ;;
-  esac
-}
-
-detect_display() {
-  if [ -n "${DISPLAY:-}" ]; then
-    return 0
-  fi
-  if grep -qi microsoft /proc/version 2>/dev/null; then
-    local host_ip
-    host_ip="$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf)"
-    [ -n "${host_ip}" ] || { error "Cannot determine Windows host IP from /etc/resolv.conf."; exit 1; }
-    export DISPLAY="${host_ip}:0.0"
-    warn "WSL: using DISPLAY=${DISPLAY} (start VcXsrv/Xming with access control disabled)."
-    return 0
-  fi
-  error "DISPLAY is not set. Start an X session first."
-  exit 1
-}
-
 if [ "${CLEAN}" = true ]; then
   info "Removing data/home (CAD overlay) ..."
   rm -rf "${SCRIPT_DIR}/data/home"/*
 fi
 
-source_nix
+mmi_source_nix
 NIX_BIN=""
-old_ifs="${IFS}"
-IFS=':'
-for dir in ${PATH}; do
-  [ -n "${dir}" ] && [ "${dir}" != "." ] || continue
-  if [ -x "${dir}/nix" ] && [ -f "${dir}/nix" ]; then
-    NIX_BIN="${dir}/nix"
-    break
-  fi
-done
-IFS="${old_ifs}"
-[ -n "${NIX_BIN}" ] || {
+if NIX_BIN="$(mmi_find_nix)"; then
+  :
+else
   error "Nix is not installed. Install from https://nixos.org/download.html"
+  error "NixOS: nix is already on PATH. Other distros: the multi-user daemon installer."
   exit 1
-}
+fi
 
-check_host
+mmi_check_linux_host || exit 1
 
-info "Ensuring vendor tree (extract tarball if needed) ..."
-bash "${SCRIPT_DIR}/nix/rebuild/extract.sh" "${SCRIPT_DIR}"
+if [ ! -d "${SCRIPT_DIR}/vendor/mmi/src/max4.3.16" ]; then
+  error "vendor/mmi/src/max4.3.16 is missing. CAD sources must be in git."
+  error "If you have vendor/mmi_pd_040526.tar.gz, run: bash nix/rebuild/extract.sh"
+  exit 1
+fi
 
 if [ ! -f "${SCRIPT_DIR}/flake.lock" ]; then
-  info "Creating flake.lock ..."
-  "${NIX_BIN}" flake lock "${SCRIPT_DIR}"
+  error "flake.lock is missing. This repository must ship a lock file for reproducibility."
+  exit 1
 fi
 
 if [ "${PREP_ONLY}" = true ]; then
-  info "Building mmi-vendor (x86_64 rebuild) ..."
-  "${NIX_BIN}" build "${SCRIPT_DIR}#mmi-vendor" --out-link "${SCRIPT_DIR}/vendor/result" --impure
-  if [ -d "${SCRIPT_DIR}/vendor/result/mmi/bin" ]; then
-    mkdir -p "${SCRIPT_DIR}/vendor/mmi/bin"
-    cp -a "${SCRIPT_DIR}/vendor/result/mmi/bin/." "${SCRIPT_DIR}/vendor/mmi/bin/"
-    info "x86_64 binaries copied to vendor/mmi/bin"
-  fi
+  info "Building mmi-vendor (pure flake eval, nixpkgs 25.05) ..."
+  "${NIX_BIN}" build --accept-flake-config "${SCRIPT_DIR}#mmi-vendor" --out-link "${SCRIPT_DIR}/vendor/result"
   info "Building mmi-cad wrapper ..."
-  "${NIX_BIN}" build "${SCRIPT_DIR}#mmi-cad" --no-link --impure
-  info "Done."
+  "${NIX_BIN}" build --accept-flake-config "${SCRIPT_DIR}#mmi-cad" --no-link
+  info "Done. Binaries stay in the Nix store (not copied into git)."
   exit 0
 fi
-
-detect_display
 
 export MMI_CAD_ROOT="${SCRIPT_DIR}"
 mkdir -p "${SCRIPT_DIR}/data/pdks" "${SCRIPT_DIR}/data/workspace" "${SCRIPT_DIR}/data/home"
 info "PDK_ROOT (host)  → ${SCRIPT_DIR}/data/pdks"
 info "Workspace        → ${SCRIPT_DIR}/data/workspace"
-info "Starting CAD via nix run ..."
-"${NIX_BIN}" run "${SCRIPT_DIR}#mmi-cad" --impure -- "${CMD_ARGS[@]}"
+info "Starting CAD via nix run (Nix Xvnc) ..."
+"${NIX_BIN}" run --accept-flake-config "${SCRIPT_DIR}#mmi-cad" -- "${CMD_ARGS[@]}"

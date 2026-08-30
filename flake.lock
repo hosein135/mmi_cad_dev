@@ -1,20 +1,78 @@
 {
   "nodes": {
-    "nixpkgs": {
+    "gf180mcu-pdk": {
+      "flake": false,
       "locked": {
-        "lastModified": 1787736819,
-        "narHash": "sha256-cV5xEJJK3BvhU8rEd4mC9UsmDi5qscv/kzGPhBRC5WA=",
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
+        "lastModified": 1685563797,
+        "narHash": "sha256-ha60Rqd88FHBvNrgGcsMcwtLJ+mxMs70sElWYBwk1/U=",
+        "owner": "google",
+        "repo": "gf180mcu-pdk",
+        "rev": "de3240d7529a6970437ac3344820aaae7839f215",
+        "type": "github"
       },
       "original": {
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
+        "owner": "google",
+        "repo": "gf180mcu-pdk",
+        "rev": "de3240d7529a6970437ac3344820aaae7839f215",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1767313136,
+        "narHash": "sha256-16KkgfdYqjaeRGBaYsNrhPRRENs0qzkQVUooNHtoy2w=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "ac62194c3917d5f474c1a844b6fd6da2db95077d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-25.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "open-pdks": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787844598,
+        "narHash": "sha256-k0hOEjKHA3+oMqyQqjb/fRO9ZTctrwO90BF7BvVWnUs=",
+        "owner": "fossi-foundation",
+        "repo": "open-pdks",
+        "rev": "1689ac3f2dc763876eaf967227c7dfe831b031ae",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fossi-foundation",
+        "repo": "open-pdks",
+        "rev": "1689ac3f2dc763876eaf967227c7dfe831b031ae",
+        "type": "github"
       }
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "gf180mcu-pdk": "gf180mcu-pdk",
+        "nixpkgs": "nixpkgs",
+        "open-pdks": "open-pdks",
+        "skywater-pdk": "skywater-pdk"
+      }
+    },
+    "skywater-pdk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1685359248,
+        "narHash": "sha256-Qh9HjSiW0/je+hZZ2eoZtYE7QEjPRR5x5dHu9XWBfYs=",
+        "owner": "google",
+        "repo": "skywater-pdk",
+        "rev": "7198cf647113f56041e02abf3eb623692820c5e1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "google",
+        "repo": "skywater-pdk",
+        "rev": "7198cf647113f56041e02abf3eb623692820c5e1",
+        "type": "github"
       }
     }
   },

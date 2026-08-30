@@ -1,0 +1,32 @@
+# Nix-pinned Magic startup for gf180mcuD (open_pdks layout).
+puts stdout "Sourcing Nix gf180mcuD.magicrc"
+
+if {[catch {set PDK_ROOT [file nativename $env(PDK_ROOT)]}]} {
+  set PDK_ROOT /mmi-pdks
+}
+set PDKPATH $PDK_ROOT/gf180mcuD
+set MAGDIR $PDKPATH/libs.tech/magic
+
+if {[file exists $MAGDIR/gf180mcuD.tech]} {
+  tech load $MAGDIR/gf180mcuD
+} elseif {[file exists $MAGDIR/gf180mcu.tech]} {
+  tech load $MAGDIR/gf180mcu
+}
+
+if {[file exists $MAGDIR/gf180mcuD.tcl]} {
+  source $MAGDIR/gf180mcuD.tcl
+} elseif {[file exists $MAGDIR/gf180mcu.tcl]} {
+  source $MAGDIR/gf180mcu.tcl
+}
+
+if {[catch {set MAGTYPE $env(MAGTYPE)}]} {
+  set MAGTYPE mag
+}
+
+foreach d [glob -nocomplain $PDKPATH/libs.ref/*/$MAGTYPE] {
+  addpath $d
+}
+
+snap lambda
+catch {drc euclidean on}
+catch {ext2spice scale off}

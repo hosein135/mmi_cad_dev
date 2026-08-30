@@ -1,0 +1,34 @@
+# Nix-pinned Magic startup for IHP SG13G2.
+puts stdout "Sourcing Nix ihp-sg13g2.magicrc"
+
+if {[catch {set PDK_ROOT [file nativename $env(PDK_ROOT)]}]} {
+  set PDK_ROOT /mmi-pdks
+}
+set PDKPATH $PDK_ROOT/ihp-sg13g2
+set MAGDIR $PDKPATH/libs.tech/magic
+
+foreach cand {
+  $MAGDIR/ihp-sg13g2.magicrc
+  $MAGDIR/sg13g2.magicrc
+} {
+  if {[file exists $cand] && $cand != [info script]} {
+    source $cand
+    return
+  }
+}
+
+if {[file exists $MAGDIR/ihp-sg13g2.tech]} {
+  tech load $MAGDIR/ihp-sg13g2
+} elseif {[file exists $MAGDIR/sg13g2.tech]} {
+  tech load $MAGDIR/sg13g2
+}
+
+if {[catch {set MAGTYPE $env(MAGTYPE)}]} {
+  set MAGTYPE mag
+}
+
+foreach d [glob -nocomplain $PDKPATH/libs.ref/*/$MAGTYPE] {
+  addpath $d
+}
+
+snap lambda

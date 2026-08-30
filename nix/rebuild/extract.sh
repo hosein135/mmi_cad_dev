@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Unpack vendor/mmi_pd_040526.tar.gz into vendor/mmi (Windows path), flatten
-# dirs, drop NTFS-unsafe leftovers, delete the tarball. Full tree including src/.
+# Optional: unpack vendor/mmi_pd_040526.tar.gz into vendor/mmi.
+# Normal clones already have vendor/mmi in git — this is recovery only.
+# Does not read ~/.cache (that was host-impure).
 set -euo pipefail
 REPO="${1:-}"
 if [ -z "$REPO" ]; then
@@ -18,7 +19,6 @@ done
 
 DEST="${REPO}/vendor/mmi"
 LAYOUT="${REPO}/nix/rebuild/layout.sh"
-OLD_CACHE="${HOME}/.cache/mmi-cad/vendor"
 
 enable_case_sensitive() {
   local linux="$1"
@@ -31,7 +31,6 @@ enable_case_sensitive() {
   fi
 }
 
-# 32-bit helper named "export" collides with directory Export/ on NTFS.
 strip_ntfs_clashes() {
   local root="$1"
   rm -f \
@@ -43,7 +42,7 @@ copy_tree() {
   local from="$1" to="$2"
   rm -rf "$to"
   enable_case_sensitive "$to"
-  tar -C "$from" -cf - . | tar -C "$to" -xf -
+  tar -C "$from" --sort=name -cf - . | tar -C "$to" -xf -
 }
 
 if [ -d "${DEST}/src/max4.3.16" ]; then
@@ -54,34 +53,9 @@ if [ -d "${DEST}/src/max4.3.16" ]; then
   exit 0
 fi
 
-# Prefer migrating the existing WSL cache onto the Windows tree.
-if [ -d "${OLD_CACHE}/src/max4.3.16" ]; then
-  echo "extract: moving WSL cache → ${DEST}"
-  BIN_SAVE=""
-  if [ -d "${DEST}/bin" ] && ls "${DEST}/bin/max" >/dev/null 2>&1; then
-    BIN_SAVE=$(mktemp -d /tmp/mmi-bin.XXXXXX)
-    cp -a "${DEST}/bin/." "$BIN_SAVE/"
-  fi
-  strip_ntfs_clashes "$OLD_CACHE"
-  copy_tree "$OLD_CACHE" "$DEST"
-  if [ -n "$BIN_SAVE" ]; then
-    mkdir -p "${DEST}/bin"
-    cp -a "$BIN_SAVE/." "${DEST}/bin/"
-    rm -rf "$BIN_SAVE"
-  fi
-  rm -rf "$OLD_CACHE" "${HOME}/mmi-vendor"
-  rmdir "${HOME}/.cache/mmi-cad" 2>/dev/null || true
-  rm -f "${REPO}/vendor/SOURCE.txt"
-  echo "extract: Windows tree ${DEST}"
-  if [ -n "$TAR" ]; then
-    rm -f "$TAR"
-    echo "extract: removed ${TAR}"
-  fi
-  exit 0
-fi
-
 if [ -z "$TAR" ]; then
-  echo "extract: need vendor/mmi_pd_040526.tar.gz (or ${DEST} with src/)" >&2
+  echo "extract: vendor/mmi is missing and no mmi_pd_040526 tarball was found." >&2
+  echo "extract: clone this repo with vendor/mmi, or place the tarball in vendor/." >&2
   exit 1
 fi
 
@@ -97,7 +71,7 @@ esac
 
 SRC="${TMP}/mmi_pd_040526"
 if [ ! -d "$SRC" ]; then
-  SRC=$(find "$TMP" -mindepth 1 -maxdepth 1 -type d | head -1)
+  SRC=$(find "$TMP" -mindepth 1 -maxdepth 1 -type d | LC_ALL=C sort | head -1)
 fi
 [ -d "$SRC/src" ] || {
   echo "extract: unexpected archive layout under $TMP" >&2
@@ -109,7 +83,7 @@ echo "extract: flattening directories"
 bash "$LAYOUT" "$SRC"
 strip_ntfs_clashes "$SRC"
 
-echo "extract: Windows tree → ${DEST}"
+echo "extract: tree → ${DEST}"
 copy_tree "$SRC" "$DEST"
 
 rm -f "$TAR" "${REPO}/vendor/SOURCE.txt"
