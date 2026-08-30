@@ -238,9 +238,9 @@ if local_fonts="$(mmi_resolve_local_max_font_dir 2>/dev/null)"; then
   esac
 fi
 if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
-  for sub in 75dpi misc 100dpi Type1 cyrillic; do
+  for sub in encodings 75dpi misc 100dpi Type1 cyrillic; do
     d="${MMI_FONTS_SRC}/${sub}"
-    if [ -d "${d}" ] && [ -f "${d}/fonts.dir" ]; then
+    if [ -d "${d}" ] && { [ -f "${d}/fonts.dir" ] || [ -f "${d}/encodings.dir" ]; }; then
       if [ -z "${FP_LIST}" ]; then
         FP_LIST="${d}"
       else
@@ -252,13 +252,21 @@ if [ -n "${MMI_FONTS_SRC:-}" ] && [ -d "${MMI_FONTS_SRC}" ]; then
 fi
 
 if [ -n "${FP_LIST}" ] && [ -n "${DISPLAY:-}" ]; then
-  if xset fp= "${FP_LIST}" 2>/tmp/xset-fp.err; then
-    echo "  Font path replaced with XLFD bitmap dirs"
+  old_fp="$(xset q 2>/dev/null | awk 'BEGIN{p=0} /Font Path:/{p=1; next} p{gsub(/^[ \t]+/,""); print; exit}')"
+  merged="${FP_LIST}"
+  if [ -n "${old_fp}" ]; then
+    merged="${FP_LIST},${old_fp}"
+  fi
+  if xset fp= "${merged}" 2>/tmp/xset-fp.err; then
+    echo "  Font path set (MMI dirs first, then server path)"
   else
     echo "  WARN: xset fp= failed:"
     cat /tmp/xset-fp.err 2>/dev/null || true
     old_ifs="${IFS}"
     IFS=','
+    for d in ${FP_LIST}; do
+      xset fp- "${d}" 2>/dev/null || true
+    done
     for d in ${FP_LIST}; do
       xset +fp "${d}" 2>/dev/null || true
     done
@@ -282,7 +290,7 @@ if [ -n "${DISPLAY:-}" ]; then
       "-misc-fixed-medium-r-normal--14-140-75-75-c-70-iso8859-1" \
       "fixed" "9x15"
   do
-    if xlsfonts 2>/dev/null | grep -qF -e "${font}"; then
+    if xlsfonts -fn "${font}" 2>/dev/null | grep -q .; then
       echo "  [OK] ${font}"
     else
       echo "  [MISSING] ${font}"

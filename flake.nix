@@ -54,6 +54,8 @@
           pkgs.mkfontscale
           pkgs.findutils
           pkgs.coreutils
+          pkgs.gawk
+          pkgs.gzip
         ];
         fontPkgs = [
           pkgs.font-adobe-75dpi
@@ -82,18 +84,28 @@
             base="$(basename "$d")"
             mkdir -p "$out/$base"
             find "$d" -maxdepth 1 -type f \
-              ! -name fonts.dir ! -name fonts.scale ! -name fonts.alias \
+              ! -name fonts.dir ! -name fonts.scale \
               -exec cp -f {} "$out/$base"/ \;
           done
         done
         chmod -R u+w "$out"
-        install -Dm644 ${./nix/x11/fonts.alias} $out/misc/fonts.alias
-        install -Dm644 ${./nix/x11/fonts.alias} $out/75dpi/fonts.alias
-        install -Dm644 ${./nix/x11/fonts.alias} $out/100dpi/fonts.alias
+        # Some X servers will not list or load gzipped PCFs.
+        find "$out" -name '*.pcf.gz' -exec gzip -df {} + 2>/dev/null || true
+        for dir in $out/misc $out/75dpi $out/100dpi; do
+          mkdir -p "$dir"
+          {
+            [ -f "$dir/fonts.alias" ] && cat "$dir/fonts.alias"
+            cat ${./nix/x11/fonts.alias}
+          } > "$dir/fonts.alias.new"
+          mv "$dir/fonts.alias.new" "$dir/fonts.alias"
+        done
         for dir in $out/misc $out/75dpi $out/100dpi $out/Type1 $out/cyrillic; do
           if [ -d "$dir" ]; then
             rm -f "$dir/fonts.dir" "$dir/fonts.scale"
             (cd "$dir" && mkfontdir . && mkfontscale . 2>/dev/null || true)
+            if [ -f "$dir/fonts.dir" ]; then
+              awk -f ${./nix/x11/mk-font-aliases.awk} "$dir/fonts.dir" >> "$dir/fonts.alias"
+            fi
           fi
         done
         chmod -R u+w "$out"
