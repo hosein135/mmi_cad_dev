@@ -106,8 +106,19 @@ EOF
     --with-tk="${UTILS}/tcltk/tk8.0.4/unix" \
     --prefix="${UTILS}/tcltk/install-x64"
   find . -type f \( -name Makefile -o -name Makefile.in \) -print0 \
-    | xargs -0 sed -i 's/-fwritable-strings//g; s/-Wtraditional//g'
-  CFLAGS="${CFLAGS} ${inc}" make -e EXTRA_CFLAGS= -j1
+    | xargs -0 sed -i \
+      's/-fwritable-strings//g; s/-Wtraditional//g; s/-Wwrite-strings//g; s/-Wshadow//g; s/-Wall//g'
+  # Build static lib only (NST needs libBLT.a, not bltwish). Do not use make -e:
+  # Nix sets AR=ar which breaks BLT's "AR = ar rc" + "$(AR) $@ $(OBJS)" recipe.
+  (
+    cd src
+    make AR="ar rc" RANLIB=ranlib EXTRA_CFLAGS= \
+      CFLAGS="${CFLAGS} ${inc}" \
+      INCLUDES="-I. -I.. ${inc}" \
+      -j1 all
+  ) || {
+    log "BLT src make failed; assembling libBLT.a from objects if any"
+  }
   mkdir -p src
   if ls src/*.o >/dev/null 2>&1; then
     ( cd src && rm -f libBLT.a && ar rcs libBLT.a ./*.o && ranlib libBLT.a )
