@@ -248,9 +248,12 @@ build_edif2sue() {
   local d="${SRC}/edif2sue1.2.12"
   [ -d "$d" ] || { log "ERROR: edif2sue sources missing"; exit 1; }
   cd "$d"
-  if ! make MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux \
+  # Do not leak C-only -std=gnu89 / -Wno-implicit-int into g++.
+  local cxxflags="-fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -fpermissive -Wno-write-strings -Wno-error -std=gnu++98"
+  if ! NIX_CFLAGS_COMPILE="" NIX_CXXFLAGS_COMPILE="${cxxflags}" \
+      make MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux \
       CC="${CXX:-g++}" CXX="${CXX:-g++}" \
-      CFLAGS="-fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -fpermissive -Wno-write-strings -Wno-error" \
+      CFLAGS="${cxxflags}" CXXFLAGS="${cxxflags}" \
       -j1; then
     log "edif2sue make failed, compiling with g++"
     shopt -s nullglob
@@ -260,9 +263,9 @@ build_edif2sue() {
       log "ERROR: edif2sue sources missing"
       exit 1
     fi
-    ${CXX:-g++} -fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
-      -fpermissive -Wno-write-strings -I. -DE2S_VERSION='"1.2.12"' -c "${srcs[@]}"
-    ${CXX:-g++} -o edif2sue.linux ./*.o -lm
+    NIX_CFLAGS_COMPILE="" NIX_CXXFLAGS_COMPILE="${cxxflags}" \
+      ${CXX:-g++} ${cxxflags} -I. -DE2S_VERSION='"1.2.12"' -c "${srcs[@]}"
+    NIX_CFLAGS_COMPILE="" ${CXX:-g++} -o edif2sue.linux ./*.o -lm
   fi
   if [ ! -x edif2sue.linux ] && [ ! -x edif2sue ]; then
     log "ERROR: edif2sue binary not produced"

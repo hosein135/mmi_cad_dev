@@ -480,6 +480,33 @@ sed -i \
   src/edif2sue1.2.12/Makefile \
   src/utils/speedy4.0/Makefile
 
+# g++ 14: nested class forward-declared private, defined public.
+python3 - << 'PY'
+from pathlib import Path
+p = Path("src/edif2sue1.2.12/netnames.h")
+t = p.read_text(encoding="latin-1")
+old = """class NETNAME {
+	class EXPR;
+	class SUBSCRIPT;
+
+    public:
+"""
+new = """class NETNAME {
+    public:
+	class EXPR;
+	class SUBSCRIPT;
+
+"""
+if old not in t:
+    if "class EXPR;" in t and "public:\n\tclass EXPR;" in t.replace("\r\n", "\n"):
+        print("netnames.h already patched")
+    else:
+        raise SystemExit("edif2sue netnames.h: nested class forwards not found")
+else:
+    p.write_text(t.replace(old, new, 1), encoding="latin-1")
+    print("edif2sue netnames.h: public nested class forwards")
+PY
+
 # SUE: no nl_shell (gr.c / mem.h). NST BLT lives in the i486-named source tree.
 python3 - << 'PY'
 from pathlib import Path
