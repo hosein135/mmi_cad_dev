@@ -339,6 +339,83 @@ sed -i \
   -e 's/ -Wreturn-type//g' \
   src/max4.3.16/make/config.linux*
 
+# Magic's page allocator stores pointers in 32-bit INT (OBJECTTOPAGE).
+# That is wrong on LP64 and GCC 14 errors on the casts. Use libc malloc.
+python3 - << 'PY'
+from pathlib import Path
+
+old_int = """#ifdef	ALPHA
+#define	INT		long
+#define ALIGN		long
+#define	BYPERWD		(sizeof (INT))
+#define	LOGBYPERWD	3				    /* LOG2(BYPERWD) */
+#else
+#define	INT		int
+#define ALIGN		int
+#define	BYPERWD		(sizeof (INT))
+#define	LOGBYPERWD	2				    /* LOG2(BYPERWD) */
+#endif"""
+
+new_int = """#ifndef USE_SYSTEM_MALLOC
+#define USE_SYSTEM_MALLOC 1
+#endif
+#define	INT		intptr_t
+#define ALIGN		intptr_t
+#define	BYPERWD		(sizeof (INT))
+#if defined(__LP64__) || defined(_LP64) || defined(ALPHA)
+#define	LOGBYPERWD	3				    /* LOG2(BYPERWD) */
+#else
+#define	LOGBYPERWD	2				    /* LOG2(BYPERWD) */
+#endif"""
+
+for p in Path("src").glob("max*/maxaux/ext/include/malloc.h"):
+    t = p.read_text(encoding="latin-1")
+    if "USE_SYSTEM_MALLOC 1" in t and "intptr_t" in t:
+        print("malloc.h already patched", p)
+        continue
+    if old_int not in t:
+        raise SystemExit(f"malloc.h INT macros not found in {p}")
+    if "#include <stdint.h>" not in t:
+        t = "#include <stdint.h>\n" + t
+    t = t.replace(old_int, new_int, 1)
+    p.write_text(t, encoding="latin-1")
+    print("malloc.h LP64 + USE_SYSTEM_MALLOC", p)
+
+old_ext = """/* These were defined to be error strings in malloc.h */
+#undef	malloc
+#undef	free
+
+/* Imports */
+extern void TxError();
+extern char *TxGetLine();
+extern char *sbrk();
+extern char *malloc();
+"""
+new_ext = """/* These were defined to be error strings in malloc.h */
+#undef	malloc
+#undef	free
+
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+/* Imports */
+extern void TxError();
+extern char *TxGetLine();
+"""
+for p in Path("src").glob("max*/maxaux/ext/utils/malloc.c"):
+    t = p.read_text(encoding="latin-1")
+    if old_ext not in t:
+        if "include <stdlib.h>" in t:
+            print("malloc.c already patched", p)
+            continue
+        raise SystemExit(f"malloc.c extern block not found in {p}")
+    t = t.replace(old_ext, new_ext, 1)
+    t = t.replace("bzero(cp, (int) nbytes);", "memset(cp, 0, (size_t) nbytes);")
+    p.write_text(t, encoding="latin-1")
+    print("malloc.c stdlib after undef", p)
+PY
+
 # MAX link rule typo: ${OBJDIR} was never defined (should be ${OBJ_DIR}).
 sed -i 's/\${OBJDIR}\/max/\${OBJ_DIR}\/max/' src/max4.3.16/max/Makefile
 
@@ -1054,6 +1131,7 @@ find src/max4.3.16/maxaux src/max4.2.11/maxaux -type f -name Makefile 2>/dev/nul
         -e 's|/o/${CONFIG}/aux/|/o/${CONFIG}/maxaux/|g' \
         -e 's|/o/$(CONFIG)/aux/|/o/$(CONFIG)/maxaux/|g' \
         -e 's|^include \$(OBJ_DIR)/depend|-include $(OBJ_DIR)/depend|' \
+        -e 's/COMPILE_FLAGS=	$(CONFIG_CFLAGS)/COMPILE_FLAGS=	$(CFLAGS) $(CONFIG_CFLAGS)/' \
         "$mk"
     done
 if [ -f src/max4.3.16/maxaux/irsim/src/anXhelper/Makefile ]; then

@@ -198,7 +198,7 @@
           "pic"
           "strictoverflow"
         ];
-        NIX_CFLAGS_COMPILE = "-std=gnu89 -fcommon -fno-strict-aliasing -frandom-seed=mmi-cad-040526 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -Wno-error -include float.h -DCLK_TCK=100";
+        NIX_CFLAGS_COMPILE = "-std=gnu89 -fcommon -fno-strict-aliasing -frandom-seed=mmi-cad-040526 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -fpermissive -Wno-error -Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-return-type -Wno-unused -Wno-builtin-declaration-mismatch -Wno-endif-labels -include float.h -DCLK_TCK=100";
         postPatch = ''
           export PATCH_INTPTR="$PATCH_INTPTR"
           export PATCH_PCCTS_H="$PATCH_PCCTS_H"
