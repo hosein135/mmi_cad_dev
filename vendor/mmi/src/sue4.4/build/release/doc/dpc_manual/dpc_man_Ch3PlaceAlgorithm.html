@@ -1,0 +1,549 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 14:38:43">
+<title>The DPC Placement Algorithm</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch2SettingUp.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch4Timing.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 3 </font>
+</h2>
+
+
+<h1>
+  <a name="1026020"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The DPC Placement Algorithm</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1026021"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Overview</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026022"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The placement of icons on the schematic directs the relative placement in the placement file. DPC assumes that data flows horizontally and builds the placement from the top <a href="dpc_man_Ch3PlaceAlgorithm.html#1026037">(See Figure 1)</a>, which is the most significant bit (MSB). </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026037"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 1:   DPC Data Flow</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig13.gif" border="1">
+</div></font><a name="1026931"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1026038"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Don't try to build data paths with data flowing from the top of the page to the bottom or with the LSB on the top. If you do, you will be greatly disappointed. </font>
+<p>
+<p>
+  <dt> <a name="1026039"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most cell libraries are oriented so that the top of the cell has a horizontal VDD supply and the bottom has a horizontal GND supply. In this orientation, the cell heights are fixed but the cell widths vary depending on the function and power level of the cell. In the DPC flow, cells are ROTATED 90 degrees. Therefore schematics oriented by columns in DPC will end up as rows in the DEF placement file. </font>
+<p>
+<p>
+  <dt> <a name="1026042"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that special libraries can also be built with different height cells to better implement certain functions. For example, better packing efficiency can be achieved by building a special full-adder cell for a multiplier. However, you must only place cells of the same heights in the same columns. DPC does not check for this violation. </font>
+<p>
+<p>
+  <dt> <a name="1026043"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Data Path Compiler automatically adjusts the rows of cells in the final placement file so that they alternate between flipped and not flipped. This enables the rows to be abutted so that the VDD supplies and the GND supplies overlap. Therefore, if you change the schematic so that you add or subtract a single column of cells, all subsequent cells will get automatically flipped in the placement from the previous run. You can see this by looking in the placement view (Select <b><code class="CodeStrong">toggle placement view</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu). The small triangle in each placement icon signifies its orientation. </font>
+<p>
+<p>
+  <dt> <a name="1026047"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DEF files allow four possible orientations of cells: N, FN, S, FS as shown in <a href="dpc_man_Ch3PlaceAlgorithm.html#1026060">Figure 2</a>. 90 degree rotations are not allowed. N corresponds to the orientation of a cell without any flipping or mirroring. Cells flipped so that their power is at the bottom of the cell and their ground at the top are FS. This differs from rotating a cell 180 degrees, which gives you an S orientation. In DPC, we define flip as mirroring the cell around its X axis and mirror as mirroring the cell around its Y axis: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026060"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 2:    DEF Cell Orientations</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpc_flips.gif" border="1">
+</div></font><a name="1027035"> </a>
+      </pre>
+
+<h3>
+  <a name="1026064"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The Basic Placement Algorithm </font>
+</h3>
+
+
+<h5>
+<align="left">
+  <a name="1026065"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">(Make Sure You Totally Understand This!)</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1026066"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The first stage of DPC consists of breaking the entire design into columns. All icons whose boundaries overlap with other icons in the same column (even a little) are placed in the same column. It is wise to leave a definite space between columns so that there is no confusion. All text (including the text in the icons), wires, arcs, lines, or icons that don't affect placement (like I/O's or title bars) are ignored during this step. </font>
+<p>
+<p>
+  <dt> <a name="1026068"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once the icons in a column are determined, DPC will place the icons beginning from the left most column and proceeding to the right. The icons in each column are placed from top (MSB) to bottom, sorted by the vertical location of their origins (the little "+" in the icon view of the cell). </font>
+<p>
+<p>
+  <dt> <a name="1026070"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Data Path Compiler is fully hierarchical. If you place down an instance of a 16-bit adder, for example, all of the sub cells of that adder will be placed starting from the given position. This is not quite the same as if you had one multiple-column cell that was the adder. In that case, columns of the cell wouldn't be flipped automatically and thus you couldn't stack other cells above or below it (it would be a special cell with a different cell height). </font>
+<p>
+<p>
+  <dt> <a name="1026071"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you place a hierarchical cell that has 3 columns of cells in it, for example, and you want to place a cell under each of the columns, you can't simply do the following: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026080"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 3:   Hierarchical Placement - Example 1</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag26.gif" border="1">
+</div></font><a name="1027090"> </a>
+      </pre>
+
+<a name="1026081"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">          <br></font>
+
+<dl><dl>
+<p>
+  <dt> <a name="1027110"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Instead you must create a new hierarchical cell which contains the three cells and then stack the two different hierarchical cells: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1027118"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 4:    Hierarchical Placement - Example 2</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag27.gif" border="1">
+</div></font><a name="1027122"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1026092"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to interleave two (or more) columns on the screen, place a <b><strong class="Strong">"</strong></b><b><code class="CodeStrong">row_spanner</code></b><b><strong class="Strong">"</strong></b> (think column spanner - it's a row in the layout because of the 90 Degree rotation) icon under the columns. This is just a simple empty generator whose width can be adjusted so that it will span multiple columns. </font>
+<p>
+<p>
+  <dt> <a name="1026094"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If none of the icons in a column have any <b><code class="CodeStrong">bit specifiers</code></b> (bus notation) or <b><code class="CodeStrong">dpc properties</code></b> (see below), then the icons will be packed flush against each other starting from the MSB (top). No bit slices will be preserved. This mode is useful for packing small bits of control logic either by themselves or in and around data paths. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026098"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Bit Slice Design </font>
+</h3>
+
+
+<h5>
+<align="left">
+  <a name="1026099"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">(You Better Understand This, Too)</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1026100"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In most data paths, cells are placed in bit slices and do not overlap into adjacent bit slices. The data wires flow horizontally, confined to a single bit slice which keeps wires short and makes circuits fast. A notable exception is in logical or arithmetic functions which contain trees or other combining functions, like carry look-ahead adders. In these cases, cells must be placed in a more free-form arrangement, often crossing bit slices. In addition, the minimal control logic and buffering that drives rows of flip-flops, muxes, etc. is often bit slice independent. </font>
+<p>
+<p>
+  <dt> <a name="1026102"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Bused icons (icons with <b><code class="CodeStrong">[max:min]</code></b> or just <b><code class="CodeStrong">[num]</code></b> in their name) are expanded into the appropriate number of individual icons and automatically placed in the bit slice associated with their bit number. For example, an icon with the name<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">[3:2]</code></b><b><strong class="Strong"> </strong></b>will be expanded into two icons,<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">[3]</code></b><b><strong class="Strong"> </strong></b>and<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">[2]</code></b><b><strong class="Strong">, </strong></b>and placed in bit slices 3 and 2. Thus, the icon's name serves two purposes: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026103"> </a>It specifies how many instances are bused together (1 or more) AND </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026104"> </a>It specifies in which bit slices to place the icon. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1026105"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the bit slice position can be overridden with the <b><code class="CodeStrong">"dpc" property </code></b>(see below). If any icon in a column has a bit specifier, then the bit slices of that column will be aligned to the same bit slices of all other columns. Therefore, icons with name [1] will be aligned with all icons in all columns with the name [1] on that schematic. Consider the following example: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026115"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 5:   Bussed Icons</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag18.gif" border="1">
+</div></font><a name="1027191"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1026117"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you place multiple bused icons in the column with overlapping bit slices, then the icons will be interleaved. Furthermore, the icon whose origin is closer to the top of the schematic will be placed first. For example: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026126"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 6:   Bussed Icon - Example 2</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag19.gif" border="1">
+</div></font><a name="1027589"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1026128"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">What happens if you interleave enough cells in the same bit slice that they don't fit? The Data Path Compiler has two ways of dealing with this situation: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026129"> </a>Let the cells overflow into the next bit slice, OR </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026130"> </a>Force overflow cells into adjacent columns to the right in the same bit slice. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1026132"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Case 1 is considered the "<b><code class="CodeStrong">normal</code></b>" mode and case 2 is called "<b><code class="CodeStrong">bit_slice</code></b>". These modes are determined globally by the variable <b><code class="CodeStrong">DPC(MODE)</code></b> and they can also be adjusted on a schematic by schematic basis by adding the "<b><code class="CodeStrong">dpc_control</code></b>" icon and specifying the "<b><code class="CodeStrong">mode</code></b>". Below is an example that shows the different placements that result under the different modes: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026144"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 7:   DPC Placement Modes</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag20.gif" border="1">
+</div></font><a name="1027645"> </a>
+      </pre>
+
+<h3>
+  <a name="1026146"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Mixed Bit Slice Design </font>
+</h3>
+
+
+<h5>
+<align="left">
+  <a name="1026147"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">(And This One)</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1026149"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">What happens when you mix bused icons with non-bused icons in the same column? This happens all the time. All icons without a bit specification will be placed in the "current" bit location. Remember that the icons are being placed on a column by column basis starting from the icon whose origin is closest to the top and ending with the one whose origin is closest to the bottom of the schematic. The "current" bit location is either the bit slice where the last icon was placed in the column or, if none, then the highest bit slice in the entire schematic (i.e. the top of the placement). </font>
+<p>
+<p>
+  <dt> <a name="1026151"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To override this rule, simply add a bit slice identifier to the icon with the desired bit location, such as <b><code class="CodeStrong">[3]</code></b><b><strong class="Strong">. </strong></b>This can be either placed in the name field or in the dpc property field for people who don't like to clutter up the name. Note: a bit specifier in the dpc field overrides the name field. </font>
+<p>
+<p>
+  <dt> <a name="1026153"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following example should make this crystal clear: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1026162"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 8:   DPC Placement Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_diag21.gif" border="1">
+</div></font><a name="1027750"> </a>
+      </pre>
+
+<h3>
+  <a name="1026164"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Getting Tricky</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026165"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes a bus with more bits than the rest of the data path is needed, for example, from the output of a multiplier. To get this bus into the width of the rest of the data path, you want to double up the bit slices. The "dpc" property on standard cell icons is set up for just that and other non-standard cases. To specify the algorithmic bit slice positioning of a bus, use the syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p[max:min]=f($b)   or</font><a name="1026168"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p[bit]=f($b)       or more simply</font><a name="1026169"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p=f($b)            or more simply</font><a name="1026170"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">f($b)
+</font><a name="1026171"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026172"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where "$b" will be substituted for the actual bit number. NOTE: spaces are NOT allowed in expressions. Also, you can use the most simplified last form only when the expression includes a "$b" (see below). For example, to fit a 64 bit bus ([63:0]) into bit slices 31 to 0, use the following expression: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">$b/2
+</font><a name="1026173"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026174"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To flip the order of an icon with the size [15:0], use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">15-$b
+</font><a name="1026175"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026176"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">to place all three inverters of [2:0] at bit slice position 5, use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p=5
+</font><a name="1026177"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026178"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that in this example you would need to use the "<b><code class="CodeStrong">p=f($b)</code></b>" syntax because it doesn't include a "<b><code class="CodeStrong">$b</code></b>", i.e., just putting a "5" in the <b><code class="CodeStrong">dpc property</code></b> won't work. </font>
+<p>
+<p>
+  <dt> <a name="1026179"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to specify some bits with a different algorithm than others, you can do that also, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p[7:4]=7 p[3:0]=0
+</font><a name="1026180"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026181"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">which will put the top half of the icons in the topmost bit position and the bottom half into the bottommost bit position. You could have specified the bits completely, also: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p[7]=7 p[6]=7 p[5]=7 p[4]=7 p[3]=0 p[2]=0 p[1]=0 p[0]=0
+</font><a name="1026182"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026183"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you don't specify any bits or ranges of bits, they will just get their normal default bit locations. </font>
+<p>
+<p>
+  <dt> <a name="1026184"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also specify what rows to place the icons of a bused icon in, using the following syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">r[max:min]=f($b)   or</font><a name="1026185"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">r[bit]=f($b)       or more simply</font><a name="1026186"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">r=f($b)
+</font><a name="1026187"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027794"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Thus, if you want to stack a bus in half the height but in two rows, you might use the following syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p=$b/2 r=$b%2
+</font><a name="1027795"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027796"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where the "%" is the modulo operator in TCL (sometimes called the remainder operator). If you want to array an icon laterally instead of vertically, use this: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">p=0 r=$b
+</font><a name="1026191"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026192"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the row syntax is more restrictive than the pitch syntax: you can't specify negative rows and you can't skip rows. </font>
+<p>
+<p>
+  <dt> <a name="1026193"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The pitch or height of each bit position is predetermined by the designer, based on the technology and cell library. This pitch is specified in the <b><strong class="Strong">.suerc</strong></b> file in terms of grids or routing tracks by the variable <b><code class="CodeStrong">DPC(PITCH)</code></b><b><strong class="Strong">. </strong></b>The bit pitch for a single schematic can be overridden by adding the<b><strong class="Strong"> "</strong></b><b><code class="CodeStrong">dpc_control</code></b><b><strong class="Strong">" </strong></b>icon and specifying the <b><strong class="Strong">"</strong></b><b><code class="CodeStrong">pitch</code></b><b><strong class="Strong">". </strong></b></font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026199"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Adding Spaces</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026200"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes, you want cells to be spaced apart from each other in ways different than the simple bit slice methodology. DPC provides this capability with "spacer" cells and by adding to the dpc properties of icons. </font>
+<p>
+<p>
+  <dt> <a name="1026202"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The spacer cell, which is in the <b><code class="CodeStrong">"dpc" Icon List</code></b> box and is a special cell, allows you to add arbitrary horizontal and/or vertical space to a design. Think of this icon as a cell whose size can be adjusted on the schematic (but is empty). If you wanted to added some space between the two rows of your design, place the spacer icon in the desired spot and set its "rows" line to, for example, "2r" or "2 rows". This will add two entire rows of space (or two columns in the placement view) which might be needed to improve the routability of a particularly congested area. If DPC doesn't see an "r" in the string, it will default to grids, which allows for finer control. Note that some routers, like Gambit's, do not handle rows spaced by anything other than complete rows. </font>
+<p>
+<p>
+  <dt> <a name="1026203"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Spacer cells can also be added in between icons in a given column to provide extra space between icons. Simply change the "col" value to the desired number of grids of space. If DPC sees a "p" in the value, as in "2p" or "2 pitches", DPC will add that many pitches of space. </font>
+<p>
+<p>
+  <dt> <a name="1026204"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A more handy way of adding space between icons in the same column is by adding "newbit" (shorthanded to "--") to the dpc property of an icon without a bit specifier. This adds as much space as needed (if any) to start the icon in the beginning of a bit pitch. This property is very useful in lining up the internals of adders and other functional blocks. </font>
+<p>
+<p>
+  <dt> <a name="1026205"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Finally, you can shift an icon up or down a specified number of grids by adding an offset to its dpc property like "+3" or "-2". Be warned that you can force DPC to overlap cells by using a negative offset. This can be useful if your standard cell library is set up to allow this. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026210"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Embedding MegaCells into Data Paths</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026211"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Often, data paths are interrupted by large array functions (called MegaCells) like register files or fifos. While the data paths can be broken and these functions can be added at the top level of the chip, embedding them into data paths is often desirable. MegaCells are different than standard cells or even special cells for the following reasons: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026212"> </a>Because they are large, we can't approximate the ports as all being in the center of the cell and hope to get reasonable estimated capacitances. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1026213"> </a>They can't be arbitrarily flipped because they don't look like standard cells and because their port locations will move drastically, affecting timing and routability. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1026214"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if a data path is interrupted by a fifo and the fifo is designed to take input from one side and create output on the other, then you definitely want to orient the fifo correctly in the data path. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1026215"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Ports Files</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026218"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC uses "ports files" to specify the actual port locations of a cell. Ports files also contain desired orientation and bounding box information. A ports file must have the same path name as the DPC cell but have the suffix "<b><code class="CodeStrong">.ports</code></b>" instead of "<b><code class="CodeStrong">.sue</code></b>". (These suffixes are the recommended defaults but can be changed in the <b><strong class="Strong">.suerc </strong></b>file.) For example, if you had the fifo located in the file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">/home/proj/fast_chip/sue/fifo64.sue
+</font><a name="1026220"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026221"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">then the ports file for this fifo would need to be in the file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">/home/proj/fast_chip/sue/fifo64.ports
+</font><a name="1026222"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026223"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Ports files will always override other data such as the bounding box size given in the files pointed to by the variable<b><code class="CodeStrong"> DPC(PATH)</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1026225"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Ports files have the following format: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026226"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Comment lines start with a "#"</font><a name="1026227"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Blank lines are ignored</font><a name="1026228"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026229"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">bbox width [height]</font><a name="1026230"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026231"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">[orient N|FN|S|FS]</font><a name="1026232"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">[flip 0|1]</font><a name="1026233"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1026234"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">port port_name x y</font><a name="1026235"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">port port_name x y</font><a name="1026236"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">...
+</font><a name="1026237"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026240"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The bbox line specifies the bounding box of the cell in grids and, the port lines specify the coordinates of each port (also in grids). If any ports are not included, they will default to the center of the cell. </font>
+<p>
+<p>
+  <dt> <a name="1026243"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If no "orient" line is given, then DPC will assume that this cell is like a standard cell and will alternate flipping it on a row by row basis. This is useful for overriding the bounding box size from DPC(PATH). </font>
+<p>
+<p>
+  <dt> <a name="1026246"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the "flip" line is supplied, DPC will use the value to determine if the next row is flipped or not. The default is "1" which means that the next row after this cell has an orientation that is flipped from this row. If given a "0" then the next row will has the same orientation as this row. This is useful for double height rows, for example. </font>
+<p>
+<p>
+  <dt> <a name="1026248"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the orientation of the cell is given in the ports file, that orientation will be passed, independent of the row, to the placement file. The user can, however, specify other orientations by adding the keywords <b><strong class="Strong">mirror</strong></b> and/or <b><strong class="Strong">flip</strong></b> to the dpc property of any instances of the cell. </font>
+<p>
+<p>
+  <dt> <a name="1026251"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verifying that a MegaCell has the correct orientation is easy by looking in the placement file. Any selected cell that has specified port locations from ports files will display those ports when you do a <b><code class="CodeStrong">show sel. term names</code></b> command from the <b><code class="CodeStrong">View</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1026253"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The task of making a ports file depends on the state of the cell. If the cell is already laid out, an automated way of creating the ports file is desirable. Micro Magic has a simple script called <b><code class="CodeStrong">lef2ports </code></b>which parses the LEF description of a cell and creates a ports file from it. Otherwise, you need to write it by hand or translate it from some other format. </font>
+<p>
+<p>
+  <dt> <a name="1026355"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch2SettingUp.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch4Timing.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

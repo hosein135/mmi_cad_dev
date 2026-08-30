@@ -241,4 +241,25 @@ mv -f nst "$NSTDIR/bin.linux/nst"
 EOF
 chmod +x src/nst2.4/mknst
 
+# Windows NTFS reserves AUX; rename MAX helper sources so git works on C:.
+for max in src/max4.2.11 src/max4.3.16; do
+  if [ -d "$max/aux" ]; then
+    rm -rf "$max/maxaux"
+    mv "$max/aux" "$max/maxaux"
+    echo "patch: $max/aux -> maxaux"
+  fi
+  mm="$max/make/Makefile.main"
+  if [ -f "$mm" ]; then
+    sed -i \
+      -e 's|aux/ext/|maxaux/ext/|g' \
+      -e 's|aux/irsim/|maxaux/irsim/|g' \
+      -e 's/all: max aux/all: max maxaux/' \
+      -e 's/^aux:/maxaux:/' \
+      -e 's/^\.PHONY: aux$/.PHONY: maxaux/' \
+      -e 's/cd aux;/cd maxaux;/' \
+      "$mm"
+    echo "patch: $mm aux paths -> maxaux"
+  fi
+done
+
 echo "x86_64 source patches applied under $ROOT"

@@ -1,0 +1,107 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_cs_start_n0A_H {} {
+  make output -orient RY -name Sum_H -origin {1150 650}
+  make input -orient RY -name A_H -origin {-20 460}
+  make input -orient RY -name B_H -origin {-20 500}
+  make input -orient R90Y -name Cin1_H -origin {480 980}
+  make input -orient R90Y -name Cin0_H -origin {750 970}
+  make output -orient R90Y -name Cout1_H -origin {480 180}
+  make output -orient R90Y -name Cout0_H -origin {710 180}
+  generate row_spanner row_spanner100 -width 100
+  make row_spanner100 -origin {480 1210}
+  make INAND2A -orient RY -origin {230 620}
+  make NAND2B -orient RY -origin {80 480}
+  make MUX2D -orient R90Y -origin {510 930}
+  make input -orient R90Y -name SelCI_H -origin {1050 960}
+  make output -orient R90Y -name SelCO_H -origin {1050 180}
+  make output -orient R90Y -name SelS_H -origin {970 180}
+  make cs_start_n0A_H -origin {50 230}
+  generate row_spanner row_spanner150 -width 150
+  make row_spanner150 -origin {150 1210}
+  make name_net -name G_L -origin {340 480}
+  make name_net -name K_H -origin {340 550}
+  make name_net -name Sum1_H -origin {720 620}
+  make name_net -name Sum0_H -origin {720 680}
+  make INVA_ -origin {520 680}
+  make NOR2B_ -orient RY -origin {60 550}
+  make BUFE -orient R270 -origin {970 790}
+  make INVB_ -orient R270 -origin {710 370}
+  make INVB_ -orient R270 -origin {480 370}
+  generate row_spanner row_spanner250 -width 250
+  make row_spanner250 -origin {890 1210}
+  make MUX2A -orient RY -origin {970 650}
+  make sccs_title_bar -owner emc -version 1.6 -date 01/25/99 -origin {330 1360}
+  make_wire -20 500 10 500
+  make_wire 10 500 60 500
+  make_wire -20 460 30 460
+  make_wire 30 460 60 460
+  make_wire 710 320 710 180
+  make_wire 160 640 190 640
+  make_wire 480 180 480 320
+  make_wire 160 550 160 640
+  make_wire 410 620 410 680
+  make_wire 190 480 190 600
+  make_wire 970 870 970 820
+  make_wire 1050 180 1050 870
+  make_wire 410 680 490 680
+  make_wire 480 400 480 550
+  make_wire 300 620 410 620
+  make_wire 150 480 190 480
+  make_wire 710 400 710 480
+  make_wire 340 480 190 480
+  make_wire 340 480 710 480
+  make_wire 340 550 480 550
+  make_wire 30 530 40 530
+  make_wire 30 460 30 530
+  make_wire 130 550 160 550
+  make_wire 160 550 340 550
+  make_wire 10 570 40 570
+  make_wire 10 500 10 570
+  make_wire 410 620 720 620
+  make_wire 720 620 950 620
+  make_wire 570 680 720 680
+  make_wire 720 680 950 680
+  make_wire 990 650 1150 650
+  make_wire 550 930 1050 930
+  make_wire 1050 930 1050 960
+  make_wire 510 870 510 910
+  make_wire 510 870 970 870
+  make_wire 970 870 1050 870
+  make_wire 540 950 540 970
+  make_wire 540 970 750 970
+  make_wire 480 950 480 980
+  make_wire 970 180 970 690
+  make_wire 970 690 970 760
+}
+
+proc ICON_cs_start_n0A_H args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {pad {}}}
+  icon_term -type input -origin {-140 -10} -name A_H
+  icon_term -type input -origin {-140 10} -name B_H
+  icon_term -type input -origin {-40 120} -orient R270 -name Cin1_H
+  icon_term -type input -origin {-20 120} -orient R270 -name Cin0_H
+  icon_term -type output -origin {140 0} -name Sum_H
+  icon_term -type output -origin {-40 -120} -orient R270 -name Cout1_H
+  icon_term -type output -origin {-20 -120} -orient R270 -name Cout0_H
+  icon_term -type input -origin {140 80} -orient RXY -name SelCI_H
+  icon_term -type output -origin {140 -80} -orient RY -name SelCO_H
+  icon_term -type output -origin {140 -100} -name SelS_H
+  icon_property -origin {-40 230} -type user -name name
+  icon_property -origin {-40 250} -type user -name M
+  icon_property -origin {-40 270} -type user -name pad
+  icon_property -origin {130 80} -anchor e -label SelCI_H
+  icon_property -origin {-40 110} -anchor e -rotate 1 -label Cin1_H
+  icon_property -origin {-20 110} -anchor e -rotate 1 -label Cin0_H
+  icon_property -origin {-40 -110} -rotate 1 -label Cout1_H
+  icon_property -origin {-20 -110} -rotate 1 -label Cout0_H
+  icon_property -origin {130 -80} -anchor e -label SelCO_H
+  icon_property -origin {-130 -10} -anchor e -rotate 1 -label A_H
+  icon_property -origin {-130 10} -rotate 1 -label B_H
+  icon_property -origin {130 0} -anchor center -rotate 1 -label Sum_H
+  icon_property -origin {0 0} -size large -anchor center -label cs_start_n0A_H
+  icon_property -origin {0 20} -size large -anchor center -label {$name}
+  icon_property -origin {130 -100} -anchor e -label SelS_H
+  icon_line -140 -120 -140 120 140 120 140 -120 -140 -120
+}
+

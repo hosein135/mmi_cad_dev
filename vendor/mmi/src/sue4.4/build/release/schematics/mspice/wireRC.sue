@@ -1,0 +1,24 @@
+# SUE version MMI_SUE3.3
+
+proc ICON_wireRC args {
+  icon_setup $args {{origin {0 0}} {orient R0} {length 100u} {width 0.9u}}
+  icon_term -type inout -origin {-50 0} -orient RX -name t1
+  icon_term -type inout -origin {50 0} -name t2
+  icon_line -30 15 -30 25 -35 25 -25 25
+  icon_line 50 0 18 0 15 -5 10 5 5 -5 0 5 -5 -5 -10 5 -15 -5 -18 0 -50 0
+  icon_property -origin {-30 30} -size small -anchor center -label gnd
+  icon_arc -50 15 -10 45 -start 66 -extent 47
+  icon_line -30 0 -30 10 -37 10 -23 10
+  icon_line 30 15 30 25 25 25 35 25
+  icon_property -origin {30 30} -size small -anchor center -label gnd
+  icon_arc 10 15 50 45 -start 66 -extent 47
+  icon_line 30 0 30 10 23 10 37 10
+  icon_line -50 -40 -50 40 50 40 50 -40 -50 -40
+  icon_property -origin {-110 70} -type user -name length -default 100u
+  icon_property -origin {-110 150} -type fixed -name spice -text {[unique_name C] $t1 gnd [expr [parse_pp_number $length] * 0.15e-9]
+[unique_name R]  $t1 $t2 [expr 0.055*[parse_pp_number $length]/[parse_pp_number $width]]
+[unique_name C] $t2 gnd [expr [parse_pp_number $length] * 0.15e-9]}
+  icon_property -origin {-110 100} -type user -name width -default 0.9u
+  icon_property -origin {-40 -30} -text {$length[if {$width != "0.9u"} {list /$width}]}
+}
+

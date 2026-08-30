@@ -1,0 +1,3758 @@
+NL_SHELL COMMAND HELP       (generated on Thu May 9 14:25:03 PDT 2002 )
+
+************************************************************************
+
+COMMAND: alias
+Usage: alias name cmd [args...]
+************************************************************************
+
+COMMAND: lambda
+
+Create a lambda object.
+
+Usage: lambda <object> <object>
+
+    argument            description
+
+     <object>            procedure arguments
+     <object>            procedure body
+
+************************************************************************
+
+COMMAND: lmapcar
+
+Apply a procedure to all elements of a list.
+
+Usage: lmapcar [-concat] <object> <object>
+
+    option              description
+
+    -concat             concat the results into the final list
+
+    argument            description
+
+     <object>            name of the procedure to apply
+     <object>            apply the procedure to the elements of this list
+
+************************************************************************
+
+COMMAND: nl_add_def_history
+
+Add a string to the DEF history for the specified design.
+
+Usage: nl_add_def_history <string> [<pdesign>]
+
+    argument            description
+
+     <string>            add this string to the history
+     <pdesign>           get the DEF history for this design
+
+************************************************************************
+
+COMMAND: nl_add_net_route
+
+Add a route to the specified net.  The default route type is ROUTED.
+
+Usage: nl_add_net_route [-type <string>] <inet> <object>
+
+    option              description
+
+    -type <string>      the type of the route: ROUTED (default), FIXED, or COVER.
+
+    argument            description
+
+     <inet>              add the route to this net
+     <object>            route to add
+
+************************************************************************
+
+COMMAND: nl_add_reference_parameter
+
+Add a parameter value to the specified reference.
+
+Usage: nl_add_reference_parameter <reference> <integer>
+
+    argument            description
+
+     <reference>         add the parameter to this reference
+     <integer>           value of parameter to add
+
+************************************************************************
+
+COMMAND: nl_add_row_site
+
+Add a row site to the specified design.
+
+Usage: nl_add_row_site <string> <string> <integer> <integer> <string> <integer> <integer> <integer> [<pdesign>]
+
+    argument            description
+
+     <string>            the name of the row
+     <string>            the name of the core site
+     <integer>           the x coordinate of the lower left corner of the row
+     <integer>           the y coordinate of the lower left corner of the row
+     <string>            the orientation of the row
+     <integer>           the number of sites in the row
+     <integer>           the width of the sites
+     <integer>           the height of the sites
+     <pdesign>           add the row site to this design
+
+************************************************************************
+
+COMMAND: nl_add_x_tracks
+
+Set the X tracks of the specified design.
+
+Usage: nl_add_x_tracks <integer> <integer> <integer> <string_list> [<pdesign>]
+
+    argument            description
+
+     <integer>           starting coordinate of the tracks
+     <integer>           the number of tracks
+     <integer>           the track separation
+     <string_list>       the layers involved
+     <pdesign>           set the X tracks for this design
+
+************************************************************************
+
+COMMAND: nl_add_y_tracks
+
+Set the Y tracks of the specified design.
+
+Usage: nl_add_y_tracks <integer> <integer> <integer> <string_list> [<pdesign>]
+
+    argument            description
+
+     <integer>           starting coordinate of the tracks
+     <integer>           the number of tracks
+     <integer>           the track separation
+     <string_list>       the layers involved
+     <pdesign>           set the Y tracks for this design
+
+************************************************************************
+
+COMMAND: nl_apply_rewrites
+
+Apply the RTL rewrites to the specified design.
+
+Usage: nl_apply_rewrites [<design>]
+
+    argument            description
+
+     <design>            apply the rewrites to this design
+
+************************************************************************
+
+COMMAND: nl_attribute_kind
+
+Return the kind of object that the specified attribute applies to.
+
+Usage: nl_attribute_kind <attribute>
+
+    argument            description
+
+     <attribute>         get the object kind of this attribute
+
+************************************************************************
+
+COMMAND: nl_cells_with_attribute
+
+Return a list of all cells that have the specified attribute.
+
+Usage: nl_cells_with_attribute <string> [<design>]
+
+    argument            description
+
+     <string>            get the cells with this attribute
+     <design>            get cells from this design
+
+************************************************************************
+
+COMMAND: nl_clear_row_sites
+
+Remove all the row sites from the specified design.
+
+Usage: nl_clear_row_sites [<pdesign>]
+
+    argument            description
+
+     <pdesign>           remove the row sites from this design
+
+************************************************************************
+
+COMMAND: nl_clear_x_tracks
+
+Remove all X tracks from the specified design.
+
+Usage: nl_clear_x_tracks [<pdesign>]
+
+    argument            description
+
+     <pdesign>           clear the X tracks of this design
+
+************************************************************************
+
+COMMAND: nl_clear_y_tracks
+
+Remove all Y tracks from the specified design.
+
+Usage: nl_clear_y_tracks [<pdesign>]
+
+    argument            description
+
+     <pdesign>           clear the Y tracks of this design
+
+************************************************************************
+
+COMMAND: nl_compute_objective_and_gradient
+
+
+
+Usage: nl_compute_objective_and_gradient [-delta <double>] [-wire_weight <double>] [-overlap_weight <double>] [-boundary_weight <double>] [-row_weight <double>] [-distribution_weight <double>] [-constant_weight <double>] [-cell_bloat <double>] [<pdesign>]
+
+    option              description
+
+    -delta <double>     compute a numeric gradient and use this as the delta
+    -wire_weight <double>weight for wire length objective
+    -overlap_weight <double>weight for overlap objective
+    -boundary_weight <double>weight for boundary objective
+    -row_weight <double>weight for row objective
+    -distribution_weight <double>weight for distribution objective
+    -constant_weight <double>weight for constant force objective
+    -cell_bloat <double>cell bloat factor (1.0 == no cell bloat)
+
+    argument            description
+
+     <pdesign>           do it for this design
+
+************************************************************************
+
+COMMAND: nl_connect_pin
+
+Connect the specified pin to the specified net.
+
+Usage: nl_connect_pin <pin> <net>
+
+    argument            description
+
+     <pin>               pin to connect
+     <net>               connect the pin to this net
+
+************************************************************************
+
+COMMAND: nl_copy_reference
+
+Make a copy of the specified reference in the specified design.
+
+Usage: nl_copy_reference <reference> <design>
+
+    argument            description
+
+     <reference>         copy this reference
+     <design>            into this design
+
+************************************************************************
+
+COMMAND: nl_create_bus
+
+Create a bus with specified type and members.
+
+Usage: nl_create_bus <string> <integer> <integer> <object>
+
+    argument            description
+
+     <string>            the name of the bus
+     <integer>           the left bound of the bus
+     <integer>           the right bound of the bus
+     <object>            a list of the members of the bus, in order
+
+************************************************************************
+
+COMMAND: nl_create_cell
+
+Create a cell (instance) of the specified reference.
+
+Usage: nl_create_cell <string> <reference>
+
+    argument            description
+
+     <string>            name of the cell to create
+     <reference>         create an instance of this reference
+
+************************************************************************
+
+COMMAND: nl_create_cell_attribute
+
+Create and return a new cell attribute.
+
+Usage: nl_create_cell_attribute [-dense] <string> [<design>]
+
+    option              description
+
+    -dense              create a dense attribute
+
+    argument            description
+
+     <string>            name of the attribute to create
+     <design>            design in which to create the attribute
+
+************************************************************************
+
+COMMAND: nl_create_design
+
+Create an empty design.
+
+Usage: nl_create_design <string>
+
+    argument            description
+
+     <string>            name of design to create
+
+************************************************************************
+
+COMMAND: nl_create_design_attribute
+
+Create and return a new design attribute.
+
+Usage: nl_create_design_attribute <string> [<design>]
+
+    argument            description
+
+     <string>            name of the attribute to create
+     <design>            create the attribute on this design
+
+************************************************************************
+
+COMMAND: nl_create_idesign
+
+Create an idesign based on the specified design.
+
+Usage: nl_create_idesign [-stop_attribute <string>] [<design>]
+
+    option              description
+
+    -stop_attribute <string>do not descend into designs that have this attribute
+
+    argument            description
+
+     <design>            top level design of the idesign
+
+************************************************************************
+
+COMMAND: nl_create_libcell
+
+Create a libcell within the specified library.
+
+Usage: nl_create_libcell <string> <library>
+
+    argument            description
+
+     <string>            name of libcell to create
+     <library>           create the libcell in this library
+
+************************************************************************
+
+COMMAND: nl_create_libpin
+
+Create a libpin on the specified libcell.
+
+Usage: nl_create_libpin <string> <string> <libcell>
+
+    argument            description
+
+     <string>            name of libpin to create
+     <string>            the direction of the libpin (in, out, or inout)
+     <libcell>           create the libpin on this libcell
+
+************************************************************************
+
+COMMAND: nl_create_libpin_bus
+
+Create a bus of libpins with specified type.
+
+Usage: nl_create_libpin_bus <string> <string> <integer> <integer> <libcell>
+
+    argument            description
+
+     <string>            the name of the bus
+     <string>            the direction of the libpin bus to create (in, out, or inout)
+     <integer>           the left bound of the bus
+     <integer>           the right bound of the bus
+     <libcell>           create the libpin bus in this libcell
+
+************************************************************************
+
+COMMAND: nl_create_library
+
+Create an empty library with the specified name.
+
+Usage: nl_create_library <string>
+
+    argument            description
+
+     <string>            name of library to create
+
+************************************************************************
+
+COMMAND: nl_create_net
+
+Create a net in the specified design.
+
+Usage: nl_create_net <string> <string> [<design>]
+
+    argument            description
+
+     <string>            name of the net to create
+     <string>            class of net to create (wire, tri, wand, wor, reg, trireg, supply0, or supply1)
+     <design>            create the net in this design
+
+************************************************************************
+
+COMMAND: nl_create_net_attribute
+
+Create and return a new net attribute.
+
+Usage: nl_create_net_attribute [-dense] <string> [<design>]
+
+    option              description
+
+    -dense              create a dense attribute
+
+    argument            description
+
+     <string>            name of the attribute to create
+     <design>            design in which to create the attribute
+
+************************************************************************
+
+COMMAND: nl_create_net_bus
+
+Create a bus of nets with specified type.
+
+Usage: nl_create_net_bus <string> <string> <integer> <integer> [<design>]
+
+    argument            description
+
+     <string>            the name of the bus
+     <string>            class of nets to create (wire, tri, wand, wor, reg, trireg, supply0, or supply1)
+     <integer>           the left bound of the bus
+     <integer>           the right bound of the bus
+     <design>            create the port bus in this design
+
+************************************************************************
+
+COMMAND: nl_create_pdesign
+
+Create a pdesign based on the specified design.
+
+Usage: nl_create_pdesign [-nohierarchy] [<design>]
+
+    option              description
+
+    -nohierarchy        do not create a hierarchical pdesign
+
+    argument            description
+
+     <design>            top level design of the pdesign
+
+************************************************************************
+
+COMMAND: nl_create_plibrary
+
+Create a physical library (plibrary) based on the specified library.
+
+Usage: nl_create_plibrary <library>
+
+    argument            description
+
+     <library>           create a plibrary for this library
+
+************************************************************************
+
+COMMAND: nl_create_port
+
+Create a port in the specified design.
+
+Usage: nl_create_port [-nonet] <string> <string> [<design>]
+
+    option              description
+
+    -nonet              do not create a net to go with the port
+
+    argument            description
+
+     <string>            name of the port to create
+     <string>            the direction of the port to create (in, out, or inout)
+     <design>            create a port on this design
+
+************************************************************************
+
+COMMAND: nl_create_port_attribute
+
+Create and return a new port attribute.
+
+Usage: nl_create_port_attribute [-dense] <string> [<design>]
+
+    option              description
+
+    -dense              create a dense attribute
+
+    argument            description
+
+     <string>            name of the attribute to create
+     <design>            design in which to create the attribute
+
+************************************************************************
+
+COMMAND: nl_create_port_bus
+
+Create a bus of ports with specified type.
+
+Usage: nl_create_port_bus <string> <string> <integer> <integer> [<design>]
+
+    argument            description
+
+     <string>            the name of the bus
+     <string>            the direction of the port bus to create (in, out, or inout)
+     <integer>           the left bound of the bus
+     <integer>           the right bound of the bus
+     <design>            create the port bus in this design
+
+************************************************************************
+
+COMMAND: nl_create_reference
+
+Create a reference in the specified design.
+
+Usage: nl_create_reference <string> [<design>]
+
+    argument            description
+
+     <string>            name of reference to create
+     <design>            design in which to create the reference
+
+************************************************************************
+
+COMMAND: nl_create_reference_for_design
+
+Create a reference referring to the specified design
+
+Usage: nl_create_reference_for_design <design> [<design>]
+
+    argument            description
+
+     <design>            create a reference to this design
+     <design>            create the reference in this design
+
+************************************************************************
+
+COMMAND: nl_create_reference_for_libcell
+
+Create a reference referring to the specified libcell
+
+Usage: nl_create_reference_for_libcell <libcell> [<design>]
+
+    argument            description
+
+     <libcell>           create a reference to this design
+     <design>            create the reference in this design
+
+************************************************************************
+
+COMMAND: nl_create_refpin
+
+Create a refpin on the specified reference.
+
+Usage: nl_create_refpin <string> <reference>
+
+    argument            description
+
+     <string>            name of the refpin to create
+     <reference>         reference on which to create the refpin
+
+************************************************************************
+
+COMMAND: nl_create_refpin_bus
+
+Create a bus of refpins with specified type.
+
+Usage: nl_create_refpin_bus <string> <integer> <integer> <reference>
+
+    argument            description
+
+     <string>            the name of the bus
+     <integer>           the left bound of the bus
+     <integer>           the right bound of the bus
+     <reference>         create the refpin bus in this design
+
+************************************************************************
+
+COMMAND: nl_disconnect_pin
+
+Disconnect the specified pin from any net it is attached to.
+
+Usage: nl_disconnect_pin <pin>
+
+    argument            description
+
+     <pin>               pin to disconnect
+
+************************************************************************
+
+COMMAND: nl_dump_rtl_trees
+
+Dump out the syntax trees for all RTL objects.
+
+Usage: nl_dump_rtl_trees [-widths] [-file] [-line] [<design>]
+
+    option              description
+
+    -widths             dump the node widths
+    -file               dump the file of each node
+    -line               dump the line number of each node
+
+    argument            description
+
+     <design>            dump the trees in this design
+
+************************************************************************
+
+COMMAND: nl_find_attributes
+
+Return the list of attributes whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_attributes [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the attribute (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the attributes anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the attributes
+
+************************************************************************
+
+COMMAND: nl_find_cell_buses
+
+Return the list of cell buses whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_cell_buses [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the cell bus (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the cell buses anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the cell buses
+
+************************************************************************
+
+COMMAND: nl_find_cells
+
+Return the list of cells whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_cells [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the cell (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the cells anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the cells
+
+************************************************************************
+
+COMMAND: nl_find_designs
+
+Return the list of designs whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_designs [-exact] [-regexp] <string>
+
+    option              description
+
+    -exact              the pattern is the name of the design (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+
+    argument            description
+
+     <string>            pattern to match
+
+************************************************************************
+
+COMMAND: nl_find_icells
+
+Return the list of cells whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match.
+
+Usage: nl_find_icells [-exact] [-regexp] [-recursive] <string> [<idesign>]
+
+    option              description
+
+    -exact              the cell name should exactly match the pattern
+    -regexp             the cell name should match the pattern
+    -recursive          find the pattern anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <idesign>           design in which to find the cells
+
+************************************************************************
+
+COMMAND: nl_find_inets
+
+Return the list of nets whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match.
+
+Usage: nl_find_inets [-exact] [-regexp] [-recursive] <string> [<idesign>]
+
+    option              description
+
+    -exact              the net name should exactly match the pattern
+    -regexp             the net name should match the pattern
+    -recursive          find the pattern anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <idesign>           design in which to find the nets
+
+************************************************************************
+
+COMMAND: nl_find_ipins
+
+Return the list of pins whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match.
+
+Usage: nl_find_ipins [-exact] [-regexp] [-recursive] <string> [<idesign>]
+
+    option              description
+
+    -exact              the pin name should exactly match the pattern
+    -regexp             the pin name should match the pattern
+    -recursive          find the pattern anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <idesign>           design in which to find the pins
+
+************************************************************************
+
+COMMAND: nl_find_iports
+
+Return the list of ports whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match.
+
+Usage: nl_find_iports [-exact] [-regexp] [-recursive] <string> [<idesign>]
+
+    option              description
+
+    -exact              the port name should exactly match the pattern
+    -regexp             the port name should match the pattern
+    -recursive          find the pattern anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <idesign>           design in which to find the ports
+
+************************************************************************
+
+COMMAND: nl_find_libcells
+
+Return the list of libcells whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_libcells [-exact] [-regexp] <string>
+
+    option              description
+
+    -exact              the pattern is the name of the libcell (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+
+    argument            description
+
+     <string>            pattern to match
+
+************************************************************************
+
+COMMAND: nl_find_libpins
+
+Return the list of libpins whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_libpins [-exact] [-regexp] <string>
+
+    option              description
+
+    -exact              the pattern is the name of the libpin (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+
+    argument            description
+
+     <string>            pattern to match
+
+************************************************************************
+
+COMMAND: nl_find_libraries
+
+Return the list of libraries whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_libraries [-exact] [-regexp] <string>
+
+    option              description
+
+    -exact              the pattern is the name of the library (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+
+    argument            description
+
+     <string>            pattern to match
+
+************************************************************************
+
+COMMAND: nl_find_net_buses
+
+Return the list of net buses whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_net_buses [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the net bus (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the net buses anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the net buses
+
+************************************************************************
+
+COMMAND: nl_find_nets
+
+Return the list of nets whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_nets [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the net (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the nets anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the nets
+
+************************************************************************
+
+COMMAND: nl_find_pins
+
+Return the list of pins whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_pins [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the pin (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the pins anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the pins
+
+************************************************************************
+
+COMMAND: nl_find_port_buses
+
+Return the list of port buses whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_port_buses [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the port bus (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the port buses anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the port buses
+
+************************************************************************
+
+COMMAND: nl_find_ports
+
+Return the list of ports whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_ports [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the port (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the ports anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the ports
+
+************************************************************************
+
+COMMAND: nl_find_references
+
+Return the list of references whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_references [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the reference (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the references anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the references
+
+************************************************************************
+
+COMMAND: nl_find_refpins
+
+Return the list of refpins whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_refpins [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the refpin (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the refpins anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the refpins
+
+************************************************************************
+
+COMMAND: nl_find_types
+
+Return the list of types whose name matches the specified pattern.
+By default the pattern is matched according to the rules of string_match,
+which allows wildcards like '*', '?', and '[]'.
+
+Usage: nl_find_types [-exact] [-regexp] [-recursive] <string> [<design>]
+
+    option              description
+
+    -exact              the pattern is the name of the type (i.e. no wildcards allowed), with -regexp this option means the pattern must match the entire name
+    -regexp             the pattern is a TCL regular expression
+    -recursive          find the types anywhere in the hierarchy
+
+    argument            description
+
+     <string>            pattern to match
+     <design>            design in which to find the types
+
+************************************************************************
+
+COMMAND: nl_find_unlinked_references
+
+Return a list of names of references
+that are unlinked.
+
+Usage: nl_find_unlinked_references [-recursive] [<design>]
+
+    option              description
+
+    -recursive          find unlinked references throughout the hierarchy.
+
+    argument            description
+
+     <design>            find unlinked references in this design
+
+************************************************************************
+
+COMMAND: nl_foreach_design_cell
+
+Loop over all the cells in the specified design.
+
+Usage: nl_foreach_design_cell [-hierarchy] [-library] [-unlinked] [-recursive] [-noassign] [-from <idesign>] <string> <design> <object>
+
+    option              description
+
+    -hierarchy          loop over only hierarchy cells
+    -library            loop over only instances of library cells
+    -unlinked           loop over only unlinked cells
+    -recursive          recursively loop over all cells in the hierarchy
+    -noassign           don't include assignment buffers
+    -from <idesign>     start at this point in the hierarchy, requires -recursive
+
+    argument            description
+
+     <string>            name of variable to which cells are bound
+     <design>            loop over the cells in this design
+     <object>            loop body
+
+************************************************************************
+
+COMMAND: nl_foreach_design_net
+
+Loop over all the nets in the specified design.
+
+Usage: nl_foreach_design_net [-hierarchy] [-recursive] [-noassign] [-noconstant] [-noempty] [-onlyconstant] <string> <design> <object>
+
+    option              description
+
+    -hierarchy          loop over all unique hierarchial nets
+    -recursive          same as -hierarchy
+    -noassign           treat nets connected by assignment buffers as equivalent
+    -noconstant         do not loop over constant nets
+    -noempty            do not loop over nets that have no pins
+    -onlyconstant       loop over only constant nets
+
+    argument            description
+
+     <string>            name of variable to which nets are bound
+     <design>            loop over the nets in this design
+     <object>            loop body
+
+************************************************************************
+
+COMMAND: nl_foreach_design_port
+
+Loop over all the ports in the specified design.
+
+Usage: nl_foreach_design_port [-inputs] [-outputs] [-inouts] <string> <design> <object>
+
+    option              description
+
+    -inputs             loop over the input ports
+    -outputs            list the output ports
+    -inouts             list the inout ports
+
+    argument            description
+
+     <string>            name of variable to which to bind ports
+     <design>            loop over the ports of this design
+     <object>            loop body
+
+************************************************************************
+
+COMMAND: nl_get_array_type
+
+Create a type with the specified parameters.
+
+Usage: nl_get_array_type <integer> <integer> <type>
+
+    argument            description
+
+     <integer>           left bound of the array
+     <integer>           right bound of the array
+     <type>              the type of the array members
+
+************************************************************************
+
+COMMAND: nl_get_bus_members
+
+Return a list of the members of the specified bus.
+By default, the members are ordered from LSB to MSB
+(i.e. the 0th element is the LSB).
+
+Usage: nl_get_bus_members [-reverse] <bus>
+
+    option              description
+
+    -reverse            return the members in the order MSB to LSB
+
+    argument            description
+
+     <bus>               get the members of this bus
+
+************************************************************************
+
+COMMAND: nl_get_bus_name
+
+Return the name of the specified bus.
+
+Usage: nl_get_bus_name <bus>
+
+    argument            description
+
+     <bus>               get the name of this bus
+
+************************************************************************
+
+COMMAND: nl_get_bus_type
+
+Return the type of the specified bus.
+
+Usage: nl_get_bus_type <bus>
+
+    argument            description
+
+     <bus>               get the type of this bus
+
+************************************************************************
+
+COMMAND: nl_get_cell_attribute
+
+Create and return a new cell attribute.
+
+Usage: nl_get_cell_attribute <cell_attribute> <cell>
+
+    argument            description
+
+     <cell_attribute>    name of the attribute to get
+     <cell>              get the attribute for this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_bus
+
+Get the bus to which the specified cell belongs.
+
+Usage: nl_get_cell_bus <cell>
+
+    argument            description
+
+     <cell>              get the bus of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_bus_offset
+
+Get the bus offset of the specified cell.
+
+Usage: nl_get_cell_bus_offset <cell>
+
+    argument            description
+
+     <cell>              get the bus offset of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_design
+
+Return the design that contains the given cell.
+
+Usage: nl_get_cell_design <icell>
+
+    argument            description
+
+     <icell>             get the design of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_icells
+
+Return a list of all the icells that correspond to the specified cell.
+
+Usage: nl_get_cell_icells <cell>
+
+    argument            description
+
+     <cell>              get the icells of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_line
+
+Get the file name and line number on which the specified cell was
+instantiated.
+
+Usage: nl_get_cell_line <cell>
+
+    argument            description
+
+     <cell>              get the file and line of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_location
+
+Return the location of the specified cell.  By default this location is
+that of the lower-left corner.
+
+Usage: nl_get_cell_location [-origin] [-grids] <icell>
+
+    option              description
+
+    -origin             return the location of the origin of the cell (not LL corener)
+    -grids              return the location in grid units
+
+    argument            description
+
+     <icell>             return the location of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_loctype
+
+Return the location type (UNPLACED, PLACED, or FIXED) 
+of the specified cell.
+
+Usage: nl_get_cell_loctype <icell>
+
+    argument            description
+
+     <icell>             return the location type of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_name
+
+Return the instance name of the specified cell.
+
+Usage: nl_get_cell_name <cell>
+
+    argument            description
+
+     <cell>              return the name of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_or_port_pins
+
+Return the pins of the specified cell or port.  By default, all pins are
+returned.  This behavior can be modified with any combination of the
+switches.
+
+Usage: nl_get_cell_or_port_pins [-inputs] [-outputs] [-inouts] <cell_or_port>
+
+    option              description
+
+    -inputs             get only input pins
+    -outputs            get only output pins
+    -inouts             get only inout pins
+
+    argument            description
+
+     <cell_or_port>      get the pins of this cell or port
+
+************************************************************************
+
+COMMAND: nl_get_cell_orientation
+
+Return the orientation (in DEF format) of the specified cell.
+
+Usage: nl_get_cell_orientation [-max] [-sue] <icell>
+
+    option              description
+
+    -max                return the orientation in MAX format
+    -sue                return the orientation in SUE format
+
+    argument            description
+
+     <icell>             get the orientation of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_overlaps
+
+
+
+Usage: nl_get_cell_overlaps [-brute] [<pdesign>]
+
+    option              description
+
+    -brute              use brute force method
+
+    argument            description
+
+     <pdesign>           do it for this design
+
+************************************************************************
+
+COMMAND: nl_get_cell_parent
+
+Get the parent cell of the specified hierarchical cell.
+
+Usage: nl_get_cell_parent <icell>
+
+    argument            description
+
+     <icell>             get the parent of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_pin
+
+Return the pin of the specified cell with the specified name.
+
+Usage: nl_get_cell_pin <icell> <string>
+
+    argument            description
+
+     <icell>             get the pin of this cell
+     <string>            get the pin with this name
+
+************************************************************************
+
+COMMAND: nl_get_cell_pins
+
+Return a list of all the pins on the specified cell.  Any combination of
+the switches may be used to get only certain pins.  If no switches are
+specified, all pins are returned.
+
+Usage: nl_get_cell_pins [-inputs] [-outputs] [-inouts] <icell>
+
+    option              description
+
+    -inputs             return only input pins
+    -outputs            return only output pins
+    -inouts             return only inout pins
+
+    argument            description
+
+     <icell>             get the pins of this cell
+
+************************************************************************
+
+COMMAND: nl_get_cell_reference
+
+Return the reference of the specified cell.
+
+Usage: nl_get_cell_reference <cell>
+
+    argument            description
+
+     <cell>              return the reference of this cell
+
+************************************************************************
+
+COMMAND: nl_get_def_history
+
+Get a list of all the strings in the DEF history for the specified design.
+
+Usage: nl_get_def_history [<pdesign>]
+
+    argument            description
+
+     <pdesign>           get the DEF history for this design
+
+************************************************************************
+
+COMMAND: nl_get_design_attribute
+
+Create and return a new design attribute.
+
+Usage: nl_get_design_attribute <design_attribute> <design>
+
+    argument            description
+
+     <design_attribute>  name of the attribute to get
+     <design>            get the attribute for this design
+
+************************************************************************
+
+COMMAND: nl_get_design_name
+
+Return the name of the specified design.
+
+Usage: nl_get_design_name <design>
+
+    argument            description
+
+     <design>            get the name of this design
+
+************************************************************************
+
+COMMAND: nl_get_design_size
+
+Get design (not icell) size as list of {x1 y1 x2 y2}; error if unknown
+
+Usage: nl_get_design_size <design>
+
+    argument            description
+
+     <design>            design whose size is to be returned
+
+************************************************************************
+
+COMMAND: nl_get_die_area
+
+Return the die area, xmin, ymin, xmax, and ymax, as a list.
+
+Usage: nl_get_die_area [-grids] [<pdesign>]
+
+    option              description
+
+    -grids              return the result in grid units
+
+    argument            description
+
+     <pdesign>           return the die area of this design
+
+************************************************************************
+
+COMMAND: nl_get_distance_units
+
+Get the distance units for the current design as a list: {unit_name number}
+
+Usage: nl_get_distance_units [<pdesign>]
+
+    argument            description
+
+     <pdesign>           get the distance units for this design
+
+************************************************************************
+
+COMMAND: nl_get_icell_cell
+
+Return the cell for the specified instance cell (icell).
+
+Usage: nl_get_icell_cell <icell>
+
+    argument            description
+
+     <icell>             get the cell of this icell
+
+************************************************************************
+
+COMMAND: nl_get_idesign_cell
+
+Get the parent cell of the specified hierarchical cell.
+
+Usage: nl_get_idesign_cell <idesign>
+
+    argument            description
+
+     <idesign>           get the parent of this cell
+
+************************************************************************
+
+COMMAND: nl_get_idesign_design
+
+Return the design for the specified instance design (idesign).
+
+Usage: nl_get_idesign_design <idesign>
+
+    argument            description
+
+     <idesign>           get the design of this idesign
+
+************************************************************************
+
+COMMAND: nl_get_idesign_root
+
+Return the top level of the current idesign tree.
+
+Usage: nl_get_idesign_root [<design>]
+
+    argument            description
+
+     <design>            return the root of the tree for this design
+
+************************************************************************
+
+COMMAND: nl_get_inet_net
+
+Return the net for the specified instance net (inet).
+
+Usage: nl_get_inet_net <inet>
+
+    argument            description
+
+     <inet>              get the net of this inet
+
+************************************************************************
+
+COMMAND: nl_get_integer_type
+
+Return the integer type.
+
+Usage: nl_get_integer_type [<design>]
+
+    argument            description
+
+     <design>            return the scalar type for this design
+
+************************************************************************
+
+COMMAND: nl_get_ipin_pin
+
+Return the pin for the specified instance pin (ipin).
+
+Usage: nl_get_ipin_pin <ipin>
+
+    argument            description
+
+     <ipin>              get the pin of this ipin
+
+************************************************************************
+
+COMMAND: nl_get_iport_port
+
+Return the port for the specified instance port (iport).
+
+Usage: nl_get_iport_port <iport>
+
+    argument            description
+
+     <iport>             get the port of this iport
+
+************************************************************************
+
+COMMAND: nl_get_libcell_class
+
+Return the LEF CLASS (COVER, RING, BLOCK, PAD, CORE, or ENDCAP) of the
+specified libcell.
+
+Usage: nl_get_libcell_class <libcell>
+
+    argument            description
+
+     <libcell>           get the class of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_library
+
+Return the library to which the specified libcell belongs.
+
+Usage: nl_get_libcell_library <libcell>
+
+    argument            description
+
+     <libcell>           get the library of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_name
+
+Return the name of the specified libcell.
+
+Usage: nl_get_libcell_name <libcell>
+
+    argument            description
+
+     <libcell>           get the name of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_obstructions
+
+Return the LEF OBS (obstructions) for the specified libcell.
+
+Usage: nl_get_libcell_obstructions <libcell>
+
+    argument            description
+
+     <libcell>           get the obstructions for this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_pins
+
+Return a list of the pins of the specified libcell.
+
+Usage: nl_get_libcell_pins [-nosupply] <libcell>
+
+    option              description
+
+    -nosupply           do not list supply (POWER, GROUND, or ANALOG) pins
+
+    argument            description
+
+     <libcell>           get the pins of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_site
+
+Return the LEF SITE (a string) of the specified libcell.
+
+Usage: nl_get_libcell_site <libcell>
+
+    argument            description
+
+     <libcell>           get the site of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_size
+
+Return the size of the specified libcell.
+
+Usage: nl_get_libcell_size [-grids] <libcell>
+
+    option              description
+
+    -grids              return the size in grid units
+
+    argument            description
+
+     <libcell>           return the size of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libcell_symmetry
+
+Return the LEF SYMMETRY for the spefied libcell.
+
+Usage: nl_get_libcell_symmetry <libcell>
+
+    argument            description
+
+     <libcell>           get the symmetry of this libcell
+
+************************************************************************
+
+COMMAND: nl_get_libpin_antennadiffarea
+
+Return the LEF ANTENNADIFFAREA (in square millimicrons) of the 
+specified libpin.
+
+Usage: nl_get_libpin_antennadiffarea <libpin>
+
+    argument            description
+
+     <libpin>            get the ANTENNADIFFAREA of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_antennagatearea
+
+Return the LEF ANTENNAGATEAREA (in square millimicrons) of the specified 
+libpin.
+
+Usage: nl_get_libpin_antennagatearea <libpin>
+
+    argument            description
+
+     <libpin>            get the ANTENNAGATEAREA of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_bus
+
+Get the bus to which the specified libpin belongs.
+
+Usage: nl_get_libpin_bus <libpin>
+
+    argument            description
+
+     <libpin>            get the bus of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_cell
+
+Return the libcell to which the specified libpin belongs.
+
+Usage: nl_get_libpin_cell <libpin>
+
+    argument            description
+
+     <libpin>            get the libcell of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_direction
+
+Return the direction (in, out, or inout) of the specified libpin
+
+Usage: nl_get_libpin_direction <libpin>
+
+    argument            description
+
+     <libpin>            get the direction of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_location
+
+Return the location (center of mass) of the specified libpin.
+
+Usage: nl_get_libpin_location [-grids] <libpin>
+
+    option              description
+
+    -grids              return the location in grid units
+
+    argument            description
+
+     <libpin>            get the location of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_name
+
+Return the name of the specified libpin.
+
+Usage: nl_get_libpin_name <libpin>
+
+    argument            description
+
+     <libpin>            get the name of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_port
+
+Return the port geometry of the specified libpin.
+
+Usage: nl_get_libpin_port <libpin>
+
+    argument            description
+
+     <libpin>            get the geometry of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_libpin_use
+
+Return the use (signal, power, ground, clock, or analog) of the
+specified libpin
+
+Usage: nl_get_libpin_use <libpin>
+
+    argument            description
+
+     <libpin>            get the use of this libpin
+
+************************************************************************
+
+COMMAND: nl_get_net_attribute
+
+Create and return a new net attribute.
+
+Usage: nl_get_net_attribute <net_attribute> <net>
+
+    argument            description
+
+     <net_attribute>     name of the attribute to get
+     <net>               get the attribute for this net
+
+************************************************************************
+
+COMMAND: nl_get_net_bbox
+
+Return the physical bounding box of the specified net.
+
+Usage: nl_get_net_bbox <net>
+
+    argument            description
+
+     <net>               get the bounding box of this net
+
+************************************************************************
+
+COMMAND: nl_get_net_bus
+
+Get the bus to which the specified net belongs.
+
+Usage: nl_get_net_bus <net>
+
+    argument            description
+
+     <net>               get the bus of this net
+
+************************************************************************
+
+COMMAND: nl_get_net_design
+
+Return the design that contains the given net.
+
+Usage: nl_get_net_design <inet>
+
+    argument            description
+
+     <inet>              get the design of this net
+
+************************************************************************
+
+COMMAND: nl_get_net_inets
+
+Return a list of all the inets that correspond to the specified net.
+
+Usage: nl_get_net_inets <net>
+
+    argument            description
+
+     <net>               get the inets of this net
+
+************************************************************************
+
+COMMAND: nl_get_net_name
+
+Return the instance name of the specified net.
+
+Usage: nl_get_net_name <net>
+
+    argument            description
+
+     <net>               return the name of this net
+
+************************************************************************
+
+COMMAND: nl_get_net_nets
+
+Return a list of all nets that are connected to the specified net.
+
+Usage: nl_get_net_nets [-hierarchy] [-noassign] <inet>
+
+    option              description
+
+    -hierarchy          return nets that are connected through the hierarchy
+    -noassign           return nets that are connected through assignments
+
+    argument            description
+
+     <inet>              get the nets connected to this net
+
+************************************************************************
+
+COMMAND: nl_get_net_pattern
+
+Return the DEF PATTERN clause (STEINER, BALANCED, WIREDLOGIC, or ANALOG)
+for the specified net.
+
+Usage: nl_get_net_pattern <inet>
+
+    argument            description
+
+     <inet>              return the PATTERN clause of this net
+
+************************************************************************
+
+COMMAND: nl_get_net_pins
+
+Return a list of all the pins connected to the specified net.  Any
+combination of the switches may be used to get only certain pins.  If no
+switches are specified, all pins are returned.
+
+Usage: nl_get_net_pins [-drivers] [-loads] [-fanios] [-hierarchy] [-recursive] [-noassign] <inet>
+
+    option              description
+
+    -drivers            return only the drivers of the net
+    -loads              return only the loads of the net
+    -fanios             return only the inout pins connected to the net
+    -hierarchy          cross hierarchy boundaries
+    -recursive          same as -hierarchy
+    -noassign           cross assignment buffers
+
+    argument            description
+
+     <inet>              get the pins connected to this net
+
+************************************************************************
+
+COMMAND: nl_get_net_routes
+
+Return a list of all the routes for the specified net.
+
+Usage: nl_get_net_routes [-special] [-nonspecial] <inet>
+
+    option              description
+
+    -special            only get special (non-minimum-width) routes
+    -nonspecial         only get non-special routes
+
+    argument            description
+
+     <inet>              get the routes for this net.
+
+************************************************************************
+
+COMMAND: nl_get_net_use
+
+Return the DEF USE clause (SIGNAL, POWER, GROUND, CLOCK, TIEOFF, or
+ ANALOG) for the specified net.
+
+Usage: nl_get_net_use <inet>
+
+    argument            description
+
+     <inet>              return the USE clause of this net
+
+************************************************************************
+
+COMMAND: nl_get_pin_direction
+
+Return the direction of the specified pin.
+
+Usage: nl_get_pin_direction <pin>
+
+    argument            description
+
+     <pin>               get the direction of this pin
+
+************************************************************************
+
+COMMAND: nl_get_pin_location
+
+Return the location of the specified pin.
+
+Usage: nl_get_pin_location [-grids] <ipin>
+
+    option              description
+
+    -grids              return the location in grid units
+
+    argument            description
+
+     <ipin>              get the location of this pin
+
+************************************************************************
+
+COMMAND: nl_get_pin_name
+
+Return the name of the specified pin.
+
+Usage: nl_get_pin_name <pin>
+
+    argument            description
+
+     <pin>               return the name of this pin
+
+************************************************************************
+
+COMMAND: nl_get_pin_net
+
+Return the net connected to the specified pin.
+
+Usage: nl_get_pin_net <ipin>
+
+    argument            description
+
+     <ipin>              get the net connected to this pin
+
+************************************************************************
+
+COMMAND: nl_get_pin_owner
+
+Return the owner (a cell or a port) of the specified pin.
+
+Usage: nl_get_pin_owner <ipin>
+
+    argument            description
+
+     <ipin>              get the owner of this pin
+
+************************************************************************
+
+COMMAND: nl_get_pin_refpin
+
+Return the reference pin (refpin) of the specified pin.
+
+Usage: nl_get_pin_refpin <pin>
+
+    argument            description
+
+     <pin>               get the refpin of this pin
+
+************************************************************************
+
+COMMAND: nl_get_port_attribute
+
+Create and return a new port attribute.
+
+Usage: nl_get_port_attribute <port_attribute> <port>
+
+    argument            description
+
+     <port_attribute>    name of the attribute to get
+     <port>              get the attribute for this port
+
+************************************************************************
+
+COMMAND: nl_get_port_bus
+
+Get the bus to which the specified port belongs.
+
+Usage: nl_get_port_bus <port>
+
+    argument            description
+
+     <port>              get the bus of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_design
+
+Return the design that contains the given port.
+
+Usage: nl_get_port_design <iport>
+
+    argument            description
+
+     <iport>             get the design of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_direction
+
+Return the direction of the specified port.
+
+Usage: nl_get_port_direction <port>
+
+    argument            description
+
+     <port>              get the direction of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_geometry
+
+Return the geometry of the specified port as a list: {layer x0 y0 x1 y1}
+
+Usage: nl_get_port_geometry <port>
+
+    argument            description
+
+     <port>              get the geometry of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_location
+
+Return the location of the specified port.
+
+Usage: nl_get_port_location [-grids] <port>
+
+    option              description
+
+    -grids              return the location in grid units
+
+    argument            description
+
+     <port>              return the location of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_loctype
+
+Return the location type (UNPLACED, PLACED, or FIXED) 
+of the specified port.
+
+Usage: nl_get_port_loctype <port>
+
+    argument            description
+
+     <port>              get the location type of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_name
+
+Return the name of the specified port.
+
+Usage: nl_get_port_name <port>
+
+    argument            description
+
+     <port>              get the name of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_orientation
+
+Return the orientation (in DEF format) of the specified port.
+
+Usage: nl_get_port_orientation [-max] [-sue] <port>
+
+    option              description
+
+    -max                return the orientation in MAX format
+    -sue                return the orientation in SUE format
+
+    argument            description
+
+     <port>              get the orientation of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_pin
+
+Return the pin associated with the specified port.
+
+Usage: nl_get_port_pin <iport>
+
+    argument            description
+
+     <iport>             get the pin of this port
+
+************************************************************************
+
+COMMAND: nl_get_port_use
+
+Return the DEF USE clause (SIGNAL, POWER, GROUND, CLOCK, TIEOFF, or
+ ANALOG) for the specified port.
+
+Usage: nl_get_port_use <port>
+
+    argument            description
+
+     <port>              get the USE clause of this port
+
+************************************************************************
+
+COMMAND: nl_get_reference_cells
+
+Return a list of all cells (instances) of a given reference.
+
+Usage: nl_get_reference_cells <reference>
+
+    argument            description
+
+     <reference>         return the cells of this reference
+
+************************************************************************
+
+COMMAND: nl_get_reference_design
+
+Return the design that contains the given reference.
+
+Usage: nl_get_reference_design <reference>
+
+    argument            description
+
+     <reference>         get the design of this reference
+
+************************************************************************
+
+COMMAND: nl_get_reference_for_design
+
+Get the reference referring to the specified design.  Create one if none currently exists.
+
+Usage: nl_get_reference_for_design <design> [<design>]
+
+    argument            description
+
+     <design>            get the reference for this design
+     <design>            get the reference in this design
+
+************************************************************************
+
+COMMAND: nl_get_reference_for_libcell
+
+Get the reference referring to the specified libcell.  Create one if none currently exists.
+
+Usage: nl_get_reference_for_libcell <libcell> [<design>]
+
+    argument            description
+
+     <libcell>           get the reference for this libcell
+     <design>            get the reference in this design
+
+************************************************************************
+
+COMMAND: nl_get_reference_link
+
+Return the link of the specified reference (either a subdesign 
+or a libcell).
+
+Usage: nl_get_reference_link <reference>
+
+    argument            description
+
+     <reference>         get the link of this reference
+
+************************************************************************
+
+COMMAND: nl_get_reference_name
+
+Return the name of the specified reference.
+
+Usage: nl_get_reference_name <reference>
+
+    argument            description
+
+     <reference>         return the name of this reference
+
+************************************************************************
+
+COMMAND: nl_get_reference_refpins
+
+Return a list of all the refpins on the specified reference.
+
+Usage: nl_get_reference_refpins [-inputs] [-outputs] [-inouts] <reference>
+
+    option              description
+
+    -inputs             return only input pins
+    -outputs            return only output pins
+    -inouts             return only inout pins
+
+    argument            description
+
+     <reference>         get the refpins of this reference
+
+************************************************************************
+
+COMMAND: nl_get_refpin_direction
+
+Return the direction of the specified reference pin.
+
+Usage: nl_get_refpin_direction <refpin>
+
+    argument            description
+
+     <refpin>            get the direction of this refpin
+
+************************************************************************
+
+COMMAND: nl_get_refpin_down_port
+
+Return the down port of the specified refpin.
+
+Usage: nl_get_refpin_down_port <refpin>
+
+    argument            description
+
+     <refpin>            get this down pin of this refpin
+
+************************************************************************
+
+COMMAND: nl_get_refpin_name
+
+Return the name of the specified refpin.
+
+Usage: nl_get_refpin_name <refpin>
+
+    argument            description
+
+     <refpin>            return the name of this refpin
+
+************************************************************************
+
+COMMAND: nl_get_refpin_owner
+
+Return the owner (reference) of the specified refpin.
+
+Usage: nl_get_refpin_owner <refpin>
+
+    argument            description
+
+     <refpin>            get the owner of this refpin
+
+************************************************************************
+
+COMMAND: nl_get_scalar_type
+
+Return the scalar type.
+
+Usage: nl_get_scalar_type [<design>]
+
+    argument            description
+
+     <design>            return the scalar type for this design
+
+************************************************************************
+
+COMMAND: nl_get_type_left
+
+Return the left bound of the specified type.
+
+Usage: nl_get_type_left <type>
+
+    argument            description
+
+     <type>              get the left bound of this type
+
+************************************************************************
+
+COMMAND: nl_get_type_right
+
+Return the right bound of the specified type.
+
+Usage: nl_get_type_right <type>
+
+    argument            description
+
+     <type>              get the right bound of this type
+
+************************************************************************
+
+COMMAND: nl_get_uppermost_net
+
+Return the highest inet in the hierarchy that is connected to the specified inet.
+
+Usage: nl_get_uppermost_net [-noassign] <inet>
+
+    option              description
+
+    -noassign           traverse assignments
+
+    argument            description
+
+     <inet>              get the uppermost net of this net
+
+************************************************************************
+
+COMMAND: nl_get_x_tracks
+
+Return the X tracks as a list: start, number, step, and layers.
+
+Usage: nl_get_x_tracks [<pdesign>]
+
+    argument            description
+
+     <pdesign>           return the X tracks of this design
+
+************************************************************************
+
+COMMAND: nl_get_y_tracks
+
+Return the Y tracks as a list: start, number, step, and layers.
+
+Usage: nl_get_y_tracks [<pdesign>]
+
+    argument            description
+
+     <pdesign>           return the Y tracks of this design
+
+************************************************************************
+
+COMMAND: nl_getopt
+Usage: getopt proc_name option_spec argument_spec doc arguments.
+************************************************************************
+
+COMMAND: nl_group
+
+Group the specified cells into a subdesign.
+
+Usage: nl_group <cell_list> <string> [<string>]
+
+    argument            description
+
+     <cell_list>         cells to ungroup
+     <string>            name of subdesign to create
+     <string>            name of subdesign instance (default is subdesign name)
+
+************************************************************************
+
+COMMAND: nl_hier_get_cell_location
+
+Get cell (not icell) origin and orientation in its immediate parent as list of {x y ori}
+
+Usage: nl_hier_get_cell_location <cell>
+
+    argument            description
+
+     <cell>              cell to get information for
+
+************************************************************************
+
+COMMAND: nl_hier_set_cell_location
+
+Set cell (not icell) location
+
+Usage: nl_hier_set_cell_location [-corner] <cell> <integer> <integer> <string>
+
+    option              description
+
+    -corner             if set, x,y are the lower-left corner, otherwise the origin
+
+    argument            description
+
+     <cell>              cell to be placed
+     <integer>           x coordinate
+     <integer>           y coordinate
+     <string>            orientation
+
+************************************************************************
+
+COMMAND: nl_infer_buses
+
+Remove the specified designs from memory.
+
+Usage: nl_infer_buses [<design>]
+
+    argument            description
+
+     <design>            design in which to infer buses
+
+************************************************************************
+
+COMMAND: nl_infer_libpin_buses
+
+Infer libpin buses (based on name) for all cells of the specified library
+
+Usage: nl_infer_libpin_buses <library>
+
+    argument            description
+
+     <library>           infer libpin buses for this library
+
+************************************************************************
+
+COMMAND: nl_is_libcell
+
+Return 1 if the specified design is a library cell, 0 otherwise.
+
+Usage: nl_is_libcell <design>
+
+    argument            description
+
+     <design>            return this libcell status of this design
+
+************************************************************************
+
+COMMAND: nl_is_special
+
+Return 1 if the specified net is a DEF special net.
+
+Usage: nl_is_special <inet>
+
+    argument            description
+
+     <inet>              return the special net status of this net
+
+************************************************************************
+
+COMMAND: nl_link
+
+Link the specified design.  All cells will be linked to the appropriate
+subdesign or library cell.
+
+Usage: nl_link [-nohierarchy] [-silent] [-libraries <object>] [<design>]
+
+    option              description
+
+    -nohierarchy        don't recursively link all subdesigns
+    -silent             don't print messages about unresolved references
+    -libraries <object> list of libraries to search
+
+    argument            description
+
+     <design>            design to link
+
+************************************************************************
+
+COMMAND: nl_link_reference
+
+Link the specified reference.
+
+Usage: nl_link_reference [-nohierarchy] [-silent] [-libraries <object>] <reference>
+
+    option              description
+
+    -nohierarchy        don't recursively link all subdesigns
+    -silent             don't print messages about unresolved references
+    -libraries <object> list of libraries to search
+
+    argument            description
+
+     <reference>         link this reference
+
+************************************************************************
+
+COMMAND: nl_list_cells
+
+Return a list of all the cells in the specified design.
+By default, all cells in the current design are listed.
+
+Usage: nl_list_cells [-hierarchy] [-library] [-unlinked] [-recursive] [-noassign] [-from <idesign>] [<design>]
+
+    option              description
+
+    -hierarchy          list only hierarchy cells
+    -library            list only instances of library cells
+    -unlinked           list only unlinked cells
+    -recursive          recursively list all cells in the hierarchy
+    -noassign           don't include assignment buffers
+    -from <idesign>     start at this point in the hierarchy, requires -recursive
+
+    argument            description
+
+     <design>            list the cells for this design
+
+************************************************************************
+
+COMMAND: nl_list_commands
+
+List all the nl commands.
+
+Usage: nl_list_commands [-dont_print]
+
+    option              description
+
+    -dont_print         return the list of commands as a TCL list, rather than printing it
+
+************************************************************************
+
+COMMAND: nl_list_designs
+
+Return a list of all designs in memory.
+
+Usage: nl_list_designs [-library] [-hierarchy]
+
+    option              description
+
+    -library            list only library designs (i.e. library cells).
+    -hierarchy          list only hierarchical (i.e. non-library) designs.
+
+************************************************************************
+
+COMMAND: nl_list_libcells
+
+List all of the libcells in the specified library.
+
+Usage: nl_list_libcells <library>
+
+    argument            description
+
+     <library>           list the libcells in this library
+
+************************************************************************
+
+COMMAND: nl_list_libraries
+
+List all of the libraries.
+
+Usage: nl_list_libraries
+
+************************************************************************
+
+COMMAND: nl_list_nets
+
+Return a list of all the nets in the specified design.
+
+Usage: nl_list_nets [-hierarchy] [-recursive] [-noassign] [-noconstant] [-noempty] [-onlyconstant] [<design>]
+
+    option              description
+
+    -hierarchy          list all unique hierarchial nets
+    -recursive          same as -hierarchy
+    -noassign           treat nets connected by assignment buffers as equivalent
+    -noconstant         do not include constant nets
+    -noempty            do not include nets that have no pins
+    -onlyconstant       list only constant nets
+
+    argument            description
+
+     <design>            list the nets for this design
+
+************************************************************************
+
+COMMAND: nl_list_ports
+
+Return a list of all the ports in the specified design.
+
+Usage: nl_list_ports [-inputs] [-outputs] [-inouts] [<design>]
+
+    option              description
+
+    -inputs             list the input ports
+    -outputs            list the output ports
+    -inouts             list the inout ports
+
+    argument            description
+
+     <design>            list the ports for this design
+
+************************************************************************
+
+COMMAND: nl_list_references
+
+Return a list of all the references in the specified design.
+
+Usage: nl_list_references [<design>]
+
+    argument            description
+
+     <design>            list the references for this design
+
+************************************************************************
+
+COMMAND: nl_list_row_sites
+
+Return a list of the row sites, each in the following form:
+{name core x0 y0 orientation count width height}
+
+Usage: nl_list_row_sites [<pdesign>]
+
+    argument            description
+
+     <pdesign>           return the row sites for this design
+
+************************************************************************
+
+COMMAND: nl_list_types
+
+Return a list of all the types in the specified design.
+
+Usage: nl_list_types [<design>]
+
+    argument            description
+
+     <design>            list the types for this design
+
+************************************************************************
+
+COMMAND: nl_load_all_libcell_lefs
+
+Load LEF files for all unlinked library cells.
+
+Usage: nl_load_all_libcell_lefs <library> [<design>]
+
+    argument            description
+
+     <library>           load the LEFs into this library.
+     <design>            load the LEFs for this design.
+
+************************************************************************
+
+COMMAND: nl_make_row_sites
+
+Fill the die area with row sites.
+
+Usage: make_row_sites [-halo <integer>] <string> [<integer>] [<integer>] [<idesign>]
+
+    option              description
+
+    -halo <integer>     leave a border of the specified size (in tracks) around the placeable area
+
+    argument            description
+
+     <string>            the name of the core site
+     <integer>           the site width in tracks (default is 1)
+     <integer>           the row height in tracks (default is 10)
+     <idesign>           make row sites for this design
+
+************************************************************************
+
+COMMAND: nl_make_row_sites_custom
+
+Build a row site array according to the specifications.
+
+Usage: make_row_sites_custom <string> <object> <integer> <integer> [<idesign>]
+
+    argument            description
+
+     <string>            the name of the core site
+     <object>            the core area as a list: {x_min y_min x_max y_max}
+     <integer>           the width of each site in DEF units
+     <integer>           the height of each site in DEF units
+     <idesign>           make row sites for this design
+
+************************************************************************
+
+COMMAND: nl_map_design
+
+For the specified design, map all the processes and expressions to gates.
+
+Usage: nl_map_design [<design>]
+
+    argument            description
+
+     <design>            map this design
+
+************************************************************************
+
+COMMAND: nl_mem_show_active
+
+Show all active memory allocations.
+
+Usage: nl_mem_show_active
+
+************************************************************************
+
+COMMAND: nl_mem_show_usage
+
+Show memory usage by group.
+
+Usage: nl_mem_show_usage
+
+************************************************************************
+
+COMMAND: nl_new_object_name
+
+Return the name of a new object (cell or net).
+
+Usage: nl_new_object_name [<design>]
+
+    argument            description
+
+     <design>            return the name of a new object in this design
+
+************************************************************************
+
+COMMAND: nl_object_type
+
+Show the type of a TCL object.
+
+Usage: nl_object_type [-realtype] <object>
+
+    option              description
+
+    -realtype           don't convert instance types to basic types
+
+    argument            description
+
+     <object>            
+
+************************************************************************
+
+COMMAND: nl_order_scan_chain
+
+Return a list of the specified cells that are ordered so as to
+minimize a scan chain running through them.
+
+Usage: nl_order_scan_chain [-limit <integer>] [-silent] [-sumsq] <icell_list>
+
+    option              description
+
+    -limit <integer>    limit on the nuber of TSP solver iterations
+    -silent             don't print status messages as the chain is being optimized
+    -sumsq              minimize the sum-of-squares rather than the linear sum
+
+    argument            description
+
+     <icell_list>        list of cells to order
+
+************************************************************************
+
+COMMAND: nl_pat_walk_hier_cells
+
+Return a list of {cell path transform} of all leaf cells in specified nl design
+
+Usage: nl_pat_walk_hier_cells <design>
+
+    argument            description
+
+     <design>            design whose size is to be set
+
+************************************************************************
+
+COMMAND: nl_place_design
+
+Place the specified design.
+
+Usage: nl_place_design [-randomly] [-wire_weight <double>] [-overlap_weight <double>] [-boundary_weight <double>] [-row_weight <double>] [-distribution_weight <double>] [-constant_weight <double>] [-iterations <integer>] [-displacement_limit <double>] [-cell_bloat <double>] [<pdesign>]
+
+    option              description
+
+    -randomly           place the cells randomly
+    -wire_weight <double>weight for wire length objective
+    -overlap_weight <double>weight for overlap objective
+    -boundary_weight <double>weight for boundary objective
+    -row_weight <double>weight for row objective
+    -distribution_weight <double>weight for distribution objective
+    -constant_weight <double>weight for constant force objective
+    -iterations <integer>iteration limit
+    -displacement_limit <double>displacement limit for terminating optimizer
+    -cell_bloat <double>cell bloat factor (1.0 == no cell bloat)
+
+    argument            description
+
+     <pdesign>           place this design
+
+************************************************************************
+
+COMMAND: nl_place_get_index
+
+Debugging command.
+
+Usage: nl_place_get_index <cell> [<pdesign>]
+
+    argument            description
+
+     <cell>              get the index of this cell
+     <pdesign>           do it for this design
+
+************************************************************************
+
+COMMAND: nl_query_cell_attribute
+
+Return 1 if the specified cell has the specified attribute, 0 otherwise.
+
+Usage: nl_query_cell_attribute <string> <cell>
+
+    argument            description
+
+     <string>            name of the attribute to get
+     <cell>              get the attribute for this cell
+
+************************************************************************
+
+COMMAND: nl_query_design_attribute
+
+Return 1 if the specified design has the specified attribute, 0 otherwise.
+
+Usage: nl_query_design_attribute <string> [<design>]
+
+    argument            description
+
+     <string>            name of the attribute to get
+     <design>            get the attribute for this design
+
+************************************************************************
+
+COMMAND: nl_read_def
+
+Read the physical information from a .def file.  The design specified in
+the .def file must exist in memory.
+
+Usage: nl_read_def [-offset <object>] [-translate <string>] [-filler <object>] [-zero <object>] [-one <object>] [-nohierarchy] <file> [<icell>]
+
+    option              description
+
+    -offset <object>    location offset in the form: {dx dy}
+    -translate <string> orientation translation (N, S, E, W, FN, FS, FW, or FW)
+    -filler <object>    list of filler cell types
+    -zero <object>      list of logic 0 nets
+    -one <object>       list of logic 1 nets
+    -nohierarchy        read a flat DEF
+
+    argument            description
+
+     <file>              .def file to read
+     <icell>             top level cell of the design to be read
+
+************************************************************************
+
+COMMAND: nl_read_lef
+
+Read the physical library information from a .lef file.
+
+Usage: nl_read_lef <file> <library>
+
+    argument            description
+
+     <file>              the LEF file
+     <library>           read the physical information for this library
+
+************************************************************************
+
+COMMAND: nl_read_verilog
+
+Read the specified Verilog file(s).  If any design specified in file already
+exists in memory, the in-memory design is overwritten.
+
+Usage: nl_read_verilog [-ports_only] [-rtl] [-define <object>] [-silent] <object>
+
+    option              description
+
+    -ports_only         ignore the insides of the Verilog modules
+    -rtl                read RTL Verilog
+    -define <object>    define these macros before reading (like {{foo 1} {bar 2}})
+    -silent             don't print the message about the current design being set
+
+    argument            description
+
+     <object>            Verilog files to read
+
+************************************************************************
+
+COMMAND: nl_read_vim_physcell
+
+Read a VIM physcell file.
+
+Usage: nl_read_vim_physcell [-core_site <string>] <file>
+
+    option              description
+
+    -core_site <string> name of core site in row site array
+
+    argument            description
+
+     <file>              file to read
+
+************************************************************************
+
+COMMAND: nl_read_vim_placement
+
+Read a VIM placement file.
+
+Usage: nl_read_vim_placement <file>
+
+    argument            description
+
+     <file>              file to read
+
+************************************************************************
+
+COMMAND: nl_read_vim_tech
+
+Read a VIM tech file.
+
+Usage: nl_read_vim_tech [-silent] <file>
+
+    option              description
+
+    -silent             don't print a message about the current design being set
+
+    argument            description
+
+     <file>              file to read
+
+************************************************************************
+
+COMMAND: nl_register_command
+
+Register the specified command as an nl command.
+
+Usage: nl_register_command <string>
+
+    argument            description
+
+     <string>            the name of the command to register
+
+************************************************************************
+
+COMMAND: nl_remove_assigns
+
+Remove all assignments from the specified design.
+
+Usage: remove_assigns [-silent] [-recursive] [-feedthroughs] [<design>]
+
+    option              description
+
+    -silent             don't print warnings
+    -recursive          do the entire hierarchy
+    -feedthroughs       allow assignments connecting ports to be removed, which creates feedthroughs
+
+    argument            description
+
+     <design>            remove the assignments from this design
+
+************************************************************************
+
+COMMAND: nl_remove_attribute
+
+Remove the specified attribute.
+
+Usage: nl_remove_attribute <string> [<design>]
+
+    argument            description
+
+     <string>            name of the attribute to remove
+     <design>            remove the attribute from this design
+
+************************************************************************
+
+COMMAND: nl_remove_buffers
+
+Remove all assignment buffers by merging the assigned nets.
+
+Usage: nl_remove_buffers [-silent] [-recursive] [-feedthroughs] <string> [<design>]
+
+    option              description
+
+    -silent             don't issue warnings
+    -recursive          do the entire hierarchy
+    -feedthroughs       allow assignments connecting ports to be removed, which creates feedthroughs
+
+    argument            description
+
+     <string>            reference name of buffers to remove
+     <design>            remove the assignment buffers from this design
+
+************************************************************************
+
+COMMAND: nl_remove_cell
+
+Remove the specified cell (instance).
+
+Usage: nl_remove_cell <cell>
+
+    argument            description
+
+     <cell>              cell to be removed
+
+************************************************************************
+
+COMMAND: nl_remove_design
+
+Remove the specified designs from memory.
+
+Usage: nl_remove_design [-all] [-silent] [<design>]
+
+    option              description
+
+    -all                remove all designs
+    -silent             don't print a message when removing a design
+
+    argument            description
+
+     <design>            design to remove
+
+************************************************************************
+
+COMMAND: nl_remove_idesigns
+
+Remove all idesigns associated witht he specified design.
+
+Usage: nl_remove_idesigns [<design>]
+
+    argument            description
+
+     <design>            remove the idesigns associated with this design
+
+************************************************************************
+
+COMMAND: nl_remove_library
+
+Remove the specified libraries from memory.
+
+Usage: nl_remove_library [-all] [-silent] [<library>]
+
+    option              description
+
+    -all                remove all libraries
+    -silent             don't print a message when removing a library
+
+    argument            description
+
+     <library>           library to remove
+
+************************************************************************
+
+COMMAND: nl_remove_net
+
+Remove the specified net (instance).
+
+Usage: nl_remove_net <net>
+
+    argument            description
+
+     <net>               net to be removed
+
+************************************************************************
+
+COMMAND: nl_remove_port
+
+Remove the specified port from the design.
+
+Usage: nl_remove_port <port>
+
+    argument            description
+
+     <port>              port to remove
+
+************************************************************************
+
+COMMAND: nl_remove_reference
+
+Remove the specified reference.
+
+Usage: nl_remove_reference <reference>
+
+    argument            description
+
+     <reference>         reference to be removed
+
+************************************************************************
+
+COMMAND: nl_rename_cell
+
+Rename the specified cell to the specified name.
+
+Usage: nl_rename_cell <cell> <string>
+
+    argument            description
+
+     <cell>              rename this cell
+     <string>            the new name for this cell
+
+************************************************************************
+
+COMMAND: nl_rename_cell_bus
+
+Rename the specified cell bus to the specified name.  All the members
+of the bus get renamed as well.
+
+Usage: nl_rename_cell_bus <cell_bus> <string>
+
+    argument            description
+
+     <cell_bus>          rename this cell bus
+     <string>            the new name for this bus
+
+************************************************************************
+
+COMMAND: nl_rename_design
+
+Rename the specified design to the specified name.
+
+Usage: nl_rename_design <design> <string>
+
+    argument            description
+
+     <design>            rename this design
+     <string>            the new name for this design
+
+************************************************************************
+
+COMMAND: nl_rename_net
+
+Rename the specified net to the specified name.
+
+Usage: nl_rename_net <net> <string>
+
+    argument            description
+
+     <net>               rename this net
+     <string>            the new name for this net
+
+************************************************************************
+
+COMMAND: nl_rename_net_bus
+
+Rename the specified net bus to the specified name.  All the members
+of the bus get renamed as well.
+
+Usage: nl_rename_net_bus <net_bus> <string>
+
+    argument            description
+
+     <net_bus>           rename this net bus
+     <string>            the new name for this bus
+
+************************************************************************
+
+COMMAND: nl_rename_port
+
+Rename the specified port to the specified name.
+
+Usage: nl_rename_port <port> <string>
+
+    argument            description
+
+     <port>              rename this port
+     <string>            the new name for this port
+
+************************************************************************
+
+COMMAND: nl_rename_port_bus
+
+Rename the specified port bus to the specified name.  All the members
+of the bus get renamed as well.
+
+Usage: nl_rename_port_bus <port_bus> <string>
+
+    argument            description
+
+     <port_bus>          rename this port bus
+     <string>            the new name for this bus
+
+************************************************************************
+
+COMMAND: nl_rename_reference
+
+Rename the specified reference to the specified name.
+
+Usage: nl_rename_reference <reference> <string>
+
+    argument            description
+
+     <reference>         rename this reference
+     <string>            the new name for this reference
+
+************************************************************************
+
+COMMAND: nl_rename_refpin
+
+Rename the specified refpin.
+
+Usage: nl_rename_refpin <refpin> <string>
+
+    argument            description
+
+     <refpin>            rename this refpin
+     <string>            the new name of this refpin
+
+************************************************************************
+
+COMMAND: nl_replace_cell
+
+Replace the specified cell with a cell of the specified reference.
+
+Usage: nl_replace_cell <cell> <reference>
+
+    argument            description
+
+     <cell>              replace this cell
+     <reference>         replace it with a cell with this reference
+
+************************************************************************
+
+COMMAND: nl_report_hierarchy
+
+Print out a report of the hierarchy of the specified design.
+
+Usage: nl_report_hierarchy [<design>]
+
+    argument            description
+
+     <design>            design to report
+
+************************************************************************
+
+COMMAND: nl_set_cell_attribute
+
+Create and return a new cell attribute.
+
+Usage: nl_set_cell_attribute <cell_attribute> <cell> <object>
+
+    argument            description
+
+     <cell_attribute>    name of the attribute to get
+     <cell>              set the attribute of this cell
+     <object>            set the attribute to this value
+
+************************************************************************
+
+COMMAND: nl_set_cell_location
+
+Set the location of the specified cell.  By default, this location is
+that of the lower-left corner.
+
+Usage: nl_set_cell_location [-origin] [-type <string>] [-grids] <icell> <integer> <integer>
+
+    option              description
+
+    -origin             the location is the origin of the cell (not LL corner)
+    -type <string>      the type of the location: PLACED (default), FIXED, or COVER.
+    -grids              set the location in grid units
+
+    argument            description
+
+     <icell>             return the location of this cell
+     <integer>           x coordinate of the location
+     <integer>           y coordinate of the location
+
+************************************************************************
+
+COMMAND: nl_set_cell_loctype
+
+Set the location type of the specified cell.
+
+Usage: nl_set_cell_loctype <icell> <string>
+
+    argument            description
+
+     <icell>             set the location type of this cell
+     <string>            set the loctype to this (UNPLACED, PLACED, or FIXED)
+
+************************************************************************
+
+COMMAND: nl_set_cell_orientation
+
+Set the orientation of the specified cell.
+
+Usage: nl_set_cell_orientation <icell> <string>
+
+    argument            description
+
+     <icell>             set the orientation of this cell
+     <string>            set the orientation to this (N, S, E, W, FN, FS, FE, or FW)
+
+************************************************************************
+
+COMMAND: nl_set_design_attribute
+
+Create and return a new design attribute.
+
+Usage: nl_set_design_attribute <design_attribute> <design> <object>
+
+    argument            description
+
+     <design_attribute>  name of the attribute to get
+     <design>            set the attribute of this design
+     <object>            set the attribute to this value
+
+************************************************************************
+
+COMMAND: nl_set_design_size
+
+Set design (not icell) size
+
+Usage: nl_set_design_size <design> <integer> <integer> <integer> <integer>
+
+    argument            description
+
+     <design>            design whose size is to be set
+     <integer>           x1 (lower left corner, normally 0)
+     <integer>           y1 (lower left corner, normally 0)
+     <integer>           x2 (upper left corner)
+     <integer>           y2 (upper left corner)
+
+************************************************************************
+
+COMMAND: nl_set_die_area
+
+Set the die area to the specified values.
+
+Usage: nl_set_die_area [-grids] <integer_list> [<pdesign>]
+
+    option              description
+
+    -grids              set the die area in grid units
+
+    argument            description
+
+     <integer_list>      a list of the form {xmin, ymin, xmax, ymax} or {}
+     <pdesign>           return the die area of this design
+
+************************************************************************
+
+COMMAND: nl_set_distance_units
+
+Set the DEF distance units for the current design.
+
+Usage: nl_set_distance_units <string> <integer> [<pdesign>]
+
+    argument            description
+
+     <string>            name of the distance unit (e.g. MICRONS)
+     <integer>           number of design units in the distance unit
+     <pdesign>           set the distance units for this design
+
+************************************************************************
+
+COMMAND: nl_set_libcell
+
+Declare the specified design to be a library cell.
+
+Usage: nl_set_libcell <design>
+
+    argument            description
+
+     <design>            declare this design to be a library cell
+
+************************************************************************
+
+COMMAND: nl_set_libcell_size
+
+Set the size of the specified libcell.
+
+Usage: nl_set_libcell_size [-grids] <libcell> <integer> <integer>
+
+    option              description
+
+    -grids              set the size in grid units
+
+    argument            description
+
+     <libcell>           return the size of this libcell
+     <integer>           the width of the libcell
+     <integer>           the height of the libcell
+
+************************************************************************
+
+COMMAND: nl_set_libpin_location
+
+Set the location (center of mass) of the specified libpin.
+
+Usage: nl_set_libpin_location [-grids] <libpin> <integer> <integer>
+
+    option              description
+
+    -grids              set the location in grid units
+
+    argument            description
+
+     <libpin>            set the location of this libpin
+     <integer>           x coordinate of the location
+     <integer>           y coordinate of the location
+
+************************************************************************
+
+COMMAND: nl_set_net_attribute
+
+Create and return a new net attribute.
+
+Usage: nl_set_net_attribute <net_attribute> <net> <object>
+
+    argument            description
+
+     <net_attribute>     name of the attribute to get
+     <net>               set the attribute of this net
+     <object>            set the attribute to this value
+
+************************************************************************
+
+COMMAND: nl_set_net_pattern
+
+Set the DEF PATTERN clause of the specified net.
+
+Usage: nl_set_net_pattern <inet> <string>
+
+    argument            description
+
+     <inet>              set the PATTERN of this net
+     <string>            set the PATTERN clause to this (STEINER, BALANCED, WIREDLOGIC, or TRUNK)
+
+************************************************************************
+
+COMMAND: nl_set_net_use
+
+Set the DEF USE clause of the specified net.
+
+Usage: nl_set_net_use <inet> <string>
+
+    argument            description
+
+     <inet>              set the USE of this net
+     <string>            set the USE clause to this (SIGNAL, POWER, GROUND, CLOCK, TIEOFF, or ANALOG)
+
+************************************************************************
+
+COMMAND: nl_set_port_attribute
+
+Create and return a new port attribute.
+
+Usage: nl_set_port_attribute <port_attribute> <port> <object>
+
+    argument            description
+
+     <port_attribute>    name of the attribute to get
+     <port>              set the attribute of this port
+     <object>            set the attribute to this value
+
+************************************************************************
+
+COMMAND: nl_set_port_geometry
+
+Set the geometry of the specified port as a list.
+
+Usage: nl_set_port_geometry <port> <string> <integer_list>
+
+    argument            description
+
+     <port>              set the geometry of this port
+     <string>            the layer of the port
+     <integer_list>      a list of the form {x0, y0, x1, y1}
+
+************************************************************************
+
+COMMAND: nl_set_port_location
+
+Return the location of the specified port.
+
+Usage: nl_set_port_location [-fixed] [-grids] <port> <integer> <integer>
+
+    option              description
+
+    -fixed              mark the location as FIXED (otherwise it is PLACED)
+    -grids              set the location in grid units
+
+    argument            description
+
+     <port>              set the location of this port
+     <integer>           x coordinate of the location
+     <integer>           y coordinate of the location
+
+************************************************************************
+
+COMMAND: nl_set_port_loctype
+
+Set the location type of the specified port.
+
+Usage: nl_set_port_loctype <port> <string>
+
+    argument            description
+
+     <port>              set the location type of this port
+     <string>            set the loctype to this (UNPLACED, PLACED, or FIXED)
+
+************************************************************************
+
+COMMAND: nl_set_port_orientation
+
+Set the orientation of the specified port.
+
+Usage: nl_set_port_orientation <port> <string>
+
+    argument            description
+
+     <port>              set the orientation of this port
+     <string>            set the orientation to this (N, S, E, W, FN, FS, FE, or FW)
+
+************************************************************************
+
+COMMAND: nl_set_port_use
+
+Set the DEF USE clause of the specified port.
+
+Usage: nl_set_port_use <port> <string>
+
+    argument            description
+
+     <port>              set the USE of this port
+     <string>            set the USE clause to this (SIGNAL, POWER, GROUND, CLOCK, TIEOFF, or ANALOG)
+
+************************************************************************
+
+COMMAND: nl_set_reference
+
+Set the reference of the specified cell to the specified reference.
+
+Usage: nl_set_reference <cell> <reference>
+
+    argument            description
+
+     <cell>              set the reference of this cell
+     <reference>         set the reference to this
+
+************************************************************************
+
+COMMAND: nl_set_special
+
+Set the DEF special net flag of the specified net to the specified value.
+
+Usage: nl_set_special <inet> <integer>
+
+    argument            description
+
+     <inet>              set the special net status of this net
+     <integer>           set the special net flag to this value (1 or 0)
+
+************************************************************************
+
+COMMAND: nl_ungroup
+
+Ungroup the specified cell.  The cell must be linked.  All the contents
+of the linked design are moved into the design containing the cell.  The
+cell is removed.
+
+Usage: nl_ungroup [-all] [-recursive] [-silent] [-prefix <string>] [<cell>]
+
+    option              description
+
+    -all                ungroup all cells in the current design
+    -recursive          recursively ungroup the cell
+    -silent             don't print the name of each cell as it is ungrouped
+    -prefix <string>    use this as the prefix when creating new cell and net names
+
+    argument            description
+
+     <cell>              cell to ungroup
+
+************************************************************************
+
+COMMAND: nl_unlink_reference
+
+Unlink the specified reference.
+
+Usage: nl_unlink_reference <reference>
+
+    argument            description
+
+     <reference>         unlink this reference
+
+************************************************************************
+
+COMMAND: nl_unset_libcell
+
+Declare the specified design not to be a library cell.
+
+Usage: nl_unset_libcell <design>
+
+    argument            description
+
+     <design>            declare this design not to be a library cell
+
+************************************************************************
+
+COMMAND: nl_update_cell_locations
+
+Update the flat cell locations based on hierarchical cell locations.
+
+Usage: nl_update_cell_locations [<design>]
+
+    argument            description
+
+     <design>            top level design of the pdesign
+
+************************************************************************
+
+COMMAND: nl_write_def
+
+Write out the physical information for the specified design as a .def file
+
+Usage: nl_write_def [-header] [-components] [-pins] [-specialnets] [-net_routes] [-net_connectivity] [-nohistory] [-special_only <object>] [-sort] [-zero_name <string>] [-one_name <string>] [-nohierarchy] [-fixed_only] <file> [<design>]
+
+    option              description
+
+    -header             write out header information
+    -components         write out the placement of cells
+    -pins               write out the placement and geometry of ports
+    -specialnets        write out the special nets
+    -net_routes         write out routing of nets
+    -net_connectivity   write out connectivity
+    -nohistory          don't write out the history strings
+    -special_only <object>place the specified nets in the specialnets section only
+    -sort               sort nets, pins, and components before writing them out
+    -zero_name <string> name of logic zero net (e.g. GND)
+    -one_name <string>  name of logic one net (e.g. VDD)
+    -nohierarchy        write out DEF for one level of hierarchy only
+    -fixed_only         only include components with fixed placement
+
+    argument            description
+
+     <file>              the name of the .def file to write
+     <design>            design to be written
+
+************************************************************************
+
+COMMAND: nl_write_pdef
+
+Write out the physical information for the specified design as a .pdef file
+
+Usage: nl_write_pdef [-fixed_only] <file> [<design>]
+
+    option              description
+
+    -fixed_only         only include components with fixed placement
+
+    argument            description
+
+     <file>              the name of the .pdef file to write
+     <design>            design to be written
+
+************************************************************************
+
+COMMAND: nl_write_sim
+
+Write a .sim representation of the specified design to a file.
+
+Usage: nl_write_sim [-hierarchy] <file> [<design>]
+
+    option              description
+
+    -hierarchy          write out the hierarchy as a flat .sim file
+
+    argument            description
+
+     <file>              .sim file to be written
+     <design>            design to write
+
+************************************************************************
+
+COMMAND: nl_write_verilog
+
+Write a Verilog representation of the specified design to a file.
+
+Usage: nl_write_verilog [-hierarchy] [-libcell_stubs] <file> [<design>]
+
+    option              description
+
+    -hierarchy          recursively write out all linked subdesigns
+    -libcell_stubs      write stub modules for libcell designs
+
+    argument            description
+
+     <file>              Verilog file to be written
+     <design>            design to write
+
+************************************************************************
+
+COMMAND: nl_write_vim_def
+
+Write out the design in VIM format.
+
+Usage: nl_write_vim_def <file> [<design>]
+
+    argument            description
+
+     <file>              the name of the VIM DEF file to write
+     <design>            design to be written
+
+************************************************************************
+
+COMMAND: nl_write_vim_physcell
+
+Write out the design in VIM format.
+
+Usage: nl_write_vim_physcell <file> [<design>]
+
+    argument            description
+
+     <file>              the name of the VIM file to write
+     <design>            design to be written
+
+************************************************************************
+
+COMMAND: nl_write_vim_placement
+
+Write out the placement information in VIM format.
+
+Usage: nl_write_vim_placement [-cell_translate <string>] [-gridless] <file> [<design>]
+
+    option              description
+
+    -cell_translate <string>proc to call to translate cell names
+    -gridless           write a VIM with a gridless scale
+
+    argument            description
+
+     <file>              the name of the VIM file to write
+     <design>            design to be written
+
+************************************************************************
+
+COMMAND: nl_write_vim_tech
+
+Write out the design in VIM format.
+
+Usage: nl_write_vim_tech [-clock_name <string>] [-cell_translate <string>] [-net_translate <string>] [-nohierarchy] [-port_translate <string>] <file> [<design>]
+
+    option              description
+
+    -clock_name <string>the name of the clock signal
+    -cell_translate <string>proc to call to translate cell names
+    -net_translate <string>proc to call to translate net names
+    -nohierarchy        do not descend hierarchy
+    -port_translate <string>proc to call to translate port names
+
+    argument            description
+
+     <file>              the name of the VIM file to write
+     <design>            design to be written
+

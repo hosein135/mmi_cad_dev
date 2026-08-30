@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="12/04/01 16:28:53">
+<title>Part 5   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td>&nbsp;&nbsp;&nbsp;<H1><font color="003366"> SUE Design Manager Tutorial</font></H1></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="sue_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_tut-Pt4HigherLevel.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+<hr align="left">
+
+ 
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 5 </font>
+</h2>
+
+
+<h2>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Cross-probing With MAX</font>
+</h2>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014881"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this section we are going to bring up a schematic in SUE and a layout in MAX, the MMT full-custom layout editor. Using interprocess communication, SUE and MAX will then share data. In this case, you will be able to select any net in a schematic in SUE and tell MAX to highlight that net in the layout, and vice-versa. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029549"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You will need a license for MAX to run this section. If you don't know if you have a MAX license, just type "<b><code class="CodeStrong">max</code></b>" at the UNIX prompt. If MAX comes up, you have a license. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029841"> </a>If you don't have SUE running at this time, start it, and load the <b><code class="CodeStrong">FA</code></b> cell. If you are continuing from before, click on the <b><code class="CodeStrong">FA</code></b> cell in the <b><code class="CodeStrong">Schematic List</code></b> box. Your screen should look like <a href="SUE_tut-Pt5Crossprobe.html#1014888">Figure 31</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014888"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 31:   "FA" Schematic</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig30.gif">
+</div></font><a name="1014892"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014894"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since cross-probing to layout is a transistor-level operation, you need to be in either <b><code class="CodeStrong">spice</code></b> or <b><code class="CodeStrong">sim</code></b> simulation mode. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014895"> </a>If you are not sure that you are in <b><code class="CodeStrong">spice</code></b> or <b><code class="CodeStrong">sim</code></b> simulation mode - look at the <b><code class="CodeStrong">MAX Title Bar</code></b>. If you are unsure, go to <b><code class="CodeStrong">Change Simulation Mode... </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu and change to <b><code class="CodeStrong">spice</code></b> or <b><code class="CodeStrong">sim</code></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014896"> </a>Select<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Max Cross Probe Init</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. the <b><code class="CodeStrong">Cross Probe</code></b> popup will appear, as shown in Figure. Be sure that "<b><code class="CodeStrong">Start a new copy of MAX</code></b>" is selected. Type in <b><code class="CodeStrong">mmi25</code></b> for the MAX technology. Then click on <b><code class="CodeStrong">Done</code></b>. This will set up the cross-probing as described below. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029699"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 32:   MAX Cross-Probe Popup</em></font>
+</h4>
+
+</pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig32new.gif">
+</div></font><a name="1029730"> </a>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030187"> </a>A copy of MAX will start, and this will load the corresponding MAX layout file (FA.max, for this example).  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030228"> </a>Next, MAX and SUE both create sim netlists of their current layouts/schematics. 
+</li><p>
+</font>
+</ul></ul>    <dl><dl>
+<p>      <dt> <a name="1014899"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE doesn't have to be in <b><code class="CodeStrong">sim</code></b> mode for this. </font>
+</p>    </dl></dl>
+<UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030221"> </a>Finally, LVS using Gemini (a netlist compare program from the University of Washington) is run to compare the schematic and layout netlists and determine node equivalents. The nets which have correspondences are selected in both SUE and MAX.  
+</li><p>
+</font>
+</ul></ul></ol>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029800"> </a>To cross-probe a specific wire in SUE, select one wire as shown in <a href="SUE_tut-Pt5Crossprobe.html#1014902">Figure 33</a> and type the hotkey <b><strong class="Strong">k </strong></b>or <b><code class="CodeStrong">Max Cross Probe </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. The wire that you selected will be highlighted on the layout in the MAX window as shown in <a href="SUE_tut-Pt5Crossprobe.html#1014915">Figure 34</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014902"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 33:   Net Selected In SUE</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig31.gif">
+</div></font><a name="1014906"> </a>
+</pre>
+
+<h4>
+  <a name="1014915"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 34:   Highlighted Net In MAX</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig32.gif">
+</div></font><a name="1014919"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014920"> </a>Now select a different net in MAX by moving the cursor over the net and hitting<b><strong class="Strong"> s</strong></b>. You can also select a net in the current hierarchy by simply clicking on it with the left mouse button (Button-1). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014921"> </a>Once you have selected a net in MAX, hit <b><strong class="Strong">k</strong></b>, or select <b><code class="CodeStrong">SUE Cross Probe Net </code></b>from the <b><code class="CodeStrong">Tool</code></b> menu. The corresponding net should be selected in SUE. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014922"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to cross-probing, MAX is a very fast and powerful, full-featured, full-custom layout editor with a complete language API. Refer to the Micro Magic Tools MAX User Guide and Micro Magic Tools MAX Tutorial (accessed from either the <b><code class="CodeStrong">Help</code></b> menu in MAX, or from the Micro Magic Tools Documentation Guide) for more details. </font>
+<p>
+<p>
+  <dt> <a name="1014923"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now take your left hand and raise it over your head and pat yourself on the back. You survived the SUE tutorial, and hopefully learned a little about SUE. However, the best way to really learn SUE - or any tool - is to try it out with something you designed yourself. So go ahead, and good luck! </font>
+<p>
+<p>
+  <dt> <a name="1013715"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="right"><font size="1">
+    <b> -----  Micro Magic  -----   
+  </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="sue_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_tut-Pt4HigherLevel.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navendx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+
+</body>
+</html>

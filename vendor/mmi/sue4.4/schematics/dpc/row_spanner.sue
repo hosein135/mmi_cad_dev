@@ -1,0 +1,11 @@
+# Generator to make a wide icon for dpc.
+
+proc ICON_row_spanner args {
+  # This line is needed for all generators
+  icon_generator $args {{width 200}}
+		
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}}}
+
+  icon_line -$width -30 -$width 30 $width 30 $width -30 -$width -30
+  icon_property -origin {0 0} -label {Row Spanner} -anchor c
+}

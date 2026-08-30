@@ -1,1 +1,57 @@
-../extract/MMI_OAI31B.sp
+*** Extracted spice netlist generated from MAX ***
+
+.SUBCKT MMI_OAI31B in0 in1 in2 in3 out
+C_1 out gnd 2.51892fF
+C_2 in0 gnd 0.948395fF
+C_3 vdd gnd 3.15482fF
+C_4 in3 gnd 2.92673fF
+C_5 in2 gnd 2.91241fF
+C_6 in1 gnd 2.69723fF
+C_7 net_9 gnd 1.72161fF
+C_8 gnd gnd 2.90516fF
+Mp_1 out in0 vdd vdd p W=1.54U L=0.15U AD=0.406175P PD=2.5625U AS=0.419169P 
++ PS=2.98U
+Mp_2 vdd in3 net_1 vdd p W=1.155U L=0.15U AD=0.314377P PD=2.235U AS=0.1848P 
++ PS=1.475U
+Mp_3 net_1 in2 net_2 vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U AS=0.1848P 
++ PS=1.475U
+Mp_4 net_2 in1 out vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U AS=0.304631P 
++ PS=1.92187U
+Mp_5 out in1 net_3 vdd p W=1.155U L=0.15U AD=0.304631P PD=1.92187U 
++ AS=0.1848P PS=1.475U
+Mp_6 net_3 in2 net_4 vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U AS=0.1848P 
++ PS=1.475U
+Mp_7 net_4 in3 vdd vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U AS=0.314377P 
++ PS=2.235U
+Mp_8 vdd in3 net_5 vdd p W=1.155U L=0.15U AD=0.314377P PD=2.235U AS=0.1848P 
++ PS=1.475U
+Mp_9 net_5 in2 net_6 vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U AS=0.1848P 
++ PS=1.475U
+Mp_10 net_6 in1 out vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U 
++ AS=0.304631P PS=1.92187U
+Mp_11 out in1 net_7 vdd p W=1.155U L=0.15U AD=0.304631P PD=1.92187U 
++ AS=0.1848P PS=1.475U
+Mp_12 net_7 in2 net_8 vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U 
++ AS=0.1848P PS=1.475U
+Mp_13 net_8 in3 vdd vdd p W=1.155U L=0.15U AD=0.1848P PD=1.475U 
++ AS=0.314377P PS=2.235U
+Mn_1 net_9 in0 out gnd n W=0.77U L=0.15U AD=0.203088P PD=1.49U AS=0.1694P 
++ PS=1.21U
+Mn_2 out in0 net_9 gnd n W=0.77U L=0.15U AD=0.1694P PD=1.21U AS=0.203088P 
++ PS=1.49U
+Mn_3 net_9 in1 gnd gnd n W=0.77U L=0.15U AD=0.203088P PD=1.49U AS=0.171325P 
++ PS=1.215U
+Mn_4 gnd in1 net_9 gnd n W=0.77U L=0.15U AD=0.171325P PD=1.215U 
++ AS=0.203088P PS=1.49U
+Mn_5 net_9 in2 gnd gnd n W=0.77U L=0.15U AD=0.203088P PD=1.49U AS=0.171325P 
++ PS=1.215U
+Mn_6 gnd in2 net_9 gnd n W=0.77U L=0.15U AD=0.171325P PD=1.215U 
++ AS=0.203088P PS=1.49U
+Mn_7 net_9 in3 gnd gnd n W=0.77U L=0.15U AD=0.203088P PD=1.49U AS=0.171325P 
++ PS=1.215U
+Mn_8 gnd in3 net_9 gnd n W=0.77U L=0.15U AD=0.171325P PD=1.215U 
++ AS=0.203088P PS=1.49U
+.ENDS	$ MMI_OAI31B
+
+.GLOBAL gnd vdd
+

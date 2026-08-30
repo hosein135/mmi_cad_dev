@@ -1,0 +1,303 @@
+------------------------------------------------
+FLAT DESIGN
+
+INVARIENTS:
+
+A PORT always has a NET (a special net "unconnected_inports" is provided per-design)
+A NET always has a source OUTPORT, which has an INSTANCE ("dummy_source")
+an INSTANCE always has a CELL
+
+... that is, a PORT always has describeable behavior.
+
+
+------------------------------------------------
+HEIRARCHICAL DESIGN
+
+The hierarchical design is represented in the form of a verilog
+gate-level file (xxx.vg), more generally, by a set of verilog
+"modules", which are one-to-one with Sue files; each one represents
+one level of hierarchy.  Therefore, it has:
+
+	a type-name
+	a list of external connection names, designated as inputs,
+		outputs, or inouts; 
+	a list of internal wire names;
+	a list of instance definitions
+
+
+type-name :: character-string
+
+exconn-name 
+wire-name	::	character_string
+		||	character_string [ integer ]
+		||	character_string [ integer1 : integer2 ]
+
+    ... the first two forms represent single wires;
+	the third form represents an ordered sequence of wires running
+	from character_string[integer1] through
+	character_string[integer2], inclusive... 
+	hence (abs(integer2 - integer1) + 1) wires.
+
+
+instance-definition	::	instance-name	type-name ( connection-list )
+
+	
+instance-name	::	character_string
+		||	character_string [ number ]
+			
+
+connection-list	::	instance-connection
+		||	instance-connection , connection-list
+
+instance-connection	::	type-connection
+
+
+--------------------------------------------------
+DOWNSTREAM TIMING
+
+For static timing purposes, instances are seen as a collection of timing
+arcs.  
+
+INPUT-TO-OUTPUT ARC
+
+An edge (rising or falling) arrives at an inport with a given slope
+(strictly, transistion time) and delay from T-zero, and propagates
+across the arc to emerge on the outport.  The outport is characterized
+by its total capacitive load.  Given input slope and output load, the
+arc calculates output slope and gate delay.  Gate delay added to input
+delay gives ouput delay.
+
+	This model assumes that other inputs are stationary, which 
+	is optimistic.
+
+	See below for net delay.
+
+INPUT-TO-CLOCK ARC
+
+As a matter of convenience, flipflop setup time is treated as an
+additional stage of delay (can be thought of as path delay internal to
+the flipflop). In this case the input slope and the clock slope
+determine setup delay that must be added to the path delay in order to
+determine whether correct phasing to the clock is being maintained.
+
+
+GLOBAL TIMING
+
+The DESIGN::global_timing() algorithm seeks to find the long path
+through the design.  Each outport is tagged with the worst-case 
+delay to that point ... that is, the maximum of 
+	(delay at inport + gate delay over an arc)
+over all arcs terminating at that outport.
+
+A separate number is calculated for rising edge and falling edge.
+
+The algorithm propagates the worst-case delay from timing sources
+(which have delay given) towards destinations.  
+
+
+TIMING SOURCES:
+	the clock inputs to flipflops, which are assumed to have zero
+	delay and slope according to the variable "clock_slope" (by
+	default tied to "nominal_slope")
+
+	external inputs, which have a delay and slope assigned by the
+	"constraints" file. Default is delay = 0 and 
+	slope = "nominal_slope". 
+
+		* external slope is fixed, which means that load has
+		no effect, which is very optimistic.  Should add an
+		external stage with selectable drive strength.
+
+TIMING DESTINATIONS
+	non-clock inputs to flipflops
+
+	external outputs, which have a load assigned by the "constraints"
+	file.
+
+		* should also be able to define an external delay,
+		modeled as a setup time on the external output.
+
+
+-------------------------------------
+
+DOWNSTREAM
+
+The DOWNSTREAM class reprents an ordered list of instances which are
+"downstream" (in the signal propagation direction) from a set of root
+instances. For global_timing, the root set is all timing sources.
+For computeing timing slack, the root set may be an individual
+instance or the instance set of a clone.
+
+The list is constructed by doing a depth-first tree traversal from
+source (inports) to destination (outports).  When a leaf node 
+(timing destination instance) is encountered or when an intermediate
+node (instance) is completed, it is pushed onto the list.
+
+A flag is kept in each instance to show whether the instance has
+already been pushed onto the list. If the traversal enters a node
+where the flag is set, it returns immediately without pushing the
+instance a second time. 
+
+We have to watch out for circular dependencies.  So when the algorithm
+first enters an instance, it sets the flag to a value indicating
+IN_PROGRESS, and then descends into downstream nodes.  If the
+algorithm enters an instance where the flag is set to IN_PROGRESS,
+then there is a circular path. The algorithm does what it can, which 
+is to provide a warning message and return immediately, without
+getting caught in a loop.
+
+Thus, in the resulting ordered list, each instance will come after
+all its timing dependencies, and before all its timing dependents.
+
+
+    clear all flags
+    for each instance in root_instances,
+      instance->find_downstream_instances;
+    done
+  
+  INSTANCE::find_downstream_instances:
+    if flag equals DONE
+      return
+
+    if flag equals IN_PROGRESS
+      message "circular path detected"
+      return
+
+    if this is timing destination,
+      set flag to DONE
+      push this onto list
+      return
+  
+    else
+      set flag to IN_PROGRESS
+      for each outport in outportlist,
+        net = outport->net;
+        for each inport in net->inportlist,
+          next_instance = inport->instance;
+          next_instance->find_downstream_instances;
+      push this onto list
+      set flag to DONE
+      return  
+
+
+GLOBAL TIMING
+
+Having constructed a global_downstream instance, the global timing
+algorithm can evaluate each instance in the list order.  The timing
+delay at the timing sources is known as initial conditions; as each
+instance is encountered, the worst-case delay to each of its inputs is
+known.  The timing model for the instance is used to construt a set of
+timing delays along all the arcs; for each outport, the worst timing
+delay is saved as the worst-case delay at that point.  That delay is
+propagated along the connected net (adding a value for net delay if
+desired) to the inputs of the directly-downstream instances.
+
+  for each instance in global_downstream instancelist sequentially,
+    for each outport in instance->outportlist,
+      set worst-case_delay = 0
+      for each timing arcs ending at this outport
+        compute gate_delay from timing arc
+        compute total_delay = gate_delay + related_inport->total_delay 
+        if total_delay > worst-case_delay,
+          worst-case_delay = total_delay
+  set design_long_path_delay = 0
+  for each instance in timing_destinations,
+    if timing_destination->worst-case_delay > design_long_path_delay,
+      set design_long_path_delay = timing_destination->worst_case_delay
+      set design_long_path_destination = timing_destination
+  done
+
+
+COMPUTING TIMING SLACK
+
+For a given instance, define the timing slack as the maximum delay
+that can be added to all paths through the instance without impacting
+the design long path.  
+
+Begin by performing a global_timing, so that the design long path and
+the worst-case delays to all inports are known. Then for the given
+instance, find the downstream instances (construct a DOWNSTREAM) as
+above, and do the timing algorithm described above... in this case it
+is a partial timing, since only instances downstream of the given
+instance are evaluated. (*Note, these values are stored in a way that
+doesn't damage the stored global timing values.)  Not every timing
+destinations in the design will be encountered, so keep track of which
+timing destination encountered has the largest delay.  At the end,
+that delay is the delay of the longest path that goes through the
+given instance; that value subtracted from the design long path delay
+gives the desired timing slack.
+
+
+USING THE TIMING SLACK TO DOWNSIZE AN INSTANCES
+
+(Assuming a smaller cell is available,) compute the timing slack 
+as above. If the timing slack is not greater than the
+minimum_desireable_slack, return.
+
+Duplicate a three-gate path through the instance; time it.  Replace
+the instance with the smaller instance; time the path again.  The
+difference is a first guess at how much slack the downsize will
+consume; if the timing_slack minus that value is not greater than 
+the minimum_desireable_slack, return.
+
+Replace the instance in the design structure with the smaller size and
+recalculate the timing slack. Again if the minimum_desireable_slack
+will not be maintained, return.
+
+We are now OK with keeping this change, but the global_timing
+worst-case delays may not be too small for the downstream instances. 
+So we have to walk over this instances downstreams recalculating
+the global delay.
+
+
+DOWNSIZEING CLONES
+
+Most similar to above; the downstream root-instance list is set to 
+the clone's instance list.  The three-gate path is constructed for a
+random instance, and if that looks good, the entire clone is replaced,
+the downstream timing recalculated, &c..
+
+
+THE HIGH-LEVEL ALGORITHMS
+
+User-level commands are availabe to downsize by instances, by clones,
+or a named instance.
+
+Experience shows that the most efficient thing to do is to downsize
+the largest instances first, so the algorithm actually makes several
+passes over the design instancelist, first trying to downsize all the
+E-sizes, then D-sizes and so on.
+
+
+
+
+
+
+
+
+
+
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

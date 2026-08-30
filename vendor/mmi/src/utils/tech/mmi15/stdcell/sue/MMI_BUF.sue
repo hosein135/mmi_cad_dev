@@ -1,0 +1,282 @@
+# Created using mapper from:
+#"MMI_BUF {B {MMI_BUFB {in in} {out out}} {MMI_BUFB_ {in in} {out out}}} {C {MMI_BUFC {in in} {out out}} {MMI_BUFC_ {in in} {out out}}} {D {MMI_BUFD {in in} {out out}} {MMI_BUFD_ {in in} {out out}}} {E {MMI_BUFE {in in} {out out}} {MMI_BUFE_ {in in} {out out}}} "
+
+proc SCHEMATIC_MMI_BUF args {
+  call_use_keyword $args {{Size "B"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    B {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make global -name gnd -origin {850 400}
+  make global -orient RY -name vdd -origin {850 160}
+  make output -name out -origin {870 280}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {660 280}
+  make pmos -W 1.54 -origin {850 200}
+  make nmos -W 0.77 -origin {850 360}
+  make nmos -W 0.385 -origin {550 360}
+  make pmos -W 0.77 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {600 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_wire 770 200 790 200
+  make_wire 770 360 790 360
+  make_wire 770 280 770 360
+  make_wire 770 280 770 200
+  make_wire 850 280 870 280
+  make_wire 850 280 850 240
+  make_wire 850 280 850 320
+  make_wire 660 280 770 280
+  make_wire 660 280 550 280
+  make_text -origin {360 90} -text Buffer
+  make_text -origin {360 110} -text {B Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_BUF MMI_BUFB -Size B -DeMorgan 0
+        make MMI_BUFB -origin "$urx $ury"
+      } else {
+        generate MMI_BUF MMI_BUFB_ -Size B -DeMorgan 1
+        make MMI_BUFB_ -origin "$urx $ury"
+      }
+    }
+
+    C {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make global -name gnd -origin {850 400}
+  make global -orient RY -name vdd -origin {850 160}
+  make output -name out -origin {870 280}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {660 280}
+  make pmos -W 3.08 -origin {850 200}
+  make nmos -W 1.54 -origin {850 360}
+  make nmos -W 0.52 -origin {550 360}
+  make pmos -W 1.04 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {590 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_wire 770 200 790 200
+  make_wire 770 360 790 360
+  make_wire 770 280 770 360
+  make_wire 770 280 770 200
+  make_wire 850 280 870 280
+  make_wire 850 280 850 240
+  make_wire 850 280 850 320
+  make_wire 660 280 770 280
+  make_wire 660 280 550 280
+  make_text -origin {360 90} -text Buffer
+  make_text -origin {360 110} -text {C Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_BUF MMI_BUFC -Size C -DeMorgan 0
+        make MMI_BUFC -origin "$urx $ury"
+      } else {
+        generate MMI_BUF MMI_BUFC_ -Size C -DeMorgan 1
+        make MMI_BUFC_ -origin "$urx $ury"
+      }
+    }
+
+    D {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make global -name gnd -origin {850 400}
+  make global -orient RY -name vdd -origin {850 160}
+  make output -name out -origin {870 280}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {660 280}
+  make pmos -W 6.16 -origin {850 200}
+  make nmos -W 3.08 -origin {850 360}
+  make pmos -W 2.08 -origin {550 200}
+  make nmos -W 1.04 -origin {550 360}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {620 560}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_wire 770 200 790 200
+  make_wire 770 360 790 360
+  make_wire 770 280 770 360
+  make_wire 770 280 770 200
+  make_wire 850 280 870 280
+  make_wire 850 280 850 240
+  make_wire 850 280 850 320
+  make_wire 660 280 550 280
+  make_wire 660 280 770 280
+  make_text -origin {360 90} -text Buffer
+  make_text -origin {360 110} -text {D Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_BUF MMI_BUFD -Size D -DeMorgan 0
+        make MMI_BUFD -origin "$urx $ury"
+      } else {
+        generate MMI_BUF MMI_BUFD_ -Size D -DeMorgan 1
+        make MMI_BUFD_ -origin "$urx $ury"
+      }
+    }
+
+    E {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make global -name gnd -origin {850 400}
+  make global -orient RY -name vdd -origin {850 160}
+  make output -name out -origin {870 280}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {660 280}
+  make pmos -W 12.32 -origin {850 200}
+  make nmos -W 6.16 -origin {850 360}
+  make nmos -W 2.08 -origin {550 360}
+  make pmos -W 4.16 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {620 550}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_wire 770 200 790 200
+  make_wire 770 360 790 360
+  make_wire 770 280 770 360
+  make_wire 770 280 770 200
+  make_wire 850 280 870 280
+  make_wire 850 280 850 240
+  make_wire 850 280 850 320
+  make_wire 660 280 550 280
+  make_wire 660 280 770 280
+  make_text -origin {360 90} -text Buffer
+  make_text -origin {360 110} -text {E Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_BUF MMI_BUFE -Size E -DeMorgan 0
+        make MMI_BUFE -origin "$urx $ury"
+      } else {
+        generate MMI_BUF MMI_BUFE_ -Size E -DeMorgan 1
+        make MMI_BUFE_ -origin "$urx $ury"
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_BUF args {
+  call_use_keyword $args {{Size "B"} {DeMorgan 0}}
+
+  set nom MMI_BUF[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_BUF args {
+  icon_generator $args {{Size "B" {radio B C D E}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "B") && ($size != "C") && ($size != "D") && ($size != "E")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_BUF icon body
+    icon_line -30 -30 -30 30 30 0 -30 -30
+
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+  } else {
+    icon_line 30 0 60 0
+    icon_line -30 0 -60 0
+  }
+
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_BUF -Size $Size]
+  set nname [NAME_MMI_BUF -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    B {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    C {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    D {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    E {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

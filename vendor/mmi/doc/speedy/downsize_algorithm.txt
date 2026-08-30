@@ -1,0 +1,172 @@
+To: santoro
+bcc: marshall
+Subject: downsizing algorithm
+--text follows this line--
+
+-------------------------------------------------------
+BASE COMPUTE_TIMING ALGORITHM
+
+Recall the "compute_timing" algorithm (simplified):
+
+* initialize all stored delays to zero
+
+* start with all timing sources (external inputs, clocks, or
+  tied nets), assigning delay = 0
+
+* propagate delay on this net:
+
+	* add net delay 
+
+	* if the inport is a timing destination (non-clock edge 
+	  of "flipflop" (...&tc, eg ram),
+		* if delay > design-long-delay, 
+		  set design-long->path = current path
+
+		* continue with next inport on this net
+
+	* propagate delay on inport->instance:
+
+		* find all timing arcs begining at the inport; 
+		  for each timing arc:	
+			* compute the delay across the timing arc
+			* set delay =  inport delay + timing arc delay
+			* if delay > outport long-delay, 
+			    set outport long-delay = delay
+			    set	outport's long-path-inport = inport
+			* mark this arc as traversed
+			* find all arcs *ending* at this outport;
+			  if all have been traversed, propagate delay
+			  to the net connected to the outport
+
+-------------------------------------------------------
+CHANGES TO THE BASE COMPUTE_TIMING ALGORITHM
+
+Now add a new data item on each outport, "instance-long-delay", 
+initially zero, and ammend the "compute_timing" algorithm:
+
+* When we encounter a timing destination, walk back along the current
+  path; for each instance, 
+	* if path-delay > instance-long-delay,
+	  set instance-long-delay = path-delay
+
+So at the conclusion of compute-timing, each instance is marked with
+the path-delay of the longest path it particpates in.  The design
+long-path-delay is also known, as usual. The difference between the
+two delays is the "instance-timing-slack". 
+
+-------------------------------------------------------
+BASIC DOWNSIZE-NONCRITICAL-INSTANCES ALGORITHM
+
+Parameters:  minimum-instance-timing-slack, maximum-acceptable-slope
+
+* mark all instances as "not-resized"
+
+* until we make a pass without downsizeing any instances:		
+
+	* compute_timing to find all instance-slack as above
+
+	* Walk over all instances 
+	  ... for the sake of arguement, breadth-first tree walk backwards
+		from timing destinations  
+	  For each instance:
+
+		* if instance has been resized, continue
+
+		* if instance-timing-slack <
+		  minimimum-instance-timing-slack, continue
+
+		* if no next-smaller-cell, continue
+
+		* compute output slope with next-smaller-cell and
+		  existing loads; 
+		  if > maximum-acceptable-slope, continue;
+
+
+		* replace instance with next-smaller-cell and compute 
+		  additional-local-delay (change in delay from input
+		  of driving instance to output of driven instance)
+
+		* if instance-slack - additional-local-delay <
+		  minimum-instance-timing-slack, 
+		  restore previous cell and continue
+
+		* walk back over tree of driver gates; for each,
+		  set instance-slack = instance-slack -
+			additional-local-delay  
+
+* (optional) 
+	* collect clones & save to sue
+	* redo DPC
+
+-------------------------------------------------------
+DISCUSSION
+
+Taking the used-up slack out of the entire backtree of each instance
+guarantees that we won't increase the long path by spending the same
+slack on two instance in a path; but obviously we will be charging it
+to a large number of gates that don't deserve it.  However, when we
+do compute-timing in the next pass, that reduced slack will be charged
+correctly.  The justification for this is that in a large design with 
+many paths, we will be able to make a large number of adjustments
+purely by local inspection before having to take the hit of a global
+retiming. 
+
+Note that we could also charge the additional-local-delay to all
+instances in the foretree as well the backtree; if this is done, then
+I claim the order of downsizeing instances is not critical in the
+sense that the algorithm is stable and will not impact the
+design-long-path.  It *does* make a difference to the result in the
+sense that the set of instances that get downsized is dependent on the
+ordering; gates early in the ordering are more likely to be
+successfully donwsized.  Possible other orderings: 
+
+	* by cell type, in order of desireability of downsizing;
+	  .... ie, in order of decreasing difference in size or power
+	  drain between this size and the next size smaller 
+
+	* decreasing order of instance-timing-slack
+	  this would tend to even out the slack, which conceivably
+	  could make life easier for the router
+		
+-------------------------------------------------------
+A MORE POWERFUL ALGORITHM
+
+It would be possible to sharpen this method to accurately account for 
+the used-up slack by storing the set of paths that pass through each
+instance. (note, a stored path, as implemented in Speedy, includes the
+timing delays along that path...) Then, for each path in the set,
+
+	* recalulate the timing along that path, and note the new
+	  path-delay 
+
+	* for each instance on the path, 
+	  if the path-delay > instance-long-delay,
+	  set instance-long-delay = path-delay
+
+With this method, it should not be necessary to iterate, since the
+instance-slack is always accurate (what it would be if compute-timing
+were done). 
+
+Note that this algorithm is inherently independent of instance order.
+
+
+-------------------------------------------------------
+IMPLICATIONS FOR GLOBAL ROUTER
+
+Note that the extended global routing algorithm has the same basic
+problem.
+
+At the conclusion of the present steiner-based global routing
+algorithm, some gridboxes (global routing cells) are known to be
+over-congested.  It is possible to reduce congestion by routing 
+some segments around congested areas; this would necessarily involve 
+adding length, and therefore delay.  In order to avoid impacting
+timing, we would like to select segments that have maximum slack,
+which can be computed using the same algorithm as above.
+
+
+ 
+
+
+
+    

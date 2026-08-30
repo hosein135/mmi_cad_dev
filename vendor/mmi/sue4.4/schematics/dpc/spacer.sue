@@ -1,0 +1,13 @@
+# SUE version MMI_SUE4.0x
+
+proc ICON_spacer args {
+  icon_setup $args {{origin {0 0}} {orient R0} {rows 0} {columns 0} {name {}}}
+  icon_property -origin {-70 120} -type user -name rows -default 0
+icon_property -origin {0 -30} -size large -anchor center -label spacer
+  icon_property -origin {-70 140} -type user -name columns -default 0
+icon_property -origin {-20 0} -label {row=$rows}
+icon_property -origin {-20 20} -label {col=$columns}
+  icon_line -40 -60 50 -60 70 -40 70 30 50 50 -40 50 -60 30 -60 -40 -40 -60
+  icon_property -origin {-70 90} -type user -name name
+}
+

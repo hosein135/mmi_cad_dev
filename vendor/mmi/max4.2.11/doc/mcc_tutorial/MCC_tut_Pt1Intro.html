@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="12/07/01 12:05:51">
+<title>Part 1   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img SRC="images/mmi-logo.gif"></td>
+     <td><font color="003366"><b><H1> MCC MegaCell Compiler Tutorial</H1></b></font></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MCC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MCC_tut_Preface.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="MCC_tut_Pt2RunningMCC.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="MCC_tut_Pt4Netlisting.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 1 </font>
+</h2>
+
+
+<h2>
+  <a name="1028534"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Mega Cell Compiler (MCC) Tutorial</font>
+</h2>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028535"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Welcome to the Micro Magic Tools MegaCell Compiler (MCC)<em class="Emphasis"> </em>tutorial. The MegaCell Compiler makes building all types of regular structures such as RAMs, Register Files, FIFOs, ROMs, and PLAs fast and easy. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028536"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MCC Features</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1039974"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following list describes the main features of MCC:</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028537"> </a>Create user-configurable memories such as SRAMs, ROMs, CAMs, PLAs, DRAMs, FIFOs, and Pad Rings.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028538"> </a>Very fast execution. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028539"> </a>Fully-hierarchical relative tiling engine. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028540"> </a>Via programming by tracing wire paths, NOT by specifying coordinates. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028541"> </a>Automatic Verilog netlisting directly from layouts means time-consuming LVS is no longer required. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028542"> </a>Simple port propagation. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028543"> </a>Easy to make fully parameterizable megacells. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028544"> </a>Completely technology independent. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028545"> </a>Automatic extraction of critical path netlists. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1039985"> </a>Automatic layout extraction of the critical path.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1028546"> </a>Ability to interface to industry-standard verification tools. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1028547"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This tutorial walks you through exercises that highlight many of these features. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028557"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 1:   Micro Magic Tools MegaCell Compiler</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/MCC_tut_Pt1Introa.gif" height="233" width="528">
+</div></font><a name="1030637"> </a>
+</pre>
+
+<h3>
+  <a name="1028558"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Getting Started </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028559"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we get started, make sure someone has already installed MAX Layout Editor and MCC at your site. If you have purchased SUE Design Environment, make sure it is installed as well. We will use SUE and NST later in the tutorial.</font>
+<p>
+<p>
+  <dt> <a name="1039997"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC is run from inside MAX.</font>
+<p>
+<p>
+  <dt> <a name="1040024"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Although not needed for the tutorial, it would be helpful to have a SPICE simulator and a Verilog simulator installed.</font>
+<p>
+<p>
+  <dt> <a name="1028561"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr bgcolor="#FFFFFF">
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"></p>
+<table border="0" width="80%" align="center" cellpadding="10">
+<tr>
+<td align="center" width="80"><img src="images/note.gif"></td>
+<td></td>
+</tr>
+</table>
+
+<br clear="left">
+ 
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1040070"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before starting this MCC tutorial, make sure you have completed the MAX Tutorial and SUE Tutorial. This tutorial assumes you have mastered the concepts in the MAX and SUE tutorials. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+
+</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028563"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Installing the MCC Tutorial</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028564"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To run the tutorials, you need to make a personal copy of the MCC tutorial example files using<b><code class="CodeStrong"> mmi_tutorial</code></b>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1040790"> </a>To install the MCC tutorial, at the UNIX prompt type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">mmi_tutorial
+</font><a name="1028566"> </a>
+</p></pre>
+   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1028567"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Make sure that the MCC tutorial is selected and then click on <b><code class="CodeStrong">Install Tutorial</code></b>. The default installation directory is <b><code class="CodeStrong">mmi_private/tutorial</code></b> in your home directory. You can also select a different directory for installation. If the directory does not already exist, the <b><code class="CodeStrong">mmi_tutorial</code></b> script creates it. You can also use <b><code class="CodeStrong">mmi_tutorial</code></b> to reinstall a clean copy of the tutorial.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028568"> </a>Change directory (<b><code class="CodeStrong">cd</code></b>) to the directory where you installed the tutorial. If you installed the tutorial in the default directory, type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd ~/mmi_private/tutorial/mcc/max 
+</font><a name="1028569"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1028570"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Otherwise, replace the above directory with the directory you specified. This directory contains files that you need to run the tutorial.</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028571"> </a>You need to start MAX in order to run MCC. To do this, type the following: </font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">max -tech mmi25
+</font><a name="1028572"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1028573"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This starts up MAX with the technology <b><code class="CodeStrong">mmi25</code></b> (.25 micron MAX technology file). Notice that the MCC commands have been added to the <b><code class="CodeStrong">Tool</code></b> menu. The <b><code class="CodeStrong">mc_init </code></b>command in your <b><code class="CodeStrong">.maxrc</code></b> file adds the MCC commands to the <b><code class="CodeStrong">Tool</code></b> menu in MAX. For clarity, all of the MCC commands are prefixed by the string <b><code class="CodeStrong">MC</code></b>.</font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="MCC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="MCC_tut_Preface.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="MCC_tut_Pt2RunningMCC.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="MCC_tut_Pt4Netlisting.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

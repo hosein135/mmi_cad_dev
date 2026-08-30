@@ -1,0 +1,262 @@
+# Created using mapper from:
+#"MMI_INV {A {MMI_INVA {in in} {out out}} {MMI_INVA_ {in in} {out out}}} {B {MMI_INVB {in in} {out out}} {MMI_INVB_ {in in} {out out}}} {C {MMI_INVC {in in} {out out}} {MMI_INVC_ {in in} {out out}}} {D {MMI_INVD {in in} {out out}} {MMI_INVD_ {in in} {out out}}} {E {MMI_INVE {in in} {out out}} {MMI_INVE_ {in in} {out out}}} "
+
+proc SCHEMATIC_MMI_INV args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    A {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make pmos -W 0.77 -origin {550 200}
+  make nmos -W 0.385 -origin {550 360}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {580 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text Inverter
+  make_text -origin {360 110} -text {A Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_INV MMI_INVA -Size A -DeMorgan 0
+        make MMI_INVA -origin "$urx $ury"
+      } else {
+        generate MMI_INV MMI_INVA_ -Size A -DeMorgan 1
+        make MMI_INVA_ -origin "$urx $ury"
+      }
+    }
+
+    B {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make pmos -W 1.54 -origin {550 200}
+  make nmos -W 0.77 -origin {550 360}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {500 550}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 80} -text Inverter
+  make_text -origin {360 100} -text {B Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_INV MMI_INVB -Size B -DeMorgan 0
+        make MMI_INVB -origin "$urx $ury"
+      } else {
+        generate MMI_INV MMI_INVB_ -Size B -DeMorgan 1
+        make MMI_INVB_ -origin "$urx $ury"
+      }
+    }
+
+    C {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make nmos -W 1.54 -origin {550 360}
+  make pmos -W 3.08 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {510 530}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text Inverter
+  make_text -origin {360 110} -text {C Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_INV MMI_INVC -Size C -DeMorgan 0
+        make MMI_INVC -origin "$urx $ury"
+      } else {
+        generate MMI_INV MMI_INVC_ -Size C -DeMorgan 1
+        make MMI_INVC_ -origin "$urx $ury"
+      }
+    }
+
+    D {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make nmos -W 3.08 -origin {550 360}
+  make pmos -W 6.16 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.4 -date 12/02/99 -origin {480 530}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text Inverter
+  make_text -origin {360 110} -text {D Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_INV MMI_INVD -Size D -DeMorgan 0
+        make MMI_INVD -origin "$urx $ury"
+      } else {
+        generate MMI_INV MMI_INVD_ -Size D -DeMorgan 1
+        make MMI_INVD_ -origin "$urx $ury"
+      }
+    }
+
+    E {
+
+  make global -name gnd -origin {550 400}
+  make global -orient RY -name vdd -origin {550 160}
+  make input -name in -origin {450 280}
+  make output -name out -origin {570 280}
+  make nmos -W 6.16 -origin {550 360}
+  make pmos -W 12.32 -origin {550 200}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {480 540}
+  make_wire 470 200 490 200
+  make_wire 470 360 490 360
+  make_wire 450 280 470 280
+  make_wire 470 280 470 360
+  make_wire 470 280 470 200
+  make_wire 550 280 570 280
+  make_wire 550 280 550 240
+  make_wire 550 280 550 320
+  make_text -origin {360 90} -text Inverter
+  make_text -origin {360 110} -text {E Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_INV MMI_INVE -Size E -DeMorgan 0
+        make MMI_INVE -origin "$urx $ury"
+      } else {
+        generate MMI_INV MMI_INVE_ -Size E -DeMorgan 1
+        make MMI_INVE_ -origin "$urx $ury"
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_INV args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_INV[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_INV args {
+  icon_generator $args {{Size "A" {radio A B C D E}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B") && ($size != "C") && ($size != "D") && ($size != "E")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_INV icon body
+  icon_line -30 -30 -30 30 30 0 -30 -30
+
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_line 30 0 60 0
+  } else {
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+    icon_line -30 0 -60 0
+  }
+
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_INV -Size $Size]
+  set nname [NAME_MMI_INV -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    A {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    B {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    C {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    D {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    E {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

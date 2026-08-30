@@ -1,0 +1,681 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:42:09">
+<title>SUE Design Manager User Guide</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+
+
+<p><table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+
+	<!-- THE FOLLOWING LINE IS THE TITLE OF THE DOCUMENT -->
+
+
+     <td> <center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_ApdxC_setup.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navidxx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+<hr align="left">
+
+ 
+
+<blockquote>
+<h1>
+  <a name="6201"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">SUE Design Manager User Guide</font>
+</h1><hr>
+
+
+<h3>
+  <a name="IX_Symbols"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Symbols</font>
+</h3>
+
+<dl>
+  <dd> <a name="31561"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">.suerc file	<a href="SUE_chap1_overview.html#1019584">1</a>, <a href="SUE_chap1_overview.html#1019650">2</a>, <a href="SUE_chap1_overview.html#1019957">3</a>, <a href="SUE_chap1_overview.html#1019976">4</a>, <a href="SUE_chap1_overview.html#1020057">5</a>, <a href="SUE_chap1_overview.html#1020098">6</a>, <a href="SUE_chap1_overview.html#1020185">7</a>, <a href="SUE_chap1_overview.html#1020253">8</a>, <a href="SUE_chap2_wires-bus.html#1023160">9</a>, <a href="SUE_chap3_property_gen.html#1023361">10</a>, <a href="SUE_chap7_interface.html#1028798">11</a></font>
+  <dl>
+    <dd> <a name="31573"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">debugging	<a href="SUE_chap1_overview.html#1019976">1</a></font>
+  </dl>
+</dl>
+
+<h3>
+  <a name="IX_A"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">A</font>
+</h3>
+
+<dl>
+  <dd> <a name="31578"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">abort a mode	<a href="SUE_chap1_overview.html#1024905">1</a></font>
+  <dd> <a name="31580"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">About SUE	<a href="SUE_chapt5_commands.html#1031250">1</a></font>
+  <dd> <a name="31582"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">active object	<a href="SUE_chap1_overview.html#1019670">1</a>, <a href="SUE_chap1_overview.html#1019683">2</a></font>
+  <dd> <a name="31585"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Add Arc	<a href="SUE_chapt5_commands.html#1030869">1</a></font>
+  <dd> <a name="31587"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Add Line/Rect	<a href="SUE_chapt5_commands.html#1030866">1</a></font>
+  <dd> <a name="31589"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Add Text	<a href="SUE_chapt5_commands.html#1030863">1</a></font>
+  <dd> <a name="31591"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Add Wire	<a href="SUE_chapt5_commands.html#1030860">1</a></font>
+  <dd> <a name="31593"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">API	<a href="SUE_chap7_interface.html#1028993">1</a></font>
+  <dl>
+    <dd> <a name="31595"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">API example	<a href="SUE_chap7_interface.html#1028900">1</a>, <a href="SUE_chap7_interface.html#1028953">2</a></font>
+    <dd> <a name="31598"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">API Procedures	<a href="SUE_chap7_interface.html#1028808">1</a></font>
+    <dd> <a name="31600"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">API syntax	<a href="SUE_chap7_interface.html#1028813">1</a>, <a href="SUE_chap7_interface.html#1028891">2</a></font>
+  </dl>
+  <dd> <a name="31603"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">arc	<a href="SUE_chap1_overview.html#1019632">1</a>, <a href="SUE_chap1_overview.html#1026695">2</a>, <a href="SUE_chap1_overview.html#1019993">3</a></font>
+  <dl>
+    <dd> <a name="31607"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">edit	<a href="SUE_chap1_overview.html#1019916">1</a></font>
+  </dl>
+  <dd> <a name="31609"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">auto_mkindex	<a href="SUE_chap1_overview.html#1025340">1</a></font>
+  <dd> <a name="31611"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">AUTOLIB	<a href="SUE_chap1_overview.html#1020069">1</a>, <a href="SUE_chap1_overview.html#1020111">2</a></font>
+  <dd> <a name="31614"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">auto-pan	<a href="SUE_chap1_overview.html#1024893">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_B"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">B</font>
+</h3>
+
+<dl>
+  <dd> <a name="31618"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Back Annotate Caps	<a href="SUE_chapt5_commands.html#1049935">1</a>, <a href="SUE_chapt5_commands.html#1050607">2</a>, <a href="SUE_chapt5_commands.html#1081183">3</a></font>
+  <dd> <a name="31622"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">behavioral models	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="31624"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bus_combine	<a href="SUE_chap2_wires-bus.html#1023297">1</a></font>
+  <dd> <a name="31626"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bus_expand	<a href="SUE_chap7_interface.html#1028862">1</a></font>
+  <dd> <a name="31628"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bus_name	<a href="SUE_chap2_wires-bus.html#1023193">1</a></font>
+  <dd> <a name="31630"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bus_width	<a href="SUE_chap7_interface.html#1028870">1</a></font>
+  <dd> <a name="31632"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">buses	<a href="SUE_chap2_wires-bus.html#1023182">1</a>, <a href="SUE_chap2_wires-bus.html#1023321">2</a></font>
+  <dl>
+    <dd> <a name="31635"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bus_combine icon	<a href="SUE_chap2_wires-bus.html#1023297">1</a></font>
+    <dd> <a name="31637"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bused icons	<a href="SUE_chap2_wires-bus.html#1023216">1</a></font>
+    <dd> <a name="31639"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">bused terminals	<a href="SUE_chap2_wires-bus.html#1023216">1</a></font>
+    <dd> <a name="31641"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">concatenated buses	<a href="SUE_chap2_wires-bus.html#1023263">1</a></font>
+    <dd> <a name="31643"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">debugging	<a href="SUE_chap2_wires-bus.html#1023316">1</a></font>
+    <dd> <a name="31645"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">implicit bus	<a href="SUE_chap2_wires-bus.html#1023216">1</a></font>
+    <dd> <a name="31647"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">name_net	<a href="SUE_chap2_wires-bus.html#1023200">1</a></font>
+    <dd> <a name="31649"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">naming	<a href="SUE_chap2_wires-bus.html#1023215">1</a></font>
+    <dd> <a name="31651"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">naming concatenated buses	<a href="SUE_chap2_wires-bus.html#1023280">1</a></font>
+  </dl>
+</dl>
+
+<h3>
+  <a name="IX_C"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">C</font>
+</h3>
+
+<dl>
+  <dd> <a name="31655"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Cancel Memory	<a href="SUE_chapt5_commands.html#1050276">1</a>, <a href="SUE_chapt5_commands.html#1050712">2</a>, <a href="SUE_chapt5_commands.html#1051133">3</a></font>
+  <dd> <a name="31659"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">cells</font>
+  <dl>
+    <dd> <a name="31660"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">load on demand	<a href="SUE_chap1_overview.html#1020077">1</a></font>
+  </dl>
+  <dd> <a name="31662"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change Grid Spacing	<a href="SUE_chapt5_commands.html#1031033">1</a></font>
+  <dd> <a name="31664"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change Path	<a href="SUE_chap1_overview.html#1020103">1</a></font>
+  <dd> <a name="31666"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change Probe Type	<a href="SUE_chapt5_commands.html#1031092">1</a></font>
+  <dd> <a name="31668"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change Probe Type...	<a href="SUE_chapt5_commands.html#1057751">1</a>, <a href="SUE_chapt5_commands.html#1049811">2</a>, <a href="SUE_chapt5_commands.html#1050566">3</a>, <a href="SUE_chapt5_commands.html#1081223">4</a></font>
+  <dd> <a name="31673"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change Simulation Mode	<a href="SUE_chapt5_commands.html#1052281">1</a>, <a href="SUE_chapt5_commands.html#1045076">2</a></font>
+  <dd> <a name="31676"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">change simulation mode	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+  <dd> <a name="31678"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change Simulation Mode...	<a href="SUE_chapt5_commands.html#1049338">1</a>, <a href="SUE_chapt5_commands.html#1080950">2</a>, <a href="SUE_chapt5_commands.html#1081217">3</a></font>
+  <dd> <a name="31682"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">check file system	<a href="SUE_chap1_overview.html#1020124">1</a></font>
+  <dd> <a name="31684"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">clipboard	<a href="SUE_chap1_overview.html#1020004">1</a></font>
+  <dd> <a name="31686"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">CLIPBOARD_FILE	<a href="SUE_chap1_overview.html#1020246">1</a></font>
+  <dd> <a name="31688"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Close Probe	<a href="SUE_chapt5_commands.html#1052278">1</a>, <a href="SUE_chapt5_commands.html#1045073">2</a>, <a href="SUE_chapt5_commands.html#1049286">3</a>, <a href="SUE_chapt5_commands.html#1050557">4</a>, <a href="SUE_chapt5_commands.html#1081214">5</a></font>
+  <dd> <a name="31694"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">colors	<a href="SUE_chap1_overview.html#1019650">1</a>, <a href="SUE_chap1_overview.html#1019969">2</a></font>
+  <dd> <a name="31697"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">comment property	<a href="SUE_chap3_property_gen.html#1023403">1</a></font>
+  <dd> <a name="31699"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">connect	<a href="SUE_chap1_overview.html#1019691">1</a></font>
+  <dd> <a name="31701"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">connectivity	<a href="SUE_chap1_overview.html#1019648">1</a>, <a href="SUE_chap1_overview.html#1019691">2</a>, <a href="SUE_chap1_overview.html#1020152">3</a></font>
+  <dl>
+    <dd> <a name="31705"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">making connections	<a href="SUE_chap6_fileformats.html#1028141">1</a></font>
+  </dl>
+  <dd> <a name="31707"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">coordinates	<a href="SUE_chap6_fileformats.html#1028136">1</a></font>
+  <dd> <a name="31709"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">copy	<a href="SUE_chap1_overview.html#1020014">1</a>, <a href="SUE_chap1_overview.html#1020128">2</a>, <a href="SUE_chap1_overview.html#1020245">3</a></font>
+  <dd> <a name="31713"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">copy to clipboard	<a href="SUE_chap1_overview.html#1020004">1</a>, <a href="SUE_chap1_overview.html#1020239">2</a></font>
+  <dd> <a name="31716"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Create Verilog Property	<a href="SUE_chapt5_commands.html#1031106">1</a>, <a href="SUE_chapt5_commands.html#1048794">2</a>, <a href="SUE_chapt5_commands.html#1050314">3</a>, <a href="SUE_chapt5_commands.html#1050715">4</a>, <a href="SUE_chapt5_commands.html#1050890">5</a></font>
+  <dd> <a name="31722"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">create verilog property	<a href="SUE_chap3_property_gen.html#1023399">1</a>, <a href="SUE_chap4_netlisting.html#1026834">2</a></font>
+  <dd> <a name="31725"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">cross-probing	<a href="SUE_chap4_netlisting.html#1026879">1</a></font>
+  <dd> <a name="31727"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Current Hot Keys	<a href="SUE_chapt5_commands.html#1031253">1</a></font>
+  <dd> <a name="31729"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">cursor	<a href="SUE_chap1_overview.html#1019803">1</a></font>
+  <dl>
+    <dd> <a name="31731"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">finger	<a href="SUE_chap1_overview.html#1019803">1</a></font>
+    <dd> <a name="31733"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">gumby	<a href="SUE_chap1_overview.html#1019803">1</a></font>
+    <dd> <a name="31735"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">pointer	<a href="SUE_chap1_overview.html#1019803">1</a></font>
+  </dl>
+  <dd> <a name="31737"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">customization	<a href="SUE_chap1_overview.html#1019956">1</a>, <a href="SUE_chap1_overview.html#1019967">2</a></font>
+</dl>
+
+<h3>
+  <a name="IX_D"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">D</font>
+</h3>
+
+<dl>
+  <dd> <a name="31742"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DEFAULT_PROP_MENU_TYPE	<a href="SUE_chap3_property_gen.html#1023346">1</a></font>
+  <dd> <a name="31744"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DEFAULT_PROPERTIES	<a href="SUE_chap3_property_gen.html#1023361">1</a></font>
+  <dd> <a name="31746"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Delete	<a href="SUE_chapt5_commands.html#1030872">1</a></font>
+  <dd> <a name="31748"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Delete Buffer	<a href="SUE_chapt5_commands.html#1030955">1</a></font>
+  <dd> <a name="31750"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">design	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="31752"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">devices	<a href="SUE_chap1_overview.html#1020135">1</a></font>
+  <dd> <a name="31754"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Display Cell Doc	<a href="SUE_chapt5_commands.html#1031056">1</a></font>
+  <dd> <a name="31756"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Display Design Hierarchy	<a href="SUE_chap4_netlisting.html#1026854">1</a>, <a href="SUE_chapt5_commands.html#1031095">2</a>, <a href="SUE_chapt5_commands.html#1074586">3</a>, <a href="SUE_chapt5_commands.html#1049814">4</a>, <a href="SUE_chapt5_commands.html#1050601">5</a>, <a href="SUE_chapt5_commands.html#1081229">6</a></font>
+  <dd> <a name="31763"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Display Term Values	<a href="SUE_chap4_netlisting.html#1026944">1</a>, <a href="SUE_chapt5_commands.html#1043083">2</a>, <a href="SUE_chapt5_commands.html#1051050">3</a></font>
+  <dd> <a name="31767"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DISPLAY_PROPS	<a href="SUE_chap3_property_gen.html#1023372">1</a></font>
+  <dd> <a name="31769"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DISPLAY_TERMS(verilog)	<a href="SUE_chap4_netlisting.html#1026944">1</a></font>
+  <dd> <a name="31771"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">documentation	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="31773"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">double clicking	<a href="SUE_chap1_overview.html#1020217">1</a></font>
+  <dl>
+    <dd> <a name="31775"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">on icons	<a href="SUE_chap1_overview.html#1020219">1</a></font>
+    <dd> <a name="31777"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">on wires	<a href="SUE_chap1_overview.html#1020222">1</a></font>
+  </dl>
+  <dd> <a name="31779"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC Manual	<a href="SUE_chapt5_commands.html#1031268">1</a></font>
+  <dd> <a name="31781"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC Tutorial	<a href="SUE_chapt5_commands.html#1031271">1</a></font>
+  <dd> <a name="31783"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Duplicate	<a href="SUE_chapt5_commands.html#1030875">1</a></font>
+  <dd> <a name="31785"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">duplicate	<a href="SUE_chap1_overview.html#1020241">1</a></font>
+  <dd> <a name="31787"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Duplicate Text	<a href="SUE_chapt5_commands.html#1030917">1</a></font>
+  <dd> <a name="31789"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">duplicate text	<a href="SUE_chap1_overview.html#1024968">1</a>, <a href="SUE_chap1_overview.html#1020171">2</a></font>
+  <dd> <a name="31792"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">duplication	<a href="SUE_chap1_overview.html#1026699">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_E"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">E</font>
+</h3>
+
+<dl>
+  <dd> <a name="31796"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Edit Generator	<a href="SUE_chapt5_commands.html#1030902">1</a></font>
+  <dd> <a name="31798"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Edit Menu	<a href="SUE_chapt5_commands.html#1030841">1</a></font>
+  <dd> <a name="31800"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Edit Properties	<a href="SUE_chap1_overview.html#1020249">1</a>, <a href="SUE_chapt5_commands.html#1030890">2</a></font>
+  <dd> <a name="31803"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Edit Verilog	<a href="SUE_chapt5_commands.html#1031109">1</a>, <a href="SUE_chapt5_commands.html#1048797">2</a>, <a href="SUE_chapt5_commands.html#1050317">3</a>, <a href="SUE_chapt5_commands.html#1050718">4</a>, <a href="SUE_chapt5_commands.html#1050893">5</a></font>
+  <dd> <a name="31809"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Erase and Plot Memory	<a href="SUE_chapt5_commands.html#1050273">1</a>, <a href="SUE_chapt5_commands.html#1050709">2</a>, <a href="SUE_chapt5_commands.html#1051130">3</a></font>
+  <dd> <a name="31813"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">error messages	<a href="SUE_chap1_overview.html#1019733">1</a></font>
+  <dd> <a name="31815"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">exit (API command)	<a href="SUE_chap7_interface.html#1028878">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_F"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">F</font>
+</h3>
+
+<dl>
+  <dd> <a name="31819"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">File Bug Report	<a href="SUE_chapt5_commands.html#1031277">1</a></font>
+  <dd> <a name="31821"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">file format	<a href="SUE_chap1_overview.html#1020098">1</a>, <a href="SUE_chap6_fileformats.html#1028101">2</a></font>
+  <dd> <a name="31824"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">FLAT_SPICE It	<a href="SUE_chapt5_commands.html#1050520">1</a></font>
+  <dd> <a name="31826"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">FLAT_SPICE Netlist	<a href="SUE_chapt5_commands.html#1050517">1</a></font>
+  <dd> <a name="31828"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Flip Sideways	<a href="SUE_chapt5_commands.html#1030881">1</a></font>
+  <dd> <a name="31830"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">flip sideways	<a href="SUE_chap1_overview.html#1019719">1</a></font>
+  <dd> <a name="31832"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Flip Upside-Down	<a href="SUE_chapt5_commands.html#1030884">1</a></font>
+  <dd> <a name="31834"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">flip upsidedown	<a href="SUE_chap1_overview.html#1019719">1</a></font>
+  <dd> <a name="31836"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">flipped	<a href="SUE_chap1_overview.html#1019708">1</a></font>
+  <dd> <a name="31838"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Forget Net	<a href="SUE_chapt5_commands.html#1051044">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_G"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">G</font>
+</h3>
+
+<dl>
+  <dd> <a name="31842"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Generate Term Names	<a href="SUE_chapt5_commands.html#1031103">1</a>, <a href="SUE_chapt5_commands.html#1046294">2</a>, <a href="SUE_chapt5_commands.html#1049887">3</a>, <a href="SUE_chapt5_commands.html#1050604">4</a>, <a href="SUE_chapt5_commands.html#1081232">5</a></font>
+  <dd> <a name="31848"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">generate term names	<a href="SUE_chap2_wires-bus.html#1023182">1</a>, <a href="SUE_chap2_wires-bus.html#1023320">2</a></font>
+  <dd> <a name="31851"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">generator properties</font>
+  <dl>
+    <dd> <a name="31852"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">edit	<a href="SUE_chap1_overview.html#1019876">1</a></font>
+  </dl>
+  <dd> <a name="31854"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">generators	<a href="SUE_chap3_property_gen.html#1023410">1</a>, <a href="SUE_chap3_property_gen.html#1023443">2</a></font>
+  <dl>
+    <dd> <a name="31857"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">parameterized icons	<a href="SUE_chap3_property_gen.html#1023326">1</a></font>
+  </dl>
+  <dd> <a name="31859"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">get_assoc	<a href="SUE_chap7_interface.html#1028816">1</a></font>
+  <dd> <a name="31861"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">globals	<a href="SUE_chap2_wires-bus.html#1023165">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_H"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">H</font>
+</h3>
+
+<dl>
+  <dd> <a name="31865"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">header files	<a href="SUE_chap4_netlisting.html#1026869">1</a></font>
+  <dd> <a name="31867"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">help	<a href="SUE_chap1_overview.html#1019750">1</a>, <a href="SUE_chap1_overview.html#1024893">2</a>, <a href="SUE_chap1_overview.html#1019818">3</a></font>
+  <dd> <a name="31871"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Help Menu	<a href="SUE_chapt5_commands.html#1031243">1</a></font>
+  <dd> <a name="31873"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">highlighted object	<a href="SUE_chap1_overview.html#1019614">1</a></font>
+  <dd> <a name="31875"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">hollow square	<a href="SUE_chap1_overview.html#1019695">1</a></font>
+  <dd> <a name="31877"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">hotkey help	<a href="SUE_chap1_overview.html#1019607">1</a></font>
+  <dd> <a name="31879"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">hotkeys	<a href="SUE_chap1_overview.html#1019607">1</a>, <a href="SUE_chap1_overview.html#1019751">2</a>, <a href="SUE_chap1_overview.html#1025930">3</a></font>
+</dl>
+
+<h3>
+  <a name="IX_I"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">I</font>
+</h3>
+
+<dl>
+  <dd> <a name="31885"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icon	<a href="SUE_chap1_overview.html#1026698">1</a>, <a href="SUE_chap1_overview.html#1020010">2</a>, <a href="SUE_chap1_overview.html#1020087">3</a></font>
+  <dl>
+    <dd> <a name="31889"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">add	<a href="SUE_chap1_overview.html#1019935">1</a></font>
+    <dd> <a name="31891"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">autoload	<a href="SUE_chap1_overview.html#1019969">1</a></font>
+    <dd> <a name="31893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">edit icon properties	<a href="SUE_chap1_overview.html#1019869">1</a></font>
+    <dd> <a name="31895"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Edit Properties	<a href="SUE_chap1_overview.html#1020046">1</a></font>
+    <dd> <a name="31897"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icon listbox	<a href="SUE_chap1_overview.html#1021832">1</a>, <a href="SUE_chap1_overview.html#1020069">2</a>, <a href="SUE_chap1_overview.html#1020094">3</a></font>
+    <dd> <a name="31901"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icon origin	<a href="SUE_chap1_overview.html#1019647">1</a>, <a href="SUE_chap1_overview.html#1020025">2</a></font>
+    <dd> <a name="31904"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">instantiate	<a href="SUE_chap1_overview.html#1020043">1</a></font>
+    <dd> <a name="31906"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Library List box	<a href="SUE_chap1_overview.html#1020041">1</a></font>
+  </dl>
+  <dd> <a name="31908"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Icon Library List Box	<a href="SUE_chap1_overview.html#1020053">1</a></font>
+  <dl>
+    <dd> <a name="31910"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Flat Icons	<a href="SUE_chap1_overview.html#1020057">1</a></font>
+    <dd> <a name="31912"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Hier Icons	<a href="SUE_chap1_overview.html#1020057">1</a></font>
+    <dd> <a name="31914"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Include	<a href="SUE_chap1_overview.html#1020057">1</a></font>
+  </dl>
+  <dd> <a name="31916"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icon_generator	<a href="SUE_chap3_property_gen.html#1023434">1</a></font>
+  <dd> <a name="31918"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icons	<a href="SUE_chap1_overview.html#1019988">1</a></font>
+  <dl>
+    <dd> <a name="31920"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">parameterized	<a href="SUE_chap1_overview.html#1019998">1</a>, <a href="SUE_chap3_property_gen.html#1023326">2</a>, <a href="SUE_chap3_property_gen.html#1023393">3</a></font>
+  </dl>
+  <dd> <a name="31924"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Init Probe	<a href="SUE_chapt5_commands.html#1052275">1</a>, <a href="SUE_chapt5_commands.html#1059630">2</a>, <a href="SUE_chapt5_commands.html#1049283">3</a>, <a href="SUE_chapt5_commands.html#1050554">4</a>, <a href="SUE_chapt5_commands.html#1081569">5</a></font>
+  <dd> <a name="31930"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">init probe	<a href="SUE_chap4_netlisting.html#1026881">1</a></font>
+  <dd> <a name="31932"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Init Probe w/Options	<a href="SUE_chapt5_commands.html#1043239">1</a></font>
+  <dd> <a name="31934"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">inout terminals	<a href="SUE_chap1_overview.html#1020022">1</a></font>
+  <dd> <a name="31936"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">input terminals	<a href="SUE_chap1_overview.html#1020022">1</a></font>
+  <dd> <a name="31938"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">instances of icons	<a href="SUE_chap1_overview.html#1019623">1</a></font>
+  <dd> <a name="31940"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">IRSIM	<a href="SUE_chap4_netlisting.html#1026959">1</a></font>
+  <dd> <a name="31942"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">irsim Set hi	<a href="SUE_chapt5_commands.html#1051056">1</a></font>
+  <dd> <a name="31944"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">irsim Set low	<a href="SUE_chapt5_commands.html#1051059">1</a></font>
+  <dd> <a name="31946"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">irsim Set X	<a href="SUE_chapt5_commands.html#1051062">1</a></font>
+  <dd> <a name="31948"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">irsim Step	<a href="SUE_chapt5_commands.html#1051053">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_K"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">K</font>
+</h3>
+
+<dl>
+  <dd> <a name="31953"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">key bindings	<a href="SUE_chap1_overview.html#1019722">1</a></font>
+  <dl>
+    <dd> <a name="31955"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">context-sensitive	<a href="SUE_chap1_overview.html#1019818">1</a></font>
+  </dl>
+  <dd> <a name="31957"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Kill Spice Job	<a href="SUE_chap4_netlisting.html#1026901">1</a>, <a href="SUE_chapt5_commands.html#1049601">2</a>, <a href="SUE_chapt5_commands.html#1050616">3</a></font>
+</dl>
+
+<h3>
+  <a name="IX_L"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">L</font>
+</h3>
+
+<dl>
+  <dd> <a name="31963"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">lappend	<a href="SUE_chap7_interface.html#1028801">1</a></font>
+  <dd> <a name="31965"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">LIB	<a href="SUE_chap1_overview.html#1020111">1</a></font>
+  <dd> <a name="31967"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">libraries</font>
+  <dl>
+    <dd> <a name="31968"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">automatic loading	<a href="SUE_chap1_overview.html#1020109">1</a></font>
+    <dd> <a name="31970"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">defalut libraries	<a href="SUE_chap1_overview.html#1020132">1</a></font>
+    <dd> <a name="31972"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">devices	<a href="SUE_chap1_overview.html#1020135">1</a></font>
+    <dd> <a name="31974"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">mspice	<a href="SUE_chap1_overview.html#1020139">1</a></font>
+    <dd> <a name="31976"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">spice	<a href="SUE_chap1_overview.html#1020139">1</a></font>
+  </dl>
+  <dd> <a name="31978"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">lines	<a href="SUE_chap1_overview.html#1019629">1</a>, <a href="SUE_chap1_overview.html#1026694">2</a>, <a href="SUE_chap1_overview.html#1019993">3</a>, <a href="SUE_chap1_overview.html#1020152">4</a></font>
+  <dl>
+    <dd> <a name="31983"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">edit	<a href="SUE_chap1_overview.html#1019909">1</a></font>
+    <dd> <a name="31985"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">edit markers	<a href="SUE_chap1_overview.html#1020158">1</a></font>
+    <dd> <a name="31987"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">editing	<a href="SUE_chap1_overview.html#1020158">1</a></font>
+  </dl>
+  <dd> <a name="31989"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">list box	<a href="SUE_chap1_overview.html#1020057">1</a></font>
+  <dd> <a name="31991"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Load Verilog I/O's	<a href="SUE_chapt5_commands.html#1031112">1</a></font>
+  <dd> <a name="31993"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Load Verilog I/O's...	<a href="SUE_chapt5_commands.html#1048800">1</a>, <a href="SUE_chapt5_commands.html#1050320">2</a>, <a href="SUE_chapt5_commands.html#1050721">3</a>, <a href="SUE_chapt5_commands.html#1050896">4</a></font>
+  <dd> <a name="31998"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Lower	<a href="SUE_chapt5_commands.html#1030920">1</a></font>
+  <dd> <a name="32000"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">lower	<a href="SUE_chap1_overview.html#1019680">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_M"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">M</font>
+</h3>
+
+<dl>
+  <dd> <a name="32004"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Magellan	<a href="SUE_chap4_netlisting.html#1026912">1</a></font>
+  <dd> <a name="32006"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Make Other View	<a href="SUE_chapt5_commands.html#1030986">1</a></font>
+  <dd> <a name="32008"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">make other view	<a href="SUE_chap3_property_gen.html#1023361">1</a></font>
+  <dd> <a name="32010"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">max (maximum)	<a href="SUE_chap7_interface.html#1028822">1</a></font>
+  <dd> <a name="32012"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Max Cross Probe	<a href="SUE_chapt5_commands.html#1049986">1</a>, <a href="SUE_chapt5_commands.html#1050613">2</a>, <a href="SUE_chapt5_commands.html#1081057">3</a></font>
+  <dd> <a name="32016"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX Cross Probe Init	<a href="SUE_chapt5_commands.html#1049983">1</a>, <a href="SUE_chapt5_commands.html#1050610">2</a>, <a href="SUE_chapt5_commands.html#1081054">3</a></font>
+  <dd> <a name="32020"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">menu_add	<a href="SUE_chap7_interface.html#1028792">1</a>, <a href="SUE_chap7_interface.html#1028881">2</a></font>
+  <dd> <a name="32023"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">message window	<a href="SUE_chap1_overview.html#1019751">1</a></font>
+  <dd> <a name="32025"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">min	<a href="SUE_chap7_interface.html#1028822">1</a></font>
+  <dd> <a name="32027"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MMI Documentation Guide	<a href="SUE_chapt5_commands.html#1031274">1</a></font>
+  <dd> <a name="32029"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">mmi_local directory	<a href="SUE_chap1_overview.html#1019964">1</a></font>
+  <dd> <a name="32031"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">mmi_private directory	<a href="SUE_chap1_overview.html#1019965">1</a></font>
+  <dd> <a name="32033"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MMI_TOOLS environment variable	<a href="SUE_chap1_overview.html#1019962">1</a></font>
+  <dd> <a name="32035"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">modes	<a href="SUE_chap1_overview.html#1019765">1</a></font>
+  <dd> <a name="32037"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Modify Properties	<a href="SUE_chapt5_commands.html#1030923">1</a></font>
+  <dd> <a name="32039"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">mouse	<a href="SUE_chap1_overview.html#1021832">1</a></font>
+  <dd> <a name="32041"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Move	<a href="SUE_chapt5_commands.html#1030887">1</a></font>
+  <dd> <a name="32043"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">move	<a href="SUE_chap1_overview.html#1019684">1</a>, <a href="SUE_chap1_overview.html#1026707">2</a>, <a href="SUE_chap1_overview.html#1020230">3</a></font>
+  <dd> <a name="32047"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">moving objects	<a href="SUE_chap1_overview.html#1021832">1</a></font>
+  <dd> <a name="32049"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">mspice library	<a href="SUE_chap1_overview.html#1020139">1</a></font>
+  <dd> <a name="32051"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">multiplier spice property	<a href="SUE_chap3_property_gen.html#1023361">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_N"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">N</font>
+</h3>
+
+<dl>
+  <dd> <a name="32055"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Name Objects	<a href="SUE_chapt5_commands.html#1030936">1</a></font>
+  <dd> <a name="32057"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">name_net	<a href="SUE_chap2_wires-bus.html#1023157">1</a>, <a href="SUE_chap2_wires-bus.html#1023175">2</a>, <a href="SUE_chap2_wires-bus.html#1023200">3</a></font>
+  <dd> <a name="32061"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">name_netS	<a href="SUE_chap2_wires-bus.html#1023208">1</a>, <a href="SUE_chap2_wires-bus.html#1023264">2</a></font>
+  <dd> <a name="32064"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">net</font>
+  <dl>
+    <dd> <a name="32065"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">select	<a href="SUE_chap1_overview.html#1020226">1</a></font>
+  </dl>
+  <dd> <a name="32067"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">netlist properties	<a href="SUE_chap4_netlisting.html#1026801">1</a></font>
+  <dd> <a name="32069"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">netlist type	<a href="SUE_chap1_overview.html#1020094">1</a>, <a href="SUE_chap4_netlisting.html#1026801">2</a></font>
+  <dl>
+    <dd> <a name="32072"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verilog	<a href="SUE_chap1_overview.html#1020094">1</a></font>
+  </dl>
+  <dd> <a name="32074"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NETLIST(warning)	<a href="SUE_chap2_wires-bus.html#1023160">1</a></font>
+  <dd> <a name="32076"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NETLIST_PROP	<a href="SUE_chap3_property_gen.html#1023393">1</a></font>
+  <dd> <a name="32078"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NETLIST_PROPS	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+  <dd> <a name="32080"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NETLIST_TYPE	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+  <dd> <a name="32082"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">netlisting	<a href="SUE_chap1_overview.html#1025213">1</a>, <a href="SUE_chap3_property_gen.html#1023393">2</a>, <a href="SUE_chap4_netlisting.html#1026767">3</a></font>
+  <dl>
+    <dd> <a name="32086"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">dpc	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+    <dd> <a name="32088"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">flat_spice	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+    <dd> <a name="32090"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">mixed structural and behavioral	<a href="SUE_chap4_netlisting.html#1026847">1</a></font>
+    <dd> <a name="32092"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">sim	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+    <dd> <a name="32094"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Spice	<a href="SUE_chap4_netlisting.html#1026777">1</a></font>
+    <dd> <a name="32096"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">spice	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+    <dd> <a name="32098"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">verilog	<a href="SUE_chap4_netlisting.html#1026787">1</a></font>
+  </dl>
+  <dd> <a name="32100"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">netlists	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="32102"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">nets	<a href="SUE_chap2_wires-bus.html#1023154">1</a></font>
+  <dl>
+    <dd> <a name="32104"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">unconnected	<a href="SUE_chap2_wires-bus.html#1023159">1</a></font>
+  </dl>
+  <dd> <a name="32106"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">new icon	<a href="SUE_chap3_property_gen.html#1023361">1</a></font>
+  <dd> <a name="32108"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NST waveform viewer	<a href="SUE_chap4_netlisting.html#1026903">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_O"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">O</font>
+</h3>
+
+<dl>
+  <dd> <a name="32112"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">object</font>
+  <dl>
+    <dd> <a name="32113"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">deselect	<a href="SUE_chap1_overview.html#1020205">1</a></font>
+    <dd> <a name="32115"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">select	<a href="SUE_chap1_overview.html#1020205">1</a></font>
+  </dl>
+  <dd> <a name="32117"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Object Name Editor	<a href="SUE_chapt5_commands.html#1030944">1</a></font>
+  <dd> <a name="32119"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">object states	<a href="SUE_chap1_overview.html#1019660">1</a></font>
+  <dd> <a name="32121"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">objects	<a href="SUE_chap1_overview.html#1019619">1</a></font>
+  <dl>
+    <dd> <a name="32123"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">active	<a href="SUE_chap1_overview.html#1019662">1</a></font>
+    <dd> <a name="32125"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">active/selected	<a href="SUE_chap1_overview.html#1019666">1</a></font>
+    <dd> <a name="32127"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">arcs	<a href="SUE_chap1_overview.html#1019632">1</a></font>
+    <dd> <a name="32129"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">instances of icons	<a href="SUE_chap1_overview.html#1019623">1</a></font>
+    <dd> <a name="32131"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">lines	<a href="SUE_chap1_overview.html#1019629">1</a></font>
+    <dd> <a name="32133"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">selected	<a href="SUE_chap1_overview.html#1019664">1</a></font>
+    <dd> <a name="32135"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">text	<a href="SUE_chap1_overview.html#1019635">1</a></font>
+    <dd> <a name="32137"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">wires	<a href="SUE_chap1_overview.html#1019626">1</a></font>
+  </dl>
+  <dd> <a name="32139"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">on-line help	<a href="SUE_chap1_overview.html#1019607">1</a>, <a href="SUE_chap1_overview.html#1019750">2</a></font>
+  <dd> <a name="32142"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">open dots	<a href="SUE_chap1_overview.html#1019643">1</a></font>
+  <dd> <a name="32144"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Orientations	<a href="SUE_chap1_overview.html#1019704">1</a></font>
+  <dd> <a name="32146"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">origin</font>
+  <dl>
+    <dd> <a name="32147"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icon	<a href="SUE_chap1_overview.html#1020025">1</a></font>
+  </dl>
+  <dd> <a name="32149"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">output terminals	<a href="SUE_chap1_overview.html#1020022">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_P"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">P</font>
+</h3>
+
+<dl>
+  <dd> <a name="32153"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Pan	<a href="SUE_chapt5_commands.html#1031009">1</a></font>
+  <dd> <a name="32155"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">pan	<a href="SUE_chap1_overview.html#1026715">1</a></font>
+  <dd> <a name="32157"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">parse_pp_number	<a href="SUE_chap7_interface.html#1028835">1</a></font>
+  <dd> <a name="32159"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">paste	<a href="SUE_chap1_overview.html#1020004">1</a>, <a href="SUE_chap1_overview.html#1020241">2</a>, <a href="SUE_chap1_overview.html#1020245">3</a></font>
+  <dd> <a name="32163"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Plot Net	<a href="SUE_chap4_netlisting.html#1026941">1</a>, <a href="SUE_chapt5_commands.html#1049392">2</a>, <a href="SUE_chapt5_commands.html#1050619">3</a>, <a href="SUE_chapt5_commands.html#1081106">4</a></font>
+  <dd> <a name="32168"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Plot Net &amp; Remember	<a href="SUE_chapt5_commands.html#1050109">1</a>, <a href="SUE_chapt5_commands.html#1050697">2</a>, <a href="SUE_chapt5_commands.html#1081037">3</a></font>
+  <dd> <a name="32172"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Plot Old Net	<a href="SUE_chapt5_commands.html#1050228">1</a>, <a href="SUE_chapt5_commands.html#1050703">2</a></font>
+  <dd> <a name="32175"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Plot Old Node	<a href="SUE_chap4_netlisting.html#1026904">1</a></font>
+  <dd> <a name="32177"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Pop Connected	<a href="SUE_chapt5_commands.html#1030972">1</a></font>
+  <dd> <a name="32179"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Pop Out Of	<a href="SUE_chapt5_commands.html#1030969">1</a></font>
+  <dd> <a name="32181"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">power supplies	<a href="SUE_chap2_wires-bus.html#1023165">1</a></font>
+  <dd> <a name="32183"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">pp_number	<a href="SUE_chap7_interface.html#1028829">1</a></font>
+  <dd> <a name="32185"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Print Net Value (binary)	<a href="SUE_chapt5_commands.html#1043074">1</a></font>
+  <dd> <a name="32187"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Print Net Value (decimal)	<a href="SUE_chapt5_commands.html#1045592">1</a></font>
+  <dd> <a name="32189"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Print Net Value (hex)	<a href="SUE_chapt5_commands.html#1043077">1</a></font>
+  <dd> <a name="32191"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Programming Interface	<a href="SUE_chap7_interface.html#1028993">1</a></font>
+  <dd> <a name="32193"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">properties	<a href="SUE_chap1_overview.html#1019745">1</a>, <a href="SUE_chap1_overview.html#1019998">2</a></font>
+  <dl>
+    <dd> <a name="32196"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">auto	<a href="SUE_chap3_property_gen.html#1023337">1</a></font>
+    <dd> <a name="32198"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">comment	<a href="SUE_chap3_property_gen.html#1023337">1</a></font>
+    <dd> <a name="32200"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">default	<a href="SUE_chap3_property_gen.html#1023361">1</a></font>
+    <dd> <a name="32202"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">displaying properties	<a href="SUE_chap3_property_gen.html#1023369">1</a></font>
+    <dd> <a name="32204"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">fixed	<a href="SUE_chap3_property_gen.html#1023337">1</a></font>
+    <dd> <a name="32206"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">icons	<a href="SUE_chap3_property_gen.html#1023326">1</a></font>
+    <dd> <a name="32208"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">text	<a href="SUE_chap3_property_gen.html#1023337">1</a></font>
+    <dd> <a name="32210"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">user	<a href="SUE_chap3_property_gen.html#1023337">1</a></font>
+    <dd> <a name="32212"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verilog	<a href="SUE_chap3_property_gen.html#1023399">1</a></font>
+  </dl>
+  <dd> <a name="32214"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Property Edit	<a href="SUE_chap3_property_gen.html#1023337">1</a></font>
+  <dd> <a name="32216"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Push Into	<a href="SUE_chapt5_commands.html#1030966">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_R"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">R</font>
+</h3>
+
+<dl>
+  <dd> <a name="32221"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">raise windows	<a href="SUE_chap1_overview.html#1020064">1</a></font>
+  <dd> <a name="32223"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">rename	<a href="SUE_chap1_overview.html#1020014">1</a></font>
+  <dd> <a name="32225"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">replace	<a href="SUE_chap1_overview.html#1026705">1</a></font>
+  <dd> <a name="32227"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Replace Instance	<a href="SUE_chapt5_commands.html#1030914">1</a></font>
+  <dd> <a name="32229"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">replace instance	<a href="SUE_chap1_overview.html#1020030">1</a></font>
+  <dd> <a name="32231"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Restore	<a href="SUE_chapt5_commands.html#1030789">1</a></font>
+  <dd> <a name="32233"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Rotate	<a href="SUE_chapt5_commands.html#1030878">1</a></font>
+  <dd> <a name="32235"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">rotate	<a href="SUE_chap1_overview.html#1019719">1</a>, <a href="SUE_chap1_overview.html#1020182">2</a></font>
+  <dd> <a name="32238"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">rotated	<a href="SUE_chap1_overview.html#1019708">1</a></font>
+  <dd> <a name="32240"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Ruler	<a href="SUE_chapt5_commands.html#1031045">1</a></font>
+  <dd> <a name="32242"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Ruler Setup	<a href="SUE_chapt5_commands.html#1031048">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_S"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">S</font>
+</h3>
+
+<dl>
+  <dd> <a name="32246"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Save	<a href="SUE_chapt5_commands.html#1030777">1</a></font>
+  <dd> <a name="32248"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SCHEM_DIR($NETLIST_TYPE)	<a href="SUE_chap1_overview.html#1020139">1</a></font>
+  <dd> <a name="32250"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SCHEM_DIR(devices)	<a href="SUE_chap1_overview.html#1020135">1</a></font>
+  <dd> <a name="32252"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">schematic	<a href="SUE_chap1_overview.html#1019988">1</a>, <a href="SUE_chap1_overview.html#1020010">2</a>, <a href="SUE_chap1_overview.html#1020087">3</a></font>
+  <dd> <a name="32256"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">schematic capture	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="32258"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">schematic terminals	<a href="SUE_chap1_overview.html#1020016">1</a></font>
+  <dd> <a name="32260"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">schematic/icon pairs	<a href="SUE_chap1_overview.html#1020012">1</a></font>
+  <dd> <a name="32262"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Schematics List box	<a href="SUE_chap1_overview.html#1020077">1</a>, <a href="SUE_chap1_overview.html#1025222">2</a></font>
+  <dd> <a name="32265"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">select	<a href="SUE_chap1_overview.html#1019614">1</a>, <a href="SUE_chap1_overview.html#1021832">2</a>, <a href="SUE_chap1_overview.html#1019831">3</a></font>
+  <dl>
+    <dd> <a name="32269"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">add to selection	<a href="SUE_chap1_overview.html#1019862">1</a></font>
+    <dd> <a name="32271"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">net	<a href="SUE_chap1_overview.html#1020226">1</a></font>
+    <dd> <a name="32273"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">object	<a href="SUE_chap1_overview.html#1021832">1</a></font>
+    <dd> <a name="32275"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">region	<a href="SUE_chap1_overview.html#1026713">1</a>, <a href="SUE_chap1_overview.html#1021832">2</a>, <a href="SUE_chap1_overview.html#1020208">3</a></font>
+  </dl>
+  <dd> <a name="32279"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Select by Name	<a href="SUE_chapt5_commands.html#1031012">1</a></font>
+  <dd> <a name="32281"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Select Simulator	<a href="SUE_chapt5_commands.html#1049386">1</a>, <a href="SUE_chapt5_commands.html#1050563">2</a>, <a href="SUE_chapt5_commands.html#1081223">3</a></font>
+  <dd> <a name="32285"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">selected objects	<a href="SUE_chap1_overview.html#1019683">1</a>, <a href="SUE_chap1_overview.html#1019751">2</a>, <a href="SUE_chap1_overview.html#1020202">3</a></font>
+  <dd> <a name="32289"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">selection	<a href="SUE_chap1_overview.html#1022574">1</a></font>
+  <dd> <a name="32291"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">setl	<a href="SUE_chap7_interface.html#1028841">1</a></font>
+  <dd> <a name="32293"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">shell commands	<a href="SUE_chap1_overview.html#1019733">1</a></font>
+  <dd> <a name="32295"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Show Inst. Origins	<a href="SUE_chapt5_commands.html#1069923">1</a></font>
+  <dd> <a name="32297"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Show Sel. Term Names	<a href="SUE_chapt5_commands.html#1031024">1</a></font>
+  <dd> <a name="32299"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">show sel. term names	<a href="SUE_chap1_overview.html#1020039">1</a></font>
+  <dd> <a name="32301"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Show Text Anchors	<a href="SUE_chap1_overview.html#1020198">1</a>, <a href="SUE_chapt5_commands.html#1031021">2</a></font>
+  <dd> <a name="32304"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">show text anchors	<a href="SUE_chap1_overview.html#1019654">1</a></font>
+  <dd> <a name="32306"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Signalscan	<a href="SUE_chap4_netlisting.html#1026912">1</a></font>
+  <dd> <a name="32308"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SIM It	<a href="SUE_chapt5_commands.html#1086172">1</a></font>
+  <dd> <a name="32310"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sim Menu	<a href="SUE_chapt5_commands.html#1031060">1</a></font>
+  <dd> <a name="32312"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SIM Netlist	<a href="SUE_chapt5_commands.html#1086169">1</a></font>
+  <dd> <a name="32314"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">simulation	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="32316"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">simulators	<a href="SUE_chap1_overview.html#1019570">1</a>, <a href="SUE_chap4_netlisting.html#1026881">2</a></font>
+  <dd> <a name="32319"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">solder dots	<a href="SUE_chap1_overview.html#1019645">1</a></font>
+  <dd> <a name="32321"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">solid square	<a href="SUE_chap1_overview.html#1019698">1</a></font>
+  <dd> <a name="32323"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SPICE	<a href="SUE_chap1_overview.html#1019742">1</a>, <a href="SUE_chap2_wires-bus.html#1024485">2</a>, <a href="SUE_chap4_netlisting.html#1026889">3</a></font>
+  <dl>
+    <dd> <a name="32327"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">header files	<a href="SUE_chap4_netlisting.html#1026869">1</a></font>
+  </dl>
+  <dd> <a name="32329"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Spice</font>
+  <dl>
+    <dd> <a name="32330"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">netlisting	<a href="SUE_chap4_netlisting.html#1026777">1</a></font>
+    <dd> <a name="32332"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NST waveform viewer	<a href="SUE_chap4_netlisting.html#1026889">1</a></font>
+  </dl>
+  <dd> <a name="32334"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SPICE It	<a href="SUE_chapt5_commands.html#1049280">1</a></font>
+  <dd> <a name="32336"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">spice it	<a href="SUE_chap4_netlisting.html#1026881">1</a></font>
+  <dd> <a name="32338"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">spice library	<a href="SUE_chap1_overview.html#1020139">1</a></font>
+  <dd> <a name="32340"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SPICE Netlist	<a href="SUE_chapt5_commands.html#1049277">1</a></font>
+  <dd> <a name="32342"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">spice netlist	<a href="SUE_chap2_wires-bus.html#1023297">1</a>, <a href="SUE_chap4_netlisting.html#1026881">2</a></font>
+  <dd> <a name="32345"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">states	<a href="SUE_chap1_overview.html#1019658">1</a></font>
+  <dd> <a name="32347"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">states of objects	<a href="SUE_chap1_overview.html#1019658">1</a></font>
+  <dd> <a name="32349"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Step Verilog	<a href="SUE_chapt5_commands.html#1043086">1</a></font>
+  <dd> <a name="32351"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">structural models	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="32353"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE FAQ	<a href="SUE_chapt5_commands.html#1031262">1</a></font>
+  <dd> <a name="32355"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE Manual	<a href="SUE_chapt5_commands.html#1031259">1</a></font>
+  <dd> <a name="32357"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE Tutorial	<a href="SUE_chapt5_commands.html#1031265">1</a></font>
+  <dd> <a name="32359"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE_EXECUTE	<a href="SUE_chap7_interface.html#1028796">1</a></font>
+  <dd> <a name="32361"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE_IGNORE_SUERC	<a href="SUE_chap1_overview.html#1019976">1</a></font>
+  <dd> <a name="32363"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">suerc file	<a href="SUE_chap1_overview.html#1019957">1</a>, <a href="SUE_chap1_overview.html#1019976">2</a></font>
+  <dd> <a name="32366"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUFFIX($NETLIST_TYPE)	<a href="SUE_chap4_netlisting.html#1026837">1</a></font>
+  <dd> <a name="32368"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Swap Views	<a href="SUE_chapt5_commands.html#1030980">1</a></font>
+  <dd> <a name="32370"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Swap Views Selected	<a href="SUE_chapt5_commands.html#1030983">1</a></font>
+  <dd> <a name="32372"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">symbols	<a href="SUE_chap1_overview.html#1019988">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_T"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">T</font>
+</h3>
+
+<dl>
+  <dd> <a name="32376"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Tcl	<a href="SUE_chap1_overview.html#1019957">1</a>, <a href="SUE_chap1_overview.html#1020109">2</a>, <a href="SUE_chap3_property_gen.html#1023385">3</a>, <a href="SUE_chap3_property_gen.html#1023411">4</a>, <a href="SUE_chap6_fileformats.html#1028101">5</a>, <a href="SUE_chap7_interface.html#1028780">6</a></font>
+  <dl>
+    <dd> <a name="32383"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">auto_path	<a href="SUE_chap1_overview.html#1020111">1</a></font>
+  </dl>
+  <dd> <a name="32385"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Tcl interpreter	<a href="SUE_chap1_overview.html#1019733">1</a>, <a href="SUE_chap3_property_gen.html#1023411">2</a></font>
+  <dd> <a name="32388"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">tclIndex	<a href="SUE_chap1_overview.html#1020109">1</a></font>
+  <dd> <a name="32390"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">terminal names	<a href="SUE_chap1_overview.html#1020033">1</a></font>
+  <dd> <a name="32392"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">terminals	<a href="SUE_chap1_overview.html#1019700">1</a>, <a href="SUE_chap1_overview.html#1019996">2</a>, <a href="SUE_chap2_wires-bus.html#1023152">3</a></font>
+  <dl>
+    <dd> <a name="32396"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">inout	<a href="SUE_chap1_overview.html#1020022">1</a></font>
+    <dd> <a name="32398"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">input	<a href="SUE_chap1_overview.html#1020022">1</a></font>
+    <dd> <a name="32400"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">output	<a href="SUE_chap1_overview.html#1020022">1</a></font>
+  </dl>
+  <dd> <a name="32402"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">text	<a href="SUE_chap1_overview.html#1019635">1</a>, <a href="SUE_chap1_overview.html#1026697">2</a>, <a href="SUE_chap1_overview.html#1019993">3</a>, <a href="SUE_chap1_overview.html#1020169">4</a></font>
+  <dl>
+    <dd> <a name="32407"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">anchor	<a href="SUE_chap1_overview.html#1020179">1</a></font>
+    <dd> <a name="32409"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">duplicate text	<a href="SUE_chap1_overview.html#1024968">1</a></font>
+    <dd> <a name="32411"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">edit	<a href="SUE_chap1_overview.html#1019902">1</a></font>
+    <dd> <a name="32413"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">rotation	<a href="SUE_chap1_overview.html#1020175">1</a></font>
+    <dd> <a name="32415"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">size	<a href="SUE_chap1_overview.html#1020177">1</a></font>
+    <dd> <a name="32417"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">text anchors	<a href="SUE_chap1_overview.html#1019654">1</a></font>
+  </dl>
+  <dd> <a name="32419"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text Commands/Variables	<a href="SUE_chapt5_commands.html#1031256">1</a></font>
+  <dd> <a name="32421"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text commands/variables	<a href="SUE_chap7_interface.html#1028780">1</a></font>
+  <dd> <a name="32423"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">title bars	<a href="SUE_chap1_overview.html#1020001">1</a></font>
+  <dd> <a name="32425"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Toggle Grid	<a href="SUE_chapt5_commands.html#1031030">1</a></font>
+  <dd> <a name="32427"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Toggle Move Off-Grid	<a href="SUE_chapt5_commands.html#1030947">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_U"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">U</font>
+</h3>
+
+<dl>
+  <dd> <a name="32431"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">unconnected	<a href="SUE_chap1_overview.html#1019695">1</a></font>
+  <dd> <a name="32433"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">undo	<a href="SUE_chap1_overview.html#1020253">1</a></font>
+  <dd> <a name="32435"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">UNDO_LEVEL	<a href="SUE_chap1_overview.html#1020253">1</a></font>
+  <dd> <a name="32437"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">unique_name	<a href="SUE_chap7_interface.html#1028890">1</a></font>
+  <dd> <a name="32439"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Unplot Net	<a href="SUE_chapt5_commands.html#1049395">1</a>, <a href="SUE_chapt5_commands.html#1050622">2</a></font>
+  <dd> <a name="32442"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Unplot Net &amp; Forget	<a href="SUE_chapt5_commands.html#1050225">1</a>, <a href="SUE_chapt5_commands.html#1050700">2</a></font>
+  <dd> <a name="32445"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Unplot Old Net	<a href="SUE_chapt5_commands.html#1050231">1</a>, <a href="SUE_chapt5_commands.html#1050706">2</a></font>
+  <dd> <a name="32448"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Update Flags	<a href="SUE_chap4_netlisting.html#1026954">1</a>, <a href="SUE_chapt5_commands.html#1043080">2</a>, <a href="SUE_chapt5_commands.html#1051047">3</a></font>
+  <dd> <a name="32452"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">use_first	<a href="SUE_chap7_interface.html#1028850">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_V"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">V</font>
+</h3>
+
+<dl>
+  <dd> <a name="32456"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">variables	<a href="SUE_chap1_overview.html#1019745">1</a></font>
+  <dd> <a name="32458"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verilog	<a href="SUE_chap1_overview.html#1020139">1</a>, <a href="SUE_chap2_wires-bus.html#1023165">2</a>, <a href="SUE_chap4_netlisting.html#1026909">3</a></font>
+  <dl>
+    <dd> <a name="32462"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">assign operator	<a href="SUE_chap2_wires-bus.html#1024485">1</a></font>
+    <dd> <a name="32464"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">assign statement	<a href="SUE_chap2_wires-bus.html#1023310">1</a></font>
+    <dd> <a name="32466"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">header file	<a href="SUE_chap4_netlisting.html#1027687">1</a></font>
+    <dd> <a name="32468"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">interactive simulation	<a href="SUE_chap4_netlisting.html#1026915">1</a></font>
+    <dd> <a name="32470"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">netlisting	<a href="SUE_chap4_netlisting.html#1026777">1</a>, <a href="SUE_chap4_netlisting.html#1026829">2</a></font>
+  </dl>
+  <dd> <a name="32473"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">VERILOG Netlist	<a href="SUE_chapt5_commands.html#1043214">1</a></font>
+  <dd> <a name="32475"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verilog netlist	<a href="SUE_chap2_wires-bus.html#1023297">1</a></font>
+  <dd> <a name="32477"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">VERILOG_PROBE_CMD(interactive)	<a href="SUE_chap4_netlisting.html#1026919">1</a></font>
+  <dd> <a name="32479"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">VERILOG_STEP	<a href="SUE_chap4_netlisting.html#1026936">1</a></font>
+  <dd> <a name="32481"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">View Menu	<a href="SUE_chapt5_commands.html#1030959">1</a></font>
+</dl>
+
+<h3>
+  <a name="IX_W"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">W</font>
+</h3>
+
+<dl>
+  <dd> <a name="32485"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">waveform viewer	<a href="SUE_chap1_overview.html#1019570">1</a></font>
+  <dd> <a name="32487"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">wires	<a href="SUE_chap1_overview.html#1019626">1</a>, <a href="SUE_chap1_overview.html#1020152">2</a>, <a href="SUE_chap2_wires-bus.html#1023152">3</a>, <a href="SUE_chap2_wires-bus.html#1023179">4</a></font>
+  <dl>
+    <dd> <a name="32492"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">highlight	<a href="SUE_chap1_overview.html#1019883">1</a></font>
+    <dd> <a name="32494"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">non-manhattan	<a href="SUE_chap1_overview.html#1020156">1</a></font>
+    <dd> <a name="32496"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">wire mode	<a href="SUE_chap1_overview.html#1019768">1</a></font>
+  </dl>
+</dl>
+
+<h3>
+  <a name="IX_Z"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Z</font>
+</h3>
+
+<dl>
+  <dd> <a name="32502"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">zoom	<a href="SUE_chap1_overview.html#1026714">1</a></font>
+  <dd> <a name="32504"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Zoom In on Cursor	<a href="SUE_chapt5_commands.html#1030994">1</a></font>
+  <dd> <a name="32506"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Zoom Out	<a href="SUE_chapt5_commands.html#1031000">1</a></font>
+  <dd> <a name="32508"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Zoom to Area	<a href="SUE_chapt5_commands.html#1030997">1</a></font>
+  <dd> <a name="32510"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Zoom to Fit	<a href="SUE_chapt5_commands.html#1031003">1</a></font>
+  <dd> <a name="32512"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Zoom to Fit Selected	<a href="SUE_chapt5_commands.html#1031006">1</a></font>
+</dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="right"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_ApdxC_setup.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><img src="images/navnextx.gif" width="81" height="23" border="0" alt="NEXT"> </td>
+    <td><img src="images/navidxx.gif" width="85" height="23" border="0" alt="INDEX"> </td>
+  </tr>
+</table>
+
+</body>
+</html>

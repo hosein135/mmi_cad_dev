@@ -1,0 +1,10 @@
+set NETLIST_CACHE(inverter,cells) {{icon nmos {}} {icon pmos {}}}
+set netlist_props verilog
+set netlist_level 1000
+set NETLIST_CACHE(inverter,level) 2000
+set NETLIST_CACHE(inverter,globals) {1'b0 1'b1}
+set NETLIST_CACHE(inverter,version) MMI_SUE4.0p2
+set NETLIST_CACHE(inverter) {{module inverter (in, out);} {	input		in;} {	output		out;} { } { } {	nmos n(out,1'b0,in);} {	pmos p(out,1'b1,in);} {} {endmodule		// inverter} {}}
+set NETLIST_CACHE(inverter,names) {{550 200 {0 p}} {550 240 {0 out}} {550 160 {1 1'b1} {2 1'b1}} {570 280 {1 out}} {490 360 {0 in}} {550 400 {1 1'b0} {2 1'b0}} {550 360 {0 n}} {450 280 {1 in}} {490 200 {0 in}} {550 320 {0 out}}}
+set NETLIST_CACHE(inverter,wires) {{470 200 490 200 in} {470 360 490 360 in} {450 280 470 280 in} {470 280 470 360 in} {470 200 470 280 in} {550 280 570 280 out} {550 240 550 280 out} {550 280 550 320 out}}
+set NETLIST_CACHE(inverter,dpc) {{{0 0 0 p pmos 10 10 {{out 5.0 5.0} {1'b1 5.0 5.0} {in 5.0 5.0}} {}} {0 10 0 n nmos 10 10 {{out 5.0 5.0} {1'b0 5.0 5.0} {in 5.0 5.0}} {}}} {} {20 10 1} {{DPC WARNING: No size data for gates: pmos nmos.  Using default width of 10 grids.}}}

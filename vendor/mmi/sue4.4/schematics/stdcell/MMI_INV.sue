@@ -1,0 +1,92 @@
+# Created using mapper from:
+#"MMI_INV {A {MMI_INVA {in in} {out out}} {MMI_INVA_ {in in} {out out}}} {B {MMI_INVB {in in} {out out}} {MMI_INVB_ {in in} {out out}}} {C {MMI_INVC {in in} {out out}} {MMI_INVC_ {in in} {out out}}} {D {MMI_INVD {in in} {out out}} {MMI_INVD_ {in in} {out out}}} {E {MMI_INVE {in in} {out out}} {MMI_INVE_ {in in} {out out}}} "
+
+proc NAME_MMI_INV args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_INV[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_INV args {
+  icon_generator $args {{Size "A" {radio A B C D E}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B") && ($size != "C") && ($size != "D") && ($size != "E")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {dpc {}}}
+
+
+  # MMI_INV icon body
+  icon_line -30 -30 -30 30 30 0 -30 -30
+
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_line 30 0 60 0
+  } else {
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+    icon_line -30 0 -60 0
+  }
+
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  switch _$size {
+    _A { set fname MMI_INVA }
+    _B { set fname MMI_INVB }
+    _C { set fname MMI_INVC }
+    _D { set fname MMI_INVD }
+    _E { set fname MMI_INVE }
+  }
+  set nname [NAME_MMI_INV -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    A {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    B {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    C {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    D {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    E {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

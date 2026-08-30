@@ -1,0 +1,132 @@
+
+
+
+EXT2SPICE(1)					     EXT2SPICE(1)
+
+
+NAME
+       ext2spice  - convert hierarchical ext(5) extracted-circuit
+       files to input files for spice(1)
+
+SYNOPSIS
+       ext2spice [ -i icfile  ]	 [  -o	spicefile  ]  [	 -F  ]	[
+       extcheck-options ] root
+
+
+DESCRIPTION
+       Ext2spice will convert an extracted circuit from the hier-
+       archical representation in the ext(5) format  produced  by
+       Magic  to the flat representation in spice(5) format suit-
+       able for input to the SPICE circuit-level simulator.   The
+       root  of the tree to be extracted is the file root.ext; it
+       and all the files it references are recursively flattened.
+       The result is a single, flat representation of the circuit
+       network that is written to the file  root.spice.	  Equiva-
+       lences  between the node numbers required by SPICE and the
+       node names from the extracted circuit appear  as	 comments
+       in the SPICE deck of the form ``** NODE: num = name''.
+
+       Nodes  are  output  as  explicit	 capacitors to ground, if
+       their capacitance exceeds the  threshold	 for  capacitance
+       specified  on  the command line.	 In addition, if a node's
+       lumped resistance exceeds the threshold specified with the
+       -r  flag	 (see  extcheck(1)  for details), all connections
+       from transistors to that node are made through an explicit
+       resistor	 whose	resistance  is	half  of  the lumped node
+       resistance.  One terminal of  the  resistor  will  be  the
+       node; the other will be a dummy node that exists solely to
+       connect the resistor and transistor terminals together.
+
+       The following options are recognized:
+
+       -i icfile
+	      If specified, read the file icfile, which	 contains
+	      lines of the form ``nodename nodevalue''.	 Causes a
+	      Spice .IC line to be output setting  the	value  of
+	      each  nodename  to  its associated nodevalue (which
+	      must be an integer volatage).
+
+       -o outfile
+	      Instead of leaving output in the	file  root.spice,
+	      leave it in outfile.
+
+       -F     Don't  output  nodes  that aren't connected to fets
+	      (floating nodes).	 If this  flag	isn't  specified,
+	      floating nodes are indicated in the output with the
+	      string  ``===FLOATING===''  appended  to	the  ``**
+	      NODE:'' comment line that identifies the node.
+
+       In  addition,  all  of  the  options  of	 extcheck(1)  are
+       accepted.
+
+
+
+								1
+
+
+
+
+
+EXT2SPICE(1)					     EXT2SPICE(1)
+
+
+SEE ALSO
+       magic(1), extcheck(1), ext2dlys(1), ext2sim(1),	spice(1),
+       ext(5), sim(5)
+
+
+AUTHOR
+       Walter Scott
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								2
+
+

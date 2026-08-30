@@ -1,0 +1,277 @@
+# Created using mapper from:
+#"MMI_AOI31 {A {MMI_AOI31A {in0 in0} {in1 in1} {in2 in2} {in3 in3} {out out}} {MMI_AOI31A_ {in0 in0} {in1 in1} {in2 in2} {in3 in3} {out out}}} {B {MMI_AOI31B {in0 in0} {in1 in1} {in2 in2} {in3 in3} {out out}} {MMI_AOI31B_ {in0 in0} {in1 in1} {in2 in2} {in3 in3} {out out}}} "
+
+proc SCHEMATIC_MMI_AOI31 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    A {
+
+  make global -name gnd -origin {0 100}
+  make global -name gnd -origin {250 300}
+  make global -orient RY -name vdd -origin {0 -200}
+  make output -name out -origin {500 0}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -orient RY -name vdd -origin {500 -200}
+  make input -name in0 -origin {-90 60}
+  make input -name in1 -origin {-90 -160}
+  make input -name in2 -origin {-90 160}
+  make input -name in3 -origin {-90 260}
+  make nmos -W 0.385 -origin {0 60}
+  make nmos -W 1.155 -origin {250 60}
+  make nmos -W 1.155 -origin {250 160}
+  make nmos -W 1.155 -origin {250 260}
+  make pmos -W 1.54 -origin {0 -60}
+  make pmos -W 1.54 -origin {0 -160}
+  make pmos -W 1.54 -origin {250 -160}
+  make pmos -W 1.54 -origin {500 -160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {120 460}
+  make_wire 0 20 0 0
+  make_wire 0 -20 0 0
+  make_wire 0 0 250 0
+  make_wire 250 20 250 0
+  make_wire 0 -120 0 -100
+  make_wire 250 120 250 100
+  make_wire 250 -120 250 -100
+  make_wire 0 -100 250 -100
+  make_wire 250 220 250 200
+  make_wire 500 -120 500 -100
+  make_wire 250 -100 500 -100
+  make_wire 250 0 500 0
+  make_wire -70 60 -70 -60
+  make_wire -70 60 -60 60
+  make_wire -70 60 -90 60
+  make_wire -60 -60 -70 -60
+  make_wire 80 -160 80 60
+  make_wire 80 60 190 60
+  make_wire -60 -160 -90 -160
+  make_wire -60 -160 80 -160
+  make_wire 160 160 160 -160
+  make_wire 160 160 -90 160
+  make_wire 160 160 190 160
+  make_wire 160 -160 190 -160
+  make_wire 190 260 -90 260
+  make_wire 190 260 370 260
+  make_wire 370 260 370 -160
+  make_wire 440 -160 370 -160
+  make_text -origin {-160 -310} -text {Inverting AND-OR 3,1 Gate}
+  make_text -origin {-160 -290} -text {A Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_AOI31 MMI_AOI31A -Size A -DeMorgan 0
+        make MMI_AOI31A -origin "$urx $ury"
+      } else {
+        generate MMI_AOI31 MMI_AOI31A_ -Size A -DeMorgan 1
+        make MMI_AOI31A_ -origin "$urx $ury"
+      }
+    }
+
+    B {
+
+  make global -name gnd -origin {0 100}
+  make global -name gnd -origin {250 300}
+  make global -orient RY -name vdd -origin {0 -200}
+  make output -name out -origin {500 0}
+  make global -name gnd -origin {340 300}
+  make global -orient RY -name vdd -origin {60 -200}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -orient RY -name vdd -origin {310 -200}
+  make global -orient RY -name vdd -origin {500 -200}
+  make global -orient RY -name vdd -origin {570 -200}
+  make input -name in0 -origin {-80 60}
+  make input -name in1 -origin {-80 -160}
+  make input -name in2 -origin {-80 160}
+  make input -name in3 -origin {-80 260}
+  make nmos -W 0.77 -origin {0 60}
+  make nmos -W 1.155 -origin {250 60}
+  make nmos -W 1.155 -origin {340 60}
+  make nmos -W 1.155 -origin {340 160}
+  make nmos -W 1.155 -origin {250 160}
+  make nmos -W 1.155 -origin {250 260}
+  make nmos -W 1.155 -origin {340 260}
+  make pmos -W 1.54 -origin {0 -60}
+  make pmos -W 1.54 -origin {60 -60}
+  make pmos -W 1.54 -origin {0 -160}
+  make pmos -W 1.54 -origin {60 -160}
+  make pmos -W 1.54 -origin {250 -160}
+  make pmos -W 1.54 -origin {310 -160}
+  make pmos -W 1.54 -origin {500 -160}
+  make pmos -W 1.54 -origin {570 -160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {150 460}
+  make_wire 0 20 0 0
+  make_wire 0 -20 0 0
+  make_wire 250 20 250 0
+  make_wire 0 -120 0 -100
+  make_wire 250 120 250 100
+  make_wire 250 -120 250 -100
+  make_wire 250 220 250 200
+  make_wire 500 -120 500 -100
+  make_wire 60 -100 0 -100
+  make_wire 60 -100 250 -100
+  make_wire 60 -120 60 -100
+  make_wire 310 -100 250 -100
+  make_wire 310 -100 500 -100
+  make_wire 310 -120 310 -100
+  make_wire 500 -100 570 -100
+  make_wire 570 -100 570 -120
+  make_wire 440 -160 510 -160
+  make_wire 190 -160 250 -160
+  make_wire -60 -160 0 -160
+  make_wire 60 0 0 0
+  make_wire 60 0 250 0
+  make_wire 60 -20 60 0
+  make_wire -60 -60 0 -60
+  make_wire 340 0 250 0
+  make_wire 340 0 500 0
+  make_wire 340 0 340 20
+  make_wire 340 200 340 220
+  make_wire 340 100 340 120
+  make_wire 190 160 280 160
+  make_wire 190 60 280 60
+  make_wire 0 -160 100 -160
+  make_wire 100 -160 100 60
+  make_wire 100 60 190 60
+  make_wire -60 60 -60 -60
+  make_wire -80 60 -60 60
+  make_wire -80 -160 -60 -160
+  make_wire -80 260 190 260
+  make_wire 190 260 280 260
+  make_wire 280 260 400 260
+  make_wire 400 260 400 -160
+  make_wire 400 -160 440 -160
+  make_wire 160 160 160 -160
+  make_wire 160 -160 190 -160
+  make_wire 160 160 -80 160
+  make_wire 160 160 190 160
+  make_text -origin {-140 -310} -text {Inverting AND-OR 3,1 Gate}
+  make_text -origin {-140 -290} -text {B Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_AOI31 MMI_AOI31B -Size B -DeMorgan 0
+        make MMI_AOI31B -origin "$urx $ury"
+      } else {
+        generate MMI_AOI31 MMI_AOI31B_ -Size B -DeMorgan 1
+        make MMI_AOI31B_ -origin "$urx $ury"
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_AOI31 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_AOI31[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_AOI31 args {
+  icon_generator $args {{Size "A" {radio A B}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_AOI31 icon body
+  if {$DeMorgan} {
+    # or
+    icon_line -88 -10 -40 -10
+    icon_line -88 50 -40 50
+    icon_arc -100 -10 10 130 -start 35 -extent 50
+    icon_arc -100 -90 10 50 -start 275 -extent 50
+    icon_arc -98 -10 -78 50 -start 270 -extent 180
+    # and
+    icon_line 50 -30 0 -30 0 30 50 30
+    icon_arc 10 -30 80 30 -start 277 -extent 166
+    # bubbles and stubs
+    icon_line -100 -30 -20 -30
+    icon_arc -100 30 -80 50 -start 0 -extent 359
+    icon_arc -100 30 -80 10 -start 0 -extent 359
+    icon_arc -100 -10 -80 10 -start 0 -extent 359
+    icon_line 80 0 100 0
+    icon_arc -20 -40 0 -20 -start 0 -extent 359
+    # properties
+    icon_property -origin {3 -22} -size small -label F
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  } else {
+    # or
+    icon_line -10 -30 40 -30
+    icon_line -10 30 40 30
+    icon_arc -20 -30 90 110 -start 35 -extent 50
+    icon_arc -20 -110 90 30 -start 275 -extent 50
+    icon_arc -20 -30 0 30 -start 270 -extent 180
+    # and
+    icon_line -40 -10 -80 -10 -80 50 -40 50
+    icon_arc -80 -10 -10 50 -start 277 -extent 166
+    # stubs
+    icon_line -100 -30 -10 -30
+    icon_line -100 0 -80 0
+    icon_line -100 20 -80 20
+    icon_line -100 40 -80 40
+    icon_arc 80 -10 100 10 -start 0 -extent 359
+    # properties
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {0 -22} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  }
+
+  # inputs
+  icon_term -type input -origin {-100 -30} -name in0
+  icon_term -type input -origin {-100 0} -name in1
+  icon_term -type input -origin {-100 20} -name in2
+  icon_term -type input -origin {-100 40} -name in3
+
+  # outputs
+  icon_term -type output -origin {100 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_AOI31 -Size $Size]
+  set nname [NAME_MMI_AOI31 -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    A {
+    set pnames ".in0(\$in0), .in1(\$in1), .in2(\$in2), .in3(\$in3), .out(\$out)"
+    }
+    B {
+    set pnames ".in0(\$in0), .in1(\$in1), .in2(\$in2), .in3(\$in3), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

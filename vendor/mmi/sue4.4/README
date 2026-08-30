@@ -1,0 +1,163 @@
+Micro Magic's Schematic User Environment (MMI_SUE4.4) or SUE for short.
+
+
+Running SUE:
+============
+
+Please read the SUE manual (either sue_manual.txt for a text file or
+sue_manual.html) for an introduction/user's guide to SUE.  Note that
+this file is also displayed when you hit "SUE manual" in the "Help"
+menu in SUE.
+
+Assuming SUE is correctly installed (see below if not), run SUE by typing:
+
+	sue
+
+or if you are really clever,
+
+	sue <-private> <file1> <file2> ... <-MODE verilog|spice> \
+		<-LIB library> <-AUTOLIB library> <-new schematic_name> \
+		<-CMD sue_command> <-SET variable=value> <-ICONIFY bogus>
+
+where <file1>, <file2> are optional SUE schematics to load after any
+libraries are added.  You can see these options with:
+
+	sue -help
+
+The <-private> switch must immediately follow the "sue" command and
+will bring up SUE with a private colormap.
+
+Note that multiple libraries may be included as:
+
+	-LIB /foo/lib1 -LIB /foo/lib2     or
+	-AUTOLIB /foo/lib1 -AUTOLIB /foo/lib2     or
+
+"LIB" libraries will be available but will not be visible in the icons
+listboxes while "AUTOLIB" libraries will (AUTOLIB for AUTOmatically
+loaded LIBraries).  Note libraries can also be automatically loaded by
+the ./.suerc file (see User Customization below).
+
+SUE commands such as "api_netlist" or "exit" can also be entered at
+startup.  Thus if you had a schematic that you just wanted to netlist
+in "batch mode", you could use the line:
+
+	sue foo.sue -CMD api_netlist -CMD exit -ICONIFY 1
+
+This would bring up SUE iconified, netlist the cell foo.sue, and then
+exit.  This mode is not really batch mode since SUE requires the GUI
+to run, but with the iconify option it behaves pretty much like batch mode.
+
+SUE is really designed to be used most effectively with hotkeys.  Yes,
+you can do just about everything with the menus -- but it is painful.
+If you really like to see menus or when learning the hotkeys, it is
+useful to select the "------------------" option in the menu (the top
+of each menu).  This will "tear off" the menu and make it a separate
+toplevel window.  The hotkeys for each menu item are displayed next to
+the item in the menu.  If there is no letter, then no hotkey.  Note
+that some functions, such as double-clicking on an icon to edit its
+properties, are in no menus.  These "non-menu" hotkeys are enumerated
+in the beginning of the SUE manual.
+
+
+Installing SUE:
+===============
+
+The file ${MMI_TOOLS}/sue/.suerc contains all the user-modifiable
+options in SUE, including pointers to tools, hotkey definitions,
+colors, etc.  Note that this is a TCL file and requires correct TCL
+syntax.  When installing SUE, read thru this file to determine what
+needs to be modified on your system and copy only those lines into the
+site .suerc file located in ${MMI_TOOLS}/../mmi_local/sue/.suerc (or
+overridden by the MMI_LOCAL unix environment varaible).  See
+the User Customization section of the SUE manual for a more complete
+description of the workings of the .suerc files.
+
+SUE should run fine on any system.  However, to interact with tools
+such as spice, verilog, irsim, and waveform viewers, the system .suerc
+file should be updated to point to the correct executables.
+
+Also included with the SUE distribution are scripts for executing
+hspice, powermill, and adm (a fast spice program from Avanti now called
+Star-Sim or some such -- and can you believe they actually think they
+can rename hspice to be Star-Hspice).  They are called "spice",
+"powermill_go", and "adm_go".  You need to configure these scripts for
+you own environment.  If you are only running hspice, then you only
+need to configure the "spice" script.  
+
+The "spice" script allows you to run spice on either your local
+machine, if you have a floating license, or a remote machine if you
+have a node-locked license or are running on Linux.
+
+On completion, all three scripts will signal SUE to pop up or
+reset the waveform viewers.  Note that NST currently doesn't
+read the powermill output format.
+
+When spice netlisting, SUE will include a default spice header if it
+can't find <schematic_name>.h.  You should change this default spice
+header to load the appropriate spice models and other parameters.
+
+SUE comes with some example libraries (i.e. directories of icons)
+which are found in <SUE_DIR>/schematics.  The devices directory
+contains generic devices like name nets, globals, I/O's, title bars,
+etc.  They should be universal for all designs.  Also, you should only
+modify these device icons with extreme caution because SUE assumes
+certain things about some of them.  Also included are spice libraries
+for doing transistor level circuit design, standard cell icons, etc.
+You can merge these libraries, modify them, or change them however you
+want.  These icon libraries are not complete nor perfect (especially
+the verilog one which is nearly useless).  The SUE MODE determines
+which library to use in addition to specifying how to netlist.  Note
+that the difference between the spice and mspice (default) mode is
+that mspice adds a "u" for micron onto mosfet widths given to it when
+netlisting.  Some spice models automatically scale their parameters in
+which case you would use spice instead of mspice.
+
+For systems with two heads, you can set the following UNIX environment
+variable
+
+PROBE_DISPLAY (environment):
+	probe display.  Default to current.  For two display systems,
+	set this to the display other than where SUE is.  Can be set
+	to be "other" for the other display.
+
+The script that starts sue (${MMI_TOOLS}/sue/sue) attempts to add
+fonts to the X font path using the "xset +fp" function.  We have found
+that this doesn't work on some systems (please tell us if you know how
+to fix this).  If this doesn't work on your system, you will have to
+comment out these lines in the sue script and change the font_mode to
+"standard" or, if you have a font server, "font_server" in the system
+.suerc.  If you selected "standard", you might also have to change the
+smallest font in the variable FONT(tiny) from nil2 to something that
+your system has like 5x8 if you don't have nil2.
+
+MAX cross-probing.  If you intend for SUE to interact with MAX, they
+do so using the sim format.  The sim format doesn't understand any
+spice parameters that you might have in your transistor libraries,
+such as ln_min and lp_min.  All spice parameters must be defined in
+the .suerc file using the SIM_PARAMS array.  For example, if you are
+using a 0.25u technology, you might add the following:
+
+set SIM_PARAMS(ln_min) 0.24u
+set SIM_PARAMS(lp_min) 0.24u
+
+
+Limitations:
+============
+
+MULTIPLE SCHEMATIC WINDOWS:
+
+TK (SUE's underlying GUI) does not permit windows to be reparented.
+Consequently, to move a schematic from one window to another would
+require cloning the schematic.  Cloning is not supported and copying
+messes up certain things like undo, not to mention being slow.
+TKSteal reportedly allows reparenting ...
+
+
+RENAME:
+
+You cannot rename schematics/icons in SUE.  You must instead copy them
+to a new name and then delete (if desired) the originals.  Note that
+if a "renamed" icon is instantiated into other schematics, it will
+not automatically be renamed when you do this copying action.  Why this
+lossage in SUE?  SUE uses the schematic/icon name in the window name
+and the window name cannot be changed.

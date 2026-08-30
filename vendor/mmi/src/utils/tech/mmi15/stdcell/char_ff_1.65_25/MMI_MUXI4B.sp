@@ -1,1 +1,87 @@
-../extract/MMI_MUXI4B.sp
+*** Extracted spice netlist generated from MAX ***
+
+.SUBCKT MMI_MUXI4B in0 in1 in2 in3 out sel0 sel1
+C_1 vdd gnd 6.01147fF
+C_2 in0 gnd 0.772035fF
+C_3 net_1 gnd 0.988145fF
+C_4 sel0 gnd 3.40598fF
+C_5 net_2 gnd 3.40994fF
+C_6 net_3 gnd 3.48525fF
+C_7 net_4 gnd 0.90238fF
+C_8 in1 gnd 0.974395fF
+C_9 in2 gnd 1.35397fF
+C_10 net_5 gnd 1.20594fF
+C_11 net_6 gnd 2.6109fF
+C_12 net_7 gnd 1.14973fF
+C_13 in3 gnd 1.19029fF
+C_14 net_8 gnd 1.19952fF
+C_15 sel1 gnd 2.3237fF
+C_16 net_9 gnd 2.46914fF
+C_17 net_10 gnd 2.34447fF
+C_18 net_11 gnd 0.881615fF
+C_19 out gnd 1.08033fF
+C_20 gnd gnd 4.90907fF
+Mp_1 vdd in0 net_1 vdd p W=1.54U L=0.15U AD=0.499881P PD=2.92682U 
++ AS=0.3388P PS=1.98U
+Mp_2 net_1 sel0 net_2 vdd p W=1.54U L=0.15U AD=0.3388P PD=1.98U AS=0.3388P 
++ PS=1.98U
+Mp_3 net_2 net_3 net_4 vdd p W=1.54U L=0.15U AD=0.3388P PD=1.98U 
++ AS=0.35035P PS=1.995U
+Mp_4 net_4 in1 vdd vdd p W=1.54U L=0.15U AD=0.35035P PD=1.995U AS=0.499881P 
++ PS=2.92682U
+Mp_5 vdd sel0 net_3 vdd p W=1.54U L=0.15U AD=0.499881P PD=2.92682U 
++ AS=0.616P PS=3.88U
+Mp_6 vdd in2 net_5 vdd p W=1.54U L=0.15U AD=0.499881P PD=2.92682U 
++ AS=0.354375P PS=2.705U
+Mp_7 net_5 sel0 net_6 vdd p W=1.54U L=0.15U AD=0.354375P PD=2.705U 
++ AS=0.35035P PS=1.995U
+Mp_8 net_6 net_3 net_7 vdd p W=1.54U L=0.15U AD=0.35035P PD=1.995U 
++ AS=0.392775P PS=2.595U
+Mp_9 net_7 in3 vdd vdd p W=1.54U L=0.15U AD=0.392775P PD=2.595U 
++ AS=0.499881P PS=2.92682U
+Mp_10 vdd net_2 net_8 vdd p W=1.54U L=0.15U AD=0.499881P PD=2.92682U 
++ AS=0.35035P PS=1.995U
+Mp_11 net_8 sel1 net_9 vdd p W=1.54U L=0.15U AD=0.35035P PD=1.995U 
++ AS=0.35505P PS=2.72U
+Mp_12 net_9 net_10 net_11 vdd p W=1.54U L=0.15U AD=0.35505P PD=2.72U 
++ AS=0.365108P PS=2.88876U
+Mp_13 net_11 net_6 vdd vdd p W=1.52U L=0.15U AD=0.360367P PD=2.85124U 
++ AS=0.493389P PS=2.88881U
+Mp_14 net_10 sel1 vdd vdd p W=0.77U L=0.15U AD=0.30415P PD=2.33U 
++ AS=0.249941P PS=1.46341U
+Mp_15 vdd net_9 out vdd p W=1.54U L=0.15U AD=0.499881P PD=2.92682U 
++ AS=0.6083P PS=3.87U
+Mn_1 gnd in0 net_1 gnd n W=0.77U L=0.15U AD=0.238122P PD=2.36424U 
++ AS=0.1694P PS=1.21U
+Mn_2 net_1 net_3 net_2 gnd n W=0.77U L=0.15U AD=0.1694P PD=1.21U AS=0.1694P 
++ PS=1.21U
+Mn_3 net_2 sel0 net_4 gnd n W=0.77U L=0.15U AD=0.1694P PD=1.21U 
++ AS=0.175175P PS=1.225U
+Mn_4 net_4 in1 gnd gnd n W=0.77U L=0.15U AD=0.175175P PD=1.225U 
++ AS=0.238122P PS=2.36424U
+Mn_5 gnd sel0 net_3 gnd n W=0.77U L=0.15U AD=0.238122P PD=2.36424U 
++ AS=0.25165P PS=2.87U
+Mn_6 gnd in2 net_5 gnd n W=0.755U L=0.15U AD=0.233483P PD=2.31819U 
++ AS=0.18323P PS=2.01003U
+Mn_7 net_8 net_10 net_9 gnd n W=0.77U L=0.15U AD=0.302113P PD=2.965U 
++ AS=0.176663P PS=1.8U
+Mn_8 net_9 sel1 net_11 gnd n W=0.77U L=0.15U AD=0.176662P PD=1.8U 
++ AS=0.1694P PS=1.21U
+Mn_9 net_11 net_6 gnd gnd n W=0.77U L=0.15U AD=0.1694P PD=1.21U 
++ AS=0.238122P PS=2.36424U
+Mn_10 net_5 net_3 net_6 gnd n W=0.77U L=0.15U AD=0.18687P PD=2.04997U 
++ AS=0.17325P PS=1.22U
+Mn_11 net_6 sel0 net_7 gnd n W=0.77U L=0.15U AD=0.17325P PD=1.22U 
++ AS=0.175175P PS=1.225U
+Mn_12 net_7 in3 gnd gnd n W=0.77U L=0.15U AD=0.175175P PD=1.225U 
++ AS=0.238122P PS=2.36424U
+Mn_13 gnd net_2 net_8 gnd n W=0.77U L=0.15U AD=0.238122P PD=2.36424U 
++ AS=0.302113P PS=2.965U
+Mn_14 net_10 sel1 gnd gnd n W=0.385U L=0.15U AD=0.152075P PD=1.56U 
++ AS=0.119061P PS=1.18212U
+Mn_15 gnd net_9 out gnd n W=0.77U L=0.15U AD=0.238122P PD=2.36424U 
++ AS=0.30415P PS=2.33U
+.ENDS	$ MMI_MUXI4B
+
+.GLOBAL gnd vdd
+

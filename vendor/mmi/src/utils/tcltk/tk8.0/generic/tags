@@ -1,0 +1,946 @@
+AddClause	tkFileFilter.c	/^static int AddClause(interp, filterPtr, patternsSt/
+AddFromString	tkOption.c	/^AddFromString(interp, tkwin, string, priority)$/
+AdjustForSticky	tkGrid.c	/^AdjustForSticky(slavePtr, xPtr, yPtr, widthPtr, he/
+AdjustForTab	tkTextDisp.c	/^AdjustForTab(textPtr, tabArrayPtr, index, chunkPtr/
+AdjustMenuCoords	tkMenuDraw.c	/^AdjustMenuCoords(menuPtr, mePtr, xPtr, yPtr, strin/
+AdjustOffsets	tkGrid.c	/^AdjustOffsets(size, slots, slotPtr)$/
+AlignParseProc	tkTextImage.c	/^AlignParseProc(clientData, interp, tkwin, value, w/
+AlignPrintProc	tkTextImage.c	/^AlignPrintProc(clientData, tkwin, widgRec, offset,/
+AllocateColors	tkImgPhoto.c	/^AllocateColors(colorPtr)$/
+AngleInRange	tkCanvArc.c	/^AngleInRange(x, y, start, extent)$/
+ArcCoords	tkCanvArc.c	/^ArcCoords(interp, canvas, itemPtr, argc, argv)$/
+ArcToArea	tkCanvArc.c	/^ArcToArea(canvas, itemPtr, rectPtr)$/
+ArcToPoint	tkCanvArc.c	/^ArcToPoint(canvas, itemPtr, pointPtr)$/
+ArcToPostscript	tkCanvArc.c	/^ArcToPostscript(interp, canvas, itemPtr, prepass)$/
+ArrangeGrid	tkGrid.c	/^ArrangeGrid(clientData)$/
+ArrangePacking	tkPack.c	/^ArrangePacking(clientData)$/
+ArrowheadPostscript	tkCanvLine.c	/^ArrowheadPostscript(interp, canvas, linePtr, arrow/
+AtomInit	tkAtom.c	/^AtomInit(dispPtr)$/
+BitSet	tkImgGIF.c	/^#define BitSet(byte, bit)	(((byte) & (bit)) == (bi/
+BitmapCoords	tkCanvBmap.c	/^BitmapCoords(interp, canvas, itemPtr, argc, argv)$/
+BitmapInit	tkBitmap.c	/^BitmapInit()$/
+BitmapToArea	tkCanvBmap.c	/^BitmapToArea(canvas, itemPtr, rectPtr)$/
+BitmapToPoint	tkCanvBmap.c	/^BitmapToPoint(canvas, itemPtr, coordPtr)$/
+BitmapToPostscript	tkCanvBmap.c	/^BitmapToPostscript(interp, canvas, itemPtr, prepas/
+BorderInit	tk3d.c	/^BorderInit()$/
+ButtonCmdDeletedProc	tkButton.c	/^ButtonCmdDeletedProc(clientData)$/
+ButtonCreate	tkButton.c	/^ButtonCreate(clientData, interp, argc, argv, type)/
+ButtonEventProc	tkButton.c	/^ButtonEventProc(clientData, eventPtr)$/
+ButtonImageProc	tkButton.c	/^ButtonImageProc(clientData, x, y, width, height, i/
+ButtonMask	tkPointer.c	/^#define ButtonMask(b) (buttonMasks[(b)-Button1])$/
+ButtonSelectImageProc	tkButton.c	/^ButtonSelectImageProc(clientData, x, y, width, hei/
+ButtonTextVarProc	tkButton.c	/^ButtonTextVarProc(clientData, interp, name1, name2/
+ButtonVarProc	tkButton.c	/^ButtonVarProc(clientData, interp, name1, name2, fl/
+ButtonWidgetCmd	tkButton.c	/^ButtonWidgetCmd(clientData, interp, argc, argv)$/
+CBindingEvalProc	tkTest.c	/^CBindingEvalProc(clientData, interp, eventPtr, tkw/
+CBindingFreeProc	tkTest.c	/^CBindingFreeProc(clientData)$/
+CSEG_SIZE	tkTextBTree.c	/^#define CSEG_SIZE(chars) ((unsigned) (Tk_Offset(Tk/
+CanvasBindProc	tkCanvas.c	/^CanvasBindProc(clientData, eventPtr)$/
+CanvasBlinkProc	tkCanvas.c	/^CanvasBlinkProc(clientData)$/
+CanvasCmdDeletedProc	tkCanvas.c	/^CanvasCmdDeletedProc(clientData)$/
+CanvasDoEvent	tkCanvas.c	/^CanvasDoEvent(canvasPtr, eventPtr)$/
+CanvasEventProc	tkCanvas.c	/^CanvasEventProc(clientData, eventPtr)$/
+CanvasFetchSelection	tkCanvas.c	/^CanvasFetchSelection(clientData, offset, buffer, m/
+CanvasFindClosest	tkCanvas.c	/^CanvasFindClosest(canvasPtr, coords)$/
+CanvasFocusProc	tkCanvas.c	/^CanvasFocusProc(canvasPtr, gotFocus)$/
+CanvasLostSelection	tkCanvas.c	/^CanvasLostSelection(clientData)$/
+CanvasSelectTo	tkCanvas.c	/^CanvasSelectTo(canvasPtr, itemPtr, index)$/
+CanvasSetOrigin	tkCanvas.c	/^CanvasSetOrigin(canvasPtr, xOrigin, yOrigin)$/
+CanvasUpdateScrollbars	tkCanvas.c	/^CanvasUpdateScrollbars(canvasPtr)$/
+CanvasWidgetCmd	tkCanvas.c	/^CanvasWidgetCmd(clientData, interp, argc, argv)$/
+CanvasWorldChanged	tkCanvas.c	/^CanvasWorldChanged(instanceData)$/
+ChangeListboxOffset	tkListbox.c	/^ChangeListboxOffset(listPtr, offset)$/
+ChangeListboxView	tkListbox.c	/^ChangeListboxView(listPtr, index)$/
+ChangeNodeToggleCount	tkTextBTree.c	/^ChangeNodeToggleCount(nodePtr, tagPtr, delta)$/
+ChangeScreen	tkBind.c	/^ChangeScreen(interp, dispName, screenIndex)$/
+ChangeTagPriority	tkTextTag.c	/^ChangeTagPriority(textPtr, tagPtr, prio)$/
+CharBboxProc	tkTextDisp.c	/^CharBboxProc(chunkPtr, index, y, lineHeight, basel/
+CharCheckProc	tkTextBTree.c	/^CharCheckProc(segPtr, linePtr)$/
+CharCleanupProc	tkTextBTree.c	/^CharCleanupProc(segPtr, linePtr)$/
+CharDeleteProc	tkTextBTree.c	/^CharDeleteProc(segPtr, linePtr, treeGone)$/
+CharDisplayProc	tkTextDisp.c	/^CharDisplayProc(chunkPtr, x, y, height, baseline, /
+CharMeasureProc	tkTextDisp.c	/^CharMeasureProc(chunkPtr, x)$/
+CharSplitProc	tkTextBTree.c	/^CharSplitProc(segPtr, index)$/
+CharUndisplayProc	tkTextDisp.c	/^CharUndisplayProc(textPtr, chunkPtr)$/
+CheckNodeConsistency	tkTextBTree.c	/^CheckNodeConsistency(nodePtr)$/
+CheckSlotData	tkGrid.c	/^CheckSlotData(masterPtr, slot, slotType, checkOnly/
+CleanupLine	tkTextBTree.c	/^CleanupLine(linePtr)$/
+ClearOptionTree	tkOption.c	/^ClearOptionTree(arrayPtr)$/
+ClipboardAppHandler	tkClipboard.c	/^ClipboardAppHandler(clientData, offset, buffer, ma/
+ClipboardHandler	tkClipboard.c	/^ClipboardHandler(clientData, offset, buffer, maxBy/
+ClipboardLostSel	tkClipboard.c	/^ClipboardLostSel(clientData)$/
+ClipboardWindowHandler	tkClipboard.c	/^ClipboardWindowHandler(clientData, offset, buffer,/
+CloneMenu	tkMenu.c	/^CloneMenu(menuPtr, newMenuName, newMenuTypeString)/
+ColorInit	tkColor.c	/^ColorInit()$/
+ComputeArcBbox	tkCanvArc.c	/^ComputeArcBbox(canvas, arcPtr)$/
+ComputeArcOutline	tkCanvArc.c	/^ComputeArcOutline(arcPtr)$/
+ComputeBitmapBbox	tkCanvBmap.c	/^ComputeBitmapBbox(canvas, bmapPtr)$/
+ComputeFormat	tkScale.c	/^ComputeFormat(scalePtr)$/
+ComputeImageBbox	tkCanvImg.c	/^ComputeImageBbox(canvas, imgPtr)$/
+ComputeLineBbox	tkCanvLine.c	/^ComputeLineBbox(canvas, linePtr)$/
+ComputeMenuGeometry	tkMenuDraw.c	/^ComputeMenuGeometry(clientData)$/
+ComputeMessageGeometry	tkMessage.c	/^ComputeMessageGeometry(msgPtr)$/
+ComputePolygonBbox	tkCanvPoly.c	/^ComputePolygonBbox(canvas, polyPtr)$/
+ComputeRectOvalBbox	tkRectOval.c	/^ComputeRectOvalBbox(canvas, rectOvalPtr)$/
+ComputeScaleGeometry	tkScale.c	/^ComputeScaleGeometry(scalePtr)$/
+ComputeTextBbox	tkCanvText.c	/^ComputeTextBbox(canvas, textPtr, recalc)$/
+ComputeWindowBbox	tkCanvWind.c	/^ComputeWindowBbox(canvas, winItemPtr)$/
+ConfigAttributesObj	tkFont.c	/^ConfigAttributesObj(interp, tkwin, objc, objv, faP/
+ConfigureArc	tkCanvArc.c	/^ConfigureArc(interp, canvas, itemPtr, argc, argv, /
+ConfigureArrows	tkCanvLine.c	/^ConfigureArrows(canvas, linePtr)$/
+ConfigureBitmap	tkCanvBmap.c	/^ConfigureBitmap(interp, canvas, itemPtr, argc, arg/
+ConfigureButton	tkButton.c	/^ConfigureButton(interp, butPtr, argc, argv, flags)/
+ConfigureCanvas	tkCanvas.c	/^ConfigureCanvas(interp, canvasPtr, argc, argv, fla/
+ConfigureEntry	tkEntry.c	/^ConfigureEntry(interp, entryPtr, argc, argv, flags/
+ConfigureFrame	tkFrame.c	/^ConfigureFrame(interp, framePtr, argc, argv, flags/
+ConfigureImage	tkCanvImg.c	/^ConfigureImage(interp, canvas, itemPtr, argc, argv/
+ConfigureLine	tkCanvLine.c	/^ConfigureLine(interp, canvas, itemPtr, argc, argv,/
+ConfigureListbox	tkListbox.c	/^ConfigureListbox(interp, listPtr, argc, argv, flag/
+ConfigureMenu	tkMenu.c	/^ConfigureMenu(interp, menuPtr, argc, argv, flags)$/
+ConfigureMenuButton	tkMenubutton.c	/^ConfigureMenuButton(interp, mbPtr, argc, argv, fla/
+ConfigureMenuCloneEntries	tkMenu.c	/^ConfigureMenuCloneEntries(interp, menuPtr, index, /
+ConfigureMenuEntry	tkMenu.c	/^ConfigureMenuEntry(mePtr, argc, argv, flags)$/
+ConfigureMessage	tkMessage.c	/^ConfigureMessage(interp, msgPtr, argc, argv, flags/
+ConfigurePolygon	tkCanvPoly.c	/^ConfigurePolygon(interp, canvas, itemPtr, argc, ar/
+ConfigureRectOval	tkRectOval.c	/^ConfigureRectOval(interp, canvas, itemPtr, argc, a/
+ConfigureScale	tkScale.c	/^ConfigureScale(interp, scalePtr, argc, argv, flags/
+ConfigureScrollbar	tkScrollbar.c	/^ConfigureScrollbar(interp, scrollPtr, argc, argv, /
+ConfigureSlave	tkPlace.c	/^ConfigureSlave(interp, slavePtr, argc, argv)$/
+ConfigureSlaves	tkGrid.c	/^ConfigureSlaves(interp, tkwin, argc, argv)$/
+ConfigureText	tkCanvText.c	/^ConfigureText(interp, canvas, itemPtr, argc, argv,/
+ConfigureWinItem	tkCanvWind.c	/^ConfigureWinItem(interp, canvas, itemPtr, argc, ar/
+ConsoleClose	tkConsole.c	/^ConsoleClose(instanceData, interp)$/
+ConsoleCmd	tkConsole.c	/^ConsoleCmd(clientData, interp, argc, argv)$/
+ConsoleDeleteProc	tkConsole.c	/^ConsoleDeleteProc(clientData) $/
+ConsoleEventProc	tkConsole.c	/^ConsoleEventProc(clientData, eventPtr)$/
+ConsoleHandle	tkConsole.c	/^ConsoleHandle(instanceData, direction, handlePtr)$/
+ConsoleInput	tkConsole.c	/^ConsoleInput(instanceData, buf, bufSize, errorCode/
+ConsoleOutput	tkConsole.c	/^ConsoleOutput(instanceData, buf, toWrite, errorCod/
+ConsoleWatch	tkConsole.c	/^ConsoleWatch(instanceData, mask)$/
+CountBits	tkImgPhoto.c	/^CountBits(mask)$/
+CreateArc	tkCanvArc.c	/^CreateArc(interp, canvas, itemPtr, argc, argv)$/
+CreateBitmap	tkCanvBmap.c	/^CreateBitmap(interp, canvas, itemPtr, argc, argv)$/
+CreateImage	tkCanvImg.c	/^CreateImage(interp, canvas, itemPtr, argc, argv)$/
+CreateLine	tkCanvLine.c	/^CreateLine(interp, canvas, itemPtr, argc, argv)$/
+CreatePolygon	tkCanvPoly.c	/^CreatePolygon(interp, canvas, itemPtr, argc, argv)/
+CreateRectOval	tkRectOval.c	/^CreateRectOval(interp, canvas, itemPtr, argc, argv/
+CreateText	tkCanvText.c	/^CreateText(interp, canvas, itemPtr, argc, argv)$/
+CreateTopLevelWindow	tkWindow.c	/^CreateTopLevelWindow(interp, parent, name, screenN/
+CreateVirtualEvent	tkBind.c	/^CreateVirtualEvent(interp, vetPtr, virtString, eve/
+CreateWinItem	tkCanvWind.c	/^CreateWinItem(interp, canvas, itemPtr, argc, argv)/
+CursorInit	tkCursor.c	/^CursorInit()$/
+DelayedMotionProc	tkEvent.c	/^DelayedMotionProc(clientData)$/
+DeleteArc	tkCanvArc.c	/^DeleteArc(canvas, itemPtr, display)$/
+DeleteBitmap	tkCanvBmap.c	/^DeleteBitmap(canvas, itemPtr, display)$/
+DeleteChars	tkEntry.c	/^DeleteChars(entryPtr, index, count)$/
+DeleteEls	tkListbox.c	/^DeleteEls(listPtr, first, last)$/
+DeleteImage	tkCanvImg.c	/^DeleteImage(canvas, itemPtr, display)$/
+DeleteLine	tkCanvLine.c	/^DeleteLine(canvas, itemPtr, display)$/
+DeleteMenuCloneEntries	tkMenu.c	/^DeleteMenuCloneEntries(menuPtr, first, last)$/
+DeletePolygon	tkCanvPoly.c	/^DeletePolygon(canvas, itemPtr, display)$/
+DeleteRectOval	tkRectOval.c	/^DeleteRectOval(canvas, itemPtr, display)$/
+DeleteSummaries	tkTextBTree.c	/^DeleteSummaries(summaryPtr)$/
+DeleteText	tkCanvText.c	/^DeleteText(canvas, itemPtr, display)$/
+DeleteVirtualEvent	tkBind.c	/^DeleteVirtualEvent(interp, vetPtr, virtString, eve/
+DeleteVirtualEventTable	tkBind.c	/^DeleteVirtualEventTable(vetPtr)$/
+DeleteWinItem	tkCanvWind.c	/^DeleteWinItem(canvas, itemPtr, display)$/
+DeleteWindowsExitProc	tkWindow.c	/^DeleteWindowsExitProc(clientData)$/
+DestroyButton	tkButton.c	/^DestroyButton(butPtr)$/
+DestroyCanvas	tkCanvas.c	/^DestroyCanvas(memPtr)$/
+DestroyEntry	tkEntry.c	/^DestroyEntry(memPtr)$/
+DestroyFrame	tkFrame.c	/^DestroyFrame(memPtr)$/
+DestroyGrid	tkGrid.c	/^DestroyGrid(memPtr)$/
+DestroyListbox	tkListbox.c	/^DestroyListbox(memPtr)$/
+DestroyMenuButton	tkMenubutton.c	/^DestroyMenuButton(memPtr)$/
+DestroyMenuEntry	tkMenu.c	/^DestroyMenuEntry(memPtr)$/
+DestroyMenuHashTable	tkMenu.c	/^DestroyMenuHashTable(clientData, interp)$/
+DestroyMenuInstance	tkMenu.c	/^DestroyMenuInstance(menuPtr)$/
+DestroyMessage	tkMessage.c	/^DestroyMessage(memPtr)$/
+DestroyNode	tkTextBTree.c	/^DestroyNode(nodePtr)$/
+DestroyPacker	tkPack.c	/^DestroyPacker(memPtr)$/
+DestroyScale	tkScale.c	/^DestroyScale(memPtr)$/
+DestroyText	tkText.c	/^DestroyText(memPtr)$/
+DisplayArc	tkCanvArc.c	/^DisplayArc(canvas, itemPtr, display, drawable, x, /
+DisplayBitmap	tkCanvBmap.c	/^DisplayBitmap(canvas, itemPtr, display, drawable, /
+DisplayCanvText	tkCanvText.c	/^DisplayCanvText(canvas, itemPtr, display, drawable/
+DisplayCanvas	tkCanvas.c	/^DisplayCanvas(clientData)$/
+DisplayDLine	tkTextDisp.c	/^DisplayDLine(textPtr, dlPtr, prevPtr, pixmap)$/
+DisplayEntry	tkEntry.c	/^DisplayEntry(clientData)$/
+DisplayFrame	tkFrame.c	/^DisplayFrame(clientData)$/
+DisplayImage	tkCanvImg.c	/^DisplayImage(canvas, itemPtr, display, drawable, x/
+DisplayLine	tkCanvLine.c	/^DisplayLine(canvas, itemPtr, display, drawable, x,/
+DisplayLineBackground	tkTextDisp.c	/^DisplayLineBackground(textPtr, dlPtr, prevPtr, pix/
+DisplayListbox	tkListbox.c	/^DisplayListbox(clientData)$/
+DisplayMenu	tkMenuDraw.c	/^DisplayMenu(clientData)$/
+DisplayMessage	tkMessage.c	/^DisplayMessage(clientData)$/
+DisplayPolygon	tkCanvPoly.c	/^DisplayPolygon(canvas, itemPtr, display, drawable,/
+DisplayRectOval	tkRectOval.c	/^DisplayRectOval(canvas, itemPtr, display, drawable/
+DisplayText	tkTextDisp.c	/^DisplayText(clientData)$/
+DisplayWinItem	tkCanvWind.c	/^DisplayWinItem(canvas, itemPtr, display, drawable,/
+DisposeColorTable	tkImgPhoto.c	/^DisposeColorTable(clientData)$/
+DisposeInstance	tkImgPhoto.c	/^DisposeInstance(clientData)$/
+Dither	tkImgPhoto.c	/^Dither(masterPtr, x, y, width, height)$/
+DitherInstance	tkImgPhoto.c	/^DitherInstance(instancePtr, xStart, yStart, width,/
+DoConfig	tkConfig.c	/^DoConfig(interp, tkwin, specPtr, value, valueIsUid/
+DoExtension	tkImgGIF.c	/^DoExtension(chan, label, transparent)$/
+DoItem	tkCanvas.c	/^DoItem(interp, itemPtr, tag)$/
+DumpLine	tkText.c	/^DumpLine(interp, textPtr, what, linePtr, start, en/
+DumpSegment	tkText.c	/^DumpSegment(interp, key, value, command, lineno, o/
+EL_ARRAY_SIZE	tkOption.c	/^#define EL_ARRAY_SIZE(numEls) ((unsigned) (sizeof(/
+EatGrabEvents	tkGrab.c	/^EatGrabEvents(dispPtr, serial)$/
+ElementSize	tkListbox.c	/^#define ElementSize(stringLength) \\$/
+EmbImageBboxProc	tkTextImage.c	/^EmbImageBboxProc(chunkPtr, index, y, lineHeight, b/
+EmbImageCheckProc	tkTextImage.c	/^EmbImageCheckProc(eiPtr, linePtr)$/
+EmbImageCleanupProc	tkTextImage.c	/^EmbImageCleanupProc(eiPtr, linePtr)$/
+EmbImageConfigure	tkTextImage.c	/^EmbImageConfigure(textPtr, eiPtr, argc, argv)$/
+EmbImageDeleteProc	tkTextImage.c	/^EmbImageDeleteProc(eiPtr, linePtr, treeGone)$/
+EmbImageDisplayProc	tkTextImage.c	/^EmbImageDisplayProc(chunkPtr, x, y, lineHeight, ba/
+EmbImageLayoutProc	tkTextImage.c	/^EmbImageLayoutProc(textPtr, indexPtr, eiPtr, offse/
+EmbImageProc	tkTextImage.c	/^EmbImageProc(clientData, x, y, width, height, imgW/
+EmbWinBboxProc	tkTextWind.c	/^EmbWinBboxProc(chunkPtr, index, y, lineHeight, bas/
+EmbWinCheckProc	tkTextWind.c	/^EmbWinCheckProc(ewPtr, linePtr)$/
+EmbWinCleanupProc	tkTextWind.c	/^EmbWinCleanupProc(ewPtr, linePtr)$/
+EmbWinConfigure	tkTextWind.c	/^EmbWinConfigure(textPtr, ewPtr, argc, argv)$/
+EmbWinDelayedUnmap	tkTextWind.c	/^EmbWinDelayedUnmap(clientData)$/
+EmbWinDeleteProc	tkTextWind.c	/^EmbWinDeleteProc(ewPtr, linePtr, treeGone)$/
+EmbWinDisplayProc	tkTextWind.c	/^EmbWinDisplayProc(chunkPtr, x, y, lineHeight, base/
+EmbWinLayoutProc	tkTextWind.c	/^EmbWinLayoutProc(textPtr, indexPtr, ewPtr, offset,/
+EmbWinLostSlaveProc	tkTextWind.c	/^EmbWinLostSlaveProc(clientData, tkwin)$/
+EmbWinRequestProc	tkTextWind.c	/^EmbWinRequestProc(clientData, tkwin)$/
+EmbWinStructureProc	tkTextWind.c	/^EmbWinStructureProc(clientData, eventPtr)$/
+EmbWinUndisplayProc	tkTextWind.c	/^EmbWinUndisplayProc(textPtr, chunkPtr)$/
+EntryBlinkProc	tkEntry.c	/^EntryBlinkProc(clientData)$/
+EntryCmdDeletedProc	tkEntry.c	/^EntryCmdDeletedProc(clientData)$/
+EntryComputeGeometry	tkEntry.c	/^EntryComputeGeometry(entryPtr)$/
+EntryEventProc	tkEntry.c	/^EntryEventProc(clientData, eventPtr)$/
+EntryFetchSelection	tkEntry.c	/^EntryFetchSelection(clientData, offset, buffer, ma/
+EntryFocusProc	tkEntry.c	/^EntryFocusProc(entryPtr, gotFocus)$/
+EntryLostSelection	tkEntry.c	/^EntryLostSelection(clientData)$/
+EntryScanTo	tkEntry.c	/^EntryScanTo(entryPtr, x)$/
+EntrySelectTo	tkEntry.c	/^EntrySelectTo(entryPtr, index)$/
+EntrySetValue	tkEntry.c	/^EntrySetValue(entryPtr, value)$/
+EntryTextVarProc	tkEntry.c	/^EntryTextVarProc(clientData, interp, name1, name2,/
+EntryUpdateScrollbar	tkEntry.c	/^EntryUpdateScrollbar(entryPtr)$/
+EntryValueChanged	tkEntry.c	/^EntryValueChanged(entryPtr)$/
+EntryVisibleRange	tkEntry.c	/^EntryVisibleRange(entryPtr, firstPtr, lastPtr)$/
+EntryWidgetCmd	tkEntry.c	/^EntryWidgetCmd(clientData, interp, argc, argv)$/
+EntryWorldChanged	tkEntry.c	/^EntryWorldChanged(instanceData)$/
+ErrorProc	tkError.c	/^ErrorProc(display, errEventPtr)$/
+EventuallyRedraw	tkEntry.c	/^EventuallyRedraw(entryPtr)$/
+ExpandPercents	tkBind.c	/^ExpandPercents(winPtr, before, eventPtr, keySym, d/
+ExtendArray	tkOption.c	/^ExtendArray(arrayPtr, elPtr)$/
+ExtendStacks	tkOption.c	/^ExtendStacks(arrayPtr, leaf)$/
+FieldSpecified	tkFont.c	/^FieldSpecified(field)$/
+FileMatchGIF	tkImgGIF.c	/^FileMatchGIF(chan, fileName, formatString, widthPt/
+FileMatchPPM	tkImgPPM.c	/^FileMatchPPM(chan, fileName, formatString, widthPt/
+FileReadGIF	tkImgGIF.c	/^FileReadGIF(interp, chan, fileName, formatString, /
+FileReadPPM	tkImgPPM.c	/^FileReadPPM(interp, chan, fileName, formatString, /
+FileWritePPM	tkImgPPM.c	/^FileWritePPM(interp, fileName, formatString, block/
+FindArea	tkCanvas.c	/^FindArea(interp, canvasPtr, argv, uid, enclosed)$/
+FindCommonAncestor	tkGrab.c	/^FindCommonAncestor(winPtr1, winPtr2, countPtr1, co/
+FindConfigSpec	tkConfig.c	/^FindConfigSpec(interp, specs, argvName, needFlags,/
+FindDLine	tkTextDisp.c	/^FindDLine(dlPtr, indexPtr)$/
+FindDisplayFocusInfo	tkFocus.c	/^FindDisplayFocusInfo(mainPtr, dispPtr)$/
+FindItems	tkCanvas.c	/^FindItems(interp, canvasPtr, argc, argv, newTag, c/
+FindMaster	tkPlace.c	/^FindMaster(tkwin)$/
+FindSequence	tkBind.c	/^FindSequence(interp, patternTablePtr, object, even/
+FindSlave	tkPlace.c	/^FindSlave(tkwin)$/
+FindTag	tkTextTag.c	/^FindTag(interp, textPtr, tagName)$/
+FindTagEnd	tkTextBTree.c	/^FindTagEnd(tree, tagPtr, indexPtr)$/
+FindTagStart	tkTextBTree.c	/^FindTagStart(tree, tagPtr, indexPtr)$/
+FocusMapProc	tkFocus.c	/^FocusMapProc(clientData, eventPtr)$/
+FormatConfigInfo	tkConfig.c	/^FormatConfigInfo(interp, tkwin, specPtr, widgRec)$/
+FormatConfigValue	tkConfig.c	/^FormatConfigValue(interp, tkwin, specPtr, widgRec,/
+ForwBack	tkTextIndex.c	/^ForwBack(string, indexPtr)$/
+FrameCmdDeletedProc	tkFrame.c	/^FrameCmdDeletedProc(clientData)$/
+FrameEventProc	tkFrame.c	/^FrameEventProc(clientData, eventPtr)$/
+FrameWidgetCmd	tkFrame.c	/^FrameWidgetCmd(clientData, interp, argc, argv)$/
+Fread	tkImgGIF.c	/^Fread(dst, hunk, count, chan)$/
+FreeClauses	tkFileFilter.c	/^FreeClauses(filterPtr)$/
+FreeColorTable	tkImgPhoto.c	/^FreeColorTable(colorPtr)$/
+FreeDLines	tkTextDisp.c	/^FreeDLines(textPtr, firstPtr, lastPtr, unlink)$/
+FreeGlobPatterns	tkFileFilter.c	/^FreeGlobPatterns(clausePtr)$/
+FreeMacFileTypes	tkFileFilter.c	/^FreeMacFileTypes(clausePtr)$/
+FreeStyle	tkTextDisp.c	/^FreeStyle(textPtr, stylePtr)$/
+FreeTclBinding	tkBind.c	/^FreeTclBinding(clientData)$/
+GCInit	tkGC.c	/^GCInit()$/
+GenerateEnterLeave	tkPointer.c	/^GenerateEnterLeave(winPtr, x, y, state)$/
+GenerateFocusEvents	tkFocus.c	/^GenerateFocusEvents(sourcePtr, destPtr)$/
+GetAllVirtualEvents	tkBind.c	/^GetAllVirtualEvents(interp, vetPtr)$/
+GetAttributeInfoObj	tkFont.c	/^GetAttributeInfoObj(interp, faPtr, objPtr)$/
+GetByte	tkImgBmap.c	/^GetByte(chan)$/
+GetCode	tkImgGIF.c	/^GetCode(chan, code_size, flag)$/
+GetColorTable	tkImgPhoto.c	/^GetColorTable(instancePtr)$/
+GetDataBlock	tkImgGIF.c	/^GetDataBlock(chan, buf)$/
+GetDefaultOptions	tkOption.c	/^GetDefaultOptions(interp, winPtr)$/
+GetEntryIndex	tkEntry.c	/^GetEntryIndex(interp, entryPtr, string, indexPtr)$/
+GetField	tkBind.c	/^GetField(p, copy, size)$/
+GetFilter	tkFileFilter.c	/^static FileFilter * GetFilter(flistPtr, name)$/
+GetFontAttributes	tkFont.c	/^#define GetFontAttributes(tkfont) \\$/
+GetFontMetrics	tkFont.c	/^#define GetFontMetrics(tkfont)    \\$/
+GetGrid	tkGrid.c	/^GetGrid(tkwin)$/
+GetIndexFromCoords	tkMenu.c	/^GetIndexFromCoords(interp, menuPtr, string, indexP/
+GetKeySym	tkBind.c	/^GetKeySym(dispPtr, eventPtr)$/
+GetListboxIndex	tkListbox.c	/^GetListboxIndex(interp, listPtr, string, endIsSize/
+GetPacker	tkPack.c	/^GetPacker(tkwin)$/
+GetPatternString	tkBind.c	/^GetPatternString(psPtr, dsPtr)$/
+GetPostscriptPoints	tkCanvPs.c	/^GetPostscriptPoints(interp, string, doublePtr)$/
+GetScreen	tkWindow.c	/^GetScreen(interp, screenName, screenPtr)$/
+GetSelText	tkCanvText.c	/^GetSelText(canvas, itemPtr, offset, buffer, maxByt/
+GetStyle	tkTextDisp.c	/^GetStyle(textPtr, indexPtr)$/
+GetTextIndex	tkCanvText.c	/^GetTextIndex(interp, canvas, itemPtr, string, inde/
+GetToplevel	tkCmds.c	/^GetToplevel(tkwin)$/
+GetVirtualEvent	tkBind.c	/^GetVirtualEvent(interp, vetPtr, virtString)$/
+GetVirtualEventUid	tkBind.c	/^GetVirtualEventUid(interp, virtString)$/
+GetXView	tkTextDisp.c	/^GetXView(interp, textPtr, report)$/
+GetYView	tkTextDisp.c	/^GetYView(interp, textPtr, report)$/
+GrabRestrictProc	tkGrab.c	/^GrabRestrictProc(arg, eventPtr)$/
+GrabWinEventProc	tkGrab.c	/^GrabWinEventProc(evPtr, flags)$/
+GridAlign	tkCanvas.c	/^GridAlign(coord, spacing)$/
+GridLostSlaveProc	tkGrid.c	/^GridLostSlaveProc(clientData, tkwin)$/
+GridReqProc	tkGrid.c	/^GridReqProc(clientData, tkwin)$/
+GridStructureProc	tkGrid.c	/^GridStructureProc(clientData, eventPtr)$/
+HandleEventGenerate	tkBind.c	/^HandleEventGenerate(interp, mainwin, argc, argv)$/
+HandleTclCommand	tkSelect.c	/^HandleTclCommand(clientData, offset, buffer, maxBy/
+HorizLineToArc	tkCanvArc.c	/^HorizLineToArc(x1, x2, y, rx, ry, start, extent)$/
+ImageChangedProc	tkCanvImg.c	/^ImageChangedProc(clientData, x, y, width, height, /
+ImageCmd	tkTest.c	/^ImageCmd(clientData, interp, argc, argv)$/
+ImageCoords	tkCanvImg.c	/^ImageCoords(interp, canvas, itemPtr, argc, argv)$/
+ImageCreate	tkTest.c	/^ImageCreate(interp, name, argc, argv, typePtr, mas/
+ImageDelete	tkTest.c	/^ImageDelete(clientData)$/
+ImageDisplay	tkTest.c	/^ImageDisplay(clientData, display, drawable, imageX/
+ImageFree	tkTest.c	/^ImageFree(clientData, display)$/
+ImageGet	tkTest.c	/^ImageGet(tkwin, clientData)$/
+ImageToArea	tkCanvImg.c	/^ImageToArea(canvas, itemPtr, rectPtr)$/
+ImageToPoint	tkCanvImg.c	/^ImageToPoint(canvas, itemPtr, coordPtr)$/
+ImgBmapCmd	tkImgBmap.c	/^ImgBmapCmd(clientData, interp, argc, argv)$/
+ImgBmapCmdDeletedProc	tkImgBmap.c	/^ImgBmapCmdDeletedProc(clientData)$/
+ImgBmapConfigureInstance	tkImgBmap.c	/^ImgBmapConfigureInstance(instancePtr)$/
+ImgBmapConfigureMaster	tkImgBmap.c	/^ImgBmapConfigureMaster(masterPtr, argc, argv, flag/
+ImgBmapCreate	tkImgBmap.c	/^ImgBmapCreate(interp, name, argc, argv, typePtr, m/
+ImgBmapDelete	tkImgBmap.c	/^ImgBmapDelete(masterData)$/
+ImgBmapDisplay	tkImgBmap.c	/^ImgBmapDisplay(clientData, display, drawable, imag/
+ImgBmapFree	tkImgBmap.c	/^ImgBmapFree(clientData, display)$/
+ImgBmapGet	tkImgBmap.c	/^ImgBmapGet(tkwin, masterData)$/
+ImgPhotoCmd	tkImgPhoto.c	/^ImgPhotoCmd(clientData, interp, argc, argv)$/
+ImgPhotoCmdDeletedProc	tkImgPhoto.c	/^ImgPhotoCmdDeletedProc(clientData)$/
+ImgPhotoConfigureInstance	tkImgPhoto.c	/^ImgPhotoConfigureInstance(instancePtr)$/
+ImgPhotoConfigureMaster	tkImgPhoto.c	/^ImgPhotoConfigureMaster(interp, masterPtr, argc, a/
+ImgPhotoCreate	tkImgPhoto.c	/^ImgPhotoCreate(interp, name, argc, argv, typePtr, /
+ImgPhotoDelete	tkImgPhoto.c	/^ImgPhotoDelete(masterData)$/
+ImgPhotoDisplay	tkImgPhoto.c	/^ImgPhotoDisplay(clientData, display, drawable, ima/
+ImgPhotoFree	tkImgPhoto.c	/^ImgPhotoFree(clientData, display)$/
+ImgPhotoGet	tkImgPhoto.c	/^ImgPhotoGet(tkwin, masterData)$/
+ImgPhotoInstanceSetSize	tkImgPhoto.c	/^ImgPhotoInstanceSetSize(instancePtr)$/
+ImgPhotoSetSize	tkImgPhoto.c	/^ImgPhotoSetSize(masterPtr, width, height)$/
+IncCount	tkTextBTree.c	/^IncCount(tagPtr, inc, tagInfoPtr)$/
+InitCanvas	tkCanvas.c	/^InitCanvas()$/
+InitKeymapInfo	tkBind.c	/^InitKeymapInfo(dispPtr)$/
+InitMasterData	tkGrid.c	/^InitMasterData(masterPtr)$/
+InitVirtualEventTable	tkBind.c	/^InitVirtualEventTable(vetPtr)$/
+Initialize	tkWindow.c	/^Initialize(interp)$/
+InitializeEvent	tkPointer.c	/^InitializeEvent(eventPtr, winPtr, type, x, y, stat/
+InsertChars	tkEntry.c	/^InsertChars(entryPtr, index, string)$/
+InsertEls	tkListbox.c	/^InsertEls(listPtr, index, argc, argv)$/
+InsertUndisplayProc	tkTextMark.c	/^InsertUndisplayProc(textPtr, chunkPtr)$/
+InterpreterCmd	tkConsole.c	/^InterpreterCmd(clientData, interp, argc, argv)$/
+Intersect	tk3d.c	/^Intersect(a1Ptr, a2Ptr, b1Ptr, b2Ptr, iPtr)$/
+IsValidPalette	tkImgPhoto.c	/^IsValidPalette(instancePtr, palette)$/
+KeepInWindow	tkSquare.c	/^KeepInWindow(squarePtr)$/
+LM_to_uint	tkImgGIF.c	/^#define LM_to_uint(a,b)         (((b)<<8)|(a))$/
+LWZReadByte	tkImgGIF.c	/^LWZReadByte(chan, flag, input_code_size)$/
+LayoutDLine	tkTextDisp.c	/^LayoutDLine(textPtr, indexPtr)$/
+LineCoords	tkCanvLine.c	/^LineCoords(interp, canvas, itemPtr, argc, argv)$/
+LineToArea	tkCanvLine.c	/^LineToArea(canvas, itemPtr, rectPtr)$/
+LineToPoint	tkCanvLine.c	/^LineToPoint(canvas, itemPtr, pointPtr)$/
+LineToPostscript	tkCanvLine.c	/^LineToPostscript(interp, canvas, itemPtr, prepass)/
+ListboxCmdDeletedProc	tkListbox.c	/^ListboxCmdDeletedProc(clientData)$/
+ListboxComputeGeometry	tkListbox.c	/^ListboxComputeGeometry(listPtr, fontChanged, maxIs/
+ListboxEventProc	tkListbox.c	/^ListboxEventProc(clientData, eventPtr)$/
+ListboxFetchSelection	tkListbox.c	/^ListboxFetchSelection(clientData, offset, buffer, /
+ListboxLostSelection	tkListbox.c	/^ListboxLostSelection(clientData)$/
+ListboxRedrawRange	tkListbox.c	/^ListboxRedrawRange(listPtr, first, last)$/
+ListboxScanTo	tkListbox.c	/^ListboxScanTo(listPtr, x, y)$/
+ListboxSelect	tkListbox.c	/^ListboxSelect(listPtr, first, last, select)$/
+ListboxUpdateHScrollbar	tkListbox.c	/^ListboxUpdateHScrollbar(listPtr)$/
+ListboxUpdateVScrollbar	tkListbox.c	/^ListboxUpdateVScrollbar(listPtr)$/
+ListboxWidgetCmd	tkListbox.c	/^ListboxWidgetCmd(clientData, interp, argc, argv)$/
+ListboxWorldChanged	tkListbox.c	/^ListboxWorldChanged(instanceData)$/
+LostSelection	tkSelect.c	/^LostSelection(clientData)$/
+MAX	tkGrid.c	/^#define MAX(x,y)	((x) > (y) ? (x) : (y))$/
+MIN	tkGrid.c	/^#define MIN(x,y)	((x) > (y) ? (y) : (x))$/
+MaintainCheckProc	tkGeometry.c	/^MaintainCheckProc(clientData)$/
+MaintainMasterProc	tkGeometry.c	/^MaintainMasterProc(clientData, eventPtr)$/
+MaintainSlaveProc	tkGeometry.c	/^MaintainSlaveProc(clientData, eventPtr)$/
+MapFrame	tkFrame.c	/^MapFrame(clientData)$/
+MarkCheckProc	tkTextMark.c	/^MarkCheckProc(markPtr, linePtr)$/
+MarkCleanupProc	tkTextMark.c	/^MarkCleanupProc(markPtr, linePtr)$/
+MarkDeleteProc	tkTextMark.c	/^MarkDeleteProc(segPtr, linePtr, treeGone)$/
+MarkFindNext	tkTextMark.c	/^MarkFindNext(interp, textPtr, string)$/
+MarkFindPrev	tkTextMark.c	/^MarkFindPrev(interp, textPtr, string)$/
+MarkLayoutProc	tkTextMark.c	/^MarkLayoutProc(textPtr, indexPtr, segPtr, offset, /
+MasterStructureProc	tkPlace.c	/^MasterStructureProc(clientData, eventPtr)$/
+MatchFileFormat	tkImgPhoto.c	/^MatchFileFormat(interp, chan, fileName, formatStri/
+MatchPatterns	tkBind.c	/^MatchPatterns(dispPtr, bindPtr, psPtr, bestPtr, ob/
+MatchStringFormat	tkImgPhoto.c	/^MatchStringFormat(interp, string, formatString, im/
+MeasureChars	tkTextDisp.c	/^MeasureChars(tkfont, source, maxChars, startX, max/
+MeasureUp	tkTextDisp.c	/^MeasureUp(textPtr, srcPtr, distance, dstPtr)$/
+MenuAddOrInsert	tkMenu.c	/^MenuAddOrInsert(interp, menuPtr, indexString, argc/
+MenuButtonCmdDeletedProc	tkMenubutton.c	/^MenuButtonCmdDeletedProc(clientData)$/
+MenuButtonEventProc	tkMenubutton.c	/^MenuButtonEventProc(clientData, eventPtr)$/
+MenuButtonImageProc	tkMenubutton.c	/^MenuButtonImageProc(clientData, x, y, width, heigh/
+MenuButtonTextVarProc	tkMenubutton.c	/^MenuButtonTextVarProc(clientData, interp, name1, n/
+MenuButtonWidgetCmd	tkMenubutton.c	/^MenuButtonWidgetCmd(clientData, interp, argc, argv/
+MenuCmdDeletedProc	tkMenu.c	/^MenuCmdDeletedProc(clientData)$/
+MenuDoYPosition	tkMenu.c	/^MenuDoYPosition(interp, menuPtr, arg)$/
+MenuNewEntry	tkMenu.c	/^MenuNewEntry(menuPtr, index, type)$/
+MenuVarProc	tkMenu.c	/^MenuVarProc(clientData, interp, name1, name2, flag/
+MenuWidgetCmd	tkMenu.c	/^MenuWidgetCmd(clientData, interp, argc, argv)$/
+MenuWorldChanged	tkMenu.c	/^MenuWorldChanged(instanceData)$/
+MessageCmdDeletedProc	tkMessage.c	/^MessageCmdDeletedProc(clientData)$/
+MessageEventProc	tkMessage.c	/^MessageEventProc(clientData, eventPtr)$/
+MessageTextVarProc	tkMessage.c	/^MessageTextVarProc(clientData, interp, name1, name/
+MessageWidgetCmd	tkMessage.c	/^MessageWidgetCmd(clientData, interp, argc, argv)$/
+MessageWorldChanged	tkMessage.c	/^MessageWorldChanged(instanceData)$/
+Mgetc	tkImgGIF.c	/^Mgetc(handle)$/
+MovePointer2	tkGrab.c	/^MovePointer2(sourcePtr, destPtr, mode, leaveEvents/
+Mread	tkImgGIF.c	/^Mread(dst, chunkSize, numChunks, handle)  $/
+NameWindow	tkWindow.c	/^NameWindow(interp, winPtr, parentPtr, name)$/
+NearestListboxElement	tkListbox.c	/^NearestListboxElement(listPtr, y)$/
+NewArray	tkOption.c	/^NewArray(numEls)$/
+NewChunk	tkFont.c	/^NewChunk(layoutPtrPtr, maxPtr, start, numChars, cu/
+NextBitmapWord	tkImgBmap.c	/^NextBitmapWord(parseInfoPtr)$/
+NextItem	tkCanvas.c	/^NextItem(searchPtr)$/
+NextTabStop	tkTextDisp.c	/^NextTabStop(tkfont, x, tabOrigin)$/
+OpenIM	tkWindow.c	/^OpenIM(dispPtr)$/
+OptionInit	tkOption.c	/^OptionInit(mainPtr)$/
+OvalToArea	tkRectOval.c	/^OvalToArea(canvas, itemPtr, areaPtr)$/
+OvalToPoint	tkRectOval.c	/^OvalToPoint(canvas, itemPtr, pointPtr)$/
+PackAfter	tkPack.c	/^PackAfter(interp, prevPtr, masterPtr, argc, argv)$/
+PackLostSlaveProc	tkPack.c	/^PackLostSlaveProc(clientData, tkwin)$/
+PackReqProc	tkPack.c	/^PackReqProc(clientData, tkwin)$/
+PackStructureProc	tkPack.c	/^PackStructureProc(clientData, eventPtr)$/
+ParseArrowShape	tkCanvLine.c	/^ParseArrowShape(clientData, interp, tkwin, value, /
+ParseEventDescription	tkBind.c	/^ParseEventDescription(interp, eventStringPtr, patP/
+ParseFontNameObj	tkFont.c	/^ParseFontNameObj(interp, tkwin, objPtr, faPtr)$/
+ParsePriority	tkOption.c	/^ParsePriority(interp, string)$/
+ParseSubcommandOptions	tkImgPhoto.c	/^ParseSubcommandOptions(optPtr, interp, allowedOpti/
+PickCurrentItem	tkCanvas.c	/^PickCurrentItem(canvasPtr, eventPtr)$/
+PlaceLostSlaveProc	tkPlace.c	/^PlaceLostSlaveProc(clientData, tkwin)$/
+PlaceRequestProc	tkPlace.c	/^PlaceRequestProc(clientData, tkwin)$/
+PolygonCoords	tkCanvPoly.c	/^PolygonCoords(interp, canvas, itemPtr, argc, argv)/
+PolygonToArea	tkCanvPoly.c	/^PolygonToArea(canvas, itemPtr, rectPtr)$/
+PolygonToPoint	tkCanvPoly.c	/^PolygonToPoint(canvas, itemPtr, pointPtr)$/
+PolygonToPostscript	tkCanvPoly.c	/^PolygonToPostscript(interp, canvas, itemPtr, prepa/
+PreprocessMenu	tkMacWinMenu.c	/^PreprocessMenu(menuPtr)$/
+PrintArrowShape	tkCanvLine.c	/^PrintArrowShape(clientData, tkwin, recordPtr, offs/
+PrintScrollFractions	tkCanvas.c	/^PrintScrollFractions(screen1, screen2, object1, ob/
+PrintUsage	tkArgv.c	/^PrintUsage(interp, argTable, flags)$/
+Prompt	tkMain.c	/^Prompt(interp, partial)$/
+QueueGrabWindowChange	tkGrab.c	/^QueueGrabWindowChange(dispPtr, grabWinPtr)$/
+ReadColorMap	tkImgGIF.c	/^ReadColorMap(chan, number, buffer)$/
+ReadGIFHeader	tkImgGIF.c	/^ReadGIFHeader(chan, widthPtr, heightPtr)$/
+ReadImage	tkImgGIF.c	/^ReadImage(interp, imagePtr, chan, len, rows, cmap,/
+ReadOK	tkImgGIF.c	/^#define ReadOK(file,buffer,len)	(Fread(buffer, len/
+ReadOptionFile	tkOption.c	/^ReadOptionFile(interp, tkwin, fileName, priority)$/
+ReadPPMFileHeader	tkImgPPM.c	/^ReadPPMFileHeader(chan, widthPtr, heightPtr, maxIn/
+Rebalance	tkTextBTree.c	/^Rebalance(treePtr, nodePtr)$/
+ReclaimColors	tkImgPhoto.c	/^ReclaimColors(id, numColors)$/
+RecomputeNodeCounts	tkTextBTree.c	/^RecomputeNodeCounts(nodePtr)$/
+RecomputePlacement	tkPlace.c	/^RecomputePlacement(clientData)$/
+RecomputeWidgets	tkFont.c	/^RecomputeWidgets(winPtr)$/
+RectOvalCoords	tkRectOval.c	/^RectOvalCoords(interp, canvas, itemPtr, argc, argv/
+RectOvalToPostscript	tkRectOval.c	/^RectOvalToPostscript(interp, canvas, itemPtr, prep/
+RectToArea	tkRectOval.c	/^RectToArea(canvas, itemPtr, areaPtr)$/
+RectToPoint	tkRectOval.c	/^RectToPoint(canvas, itemPtr, pointPtr)$/
+RecursivelyDeleteMenu	tkMenu.c	/^RecursivelyDeleteMenu(menuPtr)$/
+ReleaseButtonGrab	tkGrab.c	/^ReleaseButtonGrab(dispPtr)$/
+RelinkItems	tkCanvas.c	/^RelinkItems(canvasPtr, tag, prevPtr)$/
+ResolveConstraints	tkGrid.c	/^ResolveConstraints(masterPtr, slotType, maxOffset)/
+SAME_BACKGROUND	tkTextDisp.c	/^#define SAME_BACKGROUND(s1, s2) \\$/
+ScaleArc	tkCanvArc.c	/^ScaleArc(canvas, itemPtr, originX, originY, scaleX/
+ScaleBitmap	tkCanvBmap.c	/^ScaleBitmap(canvas, itemPtr, originX, originY, sca/
+ScaleCmdDeletedProc	tkScale.c	/^ScaleCmdDeletedProc(clientData)$/
+ScaleEventProc	tkScale.c	/^ScaleEventProc(clientData, eventPtr)$/
+ScaleImage	tkCanvImg.c	/^ScaleImage(canvas, itemPtr, originX, originY, scal/
+ScaleLine	tkCanvLine.c	/^ScaleLine(canvas, itemPtr, originX, originY, scale/
+ScalePolygon	tkCanvPoly.c	/^ScalePolygon(canvas, itemPtr, originX, originY, sc/
+ScaleRectOval	tkRectOval.c	/^ScaleRectOval(canvas, itemPtr, originX, originY, s/
+ScaleText	tkCanvText.c	/^ScaleText(canvas, itemPtr, originX, originY, scale/
+ScaleVarProc	tkScale.c	/^ScaleVarProc(clientData, interp, name1, name2, fla/
+ScaleWidgetCmd	tkScale.c	/^ScaleWidgetCmd(clientData, interp, argc, argv)$/
+ScaleWinItem	tkCanvWind.c	/^ScaleWinItem(canvas, itemPtr, originX, originY, sc/
+ScaleWorldChanged	tkScale.c	/^ScaleWorldChanged(instanceData)$/
+ScrollByLines	tkTextDisp.c	/^ScrollByLines(textPtr, offset)$/
+ScrollbarCmdDeletedProc	tkScrollbar.c	/^ScrollbarCmdDeletedProc(clientData)$/
+ScrollbarWidgetCmd	tkScrollbar.c	/^ScrollbarWidgetCmd(clientData, interp, argc, argv)/
+SelGetProc	tkSelect.c	/^SelGetProc(clientData, interp, portion)$/
+SetFocus	tkFocus.c	/^SetFocus(winPtr, force)$/
+SetGridSize	tkGrid.c	/^SetGridSize(masterPtr)$/
+SetTextCursor	tkCanvText.c	/^SetTextCursor(canvas, itemPtr, index)$/
+SetupStacks	tkOption.c	/^SetupStacks(winPtr, leaf)$/
+ShiftLine	tk3d.c	/^ShiftLine(p1Ptr, p2Ptr, distance, p3Ptr)$/
+SizeOfTab	tkTextDisp.c	/^SizeOfTab(textPtr, tabArrayPtr, index, x, maxX)$/
+SlaveStructureProc	tkPlace.c	/^SlaveStructureProc(clientData, eventPtr)$/
+SortTags	tkTextTag.c	/^SortTags(numTags, tagArrayPtr)$/
+SplitSeg	tkTextBTree.c	/^SplitSeg(indexPtr)$/
+SquareCmd	tkSquare.c	/^SquareCmd(clientData, interp, argc, argv)$/
+SquareCmdDeletedProc	tkSquare.c	/^SquareCmdDeletedProc(clientData)$/
+SquareConfigure	tkSquare.c	/^SquareConfigure(interp, squarePtr, argc, argv, fla/
+SquareDestroy	tkSquare.c	/^SquareDestroy(memPtr)$/
+SquareDisplay	tkSquare.c	/^SquareDisplay(clientData)$/
+SquareEventProc	tkSquare.c	/^SquareEventProc(clientData, eventPtr)$/
+SquareWidgetCmd	tkSquare.c	/^SquareWidgetCmd(clientData, interp, argc, argv)$/
+StartEnd	tkTextIndex.c	/^StartEnd(string, indexPtr)$/
+StartTagSearch	tkCanvas.c	/^StartTagSearch(canvasPtr, tag, searchPtr)$/
+StdinProc	tkMain.c	/^StdinProc(clientData, mask)$/
+StickyToString	tkGrid.c	/^StickyToString(flags, result)$/
+StringMatchGIF	tkImgGIF.c	/^StringMatchGIF(string, formatString, widthPtr, hei/
+StringReadGIF	tkImgGIF.c	/^StringReadGIF(interp,string,formatString,imageHand/
+StringToSticky	tkGrid.c	/^StringToSticky(string)$/
+TagSortProc	tkTextTag.c	/^TagSortProc(first, second)$/
+TestcbindCmd	tkTest.c	/^TestcbindCmd(clientData, interp, argc, argv)$/
+TestclipboardCmd	tkTest.c	/^TestclipboardCmd(clientData, interp, argc, argv)$/
+TestdeleteappsCmd	tkTest.c	/^TestdeleteappsCmd(clientData, interp, argc, argv)$/
+TestmakeexistCmd	tkTest.c	/^TestmakeexistCmd(clientData, interp, argc, argv)$/
+TestmenubarCmd	tkTest.c	/^TestmenubarCmd(clientData, interp, argc, argv)$/
+TestmetricsCmd	tkTest.c	/^TestmetricsCmd(clientData, interp, argc, argv)$/
+TestpropCmd	tkTest.c	/^TestpropCmd(clientData, interp, argc, argv)$/
+TestsendCmd	tkTest.c	/^TestsendCmd(clientData, interp, argc, argv)$/
+TestwrapperCmd	tkTest.c	/^TestwrapperCmd(clientData, interp, argc, argv)$/
+TextBlinkProc	tkText.c	/^TextBlinkProc(clientData)$/
+TextCmdDeletedProc	tkText.c	/^TextCmdDeletedProc(clientData)$/
+TextCoords	tkCanvText.c	/^TextCoords(interp, canvas, itemPtr, argc, argv)$/
+TextDeleteChars	tkCanvText.c	/^TextDeleteChars(canvas, itemPtr, first, last)$/
+TextDumpCmd	tkText.c	/^TextDumpCmd(textPtr, interp, argc, argv)$/
+TextEventProc	tkText.c	/^TextEventProc(clientData, eventPtr)$/
+TextFetchSelection	tkText.c	/^TextFetchSelection(clientData, offset, buffer, max/
+TextInsert	tkCanvText.c	/^TextInsert(canvas, itemPtr, beforeThis, string)$/
+TextInvalidateRegion	tkTextDisp.c	/^TextInvalidateRegion(textPtr, region)$/
+TextSearchCmd	tkText.c	/^TextSearchCmd(textPtr, interp, argc, argv)$/
+TextToArea	tkCanvText.c	/^TextToArea(canvas, itemPtr, rectPtr)$/
+TextToPoint	tkCanvText.c	/^TextToPoint(canvas, itemPtr, pointPtr)$/
+TextToPostscript	tkCanvText.c	/^TextToPostscript(interp, canvas, itemPtr, prepass)/
+TextWidgetCmd	tkText.c	/^TextWidgetCmd(clientData, interp, argc, argv)$/
+TextWorldChanged	tkText.c	/^TextWorldChanged(instanceData)$/
+TheWorldHasChanged	tkFont.c	/^TheWorldHasChanged(clientData)$/
+TkActivateMenuEntry	tkMenu.c	/^TkActivateMenuEntry(menuPtr, index)$/
+TkAlignImageData	tkImgUtil.c	/^TkAlignImageData(image, alignment, bitOrder)$/
+TkAllocWindow	tkWindow.c	/^TkAllocWindow(dispPtr, screenNum, parentPtr)$/
+TkBTreeCharTagged	tkTextBTree.c	/^TkBTreeCharTagged(indexPtr, tagPtr)$/
+TkBTreeCharsInLine	tkTextBTree.c	/^TkBTreeCharsInLine(linePtr)$/
+TkBTreeCheck	tkTextBTree.c	/^TkBTreeCheck(tree)$/
+TkBTreeCreate	tkTextBTree.c	/^TkBTreeCreate(textPtr)$/
+TkBTreeDeleteChars	tkTextBTree.c	/^TkBTreeDeleteChars(index1Ptr, index2Ptr)$/
+TkBTreeDestroy	tkTextBTree.c	/^TkBTreeDestroy(tree)$/
+TkBTreeFindLine	tkTextBTree.c	/^TkBTreeFindLine(tree, line)$/
+TkBTreeGetTags	tkTextBTree.c	/^TkBTreeGetTags(indexPtr, numTagsPtr)$/
+TkBTreeInsertChars	tkTextBTree.c	/^TkBTreeInsertChars(indexPtr, string)$/
+TkBTreeLineIndex	tkTextBTree.c	/^TkBTreeLineIndex(linePtr)$/
+TkBTreeLinkSegment	tkTextBTree.c	/^TkBTreeLinkSegment(segPtr, indexPtr)$/
+TkBTreeNextLine	tkTextBTree.c	/^TkBTreeNextLine(linePtr)$/
+TkBTreeNextTag	tkTextBTree.c	/^TkBTreeNextTag(searchPtr)$/
+TkBTreeNumLines	tkTextBTree.c	/^TkBTreeNumLines(tree)$/
+TkBTreePrevTag	tkTextBTree.c	/^TkBTreePrevTag(searchPtr)$/
+TkBTreePreviousLine	tkTextBTree.c	/^TkBTreePreviousLine(linePtr)$/
+TkBTreeStartSearch	tkTextBTree.c	/^TkBTreeStartSearch(index1Ptr, index2Ptr, tagPtr, s/
+TkBTreeStartSearchBack	tkTextBTree.c	/^TkBTreeStartSearchBack(index1Ptr, index2Ptr, tagPt/
+TkBTreeTag	tkTextBTree.c	/^TkBTreeTag(index1Ptr, index2Ptr, tagPtr, add)$/
+TkBTreeUnlinkSegment	tkTextBTree.c	/^TkBTreeUnlinkSegment(tree, segPtr, linePtr)$/
+TkBezierPoints	tkTrig.c	/^TkBezierPoints(control, numSteps, coordPtr)$/
+TkBezierScreenPoints	tkTrig.c	/^TkBezierScreenPoints(canvas, control, numSteps, xP/
+TkBindDeadWindow	tkBind.c	/^TkBindDeadWindow(winPtr)$/
+TkBindEventProc	tkCmds.c	/^TkBindEventProc(winPtr, eventPtr)$/
+TkBindFree	tkBind.c	/^TkBindFree(mainPtr)$/
+TkBindInit	tkBind.c	/^TkBindInit(mainPtr)$/
+TkButtonWorldChanged	tkButton.c	/^TkButtonWorldChanged(instanceData)$/
+TkCanvPostscriptCmd	tkCanvPs.c	/^TkCanvPostscriptCmd(canvasPtr, interp, argc, argv)/
+TkChangeEventWindow	tkGrab.c	/^TkChangeEventWindow(eventPtr, winPtr)$/
+TkClipInit	tkClipboard.c	/^TkClipInit(interp, dispPtr)$/
+TkComputeAnchor	tkUtil.c	/^TkComputeAnchor(anchor, tkwin, padX, padY, innerWi/
+TkConsoleCreate	tkConsole.c	/^TkConsoleCreate()$/
+TkConsoleInit	tkConsole.c	/^TkConsoleInit(interp)$/
+TkConsolePrint	tkConsole.c	/^TkConsolePrint(interp, devId, buffer, size)$/
+TkCopyAndGlobalEval	tkBind.c	/^TkCopyAndGlobalEval(interp, script)$/
+TkCreateBindingProcedure	tkBind.c	/^TkCreateBindingProcedure(interp, bindingTable, obj/
+TkCreateFrame	tkFrame.c	/^TkCreateFrame(clientData, interp, argc, argv, topl/
+TkCreateMainWindow	tkWindow.c	/^TkCreateMainWindow(interp, screenName, baseName)$/
+TkCreateMenuReferences	tkMenu.c	/^TkCreateMenuReferences(interp, pathName)$/
+TkCreateNamedFont	tkFont.c	/^TkCreateNamedFont(interp, tkwin, name, faPtr)$/
+TkCurrentTime	tkEvent.c	/^TkCurrentTime(dispPtr)$/
+TkDeadAppCmd	tkCmds.c	/^TkDeadAppCmd(clientData, interp, argc, argv)$/
+TkDeleteAllImages	tkImage.c	/^TkDeleteAllImages(mainPtr)$/
+TkDestroyMenu	tkMenu.c	/^TkDestroyMenu(menuPtr)$/
+TkDoConfigureNotify	tkWindow.c	/^TkDoConfigureNotify(winPtr)$/
+TkDrawInsetFocusHighlight	tkUtil.c	/^TkDrawInsetFocusHighlight(tkwin, gc, width, drawab/
+TkEventDeadWindow	tkEvent.c	/^TkEventDeadWindow(winPtr)$/
+TkEventuallyRecomputeMenu	tkMenuDraw.c	/^TkEventuallyRecomputeMenu(menuPtr)$/
+TkEventuallyRedrawMenu	tkMenuDraw.c	/^TkEventuallyRedrawMenu(menuPtr, mePtr)$/
+TkEventuallyRedrawScale	tkScale.c	/^TkEventuallyRedrawScale(scalePtr, what)$/
+TkFillPolygon	tkCanvPoly.c	/^TkFillPolygon(canvas, coordPtr, numPoints, display/
+TkFindMenuReferences	tkMenu.c	/^TkFindMenuReferences(interp, pathName)$/
+TkFindStateNum	tkUtil.c	/^TkFindStateNum(interp, field, mapPtr, strKey)$/
+TkFindStateString	tkUtil.c	/^TkFindStateString(mapPtr, numKey)$/
+TkFocusDeadWindow	tkFocus.c	/^TkFocusDeadWindow(winPtr)$/
+TkFocusFilterEvent	tkFocus.c	/^TkFocusFilterEvent(winPtr, eventPtr)$/
+TkFocusKeyEvent	tkFocus.c	/^TkFocusKeyEvent(winPtr, eventPtr)$/
+TkFontPkgFree	tkFont.c	/^TkFontPkgFree(mainPtr)$/
+TkFontPkgInit	tkFont.c	/^TkFontPkgInit(mainPtr)$/
+TkFreeBindingTags	tkCmds.c	/^TkFreeBindingTags(winPtr)$/
+TkFreeFileFilters	tkFileFilter.c	/^TkFreeFileFilters(flistPtr)$/
+TkFreeMenuReferences	tkMenu.c	/^TkFreeMenuReferences(menuRefPtr)$/
+TkGenerateActivateEvents	tkPointer.c	/^TkGenerateActivateEvents(winPtr, active)$/
+TkGetBitmapData	tkImgBmap.c	/^TkGetBitmapData(interp, string, fileName, widthPtr/
+TkGetButtPoints	tkTrig.c	/^TkGetButtPoints(p1, p2, width, project, m1, m2)$/
+TkGetDisplay	tkWindow.c	/^TkGetDisplay(display)$/
+TkGetDisplayOf	tkCmds.c	/^TkGetDisplayOf(interp, objc, objv, tkwinPtr)$/
+TkGetFileFilters	tkFileFilter.c	/^TkGetFileFilters(interp, flistPtr, string, isWindo/
+TkGetFocusWin	tkFocus.c	/^TkGetFocusWin(winPtr)$/
+TkGetMenuHashTable	tkMenu.c	/^TkGetMenuHashTable(interp)$/
+TkGetMenuIndex	tkMenu.c	/^TkGetMenuIndex(interp, menuPtr, string, lastOK, in/
+TkGetMiterPoints	tkTrig.c	/^TkGetMiterPoints(p1, p2, p3, width, m1, m2)$/
+TkGrabDeadWindow	tkGrab.c	/^TkGrabDeadWindow(winPtr)$/
+TkGrabState	tkGrab.c	/^TkGrabState(winPtr)$/
+TkInOutEvents	tkGrab.c	/^TkInOutEvents(eventPtr, sourcePtr, destPtr, leaveT/
+TkIncludePoint	tkTrig.c	/^TkIncludePoint(itemPtr, pointPtr)$/
+TkInitFileFilters	tkFileFilter.c	/^TkInitFileFilters(flistPtr)$/
+TkInitFontAttributes	tkFont.c	/^TkInitFontAttributes(faPtr)$/
+TkInstallFrameMenu	tkFrame.c	/^TkInstallFrameMenu(tkwin)$/
+TkInvokeButton	tkButton.c	/^TkInvokeButton(butPtr)$/
+TkInvokeMenu	tkMenu.c	/^TkInvokeMenu(interp, menuPtr, index)$/
+TkKeysymToString	tkBind.c	/^TkKeysymToString(keysym)$/
+TkLineToArea	tkTrig.c	/^TkLineToArea(end1Ptr, end2Ptr, rectPtr)$/
+TkLineToPoint	tkTrig.c	/^TkLineToPoint(end1Ptr, end2Ptr, pointPtr)$/
+TkMakeBezierCurve	tkTrig.c	/^TkMakeBezierCurve(canvas, pointPtr, numPoints, num/
+TkMakeBezierPostscript	tkTrig.c	/^TkMakeBezierPostscript(interp, canvas, pointPtr, n/
+TkMenuButtonWorldChanged	tkMenubutton.c	/^TkMenuButtonWorldChanged(instanceData)$/
+TkMenuConfigureDrawOptions	tkMenuDraw.c	/^TkMenuConfigureDrawOptions(menuPtr)$/
+TkMenuConfigureEntryDrawOptions	tkMenuDraw.c	/^TkMenuConfigureEntryDrawOptions(mePtr, index)$/
+TkMenuEntryFreeDrawOptions	tkMenuDraw.c	/^TkMenuEntryFreeDrawOptions(mePtr)$/
+TkMenuEventProc	tkMenuDraw.c	/^TkMenuEventProc(clientData, eventPtr)$/
+TkMenuFreeDrawOptions	tkMenuDraw.c	/^TkMenuFreeDrawOptions(menuPtr)$/
+TkMenuImageProc	tkMenuDraw.c	/^TkMenuImageProc(clientData, x, y, width, height, i/
+TkMenuInit	tkMenu.c	/^TkMenuInit()$/
+TkMenuInitializeDrawingFields	tkMenuDraw.c	/^TkMenuInitializeDrawingFields(menuPtr)$/
+TkMenuInitializeEntryDrawingFields	tkMenuDraw.c	/^TkMenuInitializeEntryDrawingFields(mePtr)$/
+TkMenuSelectImageProc	tkMenuDraw.c	/^TkMenuSelectImageProc(clientData, x, y, width, hei/
+TkNewMenuName	tkMenu.c	/^TkNewMenuName(interp, parentName, menuPtr)$/
+TkOptionClassChanged	tkOption.c	/^TkOptionClassChanged(winPtr)$/
+TkOptionDeadWindow	tkOption.c	/^TkOptionDeadWindow(winPtr)$/
+TkOvalToArea	tkTrig.c	/^TkOvalToArea(ovalPtr, rectPtr)$/
+TkOvalToPoint	tkTrig.c	/^TkOvalToPoint(ovalPtr, width, filled, pointPtr)$/
+TkParseXLFD	tkFont.c	/^TkParseXLFD(string, xaPtr)$/
+TkPointerDeadWindow	tkPointer.c	/^TkPointerDeadWindow(winPtr)$/
+TkPointerEvent	tkGrab.c	/^TkPointerEvent(eventPtr, winPtr)$/
+TkPolygonToArea	tkTrig.c	/^TkPolygonToArea(polyPtr, numPoints, rectPtr)$/
+TkPolygonToPoint	tkTrig.c	/^TkPolygonToPoint(polyPtr, numPoints, pointPtr)$/
+TkPositionInTree	tkGrab.c	/^TkPositionInTree(winPtr, treePtr)$/
+TkPostCommand	tkMenu.c	/^TkPostCommand(menuPtr)$/
+TkPostSubmenu	tkMenuDraw.c	/^TkPostSubmenu(interp, menuPtr, mePtr)$/
+TkPostTearoffMenu	tkMenuDraw.c	/^TkPostTearoffMenu(interp, menuPtr, x, y)$/
+TkPreprocessMenu	tkMacWinMenu.c	/^TkPreprocessMenu(menuPtr)$/
+TkQueueEventForAllChildren	tkEvent.c	/^TkQueueEventForAllChildren(winPtr, eventPtr)$/
+TkReadBitmapFile	tkBitmap.c	/^TkReadBitmapFile(display, d, filename, width_retur/
+TkRecomputeMenu	tkMenuDraw.c	/^TkRecomputeMenu(menuPtr)$/
+TkRoundToResolution	tkScale.c	/^TkRoundToResolution(scalePtr, value)$/
+TkScrollbarEventProc	tkScrollbar.c	/^TkScrollbarEventProc(clientData, eventPtr)$/
+TkScrollbarEventuallyRedraw	tkScrollbar.c	/^TkScrollbarEventuallyRedraw(scrollPtr)$/
+TkSelClearSelection	tkSelect.c	/^TkSelClearSelection(tkwin, eventPtr)$/
+TkSelDeadWindow	tkSelect.c	/^TkSelDeadWindow(winPtr)$/
+TkSelDefaultSelection	tkSelect.c	/^TkSelDefaultSelection(infoPtr, target, buffer, max/
+TkSelInit	tkSelect.c	/^TkSelInit(tkwin)$/
+TkSetClassProcs	tkWindow.c	/^TkSetClassProcs(tkwin, procs, instanceData)$/
+TkSetWindowMenuBar	tkMenu.c	/^TkSetWindowMenuBar(interp, tkwin, oldMenuName, men/
+TkStringToKeysym	tkBind.c	/^TkStringToKeysym(name)$/
+TkTextBindProc	tkTextTag.c	/^TkTextBindProc(clientData, eventPtr)$/
+TkTextChanged	tkTextDisp.c	/^TkTextChanged(textPtr, index1Ptr, index2Ptr)$/
+TkTextCharBbox	tkTextDisp.c	/^TkTextCharBbox(textPtr, indexPtr, xPtr, yPtr, widt/
+TkTextCharLayoutProc	tkTextDisp.c	/^TkTextCharLayoutProc(textPtr, indexPtr, segPtr, of/
+TkTextCreateDInfo	tkTextDisp.c	/^TkTextCreateDInfo(textPtr)$/
+TkTextCreateTag	tkTextTag.c	/^TkTextCreateTag(textPtr, tagName)$/
+TkTextDLineInfo	tkTextDisp.c	/^TkTextDLineInfo(textPtr, indexPtr, xPtr, yPtr, wid/
+TkTextEventuallyRepick	tkTextDisp.c	/^TkTextEventuallyRepick(textPtr)$/
+TkTextFreeDInfo	tkTextDisp.c	/^TkTextFreeDInfo(textPtr)$/
+TkTextFreeTag	tkTextTag.c	/^TkTextFreeTag(textPtr, tagPtr)$/
+TkTextGetIndex	tkTextIndex.c	/^TkTextGetIndex(interp, textPtr, string, indexPtr)$/
+TkTextGetTabs	tkText.c	/^TkTextGetTabs(interp, tkwin, string)$/
+TkTextImageCmd	tkTextImage.c	/^TkTextImageCmd(textPtr, interp, argc, argv)$/
+TkTextImageIndex	tkTextImage.c	/^TkTextImageIndex(textPtr, name, indexPtr)$/
+TkTextIndexBackChars	tkTextIndex.c	/^TkTextIndexBackChars(srcPtr, count, dstPtr)$/
+TkTextIndexCmp	tkTextIndex.c	/^TkTextIndexCmp(index1Ptr, index2Ptr)$/
+TkTextIndexForwChars	tkTextIndex.c	/^TkTextIndexForwChars(srcPtr, count, dstPtr)$/
+TkTextIndexToSeg	tkTextIndex.c	/^TkTextIndexToSeg(indexPtr, offsetPtr)$/
+TkTextInsertDisplayProc	tkTextMark.c	/^TkTextInsertDisplayProc(chunkPtr, x, y, height, ba/
+TkTextLostSelection	tkText.c	/^TkTextLostSelection(clientData)$/
+TkTextMakeIndex	tkTextIndex.c	/^TkTextMakeIndex(tree, lineIndex, charIndex, indexP/
+TkTextMarkCmd	tkTextMark.c	/^TkTextMarkCmd(textPtr, interp, argc, argv)$/
+TkTextMarkNameToIndex	tkTextMark.c	/^TkTextMarkNameToIndex(textPtr, name, indexPtr)$/
+TkTextMarkSegToIndex	tkTextMark.c	/^TkTextMarkSegToIndex(textPtr, markPtr, indexPtr)$/
+TkTextPickCurrent	tkTextTag.c	/^TkTextPickCurrent(textPtr, eventPtr)$/
+TkTextPixelIndex	tkTextDisp.c	/^TkTextPixelIndex(textPtr, x, y, indexPtr)$/
+TkTextPrintIndex	tkTextIndex.c	/^TkTextPrintIndex(indexPtr, string)$/
+TkTextRedrawRegion	tkTextDisp.c	/^TkTextRedrawRegion(textPtr, x, y, width, height)$/
+TkTextRedrawTag	tkTextDisp.c	/^TkTextRedrawTag(textPtr, index1Ptr, index2Ptr, tag/
+TkTextRelayoutWindow	tkTextDisp.c	/^TkTextRelayoutWindow(textPtr)$/
+TkTextScanCmd	tkTextDisp.c	/^TkTextScanCmd(textPtr, interp, argc, argv)$/
+TkTextSeeCmd	tkTextDisp.c	/^TkTextSeeCmd(textPtr, interp, argc, argv)$/
+TkTextSegToOffset	tkTextIndex.c	/^TkTextSegToOffset(segPtr, linePtr)$/
+TkTextSetMark	tkTextMark.c	/^TkTextSetMark(textPtr, name, indexPtr)$/
+TkTextSetYView	tkTextDisp.c	/^TkTextSetYView(textPtr, indexPtr, pickPlace)$/
+TkTextTagCmd	tkTextTag.c	/^TkTextTagCmd(textPtr, interp, argc, argv)$/
+TkTextWindowCmd	tkTextWind.c	/^TkTextWindowCmd(textPtr, interp, argc, argv)$/
+TkTextWindowIndex	tkTextWind.c	/^TkTextWindowIndex(textPtr, name, indexPtr)$/
+TkTextXviewCmd	tkTextDisp.c	/^TkTextXviewCmd(textPtr, interp, argc, argv)$/
+TkTextYviewCmd	tkTextDisp.c	/^TkTextYviewCmd(textPtr, interp, argc, argv)$/
+TkThickPolyLineToArea	tkTrig.c	/^TkThickPolyLineToArea(coordPtr, numPoints, width, /
+Tk_3DBorderColor	tk3d.c	/^Tk_3DBorderColor(border)$/
+Tk_3DBorderGC	tk3d.c	/^Tk_3DBorderGC(tkwin, border, which)$/
+Tk_AddOption	tkOption.c	/^Tk_AddOption(tkwin, name, value, priority)$/
+Tk_BellObjCmd	tkCmds.c	/^Tk_BellObjCmd(clientData, interp, objc, objv)$/
+Tk_BindCmd	tkCmds.c	/^Tk_BindCmd(clientData, interp, argc, argv)$/
+Tk_BindEvent	tkBind.c	/^Tk_BindEvent(bindingTable, eventPtr, tkwin, numObj/
+Tk_BindtagsCmd	tkCmds.c	/^Tk_BindtagsCmd(clientData, interp, argc, argv)$/
+Tk_ButtonCmd	tkButton.c	/^Tk_ButtonCmd(clientData, interp, argc, argv)$/
+Tk_CanvasCmd	tkCanvas.c	/^Tk_CanvasCmd(clientData, interp, argc, argv)$/
+Tk_CanvasDrawableCoords	tkCanvUtil.c	/^Tk_CanvasDrawableCoords(canvas, x, y, drawableXPtr/
+Tk_CanvasEventuallyRedraw	tkCanvas.c	/^Tk_CanvasEventuallyRedraw(canvas, x1, y1, x2, y2)$/
+Tk_CanvasGetCoord	tkCanvUtil.c	/^Tk_CanvasGetCoord(interp, canvas, string, doublePt/
+Tk_CanvasGetTextInfo	tkCanvUtil.c	/^Tk_CanvasGetTextInfo(canvas)$/
+Tk_CanvasPsBitmap	tkCanvPs.c	/^Tk_CanvasPsBitmap(interp, canvas, bitmap, startX, /
+Tk_CanvasPsColor	tkCanvPs.c	/^Tk_CanvasPsColor(interp, canvas, colorPtr)$/
+Tk_CanvasPsFont	tkCanvPs.c	/^Tk_CanvasPsFont(interp, canvas, tkfont)$/
+Tk_CanvasPsPath	tkCanvPs.c	/^Tk_CanvasPsPath(interp, canvas, coordPtr, numPoint/
+Tk_CanvasPsStipple	tkCanvPs.c	/^Tk_CanvasPsStipple(interp, canvas, bitmap)$/
+Tk_CanvasPsY	tkCanvPs.c	/^Tk_CanvasPsY(canvas, y)$/
+Tk_CanvasSetStippleOrigin	tkCanvUtil.c	/^Tk_CanvasSetStippleOrigin(canvas, gc)$/
+Tk_CanvasTagsParseProc	tkCanvUtil.c	/^Tk_CanvasTagsParseProc(clientData, interp, tkwin, /
+Tk_CanvasTagsPrintProc	tkCanvUtil.c	/^Tk_CanvasTagsPrintProc(clientData, tkwin, widgRec,/
+Tk_CanvasTkwin	tkCanvUtil.c	/^Tk_CanvasTkwin(canvas)$/
+Tk_CanvasWindowCoords	tkCanvUtil.c	/^Tk_CanvasWindowCoords(canvas, x, y, screenXPtr, sc/
+Tk_ChangeWindowAttributes	tkWindow.c	/^Tk_ChangeWindowAttributes(tkwin, valueMask, attsPt/
+Tk_CharBbox	tkFont.c	/^Tk_CharBbox(layout, index, xPtr, yPtr, widthPtr, h/
+Tk_CheckbuttonCmd	tkButton.c	/^Tk_CheckbuttonCmd(clientData, interp, argc, argv)$/
+Tk_ClearSelection	tkSelect.c	/^Tk_ClearSelection(tkwin, selection)$/
+Tk_ClipboardAppend	tkClipboard.c	/^Tk_ClipboardAppend(interp, tkwin, type, format, bu/
+Tk_ClipboardClear	tkClipboard.c	/^Tk_ClipboardClear(interp, tkwin)$/
+Tk_ClipboardCmd	tkClipboard.c	/^Tk_ClipboardCmd(clientData, interp, argc, argv)$/
+Tk_ComputeTextLayout	tkFont.c	/^Tk_ComputeTextLayout(tkfont, string, numChars, wra/
+Tk_ComputeTextLayoutExt	tkFont.c	/^Tk_ComputeTextLayoutExt(textLayout, tkfont, string/
+Tk_ConfigureInfo	tkConfig.c	/^Tk_ConfigureInfo(interp, tkwin, specs, widgRec, ar/
+Tk_ConfigureValue	tkConfig.c	/^Tk_ConfigureValue(interp, tkwin, specs, widgRec, a/
+Tk_ConfigureWidget	tkConfig.c	/^Tk_ConfigureWidget(interp, tkwin, specs, argc, arg/
+Tk_ConfigureWindow	tkWindow.c	/^Tk_ConfigureWindow(tkwin, valueMask, valuePtr)$/
+Tk_CreateBinding	tkBind.c	/^Tk_CreateBinding(interp, bindingTable, object, eve/
+Tk_CreateBindingTable	tkBind.c	/^Tk_CreateBindingTable(interp)$/
+Tk_CreateErrorHandler	tkError.c	/^Tk_CreateErrorHandler(display, error, request, min/
+Tk_CreateEventHandler	tkEvent.c	/^Tk_CreateEventHandler(token, mask, proc, clientDat/
+Tk_CreateGenericHandler	tkEvent.c	/^Tk_CreateGenericHandler(proc, clientData)$/
+Tk_CreateImageType	tkImage.c	/^Tk_CreateImageType(typePtr)$/
+Tk_CreateItemType	tkCanvas.c	/^Tk_CreateItemType(typePtr)$/
+Tk_CreatePhotoImageFormat	tkImgPhoto.c	/^Tk_CreatePhotoImageFormat(formatPtr)$/
+Tk_CreateSelHandler	tkSelect.c	/^Tk_CreateSelHandler(tkwin, selection, target, proc/
+Tk_CreateWindow	tkWindow.c	/^Tk_CreateWindow(interp, parent, name, screenName)$/
+Tk_CreateWindowFromPath	tkWindow.c	/^Tk_CreateWindowFromPath(interp, tkwin, pathName, s/
+Tk_DefineBitmap	tkBitmap.c	/^Tk_DefineBitmap(interp, name, source, width, heigh/
+Tk_DefineCursor	tkWindow.c	/^Tk_DefineCursor(tkwin, cursor)$/
+Tk_DeleteAllBindings	tkBind.c	/^Tk_DeleteAllBindings(bindingTable, object)$/
+Tk_DeleteBinding	tkBind.c	/^Tk_DeleteBinding(interp, bindingTable, object, eve/
+Tk_DeleteBindingTable	tkBind.c	/^Tk_DeleteBindingTable(bindingTable)$/
+Tk_DeleteErrorHandler	tkError.c	/^Tk_DeleteErrorHandler(handler)$/
+Tk_DeleteEventHandler	tkEvent.c	/^Tk_DeleteEventHandler(token, mask, proc, clientDat/
+Tk_DeleteGenericHandler	tkEvent.c	/^Tk_DeleteGenericHandler(proc, clientData)$/
+Tk_DeleteImage	tkImage.c	/^Tk_DeleteImage(interp, name)$/
+Tk_DeleteSelHandler	tkSelect.c	/^Tk_DeleteSelHandler(tkwin, selection, target)$/
+Tk_DestroyCmd	tkCmds.c	/^Tk_DestroyCmd(clientData, interp, argc, argv)$/
+Tk_DestroyWindow	tkWindow.c	/^Tk_DestroyWindow(tkwin)$/
+Tk_DisplayName	tkWindow.c	/^Tk_DisplayName(tkwin)$/
+Tk_DistanceToTextLayout	tkFont.c	/^Tk_DistanceToTextLayout(layout, x, y)$/
+Tk_Draw3DPolygon	tk3d.c	/^Tk_Draw3DPolygon(tkwin, drawable, border, pointPtr/
+Tk_Draw3DRectangle	tk3d.c	/^Tk_Draw3DRectangle(tkwin, drawable, border, x, y, /
+Tk_DrawFocusHighlight	tkUtil.c	/^Tk_DrawFocusHighlight(tkwin, gc, width, drawable)$/
+Tk_DrawTextLayout	tkFont.c	/^Tk_DrawTextLayout(display, drawable, gc, layout, x/
+Tk_EntryCmd	tkEntry.c	/^Tk_EntryCmd(clientData, interp, argc, argv)$/
+Tk_EventCmd	tkBind.c	/^Tk_EventCmd(clientData, interp, argc, argv)$/
+Tk_Fill3DPolygon	tk3d.c	/^Tk_Fill3DPolygon(tkwin, drawable, border, pointPtr/
+Tk_Fill3DRectangle	tk3d.c	/^Tk_Fill3DRectangle(tkwin, drawable, border, x, y, /
+Tk_FindPhoto	tkImgPhoto.c	/^Tk_FindPhoto(interp, imageName)$/
+Tk_FocusCmd	tkFocus.c	/^Tk_FocusCmd(clientData, interp, argc, argv)$/
+Tk_FontId	tkFont.c	/^Tk_FontId(tkfont)$/
+Tk_FontObjCmd	tkFont.c	/^Tk_FontObjCmd(clientData, interp, objc, objv)$/
+Tk_FrameCmd	tkFrame.c	/^Tk_FrameCmd(clientData, interp, argc, argv)$/
+Tk_Free3DBorder	tk3d.c	/^Tk_Free3DBorder(border)$/
+Tk_FreeBitmap	tkBitmap.c	/^Tk_FreeBitmap(display, bitmap)$/
+Tk_FreeColor	tkColor.c	/^Tk_FreeColor(colorPtr)$/
+Tk_FreeColormap	tkVisual.c	/^Tk_FreeColormap(display, colormap)$/
+Tk_FreeCursor	tkCursor.c	/^Tk_FreeCursor(display, cursor)$/
+Tk_FreeFont	tkFont.c	/^Tk_FreeFont(tkfont)$/
+Tk_FreeGC	tkGC.c	/^Tk_FreeGC(display, gc)$/
+Tk_FreeImage	tkImage.c	/^Tk_FreeImage(image)$/
+Tk_FreeOptions	tkConfig.c	/^Tk_FreeOptions(specs, widgRec, display, needFlags)/
+Tk_FreeTextLayout	tkFont.c	/^Tk_FreeTextLayout(textLayout)$/
+Tk_GCForColor	tkColor.c	/^Tk_GCForColor(colorPtr, drawable)$/
+Tk_GeometryRequest	tkGeometry.c	/^Tk_GeometryRequest(tkwin, reqWidth, reqHeight)$/
+Tk_Get3DBorder	tk3d.c	/^Tk_Get3DBorder(interp, tkwin, colorName)$/
+Tk_GetAllBindings	tkBind.c	/^Tk_GetAllBindings(interp, bindingTable, object)$/
+Tk_GetAnchor	tkGet.c	/^Tk_GetAnchor(interp, string, anchorPtr)$/
+Tk_GetAtomName	tkAtom.c	/^Tk_GetAtomName(tkwin, atom)$/
+Tk_GetBinding	tkBind.c	/^Tk_GetBinding(interp, bindingTable, object, eventS/
+Tk_GetBitmap	tkBitmap.c	/^Tk_GetBitmap(interp, tkwin, string)$/
+Tk_GetBitmapFromData	tkBitmap.c	/^Tk_GetBitmapFromData(interp, tkwin, source, width,/
+Tk_GetCapStyle	tkGet.c	/^Tk_GetCapStyle(interp, string, capPtr)$/
+Tk_GetColor	tkColor.c	/^Tk_GetColor(interp, tkwin, name)$/
+Tk_GetColorByValue	tkColor.c	/^Tk_GetColorByValue(tkwin, colorPtr)$/
+Tk_GetColormap	tkVisual.c	/^Tk_GetColormap(interp, tkwin, string)$/
+Tk_GetCursor	tkCursor.c	/^Tk_GetCursor(interp, tkwin, string)$/
+Tk_GetCursorFromData	tkCursor.c	/^Tk_GetCursorFromData(interp, tkwin, source, mask, /
+Tk_GetFont	tkFont.c	/^Tk_GetFont(interp, tkwin, string)$/
+Tk_GetFontFromObj	tkFont.c	/^Tk_GetFontFromObj(interp, tkwin, objPtr)$/
+Tk_GetFontMetrics	tkFont.c	/^Tk_GetFontMetrics(tkfont, fmPtr)$/
+Tk_GetGC	tkGC.c	/^Tk_GetGC(tkwin, valueMask, valuePtr)$/
+Tk_GetImage	tkImage.c	/^Tk_GetImage(interp, tkwin, name, changeProc, clien/
+Tk_GetImageMasterData	tkImage.c	/^Tk_GetImageMasterData(interp, name, typePtrPtr)$/
+Tk_GetItemTypes	tkCanvas.c	/^Tk_GetItemTypes()$/
+Tk_GetJoinStyle	tkGet.c	/^Tk_GetJoinStyle(interp, string, joinPtr)$/
+Tk_GetJustify	tkGet.c	/^Tk_GetJustify(interp, string, justifyPtr)$/
+Tk_GetNumMainWindows	tkWindow.c	/^Tk_GetNumMainWindows()$/
+Tk_GetOption	tkOption.c	/^Tk_GetOption(tkwin, name, className)$/
+Tk_GetPixels	tkGet.c	/^Tk_GetPixels(interp, tkwin, string, intPtr)$/
+Tk_GetRelief	tk3d.c	/^Tk_GetRelief(interp, name, reliefPtr)$/
+Tk_GetScreenMM	tkGet.c	/^Tk_GetScreenMM(interp, tkwin, string, doublePtr)$/
+Tk_GetScrollInfo	tkUtil.c	/^Tk_GetScrollInfo(interp, argc, argv, dblPtr, intPt/
+Tk_GetSelection	tkSelect.c	/^Tk_GetSelection(interp, tkwin, selection, target, /
+Tk_GetUid	tkGet.c	/^Tk_GetUid(string)$/
+Tk_GetVisual	tkVisual.c	/^Tk_GetVisual(interp, tkwin, string, depthPtr, colo/
+Tk_Grab	tkGrab.c	/^Tk_Grab(interp, tkwin, grabGlobal)$/
+Tk_GrabCmd	tkGrab.c	/^Tk_GrabCmd(clientData, interp, argc, argv)$/
+Tk_GridCmd	tkGrid.c	/^Tk_GridCmd(clientData, interp, argc, argv)$/
+Tk_HandleEvent	tkEvent.c	/^Tk_HandleEvent(eventPtr)$/
+Tk_IdToWindow	tkWindow.c	/^Tk_IdToWindow(display, window)$/
+Tk_ImageChanged	tkImage.c	/^Tk_ImageChanged(imageMaster, x, y, width, height, /
+Tk_ImageCmd	tkImage.c	/^Tk_ImageCmd(clientData, interp, argc, argv)$/
+Tk_Init	tkWindow.c	/^Tk_Init(interp)$/
+Tk_InternAtom	tkAtom.c	/^Tk_InternAtom(tkwin, name)$/
+Tk_IntersectTextLayout	tkFont.c	/^Tk_IntersectTextLayout(layout, x, y, width, height/
+Tk_LabelCmd	tkButton.c	/^Tk_LabelCmd(clientData, interp, argc, argv)$/
+Tk_ListboxCmd	tkListbox.c	/^Tk_ListboxCmd(clientData, interp, argc, argv)$/
+Tk_LowerCmd	tkCmds.c	/^Tk_LowerCmd(clientData, interp, argc, argv)$/
+Tk_Main	tkMain.c	/^Tk_Main(argc, argv, appInitProc)$/
+Tk_MainLoop	tkEvent.c	/^Tk_MainLoop()$/
+Tk_MainWindow	tkWindow.c	/^Tk_MainWindow(interp)$/
+Tk_MaintainGeometry	tkGeometry.c	/^Tk_MaintainGeometry(slave, master, x, y, width, he/
+Tk_MakeWindowExist	tkWindow.c	/^Tk_MakeWindowExist(tkwin)$/
+Tk_ManageGeometry	tkGeometry.c	/^Tk_ManageGeometry(tkwin, mgrPtr, clientData)$/
+Tk_MapWindow	tkWindow.c	/^Tk_MapWindow(tkwin)$/
+Tk_MenuCmd	tkMenu.c	/^Tk_MenuCmd(clientData, interp, argc, argv)$/
+Tk_MenubuttonCmd	tkMenubutton.c	/^Tk_MenubuttonCmd(clientData, interp, argc, argv)$/
+Tk_MessageCmd	tkMessage.c	/^Tk_MessageCmd(clientData, interp, argc, argv)$/
+Tk_MoveResizeWindow	tkWindow.c	/^Tk_MoveResizeWindow(tkwin, x, y, width, height)$/
+Tk_MoveWindow	tkWindow.c	/^Tk_MoveWindow(tkwin, x, y)$/
+Tk_NameOf3DBorder	tk3d.c	/^Tk_NameOf3DBorder(border)$/
+Tk_NameOfAnchor	tkGet.c	/^Tk_NameOfAnchor(anchor)$/
+Tk_NameOfBitmap	tkBitmap.c	/^Tk_NameOfBitmap(display, bitmap)$/
+Tk_NameOfCapStyle	tkGet.c	/^Tk_NameOfCapStyle(cap)$/
+Tk_NameOfColor	tkColor.c	/^Tk_NameOfColor(colorPtr)$/
+Tk_NameOfCursor	tkCursor.c	/^Tk_NameOfCursor(display, cursor)$/
+Tk_NameOfFont	tkFont.c	/^Tk_NameOfFont(tkfont)$/
+Tk_NameOfImage	tkImage.c	/^Tk_NameOfImage(imageMaster)$/
+Tk_NameOfJoinStyle	tkGet.c	/^Tk_NameOfJoinStyle(join)$/
+Tk_NameOfJustify	tkGet.c	/^Tk_NameOfJustify(justify)$/
+Tk_NameOfRelief	tk3d.c	/^Tk_NameOfRelief(relief)$/
+Tk_NameToWindow	tkWindow.c	/^Tk_NameToWindow(interp, pathName, tkwin)$/
+Tk_NormalizeBox	tkCanvText.c	/^void Tk_NormalizeBox(int *px1,int *py1,int *px2,in/
+Tk_OptionCmd	tkOption.c	/^Tk_OptionCmd(clientData, interp, argc, argv)$/
+Tk_OwnSelection	tkSelect.c	/^Tk_OwnSelection(tkwin, selection, proc, clientData/
+Tk_PackCmd	tkPack.c	/^Tk_PackCmd(clientData, interp, argc, argv)$/
+Tk_ParseArgv	tkArgv.c	/^Tk_ParseArgv(interp, tkwin, argcPtr, argv, argTabl/
+Tk_PhotoBlank	tkImgPhoto.c	/^Tk_PhotoBlank(handle)$/
+Tk_PhotoExpand	tkImgPhoto.c	/^Tk_PhotoExpand(handle, width, height)$/
+Tk_PhotoGetImage	tkImgPhoto.c	/^Tk_PhotoGetImage(handle, blockPtr)$/
+Tk_PhotoGetSize	tkImgPhoto.c	/^Tk_PhotoGetSize(handle, widthPtr, heightPtr)$/
+Tk_PhotoPutBlock	tkImgPhoto.c	/^Tk_PhotoPutBlock(handle, blockPtr, x, y, width, he/
+Tk_PhotoPutZoomedBlock	tkImgPhoto.c	/^Tk_PhotoPutZoomedBlock(handle, blockPtr, x, y, wid/
+Tk_PhotoSetSize	tkImgPhoto.c	/^Tk_PhotoSetSize(handle, width, height)$/
+Tk_PlaceCmd	tkPlace.c	/^Tk_PlaceCmd(clientData, interp, argc, argv)$/
+Tk_PointToChar	tkFont.c	/^Tk_PointToChar(layout, x, y)$/
+Tk_PostscriptFontName	tkFont.c	/^Tk_PostscriptFontName(tkfont, dsPtr)$/
+Tk_PreserveColormap	tkVisual.c	/^Tk_PreserveColormap(display, colormap)$/
+Tk_QueueWindowEvent	tkEvent.c	/^Tk_QueueWindowEvent(eventPtr, position)$/
+Tk_RadiobuttonCmd	tkButton.c	/^Tk_RadiobuttonCmd(clientData, interp, argc, argv)$/
+Tk_RaiseCmd	tkCmds.c	/^Tk_RaiseCmd(clientData, interp, argc, argv)$/
+Tk_RedrawImage	tkImage.c	/^Tk_RedrawImage(image, imageX, imageY, width, heigh/
+Tk_ResizeWindow	tkWindow.c	/^Tk_ResizeWindow(tkwin, width, height)$/
+Tk_RestackWindow	tkWindow.c	/^Tk_RestackWindow(tkwin, aboveBelow, other)$/
+Tk_RestrictEvents	tkEvent.c	/^Tk_RestrictEvents(proc, arg, prevArgPtr)$/
+Tk_RotTextXY	tkCanvText.c	/^void Tk_RotTextXY(int x0,int y0,int rot,int *px, i/
+Tk_SafeInit	tkWindow.c	/^Tk_SafeInit(interp)$/
+Tk_ScaleCmd	tkScale.c	/^Tk_ScaleCmd(clientData, interp, argc, argv)$/
+Tk_ScrollbarCmd	tkScrollbar.c	/^Tk_ScrollbarCmd(clientData, interp, argc, argv)$/
+Tk_SelectionCmd	tkSelect.c	/^Tk_SelectionCmd(clientData, interp, argc, argv)$/
+Tk_SetBackgroundFromBorder	tk3d.c	/^Tk_SetBackgroundFromBorder(tkwin, border)$/
+Tk_SetClass	tkWindow.c	/^Tk_SetClass(tkwin, className)$/
+Tk_SetInternalBorder	tkGeometry.c	/^Tk_SetInternalBorder(tkwin, width)$/
+Tk_SetWindowBackground	tkWindow.c	/^Tk_SetWindowBackground(tkwin, pixel)$/
+Tk_SetWindowBackgroundPixmap	tkWindow.c	/^Tk_SetWindowBackgroundPixmap(tkwin, pixmap)$/
+Tk_SetWindowBorder	tkWindow.c	/^Tk_SetWindowBorder(tkwin, pixel)$/
+Tk_SetWindowBorderPixmap	tkWindow.c	/^Tk_SetWindowBorderPixmap(tkwin, pixmap)$/
+Tk_SetWindowBorderWidth	tkWindow.c	/^Tk_SetWindowBorderWidth(tkwin, width)$/
+Tk_SetWindowColormap	tkWindow.c	/^Tk_SetWindowColormap(tkwin, colormap)$/
+Tk_SetWindowVisual	tkWindow.c	/^Tk_SetWindowVisual(tkwin, visual, depth, colormap)/
+Tk_SizeOfBitmap	tkBitmap.c	/^Tk_SizeOfBitmap(display, bitmap, widthPtr, heightP/
+Tk_SizeOfImage	tkImage.c	/^Tk_SizeOfImage(image, widthPtr, heightPtr)$/
+Tk_StrictMotif	tkWindow.c	/^Tk_StrictMotif(tkwin)$/
+Tk_TextCmd	tkText.c	/^Tk_TextCmd(clientData, interp, argc, argv)$/
+Tk_TextLayoutToPostscript	tkFont.c	/^Tk_TextLayoutToPostscript(interp, layout)$/
+Tk_TextWidth	tkFont.c	/^Tk_TextWidth(tkfont, string, numChars)$/
+Tk_TkObjCmd	tkCmds.c	/^Tk_TkObjCmd(clientData, interp, objc, objv)$/
+Tk_TkwaitCmd	tkCmds.c	/^Tk_TkwaitCmd(clientData, interp, argc, argv)$/
+Tk_ToplevelCmd	tkFrame.c	/^Tk_ToplevelCmd(clientData, interp, argc, argv)$/
+Tk_UndefineCursor	tkWindow.c	/^Tk_UndefineCursor(tkwin)$/
+Tk_UnderlineChars	tkFont.c	/^Tk_UnderlineChars(display, drawable, gc, tkfont, s/
+Tk_UnderlineTextLayout	tkFont.c	/^Tk_UnderlineTextLayout(display, drawable, gc, layo/
+Tk_Ungrab	tkGrab.c	/^Tk_Ungrab(tkwin)$/
+Tk_UnmaintainGeometry	tkGeometry.c	/^Tk_UnmaintainGeometry(slave, master)$/
+Tk_UnmapWindow	tkWindow.c	/^Tk_UnmapWindow(tkwin)$/
+Tk_UpdateCmd	tkCmds.c	/^Tk_UpdateCmd(clientData, interp, argc, argv)$/
+Tk_UpdatePointer	tkPointer.c	/^Tk_UpdatePointer(tkwin, x, y, state)$/
+Tk_WinfoObjCmd	tkCmds.c	/^Tk_WinfoObjCmd(clientData, interp, objc, objv)$/
+TkplatformtestInit	tkTest.c	/^#define TkplatformtestInit(x) TCL_OK$/
+Tktest_Init	tkTest.c	/^Tktest_Init(interp)$/
+ToggleCheckProc	tkTextBTree.c	/^ToggleCheckProc(segPtr, linePtr)$/
+ToggleCleanupProc	tkTextBTree.c	/^ToggleCleanupProc(segPtr, linePtr)$/
+ToggleDeleteProc	tkTextBTree.c	/^ToggleDeleteProc(segPtr, linePtr, treeGone)$/
+ToggleLineChangeProc	tkTextBTree.c	/^ToggleLineChangeProc(segPtr, linePtr)$/
+TranslateArc	tkCanvArc.c	/^TranslateArc(canvas, itemPtr, deltaX, deltaY)$/
+TranslateBitmap	tkCanvBmap.c	/^TranslateBitmap(canvas, itemPtr, deltaX, deltaY)$/
+TranslateImage	tkCanvImg.c	/^TranslateImage(canvas, itemPtr, deltaX, deltaY)$/
+TranslateLine	tkCanvLine.c	/^TranslateLine(canvas, itemPtr, deltaX, deltaY)$/
+TranslatePolygon	tkCanvPoly.c	/^TranslatePolygon(canvas, itemPtr, deltaX, deltaY)$/
+TranslateRectOval	tkRectOval.c	/^TranslateRectOval(canvas, itemPtr, deltaX, deltaY)/
+TranslateText	tkCanvText.c	/^TranslateText(canvas, itemPtr, deltaX, deltaY)$/
+TranslateWinItem	tkCanvWind.c	/^TranslateWinItem(canvas, itemPtr, deltaX, deltaY)$/
+UnRotate	tkFont.c	/^static void UnRotate(int rotate, int *px, int *py)/
+UnhookCascadeEntry	tkMenu.c	/^UnhookCascadeEntry(mePtr)$/
+Unlink	tkGrid.c	/^Unlink(slavePtr)$/
+UnlinkSlave	tkPlace.c	/^UnlinkSlave(slavePtr)$/
+UnlinkWindow	tkWindow.c	/^UnlinkWindow(winPtr)$/
+UpdateCursor	tkPointer.c	/^UpdateCursor(winPtr)$/
+UpdateDependantFonts	tkFont.c	/^UpdateDependantFonts(fiPtr, tkwin, namedHashPtr)$/
+UpdateDisplayInfo	tkTextDisp.c	/^UpdateDisplayInfo(textPtr)$/
+VertLineToArc	tkCanvArc.c	/^VertLineToArc(x, y1, y2, rx, ry, start, extent)$/
+WaitVariableProc	tkCmds.c	/^WaitVariableProc(clientData, interp, name1, name2,/
+WaitVisibilityProc	tkCmds.c	/^WaitVisibilityProc(clientData, eventPtr)$/
+WaitWindowProc	tkCmds.c	/^WaitWindowProc(clientData, eventPtr)$/
+WinItemCoords	tkCanvWind.c	/^WinItemCoords(interp, canvas, itemPtr, argc, argv)/
+WinItemLostSlaveProc	tkCanvWind.c	/^WinItemLostSlaveProc(clientData, tkwin)$/
+WinItemRequestProc	tkCanvWind.c	/^WinItemRequestProc(clientData, tkwin)$/
+WinItemStructureProc	tkCanvWind.c	/^WinItemStructureProc(clientData, eventPtr)$/
+WinItemToArea	tkCanvWind.c	/^WinItemToArea(canvas, itemPtr, rectPtr)$/
+WinItemToPoint	tkCanvWind.c	/^WinItemToPoint(canvas, itemPtr, pointPtr)$/
+WindowEventProc	tkEvent.c	/^WindowEventProc(evPtr, flags)$/
+XDefineCursor	tkPointer.c	/^XDefineCursor(display, w, cursor)$/
+XExpansion	tkPack.c	/^XExpansion(slavePtr, cavityWidth)$/
+XGrabPointer	tkPointer.c	/^XGrabPointer(display, grab_window, owner_events, e/
+XUngrabPointer	tkPointer.c	/^XUngrabPointer(display, time)$/
+YExpansion	tkPack.c	/^YExpansion(slavePtr, cavityHeight)$/
+char64	tkImgGIF.c	/^char64(c)$/
+mInit	tkImgGIF.c	/^mInit(string, handle)$/

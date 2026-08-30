@@ -1,0 +1,473 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 22:41:50">
+<title>The Layout Generator and MAX-LS</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout System User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="MAX_ManualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="MAX_Man_Ch4WireTool.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="MAX_Man_Ch6TechFiles.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="MAX_ManualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 5 </font>
+</h2>
+
+
+<h1>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The Layout Generator and MAX-LS</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1026718"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction To The MAX Layout Generator</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032300"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Layout Generator converts a schematic to a layout containing fets, with flylines to indicate connectivity. The fets are laid out in two rows with p-fets on the top and the n-fets on the bottom, and are optionally connected to power and ground rails. Additional optional features include contact sharing, folding of fets larger than a specified minimum, and pre-wiring of connections that can be wired outside of the center wiring channel.</font>
+<p>
+<p>
+  <dt> <a name="1032303"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The schematic to be converted may be hierarchical, but all hierarchical components must ultimately consist of n-fets and p-fets. The location of the fets in the generated layout from left to right is taken from the location of the fets in the schematic, looking from left to right. Where p or n fets appear vertically aligned in a column in the schematic, the order is from top to bottom. The process is fully hierarchical. That is, if an icon for a sub-schematic is encountered in the left-to-right traversal of a parent schematic, all fets in the sub-schematic are inserted at that point, followed by the remaining fets to the right or below the sub-schematic icon.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032304"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 87:   Layout Generator - First Placement</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/MAX_Man_Ch5MAX-LSa.gif" height="270" width="468" border="1">
+</div></font><a name="1036110"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032311"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Layout Generator can be used to assist in developing a standard cell library. For cells that will be regenerated for different technologies, the designer would move the fets on the schematic so that the fets are placed ideally in the layout.</font>
+<p>
+<p>
+  <dt> <a name="1032315"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the first example in <a href="MAX_Man_Ch5MAX-LS.html#1032304">Figure 87</a>, notice that the order of the fets are such that a number of the net connections have to cross each other. By changing the order of the fets in the schematic in <a href="MAX_Man_Ch5MAX-LS.html#1032323">Figure 88</a>, the resulting layout is now much easier to route. In the schematic in <a href="MAX_Man_Ch5MAX-LS.html#1032323">Figure 88</a>, the fet in the upper left and lower right have been moved toward the center.<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1032987"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The default settings for the layout generator would have placed routing pads in the center for each of the ports. They were left out for these examples for easier viewing.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032323"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 88:   Layout Generator - Better Placement</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/MAX_Man_Ch5MAX-LS2.gif" height="261" width="468" border="1">
+</div></font><a name="1036213"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032329"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To generate the layout, you must first generate a <b><code class="CodeStrong">.sim</code></b> netlist file for the schematic. To do this, start SUE and edit the top-most schematic representing the layout to be generated. From the <b><code class="CodeStrong">Sim</code></b><b><strong class="Strong"> </strong></b>menu, select <b><code class="CodeStrong">Change Simulation Mode</code></b>, and select <b><code class="CodeStrong">sim</code></b>, then <b><code class="CodeStrong">Done</code></b>. From the <b><code class="CodeStrong">Sim</code></b><b><strong class="Strong"> </strong></b>menu, select <b><code class="CodeStrong">sim netlist</code></b>. This generates the <b><code class="CodeStrong">.sim</code></b> file. (Note: The <b><code class="CodeStrong">.sim</code></b> format has been extended by Micro Magic Tools to contain the layout information.) </font>
+<p>
+<p>
+  <dt> <a name="1032334"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Start MAX and select <b><code class="CodeStrong">Layout Generator</code></b> from the <b><code class="CodeStrong">Tool</code></b> menu. This will bring up the <b><code class="CodeStrong">File Select Box</code></b>. MAX is asking you for the name of the <b><code class="CodeStrong">.sim</code></b> file that you generated in SUE. For example, if the SUE schematic was <b><code class="CodeStrong">NAND2B.sue</code></b>, then you need to enter <b><code class="CodeStrong">NAND2B.sim</code></b>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032335"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 89:   Layout Generator Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/lay_gen.gif" border="1">
+</div></font><a name="1036314"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032340"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, MAX will show you the <b><code class="CodeStrong">Layout Generator</code></b><b><strong class="Strong"> </strong></b>menu. This includes the <b><code class="CodeStrong">Input File Name</code></b> you entered above (and which you can change here), and the <b><code class="CodeStrong">Output File Name</code></b>, which is the cell name of the MAX output file, the <b><code class="CodeStrong">Generate Stdcell Layers</code></b> option, and buttons for a number of sub-menus. Changes that you make in the menus are maintained throughout your current MAX session. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1032342"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Edit Per-Cell Options</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032343"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This contains options that you might change to get a better layout of this particular cell; for example, whether to align the fets toward the inner channel or the outer power rails, and so on. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032344"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 90:   Edit Per-Cell Options Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/lay_gen_percell.gif" border="1">
+</div></font><a name="1036371"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032349"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">align_fets:</strong></b> If set to <b><code class="CodeStrong">outer</code></b>, fets will be placed as close to power rails as possible; if set to <b><code class="CodeStrong">inner</code></b>, fets will be placed near the central wiring channel.</font>
+<p>
+<p>
+  <dt> <a name="1032350"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">flyline_crossing_minimization: </strong></b>Rearrange flylines to minimize crossings. This is a time-consuming step, and probably not necessary if you are going to hand route the cell.</font>
+<p>
+<p>
+  <dt> <a name="1032351"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">flylines: </strong></b>Create flylines to indicate connectivity from the schematic.</font>
+<p>
+<p>
+  <dt> <a name="1032352"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">pad_track:</strong></b> If router pads are being created, this specifies the y coordinate, in <code class="Code">dpc_router_pitch</code> units, where pads will be placed. If this is set to <b><code class="CodeStrong">default</code></b>, pads are placed near the Nplus/Pplus boundary.   See also: <b><strong class="Strong">router_pads</strong></b>. </font>
+<p>
+<p>
+  <dt> <a name="1032353"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">preroute_inner: </strong></b>With this option is enabled, the layout generator will attempt to pre-route between the fets and the inner wiring channel, where possible. Metal preroutes will reduce the contact sizes and place metal wires directly over fets.</font>
+<p>
+<p>
+  <dt> <a name="1032354"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">preroute_outer: </strong></b>With this option enabled, the layout generator will attempt to pre-route above and below the fets, where possible. Metal preroutes will reduce the contact sizes and place metal wires directly over fets.</font>
+<p>
+<p>
+  <dt> <a name="1032355"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">reverse_stacked_fets:</strong></b> This option will reverse the layout order of specified type of fets (nfets or pfets) in the layout for stacked fets (fets that share diffusion.) This is used to ease congestion.</font>
+<p>
+<p>
+  <dt> <a name="1032356"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">route_through_fets_wider_than</strong></b><b><strong class="Strong">:</strong></b> If option: <b><code class="CodeStrong">preroute_inner</code></b> or <b><code class="CodeStrong">preroute_outer</code></b> is enabled, this option specifies the minimum size fet that may NOT be routed over. If the option is set to <b><code class="CodeStrong">default</code></b>, the min fet width will be set to preserve one contact.</font>
+<p>
+<p>
+  <dt> <a name="1032357"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">router_pads:</strong></b> If this option is set, the layout generator will place on-grid router landing pads for nets that are ports. If this option is set to <b><code class="CodeStrong">contact</code></b>, the layout generator will also provide contacts for nets that are on poly. Note: The pad size is specified by <b><code class="CodeStrong">router_pad_size</code></b> in the <b><code class="CodeStrong">Stdcell Options</code></b> menu.</font>
+<p>
+<p>
+  <dt> <a name="1032358"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">share_contacts:</strong></b> This option controls whether fets will share contacts with neighboring fets. </font>
+<p>
+<p>
+  <dt> <a name="1032359"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">spread_fets:</strong></b> If this option is <b><code class="CodeStrong">no</code></b>, fets will all be jammed to the left.   If it is <b><code class="CodeStrong">yes</code></b>, the shorter row of fets will be spread out. If it is set to <b><code class="CodeStrong">larger</code></b>, only larger fets will be pushed to the right. If it is set to <b><code class="CodeStrong">best</code></b>, split connected fets at vdd/gnd contacts, or if fets are larger. </font>
+<p>
+<p>
+  <dt> <a name="1032360"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">wiring_tracks_above_center:</strong></b> When this option is set, <em class="Emphasis">pfets</em> will be folded to preserve wiring space between the pfets and the cell N/P boundary, which would allow a set number of wiring tracks. The wiring track size is taken from <b><code class="CodeStrong">cell_router_pitch</code></b> in the <b><code class="CodeStrong">Stdcell Options</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1032361"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">wiring_tracks_below_center:</strong></b> When this option is set, <em class="Emphasis">nfets</em> will be folded to preserve wiring space between the nfets and the cell N/P boundary which would allow the set number of wiring tracks. The wiring track size is taken from <b><code class="CodeStrong">cell_router_pitch</code></b> in the <b><code class="CodeStrong">Stdcell Options</code></b> menu. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1032363"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Edit Stdcell Options</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032364"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This form contains options that you should probably set once for all the cells that you intend to generate in a particular stdcell family; for example, the height of the cells. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032365"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 91:   Edit Stdcell Options Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/lay_gen_stdcell.gif" border="1">
+</div></font><a name="1036405"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036567"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+<p>
+  <dt> <a name="1032370"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">N/P_Boundary:</strong></b> This sets the height of the Nplus/Pplus boundary from the bottom of the cell, in microns.</font>
+<p>
+<p>
+  <dt> <a name="1032371"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">cell_height:</strong></b> This sets the height of cell in microns.</font>
+<p>
+<p>
+  <dt> <a name="1032372"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">cell_router_pitch:</strong></b> The pitch that will be used for inter-cell wiring, which may be finer than the <b><code class="CodeStrong">dpc_router_pitch</code></b>, is entered here. See also: <b><code class="CodeStrong">wiring_tracks_above_center</code></b> and <b><code class="CodeStrong">wiring_tracks_below_center</code></b> in the <b><code class="CodeStrong">Per-Cell Options</code></b> menu.</font>
+<p>
+<p>
+  <dt> <a name="1032373"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">cell_width_pitch:</strong></b> The cell width will be rounded up to this pitch, normally equal to <b><code class="CodeStrong">dpc_router_pitch</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1032374"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">dpc_router_offset_x,y:</strong></b><b><strong class="Strong"> </strong></b>The offset of final router tracks, in microns, is entered here. Values to be entered in the form: <b><code class="CodeStrong">&lt;xoffset&gt;, &lt;yoffset&gt;</code></b>. Usually both <b><code class="CodeEmphasis">xoffset</code></b> and <b><code class="CodeEmphasis">yoffset</code></b> are equal to one-half the <b><code class="CodeStrong">dpc_router_pitch</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1032375"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">dpc_router_pitch:</strong></b> The router pitch that will be used for final (post-DPC) routing is entered here.   Router landing pads are created on this pitch.</font>
+<p>
+<p>
+  <dt> <a name="1032376"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">draw_fets_using:</strong></b> Fets will be created using the method specified here. Notes: If you specify any <b><code class="CodeStrong">preroute_</code></b> options that require modifications to the fets, the fets will be drawn using paint regardless of the setting of this option. If you specify <b><code class="CodeStrong">subcells</code></b> you should flatten the subcells created for fets before writing out the standard cell, to avoid naming conflicts among the subcells created for the fets. </font>
+<p>
+<p>
+  <dt> <a name="1032377"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">draw_vias_using:</strong></b> Vias will be created using the method specified here.</font>
+<p>
+<p>
+  <dt> <a name="1032378"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">gcell_name_fet:</strong></b> The name of the fet gcell, if <b><code class="CodeStrong">draw_fets_using</code></b> is <b><strong class="Strong">gcells</strong></b>, is entered here.</font>
+<p>
+<p>
+  <dt> <a name="1032379"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">gcell_name_via:</strong></b> The name of via gcell, if <b><code class="CodeStrong">draw_vias_using</code></b> is <b><strong class="Strong">gcells</strong></b>, is entered here.</font>
+<p>
+<p>
+  <dt> <a name="1033608"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">m1,router_pad_size:</strong></b><b><strong class="Strong"> </strong></b>The size of metal1 landing pads required for the final router, in the form: <b><code class="CodeStrong">&lt;width&gt; x &lt;height&gt;</code></b> in microns, is entered. The default size is determined from the minimum metal1 area rule.</font>
+<p>
+<p>
+  <dt> <a name="1032381"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">nwc,width: </strong></b>This is for the size of the nwell contact under the power strap, if any.</font>
+<p>
+<p>
+  <dt> <a name="1032382"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">power_high_names:</strong></b> Enter the name(s) of the positive power supply here. If multiple names are used, they will all be considered equivalent. The positive power rail is labeled with the first name.</font>
+<p>
+<p>
+  <dt> <a name="1032383"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">power_low_names: </strong></b>Enter the name(s) of the negative power supply. If multiple names are used, they will all be considered equivalent. The negative power rail is labeled with the first name.</font>
+<p>
+<p>
+  <dt> <a name="1032384"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">pwc,width:</strong></b><b><strong class="Strong"> </strong></b>This sets the size of the pwell contact under the power strap, if any.</font>
+<p>
+<p>
+  <dt> <a name="1032385"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">well_v0_pitch:</strong></b> Well contacts under the power straps, if enabled, will be created on this pitch, normally equal to <b><code class="CodeStrong">dpc_router_pitch</code></b>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1032387"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Edit Layers to Generate</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032388"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This lets you individually control various Layout Generator layers. These layers are only generated if the <b><code class="CodeStrong">Generate Stdcell Layers</code></b> option in the main <b><code class="CodeStrong">Layout Generator</code></b><b><strong class="Strong"> </strong></b>menu is enabled. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032389"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 92:   Edit Layers to Generate Form</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/laygen_layers.gif" border="1">
+</div></font><a name="1036447"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032394"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have set the options, select <b><code class="CodeStrong">Done</code></b> to generate the layout. The layout cell name will default to <b><code class="CodeStrong">&lt;cell_name&gt;.max</code></b><b><strong class="Strong"> </strong></b>where <b><code class="CodeStrong">cell_name</code></b> is the name of the cell in SUE.</font>
+<p>
+<p>
+  <dt> <a name="1033961"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You now see the layout in the MAX window with flylines (turned on by default) showing connectivity. See <a href="MAX_Man_Ch5MAX-LS.html#1032304">Figure 87</a> and <a href="MAX_Man_Ch5MAX-LS.html#1032323">Figure 88</a>. Use the MAX <b><code class="CodeStrong">Wire Tool</code></b> <a href="MAX_Man_Ch4WireTool.html#1026718">(See <b><code class="CodeStrong">Introduction To The MAX Wire Tool </code></b>)</a> to make the connections. The flylines disappear as each connection is made. If the connection is broken, the flylines currently do not reappear. Use the <a href="MAX_Man_Ch3Commands.html#1031967"><b><code class="CodeStrong">Edit Flylines </code></b> </a> command to manually add the flyline back into the layout.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1032412"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Cross-probing</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032413"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once the layout has been generated for a cell, you would then wire up the connections using the flylines as guides. The Wire Tool makes the process of wiring up the cells quick and painless.</font>
+<p>
+<p>
+  <dt> <a name="1033997"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once some of the wires have been completed, you can cross-probe between MAX and SUE to check the connections. To do this, select <a href="MAX_Man_Ch3Commands.html#1032340"><b><code class="CodeStrong">SUE Cross Probe Init. </code></b> </a> from the <b><code class="CodeStrong">Tool</code></b> menu. Before you ran the Layout Generator, you created a <b><code class="CodeStrong">.sim</code></b> file of the schematic. <b><code class="CodeStrong">SUE Cross Probe Init</code></b> first extracts a <b><code class="CodeStrong">.sim </code></b>netlist from the layout and then runs <em class="Emphasis">Gemini</em> LVS between the SUE schematic and the MAX layout. Cross-probing can also be invoked from SUE by selecting <b><code class="CodeStrong">max cross probe init</code></b> from the <b><code class="CodeStrong">Sim</code></b><b><strong class="Strong"> </strong></b>menu.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032420"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 93:   Cross-Probe Init</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/MAX_Man_Ch5MAX-LS7.gif" height="427" width="528" border="1">
+</div></font><a name="1036476"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032426"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once <em class="Emphasis">Gemini</em> LVS has run, the nets which match are highlighted in MAX and SUE. Matching nets are highlighted in MAX using the highlight layer <a href="MAX_Man_Ch2LayoutEd.html#1027711">(See <b><code class="CodeStrong">Edit Layers </code></b>)</a>. The nets which match in SUE are highlighted in blue by default.</font>
+<p>
+<p>
+  <dt> <a name="1032430"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can select a net in MAX either by selecting the net (hotkey: <b><strong class="Strong">s</strong></b>), or simply selecting a portion of the net and then using the <b><code class="CodeStrong">cross-probe</code></b> command to find the corresponding net in SUE. To do this, select <a href="MAX_Man_Ch3Commands.html#1032351"><b><code class="CodeStrong">SUE Cross Probe Net </code></b> </a> from the <b><code class="CodeStrong">Tool</code></b> menu, or use the hot key <b><strong class="Strong">k</strong></b>. The corresponding net will be highlighted in SUE <a href="MAX_Man_Ch5MAX-LS.html#1032438">(See Figure 94)</a>. If there is no corresponding net in SUE, nothing will be highlighted and an error message will be printed in the MAX command window.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1032438"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 94:   Cross-Probe Net</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/MAX_Man_Ch5MAX-LS8.gif" height="275" width="468" border="1">
+</div></font><a name="1036504"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1032444"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can cross-probe from SUE to MAX by selecting a net in SUE, clicking on the net with Button-1, and then selecting <b><code class="CodeStrong">max cross probe</code></b> from the <b><code class="CodeStrong">Sim</code></b><b><strong class="Strong"> </strong></b>menu in SUE (or using the hotkey <b><strong class="Strong">k</strong></b>). The corresponding net in MAX will be highlighted. If there is no corresponding net in MAX, nothing will be highlighted and an error message will be printed in the SUE command window.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1032446"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Cross-probing without the Layout Generator</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032447"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can cross-probe any layout that has recognizable fets in it (and no other types of devices). No text entry at all is required. The cell does not need to be DRC clean to cross-probe.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1032449"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Search Paths in MAX</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032453"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you do a <a href="MAX_Man_Ch3Commands.html#1032340"><b><code class="CodeStrong">SUE Cross Probe Init. </code></b> </a> from the <b><code class="CodeStrong">Tool</code></b> menu in MAX, MAX will first run LVS on the current layout cell versus the schematic with the same name. Thus, if you are editing <b><code class="CodeStrong">foo.max</code></b>, MAX will try to run LVS against the schematic <b><code class="CodeStrong">foo.sue</code></b> using the <b><code class="CodeStrong">foo.sim</code></b> netlist. If <b><code class="CodeStrong">foo.sue</code></b> and <b><code class="CodeStrong">foo.sim </code></b>are in the same directory as <b><code class="CodeStrong">foo.max</code></b>, then great. If they are not in the same directory, you have to specify where MAX should look for them. The list of paths to search is stored in the MAX variable <b><code class="CodeStrong">LVS_SEARCH_DIRS</code></b>. Thus, if you have some schematics in the current directory and some in the parallel SUE directory, you would add the following line to your .<b><code class="CodeStrong">maxrc</code></b> file:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set LVS_SEARCH_DIRS ". ../sue"</font><a name="1032456"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1033221"> </a>
+      </pre>
+<p>
+  <dt> <a name="1032457"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes you want to run LVS against a schematic that has a different name than the layout. This occurs when you have two or more different layouts for the same schematic. For example, in an SRAM, you might have two different SRAM cells - <b><code class="CodeStrong">cell_L</code></b> and <b><code class="CodeStrong">cell_R</code></b><b><strong class="Strong"> </strong></b>- but only one schematic - <b><code class="CodeStrong">cell.sue</code></b>. In this case you want to map the layout cell name to the schematic cell name. Use the LVS associative array for this:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set lvs(&lt;layout_name&gt;) &lt;schematic_name&gt;</font><a name="1032458"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1032459"> </a>
+      </pre>
+<p>
+  <dt> <a name="1032460"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, in the SRAM case, you would add the following lines into your .<b><code class="CodeStrong">maxrc</code></b>:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set lvs(cell_L) cell</font><a name="1032461"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set lvs(cell_R) cell</font><a name="1032462"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1032463"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Search Paths in SUE</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1032464"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When cross-probing from SUE to MAX, SUE needs to be able to find the extracted netlists (.<b><code class="CodeStrong">sim</code></b> files) from the MAX layouts. If these layouts are not in the same directory, SUE needs to know where they are. This search path is stored in the SUE variable <b><code class="CodeStrong">BACK_ANNOTATE_PATH</code></b>. For example, if you stored some MAX layouts in the same directory as the schematics, and some in the parallel <b><strong class="Strong">max</strong></b> directory, you would add the following to your .<b><code class="CodeStrong">suerc</code></b> file:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set BACK_ANNOTATE_PATH ". ../max"</font><a name="1032467"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1032468"> </a>
+      </pre>
+<p>
+  <dt> <a name="1032469"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this version, if you have SUE bring up MAX and load the cell, that cell must be in the same directory as where you started SUE. Otherwise, you have to load the MAX cell yourself.</font>
+<p>
+<p>
+  <dt> <a name="1026846"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="MAX_ManualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="MAX_Man_Ch4WireTool.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="MAX_Man_Ch6TechFiles.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="MAX_ManualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

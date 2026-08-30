@@ -1,1 +1,55 @@
-../extract/MMI_TSBUFE.sp
+*** Extracted spice netlist generated from MAX ***
+
+.SUBCKT MMI_TSBUFE en enb in out
+C_1 net_1 gnd 3.56152fF
+C_2 enb gnd 0.71604fF
+C_3 net_2 gnd 3.36758fF
+C_4 in gnd 1.08086fF
+C_5 vdd gnd 4.2942fF
+C_6 en gnd 0.70194fF
+C_7 out gnd 3.23507fF
+C_8 gnd gnd 4.6272fF
+Mp_1 net_1 enb net_2 vdd p W=1.675U L=0.15U AD=0.661625P PD=4.14U 
++ AS=0.3685P PS=2.115U
+Mp_2 net_2 in vdd vdd p W=1.675U L=0.15U AD=0.3685P PD=2.115U AS=0.416902P 
++ PS=2.48717U
+Mp_3 vdd in net_2 vdd p W=1.675U L=0.15U AD=0.416902P PD=2.48717U 
++ AS=0.3685P PS=2.115U
+Mp_4 net_2 en vdd vdd p W=1.675U L=0.15U AD=0.3685P PD=2.115U AS=0.416902P 
++ PS=2.48717U
+Mp_5 vdd net_2 out vdd p W=2.055U L=0.15U AD=0.511482P PD=3.05142U 
++ AS=0.4521P PS=2.495U
+Mp_6 out net_2 vdd vdd p W=2.055U L=0.15U AD=0.4521P PD=2.495U AS=0.511482P 
++ PS=3.05142U
+Mp_7 vdd net_2 out vdd p W=2.055U L=0.15U AD=0.511482P PD=3.05142U 
++ AS=0.4521P PS=2.495U
+Mp_8 out net_2 vdd vdd p W=2.055U L=0.15U AD=0.4521P PD=2.495U AS=0.511482P 
++ PS=3.05142U
+Mp_9 vdd net_2 out vdd p W=2.055U L=0.15U AD=0.511482P PD=3.05142U 
++ AS=0.4521P PS=2.495U
+Mp_10 out net_2 vdd vdd p W=2.055U L=0.15U AD=0.4521P PD=2.495U 
++ AS=0.511482P PS=3.05142U
+Mn_1 gnd enb net_1 gnd n W=1.04U L=0.15U AD=0.289467P PD=1.94874U 
++ AS=0.2288P PS=1.48U
+Mn_2 net_1 in gnd gnd n W=1.04U L=0.15U AD=0.2288P PD=1.48U AS=0.289467P 
++ PS=1.94874U
+Mn_3 gnd in net_1 gnd n W=1.04U L=0.15U AD=0.289467P PD=1.94874U AS=0.2288P 
++ PS=1.48U
+Mn_4 net_1 en net_2 gnd n W=1.04U L=0.15U AD=0.2288P PD=1.48U AS=0.4108P 
++ PS=2.87U
+Mn_5 gnd net_1 out gnd n W=1.025U L=0.15U AD=0.285292P PD=1.92063U 
++ AS=0.2255P PS=1.465U
+Mn_6 out net_1 gnd gnd n W=1.025U L=0.15U AD=0.2255P PD=1.465U AS=0.285292P 
++ PS=1.92063U
+Mn_7 gnd net_1 out gnd n W=1.025U L=0.15U AD=0.285292P PD=1.92063U 
++ AS=0.2255P PS=1.465U
+Mn_8 out net_1 gnd gnd n W=1.025U L=0.15U AD=0.2255P PD=1.465U AS=0.285292P 
++ PS=1.92063U
+Mn_9 gnd net_1 out gnd n W=1.025U L=0.15U AD=0.285292P PD=1.92063U 
++ AS=0.2255P PS=1.465U
+Mn_10 out net_1 gnd gnd n W=1.025U L=0.15U AD=0.2255P PD=1.465U 
++ AS=0.285292P PS=1.92063U
+.ENDS	$ MMI_TSBUFE
+
+.GLOBAL gnd vdd
+

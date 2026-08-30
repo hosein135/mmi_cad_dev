@@ -1,0 +1,1742 @@
+<html>
+
+<head>
+<title>
+SUE Variables Reference Guide
+</title>
+</head>
+
+<BODY BGCOLOR="ffffff" >
+
+<TABLE width="96%" border="0" align="center">
+  <TR>
+    <TD rowspan="2" width="31%"><IMG src="images/mmi-logo.gif" width="155" height="79"></TD>
+    <TD width="69%" height="91" valign="bottom">
+      <H1 align="left">SUE Variables Reference Guide</H1>
+    </TD>
+  </TR>
+</TABLE>
+
+<br>
+<hr>
+
+  
+
+
+
+<hr>
+
+<ul>
+<li>
+<b><pre>
+AUTOLIB
+</pre></b>
+
+Pathnames to libraries to be added to the SUE search path and
+automatically loaded at startup.
+
+<p>
+
+The suggested method for adding an autolib is:
+
+<p>
+
+<pre>
+        lappend AUTOLIB &lt;path_to_lib>
+</pre>
+
+This variable is only accessed at startup and thus must be set in a
+.suerc file.
+
+<p>
+
+VALUE (LIST):  /home/cad/mmi/../mmi_local/sue/schematics/devices
+
+<p>
+
+<li>
+<b><pre>
+AUTO_SAVE(interval)
+</pre></b>
+
+Interval in minutes for auto-saving modified buffers.
+If set to 0, auto-saving is disabled.
+
+<p>
+
+Modified buffers get automatically saved to disk with the suffix
+defined by SUFFIX(auto_save).  The auto-save interval starts from when
+a buffer is first modified, after either a save or an auto-save.  If
+the buffer is saved before the auto-save interval is up, then the
+auto-save is reset.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  15
+
+<p>
+
+<li>
+<b><pre>
+BATCH
+</pre></b>
+
+If set to 1 (true) then all popup queries are bypassed with the same
+result as if the user hit the OK button.  Useful for scripts that run
+in batch mode.
+
+<p>
+
+VALUE (BOOLEAN,DEFAULT):  0
+
+<p>
+
+<li>
+<b><pre>
+COLORS
+</pre></b>
+
+Color array for specifying foreground, background, object, etc
+colors in SUE.
+
+<p>
+
+The colors can be specified as either legal names as defined in
+rgb.txt (see /usr/openwin/lib/X11/rgb.txt for sparc or
+/usr/X11/lib/X11/rgb.txt for linux) or as RGB values.  RGB values must
+be given in the form of #RRGGBB, where RR, GG, and BB are 2 digit hex
+values (is this gross or what).
+
+<p>
+
+SUE uses the follwing colors:
+
+<p>
+
+<pre>
+        background       Background color of SUE window.
+        fore             Standard objects color (i.e. foreground color).
+        active           Current object color-- i.e. the object under the
+                         cursor.  This object will be selected if Button-1
+                         is pressed.
+        selected         Selected object color.
+        selected,active  Selected and active object color.
+        anchor           Text anchor color.  Also temporary annotation color.
+        grid             Grid color.
+        stroke_box       Stroke box color.
+</pre>
+
+
+<p>
+
+ARRAY:
+<pre>
+        COLORS(active) = white
+        COLORS(anchor) = white
+        COLORS(background) = grey
+        COLORS(fore) = black
+        COLORS(grid) = #e0e0d0
+        COLORS(main) = old
+        COLORS(selected) = blue
+        COLORS(selected,active) = yellow
+        COLORS(stroke_box) = red
+</pre>
+
+<li>
+<b><pre>
+DEFAULT_BROWSER
+</pre></b>
+
+If neither the unix environment variables MMI_BROWSER of BROWSER are
+set then this value will select the browser that SUE will use for
+displaying html documentation.
+
+<p>
+
+VALUE (STRING,DEFAULT):  netscape
+
+<p>
+
+<li>
+<b><pre>
+DEFAULT_EDITOR
+</pre></b>
+
+If your unix environment variable EDITOR is not set, this value will
+select which editor SUE should use during functions like "display cell
+doc", "edit verilog", or "edit object names".
+
+<p>
+
+NOTE: this variable is only used if your unix environment variable
+EDITOR is not set.
+
+<p>
+
+Typical editors are emacs, xemacs, or vi.
+
+<p>
+
+VALUE (STRING,DEFAULT):  emacs
+
+<p>
+
+<li>
+<b><pre>
+DEFAULT_PROPERTIES
+</pre></b>
+
+List of properties added to all newly created icons.  This is merely a
+convenience item.
+
+<p>
+
+VALUE (LIST):  {-type user -name name} {-type user -name M}
+<pre>
+                          {-type user -name dpc}
+</pre>
+
+DEFAULT: {-type user -name name} {-type user -name M} {-type user -name dpc}
+
+<p>
+
+<li>
+<b><pre>
+DISPLAY_COORDS
+</pre></b>
+
+Controls whether to display the coordinates of the selected object in
+the SUE message window.
+
+<p>
+
+Displays if set to non-nil, else doesn't display.
+
+<p>
+
+VALUE (STRING,DEFAULT):  
+
+<p>
+
+<li>
+<b><pre>
+DISPLAY_PROPS
+</pre></b>
+
+Determines how and which properties should be displayed on icons.
+Each included property will be displayed at the given location using
+the given format if it is non-nil and isn't already being displayed
+explicitly in the icon.  
+
+<p>
+
+For each property, the property name, location, and optional format is
+defined.  The locations can be any one of the following:
+
+<p>
+
+<pre>
+        upper-left (ul)
+        upper-right (ur) 
+        lower-left (ll)
+        lower-right (lr)
+        origin.
+</pre>
+
+The property is displayed as:
+
+<p>
+
+<pre>
+        &lt;format>&lt;property_value>
+</pre>
+
+The format defaults to nil.
+
+<p>
+
+Note that icons with property "primitive" never display properties.
+
+<p>
+
+For example, with the following settings:
+
+<p>
+
+<pre>
+        set DISPLAY_PROPS {{name ul} {M ur M=} {dpc ll "dpc "}}
+</pre>
+
+The value of the "name" property is displayed in the upper-left corner
+of the bounding-box of each instantiation of each icon.  The position
+of the "name" property on a given icon can be changed by adding the
+text "$name" to its icon view in the desired location.  This will
+override the default position.
+
+<p>
+
+The value of the "M" property (used for making multiple identical
+devices in HSPICE) is displayed in the upper-right corner of each
+instantiation of each icon if it's value is non-nil.  Furthermore, it
+is display with a format prefix of "M=".  Thus an icon with an "M"
+property of 2 would display the string "M=2", while an icon without an
+M property defined would display nothing (NOT "M=").
+
+<p>
+
+VALUE (LIST_OF_LISTS,DEFAULT):  {name ul} {M ur M=} {dpc ll "dpc "}
+
+<p>
+
+<li>
+<b><pre>
+DONT_REPLACE_PROPS
+</pre></b>
+
+List of properties that don't get replaced when running "replace
+instance" from the "Edit" menu.
+
+<p>
+
+VALUE (LIST):  name M dpc
+
+<p>
+
+DEFAULT: name M
+
+<p>
+
+<li>
+<b><pre>
+DPC(DEFAULT_COLUMN_WIDTH)
+</pre></b>
+
+Default width given to cells not found in the DPC(PATH) and which
+don't have .ports files.
+
+<p>
+
+Since cell widths vary, this default should only be applicable in
+early phases of the design when not all cell sizes are known.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  10
+
+<p>
+
+<li>
+<b><pre>
+DPC(DEFAULT_ROW_HEIGHT)
+</pre></b>
+
+Default height given to cells not found in the DPC(PATH) and which don't
+have .ports files.
+
+<p>
+
+Since standard cells have the same height, defaulting this value is
+typically OK.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  10
+
+<p>
+
+<li>
+<b><pre>
+DPC(dspf)
+</pre></b>
+
+If set to 1, DPC will create a dspf file with RC networks based on a
+complete steiner route of each net.  If set to 0, DPC will create a
+capacitance only file which is also based on a complete steiner route.  
+
+<p>
+
+By setting DPC(MIN_RC), you can write out complete RC networks for
+only those nets which have a significant RC time constant.
+
+<p>
+
+NOTE: Primetime users can only get capacitance files at this point
+because of the way it deals with net ambiguity due to assigns.
+
+<p>
+
+VALUE (BINARY):  1
+
+<p>
+
+DEFAULT: 0
+
+<p>
+
+<li>
+<b><pre>
+DPC(FLIP)
+</pre></b>
+
+DEF Orientations for unflipped and flipped cells created by DPC.
+
+<p>
+
+NOTE: if you change this, you must remove all cache files.
+
+<p>
+
+VALUE (BOOLEAN,DEFAULT):  N FS
+
+<p>
+
+<li>
+<b><pre>
+DPC(MICRON_CAP_FACTOR)
+</pre></b>
+
+Capacitance (fF) per wire length (microns) used by DPC for computing
+wire capacitances.
+
+<p>
+
+If you have a non square grid (i.e. DPC(SCALE) is a list of different
+numbers), you typically want this capacitance/length to be different
+in X and Y.  In this case, make this a list.
+
+<p>
+
+VALUE (REAL_LIST,DEFAULT):  0.22
+
+<p>
+
+<li>
+<b><pre>
+DPC(MICRON_RES_FACTOR)
+</pre></b>
+
+For DSPF calculation, this wire resistance is used to calculate
+resistances for net RC networks.  The value is specified in
+Ohms/micron of wire length for the wiring width of the routed wires.
+
+<p>
+
+For example, if your wire resistance is 110 mOhms/square @105C and the
+wire width is 0.6um, then value here should be 0.110 / 0.6 = 0.183
+
+<p>
+
+VALUE (NUMBER):  0.183333333333
+
+<p>
+
+DEFAULT: 0.183333333333
+
+<p>
+
+<li>
+<b><pre>
+DPC(MIN_RC)
+</pre></b>
+
+During DPC DSPF parasitic generation, if the RC time constant of
+a net is less than this value, its R's are ignored.  Set to 0 to
+force inclusion of all R's.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  2ps
+
+<p>
+
+<li>
+<b><pre>
+DPC(PATH)
+</pre></b>
+
+Path(s) to standard-cell/data path cell size information for DPC.
+
+<p>
+
+These files have the format: 
+
+<p>
+
+<pre>
+         &lt;cell_name>     &lt;width>   [&lt;height>]
+         &lt;cell_name>     &lt;width>   [&lt;height>]
+         ...
+</pre>
+
+Where the width and (optional) height are specified in grids (routing
+tracks). For Example,
+
+<p>
+
+<pre>
+            INVA      2
+            INVB      4
+            NAND2A    4
+            FAD       10     12
+            ...
+</pre>
+
+In this example, all of the cells except for "FAD" would get the
+default height defined by DPC(DEFAULT_ROW_HEIGHT).
+
+<p>
+
+VALUE (LIST):  /home/cad/stdcell/dpc/stdcell.dpc
+
+<p>
+
+<li>
+<b><pre>
+DPC(PITCH)
+</pre></b>
+
+The default bit pitch in grids for bit slices.  
+
+<p>
+
+Icons with bus notation in their names (e.g. [3:0] or [2]) or dpc properties will be spaced in accordance with this PITCH value.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  16
+
+<p>
+
+<li>
+<b><pre>
+DPC(PLACE)
+</pre></b>
+
+The DEF file placement property for icons written by DPC.
+
+<p>
+
+Can be either "PLACED" or "FIXED"
+
+<p>
+
+VALUE (STRING,DEFAULT):  PLACED
+
+<p>
+
+<li>
+<b><pre>
+DPC(SCALE)
+</pre></b>
+
+Scale factor to convert minimum routing grids (which DPC uses) into microns.  
+
+<p>
+
+NOTE: the SCALE must be chosen so that all cells are an integral
+number of grids tall and wide.
+
+<p>
+
+For uneven grid dimensions in X and Y, use a list with the first
+element specifiying the X and the second the Y scale in mask coords,
+i.e. rotated 90 degrees from DPC orientation.
+
+<p>
+
+VALUE (REAL_LIST,DEFAULT):  1
+
+<p>
+
+<li>
+<b><pre>
+DPC(TRACKS)
+</pre></b>
+
+A list of lists with the first element in the sublist being the
+track direction and the remainder, the track layers.
+
+<p>
+
+This value only affects the TRACKS lines in the .place.def file.
+
+<p>
+
+Because most large routes require some amount of wrong-way routing,
+all layers are typically listed for both horizontal (X) and vertical (Y)
+routing.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  {Y M1 M2 M3 M4 M5 M6} {X M1 M2 M3 M4 M5 M6}
+
+<p>
+
+<li>
+<b><pre>
+DPC(TRACK_OFFSET)
+</pre></b>
+
+Routing track offset in grids passed to the placement DEF file during DPC.
+
+<p>
+
+This value only affects the TRACKS lines in the .place.def file.
+
+<p>
+
+Typical values are either 0.0 (no routing offset) or 0.5 (one-half
+grid offset).  With no routing offset, wires will be centered around
+0, 1, 2, etc. grids.  With a one-half grid offset, wires will be
+centered around 0.5, 1.5, 2.5, etc. grids.  
+
+<p>
+
+This value depends on the port locations in the layout of the standard
+cell library.
+
+<p>
+
+For uneven track offsets in x and y, use a list.
+
+<p>
+
+VALUE (REAL,DEFAULT):  0.5
+
+<p>
+
+<li>
+<b><pre>
+DPC(UNPLACED)
+</pre></b>
+
+Ignore these icons (which have verilog properties) during DPC placement.
+
+<p>
+
+VALUE (LIST,DEFAULT):  bus_combine bus_split sign_extend
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(arrival_time)
+</pre></b>
+
+Specifies the default arrival time for primary inputs to sequential
+logic circuits.
+
+<p>
+
+When timing a circuit in isolation, you must be conscious of the time
+required to get a primary input to the circuit in question.  In a
+register-based design, all inputs are available at a minimum of a
+clock-to-q delay after the clock, and thus the minimum value for the
+arrival time should be set to the clock-to-q delay.  However, it is
+more than likely that the inputs must come from other parts of the
+chip and may even go through other logic in the current cycle before
+arriving.  
+
+<p>
+
+It is suggested that the sum of the default arrival and departure
+times be greater than or equal to the cycle time.
+
+<p>
+
+Arrival times of specific signals can be set in the SUE DPC
+constraint file for the circuit and will then override the deafult
+value.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  3n
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(clk_names)
+</pre></b>
+
+Contains the list of top level clock net names.  SUE searches all
+primary inputs, looking for any in this list to determine if the circuit
+is purely combinational (i.e. no clocks) or sequential and sets up the
+timing accordingly.
+
+<p>
+
+VALUE (LIST,DEFAULT):  clk
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(clk_period)
+</pre></b>
+
+When timing a sequential circuit, this value specifies the desired
+clock period from which slack times are calculated.
+
+<p>
+
+Typically, this clock period includes the overhead of clock skew and
+jitter.  For example, if the desired clock frequency is 5.5ns and the
+clock skew and jitter are budgeted at 500ps, then this value should be
+set to 5ns.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  5ns
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(ctlf_file)
+</pre></b>
+
+List of paths to the ctlf timing models used by Pearl for timing analysis.  
+
+<p>
+
+Typically one of the paths contains the timing models for the entire
+standard cell library.  Additional paths might contain timing models
+for megacells (e.g. memories) or special datapath cells.
+
+<p>
+
+Only used in Pearl timing.
+
+<p>
+
+VALUE (LIST):  /home/cad/stdcell/tlf/timing.ctlf
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(db_cap_units)
+</pre></b>
+
+Capacitance units in the .db files.  Typically pF.
+
+<p>
+
+Since Primetime requires scaled input values, this value tells DPC
+what scale factor to use.
+
+<p>
+
+Only used in Primetime timing.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  1pF
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(db_file)
+</pre></b>
+
+List of paths to the .db timing models used by Primetime for timing analysis.  
+
+<p>
+
+Typically one of the paths contains the timing models for the entire
+standard cell library.  Additional paths might contain timing models
+for megacells (e.g. memories) or special datapath cells.
+
+<p>
+
+Only used in Primetime timing.
+
+<p>
+
+VALUE (LIST):  /home/cad/stdcell/synopsys/timing.db
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(db_time_units)
+</pre></b>
+
+Times units in the .db files.  Typically ns.
+
+<p>
+
+Since Primetime requires scaled input values, this value tells DPC
+what scale factor to use.
+
+<p>
+
+Only used in Primetime timing.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  1ns
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(departure_time)
+</pre></b>
+
+Specifies the default departure time before next clock for primary outputs to
+sequential logic circuits.
+
+<p>
+
+When timing a circuit in isolation, you must be conscious of the time
+required to get a primary output to the circuit it goes to.  In a
+register-based design, all outputs must be valid at a minimum of a
+setup time before the clock, and thus the minimum value for the
+departure time should be set to the setup time of the register.
+However, it is more than likely that the outputs must go to other
+parts of the chip and may even go through other logic before the
+current cycle is over.
+
+<p>
+
+It is suggested that the sum of the default arrival and departure
+times be greater than or equal to the cycle time.
+
+<p>
+
+Departure times of specific signals can be set in the SUE DPC
+constraint file for the circuit and will then override the deafult
+value.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  2n
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(driver_cell)
+</pre></b>
+
+If non-nil, specifies the cell to use to drive any primary inputs to
+the circuit during timing.  If nil, uses the default input transition
+time specified in DPC_TIMING(input_transition).
+
+<p>
+
+The format of this list is:
+
+<p>
+
+<pre>
+       "&lt;cell_name> [&lt;output_port>]"
+</pre>
+
+If the output port is not specified, it defaults to "out".
+
+<p>
+
+For example, to set the default driver cell to be MMI_INVB (a B-size
+inverter), use the following line:
+
+<p>
+
+<pre>
+        set DPC_TIMING(driver_cell) "MMI_INVB"
+</pre>
+
+If the output pin is not "out" but, for example "Z", use the following line instead"
+
+<p>
+
+<pre>
+        set DPC_TIMING(driver_cell) "MMI_INVB Z"
+</pre>
+
+Only used in Pearl and Primetime timing.
+
+<p>
+
+VALUE (LIST,DEFAULT):  
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(filter)
+</pre></b>
+
+Arguments passed to Pearl to limit (filter) the paths Pearl reports in
+the critical path list.
+
+<p>
+
+Used filter similar critical paths that might obscure other important paths.
+
+<p>
+
+Only used in Pearl timing.
+
+<p>
+
+VALUE (LIST,DEFAULT):  -same_path -same_node -same_pin
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(input_transition)
+</pre></b>
+
+Default input slew rate on primary inputs to the schematic during
+timing.
+
+<p>
+
+This is an ideal source and, as such, can be abused.  Increasing the
+input load of a circuit by oversizing the gates connected to the
+inputs may make a specific circuit, in isolation, time faster.  However,
+with a real input driver the circuit may actually slow down.
+
+<p>
+
+The input slew rate can be overridden in Pearl and Primetime by
+specifying a real driver cell using DPC_TIMING(driver_cell).
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  200ps
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(max_transition)
+</pre></b>
+
+Gates, whose outputs transition slower than this value, will be
+displayed to the screen during DPC timing and written to the slow
+nodes file for later inspection.
+
+<p>
+
+Slow nodes can have a large impact on dynamic power consumption since
+they potentially cause the gates that they drive to have large
+crowbar currents.  Furthermore, slow nodes are more susceptable to
+noise, crosstalk, and process variations and should be avoided.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  1n
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(out_cap)
+</pre></b>
+
+When timing the circuit, this load capacitance is added to all primary
+outputs.
+
+<p>
+
+This value approximates the load of driving the connected block and
+can be overridden on a case-by-case basis in the SUE constraint file.
+
+<p>
+
+VALUE (PP_NUMBER,DEFAULT):  20fF
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(pathmill,cfg_options)
+</pre></b>
+
+Optional Pathmill configuration commands specified as a list of lists.
+These command are directly inserted into the Pathmill run.
+
+<p>
+
+VALUE (LIST,DEFAULT):  {pwl *} {log_on all} {search_structure all}
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(pathmill,command)
+</pre></b>
+
+The string used to invoke the Pathmill static timing analyzer on this
+system.  Arguments will be appended onto this string.
+
+<p>
+
+VALUE (STRING,DEFAULT):  pathmill
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(pathmill,filter)
+</pre></b>
+
+If set to 1, filters out paths with same starting and ending points,
+independent or rise/fall direction.
+
+<p>
+
+VALUE (BINARY,DEFAULT):  1
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(pathmill,library)
+</pre></b>
+
+List of pathnames to directories containing spice netlists of
+leafcells for Pathmill timing.
+
+<p>
+
+VALUE (LIST):  . /proj/tech/mmi25/stdcell/spi
+
+<p>
+
+DEFAULT: .
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(pathmill,tech_file)
+</pre></b>
+
+Path to the Pathmill tech file which includes I-V and C-V curves for
+various size transistors at the appropriate process corner.  This file
+is typically generated by the EPIC gentech program included with
+Pathmill, which runs spice over a large matrix of transistor sizes.
+
+<p>
+
+If this value is set to "" (null), Pathmill will read the spice models
+directly, bypassing the gentech step.  This is the preferred method if
+you have BSIM3 spice models.
+
+<p>
+
+VALUE (STRING):  /proj/tech/mmi25/library/pathmill/tech.mmi25.ttlh
+
+<p>
+
+DEFAULT: 
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(paths)
+</pre></b>
+
+Specifies the number of critical paths that the static timing analyser
+is asked for and thus the maximum number that can be highlighted from
+within SUE.
+
+<p>
+
+NOTE: too large a number of paths will slow down the timing.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  10
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(pearl,command)
+</pre></b>
+
+The string used to invoke the Pearl static timing analyzer on this
+system.  Arguments will be appended onto this string.
+
+<p>
+
+VALUE (STRING,DEFAULT):  pearl
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(primetime,command)
+</pre></b>
+
+The string used to invoke the Primetime static timing analyzer on this
+system.  Arguments will be appended onto this string.
+
+<p>
+
+VALUE (STRING,DEFAULT):  pt_shell
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(simulator)
+</pre></b>
+
+Selects the static timing analyzer to use during DPC timing.
+
+<p>
+
+Valid programs are: pearl, primetime, and pathmill.
+
+<p>
+
+VALUE (STRING,DEFAULT):  pearl
+
+<p>
+
+<li>
+<b><pre>
+DPC_TIMING(tech_file)
+</pre></b>
+
+Path to the Pearl tech file for running timing.  
+
+<p>
+
+A sample Pearl tech file for a 2.5V-nominal process is:
+
+<p>
+
+<pre>
+        technology mmi25
+        power_node_name vdd 2.25
+        gnd_node_name gnd
+        logic_threshold  1.125
+        rise_time 20-80 200PS
+        SYNOPSYS_UNITS 1N 1P 1K
+        TEMPERATURE 105
+        PROCESS 1.0
+        LIBRARY_CORNER TYP
+        units time 4.0ps 1e-12
+        units capacitance 4.0fF 1e-15
+        end_technology
+</pre>
+
+Only used in Pearl timing.
+
+<p>
+
+VALUE (STRING):  /home/cad/stdcell/pearl/pearl.tech
+
+<p>
+
+<li>
+<b><pre>
+GEOMETRY(NST)
+</pre></b>
+
+Default NST window size and placement for cross-probing.
+
+<p>
+
+VALUE (STRING,DEFAULT):  1050x850-6-27
+
+<p>
+
+<li>
+<b><pre>
+GLOBAL_TRANSLATIONS
+</pre></b>
+
+This array translate the names of globals during netlisting, depending
+on the netlisting type.
+
+<p>
+
+The format is:
+
+<p>
+
+<pre>
+        set GLOBAL_TRANSLATIONS(&lt;netlister>,&lt;global>) &lt;new_name>
+</pre>
+
+For example, to map vdd and gnd to 1'b1 and 1'b0, respectively, in
+verilog, use:
+
+<p>
+
+<pre>
+        set GLOBAL_TRANSLATIONS(verilog,vdd) "1'b1"
+        set GLOBAL_TRANSLATIONS(verilog,gnd) "1'b0"
+</pre>
+
+For verilog, if you don't map a global supply to 1'b0 or 1'b1, you
+need to declare the supply.  You can do so with the following lines:
+
+<p>
+
+<pre>
+        set GLOBAL_TRANSLATIONS(verilog,supply,GND) "supply0 GND;"
+        set GLOBAL_TRANSLATIONS(verilog,supply,VDD) "supply1 VDD;"
+</pre>
+
+NOTE: globals must be upper case.
+
+<p>
+
+ARRAY:
+<pre>
+        GLOBAL_TRANSLATIONS(flat_spice,1'b0) = gnd
+        GLOBAL_TRANSLATIONS(flat_spice,1'b1) = vdd
+        GLOBAL_TRANSLATIONS(sim,1'b0) = gnd
+        GLOBAL_TRANSLATIONS(sim,1'b1) = vdd
+        GLOBAL_TRANSLATIONS(spice,1'b0) = gnd
+        GLOBAL_TRANSLATIONS(spice,1'b1) = vdd
+        GLOBAL_TRANSLATIONS(verilog,GND) = 1'b0
+        GLOBAL_TRANSLATIONS(verilog,gnd) = 1'b0
+        GLOBAL_TRANSLATIONS(verilog,supply,GND) = supply0 GND;
+        GLOBAL_TRANSLATIONS(verilog,supply,VDD) = supply1 VDD;
+        GLOBAL_TRANSLATIONS(verilog,VDD) = 1'b1
+        GLOBAL_TRANSLATIONS(verilog,Vdd) = 1'b1
+        GLOBAL_TRANSLATIONS(verilog,vdd) = 1'b1
+        GLOBAL_TRANSLATIONS(vhdl,1'b0) = '0'
+        GLOBAL_TRANSLATIONS(vhdl,1'b1) = '1'
+        GLOBAL_TRANSLATIONS(vhdl,GND) = '0'
+        GLOBAL_TRANSLATIONS(vhdl,gnd) = '0'
+        GLOBAL_TRANSLATIONS(vhdl,VDD) = '1'
+        GLOBAL_TRANSLATIONS(vhdl,Vdd) = '1'
+        GLOBAL_TRANSLATIONS(vhdl,vdd) = '1'
+</pre>
+
+<li>
+<b><pre>
+GRID_SPACING
+</pre></b>
+
+Spacing of visible grid lines when grid is enabled.  A spacing of 1 
+corresponds to the minimum wiring grid in SUE.
+
+<p>
+
+To display grid lines with different spacings in X and Y, set
+GRID_SPACING to a list of 2 integers, the first for X and the second for Y.
+For example:
+
+<p>
+
+<pre>
+        set GRID_SPACING "4 8"
+</pre>
+
+
+<p>
+
+VALUE (INTEGER_LIST,DEFAULT):  8
+
+<p>
+
+<li>
+<b><pre>
+LIB
+</pre></b>
+
+Pathnames to libraries to be added to the SUE search path.
+
+<p>
+
+The suggested method for adding a lib is:
+
+<p>
+
+<pre>
+        lappend LIB &lt;path_to_lib>
+</pre>
+
+Any SUE files (or tcl procedures in files with a .tcl suffix) in the
+SUE search path will be automatically loaded when needed.
+
+<p>
+
+This variable is only accessed at startup and thus must be set in a
+.suerc file.
+
+<p>
+
+VALUE (LIST):  
+
+<p>
+
+<li>
+<b><pre>
+MAX_BUS_WIDTH
+</pre></b>
+
+Maximum bus width allowed during netlisting.  A value greater than
+this flags an error.
+
+<p>
+
+VALUE (INTEGER,DEFAULT):  256
+
+<p>
+
+<li>
+<b><pre>
+MAX_EXEC
+</pre></b>
+
+Command line to start max for cross-probing.
+
+<p>
+
+VALUE (STRING,DEFAULT):  xterm $PROBE_DISPLAY -e max
+
+<p>
+
+<li>
+<b><pre>
+NETLIST(ignore_unconnected)
+</pre></b>
+
+A list Pin names that will not generate unconnected warnings during
+netlisting.
+
+<p>
+
+For example, to not display warnings when the scan_in pin is
+unconnected (presumably, a later script will hook up these pins in the
+netlist), use:
+
+<p>
+
+<pre>
+         set NETLIST(ignore_unconnected) "scan_in"
+</pre>
+
+
+<p>
+
+VALUE (LIST):  
+
+<p>
+
+<li>
+<b><pre>
+NETLIST(no_header)
+</pre></b>
+
+If true (1), header files are not included in the spice or
+verilog netlists.  
+
+<p>
+
+Also, when true, the top level spice subcircuit is not commented out.
+
+<p>
+
+VALUE (BINARY,DEFAULT):  0
+
+<p>
+
+<li>
+<b><pre>
+NETLIST(warning)
+</pre></b>
+
+If true (1), prints netlist warnings of unconnected nets.  If false
+(0), ignore.
+
+<p>
+
+VALUE (BINARY,DEFAULT):  1
+
+<p>
+
+<li>
+<b><pre>
+NETLIST_CONVERT_CONSTANT
+</pre></b>
+
+If true (1) then all non-binary constants (hex, decimal, and octal)
+will be converted to binary in verilog netlists.  Set this if any
+downstream tools don't handle these constant types.
+
+<p>
+
+NOTE: you may need to remove .cache files to see the effect of changing this.
+
+<p>
+
+VALUE (BINARY,DEFAULT):  0
+
+<p>
+
+<li>
+<b><pre>
+NETLIST_MAX_NAME_LENGTH
+</pre></b>
+
+Names longer than this will be replaced during netlisting set.
+
+<p>
+
+VALUE (STRING):  1000
+
+<p>
+
+DEFAULT: 1024
+
+<p>
+
+<li>
+<b><pre>
+NETLIST_PROPS
+</pre></b>
+
+A string (or list if more than one) containing the icon properties that
+will be used when netlisting.
+
+<p>
+
+VALUE (LIST):  spice
+
+<p>
+
+<li>
+<b><pre>
+NETLIST_TYPE
+</pre></b>
+
+Determines which netlister to run.
+
+<p>
+
+Valid netlisters are: verilog, dpc, spice, flat_spice, sim.
+
+<p>
+
+This variable and its companion, NETLIST_PROPS, should be changed
+together.
+
+<p>
+
+If changed after SUE is initialized (i.e. not in a .suerc file), then
+should be followed by a call to api_change_simulation_mode.
+
+<p>
+
+VALUE (STRING):  spice
+
+<p>
+
+<li>
+<b><pre>
+PAN_MAG
+</pre></b>
+
+Amount of magnification to pan screen relative to the mouse motion.  1
+means that the screen moves with the mouse.
+
+<p>
+
+VALUE (number,DEFAULT):  2
+
+<p>
+
+<li>
+<b><pre>
+PRINT(A,COMMAND)
+</pre></b>
+
+Default command to print an "A" size schematic/icon postscript file
+generated from SUE when using the "print" command in the "File" menu.
+The "-r" switch to lpr removes the file after printing.
+
+<p>
+
+Can be overridden in the "print setup..." command in the "File" menu.
+
+<p>
+
+VALUE (STRING,DEFAULT):  lpr -r %s
+
+<p>
+
+<li>
+<b><pre>
+PRINT(PAGE_SIZE)
+</pre></b>
+
+Default page size at which to print the schematic/icon.  The page size
+dimensions for this size are defined in PRINT($PRINT(PAGE_SIZE),SIZE)
+and the print command for this size is defined in
+PRINT($PRINT(PAGE_SIZE),COMMAND).
+
+<p>
+
+Can be overridden in the "print setup..." command in the "File" menu.
+
+<p>
+
+VALUE (STRING,DEFAULT):  A
+
+<p>
+
+<li>
+<b><pre>
+PRINT(PAGE_SIZES)
+</pre></b>
+
+Possible page sizes available for printing.  
+
+<p>
+
+Pages sizes are defined by specifying PRINT(&lt;page_size>,SIZE) and
+PRINT(&lt;page_size>,COMMAND).
+
+<p>
+
+VALUE (LIST,DEFAULT):  A B
+
+<p>
+
+<li>
+<b><pre>
+READ_ONLY
+</pre></b>
+
+Determines if newly loaded cells will be set to read-only (no
+modifications allowed) by default.  If true (1) all newly loaded cells
+will be read-only.
+
+<p>
+
+Changing the status of "all cells" in the "toggle read only" menu
+option, will change the value of this command for this SUE session.
+
+<p>
+
+VALUE (BINARY,DEFAULT):  0
+
+<p>
+
+<li>
+<b><pre>
+SIM_PARAMS
+</pre></b>
+
+For creating sim files for LVS and cross-probing with max.  
+
+<p>
+
+Need to set the values here for any SPICE parameters you use.
+
+<p>
+
+For Example:
+
+<p>
+
+<pre>
+        set SIM_PARAMS(ln_min) 0.24u
+        set SIM_PARAMS(lp_min) 0.24u
+</pre>
+
+
+<p>
+
+ARRAY:
+<pre>
+        SIM_PARAMS(ln_min) = 0.24u
+        SIM_PARAMS(lp_min) = 0.24u
+        SIM_PARAMS(wn) = 1
+        SIM_PARAMS(wp) = 2
+</pre>
+
+<li>
+<b><pre>
+SPICE_PROBE_CMD(NST)
+</pre></b>
+
+Command to start up NST from SUE for cross-probing.
+
+<p>
+
+NOTE: this string gets evaluated just before execution to allow
+current global variables to be used.
+
+<p>
+
+VALUE (STRING,DEFAULT):  nst -geometry $GEOMETRY(NST) $PROBE_DISPLAY
+
+<p>
+
+<li>
+<b><pre>
+SPICE_PROBE_TYPE
+</pre></b>
+
+Waveform viewer to use for cross-probing in spice mode.
+
+<p>
+
+VALUE (STRING,DEFAULT):  NST
+
+<p>
+
+<li>
+<b><pre>
+SUE_EXECUTE
+</pre></b>
+
+Contains a list of commands which get executed after SUE comes up but before
+any command line commands get executed.
+
+<p>
+
+Any SUE commands, like api calls, that should be executed at start up
+should be add to this variable in the .suerc file, preferably with the
+lappend command.  API commands cannot be executed directly from .suerc
+files sinces SUE is not yet initialized at that point.  For example, adding the following lines to your local .suerc file:
+
+<p>
+
+<pre>
+        lappend SUE_EXECUTE  "api_icon_listbox -command change -dir $SUE_DIR/schematics/devices -index 1"
+        lappend SUE_EXECUTE  "api_icon_listbox -command change -dir $SUE_DIR/schematics/mspice -index 2"
+</pre>
+
+Will set the listboxes at startup.
+
+<p>
+
+NOTE: illegal command syntax here can cause SUE to error out before starting up.
+
+<p>
+
+VALUE (LIST_OF_LISTS):  {api_icon_listbox -command change -dir /home/cad/mmi/sue/schematics/devices -index 1} {api_icon_listbox -command change -dir /home/cad/mmi/sue/schematics/mspice -index 2}
+
+<p>
+
+DEFAULT: 
+
+<p>
+
+<li>
+<b><pre>
+TITLE_BAR_STRING
+</pre></b>
+
+String that appears at the top of title bars
+
+<p>
+
+For example
+
+<p>
+
+<pre>
+        set TITLE_BAR_STRING "Micro Magic Inc., Confidential and Proprietary"
+</pre>
+
+
+<p>
+
+VALUE (STRING):  Micro Magic Inc., Confidential and Proprietary
+
+<p>
+
+DEFAULT: Change TITLE_BAR_STRING in .suerc for this string
+
+<p>
+
+<li>
+<b><pre>
+VERILOG_CMD
+</pre></b>
+
+Command to run verilog when executing "verilog_it" in the "Sim" menu.
+The current cell is appended to this string before it is executed.
+
+<p>
+
+If using vcs, you must include the -R flag.
+
+<p>
+
+VALUE (STRING):  verilog +lic_ncv +libext+.vb+.v -y . -y lib.v
+
+<p>
+
+DEFAULT: verilog +libext+.vb+.v -y . -y lib.v
+
+<p>
+
+<li>
+<b><pre>
+VERILOG_PROBE_CMD(interactive)
+</pre></b>
+
+Command to run when executing "init probe" in the "Sim" menu.
+The current cell is appended to this string before it is executed.
+
+<p>
+
+If using vcs, you must include the following flags "+cli -O0 -R" and
+for version 4.1 or earlier use "+cli+2 -O0 -R".  NOTE: due to a
+limitation in the vcs cli, you cannot use the interactive feature of
+SUE if your verilog uses the $fopen command.
+
+<p>
+
+VALUE (STRING):  verilog +lic_ncv -s +libext+.vb+.v -y . -y lib.v
+
+<p>
+
+DEFAULT: verilog -s +libext+.vb+.v -y . -y lib.v
+
+<p>
+
+<li>
+<b><pre>
+VERILOG_ROOT
+</pre></b>
+
+For verilog crossprobing, SUE needs to know the top most module name
+to generate full hierarchical signal names.
+
+<p>
+
+VALUE (STRING,DEFAULT):  test
+
+<p>
+
+<li>
+<b><pre>
+VERILOG_STEP
+</pre></b>
+
+This values specifies the amount of simulation time to step forward
+when the "step verilog" command is executed from the "Sim" menu.
+
+<p>
+
+VALUE (NUMBER,DEFAULT):  10
+
+<p>
+
+</ul>
+
+<hr>
+</html>

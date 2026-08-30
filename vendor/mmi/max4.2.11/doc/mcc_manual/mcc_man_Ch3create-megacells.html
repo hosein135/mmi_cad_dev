@@ -1,0 +1,1716 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 18:16:47">
+<title>Creating Megacells</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MCC MegaCell Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="mcc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="mcc_man_Ch2runningMCC.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 3 </font>
+</h2>
+
+
+<h1>
+  <a name="1028486"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Creating Megacells</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1028630"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Overview</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1045282"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To create a megacell, you need the leaf cells in MAX format and the control program written in <b><strong class="Strong">tcl</strong></b>. The control program sets parameters and defines the tiling, via programming, and port propagation. Typically, this control program is sourced by the <b><code class="CodeStrong">.maxrc </code></b>file on startup. Otherwise, it can be sourced from the command line in MAX. It can also be included directly in the <b><code class="CodeStrong">.maxrc</code></b> file. For details on what is required in the leaf cell layout, refer to the sections <a href="mcc_man_Ch3create-megacells.html#1028789">Abutment</a> and, <a href="mcc_man_Ch3create-megacells.html#1028977">Netlisting</a>.</font>
+<p>
+<p>
+  <dt> <a name="1028632"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The MCC control program is sourced into a <b><strong class="Strong">tcl</strong></b> interpreter and must abide by all <b><strong class="Strong">tcl</strong></b> syntax conventions. In addition, any <b><strong class="Strong">tcl</strong></b> programs or expressions can be added to this control program to aid in building megacells. The <b><strong class="Strong">tcl</strong></b> language is a standard, free language and is described in many books and web pages (see, for example, the <b><strong class="Strong">Scriptics</strong></b> <b><strong class="Strong">tcl/tk</strong></b> page at <b><strong class="Strong">http://www.scriptics.com</strong></b>). MAX and MCC use the <b><strong class="Strong">tcl/tk8.0</strong></b> version of <b><strong class="Strong">tcl</strong></b>. </font>
+<p>
+<p>
+  <dt> <a name="1028634"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The control program should define all parameters and other options and variables needed for the compiler and netlisting. These parameters, options, and variables are described in the following sections. Note that <b><strong class="Strong">tcl</strong></b> and MAX and MCC are case sensitive. </font>
+<p>
+<p>
+  <dt> <a name="1028635"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The control program should also define the following special procedures: </font>
+<p>
+<pre>
+	setup_&lt;megacell&gt;
+	program_&lt;megacell&gt;</font> 
+      </pre>
+ 
+  <dt> <a name="1028637"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The procedure <b><code class="CodeStrong">setup_&lt;megacell&gt;</code></b> (for example, "<b><code class="CodeStrong">setup_sram</code></b>") is optional and is executed before the tiler. It can be used to change the tiler, via programming, or port propagation that can be parameter dependent. For example, if you want to substitute mux cells depending on a parameter that changes the data width, you would do it in the <b><code class="CodeStrong">setup_ </code></b>procedure. Alternatively, if you were programming a ROM, you might read the data file and set up the tiler in the <b><code class="CodeStrong">setup_</code></b> procedure, depending on the data file. </font>
+<p>
+<p>
+  <dt> <a name="1028638"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The procedure <b><code class="CodeStrong">program_&lt;megacell&gt;</code></b> (for example "<b><code class="CodeStrong">program_sram</code></b>") is called to program the vias for the megacell. It is also optional, but almost always necessary to create the desired functionality. Procedure contents are defined in the section<a href="mcc_man_Ch3create-megacells.html#1028915"><b><code class="CodeStrong">Via Programming </code></b> </a>. </font>
+<p>
+<p>
+  <dt> <a name="1038118"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While reading the following sections, it would be helpful to view the example control program for an SRAM which is part of the MCC tutorial.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028643"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Parameters</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028644"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Parameters are global <b><strong class="Strong">tcl</strong></b> variables that you choose. For example, if you want parameters for the number of rows and the number of columns of a memory, you might set the following parameters: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set ROWS 128
+	set COLUMNS 256
+ 
+      </pre>
+<p>
+  <dt> <a name="1028648"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the values are the default values of these parameters. When you run MCC interactively, you can change these values.</font>
+<p>
+<p>
+  <dt> <a name="1028649"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For MCC to know what parameters to put in the parameter popup form, you need to add them to the <b><code class="CodeStrong">MC(&lt;megacell&gt;,parameters)</code></b> variable. For example, you add the line:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(sram,parameters) "ROWS COLUMNS"
+</font><a name="1028650"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028651"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To set parameters to which you do not allow the user access, do not add them to the <b><code class="CodeStrong">MC(&lt;megacell&gt;,parameters)</code></b> variable. For example, you can use <b><code class="CodeStrong">STRAP_SPACING</code></b> for the number of cells between straps. It is better to use a numeric string like <b><code class="CodeStrong">STRAP_SPACING</code></b> than a number, even if you never want to change it. This will make the megacell control program much more understandable. </font>
+<p>
+<p>
+  <dt> <a name="1028653"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We recommend that you choose parameters that pertain to the final output. For example, if you are building an SRAM with the spine down the center so half the memory cells are on the right of the spine and the other half on the left, you should create a parameter for the total number of memory columns. Do not have the parameter specify the number of columns in each half - this will lead to confusion. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028656"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Tiling</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028657"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Tiling is specified hierarchically. The way a small group of cells fits together is first defined and given a name. This is called a <em class="Emphasis">macro</em>. You use this macro just as if it were a leaf cell to build even more complicated and larger structures, until you eventually define the entire megacell. The name of the macro defining the entire megacell is the name that you give to MCC to tell it to build that megacell ("<b><code class="CodeStrong">sram</code></b>" in the previous example). Even though the tiler is specified hierarchically, the user independently controls the amount of hierarchy in the final layout, as described later in this section. </font>
+<p>
+<p>
+  <dt> <a name="1028658"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To tile up a design, ensure that leaf cells meet the following criteria: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1040825"> </a>They must contain the layout for the wiring to connect signals together when the cells are tiled - MCC does not perform routing. You can create leaf cells that only contain routing, if necessary. Sometimes, you need to create a leaf cell (for the tiler) that contains other leaf cells and routing. For example, the base of an SRAM often must be done by hand. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1040897"> </a>They must contain abutment information. (For further information, see<a href="mcc_man_Ch3create-megacells.html#1028789"><b><code class="CodeStrong">Abutment </code></b> </a>.)</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1040898"> </a>Though not required, it is highly recommended that all leaf cells are DRC clean, with no quarter contacts or half wires.</font>
+</p>   </ol>
+<p>
+  <dt> <a name="1028659"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The MCC tiler is controlled by a set of statements of the form: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(&lt;<b><code class="CodeEmphasis">name</code></b>&gt;) &lt;<b><code class="CodeEmphasis">how_to_build_this</code></b>&gt;</font><a name="1028660"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029928"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028661"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This command defines how to build the macro <b><code class="CodeStrong">&lt;</code></b><b><strong class="Strong">name</strong></b><b><code class="CodeStrong">&gt;</code></b>. It is built from a combination of leaf cells and other macros. Typically, each macro stipulates a level of hierarchy in the final design; however, this is not a requirement. </font>
+<p>
+<p>
+  <dt> <a name="1028662"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The full syntax of the macro command is: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(&lt;name&gt;) {[CELL] &lt;row1&gt; &lt;row2&gt; ...}</font><a name="1028664"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029929"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028665"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the syntax is very important here - you need to keep track of the braces ({}) very carefully. At each level of the hierarchy you can specify whether you want the combination of cells and macros to be a separate cell in the layout or not. This selection is done by adding the keyword "<b><code class="CodeStrong">CELL</code></b>" to the beginning of the definition, which will make a separate cell in the layout. If you never use the <b><code class="CodeStrong">CELL</code></b> keyword, the final layout will be completely flat (except for the leaf cells). </font>
+<p>
+<p>
+  <dt> <a name="1041257"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The MCC tiler places the specified rows one above the other. The lower left-hand corner of the first row <b><code class="CodeStrong">&lt;row1&gt;</code></b> is placed at the origin (0,0). The next row <b><code class="CodeStrong">&lt;row2&gt;</code></b> is abutted to the top of <b><code class="CodeStrong">&lt;row1&gt;</code></b> aligned to the left edge of <b><code class="CodeStrong">&lt;row1&gt;</code></b>, and so on <a href="mcc_man_Ch3create-megacells.html#1041261">(See Figure 7)</a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1041261"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 7:   Tiling Rows Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig1.gif" border="1">
+</div></font><a name="1041336"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1041262"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, <b><code class="CodeStrong">&lt;row2&gt;</code></b> happens to be wider and taller than the other rows. </font>
+<p>
+<p>
+  <dt> <a name="1028678"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Each row can, and often is, made up of cells and macros. A row is defined as follows: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	row := {<b><code class="CodeEmphasis">object</code></b> [<b><code class="CodeEmphasis">object</code></b> ...]}     or
+	row := <b><code class="CodeEmphasis">object</code></b></font><a name="1028679"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029930"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028680"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You must put braces around the list of objects to signify a list. The objects are placed from left to right, abutting on the sides. The height of the entire row is determined by the height of the tallest object in that row. </font>
+<p>
+<p>
+  <dt> <a name="1028681"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Here is a simple example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(test) {CELL {foo bar} {foo foo bar}}</font><a name="1028682"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029931"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028683"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This produces the placement shown in <a href="mcc_man_Ch3create-megacells.html#1028692">Figure 8</a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028692"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 8:   Tiling Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig2.gif" border="1">
+</div></font><a name="1031288"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028693"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also specify the orientation and name (in other words, the <em class="Emphasis">instance</em> name) of an object using the following syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	object := {&lt;cell|macro&gt; &lt;<b><code class="CodeEmphasis">orientation</code></b>&gt; &lt;<b><code class="CodeEmphasis">instance_name</code></b>&gt;} or
+	object := &lt;cell|macro&gt;</font><a name="1028694"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029932"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028696"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The orientation can be one of those shown in <a href="mcc_man_Ch3create-megacells.html#1028752">Table 1</a>: </font>
+<p>
+</dl></dl>
+<a name="1028752"> </a><font face="ITC Franklin Gothic Book">Table 1: Orientation and Name of Objects  <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr align="center" bgcolor="#CCCCCC">
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1028699"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">MAX</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1028701"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">SUE</font></font></th>
+    <th><font face="Verdana, Arial, Helvetica, sans-serif" color="#003366"><a name="1028703"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Effect</font></font></th>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028705"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">""</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028707"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">R0</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028709"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Standard orientation</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028711"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">fx</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028713"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">RX</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028715"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Mirrored left to right</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028717"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">fy</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028719"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">RY</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028721"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Flipped top to bottom</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028723"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">r180</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028725"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">RXY</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028727"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Mirrored and flipped</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028729"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">r90</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028731"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">R90</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028733"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Rotated 90 degrees clockwise</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028735"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">fy_r90</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028737"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">R90X</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028739"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">First flipped, then rotated 90 degrees</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028741"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">fx_r90</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028743"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">R90Y</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028745"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">First mirrored, then rotated 90 degrees</font></font></td>
+  </tr>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028747"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">r270</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028749"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">R270</font></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><a name="1028751"> </a><font size="-1"  face="Verdana, Arial, Helvetica, sans-serif">Rotated 270 degrees clockwise</font></font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font><dl><dl>
+<p>
+  <dt> <a name="1028753"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can specify orientations in either MAX or SUE format. We recommend MAX format because it corresponds to what you will see on the screen. </font>
+<p>
+<p>
+  <dt> <a name="1028754"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you include the orientation in the object, you cannot use the shorthand name for the row syntax. </font>
+<p>
+<p>
+  <dt> <a name="1028755"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following example includes orientations, and creates the common SRAM layout shown in <a href="mcc_man_Ch3create-megacells.html#1028766">Figure 9</a>: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(cell_4) {CELL {cell {cell fx}} {{cell r180} {cell fy}}}
+</font><a name="1028756"> </a>
+      </pre>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028766"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 9:   Orientation Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig3.gif" border="1">
+</div></font><a name="1031305"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028767"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you do not want to type the macro lines in by hand, MCC can help you to create them. Simply create a layout in MAX and add the cells or macros into it as you want them, including proper orientations. Then run <b><code class="CodeStrong">MC What,</code></b> in the MAX <b><code class="CodeStrong">Tool</code></b> menu. MCC will output to the MAX command window (the shell window from which you started MAX) the appropriate <b><code class="CodeStrong">MACRO</code></b> line(s) to create the layout. You can then cut and paste this output into your control program. </font>
+<p>
+<p>
+  <dt> <a name="1028768"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also specify the instance name for a given cell instead of letting MAX choose a name for it by adding the instance name after the orientation. The default instance name has the format <b><code class="CodeStrong">&lt;cell_name&gt;_&lt;count&gt;</code></b>. For example, the following line produces the layout shown in <a href="mcc_man_Ch3create-megacells.html#1028780">Figure 10</a>: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(cell_4) {CELL {{cell "" ll} {cell fx lr}} {{cell r180 ul} {cell fy ur}}}</font><a name="1028770"> </a>
+      </pre>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028780"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 10:   Instance Name Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig4.gif" border="1">
+</div></font><a name="1031346"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028781"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, the 4 cells are named "<b><code class="CodeStrong">ll</code></b>", "<b><code class="CodeStrong">lr</code></b>", "<b><code class="CodeStrong">ul</code></b>", and "<b><code class="CodeStrong">ur</code></b>", instead of "<b><code class="CodeStrong">cell_0</code></b>", "<b><code class="CodeStrong">cell_1</code></b>", "<b><code class="CodeStrong">cell_2</code></b>", "<b><code class="CodeStrong">cell_3</code></b>" as in <a href="mcc_man_Ch3create-megacells.html#1028766">Figure 9</a>. If you specify duplicate instance names, MAX will add "<b><code class="CodeStrong">_&lt;num&gt;</code></b>" to the specified instance name to make it unique. </font>
+<p>
+<p>
+  <dt> <a name="1028782"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By default, leaf cell names are used in the <b><code class="CodeStrong">MACRO</code></b> declaration above. Sometimes you need to refer to a leaf cell of a different name based on the input parameters, or the leaf cell name might be cumbersome or nonintuitive. To alias a leaf cell to another name, add a line that has the following form: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC_DATA(&lt;desired_name&gt;) &lt;leaf_cell_name&gt;
+</font><a name="1028784"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028785"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">&lt;leaf_cell_name&gt;</code></b> is the actual layout cell name and <b><code class="CodeStrong">&lt;desired_name&gt;</code></b> is how you refer to it in the tiler. If no <b><code class="CodeStrong">MC_DATA</code></b> field is present, then MCC uses the default. For example, you might add the following line to more easily refer to this SRAM cell by using the word "<b><code class="CodeStrong">cell</code></b>" instead of "<b><code class="CodeStrong">L018CELL_V3_2</code></b>": </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC_DATA(cell) L018CELL_V3_2</font><a name="1028786"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029970"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028787"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Furthermore, aliasing makes it much easier to substitute this cell for another, if necessary. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028789"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Abutment</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1045381"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before describing the more advanced features of the tiler, including the <b><code class="CodeStrong">REPEAT</code></b> keyword, we need to address abutting cells. The tiler places cells next to and on top of other cells. To place cells correctly, it needs to know the desired cell abutment boundaries. This is especially important for memories because leaf cells typically overlap and share contacts, wires, and source/drain areas. Note that the cell origin does not matter, only the abutment boundaries. </font>
+<p>
+<p>
+  <dt> <a name="1028792"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC supports three different means of determining the cell abutment boundaries. </font>
+<p>
+<p>
+  <dt> <a name="1042077"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1042123"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>Abutment boundaries must be rectangular. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1042078"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The suggested and most common way is to draw a special layer in each leaf cell whose extent is the abutment boundary. In MAX, this layer is often called <b><strong class="Strong">prb</strong></b> for <em class="Emphasis">place and route boundary</em>.To tell MCC what layer you are using, add the following line to your MCC control program: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(boundary) &lt;<b><code class="CodeEmphasis">layer_name</code></b>&gt;</font><a name="1028793"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029971"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028794"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you use the <b><code class="CodeStrong">prb</code></b> layer, you add this line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(boundary) prb
+</font><a name="1028796"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028797"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the <b><code class="CodeStrong">prb</code></b> layer is the default, so if you use it, you do not need to add this line. Notice in <a href="mcc_man_Ch3create-megacells.html#1042461">Figure 11</a> that the <b><code class="CodeStrong">prb</code></b> layer does not go to the edge of the cell. This means the cells will overlap when tiled together.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1042461"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 11:   Example of "prb" Layer as Default in MAX Layout Editor.</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig05.gif" border="1">
+</div></font><a name="1042524"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1042553"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028798"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A second approach is to add a label to each leaf cell whose bounding box is the desired abutment boundary and whose text is "<b><code class="CodeStrong">bbox</code></b>". In MAX, use a <em class="Emphasis">box</em> label instead of a point label. (For additional information on labels, refer to the <em class="Emphasis">Micro Magic Tools MAX User Guide</em>.) Furthermore, the label must be on the layer <b><code class="CodeStrong">space</code></b> (not attached to any layer) and must be of type <b><code class="CodeStrong">comment</code></b> or <b><code class="CodeStrong">local</code></b>. This works exactly like the abutment layer described in the first approach, except it uses a label instead. If you do not have a spare layer or do not want to add one, you can use this approach. </font>
+<p>
+<p>
+  <dt> <a name="1028799"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A third approach is to type the coordinates of the abutment boundary into the <b><code class="CodeStrong">MC_DATA</code></b> array that was described earlier for aliasing leaf cell names. The full syntax of this line is: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC_DATA(&lt;<b><code class="CodeEmphasis">name</code></b>&gt;) "&lt;<b><code class="CodeEmphasis">leaf_cell_name</code></b>&gt; &lt;<b><code class="CodeEmphasis">x1</code></b>&gt; &lt;<b><code class="CodeEmphasis">y1</code></b>&gt; &lt;<b><code class="CodeEmphasis">x2</code></b>&gt; &lt;<b><code class="CodeEmphasis">y2</code></b>&gt;"</font><a name="1028800"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029973"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028801"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Thus if you have a leaf cell called <b><code class="CodeStrong">foo</code></b> whose abutment boundary is at the coordinates (0,0) and (13.4,8.6) you would add the following line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC_DATA(foo) "foo 0 0 13.4 8.6"</font><a name="1028802"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029974"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028803"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Specifying the abutment boundary in this way is cumbersome and can easily introduce an error. Use this technique only if you do not want to modify the leaf cell layouts. </font>
+<p>
+<p>
+  <dt> <a name="1028804"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If a leaf cell has none of the specifications described above for the abutment boundary, MCC defaults to using the bounding box of the geometries in the cell in MAX. This simple technique is not sufficient if the cell overlaps with its neighbors. Furthermore, it is rarely correct because implant and well layers usually extend beyond wiring. However, this technique can be useful when getting started. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028806"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Special Keywords</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028808"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to the keyword "<b><code class="CodeStrong">CELL</code></b>" described in the "Parameters" section, you can use the following special keywords: <b><code class="CodeStrong">REPEAT</code></b>, <b><code class="CodeStrong">TOP</code></b>, <b><code class="CodeStrong">BOTTOM</code></b>, <b><code class="CodeStrong">SPACE</code></b>, and <b><code class="CodeStrong">STRETCH</code></b>. The common <b><code class="CodeStrong">REPEAT</code></b> command is described in the next section. Use the rest of the keywords very sparingly. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028810"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>REPEAT</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028811"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To create parameterized megacells, use the <b><code class="CodeStrong">REPEAT</code></b> command. Any repetition of cells or macros in the <b><code class="CodeStrong">MACRO</code></b> lines can be simplified to the "<b><code class="CodeStrong">REPEAT</code></b>" keyword, the number of times to repeat it, and what cell or macro to repeat. The repeat value can be a single number, a variable (in other words, a parameter), or an expression. The syntax for <b><code class="CodeStrong">REPEAT</code></b> is: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">object := {REPEAT &lt;value&gt; &lt;cell|macro&gt;}
+</font><a name="1028812"> </a>
+      </pre>
+<p>
+  <dt> <a name="1042841"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if you wanted a macro called <b><code class="CodeStrong">foo4</code></b> to place four copies of the leaf cell "<b><code class="CodeStrong">foo</code></b>" in a row, as shown in <a href="mcc_man_Ch3create-megacells.html#1028822">Figure 12</a>, you could add: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(foo4) {CELL {foo foo foo foo}}
+</font><a name="1042842"> </a>
+      </pre>
+<p>
+  <dt> <a name="1042844"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">or use the repeat command: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MACRO(foo4) {CELL {{REPEAT 4 foo}}}
+</font><a name="1042845"> </a>
+      </pre>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028822"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 12:   Repeat Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig5.gif" border="1">
+</div></font><a name="1031587"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030019"> </a>
+      </pre>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1030016"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">REPEAT</code></b> command repeats the next cell or group the desired number of times, just as if you had typed them that many times yourself, and it allows you to parameterize it. For example, to parameterize <b><code class="CodeStrong">foo4</code></b>, just change the previous sample line to: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(foo4) {CELL {{REPEAT $NUM foo}}}
+</font><a name="1028828"> </a>
+      </pre>
+<p>
+  <dt> <a name="1036733"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case the global <b><strong class="Strong">tcl</strong></b> variable "<b><code class="CodeStrong">NUM</code></b>" is the parameter. </font>
+<p>
+<p>
+  <dt> <a name="1036734"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the <b><code class="CodeStrong">REPEAT</code></b> command can be used for <em class="Emphasis">repeating objects </em>in a row, as shown in the previous example, or for <em class="Emphasis">repeating</em> <em class="Emphasis">rows</em>, depending on the depth of braces. </font>
+<p>
+<p>
+  <dt> <a name="1042943"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, to repeat the row "<b><code class="CodeStrong">my_row</code></b>" six times to create <a href="mcc_man_Ch3create-megacells.html#1028839">Figure 13</a>, use the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(my_rows) {CELL {REPEAT 6 my_row}}
+</font><a name="1042944"> </a>
+      </pre>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028839"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 13:   Repeat Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig6.gif" border="1">
+</div></font><a name="1031641"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028842"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This example looks very similar to "<b><code class="CodeStrong">foo4</code></b>", but has one less set of braces ({}). Remember, you can also create the desired cell layout in MAX and then use the <b><code class="CodeStrong">MC What</code></b> command to help you create these lines. </font>
+<p>
+<p>
+  <dt> <a name="1028843"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Parameterized megacells usually require expressions for the value of the repeat. For example, in the following line, the block of 2x2 SRAM cells is repeated by the expression <b><code class="CodeStrong">$COLS/4</code></b> to create a double-high row called <b><code class="CodeStrong">row2</code></b>:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(row2) {CELL {{REPEAT [expr $COLS/4] cell_4}}}
+</font><a name="1028844"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028845"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">First, you divide <b><code class="CodeStrong">COLS</code></b> by 2 because <b><code class="CodeStrong">cell_4</code></b> is already two cells wide. We then divide by 2 again because, in this implementation, the SRAM spine is in the center of the SRAM and therefore half of the complete row is on the left of the spine and half on the right. </font>
+<p>
+<p>
+  <dt> <a name="1028846"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can use any legal <b><strong class="Strong">tcl</strong></b> expression, including function calls. This expression is evaluated at the <b><strong class="Strong">tcl</strong></b> top level, so all global variables are available. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028848"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>TOP and BOTTOM</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028849"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By default, objects in rows are aligned to the bottom of the first object in the row, which is aligned to the top of the previous row. Sometimes you need to align the objects to the top of the first object in the row. This is useful only in the first row of a macro. To align to the top of the row, instead of the bottom, insert the <b><code class="CodeStrong">TOP</code></b> keyword at the beginning of the row. </font>
+<p>
+<p>
+  <dt> <a name="1028850"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Here is a common example of a simple top-level SRAM macro that uses the <b><code class="CodeStrong">TOP</code></b> keyword: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MACRO(sram) 	{CELL {TOP {side fx} base side} {{core fx} spine core}}</font><a name="1028851"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030073"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028852"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This example creates the layout shown in <a href="mcc_man_Ch3create-megacells.html#1028861">Figure 14</a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028861"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 14:   TOP Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig7.gif" border="1">
+</div></font><a name="1031944"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028862"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">TOP</code></b> keyword is necessary because the "<b><code class="CodeStrong">base</code></b>" macro is taller than the "<b><code class="CodeStrong">side</code></b>" macros. Note that the <b><code class="CodeStrong">TOP</code></b> keyword only applies to the row that it is in. If you need to resume the bottom alignment in a row beginning with <b><code class="CodeStrong">TOP</code></b>, you must add the keyword <b><code class="CodeStrong">BOTTOM</code></b> where you want the bottom alignment to proceed.</font>
+<p>
+<p>
+  <dt> <a name="1028863"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Megacells are placed with their lower left corner at the coordinates (0,0). In the previous example, however, the "<b><code class="CodeStrong">base</code></b>" macro extends below the 0 y-coordinate. Furthermore, the megacell size reported by MCC (in the <b><code class="CodeStrong">MAX Command Window</code></b>) will not include the part of the base that extends below the 0 y-coordinate. If the first object in the row is the tallest object in the row, unlike the previous example, all objects will work normally. If this is a problem, you can add another level of hierarchy, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MACRO(bottom) {CELL {TOP {side fx} base side}}
+	set MACRO(sram) {CELL bottom {{core fx} spine core}}</font><a name="1028864"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1028866"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>SPACE</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028867"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes you need to add additional space between objects or rows - for example, when you do not want the objects or rows to abut. You can accomplish this with the <b><code class="CodeStrong">SPACE</code></b> command. The <b><code class="CodeStrong">SPACE</code></b> command takes one argument, the <em class="Emphasis">space value,</em> in microns. Depending on the context - whether it is inside a row or not - it will either add spaces between objects in a row, or between rows. </font>
+<p>
+<p>
+  <dt> <a name="1028868"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Consider the following example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(test) {CELL {thin {SPACE 2} thin} {fat fat}}</font><a name="1028869"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030078"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028870"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This creates the cell placement shown in <a href="mcc_man_Ch3create-megacells.html#1028879">Figure 15</a>: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028879"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 15:   SPACE Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig8.gif" border="1">
+</div></font><a name="1032296"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028880"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1037028"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Do NOT use the <b><code class="CodeStrong">SPACE</code></b> command as a substitute for setting the abutment boundaries of the leaf cells. You will get very frustrated if you try to do this. Use the <b><code class="CodeStrong">SPACE</code></b> command sparingly since it will not track changes to the leaf cells or process shrinks. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1043368"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To add a <em class="Emphasis">vertical</em> space, the <b><code class="CodeStrong">SPACE</code></b> command must be placed slightly differently. Consider the following example, which produces the cell placement shown in <a href="mcc_man_Ch3create-megacells.html#1028892">Figure 16</a>.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MACRO(test2) {CELL {foo foo} {SPACE 2} bar}
+</font><a name="1028882"> </a>
+      </pre>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028892"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 16:   Vertical SPACE Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig9.gif" border="1">
+</div></font><a name="1032509"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, the <b><code class="CodeStrong">{SPACE 2}</code></b> command has one less set of braces around it than in the previous example. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1028895"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>STRETCH</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028896"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes you want cells to be separated, or have space between their abutment boundaries, yet preserve connectivity. For example, in a pad ring, you might want to change the pad spacing but not have to re-layout all of the different types of pad cells, yet still preserve the connectivity of the power ring through them. You can do this with the <b><code class="CodeStrong">STRETCH</code></b> command. The <b><code class="CodeStrong">STRETCH</code></b> command is an extension to the object syntax. The extended object syntax is: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">object := {&lt;cell|macro&gt; &lt;orientation&gt; &lt;instance_name&gt; [STRETCH] &lt;left_spacing&gt; &lt;right_spacing&gt;} </font><a name="1028897"> </a>
+      </pre>
+<p>
+  <dt> <a name="1045908"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>or</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">object := {&lt;cell|macro&gt; &lt;orientation&gt; &lt;instance_name&gt; [STRETCH] &lt;spacing&gt; center}
+</font><a name="1028898"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028899"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the spacings are in microns. Thus, you can either specify the spacing on the left and the spacing on the right of the cell, or you can specify the total spacing and tell MCC to place the cell in the center. For example, a snippet of the west pad ring on a chip might look like the following: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set spacing 10
+	set MACRO(pad_w) {CELL {pr_corner
+	   {pad_vddq "" "" STRETCH $spacing center}
+	   {pad_vdd "" "" STRETCH $spacing center}
+	   {pad_gnd "" "" STRETCH $spacing center}
+	   {pad_gndq "" "" STRETCH $spacing center}
+	   {pad_out "" dout12 STRETCH $spacing center}
+	   {pad_vddq "" "" STRETCH $spacing center}
+	   {pad_out "" dout13 STRETCH $spacing center}
+	   {pad_gndq "" "" STRETCH $spacing center}
+	   ...
+	}</font><a name="1038259"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030153"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028901"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this example, an additional 10 microns of space is added between each pad in the pad ring. The resultant cell placement would look something like that in <a href="mcc_man_Ch3create-megacells.html#1028910">Figure 17</a>, with the wires added: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1028910"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 17:   STRETCH Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig12.gif" border="1">
+</div></font><a name="1032682"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1028911"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When MCC stretches a cell, it only stretches the metal layers that intersect the abutment boundary of the cell. Metals layers are specified in the technology source files for MAX. </font>
+<p>
+<p>
+  <dt> <a name="1038266"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1038276"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this version you can only stretch left and right. You cannot stretch up and down. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028915"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Via Programming</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028916"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have tiled up a memory, you need to make every memory cell unique. This entails, at the very least, programming the word line decoders so that each one gets a unique set of addresses. To make each memory cell unique, you could create overlay cells that contain the desired connections. Instead, MCC uses via programming. Connections are made with vias and programmed algorithmically. This approach simplifies the programming. </font>
+<p>
+<p>
+  <dt> <a name="1028917"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To further simplify via programming, MCC determines where to put the vias and what vias to use by tracing nets. You need only specify the desired ports to be connected and MCC will figure out where the nets overlap, what the layers are, and add the appropriate vias. If you need to change your design or port it to another process, the via programming will still work because it is not hard-coded to any positions. </font>
+<p>
+<p>
+  <dt> <a name="1028918"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that MAX labels (text) must be attached to the layer that will connect to the via. For example, if you want MCC to add a via between metal2 and metal3, then the labels must be attached to metal2 and metal3, respectively. While MAX can trace through all layers, for efficiency, MCC only traces a single layer during via programming. </font>
+<p>
+<p>
+  <dt> <a name="1028919"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC via programming is not meant for ROMs that are via programmed. ROM programming is better done with two types of leaf cells, one with the via and one without. </font>
+<p>
+<p>
+  <dt> <a name="1028920"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When building memories, it is generally not important that the address lines decode sequential rows of memory cells. It is only important that the addresses uniquely decode every row. However, if you want to build memories with fewer numbers of rows, you will need to be careful to tie off the address lines that decode the removed rows. </font>
+<p>
+<p>
+  <dt> <a name="1037102"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To set up the via programming for a megacell, you need to create a <b><strong class="Strong">tcl</strong></b> procedure with the name "<b><code class="CodeStrong">program_&lt;</code></b><b><strong class="Strong">megacell</strong></b><b><code class="CodeStrong">&gt;</code></b>" where <b><code class="CodeStrong">&lt;</code></b><b><strong class="Strong">megacell</strong></b><b><code class="CodeStrong">&gt;</code></b> is the name of the megacell. Typically, this procedure is in the control program. When you tell MCC to build a megacell named <b><code class="CodeStrong">&lt;megacell&gt;</code></b>, the <b><code class="CodeStrong">program_&lt;megacell&gt;</code></b> procedure is called after the tiler and before port propagation, unless you have told MCC not to program the megacell. </font>
+<p>
+<p>
+  <dt> <a name="1028922"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "<b><code class="CodeStrong">program_&lt;megacell&gt;</code></b>" procedure contains two types of MCC commands: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	program_cell &lt;<b><code class="CodeEmphasis">cell</code></b>&gt; 
+	program &lt;<b><code class="CodeEmphasis">args</code></b>&gt;
+</font><a name="1028924"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028926"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "<b><code class="CodeStrong">program_cell</code></b>" command tells MCC which cell to place the vias in and the "<b><code class="CodeStrong">program</code></b>" command tells MCC how to place the vias. If you want the vias placed in the top-level cell, then you do not need the <b><code class="CodeStrong">program_cell</code></b> command. Typically, you want to program the vias in the cell that contains the instances to be programmed. For example, if you program the word-line decoder/driver cells (wld), you want to program in the cell that contains them. This cell might be called <b><code class="CodeStrong">wlds</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1028927"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">An example procedure for programming an SRAM might look like this: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	proc program_sram {} {
+	   program_cell wlds
+	   program ...
+	   program ...
+	   program ...
+	}
+</font><a name="1028928"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028929"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The actual program lines are discussed later in this section. Note that because this is a <b><strong class="Strong">tcl</strong></b> procedure, you can also call other procedures and do other tasks here. </font>
+<p>
+<p>
+  <dt> <a name="1028930"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "<b><code class="CodeStrong">program</code></b>" command actually drives the programming of vias. The program command takes the following arguments: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	program \
+	   &lt;list of ports to alternatively connect&gt; \
+	   &lt;port to connect to in cell&gt; \
+	   &lt;format of name of cell to connect in&gt; \
+	   &lt;number of cells to make connections in&gt; \
+	   &lt;number of cells to program before moving to next port&gt;</font><a name="1028931"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030212"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028932"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Following is a very simple programming example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	program \
+	   {a1_L a1} \
+	   in1 \
+	   wld_%d \
+	   $ROWS \
+	   1</font><a name="1028933"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030227"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028934"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This program command will add vias in the cell specified in the <b><code class="CodeStrong">program_cell</code></b> command. They will connect the wires containing, alternately, ports "<b><code class="CodeStrong">a1_L</code></b>" and "<b><code class="CodeStrong">a1</code></b>" to the port "<b><code class="CodeStrong">in1</code></b>" in the cells "<b><code class="CodeStrong">wld_0</code></b>", "<b><code class="CodeStrong">wld_1</code></b>", and so on, up to "<b><code class="CodeStrong">wld_63</code></b>" (if ROWS=64). The "<b><code class="CodeStrong">%d</code></b>" in "<b><code class="CodeStrong">wld_%d</code></b>" gets replaced with the integers 0, 1, and so on. </font>
+<p>
+<p>
+  <dt> <a name="1028935"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The next address might look like this: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	program \
+	   {a2_L a2} \
+	   in2 \
+	   wld_%d \
+	   $ROWS \
+	   2</font><a name="1028936"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030228"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028937"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The main difference, in addition to the different ports, is that the last argument is now a `<b><code class="CodeStrong">2</code></b>' which means that the port "<b><code class="CodeStrong">a2_L</code></b>" will be tied to port "<b><code class="CodeStrong">in2</code></b>" in cells "<b><code class="CodeStrong">wld_0</code></b>" and "<b><code class="CodeStrong">wld_1</code></b>", "<b><code class="CodeStrong">a2</code></b>" goes to "<b><code class="CodeStrong">wld_2</code></b>" and "<b><code class="CodeStrong">wld_3</code></b>", and so on. By programming two cells before alternating the port from "<b><code class="CodeStrong">a2_L</code></b>" to "<b><code class="CodeStrong">a2</code></b>", we can build up a binary count. </font>
+<p>
+<p>
+  <dt> <a name="1028938"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In all but the smallest memories, some form of address predecoding is usually employed. In the case of 3-bit predecoding, three addresses are predecoded onto eight wires. Following is an example of how to modify the previous example to handle 3-bit predecoding:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	program \
+	   {a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8} \
+	   in1 \
+	   wld_%d \
+	   $ROWS \
+	   1</font><a name="1028939"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030229"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028940"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now, the ports will alternate through eight <b><code class="CodeStrong">wld</code></b> cells before repeating. </font>
+<p>
+<p>
+  <dt> <a name="1028941"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes the cells that you want to program do not have the names <b><code class="CodeStrong">&lt;cell&gt;_0</code></b>, <b><code class="CodeStrong">&lt;cell&gt;_1</code></b>, and so on. Note that this is the way the MAX names cells. For example, you might want to program every other cell, for example, <b><code class="CodeStrong">&lt;cell&gt;_0</code></b>, <b><code class="CodeStrong">&lt;cell&gt;_2</code></b>, and so forth. In this case, you can use a more sophisticated format: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{&lt;cell&gt;_%d [expr f($i)]}
+</font><a name="1028942"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028943"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">$i </code></b>is replaced by the values 0, 1, 2, and so on. Therefore, to program every other <b><code class="CodeStrong">wld</code></b>, you would use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{wld_%d [expr 2 * $i]}
+</font><a name="1028944"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028945"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">instead of simply </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">wld_%d
+</font><a name="1028946"> </a>
+      </pre>
+</dl></dl>
+
+<h3>
+  <a name="1028948"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Port Propagation</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1037536"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have tiled up and via programmed a megacell, you need to add the I/O and global ports to the megacell for verification and connection to the outside world. MCC adds these ports by propagating them directly up from the leaf cells and renaming them (if necessary). The ports are added to the top level on the same layer and at the same location as the ports in the leaf cells, as if the entire megacell were flattened. For example, the data output line of the sense amplifier in a SRAM might be called "<b><code class="CodeStrong">out</code></b>" in the leaf cell. You would then propagate this port in all copies of the sense amp to the top level and name them, for example, <b><code class="CodeStrong">d_out[0] - d_out[31]</code></b>. You might find it necessary to move leaf cell port locations so that when they are propagated they are in the desired positions. </font>
+<p>
+<p>
+  <dt> <a name="1028950"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To instruct MCC how to propagate the ports, add the following line to your control program: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(&lt;megacell&gt;,propagate) {&lt;prop_list&gt; [&lt;prop_list&gt; ...]}</font><a name="1028952"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030277"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028953"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">&lt;megacell&gt;</code></b> is the name of the megacell such as "<b><code class="CodeStrong">sram</code></b>". A <b><code class="CodeStrong">&lt;prop_list&gt;</code></b> is a command to propagate ports and has the form: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">&lt;prop_list&gt; := {prop|count &lt;command&gt; [&lt;command&gt; ...]}</font><a name="1028954"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030290"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028955"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To propagate a single port, you would use the "<b><code class="CodeStrong">prop</code></b>" command. If you simply want to propagate a port from a specific cell in the hierarchy, you wound add the following <b><code class="CodeStrong">&lt;prop_list&gt;</code></b>: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{prop &lt;path_to_port&gt;}</font><a name="1028957"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030291"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028958"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, to propagate the "<b><code class="CodeStrong">clk</code></b>" input from the cell base, use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{prop base_0/clk}</font><a name="1028959"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030292"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028960"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the "<b><code class="CodeStrong">_0</code></b>" is necessary here because you are specifying which instance of which cell to use and MAX appends "<b><code class="CodeStrong">_0</code></b>" to the first instance of any cell. You can also find this by selecting the cell base in MAX and looking at its name. </font>
+<p>
+<p>
+  <dt> <a name="1028961"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typically, you want to rename the port and possibly even change it's port direction (not from input to output, but from no direction to input or output). In this case, use the following syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{prop {&lt;path_to_port&gt; &lt;new_port_name&gt; &lt;port_direction&gt;}}</font><a name="1028962"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030305"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028963"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, to propagate the "<b><code class="CodeStrong">clk</code></b>" input from the cell base, change its name, and make sure that it is an input, use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{prop {base_0/clk CLOCK input}}
+</font><a name="1028964"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028965"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When propagating inputs and outputs that are a function of the size of the megacell, you typically want to use the "<b><code class="CodeStrong">count</code></b>" command. The <b><code class="CodeStrong">count</code></b> command will propagate each port in a group of leaf cells with unique names. The syntax of the <b><code class="CodeStrong">count</code></b> command is: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{count {&lt;leaf_cell&gt;/&lt;port&gt; &lt;new_port&gt; &lt;port_direction&gt; &lt;count_direction&gt;}}
+</font><a name="1028967"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028968"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, you do not specify the path to the port, just the leaf cell that the port comes from. For example, to propagate the data out ports from the sense amp leaf cells, you might use the following line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{count {sense_amp/out d_out[%d]}}
+</font><a name="1028969"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028970"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If there are 32 copies of the <b><code class="CodeStrong">sense_amp</code></b> leaf cell in the design, you will get the ports <b><code class="CodeStrong">d_out[0]</code></b> to <b><code class="CodeStrong">d_out[31]</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1028971"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the count command, the ports can be labeled from right to left (left), left to right (right), top to bottom (down), or bottom to top (up). The default count direction is right to left, but can be changed with the <b><strong class="Strong">tcl</strong></b> line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set MC(default_propagate_direction) left|right|down|up
+</font><a name="1028972"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028973"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also change the count direction for each count line. For example, to propagate the ports from left to right in the previous example, use the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">{count {sense_amp/out d_out[%d] output right}}</font><a name="1028974"> </a>
+      </pre>
+</dl></dl>
+
+<h3>
+  <a name="1028977"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Netlisting </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028978"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once a megacell has been built, it must be verified. Furthermore, a netlist (typically in SPICE format) of the megacell must be provided with the layout for higher level or full chip LVS. Otherwise, even if the megacell by itself is perfect and connected correctly to the surrounding circuitry, the chip might not work because someone accidentally ran a wire over it and shorted part of it out. </font>
+<p>
+<p>
+  <dt> <a name="1028981"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the past, this netlist has typically been created by drawing a schematic for the entire megacell, and then netlisting that schematic. Because megacells can be quite large, this is a cumbersome and error-prone process. Automating this schematic creation can be done, but writing the schematic generator and verifying it is a large task in itself. Furthermore, the schematic for the entire megacell is typically created for only two purposes: creating the netlist and documentation. </font>
+<p>
+<p>
+  <dt> <a name="1028982"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">An alternative approach is to extract a netlist directly from the megacell layout and verify the megacell from that netlist. This eliminates the time-consuming task of creating a full schematic of the megacell and iterating with LVS in order to verify that the schematic and layout are the same. Furthermore, the time of creating and verifying the schematic are only multiplied if multiple sizes or configurations of megacells are to be created. </font>
+<p>
+<p>
+  <dt> <a name="1028983"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to use the MCC netlisting functions, your layout needs to abide by these restrictions: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028985"> </a>All ports of leaf cells must have labels (text), as shown in <a href="mcc_man_Ch3create-megacells.html#1046129">Figure 18</a>. Furthermore, the labels must use the MAX types of either <b><strong class="Strong">input</strong></b>, <b><strong class="Strong">output</strong></b>, <b><strong class="Strong">inout</strong></b>, or <b><strong class="Strong">global</strong></b>. You cannot connect to a leaf cell other than through a port. If you do, the extracted netlists will be incorrect. A good practice is to run LVS between the extracted netlist and the layout. If you find any discrepancies, you likely have violated this rule. </font>
+</p>   </ol>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1046129"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 18:   Text Labels for Magnified Area of "mmi_sram_cell"</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_fig06.gif" border="1">
+</div></font><a name="1046305"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1046307"> </a>
+      </pre>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1046586"> </a>Transistors must be made from manhattan geometries only. This is a limitation of this version of MAX. Thus, bent gate transistors do not netlist correctly. Similarly, non-rectangular shaped source/drain areas likely do not netlist correctly. </font>
+</p>   </ol>
+
+<h4>
+  <a name="1028990"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Spice Netlist</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1037133"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC creates a two level SPICE netlist of your megacell by executing the <b><code class="CodeStrong">MC Netlist</code></b> command and selecting the SPICE option. The netlist contains a top level <b><code class="CodeStrong">subckt</code></b> call which instantiates all of the leaf cells and inserts loads on all of the top level nets. Each leaf cell also has a <b><code class="CodeStrong">subckt</code></b> definition which includes loads on all nets except for I/Os, as these are included in the top level <b><code class="CodeStrong">subckt</code></b>. A leaf cell is defined as a cell that contains a transistor or transistor cell like a gcell in it. </font>
+<p>
+<p>
+  <dt> <a name="1037134"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The SPICE netlist has the following limitations:</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1044385"> </a>The power network is not explicitly extracted and thus might not contain isolated power supplies if present in the design. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1044394"> </a>On the leaf cell level, isolated power supplies (assumed to be connected at a higher level) are reported as warnings. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1044399"> </a>Also, FET bulk connections are not extracted. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1046598"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It is always a good idea to run a commercial LVS program between the SPICE netlist and the layout to insure a correct extraction. </font>
+<p>
+<p>
+  <dt> <a name="1028993"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before running the SPICE netlister, you must set up the following parameters: the desired fet models, bulk terminals, and power supplies. Add the following lines to your control program or <b><code class="CodeStrong">.maxrc</code></b> file to set the desired fet models for the SPICE netlist:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(&lt;fet&gt;,model) &lt;fet_model&gt;
+</font><a name="1028995"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028996"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The defaults are: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(nfet,model) n
+	set MC(pfet,model) p
+</font><a name="1028997"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028998"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To set the bulk connections, use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(&lt;fet&gt;,bulk) &lt;supply&gt;
+</font><a name="1029000"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029001"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The bulk connection defaults are:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(nfet,bulk) gnd
+	set MC(pfet,bulk) vdd
+</font><a name="1029002"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029003"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To set the supplies for grounding of explicit capacitances and to tie off fets (mostly for critical path netlisting), use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(supply,high|low) &lt;supply&gt;
+</font><a name="1029005"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029006"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The defaults for grounding capacitances are:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(supply,high) vdd
+	set MC(supply,low) gnd
+</font><a name="1029007"> </a>
+      </pre>
+<p>
+  <dt> <a name="1044747"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The length of the signal/node names in the SPICE netlist is controlled by the following parameter.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set NETLIST_MAX_NAME_LENGTH &lt;<b><code class="CodeEmphasis">length</code></b>&gt;
+</font> </pre>
+  <dl></dl>
+<p> <dt> <a name="1044749"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This controls the length of net names that are output by MCC.</font>
+<p>  
+<p>
+  <dt> <a name="1029012"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The default value for <b><code class="CodeStrong">NETLIST_MAX_NAME_LENGTH</code></b> is 13. To set the length to 50, either type the following on the MAX command line or add it to your <b><code class="CodeStrong">.maxrc </code></b>file.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set NETLIST_MAX_NAME_LENGTH 50
+</font><a name="1029013"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1029015"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Verilog Netlist</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029016"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC creates a two-level Verilog netlist of your megacell by executing the <b><code class="CodeStrong">MC Netlist</code></b> command and selecting the Verilog option. This Verilog netlist is meant for functional verification of the megacell. For example, if you have created an SRAM, you want to ensure that each memory cell is uniquely addressed and that there are no unwanted sign inversions. </font>
+<p>
+<p>
+  <dt> <a name="1029017"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the chip that this megacell is going into is verified in Verilog, you can also substitute this extracted Verilog model for the behavioral model used in simulation and verification of the entire chip. Although the extracted model is much slower than the behavioral model to simulate, it allows you to verify your megacell has the desired functionality. Often megacells, such as memories, are black-boxed manually, which provides a likely place for errors if you cannot verify the actual megacell. </font>
+<p>
+<p>
+  <dt> <a name="1029019"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The netlist contains a top level module which instantiates all of the leaf cells. The leaf cells must be created by hand because Verilog can only simulate the simplest transistor circuits. MCC requires you to build models for all leaf cells. Fortunately, most of the behavioral models are quite simple. For example, a word-line decoder driver (wld) Verilog module might look like this: </font>
+<p>
+      <pre>
+<font face="ITC Franklin Gothic Book">
+	// word-line decoder/driver behavioral model
+	module wld (wl, in0, in1, in2);
+	input   in0, in1, in2;
+	output  wl;
+	buf buf0 (wl, in0 &amp;&amp; in1 &amp;&amp; in2);
+	endmodule       // wld
+      </font></pre>
+<p>
+  <dt> <a name="1029025"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Circuits that are inherently bidirectional or analog are slightly more difficult to model. Here is an example of a 6t SRAM cell behavioral model in Verilog: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	// 6T sram cell behavioral model
+	module cell (wl, bl, bl_L);
+	   input   wl;
+	   inout   bl, bl_L;
+	   trireg  q;
+	   // reading
+	   nmos n1 (bl, q, wl);
+	   rnmos n2 (bl_L, ~q, wl);
+	   // writing
+	   bufif1 bf1 (q, bl, wl &amp; (bl ^ bl_L));
+	endmodule       // cell</font><a name="1029027"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030423"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029029"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Verilog needs to understand what logical states each supply refers to. For MCC to set these correctly, set the following variables: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(supply,&lt;supply_name&gt;) supply0|supply1</font><a name="1029031"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030448"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029032"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following are the defaults for the supplies: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(supply,VDD) supply1
+	set MC(supply,GND) supply0</font><a name="1029033"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030455"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029034"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also alias the supplies, using the following syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(tie,&lt;supply&gt;) &lt;<b><code class="CodeEmphasis">new_name</code></b>&gt;</font><a name="1029036"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030456"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029037"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following aliases are defined by default: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set MC(tie,vdd) VDD
+	set MC(tie,gnd) GND</font><a name="1029038"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030463"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029039"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">These two lines rename any lower-case vdd and gnd ports to VDD and GND, respectively. </font>
+<p>
+<p>
+  <dt> <a name="1029040"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have a Verilog netlist of the megacell, you need to create a test bench to exercise the entire megacell. To test an SRAM, you might want to write unique data into every address of the SRAM and then read it out and compare. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1044852"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MC Critical Path</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1044853"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can extract either a SPICE netlist for the critical path of a memory or the layout associated with that critical path.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029045"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Critical Path Netlist</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1038345"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC creates a critical path netlist of your megacell through any cell(s) that you select. This netlist is generated by tracing the cone of logic backwards to the input ports and forward to the output ports from the selected cell(s). If you select the memory cell that is furthest away from the decoders and ask MCC to generate a critical path with the <b><code class="CodeStrong">MC Critical Path</code></b> command, you should get the critical path for the entire SRAM. </font>
+<p>
+<p>
+  <dt> <a name="1038346"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1038359"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Be sure to select a leaf cell and not a hierarchical cell. Also, be sure to select a cell whose cone of logic does not include too much information. For example, if you select an input address flipflop, you will get the entire SRAM netlist out. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1029048"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The<b><code class="CodeStrong"> MC Critical Path</code></b> command is not the same as a static timing analyzer which searches all legal paths to find the longest path. The MCC command simply creates the netlist through the selected path. In most memory structures, the critical path is easy to identify and thus this netlist will be the critical path. You can also select the memory cell that is the closest to the decoders and get a different type of critical path that is most susceptible to race conditions. </font>
+<p>
+<p>
+  <dt> <a name="1029049"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC tries to create as accurate a critical path netlist as possible while minimizing simulation time. All wire resistances and capacitances on the critical path are included. All gates that load the critical path are tied off appropriately. For large megacells of 1 million or more transistors, the critical paths typically contain only a few thousand devices. </font>
+<p>
+<p>
+  <dt> <a name="1029050"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Consider the small critical path section illustrated in <a href="mcc_man_Ch3create-megacells.html#1029059">Figure 19</a>: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1029059"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 19:   Critical Path Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig10.gif" border="1">
+</div></font><a name="1032862"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029060"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Assume the critical path is being traced through the NAND3 gate "<b><code class="CodeStrong">A</code></b>" above as illustrated. The NAND3 gate "<b><code class="CodeStrong">B</code></b>" is a load on the critical path on <b><code class="CodeStrong">net_23</code></b> and is modeled by the gates of the input devices of <b><code class="CodeStrong">B</code></b> tied off, as shown in <a href="mcc_man_Ch3create-megacells.html#1029069">Figure 20</a>.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1029069"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 20:   Critical Path Tie Off</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fig11.gif" border="1">
+</div></font><a name="1032900"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029070"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Here, the transistor sizes are extracted from the layout. MCC will also tie off pass gates (source/drain inputs and outputs) appropriately. </font>
+<p>
+<p>
+  <dt> <a name="1029071"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The MCC critical path netlister uses the same variables as the MCC SPICE netlister <a href="mcc_man_Ch3create-megacells.html#1028990">(See <b><code class="CodeStrong">Spice Netlist </code></b>)</a>. When tying off transistors as shown above, it ties them to their bulks or to the value defined in the variable <b><code class="CodeStrong">MC(&lt;fet&gt;,bulk)</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1029075"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes, when running the MCC critical path netlister, the cone of logic gets too large, or there are parts of the cone of logic that you do not wish to include. You can eliminate paths by setting the <b><code class="CodeStrong">CP_TIE</code></b> array. Paths can be terminated whenever they reach an instance type, using the following syntax: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set CP_TIE(&lt;instance_type&gt;) {{&lt;port&gt; &lt;tie&gt;} [{&lt;port&gt; &lt;tie&gt;} ...]}
+</font><a name="1029077"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029078"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">&lt;port&gt;</code></b> is the port in <b><code class="CodeStrong">&lt;instance_type&gt;</code></b> to tie off and <b><code class="CodeStrong">&lt;tie&gt;</code></b> is what to tie it to. </font>
+<p>
+<p>
+  <dt> <a name="1029079"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, if you have a two port memory and only wish to trace the critical path through one of the two ports, you might add the following line to ignore the second port: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	set CP_TIE(cell) {{wl2 gnd} {bl2 vdd} {bl2_L vdd}
+</font><a name="1029080"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029081"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Thus, any memory cells (<b><code class="CodeStrong">cell</code></b>) that are traced will automatically have their second word lines (<b><code class="CodeStrong">wl2</code></b>) tied low and their second bit lines (<b><code class="CodeStrong">bl2,bl2_L</code></b>) tied high. </font>
+<p>
+<p>
+  <dt> <a name="1029082"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Running <b><code class="CodeStrong">MC Critical Path</code></b> creates a SPICE netlist with the name <b><code class="CodeStrong">&lt;megacell&gt;_cp.sp</code></b>. If you don't have a file called <b><code class="CodeStrong">&lt;megacell&gt;_cp.h</code></b>, it will also create a basic header file to drive the critical path simulation. The header file looks like this: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	* &lt;Insert spice models, options, and conditions&gt;</font><a name="1029084"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	.INCLUDE '/users/sram/sram_256_256_cp.sp'</font><a name="1029085"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	* Input stimulus
+	Vclk clk gnd 0V
+	Vdin[0] din[0] gnd 0V
+	Va[0] a[0] gnd 0V
+	Va[1] a[1] gnd 0V
+	Va[2] a[2] gnd 0V
+	Va[3] a[3] gnd 0V
+	Va[4] a[4] gnd 0V
+	Va[5] a[5] gnd 0V
+	Va[6] a[6] gnd 0V
+	Ven en gnd 0V</font><a name="1029086"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	* Output loads
+	Cdout[0] dout[0] gnd 100fF</font><a name="1029087"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+	*.END</font><a name="1029088"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030542"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029089"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the inputs to the critical path have been grounded and all of the outputs have been loaded with 100fF of capacitance. To use this header, you must insert your SPICE models, options, and conditions at the top of the file. Then, change the appropriate inputs from grounded to piece-wise linear (<b><code class="CodeStrong">PWL</code></b>) sources or <b><code class="CodeStrong">PULSE</code></b> sources to exercise the critical path. Also, change the output loads to the desired values. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029090"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Extracting the Critical Path</font></i>
+</align>
+</h5>
+
+
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029091"> </a>To extract the critical path, select the cell(s) through which you want the critical path to go. This must be a leaf cell, like an SRAM cell. Use the <b><code class="CodeStrong">Select Cell </code></b>command (hotkey: <b><strong class="Strong">f</strong></b>).</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029092"> </a>Then, select <b><code class="CodeStrong">MC Critical Path</code></b> from the <b><code class="CodeStrong">Tool</code></b> menu in MAX. The popup form shown in <a href="mcc_man_Ch3create-megacells.html#1029108">Figure 21</a> will appear. Select <b><code class="CodeStrong">type</code></b> to be "<b><code class="CodeStrong">netlist</code></b>" and click on <b><code class="CodeStrong">Done</code></b>. You can also have MCC extract a smaller critical path by selecting <b><code class="CodeStrong">smaller cp</code></b>. For more detail, see the section <a href="mcc_man_Ch3create-megacells.html#1029151"><b><code class="CodeStrong">smaller cp </code></b> </a>.</font>
+</p>   </ol>
+</ol>
+<ul>
+<h5>
+<align="left">
+  <a name="1029108"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 21:   Critical Path Extraction Menu</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/crit_path_menu.gif" border="1">
+</div></font><a name="1032994"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029109"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once the critical path has been generated, MCC highlights all of the cells in the critical path and brings up a menu shown in <a href="mcc_man_Ch3create-megacells.html#1029127">Figure 22</a>. If you close the menu, you can get it back by running <b><code class="CodeStrong">MC Critical Path</code></b> and selecting "<b><code class="CodeStrong">menu</code></b>". The menu allows you to highlight the cells in the critical path, the cells and loads in the critical path, or the nets in the critical path. </font>
+<p>
+<p>
+  <dt> <a name="1029110"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have run a SPICE simulation of your critical path, you can cross-probe directly from the layout to the Micro Magic NST Waveform Viewer. Simply start NST and load the data file from the SPICE simulation, for example, by typing the following at a UNIX prompt: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">nst sram_256_256_cp.tr0</font><a name="1029112"> </a>
+      </pre>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1029127"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 22:   Select CP Nets</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+<img src="images/mc_cp.gif" border="1"><img src="images/regfile1.gif" border="1">
+</font><a name="1033534"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1038681"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Next, highlight a single net in MAX that is part of the critical path. If you are unsure what nets are part of the critical path, click the <b><code class="CodeStrong">select CP nets</code></b> button to see them all as shown in <a href="mcc_man_Ch3create-megacells.html#1029127">Figure 22</a> and then select a net (hotkey: <b><strong class="Strong">s</strong></b>). Finally, click the <b><code class="CodeStrong">plot net</code></b> button of the <b><code class="CodeStrong">MCC CP</code></b> menu and MCC will plot that net in NST as shown in <a href="mcc_man_Ch3create-megacells.html#1033950">Figure 23</a>. You can also unplot nets using the <b><code class="CodeStrong">unplot net </code></b>command. This interface makes it quite easy to debug, measure, and verify the performance and functionality of your megacell. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1033950"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 23:   Plot Net</font></i>
+</align>
+</h5>
+</ul> 
+
+<table border="0" width="100%">
+<tr>
+<td><img src="images/regfile_net.gif" border="1" width="286" height="223"><img src="images/nst.gif" border="1">
+</td>
+</tr>
+</table>
+</font><a name="1033957"> </a>
+       
+<dl><dl>
+<p>
+  <dt> <a name="1038518"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1038559"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"> You can have only one copy of NST running on your window system, otherwise MCC doesn't know which one to cross-probe to.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1038537"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You will need to tell MCC what the suffix of the data output file is if you aren't using HSPICE. The default suffix is <b><code class="CodeStrong">.tr0,</code></b> but you can change it by adding the following line with your desired suffix: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">
+		set MC(cp_suffix) .tr0</font><a name="1029141"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1029142"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Critical Path Layout</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029143"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Instead of extracting a SPICE netlist for the critical path, you can extract the layout associated with that critical path. Once the layout is extracted, you pass the GDSII of the layout to an external parasitic extraction tool.</font>
+<p>
+<p>
+  <dt> <a name="1029144"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">First, select the cell through which you want the critical path to go, just like with the critical path netlist.</font>
+<p>
+<p>
+  <dt> <a name="1029145"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Then, select <b><code class="CodeStrong">MC Critical Path</code></b> from the <b><code class="CodeStrong">Tool</code></b> menu in MAX. The menu shown in <a href="mcc_man_Ch3create-megacells.html#1029108">Figure 21</a> will appear. Select <b><code class="CodeStrong">type</code></b> to be <b><code class="CodeStrong">layout</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1029149"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following options are available:</font>
+<p>
+</dl></dl>
+
+
+<h4>
+
+  <a name="1029151"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">smaller cp</font>
+
+</h4>
+</div>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029152"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This option is available for both the critical path netlist and the critical path layout.</font>
+<p>
+<p>
+  <dt> <a name="1029153"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This creates a smaller critical path by not tracing the inputs of cells traced through their outputs. You can also use the <b><code class="CodeStrong">CP_TRACE_BASIC</code></b> variable.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TRACE_BASIC 0 or 1</font><a name="1029154"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1037295"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029155"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If set to 0, which is the default, it extracts a more complete critical path. If set to 1, MCC only traces the outputs of receivers, not the drivers, and will create a smaller critical path circuit. </font>
+<p>
+<p>
+  <dt> <a name="1029156"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Consider the example of an SRAM where you have selected a particular SRAM cell through which to trace the critical path. If you ask for the <b><code class="CodeStrong">smaller cp</code></b>, you will not get the circuitry that controls the sense amp enable, while you will get it if you do not choose <b><code class="CodeStrong">smaller cp</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1029160"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">See <a href="mcc_man_Ch3create-megacells.html#1034047">Figure 24</a> for an additional example. If <b><code class="CodeStrong">smaller cp</code></b> is selected or <b><code class="CodeStrong">CP_TRACE_BASIC</code></b> is set to 1, only the three gates on the bottom of <a href="mcc_man_Ch3create-megacells.html#1034047">Figure 24</a> will be extracted. Otherwise, the entire circuit shown in <a href="mcc_man_Ch3create-megacells.html#1034047">Figure 24</a> will be extracted.</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1034047"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 24:   CP_TRACE_BASIC Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/mcc_man_Ch3create-megacells15.gif" height="235" width="360" border="1">
+</div></font><a name="1034048"> </a>
+      </pre>
+
+
+<h4>
+
+  <a name="1034049"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">halo</font>
+
+</h4>
+</div>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029188"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If this option is selected, MCC adds wires that are within a halo radius of any nets in the critical path and are on the same layer as the critical path nets. This allows for more accurate parasitic extraction. You can also use the <b><code class="CodeStrong">CP_HALO</code></b> variable.</font>
+<p>
+<p>
+  <dt> <a name="1029189"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When computing the halo, the database is searched for metal on the same layer and within the halo distance of every piece of metal on the critical path net. MCC does not include only metal that is barely within the halo; this can potentially add thin slivers of metal that violate DRC and confuse the extractor. Instead, for every halo metal, MCC adds the entire connected metal to that metal without changing layers.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">CP_HALO = 1 turns feature on, 0 truns off.</font><a name="1029190"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030594"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029191"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Use "<b><code class="CodeStrong">halo radius</code></b>" or the <b><code class="CodeStrong">CP_HALO_RADIUS</code></b> variable to specify how far the halo extends (in microns).</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_HALO_RADIUS &lt;microns_of_extent&gt;</font><a name="1029192"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030595"> </a>
+      </pre>
+</dl></dl>
+
+
+<h4>
+
+  <a name="1029193"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">CP_TIE_INPUT</font>
+
+</h4>
+</div>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029194"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can use this variable to tie off inputs to specific signals. The text specified is placed at the inputs in the layout.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TIE_INPUT(&lt;cell_type&gt;,&lt;port&gt;) &lt;signal&gt;</font><a name="1029195"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TIE_INPUT(DEFAULT) &lt;signal&gt;</font><a name="1029196"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030598"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029197"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TIE_INPUT(sram_cell,wl) gnd</font><a name="1029198"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TIE_INPUT(sram_cell,bl) vdd</font><a name="1029199"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TIE_INPUT(sram_cell,bl_L) vdd</font><a name="1029200"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set CP_TIE_INPUT(DEFAULT) gnd</font><a name="1029201"> </a>
+      </pre>
+</dl></dl>
+
+<h3>
+  <a name="1029204"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running MCC in Batch Mode</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029205"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can run all of the MCC commands in the <b><code class="CodeStrong">Tool</code></b> menu in "<b><code class="CodeStrong">batch mode</code></b>" using <b><strong class="Strong">tcl</strong></b>. For example, if you wanted to build four different sizes of the same memory and SPICE netlist them, you could do this from a script instead of needing to monitor MCC. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029206"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Batch mode commands</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029207"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To build a megacell of name <b><code class="CodeStrong">&lt;megacell&gt;</code></b>, use the following command: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">mc_build [-program 0|1] [-propagate 0|1] &lt;megacell&gt;</font><a name="1029209"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030603"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029210"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The optional "<b><code class="CodeStrong">-program</code></b>" and "<b><code class="CodeStrong">-propagate</code></b>" switches default to 1 (on). Changing either to 0 (off) would prevent via programming and port propagation. These are the same options that are available in the <b><code class="CodeStrong">MC Build</code></b> menu. To change various parameters for building different size megacells, simply change the corresponding <b><strong class="Strong">tcl</strong></b> global variables in the script. Remember to make all variables global by using the "<b><code class="CodeStrong">global</code></b>" <b><strong class="Strong">tcl</strong></b> command if you are in a procedure. </font>
+<p>
+<p>
+  <dt> <a name="1029211"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To netlist a megacell which is the current MAX cell, use the following command: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">mc_netlist [-parasitics 0|1] [-verbose 0|1] spice|verilog</font><a name="1029213"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030616"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029214"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The optional "<b><code class="CodeStrong">-parasitics</code></b>" and "<b><code class="CodeStrong">-verbose</code></b>" switches default to 0. </font>
+<p>
+<p>
+  <dt> <a name="1029215"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To generate a critical path of a megacell, use the command: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">mc_cp netlist|layout|menu</font><a name="1029217"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030617"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029218"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The desired megacell must be the current MAX cell and you must have selected the desired cell(s) to create the critical path through. You can use the <b><code class="CodeStrong">sel_cell</code></b> command in MAX to select the cell. For more information, see the text command documentation in the MAX User Guide. </font>
+<p>
+<p>
+  <dt> <a name="1029219"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To run <b><code class="CodeStrong">MC What</code></b> from batch mode, use the following command: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">mc_what batch</font><a name="1029221"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1030618"> </a>
+      </pre>
+<p>
+  <dt> <a name="1029222"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To set the <b><code class="CodeStrong">hierarchy</code></b>, <b><code class="CodeStrong">prefix</code></b>, and <b><code class="CodeStrong">suffix</code></b>, set the following <b><strong class="Strong">tcl</strong></b> variables: <b><code class="CodeStrong">MC(create,hierarchy)</code></b>, <b><code class="CodeStrong">MC(create,prefix)</code></b>, <b><code class="CodeStrong">MC(create,suffix)</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1025897"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="mcc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="mcc_man_Ch2runningMCC.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

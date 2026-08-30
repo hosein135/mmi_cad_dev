@@ -152,10 +152,10 @@ build_max() {
 }
 
 build_aux() {
-  log "MAX aux (ext2spice, ext2sim, gemini, irsim, anXhelper)"
+  log "MAX maxaux (ext2spice, ext2sim, gemini, irsim, anXhelper)"
   local max="${SRC}/max4.3.16"
   mkdir -p "${max}/o/linux/aux"
-  make -C "${max}/aux" -e -k -j1 || true
+  make -C "${max}/maxaux" -e -k -j1 || true
   cd "${ROOT}"
 }
 

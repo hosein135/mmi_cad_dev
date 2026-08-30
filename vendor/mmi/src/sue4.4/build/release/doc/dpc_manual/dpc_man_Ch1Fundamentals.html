@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 14:38:41">
+<title>DPC: Data Path Compiler And Data Path Fundamentals</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_man_Preface.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch2SettingUp.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 1 </font>
+</h2>
+
+
+<h1>
+  <a name="1024688"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DPC: Data Path Compiler And Data Path Fundamentals</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1025897"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1025898"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In deep submicron design, wire length is the dominant factor affecting critical path timing. Cell placement becomes a crucial step in chip performance. With traditional CAD tools, designers are at the mercy of automatic placement tools. DPC lets the designer control placement with immediate timing feedback. Multiple "what-if" experiments can be performed, allowing rapid identification and experimentation with solutions to timing problems that might otherwise be very difficult to identify, not to mention fix. For data paths in particular, this methodology typically yields a minimum 2x performance improvement over automatic place and route. </font>
+<p>
+<p>
+  <dt> <a name="1025900"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Much of the performance gain in data paths is realized by ordering icons into bit slices to minimize wire lengths. Maximal packing density, which is possible with automatic placement tools, will produce much longer average wire lengths and seriously increase routing congestion compared to bit-slice data path design. Furthermore, clock routing in these structured data paths can be predetermined, which allows for excellent clock balancing and skew reduction. Control logic tends to be less structured than data paths, is more time consuming to enter and provides less speedup. However, improved clock routing and placement control makes it a viable alternative to place and route for very high-performance designs. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029534"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Data Path Compiler Foundations</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1025903"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The DPC flow is standard-cell based, as opposed to full-custom data path flows which are transistor based. All timing is done at the cell level. While most data paths created with DPC approach the performance and packing density of full-custom data paths, further improvements are possible by adding custom cells to the library. These new cells need only to be sized and characterized to be used by DPC. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029540"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The Standard Cell Library And Timing Models</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1025905"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To fully utilize the placement and timing features of DPC, you need a standard cell library complete with timing models, and access to one of the following static timing analyzers: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1025908"> </a>Cadence <em class="Emphasis">Pearl</em> (Version 4.0 or later), or </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1025910"> </a>Synopsys <em class="Emphasis">Pathmill</em> (Version 5.3 or later), or </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1025912"> </a>Synopsys <em class="Emphasis">PrimeTime</em> (Version 2.1 or later).</font>
+</p>   </ol>
+<p>
+  <dt> <a name="1025914"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">Pearl</em> requires timing libraries in the TLF/CTLF format, while <em class="Emphasis">Primetime</em> requires timing libraries in the Synopsys <em class="Emphasis">db</em> (binary) format. Fortunately, both formats can be derived from the Synopsys <em class="Emphasis">lib</em> (ASCII) format, using <em class="Emphasis">syn2tlf/tlfc</em> from Cadence and <em class="Emphasis">dc_shell</em> from Synopsys, respectively. <em class="Emphasis">Pathmill</em> can be run using Synopsys timing models for cells (this method requires the SFX license) or at the transistor level. Note that you must have the <b><strong class="Strong">vlog2e license</strong></b> to operate <em class="Emphasis">Pathmill</em> from DPC. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1026769"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For best results, the cell libraries might need to be tuned so that cells pack well inside of bit pitches. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029543"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Placement Files</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1025919"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Data Path Compiler creates both a gate-level hierarchical Verilog netlist and a DEF placement file from a hierarchical <em class="Emphasis">SUE Design Manager</em> schematic. Most commercial routers, such as Cadence's <em class="Emphasis">Warp Router</em> (part of the Silicon Ensemble suite), or Avant!'s <em class="Emphasis">Apollo,</em> read this DEF format. This DEF file, complete with the Verilog netlist and cell information such as LEF, enables these tools to fully route the design. </font>
+<p>
+<p>
+  <dt> <a name="1025927"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The placement information is derived from the location of the icons in the schematic, along with bit position information (if desired). Icons in the same column in the schematic are aligned vertically and ordered by placement, or according to bit number as determined from the icon's name or <em class="Emphasis">dpc property</em> (see below for a complete description of the placement algorithm). Since <b><strong class="Strong">SUE</strong></b> knows the placement and connectivity, it can estimate the wire capacitance, assuming manhattan routing and a user-defined overhead factor that accounts for routing inefficiencies. In practice, this capacitance estimate is usually accurate to within 10% for typical designs which do not have significant routing congestion. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029546"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Critical Path Timing</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1025929"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">After netlisting and placement, the designer can view the cell placement in <b><strong class="Strong">SUE</strong></b> and quickly iterate the design by changing the schematics until the desired placement is achieved. Next, <b><strong class="Strong">SUE</strong></b> automatically times the design using the specified static timing analyzer, and back-annotates the timing results onto the schematic. <b><strong class="Strong">SUE</strong></b> calls the desired static timing analyzer, passing it the Verilog netlist, the estimated capacitances, and any user-defined timing constraints, and parses the output. Any particularly slow nodes are reported in the <b><strong class="Strong">SUE</strong></b> command window. All top-level nets are then back-annotated directly onto the schematic and the critical path is highlighted. Other paths can be selected from the timing window and highlighted through all levels of hierarchy. Any critical path timing can also be displayed directly on the <b><strong class="Strong">SUE</strong></b> placement window, in addition to the schematic. </font>
+<p>
+<p>
+  <dt> <a name="1025936"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">After the desired placement and timing are completed, the DEF files created can be used to drive a commercial router to route the design and extract either capacitances or RC data in the form of DSPF or RSPF files. This post-route data can then be substituted for estimated capacitance through SUE to time the final design and back-annotate the results onto the schematics. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1029736"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">The Data Path Flow</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029749"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This section describes the general flow which should be used when designing a data path using DPC. This assumes that DPC has been properly installed as described in Appendix A.</font>
+<p>
+<p>
+  <dt> <a name="1029752"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before using DPC, you should first go through the SUE Tutorial and then the DPC Tutorial.</font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029815"> </a>Using your DPC icons (ones which are associated to actual layout cells), create a schematic for your datapath. The SUE schematic can be hierarchical and can contain custom blocks such as a register file. Refer to the DPC Tutorial and "The DPC Placement Algorithm" chapter of this manual for details on how to draw your SUE schematic to achieve the desired placement. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029851"> </a>Once your schematic is complete, select <b><code class="CodeStrong">DPC Netlist</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. This will create a placement view of your datapath. View your resulting placement with the <b><code class="CodeStrong">Toggle Placement View</code></b> command (hotkey: <b><strong class="Strong">Ctrl-a</strong></b>). Make changes to your schematic until you have a good placement. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029872"> </a>Once the placement looks OK, run <b><code class="CodeStrong">DPC It</code></b>. This will:</font>
+</p>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><ul><li class="SmartList2"><a name="1030012"> </a>Create the placement file (&lt;<b><code class="CodeStrong">cell_name&gt;.place.def</code></b>) and Verilog netlist (<b><code class="CodeStrong">&lt;cell_name&gt;.vg</code></b>). These files are also created when you run <b><code class="CodeStrong">DPC Netlist</code></b>.</font>
+</p>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1030013"> </a>Estimate the routing distance and generate an estimated parasitic file (<b><code class="CodeStrong">&lt;cell_name&gt;.est_dspf</code></b>).</font>
+</p>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1030020"> </a>Run static timing analysis (<em class="Emphasis">Pearl</em>, <em class="Emphasis">PrimeTime</em> or <em class="Emphasis">PathMill</em>).</font>
+</p>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1030024"> </a>Load the resulting timing information into DPC. </font>
+</p>
+</ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029904"> </a>You now look at the critical paths both in the schematic and placement view. Make the necessary changes to your schematic (changing placement, sizing gates, or even changing architecture) and then rerun <b><code class="CodeStrong">DPC It</code></b>. You iterate through this flow until you have the desired timing. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1029931"> </a>Once the timing is good, you need to look at the congestion to see if this design is routable. Go to the placement view for this datapath and select the <b><code class="CodeStrong">Congestion</code></b> command from the <b><code class="CodeStrong">DPC Sim</code></b> menu. Refer to the <a href="dpc_man_Ch5Commands.html#1044382"><b><code class="CodeStrong">Congestion</code></b></a> command for details on how to interpret the congestion information. Make changes to your schematic, including inserting space, until the congestion looks good. You can also check the congestion before timing.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1029968"> </a>Once both timing and congestion for your datapath good, you now send the design to a router. Most commercial routers take the placement file (<b><code class="CodeStrong">&lt;cell_name&gt;.place.def</code></b>), Verilog netlist (<b><code class="CodeStrong">&lt;cell_name&gt;.vg</code></b>) and the cell library information as input. </font>
+</p>   </ol>
+<p>
+  <dt> <a name="1029799"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">With DPC, you spend your timing iterating, fixing the timing and congestion, before you send the design to a router.</font>
+<p>
+<p>
+  <dt> <a name="1029526"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="dpc_man_Preface.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch2SettingUp.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,1704 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="11/27/01 13:22:59">
+<title>Part 2   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout Environment Tutorial </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="max_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="max_tut-Pt1Intro.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="max_tut-Pt3BiggerHier.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="max_tut-Pt4MAX-LS.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 2 </font>
+</h2>
+
+
+<h2>
+  <a name="1014265"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Simple Layout</font>
+</h2>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014266"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">OK, let's get started on some layout.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014267"> </a>Go to the <b><code class="CodeStrong">File</code></b> menu and select <b><code class="CodeStrong">New...</code></b> This will bring up the <b><code class="CodeStrong">File Select </code></b>box.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014268"> </a>Type in the cell name <b><strong class="Strong">foo</strong></b> where it says <b><code class="CodeStrong">Filename:</code></b>. Then click <b><code class="CodeStrong">OK</code></b>, or hit Return.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014269"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">UNNAMED </code></b>at the top of your MAX window should now say <b><code class="CodeStrong">foo</code></b>. This means that you are now editing the cell <b><code class="CodeStrong">foo</code></b>. When you save it out it will be saved as <b><code class="CodeStrong">foo.max</code></b>. Also, notice that <b><code class="CodeStrong">foo</code></b> now appears in the <b><code class="CodeStrong">Cell List Box</code></b> on the right side of the MAX window.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014270"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Using Gcells</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014271"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While MAX can do very low level full custom layout, it also has a complete Tcl/Tk interpreter built in. Tcl is a language developed by John K. Ousterhout at UC Berkeley. Tk is the windowing tool kit. Books on both can be found at your local bookstore. The Tcl/Tk interface in MAX allows full access to MAX layout functionality, providing unprecedented power and flexibility.</font>
+<p>
+<p>
+  <dt> <a name="1014272"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A <b><strong class="Strong">gcell</strong></b> is a<i><strong class="StrongItalic"> </strong></i><em class="Emphasis">cell generator</em> written in the Tcl/Tk language. The gcell generates layout for a cell automatically from "properties" that you specify using a simple menu interface. MAX comes with gcells to generate FETs and Vias. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1019239"> </a>Go to the <b><code class="CodeStrong">List Box</code></b> down the right side and select <b><code class="CodeStrong">fet</code></b> from the list by clicking on it with Button-1. The <b><code class="CodeStrong">G</code></b> next to the fet indicates that this cell is a <b><code class="CodeStrong">gcell</code></b>, or generator. .<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1019316"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you do not see <b><code class="CodeStrong">fet</code></b> in the List box, click and hold the left mouse button (Button-1) over the List box header to display the directory list, then select the directory ending in <b><code class="CodeStrong">cells</code></b>. This is the directory that contains the <b><code class="CodeStrong">fet</code></b> and <b><code class="CodeStrong">via</code></b> gcells provided with the Micro Magic Tools software.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1015969"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 4:   FET Gcell</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fet_gcell.gif">
+</div></font><a name="1031021"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1034068"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you click the left mouse button (Button-1) on <b><code class="CodeStrong">fet</code></b> in the <b><code class="CodeStrong">List Box</code></b>, the <b><code class="CodeStrong">fet generator window</code></b> will pop up. It should look something like <a href="max_tut-Pt2Layout.html#1015969">Figure 4</a>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1034322"> </a>Now, change the <b><code class="CodeStrong">width</code></b> to <i><strong class="StrongItalic">2.0</strong></i>. This will make the nfet 2.0um wide.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1034073"> </a>Since we eventually want to use this device to make a 2 input NAND gate, change <b><code class="CodeStrong">fingers</code></b> to <i><strong class="StrongItalic">2</strong></i>, and <b><code class="CodeStrong">contacts</code></b> to <i><strong class="StrongItalic">both</strong></i>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014286"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">Contacts</code></b> allows you to put contacts on the left side, the right side, both sides, between the devices (all), or no contacts at all. Click on <b><code class="CodeStrong">Help</code></b> or refer to the <em class="Emphasis">Micro Magic Tools MAX User Guide </em>for more details.</font>
+<p>
+<p>
+  <dt> <a name="1014287"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you click the left mouse button (Button-1) on the word <b><code class="CodeStrong">both</code></b> it will change to the next option. Clicking the left mouse button (Button-1) on the little bar to the right of this option will bring up all of the possible options.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014288"> </a>Now click <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014289"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Two nfets merged (stacked) together should appear, attached to the upper-right corner of the cursor. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1034423"> </a>Click Button-1 to place the nfets in the window.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014290"> </a>Type <b><code class="CodeStrong">v</code></b> (the hotkey for <b><code class="CodeStrong">Zoom To Fit Edit Cell</code></b><b><code class="CodeStrong"> </code></b>under the <b><code class="CodeStrong">View</code></b> menu) and the layout will be centered in the window.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014294"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your screen should now look like <a href="max_tut-Pt2Layout.html#1014295">Figure 5</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014295"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 5:   Generated nfet Gcell</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig04.gif">
+</div></font><a name="1030629"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014300"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The white text on the cell tells you that you are editing a fet (label at top), and that it is 2 gates x 2 microns wide, at a .18 micron channel length.</font>
+<p>
+<p>
+  <dt> <a name="1014301"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the letter <b><code class="CodeStrong">M</code></b> appears to the left of <b><code class="CodeStrong">foo</code></b> in the <b><code class="CodeEmphasis">Cell List Box</code></b>. This tells you that <b><code class="CodeStrong">foo</code></b> has been <i><strong class="StrongItalic">Modified</strong></i>.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1020293"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can undo whatever you have just done in MAX. Use the <b><strong class="Strong">u</strong></b> hot key or select <b><code class="CodeStrong">Undo</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu. You can also <b><code class="CodeStrong">Redo</code></b> what you have just undone using the <b><strong class="Strong">Shift-u</strong></b> hotkey. There are 99 levels of undo in MAX. If you can remember back more than 99 items please call us, we would love to meet you!</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014303"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Zooming</em></font>
+</h4>
+
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014304"> </a>Now zoom out by typing <b><strong class="Strong">Shift-z</strong></b>, or use <b><code class="CodeStrong">Zoom Out</code></b> in the <b><code class="CodeStrong">View</code></b> menu. You can also use the <i><strong class="StrongItalic">Zoom Bar </strong></i>at the bottom just below the scroll bars.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014305"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are several methods for zooming found in the <b><code class="CodeStrong">View</code></b> menu.</font>
+<p>
+<p>
+  <dt> <a name="1014306"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One easy way to zoom to the exact region you want is by using the zoom hotkey.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014307"> </a>Type <b><strong class="Strong">z</strong></b>. This puts you in <i><strong class="StrongItalic">zoom mode</strong></i>. Note that the cursor has changed. Next hold down the left mouse button (Button-1) and "drag" out a box which surrounds the region you wish to zoom to. When you release the mouse the screen will zoom to where your box was.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014308"> </a>If you mess up don't panic. Remember, <b><strong class="Strong">u</strong></b> will <i><strong class="StrongItalic">undo</strong></i>, and <b><strong class="Strong">v</strong></b> will always <i><strong class="StrongItalic">zoom to fit</strong></i>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014309"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One often-used technique for zooming is to use the <b><strong class="Strong">j </strong></b>hotkey to <i><strong class="StrongItalic">zoom in</strong></i> by a factor of two centered on the mouse. The hotkey <b><strong class="Strong">Shift-z </strong></b>can be used to <i><strong class="StrongItalic">zoom out </strong></i>by a factor of two.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014310"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting and Moving Layout</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014311"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are two types of layout you can select and move in MAX: <b><strong class="Strong">objects</strong></b> and <b><strong class="Strong">paint</strong></b>.</font>
+<p>
+<p>
+  <dt> <a name="1014312"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Objects</strong></b> may be<i><strong class="StrongItalic"> </strong></i><i><strong class="StrongItalic">sub-cells</strong></i> (cells), <i><strong class="StrongItalic">generated cells</strong></i> (gcells) or <i><strong class="StrongItalic">polygons</strong></i>.</font>
+<p>
+<p>
+  <dt> <a name="1014313"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Paint</strong></b> is basically <i><strong class="StrongItalic">flat layout</strong></i>. Think of paint as if you were painting something with a paintbrush. You can apply paint, remove paint, you can even stretch and drag paint. Paint is similar to flattened objects in other layout editors, but more flexible.</font>
+<p>
+<p>
+  <dt> <a name="1014314"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are many methods for selecting objects and paint.</font>
+<p>
+<p>
+  <dt> <a name="1014315"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When MAX is in main mode (the default), if you simply drag out a region while holding down the left mouse button (Button-1), whatever is within the box will be selected when you release the button and will be highlighted in white.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014316"> </a>Drag a box over the stacked nfets we just drew. When you release the mouse button, whatever is "selected", in this case the fet gcell, will be highlighted.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014317"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have selected an object or paint you can do lots of things with it.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014318"> </a>For example, you can <i><strong class="StrongItalic">rotate</strong></i> it by typing the <b><code class="CodeStrong">r</code></b> hotkey. Try it. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1034568"> </a>Type <b><code class="CodeStrong">r</code></b> three more times will rotate the object back to its original position.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014319"> </a>You can <i><strong class="StrongItalic">move</strong></i> layout up/down/left/right one grid at a time by using the arrow keys.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014320"> </a>You can also <i><strong class="StrongItalic">move</strong></i> any layout by first selecting it, then clicking and holding down the middle mouse button (Button-2) and dragging it around the screen.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014321"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also select objects or paint by clicking on them.</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014322"> </a>Clicking the left mouse button on a piece of paint selects that particular rectangle of paint. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014323"> </a>Clicking on a cell, gcell or polygon will select the object.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014324"> </a>When there are multiple layers under the mouse cursor, clicking more than once will select each thing in turn. You can keep clicking until the one you want is selected. The <b><code class="CodeStrong">Probe</code></b> command (Shift-Button-1) opens a popup window showing everything underneath the cursor. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1020980"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX also supports <b><code class="CodeStrong">Cut</code></b>, <b><code class="CodeStrong">Copy</code></b>, and <b><code class="CodeStrong">Paste</code></b> in the same format you would see on any good Mac- or PC-based drawing or painting program.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1021947"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the zoom, move, cut and paste, rotate, etc. features that we just executed using hotkeys also have menu equivalents which can be found in the <b><code class="CodeStrong">Edit</code></b> and <b><code class="CodeStrong">View</code></b> menus.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014327"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Duplicating gcells</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014328"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We now wish to create a couple of pfets. We could go back to the List box and select the fet generator again, but there is another way.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014329"> </a>Simply select your nfet by either clicking the left mouse button (Button- 1) over it, or by dragging a box around it using Button-1.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014330"> </a>Now select <b><code class="CodeStrong">Duplicate</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu, or type <b><strong class="Strong">d</strong></b><b><code class="CodeStrong">.</code></b> This creates a duplicate of the selected objects (or paint) slightly offset from the original.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014331"> </a>Hold down the middle mouse button (Button-2) and move the new nfet above the existing nfet.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014332"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that when you selected the fet and held down the middle mouse button (Button-2) the cursor changed to a 4-way arrow. This change in the cursor tells you that you are in a mode other than <code class="Code">main mode</code>. In this case you are in <code class="Code">move mode</code>.</font>
+<p>
+<p>
+  <dt> <a name="1014333"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now you will begin to see the true power of gcells.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1034767"> </a>Select the top nfets and then type <b><strong class="Strong">e</strong></b>, or select <b><code class="CodeStrong">Push Into Cell </code></b>from the <b><code class="CodeStrong">View</code></b> menu. The popup menu shown in Figure 5 appears.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1034768"> </a>Click on <b><code class="CodeStrong">nfet</code></b> to change it to a <b><code class="CodeStrong">pfet</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014336"> </a>Change the <b><code class="CodeStrong">width</code></b> to <i><strong class="StrongItalic">4</strong></i>, to make the pfet 4<font  face="Symbol">&#181;</font>m wide.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014337"> </a>Change <b><code class="CodeStrong">contacts</code></b> to <i><strong class="StrongItalic">all</strong></i> by either clicking several times on the box next to the word <b><code class="CodeStrong">contacts</code></b>, or click Button-1 on the little bar on the right side of the box next to <b><code class="CodeStrong">contacts</code></b> and then click Button-1 on "<i><strong class="StrongItalic">all</strong></i>".</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1014338"> </a>Once you are finished click Button-1 on <b><code class="CodeStrong">Done</code></b> to invoke the generator. This will change the old nfets to magically become new 4um wide pfets with contacts in the middle and on both sides.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014339"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 6:   Edit Properties Form For fet Gcell</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/fet_props.gif">
+</div></font><a name="1030503"> </a>
+</pre>
+
+<h4>
+  <a name="1014344"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Stretching gcells</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014345"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As you have seen, gcells can be used to create fets and vias. The wiring tool can also automatically drop gcell vias. You can change the size of a gcell fet by:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014346"> </a>Using the <b><code class="CodeStrong">e</code></b><b><strong class="Strong"> </strong></b>hotkey, and accessing the <b><code class="CodeStrong">Edit Properties</code></b> box, or 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014347"> </a>Doing an <b><code class="CodeStrong">Edit Cell or Object In Place</code></b> from the <b><code class="CodeStrong">View</code></b> menu (hotkey: <b><strong class="Strong">Shift-e</strong></b>). Place the mouse near the bottom (or top) of the fets, and the cursor will change into a double-headed `stretch arrow'. Holding down the middle mouse button (Button-2), drag up or down to stretch the fet. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1034914"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Try this on your pfet:</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1034915"> </a>Select the pfet by clicking on it with Button-1.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1034916"> </a>Type the <b><strong class="Strong">Shift-e</strong></b> hotkey.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014351"> </a>Move the mouse to the top of the pfet, hold down Button-1 and drag the mouse up.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014352"> </a>Undo the new width with the <b><strong class="Strong">u</strong></b> hotkey.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014353"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This trick also works on vias, except the outcome is placing multiple vias!<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1022168"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can stretch a well contact to help you with things like quickly building guard rings.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014355"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Aligning objects</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014356"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It would be nice if our new fets were lined up. One way to align objects is to draw a ruler (hotkey:<b><strong class="Strong"> Control-r</strong></b>), zoom way in, and carefully move the objects until they are aligned with the ruler. But a much easier way is to use the <b><code class="CodeStrong">Align Objects</code></b> command. </font>
+<p>
+<p>
+  <dt> <a name="1014357"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">First, select all the objects to be aligned. One easy way to select multiple objects is to hold down the Shift key while clicking on them with the left mouse button (Shift-Button-1.) The Shift-Button-1 means "add or subtract something under the mouse to/from the selection". If the gcell is selected, it will be deselected, and vice versa. You can tell when the gcell is selected because its outline is highlighted, and its name and size are also displayed in white. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014358"> </a>Press <b><strong class="Strong">Shift-Button-1</strong></b> over the two gcells until they are both selected.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014359"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Second, you must place the box. By selecting the gcells with Shift-Button-1, the box has already automatically been placed over the last gcell you selected. The gcells will be moved so they align with the box, which, in this case, means that the first gcell you selected will be moved so it aligns with the second gcell you selected.</font>
+<p>
+<p>
+  <dt> <a name="1014360"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Finally, use the <b><code class="CodeStrong">Align Objects</code></b> command.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014361"> </a>Choose<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Align Objects</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu (hotkey: <b><strong class="Strong">Control-a</strong></b>). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014362"> </a>Make sure that <b><code class="CodeStrong">left sides</code></b> (the default) is selected (has a red dot next to it.)</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014363"> </a>Click <b><code class="CodeStrong">Done</code></b>. The gcells are now aligned vertically on their left sides.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014364"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Continuous DRC</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014365"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to see a really powerful feature in MAX, real-time DRC.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014366"> </a>With the new pfets on top of the nfets, select the pfets.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014367"> </a>Now, either using the arrow keys (best for precise placement) or by holding down the middle mouse button (Button-2) and dragging, move the pfet just above the nfet as shown in <a href="max_tut-Pt2Layout.html#1014372">Figure 7</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014372"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 7:   Real-time DRC</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig06.gif">
+</div></font><a name="1030450"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014377"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you move the pfet too close to the nfet, little white dots will appear. These little white dots tell you that there is a <i><strong class="StrongItalic">Design Rule Check</strong></i> error (DRC error).</font>
+<p>
+<p>
+  <dt> <a name="1014378"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that as you move the pfet closer or further away the DRC errors show up in "real" time! This is one of the powerful features in MAX.</font>
+<p>
+<p>
+  <dt> <a name="1014379"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Continuous DRC means you don't even have to learn the DRC rules, or count grids. Just move things closer together until you see the white dots, and then back off a little. The small DRC error box, to the left of the zoom bar, displays the number of errors.</font>
+<p>
+<p>
+  <dt> <a name="1014380"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are curious about what the error represented by the white dots is, then you can draw a box around the white dots, type <b><strong class="Strong">Shift-y </strong></b>or choose <b><code class="CodeStrong">Explain DRC under Box</code></b> from the <b><code class="CodeStrong">Misc</code></b> menu. Look for the list of DRC errors in the MAX command window (the window from which you started MAX).</font>
+<p>
+<p>
+  <dt> <a name="1035115"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are going to use the <b><code class="CodeStrong">DRC Results</code></b> form to view the DRC errors. </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014381"> </a>Move the pfet close to the nfet, as shown in Figure 6, so that DRC errors occur.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1035116"> </a>Select <b><code class="CodeStrong">DRC Results</code></b> from the <b><code class="CodeStrong">Misc</code></b> menu. You should see a popup window similar to Figure XX.</font>
+</p>   </ol>
+</dl></dl>
+
+<h4>
+  <a name="1035133"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 8:   DRC Results Popup Form</em></font>
+</h4>
+
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1035117"> </a>Click on <b><code class="CodeStrong">Next Error</code></b> to step through all of the DRC errors. Notice that each DRC error is highlighted in the layout, and the text of that DRC error is displayed in the <b><code class="CodeStrong">DRC Feedback</code></b> window as well as the MAX Message Area.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1035196"> </a>When you are finished looking at the DRC errors, click on <b><code class="CodeStrong">Close</code></b> in the <b><code class="CodeStrong">DRC Feedback</code></b> popup window.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035349"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Refer the the MAX User Guide for more details on the <b><code class="CodeStrong">DRC Results</code></b> popup window. This window can also be used to view results of DRC runs with other tools, such as Cadence Calibre.</font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1035118"> </a>For now, place the pfet above the left nfet so that the gates of the pfet and left nfet line up (this should be the case already after you aligned them). Then move the pfet up until it is DRC correct (no white dots) as shown in <a href="max_tut-Pt2Layout.html#1014386">Figure 9</a>.</font>
+</p>   </ol>
+</dl></dl>
+
+<h4>
+  <a name="1014386"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 9:   FETs Lined Up</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig07.gif">
+</div></font><a name="1030411"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035973"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Continuous DRC feature uses design rules defined in the<b><code class="CodeStrong"> MAX technology file</code></b>. This single plain text file defines all the design rules needed by MAX's extensive DRC. The technology file uses a simple table format for most rules, resulting in a compact, easy to understand file format that can be as short as a single page. Micro Magic Tools provides common CMOS technology files as a starting point to build your own, or, you can build a prototype technology file automatically from an existing GDS file by choosing <b><code class="CodeStrong">Import File</code></b> from the <b><code class="CodeStrong">File</code></b> menu. For further information, refer to <b><strong class="Strong">Chapter 6: "MAX Technology Targeting</strong></b>" in the Micro Magic Tools MAX User Guide.</font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book"></font><a name="1035949"> </a>
+</pre>
+</dl></dl>
+
+<h4>
+  <a name="1014391"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Wiring Mode</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014392"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now you will route up the poly. You could route the poly by drawing rectangles and then filling them with poly (red) paint, but that's a lot of work. There's a much easier way - use MAX's built-in wiring tool.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1036009"> </a>To use the wiring tool type <b><strong class="Strong">w</strong></b>, or select <b><code class="CodeStrong">add wire</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014394"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice the cursor has changed. Remember, that's to let you know you are in a different mode. In this case, you are in <b><code class="CodeStrong">wire mode</code></b>.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014395"> </a>Place the cursor over the poly on the right hand nfet (fet on the bottom) and click the left mouse button (Button-1).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1036077"> </a>Now move the cursor up. A poly wire should follow the cursor, as shown in <a href="max_tut-Pt2Layout.html#1014401">Figure 10</a>. If the wire doesn't start in poly, check and make sure the <b><strong class="Strong">Active</strong></b> layer is set to <b><strong class="Strong">auto</strong></b> (the upper left corner of the MAX window).</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014401"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 10:   Drawing A Wire</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig08.gif">
+</div></font><a name="1030319"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014406"> </a>If at any time when in wire mode you wish to bail out and start over, you can do so by typing <b><strong class="Strong">Ctrl-c</strong></b><b><code class="CodeStrong">.</code></b><b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1022264"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Ctrl-c </strong></b>always aborts any sub-mode and returns you to main mode.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014408"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As the pfet is not directly above the nfet we need a "kink" in the wire. You do this by simply clicking the left mouse button (Button-1) where you want the kink.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1036170"> </a>Move the cursor up and then click with the left mouse button to add a kink.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1036171"> </a>Now move the cursor to the right until it's directly under the pfet poly and click the left mouse button again to add another kink.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014411"> </a>Finally, move the mouse up until it's over the pfet poly. If you glance up at the <b><code class="CodeStrong">MAX Info Bar</code></b><b><code class="CodeStrong">,</code></b> notice that it says "<b><code class="CodeStrong">BUT-1 adds new segment BUT-2 ends</code></b>". This means that when you click Button-2 it ends the wire.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014412"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In fact, MAX does even better than that. If you click the middle mouse button over the poly but are not exactly in the middle of the wire, MAX will actually snap the wire into place for you and end it. How about that? </font>
+<p>
+<p>
+  <dt> <a name="1014413"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you didn't put the wire exactly where you wanted it don't worry. You can always undo. While in wire mode, undo (<b><strong class="Strong">u</strong></b>) will back up one segment at a time.</font>
+<p>
+<p>
+  <dt> <a name="1014414"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You might have noticed that the little piece of poly you just added is a brighter color than the poly that was part of the gcell fets. This is a feature in MAX that is designed to help you know what you are editing. Paint or objects that you draw in the cell you are currently editing show up brighter than the cells you are not editing. This includes gcells. Thus, since you are not editing the gcell fets, they show up dimmer than the cell that you are editing. If you wish to have all of the layers show up the same brightness (even in the gcells or subcells) then go to the <b><code class="CodeStrong">View</code></b> menu, select <b><code class="CodeStrong">Display Options...</code></b>, then select <b><code class="CodeStrong">Dim Non-Edit Cells</code></b> and click <b><code class="CodeStrong">Done</code></b>. The radio button should go "off" and the non-edit cells no longer dimmed.</font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1014415"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Editing a Placed Wire</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1014416"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once a wire has been placed, you can edit the wire. The <b><code class="CodeStrong">Edit</code></b> menu contains commands to <b><code class="CodeStrong">Move</code></b>, <b><code class="CodeStrong">Stretch</code></b>, and <b><code class="CodeStrong">Fill</code></b> any painted layout, including wires.</font>
+<p>
+<p>
+  <dt> <a name="1014417"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You may find that it is sometimes even faster to simply redo a wire if you need to make a number of edits.</font>
+<p>
+<p>
+  <dt> <a name="1014418"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you just want to move the wire a little you can select the wire segment you wish to move and then move it using the arrow keys. The arrow keys will do a "stretchy" move.</font>
+<p>
+<p>
+  <dt> <a name="1014419"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's try a stretchy move with our connected fets.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014420"> </a>Draw a box by holding down and dragging Button-1 so that it encloses part or all of the pfet, and part of the vertical section of the poly wire, as shown in <a href="max_tut-Pt2Layout.html#1014425">Figure 11</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014425"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 11:   Stretchy Move</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig09.gif">
+</div></font><a name="1030044"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014430"> </a>Press the up arrow key a few times and notice that the poly wire stays connected.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014431"> </a><b><code class="CodeStrong">Undo</code></b> your stretchy move with the <b><strong class="Strong">u</strong></b> hotkey.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014432"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's move the middle segment of the poly wire.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014436"> </a>Select the horizontal section of the poly wire as shown in <a href="max_tut-Pt2Layout.html#1014438">Figure 12</a>. You will probably have to click twice with Button-1 over the middle segment in order to get the entire horizontal segment.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014438"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 12:   Moving Wire Segment</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig10.gif">
+</div></font><a name="1029821"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014443"> </a>Use the up and down arrow keys to move the segment. Notice that the wire stays connected.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"><br></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1022366"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to move (and keep the net connected) the segment a long distance, you can use Ctrl-Button-2. Using Button-2 without the Ctrl will move the segment but will not maintain connectivity.<br><br>If you are using the arrow keys for the move and do NOT want the wires to stretch, hold down the Shift key when moving the selected layout.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014445"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Fill</code></b> command fills the area bounded by the box with whichever layers touch (or extend past) the edge of the box. The effect is to extend whichever layers touch one edge of the box all the way to the other edge of the box. Refer to the Micro Magic Tools MAX User Guide for more details.</font>
+<p>
+<p>
+  <dt> <a name="1014446"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now wire up the metal just as you did the poly.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014447"> </a>Get into <b><code class="CodeStrong">wire mode</code></b> (hotkey: <b><strong class="Strong">w</strong></b>) and then click on one of the contacts and draw the metal so it looks like <a href="max_tut-Pt2Layout.html#1022781">Figure 13</a>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014451"> </a>First wire the two left contact regions and then add the connection to the right pfet contacts.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1014455"> </a>Wire the left poly gates as shown in <a href="max_tut-Pt2Layout.html#1022781">Figure 13</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1022781"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 13:   Wired 2 Left Poly Gates</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig11.gif">
+</div></font><a name="1029716"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1036483"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When starting a new wire, the <b><code class="CodeStrong">Active</code></b><code class="Code"> </code><b><code class="CodeStrong">Layer</code></b> box (remember it's on the top left just under the <b><code class="CodeStrong">File</code></b> menu) tells you what layer the wire (or circle or polygon) is going to be drawn in. If it is set to <b><strong class="Strong">auto</strong></b> it picks the layer under the mouse.</font>
+<p>
+<p>
+  <dt> <a name="1036467"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to tell it exactly which layer to start drawing on, then hold down the left mouse button (Button-1) over the <b><code class="CodeStrong">Active</code></b><code class="Code"> </code><b><code class="CodeStrong">Layer</code></b> box. When the popup appears simply place the mouse over the layer you want and then release the button.</font>
+<p>
+<p>
+  <dt> <a name="1014464"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since you have done a fair amount of work you should now save your layout.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1014465"> </a>Type <b><strong class="Strong">Ctrl-s</strong></b>, or select <b><code class="CodeStrong">Save</code></b> from the <b><code class="CodeStrong">File</code></b> menu. Notice that the <b><code class="CodeStrong">M</code></b> next to the <b><code class="CodeStrong">foo</code></b> in the <b><code class="CodeStrong">Cell List</code></b> went away.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014466"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Adding the Power Rails</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014467"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are ready to put in the power rails. Let's say we were laying out this NAND gate for a standard cell library. Furthermore, assume that the power and ground rails are run in Metal 1 (M1) and that they are 2<font  face="Symbol">&#181;</font>m wide.</font>
+<p>
+<p>
+  <dt> <a name="1014468"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We could use the wire tool to draw the power rails, by drawing wires with width set to 2um. To do this, you would start drawing a normal wire (hotkey: <b><strong class="Strong">w</strong></b>) in layer M1, positioned above or below the fets. Then, press the right mouse button (Button-3) to access a popup menu for wiring options, including the current wire width. Here you can set the wire width of the current wire segment(s) to 2um, or whatever width you want. </font>
+<p>
+<p>
+  <dt> <a name="1014469"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also set the default width, spacing, and snap grid for each wire layer in the <b><code class="CodeStrong">Wiring Parameters</code></b> menu. It is found under <b><code class="CodeStrong">User Preferences</code></b> in the <b><code class="CodeStrong">File</code></b> menu, then choose <b><code class="CodeStrong">Wire Setup... </code></b>(or just use the<b><strong class="Strong"> Shift-w </strong></b>hotkey), then choose <b><code class="CodeStrong">Wiring Parameters</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1014470"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">But this is a good opportunity to use paint directly. MAX has excellent capabilities for low-level layout "rectangle hacking", and this is an ideal way to put in the power rails. To use paint effectively in MAX, we will first have to learn to manipulate the Box and use the Palette.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014471"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>The Box</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014472"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Box is important in MAX because it is used by many commands to determine where you are going to place, or do, something. For painting, the Box marks the region where paint is going to be drawn or erased. We have already seen the Box on the screen while doing the commands above; for example, the<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Align Objects</code></b> command.</font>
+<p>
+<p>
+  <dt> <a name="1037134"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can create a box by simply holding down the left mouse button (Button-1) and dragging the outline about a region. <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"><b><strong class="Strong"><br></strong></b></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1037139"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Drawing a box by holding down Button-1 also automatically selects what is under the box, so don't drag a box around an entire chip! Use Box Mode (below) for that.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</font>
+<p>
+<p>
+  <dt> <a name="1037141"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Assuming you were in <b><code class="CodeStrong">main mode</code></b> (the default), any paint within the box is selected. This is the way we have done things thus far.</font>
+<p>
+<p>
+  <dt> <a name="1014475"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also position the box exactly by typing <b><strong class="Strong">Shift-b</strong></b>, or selecting <b><code class="CodeStrong">Box Dimensions</code></b> from the <b><code class="CodeStrong">Misc</code></b> menu, or by clicking on the <b><code class="CodeStrong">Box Size</code></b> window in the lower right corner of the display. Any of these will show a menu that allows you to precisely set the box size.</font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1014476"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Box Mode</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1014477"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">Box Mode</code></b> is useful when you need to do detailed layout. You can resize the box to the exact size you want, and place it exactly where you want it, without having to worry about corrupting any existing paint that you might have inadvertently selected.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1023737"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Dragging out a box in this mode does NOT select anything.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1014479"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">After typing <b><strong class="Strong">b</strong></b>, (or <b><code class="CodeStrong">Make Box</code></b> in the <b><code class="CodeStrong">Misc</code></b> menu) you can do any of the following:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014480"> </a>You can specify a new box position by holding down the left mouse button (Button-1) as you drag out a region, then release Button-1. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014481"> </a>Resize the existing box by moving the mouse over the sides or corners of the existing box until the cursor icon changes (to either a `stretch-arrow' or a `corner'), then drag that side or corner by pressing and holding the left mouse button (Button-1.) 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014482"> </a>Move the box by holding down the middle mouse button (Button-2) and moving the mouse. 
+</li><p>
+</font>
+</ul></ul></ol>
+</dl></dl>
+
+<h4>
+  <a name="1014483"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>The Palette</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014484"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A few more words about the <i><strong class="StrongItalic">Smart Palette</strong></i>. Remember, down the left side of the window is the Smart Palette.</font>
+<p>
+<p>
+  <dt> <a name="1014485"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The Smart Palette provides many features. It allows you to control what you can see, what you can select, what's under the cursor, what you can paint, and what the layers look like. Remember the <b><code class="CodeStrong">MAX Message Area</code></b> (directly to the right of the <b><code class="CodeStrong">Help</code></b> menu) will tell you what the available options are if you place the mouse over the palette.</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014486"> </a>To control which layers are <i><strong class="StrongItalic">visible</strong></i>, click the left mouse button (Button-1) over the little colored square. To control visibility by group, click the left mouse button (Button-1) on the group button (i.e. <i><strong class="StrongItalic">metal</strong></i>, <i><strong class="StrongItalic">active</strong></i>, etc.). This is a very useful feature for reducing clutter when you are working on a subset of the layers. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014487"> </a>To control which layers are <i><strong class="StrongItalic">selectable</strong></i>, click the left mouse button (Button-1) over the layer name (such as m2, v12, pfet, and so on). The button with the layer name will turn grey when that layer can NOT be selected. Or click the right mouse button (Button-3) over the group button to toggle selectability for the entire group. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014488"> </a>To <i><strong class="StrongItalic">paint</strong></i> layers, click the right mouse button (Button-3) on either the text or the little paint square for the layer you wish to paint. This will put that layer in the region specified by the Box. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014489"> </a>Layers which are <i><strong class="StrongItalic">under the mouse</strong></i> are indicated by the little red rectangular LED's just to the left of the colored boxes. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014490"> </a>Layers which are <i><strong class="StrongItalic">currently selected</strong></i> are indicated by the layer name changing from black to red. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014491"> </a>Finally, you can <i><strong class="StrongItalic">change the color or stipple patterns</strong></i> of any of the layers by clicking the middle mouse button (Button-2) over either the colored box or the layer name. This brings up the<b><code class="CodeStrong"> </code></b><i><strong class="StrongItalic">MAX Color/Stipple Editor</strong></i>. Using the editor, you can even change the colors of things like the background (for example, make it black), the grid, labels, etc. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1014492"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While the grid color is changed in the <code class="Code">Color/Stipple Editor</code>, the grid size and style are changed in <b><code class="CodeStrong">Grid Setup... </code></b>under <b><code class="CodeStrong">User Preferences</code></b> in the <b><code class="CodeStrong">File</code></b> menu, or by typing the <b><strong class="Strong">Shift-g</strong></b> hotkey.</font>
+<p>
+<p>
+  <dt> <a name="1014493"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also paint by clicking the right mouse button (Button-3) over any existing paint of the type you wish to paint with. That is, you can click the right mouse button (Button-3) over an existing piece of poly in the layout window and it will paint with that layer just as if you clicked on that layer in the palette.</font>
+<p>
+<p>
+  <dt> <a name="1014494"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note, however, that if you click over a place with NO layout then the area under the box will be erased. </font>
+<p>
+<p>
+  <dt> <a name="1014495"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Remember, <b><code class="CodeStrong">Undo</code></b> (hotkey: <b><strong class="Strong">u</strong></b>) can recover from this.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014496"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Painting the Power Rails</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014497"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now we are ready to add the power rails as paint rectangles.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1037274"> </a>Hold down the left mouse button (Button-1) and drag out a region where you want to paint the new Vdd power rail as shown in <a href="max_tut-Pt2Layout.html#1014503">Figure 14</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014503"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 14:   Drawing a Box for Painting Power Rails</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig12.gif">
+</div></font><a name="1029632"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014508"> </a>Place the cursor over the M1 button in the palette (on the left), then click the RIGHT mouse button (Button-3) on either the text `<code class="Code">M1</code>' or the little blue square (palette box) immediately to the left of the word `<code class="Code">M1</code>'.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notecaution.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+ </font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1023804"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Make sure you hit the RIGHT mouse button (Button-3). Clicking the left mouse button (Button-1) on the paint square toggles that layer's visibility, or if over the layer name, that layer's selectability.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014510"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the box isn't the size you want it (see the lower right corner for the box size) you can make the box exactly 2<font  face="Symbol">&#181;</font>m tall.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014511"> </a>Undo (<b><strong class="Strong">u</strong></b>) the M1 paint before we resize the box.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1037350"> </a>To make the box an exact size type <b><strong class="Strong">Shift-b</strong></b>, or select <b><code class="CodeStrong">Box Dimensions</code></b> from the <b><code class="CodeStrong">Misc</code></b> menu. A popup menu as shown in <a href="max_tut-Pt2Layout.html#1037357">Figure 15</a> appears.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1037357"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 15:   Box Dimensions Popup Form</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/box_size.gif">
+</div></font><a name="1037392"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014512"> </a>Make sure the <b><code class="CodeStrong">Specify Box by:</code></b> is set to <b><code class="CodeStrong">origin+size</code></b>. Then type in <i><strong class="StrongItalic">4.0</strong></i> for the width and <i><strong class="StrongItalic">2.0</strong></i> for the height, then click <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014513"> </a>Fill the box with M1 by clicking the right mouse button (Button-3) on the `<code class="Code">M1</code>' paint square in the palette.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014514"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Remember you can always resize or move the box as previously described in the section on The Box.</font>
+<p>
+<p>
+  <dt> <a name="1014515"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can change the size of a paint region by stretching an edge of any width using the <b><code class="CodeStrong">Edit Rectangle Edge</code></b> command found in the <b><code class="CodeStrong">Edit</code></b> menu (hotkey: <b><strong class="Strong">a</strong></b>).</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014516"> </a>Simply type <b><strong class="Strong">a</strong></b>. The cursor changes to let you know you are in<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Edit Edge</code></b> mode. Now move the finger over the edge you wish to stretch. A little select box will show you which edge you are over. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014517"> </a>Once you have the edge you want, hold down the left mouse button (Button-1) and move the mouse in the direction you wish to stretch the edge. Release the button when the edge is where you want it.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1037474"> </a>You can also change the size of a paint rectangle by first selecting it, and then selecting <b><code class="CodeStrong">Edit Properties</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu (Hotkey: <b><strong class="Strong">p</strong></b>).</li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1014518"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have painted the top power line you can simply duplicate the top power line and move it down.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014519"> </a>Select the power line with the left mouse button.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1014523"> </a>Duplicate the top power line (hotkey: <b><strong class="Strong">d</strong></b>) and move it down as shown in <a href="max_tut-Pt2Layout.html#1014526">Figure 16</a>.<center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1037601"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you duplicate something and hold the Shift key down while moving it, the duplicated item will remain lined up with the original.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014526"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 16:   Nand Wired to Power Raill</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig13.gif">
+</div></font><a name="1029468"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014531"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now that you have painted in your power and ground rails you should wire them up using the <code class="Code">Wiring Mode</code> as before.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1014532"> </a>After you have entered the <b><code class="CodeStrong">Wire Mode</code></b> (<b><strong class="Strong">w</strong></b>), hold down the Shift key and click the left mouse button (Button-1) over the middle of the pfet contact region. This will start a M1 wire with the width of the M1 under the cursor. By holding down the Shift key you are telling the wire tool to use the width of the wire under the cursor and NOT the minimum wire width. Connect it to the power rail.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1037610"> </a>Now connect the right nfet contact region to the ground rail.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014537"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your cell should now look like <a href="max_tut-Pt2Layout.html#1014526">Figure 16</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014538"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Wiring Mode - Changing Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014539"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the inputs and outputs are all found within the power straps. What if they need to be brought out so a router can get to them?</font>
+<p>
+<p>
+  <dt> <a name="1014540"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's assume the router requires all signals to be at the top of the cell and in M1. You need to route the poly wires over the M1 power straps and then change to M1.</font>
+<p>
+<p>
+  <dt> <a name="1014541"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">Wire Mode</code></b> in MAX can make this job easier since it can change layers for you.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014542"> </a>To route the wire, type <b><strong class="Strong">w</strong></b> (<b><code class="CodeStrong">Wire Mode</code></b>) and click the left mouse button (Button-1) over one of the poly wires.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014543"> </a>Drag the mouse up and over the M1 power rail.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014544"> </a>Type <b><strong class="Strong">d</strong></b>. This will <em class="Emphasis">drop a poly to M1 contact</em> for you, which you can move around.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014545"> </a>Now try moving the mouse to the left. This will draw a M1 line left of the contact. While holding the mouse to the left try moving it up and down (north and south).</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014546"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the contact tracks the vertical location of the mouse for you. Also notice that the DRC is working while you are moving the contact. Whenever you get too close to the M1 Vdd line, the little white DRC dots appear, as you can see in <a href="max_tut-Pt2Layout.html#1014551">Figure 17</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014551"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 17:   Active DRC Showing Errors As Wire Is Drawn.</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig14.gif">
+</div></font><a name="1029317"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014556"> </a>When you get the contact where you want it (no DRC errors), press and hold the right mouse button (Button-3), then select <b><code class="CodeStrong">anchor vertex</code></b> from the popup menu (hotkey: <b><strong class="Strong">a</strong></b>) to `freeze' or anchor the contact in place. Then drag the mouse upward.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014557"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As you continue dragging the mouse upward notice that you are now in M1. If you hit<b><strong class="Strong"> </strong></b><b><strong class="Strong">d</strong></b> (drop a contact) again, you will add a via1 and automatically change to M2, and so on until your technology runs out of metal layers.</font>
+<p>
+<p>
+  <dt> <a name="1023915"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The generic technology file we have included (mmi18) has six layers of metal.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1023921"> </a>End the wire by clicking the middle mouse button (Button-2) at the desired location, as shown in <a href="max_tut-Pt2Layout.html#1014551">Figure 17</a>.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1023920"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typing <b><strong class="Strong">d</strong></b> in <b><code class="CodeStrong">wire mode</code></b> drops a contact and brings you up to the next higher layer. If you want to go down a layer simply type <b><strong class="Strong">Shift-d </strong></b>and the wiring tool will drop a contact or via, and bring you down to the next lower layer.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1023922"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are LOTS of other options in the wiring tool, such as<b><code class="CodeStrong"> snap to grid</code></b>, <b><code class="CodeStrong">wire in 45's</code></b>, <b><code class="CodeStrong">change wire layer</code></b>, and more.</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014562"> </a>To see the <b><code class="CodeStrong">Wire Mode</code></b><code class="Code"> </code>menu simply hold down the right mouse button (Button-3) when in wire mode. This will bring up the <b><code class="CodeStrong">Wire Mode</code></b> pop-up menu.</li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014563"> </a>One of the options is <b><strong class="Strong">Shift-w</strong></b> which brings up a more extensive <b><code class="CodeStrong">Wire</code></b> menu (also found as <b><code class="CodeStrong">Wire Setup...</code></b> in <b><code class="CodeStrong">User Preferences</code></b> under the <b><code class="CodeStrong">File</code></b> menu). This menu gives you options like the <b><code class="CodeStrong">Active Layer</code></b> (which can also be set via the <b><code class="CodeStrong">Active Layer Box</code></b> in the upper left corner of MAX), the <b><code class="CodeStrong">Default Layer</code></b>, <b><code class="CodeStrong">Snap options</code></b>, and you can even override any or all of the wiring parameters.</li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1014564"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Remember, for a list of all the options (hotkeys) while in wiring mode, hit the Space bar, or select <b><code class="CodeStrong">hotkeys</code></b> in the <b><code class="CodeStrong">Help</code></b> menu.</font>
+<p>
+<p>
+  <dt> <a name="1014565"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Space bar works for ALL modes in MAX.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014566"> </a>Wire up the other poly input.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014570"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your cell should now look like <a href="max_tut-Pt2Layout.html#1014572">Figure 18</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014572"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 18:   Inputs of Nand Brought Outside</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig15.gif">
+</div></font><a name="1029188"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014580"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the top of the M1 wires are not aligned as shown in <a href="max_tut-Pt2Layout.html#1014572">Figure 18</a>, there are a number of ways to align them.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1014581"> </a>The easiest way is to draw a box and select the top edges of both wires. Then click with button-3 over empty space (any area where there is no layout) and the selected paint will be erased.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014582"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also use the <b><code class="CodeStrong">Fill</code></b> command in the <b><code class="CodeStrong">Edit</code></b> menu to extend both top edges of the M1 wires up. (Refer to the Micro Magic Tools MAX User Guide for more details.)</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014583"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Erasing Layers</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014584"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are getting ready to finish this cell and your boss has just informed you that the power rails have been changed from M1 to M2.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014585"> </a>To change them simply hold down the left mouse button (Button-1) and drag a box around the upper (Vdd) rail to select it.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014586"> </a>Now if you click the right mouse button over a blank space on the screen it will erase everything within the box. But wait! You also have some poly within the box. If you erase everything inside the box your poly will also go away.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014587"> </a>Undo (<b><strong class="Strong">u</strong></b>) your last change.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014588"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX allows you to selectively erase layers.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014589"> </a>To do this select the M1 power rail by drawing a box enclosing the M1 power rail.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014590"> </a>Then, hold down the <b><strong class="Strong">Ctrl</strong></b> key and click the right mouse button (Button-3) over a piece of M1 in the layer, or `<b><code class="CodeStrong">M1</code></b>' in the palette. The <b><strong class="Strong">Ctrl</strong></b> key tells MAX to toggle the paint function and erase the layer instead of painting it.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014591"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Like the painting function, erasing works from both the palette and by clicking on the layer in the actual layout.</font>
+<p>
+<p>
+  <dt> <a name="1038205"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You will notice that the box is not the correct size.</font>
+<p>
+<p>
+  <dt> <a name="1038030"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We're now going to erase the M1 a third way.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1038031"> </a>Undo (<b><strong class="Strong">u</strong></b>) your last change.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1038057"> </a>Click with Button-1 on the M1 power rail. You may need to click a second time to select the entire power rail.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1038291"> </a>Now, to selectively erase M1, hold down the <b><strong class="Strong">Ctrl</strong></b> key and click with Button-3 over a piece of M1.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1038250"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have erased the M1 layer, notice that your box is exactly the size it needs to be for the M2.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1038358"> </a>Simply click the right mouse button (Button-3) on `<b><code class="CodeStrong">M2</code></b>' in the palette.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014594"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are several ways to accomplish what you just did. For example, rather than drawing a box around the M1 power lines - which also selects the poly crossing over it - you could click the left mouse button (Button-1) over the M1 power line to select it. Once selected, hit the <b><strong class="Strong">Delete</strong></b> key to delete the selected item. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notecaution.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+ </font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024001"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Delete</strong></b> will delete everything you currently have selected, including paint, polygons, gcells, and sub-cells.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1014596"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are several options for mouse selection.</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014597"> </a>Clicking button-1 will select the object or rectangle of paint under the cursor. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014598"> </a>Holding down the Shift key while clicking button-1 will add to the selection. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014599"> </a>Holding down button-1 while dragging out a region will select objects and paint within that region. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1014600"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have selected the layer, rather than delete it and replace it with another layer, you can also use the nifty little <code class="Code">Change Layer</code> feature found in <b><code class="CodeStrong">Edit Properties...</code></b> under the <b><code class="CodeStrong">Edit</code></b> menu.</font>
+<p>
+<p>
+  <dt> <a name="1014601"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Change the lower (GND) M1 and replace it with M2.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1014602"> </a>To do this simply select the <b><code class="CodeStrong">M1</code></b> rectangle, then choose <b><code class="CodeStrong">Edit Properties...</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu, or type the <b><strong class="Strong">p</strong></b> hotkey. Change the layer to <b><strong class="Strong">M2</strong></b> and click <b><strong class="Strong">Done</strong></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014603"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now go ahead and attach the power and ground lines to the new M2 straps.</font>
+<p>
+<p>
+  <dt> <a name="1014604"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To do this, use the wire mode.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1014605"> </a>Start the wire (<b><strong class="Strong">w</strong></b>) from the M1 wires using Shift-Button-1, so that the wire width will match.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1014606"> </a>When you are over the M2 straps type <b><strong class="Strong">d</strong></b> to add a via to M2</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="13"><a name="1014607"> </a>Click the middle mouse button (Button-2) to end the wire.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="14"><a name="1014608"> </a>Next route the output to the top over the M2 next to the inputs so the router can get to it as well.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024074"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This will introduce a DRC error if you followed the layout instructions as stated.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="15"><a name="1014610"> </a>Select the two <b><code class="CodeStrong">ct_poly</code></b> gcells and the two pieces of M1 using Shift-Button-1 to add to the selection, as shown in <a href="max_tut-Pt2Layout.html#1014616">Figure 19</a>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="16"><a name="1014614"> </a>Use the right arrow key to move the selection to the right until there are no more DRC errors.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014616"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 19:   Selected Poly Gcells And M1 Wires</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/move_ports.gif">
+</div></font><a name="1029081"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014621"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You could also jog the M1 output, or the poly lines going under the M2 as well. It's up to you.</font>
+<p>
+<p>
+  <dt> <a name="1014622"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">However you do it, your design should now be DRC correct and look similar to <a href="max_tut-Pt2Layout.html#1014627">Figure 20</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014627"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 20:   Nand Gate Wired Up</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wired_up.gif">
+</div></font><a name="1029000"> </a>
+</pre>
+
+<h4>
+  <a name="1014632"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Text</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014633"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There is one last thing before we are finished with our Nand gate.</font>
+<p>
+<p>
+  <dt> <a name="1014634"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The input and output nets of the Nand gate should be marked with unique names. This is accomplished by adding Text to the nets.</font>
+<p>
+<p>
+  <dt> <a name="1014635"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To add Text, you first select the paint rectangle where you want to put Text. Simply click the left mouse button (Button-1) on the piece of paint, which will select the paint rectangle and place the Box around it. The new Text will be positioned in the middle of the paint rectangle. Or, to position the Text elsewhere, use the left mouse button (Button-1) to drag a small box over the paint at the location where you want the Text.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014636"> </a>Select the ground (lower) rail (click with Button-1)</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014637"> </a>Then type <b><strong class="Strong">t</strong></b> for <b><strong class="Strong">Text</strong></b>, or choose <b><code class="CodeStrong">Add Text</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu. The <b><code class="CodeStrong">MAX Text Edit </code></b>dialog box will appear.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014638"> </a>Enter the name <b><strong class="Strong">GND</strong></b> into the Text field.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014639"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The<b><code class="CodeStrong"> MAX Text Edit</code></b> dialog box permits you to set the type of Text label: <b><strong class="Strong">input</strong></b>, <b><strong class="Strong">output</strong></b>, and so forth. Marking labels as inputs, outputs, global, etc. can be useful for use with other extraction or routing tools. </font>
+<p>
+<p>
+  <dt> <a name="1039150"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also specify the Text "position", such as <b><strong class="Strong">n</strong></b> for north, or <b><strong class="Strong">s</strong></b> for south. Specifying the orientation of the Text, relative to the crosshair that marks the Text location, places it on one side or another for easier viewing. The Text "type" can be a <b><strong class="Strong">point</strong></b> (the default) or a <b><strong class="Strong">box</strong></b>. The `box' option produces text which marks a specified area, but is rarely used.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014640"> </a>Specify the GND text direction to be <b><strong class="Strong">e</strong></b> (<i><strong class="StrongItalic">east</strong></i>) and specify that it is a <i><strong class="StrongItalic">global</strong></i> signal.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014641"> </a>Now move the mouse to the point on the layout you wish the text to be and click the left mouse button (Button-1).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014642"> </a>Then click <b><code class="CodeStrong">Done</code></b> or hit Return.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014643"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this tutorial:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014644"> </a><b><code class="CodeStrong">VDD</code></b> and <b><code class="CodeStrong">GND</code></b> were marked as <i><strong class="StrongItalic">global</strong></i>, and are positioned east (<b><code class="CodeStrong">e</code></b>). 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1038830"> </a>The inputs (<b><code class="CodeStrong">In1, In2</code></b>), and output (<b><code class="CodeStrong">Out</code></b>), were marked as <i><strong class="StrongItalic">local</strong></i>, and are positioned north (<b><code class="CodeStrong">n</code></b>). 
+</li><p>
+</font>
+</ul></ul></ol>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1038834"> </a>Add labels for <code class="Code">VDD</code>, <code class="Code">In1</code>, <code class="Code">In2</code> and <code class="Code">Out</code>, as shown in Figure 21</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1039245"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 21:   Adding Labels</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig18.gif">
+</div></font><a name="1014656"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1039347"> </a>Remember to save your cell (Hotkey: <b><strong class="Strong">Ctrl-s</strong></b>).</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014657"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">At this point our little NAND gate example should be done, and yours should look something like <a href="max_tut-Pt2Layout.html#1014662">Figure 22</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014662"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 22:   Finished Nand Gate</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/max4_fig19.gif">
+</div></font><a name="1028918"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014667"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can copy the cell into a new name. Let's call it <b><code class="CodeStrong">my_nand</code></b>.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1014668"> </a>Select <b><code class="CodeStrong">Save As... </code></b>from the <b><code class="CodeStrong">File</code></b> menu.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1014669"> </a>Type in "<b><code class="CodeStrong">my_nand</code></b>" in the <b><code class="CodeStrong">Filename</code></b> field and click on <b><code class="CodeStrong">OK</code></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014670"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You will now see both <b><code class="CodeStrong">foo</code></b> and <b><code class="CodeStrong">my_nand</code></b> in the List box. You are currently editing <b><code class="CodeStrong">my_nand</code></b>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014671"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Selecting Nets</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014672"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX can trace connectivity through vias and contacts to interactively show everything connected to a net. Place the mouse over any piece of metal, poly or diffusion and type<b><strong class="Strong"> </strong></b><b><strong class="Strong">s</strong></b>, or choose <b><code class="CodeStrong">Select Net </code></b>from the <b><code class="CodeStrong">Misc</code></b> menu. MAX will automatically select the entire net that is connected to that piece of paint, and will also display the net name, if known, in the <b><code class="CodeStrong">MAX Message Area</code></b>. The net name(s) are taken from any Text (labels) attached to the net.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014673"> </a>Move the mouse over the M1 rectangle for `<b><code class="CodeStrong">In2</code></b>' in the upper right corner.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014677"> </a>Type the <b><strong class="Strong">s</strong></b><b><code class="CodeStrong"> </code></b>hotkey. You should now see the net highlighted as in <a href="max_tut-Pt2Layout.html#1014679">Figure 23</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014679"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 23:   Highlighted Net<div align="center"><img src="images/max4_fig20.gif">
+</div></em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014684"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If there are multiple layers under the mouse cursor, you type <b><strong class="Strong">s</strong></b> multiple times to cycle through the nets.<b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024423"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One nice feature often used for debugging is that, when MAX selects a net, the name of all of the text labels on that net are displayed in the <b><code class="CodeStrong">MAX Message Area</code></b> (at the top, just to the right of the menus). For example, if you select <b><code class="CodeStrong">VDD</code></b> and the names <b><code class="CodeStrong">VDD</code></b> and <b><code class="CodeStrong">GND</code></b> both appear, you know you have a problem.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1039645"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX can also check to make sure you don't accidently connect two nets with the wire tool whhich have different net names. If your nets have text on them at the level of hierarchy you're editing, you will get a warning when connecting them.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1039646"> </a>To use this feature, it needs to first be turned on. Type the hotkey <b><strong class="Strong">Shift-w</strong></b>. You should see the popup menu shown in <a href="max_tut-Pt2Layout.html#1039651">Figure 24</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1039651"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 24:   Wire Menu Warning Popup</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/wire_menu.gif">
+</div></font><a name="1039654"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1039655"> </a>Click on the <b><code class="CodeStrong">Check Connectivity</code></b> toggle button to turn the feature on, and then click on <b><code class="CodeStrong">Done</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1039656"> </a>Now use the <b><code class="CodeStrong">wire tool</code></b> (Hotkey: <b><strong class="Strong">w</strong></b>) to connect the <b><code class="CodeStrong">VDD</code></b> and <b><code class="CodeStrong">GND</code></b> power rails.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1039657"> </a>When you try to end the wire on the other power rail, you get a warning popup telling you that you are connecting two different nets. Click on <b><code class="CodeStrong">Close</code></b>.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1039658"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the wire does get drawn, even thought it creates a short. The MAX methodology is to warn you if you're creating DRC or LVS errors, but still allow you to create that layout.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1039659"> </a>Undo (<b><strong class="Strong">u</strong></b>) the wire.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014686"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Advanced Selecting, Duplicating, And Renaming</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014687"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at a few more advanced selection techniques before we go on.</font>
+<p>
+<p>
+  <dt> <a name="1014688"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Under the <b><code class="CodeStrong">Edit</code></b> menu there are a few other interesting items.</font>
+<p>
+<p>
+  <dt> <a name="1014689"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We already know that we can select pieces of layout by:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014690"> </a>Dragging the select box around them, or  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014691"> </a>Clicking on them. 
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1014692"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To select a cell rather than some paint or an object:</font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014693"> </a>Position the mouse cursor over the cell and type <b><strong class="Strong">f</strong></b> (<b><code class="CodeStrong">Select Cell </code></b>from the <b><code class="CodeStrong">Misc</code></b> menu). Type <b><strong class="Strong">f</strong></b> repeatedly to cycle the selection through overlaid cells. After all cells under the cursor have been displayed, the <b><strong class="Strong">f </strong></b>key places a box around the entire cell. 
+</li><p>
+</font>
+</ul></ul></ol>
+  <dl>
+<p> <dt> <a name="1014694"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It easier to use the <b><strong class="Strong">f</strong></b> hotkey instead of the menu item for the <b><code class="CodeStrong">Select Cell</code></b><b><code class="CodeStrong"> </code></b>command because it uses the mouse cursor location to select cells.</font>
+<p>  </dl>
+<p>
+  <dt> <a name="1014695"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Probe</code></b> command is another way to see what layers and objects are under a particular point. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014696"> </a>Put the mouse over some layout geometry in your cell, hold down the <b><strong class="Strong">Ctrl</strong></b> key and press the left mouse button (Control-Button-1). </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1039730"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You could also choose <b><code class="CodeStrong">Probe</code></b> from the <b><code class="CodeStrong">Misc</code></b> menu, then point at the location you want to probe. The <b><code class="CodeStrong">Selection Probe</code></b> menu that appears contains a list of all the layers and objects under that point. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014697"> </a>To select a paint rectangle or other object, click on it in the popup with mouse Button-1. To deselect it, click again. By default, only items in the current edit cell are displayed, since those are the only ones you can effectively manipulate. But if you choose the <b><code class="CodeStrong">All Expanded Cells</code></b> radio-button, the list will contain everything in any cell under the point where you probed. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014698"> </a>You can also clear the selection by choosing <b><code class="CodeStrong">Clear Selection</code></b>. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014699"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Another way of duplicating layout is by using the <b><code class="CodeStrong">Copy Cell Buffer </code></b>command in the <b><code class="CodeStrong">File</code></b> menu. This command will copy the current cell buffer to a new cell buffer in memory. The new cell will be saved to disk when you <b><code class="CodeStrong">Save</code></b> the cell (from the <b><code class="CodeStrong">File</code></b> menu.) The <b><code class="CodeStrong">Save As</code></b> command (also in the <b><code class="CodeStrong">File</code></b> menu) is similar to <b><code class="CodeStrong">Copy Cell Buffer</code></b>, but also immediately saves the cell to disk. In fact, the <b><code class="CodeStrong">Copy Cell Buffer </code></b>command was used to create an Inverter cell (<b><code class="CodeStrong">INV.max</code></b>) from the <b><code class="CodeStrong">Nand</code></b> cell we just finished, and the <b><code class="CodeStrong">Save As</code></b> command was used to save cell <b><code class="CodeStrong">foo</code></b> as <b><code class="CodeStrong">Nand.max</code></b>.</font>
+<p>
+<p>
+  <dt> <a name="1014700"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are working on a cell and want to discard its contents, perhaps to completely replace it with another cell, you can use the<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Delete Cell Buffer</code></b><b><code class="CodeStrong"> </code></b>command (under the <b><code class="CodeStrong">File</code></b> menu) to delete the in-memory copy of a cell. This command does not affect the file on disk.</font>
+<p>
+<p>
+  <dt> <a name="1014708"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="max_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="max_tut-Pt1Intro.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="max_tut-Pt3BiggerHier.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="max_tut-Pt4MAX-LS.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

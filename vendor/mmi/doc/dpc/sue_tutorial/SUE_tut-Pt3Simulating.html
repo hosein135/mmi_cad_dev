@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="12/04/01 16:28:49">
+<title>Part 3   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td>&nbsp;&nbsp;&nbsp;<H1><font color="003366"> SUE Design Manager Tutorial</font></H1></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="sue_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_tut-Pt2Schematics.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_tut-Pt4HigherLevel.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_tut-Pt5Crossprobe.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 3 </font>
+</h2>
+
+
+<h2>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Simulating Circuits With SPICE And IRSIM</font>
+</h2>
+
+
+<h3>
+  <a name="1014409"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Simulating Circuits</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014410"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The main purpose of creating schematics is to netlist, simulate and verify them. In SUE this is a snap! In the next few sections you will get a chance to simulate the same circuit in three different simulators: HSPICE, IRSIM, and Verilog. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029673"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Running HSPICE </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029674"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you don't have HSPICE installed, skip to the <a href="SUE_tut-Pt3Simulating.html#1014451">Running IRSIM</a> section. If you have never run HSPICE before, don't worry.</font>
+<p>
+<p>
+  <dt> <a name="1029737"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">First, make sure the following two things are set up: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029738"> </a>You have a circuit loaded into SUE that you want to simulate. The "<b><code class="CodeStrong">pulsegen</code></b>" circuit you just entered will work fine. If you just started SUE again, load the circuit with the <b><code class="CodeStrong">Open</code></b> command in the <b><code class="CodeStrong">File</code></b> menu. Your schematic should look like <a href="SUE_tut-Pt3Simulating.html#1014437">Figure 12</a>-a.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014418"> </a>Insure that you are in<b><code class="CodeStrong"> </code></b><code class="Code">SPICE mode</code>. On the title bar of SUE you should see `<b><code class="CodeStrong">(spice)</code></b>' which means you are in <code class="Code">SPICE mode</code>. Otherwise, go to<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Change Simulation Mode</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu and click on <b><code class="CodeStrong">spice</code></b> and then <b><code class="CodeStrong">Done</code></b>. </font>
+</p>   </ol>
+<p>
+  <dt> <a name="1014419"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">OK, pay close attention. To run HSPICE you have to do the following set of complex tasks: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014421"> </a>Type <b><strong class="Strong">h</strong></b></font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1014422"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">That's it! </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1014423"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This single command (<b><code class="CodeStrong">SPICE it</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu) does the following: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014424"> </a>First, it creates an HSPICE netlist of the current schematic which is the same as the hotkey <b><strong class="Strong">Shift-n</strong></b> or <b><code class="CodeStrong">SPICE Netlist </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014425"> </a>Second, it runs a script that starts HSPICE either on your local machine or on a remote server depending on the configuration (assuming the script is set up). </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1020671"> </a>When the HSPICE job is finished, it starts the <em class="Emphasis">Micro Magic Tools NST Waveform Viewer</em> (included with SUE) and loads the SPICE data file (the<code class="Code"> </code><b><code class="CodeStrong">.tr0</code></b> file) into it. This can also be done by<b><strong class="Strong"> Ctrl-i </strong></b>or <b><code class="CodeStrong">Init Probe</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1030382"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have two monitors on your machine, you can have SUE start NST on the other monitor by typing the line "<b><code class="CodeStrong">setenv PROBE_DISPLAY other</code></b>" at the UNIX prompt before starting SUE.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></li>
+ </font>
+
+
+</ul></dl></dl>
+
+<h4>
+  <a name="1014428"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Displaying HSPICE Waveforms From SUE</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014429"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now you will start to see some of the real power of SUE. </font>
+<p>
+<p>
+  <dt> <a name="1014430"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To see how your circuit simulated, you would simply select one of the wires in your schematic and then type <b><strong class="Strong">p</strong></b> or <b><code class="CodeStrong">Plot Net</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. The waveform for that wire should show up in the NST window. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014431"> </a>Select the wire at the top of the <b><code class="CodeStrong">pulse</code></b><b><code class="CodeStrong"> </code></b>icon and hit <b><code class="CodeStrong">p</code></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014432"> </a>Select the wire at the output of the <b><code class="CodeStrong">nand2</code></b> gate and hit<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">p</code></b>. You might have to carefully select the `<em class="Emphasis">open</em>' on the output of the <b><code class="CodeStrong">nand2</code></b> gate if you didn't add a wire there. Do you see the pulse output? Remember the pulse is low going because we have a <b><code class="CodeStrong">nand2</code></b> instead of an <b><code class="CodeStrong">and2</code></b>. Your waveforms should look like <a href="SUE_tut-Pt3Simulating.html#1014437">Figure 12</a>-b.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014437"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 12:   Displaying HSPICE Waveforms: a) "pulsegen" Schematic; b) NST With Two Waveforms</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/SUE_tut-Pt3Simulatinga.gif" height="747" width="975">
+</div></font><a name="1014442"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014443"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you changed any of the parameters for the <b><code class="CodeStrong">pulse_icon</code></b>, your waveforms will look different.</font>
+<p>
+<p>
+  <dt> <a name="1020766"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are lots of plotting options in the <b><code class="CodeStrong">Sim</code></b> menu such as <b><code class="CodeStrong">Plot Old Net, Unplot Net, Plot Net &amp; Remember</code></b>, etc. <b><code class="CodeStrong">Plot Old Net</code></b> will plot the same net from the last HSPICE run. So you can tweak a device size or change a gate, rerun HSPICE with <b><strong class="Strong">h</strong></b>, and compare the old and the new waveforms! <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1020814"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">NST can do a lot more than just plot waveforms. You can add panels, print, compute power, and do arithmetic derivations on waveforms! (See the NST manual for details).</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1014446"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can plot net waveforms at any level of the hierarchy just as easily as at the top. SUE does all of the messy translations for you. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014447"> </a>In this circuit there are only two levels of hierarchy: the one we are looking at, and the transistor level circuits of the inverters and nand2. Push into the <b><code class="CodeStrong">nand2</code></b> gate (select it and hit <b><strong class="Strong">e </strong></b>or <b><code class="CodeStrong">Push Into</code></b> in the <b><code class="CodeStrong">View</code></b> menu). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014448"> </a>Now select the net between the 2 series nfets and hit <b><strong class="Strong">p</strong></b> to plot its waveform. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014449"> </a>Pop back out to the <b><code class="CodeStrong">pulsegen</code></b> circuit with<b><strong class="Strong"> </strong></b><b><strong class="Strong">Ctrl-e</strong></b><b><strong class="Strong"> </strong></b>or <b><code class="CodeStrong">Pop Out Of</code></b> in the <b><code class="CodeStrong">View</code></b> menu. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1020879"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can always go directly to a schematic without pushing or popping by clicking on its schematic name in the <b><code class="CodeStrong">Schematic List</code></b> box. However, SUE will assume that the schematic you went to is at the top of the hierarchy so you should use push and pop whenever you can.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014451"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Running IRSIM </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014452"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We now are going to run IRSIM on your same circuit. </font>
+<p>
+<p>
+  <dt> <a name="1014453"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">IRSIM is a switch level simulator from Stanford University. We have included it with SUE. In any other schematic editor you would have to draw a different schematic to run IRSIM, but not with SUE. SUE can run SPICE, IRSIM, and Verilog all from the same schematic! </font>
+<p>
+<p>
+  <dt> <a name="1014454"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To run IRSIM, we first need to switch simulation modes: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014455"> </a>Select <b><code class="CodeStrong">Change Simulation Mode </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu and then click <b><code class="CodeStrong">sim</code></b> and then click <b><code class="CodeStrong">Done</code></b><b><code class="CodeStrong"> </code></b>or hit Return. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014456"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you had an NST window up from the previous section, SUE closes it since IRSIM comes with it's own waveform viewer (called <em class="Emphasis">Analyzer</em>). </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014457"> </a>Pull down the <b><code class="CodeStrong">Sim</code></b> menu. You will see that it has changed since you changed the simulation mode. But only the <b><code class="CodeStrong">Sim</code></b> menu changed. Note that the first entry used to be <b><code class="CodeStrong">SPICE Netlist </code></b>and it is now <b><code class="CodeStrong">SIM Netlist</code></b>, but the hotkey is the same.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014458"> </a>Now type<b><strong class="Strong"> h</strong></b><b><code class="CodeStrong"> </code></b>to run IRSIM (or<b><code class="CodeStrong"> SIM it</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu). </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014459"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE creates a SIM netlist for your schematic (<b><code class="CodeStrong">SIM Netlist</code></b>) and then starts IRSIM in interactive mode with the SIM netlist and brings up the waveform analyzer (<b><code class="CodeStrong">Init Probe</code></b>). </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014460"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Interacting With IRSIM </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014461"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You are now running IRSIM and the time is "0ns". Furthermore, no inputs are set. In SPICE we set up a driving function with the <b><code class="CodeStrong">pulse</code></b> icon. In IRSIM (or Verilog) mode, this type of simple waveform is usually too simplistic and thus doesn't netlist to anything. </font>
+<p>
+<p>
+  <dt> <a name="1014462"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's setup an input: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014463"> </a>Select the wire at the top of the <b><code class="CodeStrong">pulse</code></b> icon. This is the one we want to drive. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014464"> </a>Hit hotkey<b><strong class="Strong"> </strong></b><b><strong class="Strong">0</strong></b> (zero) or <b><code class="CodeStrong">I</code></b><b><code class="CodeStrong">rsim Set Low </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. This will tell IRSIM to set that net to a `logical 0'. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014465"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since this is the only input to the circuit we can now "step time" forward. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014466"> </a>Hit hotkey <b><strong class="Strong">s</strong></b> or <b><code class="CodeStrong">Irsim Step</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014467"> </a>Plot the selected net with the <b><strong class="Strong">p</strong></b> hotkey, just like in SPICE mode. The timing waveform should appear in the analyzer window. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014468"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at another node: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014469"> </a>Select the <b><code class="CodeStrong">nand2</code></b> output and type <b><strong class="Strong">p</strong></b>. Notice that the <b><code class="CodeStrong">nand2</code></b> output went high after the input went low. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014470"> </a>Now go back to the input and set it high by selecting it and typing <b><code class="CodeStrong">9</code></b> (or choose <b><code class="CodeStrong">Irsim Set Hi</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu). Step time again by typing<b><strong class="Strong"> s</strong></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014471"> </a>Notice that the <b><code class="CodeStrong">nand2</code></b> output went low, and then some time later back high. Yep, we actually have a pulse generator. Your waveforms should look something like <a href="SUE_tut-Pt3Simulating.html#1014476">Figure 13</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014476"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 13:   IRSIM Waveform With Two Nets</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig11.gif">
+</div></font><a name="1014480"> </a>
+</pre>
+
+<h4>
+  <a name="1014482"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Net Names When Netlisting</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014483"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Did you notice that you haven't named a single net, however, you just finished simulating a schematic in two different types of simulators? In SUE, you only need to name ports and globals. SUE will create unique names for all other unnamed nets. </font>
+<p>
+<p>
+  <dt> <a name="1014484"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There are three ways to name a net in SUE: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014485"> </a>By connecting the net to an I/O port with either the "<b><code class="CodeStrong">input</code></b>", "<b><code class="CodeStrong">output</code></b>", or "<b><code class="CodeStrong">inout</code></b>" icons. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014486"> </a>By connecting the net to a global signal name with the "<b><code class="CodeStrong">global</code></b>" icon. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1014487"> </a>By adding a "<b><code class="CodeStrong">name_net_s</code></b>" icon to a net and labeling it with a name. (Do this by double-clicking Button-1 on the icon, and then entering a net name.)</li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1021445"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Otherwise, SUE makes up a name for the net of the form: "<b><code class="CodeStrong">net_#</code></b>". SUE will also make up unique names for devices and icons if you don't name them. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1021873"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you have trouble double-clicking on the small "<b><code class="CodeStrong">name_net_s</code></b>" icons to name them, you might use the <b><code class="CodeStrong">Edit Selected</code></b> command in the <b><code class="CodeStrong">Edit</code></b> menu, or first name them and then move them onto the desired net.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1014490"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want to see what SUE has named a wire, just select it and look at the<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">SUE Message Area</code></b>. Note that you have to netlist first to see the net name. </font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="sue_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_tut-Pt2Schematics.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_tut-Pt4HigherLevel.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_tut-Pt5Crossprobe.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

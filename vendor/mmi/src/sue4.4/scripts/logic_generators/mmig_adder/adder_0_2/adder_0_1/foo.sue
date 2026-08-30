@@ -1,0 +1,38 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_foo {} {
+  make global -name gnd -origin {420 390}
+  make name_net -name cout -origin {420 220}
+  make global -name gnd -origin {290 430}
+  make global -name vdd -origin {260 430}
+  make flag -value 0 -origin {420 180}
+  make flag -value 33 -origin {510 310}
+  make flag -value 1 -origin {320 280}
+  make flag -value 32 -origin {320 340}
+  generate adder adder5_CarrySelect_4_C_Y -NBITS 5 -Partition 4
+  make adder5_CarrySelect_4_C_Y -origin {420 310}
+  make name_net -name {A_H[4:0]} -origin {210 280}
+  make name_net -name {B_H[4:0]} -origin {210 340}
+  make output -name {sum_h[4:0]} -origin {510 310}
+  generate testCounter testCounter5 -NBITS 5
+  make testCounter5 -orient R90X -origin {50 310}
+  make_wire 420 380 420 390
+  make_wire 320 280 370 280
+  make_wire 320 340 370 340
+  make_wire 420 220 420 240
+  make_wire 510 310 470 310
+  make_wire 160 290 100 290
+  make_wire 210 280 320 280
+  make_wire 210 340 160 340
+  make_wire 210 340 320 340
+  make_wire 160 330 160 340
+  make_wire 100 330 160 330
+  make_wire 160 280 160 290
+  make_wire 160 280 210 280
+  make_wire 420 180 420 220
+  make_wire 370 360 260 360
+  make_wire 260 360 260 430
+  make_wire 370 380 290 380
+  make_wire 290 380 290 430
+}
+

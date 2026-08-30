@@ -89,4 +89,6 @@ find . -type f \( -name '*.so' -o -name '*.so.*' -o -name '*.exe' \) -print0 2>/
     esac
   done
 
+bash "$(dirname "$0")/normalize-windows-git.sh" "$TREE"
+
 echo "layout: done under $TREE"

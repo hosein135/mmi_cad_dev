@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 14:38:42">
+<title>Setting Up And Initializing DPC</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch1Fundamentals.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch3PlaceAlgorithm.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 2 </font>
+</h2>
+
+
+<h1>
+  <a name="1024688"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting Up And Initializing DPC</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1025897"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029605"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to run DPC, you must already have a licensed version of Micro Magic Tools' <em class="Emphasis">SUE Design Manager</em> installed at your site. DPC is initially launched through SUE, and runs on top of the SUE program, as well an making use of SUE schematics and library files.</font>
+<p>
+<p>
+  <dt> <a name="1029610"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to SUE, you must have your design library installed and ready to access. This chapter will address the directory and file structure setup, switch and variable settings, and other configurations necessary to run DPC to maximimum efficiency.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1025941"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting Up The Data Path Compiler</font>
+</h3>
+
+
+<h4>
+  <a name="1029618"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Setting Pointers And Variables</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1025942"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before running DPC, a librarian should set up the appropriate pointers and variables in the <b><strong class="Strong">.suerc</strong></b> file. These pointers and variables include, but are not limited to: </font>
+<p>
+   <ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029248"> </a>The pathname to the standard cell library, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029258"> </a>The routing grid size, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029259"> </a>The default cell heights and widths of the standard cells, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029264"> </a>The pathname to a file specifying the widths of all standard cells and/or heights, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029265"> </a>The data path pitch. </font>
+</p>   </ul>
+<p>
+  <dt> <a name="1029268"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For static timing, the following variables must also be set up: </font>
+<p>
+   <ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029278"> </a>The selection of the static timing analyzer and the command needed to invoke it, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029281"> </a>The pathname of the timing files, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029282"> </a>The average capacitance per micron of wire, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029283"> </a>The clock period and clock waveforms, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029284"> </a>The default output loading, </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1029285"> </a>The default input arrival time of inputs and departure time of outputs, etc. </font>
+</p>   </ul>
+</dl></dl>
+
+<h4>
+  <a name="1025957"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Setting Grid And Pitch Sizes</em></font>
+</h4>
+
+
+<h5>
+<align="left">
+  <a name="1029648"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting Grid Size</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029621"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Size input to DPC is in grids, also known as <em class="Emphasis">minimum routing pitches</em>. DPC uses the global variable <b><code class="CodeStrong">DPC(SCALE)</code></b> to convert from microns to grids. Most routers, despite their claims, generally adhere to a wiring grid to work well. The wiring pitch is often chosen to be the minimum contacted wiring pitch allowed by the design rules for the process. High speed designs sometimes use larger pitches to reduce sidewall capacitances which tend to dominate, especially with millering. Minimum metal area rules, as well as the fet pitch in the cells, also play into determining the appropriate pitch to allow stacked vias. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029657"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting Pitch Size</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029627"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Some processes, in order to further increase contacted pitch, allow one direction to have a tighter pitch than the other direction. For example, in a common 0.18 micron process, the minimum X pitch of metal layers M1-5 might be 0.56 microns, while the minimum Y pitch is 0.66 microns. They do this by reducing the metal overlap of contact/via requirement in one direction. DPC handles a non-square pitch by accepting a pair of values for the <b><code class="CodeStrong">DPC(SCALE)</code></b> variable, setting the X and Y pitch, respectively. </font>
+<p>
+<p>
+  <dt> <a name="1029321"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, in the case above, you would set the pitch by typing: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC(SCALE) "0.56 0.66"
+</font><a name="1025961"> </a>
+      </pre>
+<p>
+  <dt> <a name="1025962"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you decided to use a square pitch, you would enter: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC(SCALE) 0.66
+</font><a name="1025963"> </a>
+      </pre>
+<p>
+  <dt> <a name="1025965"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you purchase a cell library, the assumed routing grid will be specified by the library's manufacturer. </font>
+<p>
+<p>
+  <dt> <a name="1025966"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Cell sizes must be specified as an integral number of grids. If grid sizes are not integers, they will be rounded by DPC, so you cannot simply set <b><code class="CodeStrong">DPC(SCALE)</code></b> to equal 1 and design in microns unless your grid happens to be 1 micron. Why must cell sizes be an integral number of grids? Because the port locations in the cells will be off-grid. Furthermore, filler cells will not fit, cell spacings will cause lots of well and implant gaps, and well/substrate ties won't overlap (assuming the common practice of sharing well/substrate ties with cells above and below). </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029668"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting Standard Cell Height And Width</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1025968"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For all placement and timing, DPC only needs to know the width and heights of the standard cells. It does not need a layout or even an abstract of the cell (for example, a LEF file). However, if you have these, you can write a script to extract the widths and heights. </font>
+<p>
+<p>
+  <dt> <a name="1029387"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Furthermore, since the heights are typically all the same (except for a few special cells), only the widths need to be specified and the heights will default to the value specified in the variable <b><code class="CodeStrong">DPC(DEFAULT_ROW_HEIGHT)</code></b>. The pathnames to the file or files containing the cell sizes are specified in the variable <b><code class="CodeStrong">DPC(PATH)</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1029399"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, you might have two set of files set up as: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC(PATH) "/home/cad/stdcell/dpc/stdcell.dpc \</font><a name="1025972"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">/home/cad/stdcell/dpc/special.dpc"
+</font><a name="1025973"> </a>
+      </pre>
+<p>
+  <dt> <a name="1025974"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">These files have the format: </font>
+<p>
+<pre>
+<font face="Courier">	# Comment lines start with a "#"</font><a name="1025975"> </a>
+</p><font face="Courier">	# Blank lines are ignored</font><a name="1025976"> </a>
+</p><font face="Courier">
+	&lt;cell_name&gt;     &lt;width&gt;   [&lt;height&gt;]</font><a name="1025977"> </a>
+</p><font face="Courier">	&lt;cell_name&gt;     &lt;width&gt;   [&lt;height&gt;]</font><a name="1025978"> </a>
+</p><font face="Courier">	...
+</font><a name="1025979"> </a>
+</p></pre>
+  <dl>
+<p> <dt> <a name="1025980"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Where the width and (optional) height are specified in grids (routing tracks). </font>
+<p><p> <dt> <a name="1029403"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, </font>
+<p>  </dl>
+<pre>
+<font face="Courier">	# My Standard Cell Library</font><a name="1025981"> </a>
+</p><font face="Courier">	INVA			2</font><a name="1025982"> </a>
+</p><font face="Courier">	INVB 			4</font><a name="1025983"> </a>
+</p><font face="Courier">	NAND2A			4</font><a name="1025984"> </a>
+</p><font face="Courier">	FAD 			10 	12</font><a name="1025985"> </a>
+</p><font face="Courier">	...</font><a name="1025986"> </a>
+</p></pre>
+  <dl>
+<p> <dt> <a name="1025987"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this example, all of the cells except for "FAD" would get the default height. </font>
+<p>  </dl>
+</dl></dl>
+
+<h4>
+  <a name="1029671"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Loading Specialized Data Path Icons</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1025989"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You also need to insure that the special data path icons are loaded. Note: these are NOT icons like NAND and NOR but are internal icons, like "place", that DPC requires. This can be done by adding the following line to your <b><strong class="Strong">.suerc</strong></b> file:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">lappend AUTOLIB $SUE_DIR/schematics/dpc
+</font><a name="1025991"> </a>
+      </pre>
+<p>
+  <dt> <a name="1025992"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Alternatively, copy these icons into the <b><code class="CodeStrong">devices Library</code></b> or some other library that will be loaded. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1025994"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running The Data Path Compiler</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1025995"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To run Data Path Compiler (DPC), you must have a valid SUE Design Manager license installed.</font>
+<p>
+<p>
+  <dt> <a name="1029677"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For your initial startup of DPC, first load SUE.</font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029678"> </a>From the UNIX command window, type:</li>
+ </font>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue</font><a name="1029680"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1029681"> </a>
+      </pre>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029679"> </a>Once SUE has loaded, from within the main SUE window select <b><code class="CodeStrong">Change Simulation Mode</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu, then set "<b><code class="CodeStrong">Type</code></b>" to <b><code class="CodeStrong">dpc</code></b> and the "<b><code class="CodeStrong">Properties</code></b>" to <b><code class="CodeStrong">verilog</code></b>. <br><br>Alternatively, you can set the above variables directly by addint the following lines in the <b><strong class="Strong">.suerc</strong></b> file before starting SUE: </li>
+ </font>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set NETLIST_TYPE dpc</font><a name="1025997"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set NETLIST_PROPS verilog
+</font><a name="1025999"> </a>
+      </pre>
+</ul>  <dl>
+<p> <dt> <a name="1026000"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also start in DPC mode by starting SUE with the following command:</font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">sue -SET NETLIST_TYPE=dpc -SET NETLIST_PROPS=verilog
+</font><a name="1026001"> </a>
+      </pre>
+  </dl>
+</dl></dl>
+
+<h4>
+  <a name="1026003"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Basic DPC Features</em></font>
+</h4>
+
+
+<h5>
+<align="left">
+  <a name="1029725"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Netlisting And Viewing</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029709"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Execute <b><code class="CodeStrong">DPC Netlis</code></b><b><strong class="Strong">t</strong></b> from the <b><code class="CodeStrong">Sim</code></b> menu to automatically netlist the design to Verilog from the current cell and build the corresponding placement file (<b><code class="CodeStrong">&lt;cell_name&gt;.place.def</code></b>).<b><strong class="Strong"> </strong></b></font>
+<p>
+<p>
+  <dt> <a name="1026005"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Execute <b><code class="CodeStrong">toggle placement view</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu to display the hierarchical placement. </font>
+<p>
+<p>
+  <dt> <a name="1029460"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To see the contents of hierarchical blocks, select the desired blocks and then execute <b><code class="CodeStrong">push into</code></b> from the <b><code class="CodeStrong">View</code></b> menu, just as if they were hierarchical cells in a SUE schematic. To return to the hierarchical view of a cell, select any of its contents and execute <b><code class="CodeStrong">pop out of</code></b> from the <b><code class="CodeStrong">View</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1026006"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The features above do not require a static timing analyzer or any standard-cell timing information or setup. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029719"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Timing A Design</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1026008"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To time the design, select <b><code class="CodeStrong">DPC It</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu which will first run <b><code class="CodeStrong">DPC Netlist</code></b> and then run timing and back-annotate the results. Alternately, you can select <b><code class="CodeStrong">Time It</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. <b><code class="CodeStrong">DPC It</code></b> is just a shorthand for running <b><code class="CodeStrong">DPC Netlist</code></b> followed by <b><code class="CodeStrong">Time It</code></b>. However, <b><code class="CodeStrong">Time It</code></b> will also bring up a window listing various options and allow you to change any defaults, such as the capacitance file to use, before proceeding. </font>
+<p>
+<p>
+  <dt> <a name="1029840"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">At the completion of the static timing analysis, all nets are back-annotated with timing values, and the worst critical path in the schematic is automatically selected. To view other critical paths, click on the radio button for the desired critical path and then click on <b><code class="CodeStrong">Display CP</code></b>. You can also push into sub cells in the critical path to view them, or go to the placement view and click on <b><code class="CodeStrong">Display CP</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1026014"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you select <b><code class="CodeStrong">Display CP</code></b>, in addition to the timing, SUE annotates the rise or fall time on the critical path. You won't see the rise/fall times immediately after running <b><code class="CodeStrong">DPC It</code></b>, because you are seeing all the timing. To view the rise/fall times, click on <b><code class="CodeStrong">Display CP</code></b>. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1029722"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Displaying A Specific Instance</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1026016"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">It is often desirable to locate a specific instance from the schematic view in the placement view, or the reverse. Select the appropriate instance in either view and execute <b><code class="CodeStrong">Display Other View</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. This will toggle views and select the appropriate icon. If the icon is not visible in the placement view because it is in an unexpanded cell, a temporary icon will be displayed. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1030021"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Displaying Connections</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1030022"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the placement view, it can be very helpful to know all the connections to an instance before deciding to move that instance. Select the instance in the placement view, and then execute <b><code class="CodeStrong">Display Connections</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. This will show all the connections to that instance with flylines. If a hierarchical instance is selected, then all connections to any cell in that hierarchical instance are displayed.</font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1030051"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Congestion Analysis</font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1030060"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before you send a design to a detailed router such as <em class="Emphasis">Silicon Ensemble</em> or <em class="Emphasis">Apollo</em>, you want to make sure the design is routable. After either <b><code class="CodeStrong">DPC It</code></b> or <b><code class="CodeStrong">Time It</code></b> have been run (both run the DPC global router), you can execute <b><code class="CodeStrong">Congestion...</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. Refer to <a href="dpc_man_Ch5Commands.html#1044382"><b><code class="CodeStrong">Congestion... </code></b> </a> for more details on the congestion analyzer. If you find areas which are congested, you can add space for routing as described in <a href="dpc_man_Ch3PlaceAlgorithm.html#1026199"><b><code class="CodeStrong">Adding Spaces </code></b> </a>.</font>
+<p>
+<p>
+  <dt> <a name="1029526"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch1Fundamentals.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch3PlaceAlgorithm.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

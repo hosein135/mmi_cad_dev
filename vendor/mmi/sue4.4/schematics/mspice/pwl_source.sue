@@ -1,0 +1,69 @@
+# SUE version MMI_SUE3.5
+
+proc ICON_pwl_source args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {initial_voltage 0} {pulse_voltage vddp} {edges {}} {rise_time 200ps} {fall_time 200ps} {repeat 0}}
+  icon_term -type inout -origin {0 40} -name v_minus
+  icon_term -type inout -origin {0 -40} -name v_plus
+  icon_arc -20 -20 20 20 -start 0 -extent 359
+  icon_line 0 -20 0 -40 0 -40
+  icon_line 0 40 0 20 0 20
+  icon_property -origin {-130 90} -type user -name name
+  icon_property -origin {-200 260} -type fixed -name spice -text {[unique_name V $name] $v_plus $v_minus 
++ PWL([pwl_function $initial_voltage $pulse_voltage $edges $rise_time $fall_time]) [if {$repeat} {concat R}]}
+  icon_property -origin {-130 110} -type user -name initial_voltage -default 0
+  icon_property -origin {-130 130} -type user -name pulse_voltage -default vddp
+  icon_property -origin {-130 150} -type user -name edges
+  icon_property -origin {-130 170} -type user -name rise_time -default 200ps
+  icon_property -origin {-130 190} -type user -name fall_time -default 200ps
+  icon_property -origin {-130 210} -type user -name repeat -default 0 -choices binary
+  icon_property -origin {-20 10} -anchor e -label {$initial_voltage}
+  icon_property -origin {20 -10} -label {$pulse_voltage}
+  icon_line -15 10 -13 10 -12 -10 -9 -10 -8 10 0 10 1 -10 12 -10 13 10 15 10
+  icon_property -origin {-190 330} -size large -type comment -text {Don't edit this cell in SUE.}
+}
+
+
+# This function returns the PWL string for spice as used by the above icon.
+#   "<time> <voltage> <time> <voltage> ...
+
+# Note that if you try to modify and save this icon from SUE, you will
+# lose this function.
+
+proc pwl_function {initial_voltage pulse_voltage edges rise_time fall_time} {
+
+  # initialize 
+  set string "0 $initial_voltage"
+
+  set voltages "$initial_voltage $pulse_voltage"
+  set voltage 0
+
+  set rise [parse_pp_number $rise_time]
+  set fall [parse_pp_number $fall_time]
+  set rise2 [expr $rise/2.0]
+  set fall2 [expr $fall/2.0]
+
+  set transitions "$rise2 $fall2"
+  set transition 0
+
+  foreach edge $edges {
+    
+    set edge [parse_pp_number $edge]
+
+    # start of edge
+    lappend string [pp_number [expr $edge - [lindex $transitions $transition]]]
+
+    lappend string [lindex $voltages $voltage]
+    # flip voltage to other one
+    set voltage [expr 1 - $voltage]
+
+    # end of edge
+    lappend string [pp_number [expr $edge + [lindex $transitions $transition]]]
+
+    lappend string [lindex $voltages $voltage]
+    
+    # flip to other transition for next edge
+    set transition [expr 1 - $transition]
+  }
+
+  return $string
+}

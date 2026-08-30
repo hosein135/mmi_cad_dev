@@ -1,0 +1,355 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 22:41:43">
+<title>MAX Appendix C - Tcl/Tk</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MAX Layout System User Guide </H1></font></center></td>
+   </tr>
+</table>
+
+<table ALIGN=RIGHT BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="331" >
+<tr>
+<td><a href="MAX_ManualTOC.html"><img SRC="images/navtoc.gif" ALT="TOC" BORDER=0 height=23 width=84></a></td>
+
+<td><a href="apndxb.html"><img SRC="images/navprev.gif" ALT="PREV" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="MAX_ManualIX.html"><img SRC="images/navnext.gif" ALT="NEXT" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="MAX_ManualIX.html"><img SRC="images/navidx.gif" ALT="INDEX" BORDER=0 height=23 width=85></a></td>
+</tr>
+</table>
+
+<hr align="left">
+<blockquote>
+<h2>
+<a NAME="1012811"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Appendix
+C</font></font></h2>
+
+<h2>
+<a NAME="1013842"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Tcl/Tk
+And The MAX API</font></font></h2>
+
+<h3>
+<a NAME="1018680"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Writing
+Tcl/Tk Scripts</font></font></h3>
+
+<dl>
+<dl><a NAME="1019476"></a><font face="Verdana, Arial, Helvetica, sans-serif">Tcl/Tk
+is used for the programming interface for MAX. All Tcl and Tk commands
+are available providing a complete scripting language and toolkit for GUI
+extensions. Complete information on Tcl/Tk is available from the official
+Tcl/Tk website at <b>http://scriptics.com</b>. We also recommend the book
+"<b>Tcl and the Tk Toolkit</b>", authored by John Ousterhout, and published
+by Addison-Weseley.</font>
+<br>&nbsp;
+<dt>
+<a NAME="1019479"></a><font face="Verdana, Arial, Helvetica, sans-serif">There
+is an extensive list of text commands which are built on top of Tcl/Tk
+<a href="apndxb.html#1013842">(See
+<b><tt>MAX Text Commands </tt></b>)</a>. Tcl/Tk commands can be typed directly
+into the MAX <b><tt><a href="MAX_Man_Ch2LayoutEd.html#1027844">Command
+Window</a></tt></b>, can be put into a <b><tt>.maxrc</tt></b> file or
+into a separate file which can be sourced. Examples of Tcl/Tk scripts can
+be found in <b><tt>$MMI_TOOLS/mmi_local.sample/max/api_examples</tt></b>.</font></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<br>&nbsp;
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1018689"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Useful
+Tcl Commands (MMI Extensions)</font></font></i></h4>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">setl {a b c} "4 12 foo"<a NAME="1018690"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018691"></a></pre>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1018692"></a><font face="Verdana, Arial, Helvetica, sans-serif">is
+the same as</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set a 4<a NAME="1018693"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set b 12<a NAME="1018694"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set c foo<a NAME="1018695"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018696"></a></pre>
+
+<dt>
+<a NAME="1018697"></a><font face="Verdana, Arial, Helvetica, sans-serif">Creating
+associated lists:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set my_list [list "a 25" "type $type" "xyz 5"]<a NAME="1018698"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set my_var [get_assoc "xyz" $my_list]<a NAME="1018699"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018700"></a></pre>
+
+<dt>
+<a NAME="1018701"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+above commands put <b><tt>5</tt></b> in <b><tt>my_var</tt></b></font></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<br>&nbsp;
+<br>&nbsp;</dl>
+</dl>
+
+<h3>
+<a NAME="1018704"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Gcells
+Tcl Programs</font></font></h3>
+
+<dl>
+<dl><a NAME="1018705"></a><font face="Verdana, Arial, Helvetica, sans-serif">Generator
+cells or Gcells are parameterized cells that regenerate themselves when
+they get different inputs. Devices (for example, fets) and vias are good
+candidates for Gcells since a given layout may have multiple types that
+differ only by size or some other attribute.</font>
+<p><a NAME="1018706"></a><font face="Verdana, Arial, Helvetica, sans-serif">Gcells
+are user definable using the Tcl scripting language. Presently they must
+be created and modified using a text editor. To discern Gcells from conventional
+MAX cells, Gcells are saved in<b><tt> .maxg</tt></b> files as opposed to
+<b><tt>.max</tt></b>
+files.</font>
+<p><a NAME="1018707"></a><font face="Verdana, Arial, Helvetica, sans-serif">A
+Gcell layout requires the following two structures to be defined:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">proc gcell_make_&lt;name> {properties} { ... }<a NAME="1018708"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">define_gcell &lt;name> &lt;property_list><a NAME="1018709"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018710"></a></pre>
+<a NAME="1018711"></a><font face="Verdana, Arial, Helvetica, sans-serif">where<b><tt>
+&lt;name>.maxg </tt></b>is the name of the file that they are in. Note
+that other Tcl procedures can also be defined and used in the Gcell file.</font>
+<p><a NAME="1018712"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>gcell_make_&lt;name></tt></b>
+procedure is called whenever the Gcell is created or modified and is passed
+the properties for that given instantiation. The procedure should draw
+the Gcell oriented around the origin - translations and rotations/mirrors
+are handled automatically by MAX. Gcells can ONLY use the following drawing
+procedures to create layout:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">gcell_paint &lt;layer> &lt;x1> &lt;y1> &lt;x2> &lt;y2>&nbsp;<a NAME="1018713"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">gcell_label &lt;text> &lt;type> &lt;layer> &lt;x1> &lt;y1> [&lt;x2> &lt;y2>]<a NAME="1018714"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">gcell_polygon &lt;layer> &lt;x1> &lt;y1> &lt;x2> &lt;y2> ...<a NAME="1018715"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018716"></a></pre>
+<a NAME="1018717"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+CANNOT use the conventional drawing commands like <b><tt>db_paint</tt></b>
+or <b><tt>db_polygon.</tt></b></font>
+<p><a NAME="1018718"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+<b><tt>define_gcell</tt></b>
+command defines the default user-definable properties of the Gcell and
+optional choices and checks on those parameters. The simplest form of the
+<b><tt>property_list</tt></b> is the form:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">{{&lt;prop1> &lt;default_value>} {&lt;prop2> &lt;default_value>} ...}<a NAME="1018719"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019190"></a></pre>
+
+<dl>
+<dt>
+<a NAME="1018720"></a><font face="Verdana, Arial, Helvetica, sans-serif">which
+is also known as an associative list. You can also restrict the choices
+for a property with the line:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">{&lt;prop> &lt;default_value> choice|radio &lt;list_of_choices>}<a NAME="1018721"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018722"></a></pre>
+</dl>
+
+<dt>
+<a NAME="1018723"></a><font face="Verdana, Arial, Helvetica, sans-serif">For
+example, a fet Gcell might have the property:</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">{type nfet choice {nfet pfet}}<a NAME="1018724"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018725"></a></pre>
+<a NAME="1018726"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+difference between <b><tt>choice</tt></b> and <b><tt>radio</tt></b> is
+the look on the <b><tt>property</tt></b> menu that the user will see. The
+use of <b><tt>radio</tt></b> will cause all choices to be listed with radio
+buttons before them.</font>
+<p><a NAME="1018727"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+can also do simple checks on property values by using the <b><tt>-number</tt>,<tt>-min</tt>,<tt>-max</tt></b>
+and <b><tt>-incr</tt></b> switches, for example:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">{&lt;prop &lt;width> &lt;1.2> -number -incr 0.1 -min 0.6 -max 20.0}<a NAME="1018728"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018729"></a></pre>
+<a NAME="1018730"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+will insure that the user can only enter widths between 0.6 and 20.0 in
+increments of 0.1.</font>
+<p><a NAME="1018731"></a><font face="Verdana, Arial, Helvetica, sans-serif">Typically
+the first few lines of any Gcell procedure (such as <b><tt>gcell_make_&lt;name></tt></b>)
+are the following:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier"> # get values out of properties list&nbsp;<a NAME="1018732"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set type [get_assoc type $properties]&nbsp;<a NAME="1018733"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set width [get_assoc width $properties] ...<a NAME="1018734"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018735"></a></pre>
+
+<dt>
+<a NAME="1018736"></a><font face="Verdana, Arial, Helvetica, sans-serif">which
+will get the actual values out of the property list and assign them to
+more manageable variables.</font></dt>
+
+<br>&nbsp;
+<p>&nbsp;
+<br>&nbsp;
+<br>&nbsp;</dl>
+</dl>
+
+<h4>
+<a NAME="1018738"></a><i><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Example
+Gcell</font></font></i></h4>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Example generator cell (Gcell) to draw a simple fet.<a NAME="1019269"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019270"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># This procedure draws a simple fet given a list of properties<a NAME="1019271"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019272"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">proc gcell_make_simplefet {properties} -desc {<a NAME="1019273"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; Gcell procedure to make a fet<a NAME="1019274"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">} {<a NAME="1019275"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019276"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # get values out of properties list<a NAME="1019277"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set type [get_assoc type $properties]<a NAME="1019278"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set width [get_assoc width $properties]<a NAME="1019279"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set length [get_assoc length $properties]<a NAME="1019280"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019281"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # fet gate is vertical.&nbsp; Origin is lower left corner of gate<a NAME="1019282"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019283"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # what layers make up this fet?<a NAME="1019284"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; setl {poly diff} [techinfo device $type]<a NAME="1019285"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; if {$poly == ““} {<a NAME="1019286"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; puts “Aborting, Illegal fet type $type.”<a NAME="1019287"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; return<a NAME="1019288"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; }<a NAME="1019289"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019290"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # get some key params<a NAME="1019291"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set poly_ext_gate [max [techinfo enclose $poly $type opt] 0.1]<a NAME="1019292"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set diff_ext_gate [max [techinfo enclose $diff $type opt] 0.1]<a NAME="1019293"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019294"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set x -$diff_ext_gate<a NAME="1019295"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019296"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # draw the poly<a NAME="1019297"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; gcell_paint $poly 0 -$poly_ext_gate $length [expr $width + \<a NAME="1019298"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; $poly_ext_gate]<a NAME="1019299"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;<a NAME="1019300"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # draw the diffusion<a NAME="1019301"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; gcell_paint $diff -$diff_ext_gate 0 [expr $length + \<a NAME="1019302"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; $diff_ext_gate] $width<a NAME="1019303"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019304"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # the return string will show up when the Gcell is selected<a NAME="1019305"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; return “$width/$length”<a NAME="1019306"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">}<a NAME="1019307"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019308"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Fix up the props used to make a fet Gcell.&nbsp;&nbsp;<a NAME="1019309"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># Allow fet width only to stretch.<a NAME="1019310"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019311"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">proc gcell_make_props_simplefet {prop_list} {<a NAME="1019312"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019313"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; # get layers and key parameters<a NAME="1019314"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set type [get_assoc type $prop_list]<a NAME="1019315"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; setl {poly diff} [techinfo device $type]<a NAME="1019316"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; if {$poly == ““} {<a NAME="1019317"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; # illegal type<a NAME="1019318"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; return $prop_list<a NAME="1019319"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; }<a NAME="1019320"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019321"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; set minwidth 0.4<a NAME="1019322"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019323"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; if {[set bbox [get_assoc _BBOX_&nbsp; $prop_list]] != ““} {<a NAME="1019324"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; # compute width from bbox<a NAME="1019325"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; set prop_list [rm_assoc _BBOX_ $prop_list]<a NAME="1019326"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; set prop_list [rm_assoc width $prop_list]<a NAME="1019327"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019328"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; setl {x1 y1 x2 y2} $bbox<a NAME="1019329"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; set poly_ext_gate [max [techinfo enclose $poly $type opt] 0.1]<a NAME="1019330"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; set newwidth [expr $y2 - $y1 - 2.0 * $poly_ext_gate]<a NAME="1019331"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; lappend prop_list [list width [uusnap [max $newwidth \<a NAME="1019332"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; $minwidth]]]<a NAME="1019333"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019334"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; } elseif {[set newwidth [get_assoc width $prop_list]] != ““} {<a NAME="1019335"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; # Check width validity.<a NAME="1019336"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; set prop_list [rm_assoc width $prop_list]<a NAME="1019337"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp;&nbsp;&nbsp; lappend prop_list [list width [uusnap [max $newwidth \<a NAME="1019338"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; $minwidth]]]<a NAME="1019339"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; }<a NAME="1019340"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019341"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; return $prop_list<a NAME="1019342"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">}<a NAME="1019343"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019344"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"># now define it and give default arguments<a NAME="1019345"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019346"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set fets [techinfo devices]<a NAME="1019347"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019348"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set properties ““<a NAME="1019349"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">lappend properties “type [lindex $fets 0] choice \{$fets\}”<a NAME="1019350"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">#<a NAME="1019351"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">lappend properties “width 1 -number -incr 0.1”<a NAME="1019352"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019353"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">set min_length [techinfo width [lindex [techinfo device \<a NAME="1019354"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; $default_fet] 0]]<a NAME="1019355"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">lappend properties “length $min_length -number \<a NAME="1019356"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font face="Courier">&nbsp; -incr [res] -snap 0.1”<a NAME="1019357"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1019358"></a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">define_gcell simplefet $properties<a NAME="1019359"></a></font></pre>
+
+<h3>
+<a NAME="1018831"></a><font face="Verdana, Arial, Helvetica, sans-serif"><font color="#003366">Adding
+Commands to the Local Menu</font></font></h3>
+
+<dl>
+<dl>
+<dt>
+<a NAME="1018832"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+can add commands to the <b><tt>Local</tt> </b>menu<b> </b>in MAX. To add
+a command into the <b><tt>Local</tt> </b>menu, you need to add the following
+lines to a .<b><tt>maxrc</tt></b> file.</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">source ~/mmi_private/max/my_commands.tcl<a NAME="1018833"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">menu_local_cmd "My command 1" command_one<a NAME="1018834"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018835"></a></pre>
+<a NAME="1018836"></a><font face="Verdana, Arial, Helvetica, sans-serif">You
+first load in the Tcl file containing your Tcl procedures. You then add
+the command to the <b><tt>Local</tt> </b>menu.</font>
+<p><a NAME="1018837"></a><font face="Verdana, Arial, Helvetica, sans-serif">The
+syntax of the <b><tt>menu_local_command</tt></b> is:</font>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">menu_local_command &lt;name in menu> &lt;name of tcl command><a NAME="1018838"></a></font>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018839"></a></pre>
+
+<dt>
+<a NAME="1018840"></a><font face="Verdana, Arial, Helvetica, sans-serif">This
+will add the command at the bottom of the <b><tt>Local</tt> </b>menu. At
+present you cannot add hotkey bindings to any <b><tt>Local</tt> </b>menu
+commands.</font></dt>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a NAME="1018841"></a></pre>
+</dl>
+</dl>
+</blockquote>
+
+<hr>
+<table ALIGN=LEFT BORDER=0 CELLSPACING=0 CELLPADDING=0 >
+<tr>
+<td ALIGN=LEFT><b><font size=-2>----- Micro Magic----- </font></b></td>
+</tr>
+</table>
+
+<table ALIGN=RIGHT BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="331" >
+<tr>
+<td><a href="MAX_ManualTOC.html"><img SRC="images/navtoc.gif" ALT="TOC" BORDER=0 height=23 width=84></a></td>
+
+<td><a href="apndxb.html"><img SRC="images/navprev.gif" ALT="PREV" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="MAX_ManualIX.html"><img SRC="images/navnext.gif" ALT="NEXT" BORDER=0 height=23 width=81></a></td>
+
+<td><a href="MAX_ManualIX.html"><img SRC="images/navidx.gif" ALT="INDEX" BORDER=0 height=23 width=85></a></td>
+</tr>
+</table>
+
+</body>
+</html>

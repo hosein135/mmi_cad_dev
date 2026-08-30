@@ -1,0 +1,88 @@
+# Created using mapper from:
+#"MMI_BUF {B {MMI_BUFB {in in} {out out}} {MMI_BUFB_ {in in} {out out}}} {C {MMI_BUFC {in in} {out out}} {MMI_BUFC_ {in in} {out out}}} {D {MMI_BUFD {in in} {out out}} {MMI_BUFD_ {in in} {out out}}} {E {MMI_BUFE {in in} {out out}} {MMI_BUFE_ {in in} {out out}}} "
+
+proc NAME_MMI_BUF args {
+  call_use_keyword $args {{Size "B"} {DeMorgan 0}}
+
+  set nom MMI_BUF[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_BUF args {
+  icon_generator $args {{Size "B" {radio B C D E}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "B") && ($size != "C") && ($size != "D") && ($size != "E")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {dpc {}}}
+
+
+  # MMI_BUF icon body
+    icon_line -30 -30 -30 30 30 0 -30 -30
+
+  if {$DeMorgan} {
+    icon_arc -30 -10 -50 10 -start 0 -extent 359
+    icon_line -50 0 -60 0
+    icon_arc 30 -10 50 10 -start 0 -extent 359
+    icon_line 50 0 60 0
+  } else {
+    icon_line 30 0 60 0
+    icon_line -30 0 -60 0
+  }
+
+  # properties
+  icon_property -origin {-10 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 0} -name in
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  switch _$size {
+    _B { set fname MMI_BUFB }
+    _C { set fname MMI_BUFC }
+    _D { set fname MMI_BUFD }
+    _E { set fname MMI_BUFE }
+  }
+  set nname [NAME_MMI_BUF -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    B {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    C {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    D {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+    E {
+    set pnames ".in(\$in), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

@@ -1,0 +1,12 @@
+proc ICON_not args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}}}
+  icon_term -type output -origin {10 0} -name out
+  icon_term -type input -origin {-10 0} -name in
+  icon_property -origin {-50 40} -type user -name name
+  icon_arc -10 -10 10 10 -start 91 -extent 359
+  icon_property -origin {-10 10} -label i
+  icon_property -origin {10 10} -label o
+  icon_property -origin {-70 80} -type fixed -name verilog \
+	-text {not [unique_name "" $name inv]\($out, $in\)\;}
+}
+

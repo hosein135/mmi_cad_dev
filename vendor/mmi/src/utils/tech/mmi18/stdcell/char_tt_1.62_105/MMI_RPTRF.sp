@@ -1,1 +1,51 @@
-../extract/MMI_RPTRF.sp
+*** Extracted spice netlist generated from MAX ***
+
+.SUBCKT MMI_RPTRF in out
+C_1 out gnd 9.65265fF
+C_2 in gnd 5.93581fF
+C_3 vdd gnd 6.1046fF
+C_4 gnd gnd 5.52779fF
+Mp_1 out in vdd vdd p W=2.455U L=0.18U AD=0.748775P PD=3.47417U AS=0.66285P 
++ PS=2.995U
+Mp_2 vdd in out vdd p W=2.455U L=0.18U AD=0.66285P PD=2.995U AS=0.748775P 
++ PS=3.47417U
+Mp_3 out in vdd vdd p W=2.455U L=0.18U AD=0.748775P PD=3.47417U AS=0.66285P 
++ PS=2.995U
+Mp_4 vdd in out vdd p W=2.455U L=0.18U AD=0.66285P PD=2.995U AS=0.748775P 
++ PS=3.47417U
+Mp_5 out in vdd vdd p W=2.455U L=0.18U AD=0.748775P PD=3.47417U AS=0.66285P 
++ PS=2.995U
+Mp_6 vdd in out vdd p W=2.455U L=0.18U AD=0.66285P PD=2.995U AS=0.748775P 
++ PS=3.47417U
+Mp_7 out in vdd vdd p W=2.455U L=0.18U AD=0.748775P PD=3.47417U AS=0.66285P 
++ PS=2.995U
+Mp_8 vdd in out vdd p W=2.455U L=0.18U AD=0.66285P PD=2.995U AS=0.748775P 
++ PS=3.47417U
+Mp_9 out in vdd vdd p W=2.455U L=0.18U AD=0.748775P PD=3.47417U AS=0.66285P 
++ PS=2.995U
+Mp_10 vdd in out vdd p W=2.455U L=0.18U AD=0.66285P PD=2.995U AS=0.748775P 
++ PS=3.47417U
+Mp_11 out in vdd vdd p W=2.455U L=0.18U AD=0.748775P PD=3.47417U 
++ AS=0.66285P PS=2.995U
+Mp_12 vdd in out vdd p W=2.455U L=0.18U AD=0.66285P PD=2.995U AS=0.748775P 
++ PS=3.47417U
+Mn_1 out in gnd gnd n W=1.84U L=0.18U AD=0.5934P PD=2.945U AS=0.69115P 
++ PS=3.51125U
+Mn_2 gnd in out gnd n W=1.84U L=0.18U AD=0.69115P PD=3.51125U AS=0.5934P 
++ PS=2.945U
+Mn_3 out in gnd gnd n W=1.84U L=0.18U AD=0.5934P PD=2.945U AS=0.69115P 
++ PS=3.51125U
+Mn_4 gnd in out gnd n W=1.84U L=0.18U AD=0.69115P PD=3.51125U AS=0.5934P 
++ PS=2.945U
+Mn_5 out in gnd gnd n W=1.84U L=0.18U AD=0.5934P PD=2.945U AS=0.69115P 
++ PS=3.51125U
+Mn_6 gnd in out gnd n W=1.84U L=0.18U AD=0.69115P PD=3.51125U AS=0.5934P 
++ PS=2.945U
+Mn_7 out in gnd gnd n W=1.84U L=0.18U AD=0.5934P PD=2.945U AS=0.69115P 
++ PS=3.51125U
+Mn_8 gnd in out gnd n W=1.84U L=0.18U AD=0.69115P PD=3.51125U AS=0.5934P 
++ PS=2.945U
+.ENDS	$ MMI_RPTRF
+
+.GLOBAL gnd vdd
+

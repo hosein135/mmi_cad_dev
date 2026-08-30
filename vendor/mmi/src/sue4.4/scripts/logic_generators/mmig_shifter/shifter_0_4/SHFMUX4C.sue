@@ -1,1 +1,82 @@
-../shifter_0_3/SHFMUX4C.sue
+# SUE version MMI_SUE4.0p1
+
+proc SCHEMATIC_SHFMUX4C {} {
+  make name_net_s -name N3 -origin {580 430}
+  make name_net_s -name N2 -origin {580 370}
+  make name_net_s -name N1 -origin {580 310}
+  make output -name out -origin {840 400}
+  make input -name in0 -origin {220 290}
+  make input -name in1 -origin {220 350}
+  make input -name in2 -origin {220 410}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -origin {470 310}
+  make MMI_NAND2B -origin {470 370}
+  make MMI_NAND2B -origin {470 430}
+  make name_net_s -name {[0]} -origin {340 330}
+  make name_net_s -name {[1]} -origin {340 390}
+  make name_net_s -name {[2]} -origin {340 450}
+  make MMI_NAND2B -origin {470 490}
+  make input -name in3 -origin {220 470}
+  make name_net_s -name {[3]} -origin {340 510}
+  make input -name {sel[3:0]} -origin {220 330}
+  generate MMI_NAND4 MMI_NAND4C_ -Size C -DeMorgan 1
+  make MMI_NAND4C_ -orient RY -origin {730 400}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.5 -date 04/20/99 -origin {440 650}
+  make_wire 410 290 220 290
+  make_wire 410 350 220 350
+  make_wire 410 410 220 410
+  make_wire 340 330 410 330
+  make_wire 340 390 410 390
+  make_wire 340 450 410 450
+  make_wire 260 330 260 390
+  make_wire 260 330 340 330
+  make_wire 260 330 220 330
+  make_wire 260 390 340 390
+  make_wire 260 390 260 450
+  make_wire 260 450 340 450
+  make_wire 260 450 260 510
+  make_wire 530 490 650 490
+  make_wire 630 370 630 390
+  make_wire 650 310 650 370
+  make_wire 630 410 630 430
+  make_wire 650 430 670 430
+  make_wire 650 430 650 490
+  make_wire 530 310 580 310
+  make_wire 580 310 650 310
+  make_wire 650 370 670 370
+  make_wire 630 390 670 390
+  make_wire 530 370 580 370
+  make_wire 580 370 630 370
+  make_wire 630 410 670 410
+  make_wire 530 430 580 430
+  make_wire 580 430 630 430
+  make_wire 790 400 840 400
+  make_wire 220 470 410 470
+  make_wire 340 510 260 510
+  make_wire 340 510 410 510
+  make_text -origin {140 140} -text SHFMUX4C -size large
+}
+
+proc ICON_SHFMUX4C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -90} -name in0
+  icon_term -type input -origin {-60 -30} -name in1
+  icon_term -type input -origin {-60 30} -name in2
+  icon_term -type input -origin {-60 90} -name in3
+  icon_term -type input -origin {0 110} -orient R270 -name {sel[3:0]}
+  icon_property -origin {-70 310} -type user -name name
+  icon_property -origin {-70 330} -type user -name M
+  icon_property -origin {-70 350} -type user -name dpc
+  icon_line -60 -30 -40 -30
+  icon_line -60 -90 -40 -90
+  icon_line -60 30 -40 30
+  icon_line 0 110 0 105
+  icon_property -origin {-30 -90} -size small -label 0
+  icon_property -origin {0 0} -anchor center -label SC
+  icon_line 60 0 40 0
+  icon_line -60 90 -40 90
+  icon_line -40 -130 40 -90 40 70 40 80 -40 130 -40 -130
+}
+

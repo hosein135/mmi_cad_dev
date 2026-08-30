@@ -1,0 +1,813 @@
+# Created using mapper from:
+#"MMI_FF {B {MMI_FFB {d d} {clk clk} {q q}}} {CB {MMI_FFCB {d d} {clk clk} {clrb clrb} {q q}}} {SB {MMI_FFSB {d d} {clk clk} {setb setb} {q q}}} {HB {MMI_FFHB {d d} {clk clk} {hold hold} {q q}}} {MB {MMI_FFMB {d0 d0} {d1 d1} {sel sel} {clk clk} {q q}}} {NCB {MMI_FFNCB {d d} {clk clk} {clrb clrb} {q q}}} "
+
+proc SCHEMATIC_MMI_FF args {
+  call_use_keyword $args {{Size "B"}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    B {
+
+  make input -name clk -origin {-750 -760}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {-520 -760}
+  make name_net -orient RX -name clk -origin {-260 -1230}
+  make name_net -orient RX -name clk_L -origin {-260 -1310}
+  make global -name gnd -origin {-320 -1110}
+  make global -orient RY -name vdd -origin {-320 -1430}
+  make global -name gnd -origin {130 -1100}
+  make global -orient RY -name vdd -origin {130 -1420}
+  make name_net -orient RX -name clk -origin {190 -1300}
+  make name_net -orient RX -name clk_L -origin {190 -1220}
+  make name_net -orient RXY -name clk_L -origin {-500 -1020}
+  make name_net -orient RX -name clk -origin {-500 -1090}
+  make name_net -name clk_L -origin {-90 -1090}
+  make name_net -orient RY -name clk -origin {-90 -1000}
+  make name_net -name N2 -origin {-400 -1270}
+  make name_net -name N3 -origin {-170 -1050}
+  make name_net -name N4 -origin {50 -1260}
+  make name_net -name N5 -origin {220 -1380}
+  make inverter -WP 1.54 -WN 0.77 -origin {300 -1050}
+  make inverter -WP 0.77 -WN 0.385 -origin {-640 -760}
+  make nmos -orient RX -W 0.35 -origin {130 -1140}
+  make pmos -orient RX -W 0.35 -origin {130 -1300}
+  make nmos -orient RX -W 0.35 -origin {130 -1220}
+  make pmos -orient RX -W 0.35 -origin {130 -1380}
+  make pmos -orient RX -W 0.35 -origin {-320 -1390}
+  make pmos -orient RX -W 0.35 -origin {-320 -1310}
+  make nmos -orient RX -W 0.35 -origin {-320 -1230}
+  make nmos -orient RX -W 0.35 -origin {-320 -1150}
+  make xgate -orient RY -WP 0.77 -WN 0.35 -origin {-90 -1050}
+  make xgate -orient RXY -WP 0.77 -WN 0.35 -origin {-500 -1050}
+  make inverter -WP 0.77 -WN 0.52 -origin {120 -1030}
+  make inverter -WP 0.77 -WN 0.385 -origin {-320 -1030}
+  make inverter -WP 0.77 -WN 0.385 -origin {-750 -1050}
+  make input -name d -origin {-840 -1050}
+  make output -name q -origin {370 -1050}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.5 -date 01/05/00 -origin {-390 -490}
+  make_wire -670 -760 -750 -760
+  make_wire -270 -1030 -220 -1030
+  make_wire -590 -760 -520 -760
+  make_wire -260 -1150 -220 -1150
+  make_wire -220 -1390 -220 -1150
+  make_wire -260 -1390 -220 -1390
+  make_wire 190 -1140 230 -1140
+  make_wire 230 -1380 230 -1140
+  make_wire -90 -1020 -90 -1000
+  make_wire -60 -1050 30 -1050
+  make_wire -470 -1050 -420 -1050
+  make_wire 230 -1050 270 -1050
+  make_wire 350 -1050 370 -1050
+  make_wire -400 -1270 -420 -1270
+  make_wire -400 -1270 -320 -1270
+  make_wire -170 -1050 -120 -1050
+  make_wire -170 -1050 -220 -1050
+  make_wire 50 -1260 30 -1260
+  make_wire 50 -1260 130 -1260
+  make_wire 220 -1380 190 -1380
+  make_wire 220 -1380 230 -1380
+  make_wire 170 -1030 230 -1030
+  make_wire 230 -1140 230 -1050
+  make_wire 230 -1050 230 -1030
+  make_wire 30 -1030 90 -1030
+  make_wire 30 -1260 30 -1050
+  make_wire 30 -1050 30 -1030
+  make_wire -220 -1150 -220 -1050
+  make_wire -220 -1050 -220 -1030
+  make_wire -420 -1030 -350 -1030
+  make_wire -420 -1270 -420 -1050
+  make_wire -420 -1050 -420 -1030
+  make_wire -700 -1050 -530 -1050
+  make_wire -840 -1050 -780 -1050
+  make_text -origin {-850 -1500} -text {Flipflop (with no scan)}
+  make_text -origin {-850 -1470} -text {B Size}
+  make_text -origin {-10 -790} -text {^.ic N4=0V}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_FF MMI_FFB -Size B -DeMorgan 0
+        make MMI_FFB -origin "$urx $ury"
+    }
+
+    CB {
+
+  make input -name clk -origin {-210 -770}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {20 -770}
+  make name_net -orient RX -name clk -origin {280 -1240}
+  make name_net -orient RX -name clk_L -origin {280 -1320}
+  make global -name gnd -origin {220 -1120}
+  make global -orient RY -name vdd -origin {220 -1440}
+  make global -name gnd -origin {670 -1110}
+  make global -orient RY -name vdd -origin {670 -1430}
+  make name_net -orient RX -name clk -origin {730 -1310}
+  make name_net -orient RX -name clk_L -origin {730 -1230}
+  make name_net -orient RXY -name clk_L -origin {40 -1030}
+  make name_net -orient RX -name clk -origin {40 -1100}
+  make name_net -name clk_L -origin {450 -1100}
+  make name_net -orient RY -name clk -origin {450 -1010}
+  make name_net -name N1 -origin {-70 -1060}
+  make name_net -name N2 -origin {140 -1280}
+  make name_net -name N3 -origin {370 -1060}
+  make name_net -name N4 -origin {590 -1270}
+  make name_net -name N5 -origin {760 -1390}
+  make inverter -WP 1.54 -WN 0.77 -origin {840 -1020}
+  make inverter -WP 0.77 -WN 0.385 -origin {-100 -770}
+  make nmos -orient RX -W 0.35 -origin {670 -1150}
+  make pmos -orient RX -W 0.35 -origin {670 -1310}
+  make nmos -orient RX -W 0.35 -origin {670 -1230}
+  make pmos -orient RX -W 0.35 -origin {670 -1390}
+  make pmos -orient RX -W 0.35 -origin {220 -1400}
+  make pmos -orient RX -W 0.35 -origin {220 -1320}
+  make nmos -orient RX -W 0.35 -origin {220 -1240}
+  make nmos -orient RX -W 0.35 -origin {220 -1160}
+  make xgate -orient RY -WP 0.77 -WN 0.35 -origin {450 -1060}
+  make xgate -orient RXY -WP 0.77 -WN 0.35 -origin {40 -1060}
+  make inverter -WP 1.04 -WN 0.52 -origin {-100 -890}
+  make name_net -name clear -origin {20 -890}
+  make nand2 -WP 0.77 -WN 1.04 -origin {640 -1020}
+  make nor2 -orient RY -WP 1.54 -WN 0.385 -origin {200 -1020}
+  make input -name clrb -origin {-210 -890}
+  make input -name d -origin {-300 -1060}
+  make output -name q -origin {910 -1020}
+  make inverter -WP 1.54 -WN 0.77 -origin {-200 -1060}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/09/00 -origin {90 -520}
+  make_wire -130 -770 -210 -770
+  make_wire 270 -1020 320 -1020
+  make_wire -50 -770 20 -770
+  make_wire 280 -1160 320 -1160
+  make_wire 320 -1160 320 -1060
+  make_wire 320 -1400 320 -1160
+  make_wire 280 -1400 320 -1400
+  make_wire 730 -1150 770 -1150
+  make_wire 450 -1030 450 -1010
+  make_wire 480 -1060 570 -1060
+  make_wire 70 -1060 120 -1060
+  make_wire 890 -1020 910 -1020
+  make_wire 140 -1280 120 -1280
+  make_wire 140 -1280 220 -1280
+  make_wire 370 -1060 420 -1060
+  make_wire 370 -1060 320 -1060
+  make_wire 590 -1270 570 -1270
+  make_wire 590 -1270 670 -1270
+  make_wire 760 -1390 730 -1390
+  make_wire 760 -1390 770 -1390
+  make_wire 570 -1040 620 -1040
+  make_wire 570 -1270 570 -1060
+  make_wire 570 -1060 570 -1040
+  make_wire 120 -1040 180 -1040
+  make_wire 120 -1280 120 -1060
+  make_wire 120 -1060 120 -1040
+  make_wire 320 -1060 320 -1020
+  make_wire -50 -890 20 -890
+  make_wire 560 -1000 620 -1000
+  make_wire 110 -1000 180 -1000
+  make_wire 110 -890 20 -890
+  make_wire 110 -1000 110 -890
+  make_wire -180 -890 -180 -830
+  make_wire -180 -830 560 -830
+  make_wire 560 -830 560 -1000
+  make_wire -180 -890 -130 -890
+  make_wire -180 -890 -210 -890
+  make_wire 770 -1390 770 -1150
+  make_wire 770 -1150 770 -1020
+  make_wire 710 -1020 770 -1020
+  make_wire 770 -1020 810 -1020
+  make_wire -150 -1060 -70 -1060
+  make_wire -70 -1060 10 -1060
+  make_wire -300 -1060 -230 -1060
+  make_text -origin {-160 -1570} -text {Flipflop with asynchronous clear (active low)}
+  make_text -origin {-150 -1540} -text {B Size}
+  make_text -origin {530 -800} -text {^.ic N4=0V}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_FF MMI_FFCB -Size CB -DeMorgan 0
+        make MMI_FFCB -origin "$urx $ury"
+    }
+
+    SB {
+
+  make input -name clk -origin {-100 630}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {130 630}
+  make name_net -orient RX -name clk -origin {390 160}
+  make name_net -orient RX -name clk_L -origin {390 80}
+  make global -name gnd -origin {330 280}
+  make global -orient RY -name vdd -origin {330 -40}
+  make global -name gnd -origin {780 290}
+  make global -orient RY -name vdd -origin {780 -30}
+  make name_net -orient RX -name clk -origin {840 90}
+  make name_net -orient RX -name clk_L -origin {840 170}
+  make name_net -orient RXY -name clk_L -origin {150 370}
+  make name_net -orient RX -name clk -origin {150 300}
+  make name_net -name clk_L -origin {560 300}
+  make name_net -orient RY -name clk -origin {560 390}
+  make name_net -name N1 -origin {30 340}
+  make name_net -name N2 -origin {250 120}
+  make name_net -name N3 -origin {480 340}
+  make name_net -name N4 -origin {700 130}
+  make name_net -name N5 -origin {870 10}
+  make inverter -WP 1.54 -WN 0.77 -origin {950 380}
+  make inverter -WP 0.77 -WN 0.385 -origin {10 630}
+  make nmos -orient RX -W 0.35 -origin {780 250}
+  make pmos -orient RX -W 0.35 -origin {780 90}
+  make nmos -orient RX -W 0.35 -origin {780 170}
+  make pmos -orient RX -W 0.35 -origin {780 10}
+  make pmos -orient RX -W 0.35 -origin {330 0}
+  make pmos -orient RX -W 0.35 -origin {330 80}
+  make nmos -orient RX -W 0.35 -origin {330 160}
+  make nmos -orient RX -W 0.35 -origin {330 240}
+  make xgate -orient RY -WP 0.77 -WN 0.35 -origin {560 340}
+  make xgate -orient RXY -WP 0.77 -WN 0.35 -origin {150 340}
+  make input -name setb -origin {-100 510}
+  make nor2 -orient RY -WP 1.54 -WN 0.52 -origin {750 380}
+  make nand2 -WP 0.77 -WN 0.77 -origin {310 380}
+  make name_net -name set -origin {550 510}
+  make output -name q -origin {1020 380}
+  make inverter -WP 1.54 -WN 0.77 -origin {-80 340}
+  make input -name d -origin {-160 340}
+  make inverter -WP 1.005 -WN 0.505 -origin {400 510}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 08/05/01 -last_modified_by dweisner -origin {590 800}
+  make_wire -20 630 -100 630
+  make_wire 380 380 430 380
+  make_wire 60 630 130 630
+  make_wire 390 240 430 240
+  make_wire 430 240 430 340
+  make_wire 430 0 430 240
+  make_wire 390 0 430 0
+  make_wire 840 250 880 250
+  make_wire 560 370 560 390
+  make_wire 590 340 680 340
+  make_wire 180 340 230 340
+  make_wire 1000 380 1020 380
+  make_wire 250 120 230 120
+  make_wire 250 120 330 120
+  make_wire 480 340 530 340
+  make_wire 480 340 430 340
+  make_wire 700 130 680 130
+  make_wire 700 130 780 130
+  make_wire 870 10 840 10
+  make_wire 870 10 880 10
+  make_wire 680 360 730 360
+  make_wire 680 130 680 340
+  make_wire 680 340 680 360
+  make_wire 230 360 290 360
+  make_wire 230 120 230 340
+  make_wire 230 340 230 360
+  make_wire 430 340 430 380
+  make_wire 670 510 670 400
+  make_wire 670 400 730 400
+  make_wire 220 400 290 400
+  make_wire 220 400 220 510
+  make_wire -100 510 220 510
+  make_wire 220 510 370 510
+  make_wire 550 510 450 510
+  make_wire 550 510 670 510
+  make_wire 880 10 880 250
+  make_wire 880 250 880 380
+  make_wire 820 380 880 380
+  make_wire 880 380 920 380
+  make_wire -110 340 -160 340
+  make_wire -30 340 30 340
+  make_wire 30 340 120 340
+  make_text -origin {-250 -40} -text {Flipflop with asynchronous set (active low)}
+  make_text -origin {-250 -20} -text {B Size}
+  make_text -origin {640 600} -text {^.ic N4=0V}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_FF MMI_FFSB -Size SB -DeMorgan 0
+        make MMI_FFSB -origin "$urx $ury"
+    }
+
+    HB {
+
+  make input -name clk -origin {40 -830}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {270 -830}
+  make name_net -orient RX -name clk -origin {280 -1240}
+  make name_net -orient RX -name clk_L -origin {280 -1320}
+  make global -name gnd -origin {220 -1120}
+  make global -orient RY -name vdd -origin {220 -1440}
+  make global -name gnd -origin {670 -1110}
+  make global -orient RY -name vdd -origin {670 -1430}
+  make name_net -orient RX -name clk -origin {730 -1310}
+  make name_net -orient RX -name clk_L -origin {730 -1230}
+  make name_net -orient RXY -name clk_L -origin {40 -1030}
+  make name_net -orient RX -name clk -origin {40 -1100}
+  make name_net -name clk_L -origin {450 -1100}
+  make name_net -orient RY -name clk -origin {450 -1010}
+  make global -name gnd -origin {-500 -830}
+  make global -orient RY -name vdd -origin {-500 -1280}
+  make name_net -name N2 -origin {140 -1280}
+  make name_net -name N3 -origin {370 -1060}
+  make name_net -name N4 -origin {590 -1270}
+  make name_net -name N5 -origin {760 -1390}
+  make inverter -WP 1.54 -WN 0.77 -origin {840 -1040}
+  make pmos -W 1.54 -origin {-500 -1120}
+  make nmos -W 0.77 -origin {-500 -1000}
+  make inverter -WP 0.77 -WN 0.385 -origin {150 -830}
+  make nmos -orient RX -W 0.35 -origin {670 -1150}
+  make pmos -orient RX -W 0.35 -origin {670 -1310}
+  make nmos -orient RX -W 0.35 -origin {670 -1230}
+  make pmos -orient RX -W 0.35 -origin {670 -1390}
+  make pmos -orient RX -W 0.35 -origin {220 -1400}
+  make pmos -orient RX -W 0.35 -origin {220 -1320}
+  make nmos -orient RX -W 0.35 -origin {220 -1240}
+  make nmos -orient RX -W 0.35 -origin {220 -1160}
+  make xgate -orient RY -WP 0.77 -WN 0.35 -origin {450 -1060}
+  make xgate -orient RXY -WP 0.77 -WN 0.35 -origin {40 -1060}
+  make inverter -WP 0.77 -WN 0.52 -origin {660 -1040}
+  make inverter -WP 0.77 -WN 0.385 -origin {220 -1040}
+  make input -name hold -origin {-850 -920}
+  make pmos -W 1.54 -origin {-500 -1200}
+  make pmos -orient RX -W 1.54 -origin {-380 -1120}
+  make pmos -orient RX -W 1.54 -origin {-380 -1200}
+  make nmos -W 0.77 -origin {-500 -920}
+  make nmos -orient RX -W 0.77 -origin {-390 -920}
+  make nmos -orient RX -W 0.77 -origin {-390 -1000}
+  make name_net_s -name hold -origin {-590 -1200}
+  make name_net_s -name hold -origin {-300 -920}
+  make name_net_s -name hold_L -origin {-290 -1120}
+  make name_net_s -name hold_L -origin {-660 -920}
+  make inverter -orient RX -WP 0.77 -WN 0.385 -origin {460 -1550}
+  make name_net_s -name q_fb -origin {-70 -1550}
+  make inverter -WP 0.77 -WN 0.385 -origin {-770 -920}
+  make input -name d -origin {-610 -1120}
+  make output -name q -origin {910 -1040}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/09/00 -origin {-390 -490}
+  make_wire 120 -830 40 -830
+  make_wire 270 -1040 320 -1040
+  make_wire 200 -830 270 -830
+  make_wire 280 -1160 320 -1160
+  make_wire 320 -1400 320 -1160
+  make_wire 280 -1400 320 -1400
+  make_wire 730 -1150 770 -1150
+  make_wire 770 -1390 770 -1150
+  make_wire 450 -1030 450 -1010
+  make_wire 480 -1060 570 -1060
+  make_wire 70 -1060 120 -1060
+  make_wire -500 -1080 -500 -1060
+  make_wire 140 -1280 120 -1280
+  make_wire 140 -1280 220 -1280
+  make_wire 370 -1060 420 -1060
+  make_wire 370 -1060 320 -1060
+  make_wire 590 -1270 570 -1270
+  make_wire 590 -1270 670 -1270
+  make_wire 760 -1390 730 -1390
+  make_wire 760 -1390 770 -1390
+  make_wire -500 -1060 -500 -1040
+  make_wire -590 -1120 -590 -1000
+  make_wire -590 -1000 -560 -1000
+  make_wire -590 -1120 -560 -1120
+  make_wire -590 -1120 -610 -1120
+  make_wire 570 -1040 630 -1040
+  make_wire 570 -1270 570 -1060
+  make_wire 570 -1060 570 -1040
+  make_wire 320 -1160 320 -1060
+  make_wire 320 -1060 320 -1040
+  make_wire 120 -1040 190 -1040
+  make_wire 120 -1280 120 -1060
+  make_wire 120 -1060 120 -1040
+  make_wire -500 -1260 -380 -1260
+  make_wire -380 -1260 -380 -1240
+  make_wire -500 -1260 -500 -1240
+  make_wire -380 -1080 -380 -1060
+  make_wire -390 -1040 -390 -1060
+  make_wire -390 -1060 -500 -1060
+  make_wire -500 -870 -390 -870
+  make_wire -390 -870 -390 -880
+  make_wire -590 -1200 -560 -1200
+  make_wire -620 -1200 -590 -1200
+  make_wire -300 -920 -270 -920
+  make_wire -330 -920 -300 -920
+  make_wire -290 -1120 -260 -1120
+  make_wire -320 -1120 -290 -1120
+  make_wire -330 -1000 -220 -1000
+  make_wire -220 -1000 -220 -1200
+  make_wire -220 -1200 -320 -1200
+  make_wire 770 -1390 770 -1550
+  make_wire 770 -1550 490 -1550
+  make_wire -220 -1550 -220 -1200
+  make_wire -850 -920 -800 -920
+  make_wire -720 -920 -660 -920
+  make_wire 710 -1040 770 -1040
+  make_wire 770 -1040 810 -1040
+  make_wire 770 -1040 770 -1150
+  make_wire 890 -1040 910 -1040
+  make_wire -390 -1060 -380 -1060
+  make_wire -560 -920 -660 -920
+  make_wire -500 -880 -500 -870
+  make_wire -500 -870 -500 -830
+  make_wire -500 -1280 -500 -1260
+  make_wire -380 -1060 10 -1060
+  make_wire -220 -1550 -70 -1550
+  make_wire -70 -1550 410 -1550
+  make_text -origin {-590 -1640} -text {Flipflop (with hold mux on input)}
+  make_text -origin {-590 -1610} -text {B Size}
+  make_text -origin {270 -700} -text {^.ic N4=0V}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_FF MMI_FFHB -Size HB -DeMorgan 0
+        make MMI_FFHB -origin "$urx $ury"
+    }
+
+    MB {
+
+  make input -name clk -origin {40 -830}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {270 -830}
+  make name_net -orient RX -name clk -origin {280 -1240}
+  make name_net -orient RX -name clk_L -origin {280 -1320}
+  make global -name gnd -origin {220 -1120}
+  make global -orient RY -name vdd -origin {220 -1440}
+  make global -name gnd -origin {670 -1110}
+  make global -orient RY -name vdd -origin {670 -1430}
+  make name_net -orient RX -name clk -origin {730 -1310}
+  make name_net -orient RX -name clk_L -origin {730 -1230}
+  make name_net -orient RXY -name clk_L -origin {40 -1030}
+  make name_net -orient RX -name clk -origin {40 -1100}
+  make name_net -name clk_L -origin {450 -1100}
+  make name_net -orient RY -name clk -origin {450 -1010}
+  make global -name gnd -origin {-450 -860}
+  make global -orient RY -name vdd -origin {-450 -1280}
+  make name_net -name N2 -origin {140 -1280}
+  make name_net -name N3 -origin {370 -1060}
+  make name_net -name N4 -origin {590 -1270}
+  make name_net -name N5 -origin {760 -1390}
+  make inverter -WP 1.54 -WN 0.77 -origin {840 -1040}
+  make pmos -W 1.54 -origin {-450 -1120}
+  make nmos -W 0.77 -origin {-450 -1000}
+  make inverter -WP 0.77 -WN 0.385 -origin {150 -830}
+  make nmos -orient RX -W 0.35 -origin {670 -1150}
+  make pmos -orient RX -W 0.35 -origin {670 -1310}
+  make nmos -orient RX -W 0.35 -origin {670 -1230}
+  make pmos -orient RX -W 0.35 -origin {670 -1390}
+  make pmos -orient RX -W 0.35 -origin {220 -1400}
+  make pmos -orient RX -W 0.35 -origin {220 -1320}
+  make nmos -orient RX -W 0.35 -origin {220 -1240}
+  make nmos -orient RX -W 0.35 -origin {220 -1160}
+  make xgate -orient RY -WP 0.77 -WN 0.35 -origin {450 -1060}
+  make xgate -orient RXY -WP 0.77 -WN 0.35 -origin {40 -1060}
+  make inverter -WP 0.77 -WN 0.52 -origin {660 -1040}
+  make inverter -WP 0.77 -WN 0.385 -origin {220 -1040}
+  make pmos -W 1.54 -origin {-450 -1200}
+  make pmos -orient RX -W 1.54 -origin {-330 -1120}
+  make pmos -orient RX -W 1.54 -origin {-330 -1200}
+  make nmos -W 0.77 -origin {-450 -920}
+  make nmos -orient RX -W 0.77 -origin {-340 -920}
+  make nmos -orient RX -W 0.77 -origin {-340 -1000}
+  make inverter -WP 0.77 -WN 0.385 -origin {-700 -920}
+  make output -name q -origin {910 -1040}
+  make input -name sel -origin {-780 -920}
+  make name_net_s -name sel -origin {-250 -920}
+  make name_net_s -name sel -origin {-540 -1200}
+  make name_net_s -name sel_L -origin {-590 -920}
+  make name_net_s -name sel_L -origin {-240 -1200}
+  make input -name d0 -origin {-560 -1120}
+  make input -name d1 -origin {-580 -1360}
+  make name_net -name N1 -origin {-110 -1060}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 02/09/00 -origin {-370 -590}
+  make_wire 120 -830 40 -830
+  make_wire 270 -1040 320 -1040
+  make_wire 200 -830 270 -830
+  make_wire 280 -1160 320 -1160
+  make_wire 320 -1400 320 -1160
+  make_wire 280 -1400 320 -1400
+  make_wire 730 -1150 770 -1150
+  make_wire 770 -1390 770 -1150
+  make_wire 450 -1030 450 -1010
+  make_wire 480 -1060 570 -1060
+  make_wire 70 -1060 120 -1060
+  make_wire 770 -1040 810 -1040
+  make_wire 890 -1040 910 -1040
+  make_wire -450 -1080 -450 -1060
+  make_wire 140 -1280 120 -1280
+  make_wire 140 -1280 220 -1280
+  make_wire 370 -1060 420 -1060
+  make_wire 370 -1060 320 -1060
+  make_wire 590 -1270 570 -1270
+  make_wire 590 -1270 670 -1270
+  make_wire 760 -1390 730 -1390
+  make_wire 760 -1390 770 -1390
+  make_wire -450 -1060 -450 -1040
+  make_wire -540 -1120 -540 -1000
+  make_wire -540 -1000 -510 -1000
+  make_wire -540 -1120 -510 -1120
+  make_wire -540 -1120 -560 -1120
+  make_wire 710 -1040 770 -1040
+  make_wire 570 -1040 630 -1040
+  make_wire 570 -1270 570 -1060
+  make_wire 570 -1060 570 -1040
+  make_wire 320 -1160 320 -1060
+  make_wire 320 -1060 320 -1040
+  make_wire 120 -1040 190 -1040
+  make_wire 120 -1280 120 -1060
+  make_wire 120 -1060 120 -1040
+  make_wire -450 -1260 -330 -1260
+  make_wire -330 -1260 -330 -1240
+  make_wire -450 -1260 -450 -1240
+  make_wire -450 -1260 -450 -1280
+  make_wire -330 -1080 -330 -1060
+  make_wire -340 -1040 -340 -1060
+  make_wire -340 -1060 -450 -1060
+  make_wire -450 -870 -340 -870
+  make_wire -340 -870 -340 -880
+  make_wire -450 -870 -450 -860
+  make_wire -450 -870 -450 -880
+  make_wire -540 -1200 -510 -1200
+  make_wire -570 -1200 -540 -1200
+  make_wire -250 -920 -220 -920
+  make_wire -280 -920 -250 -920
+  make_wire -280 -1000 -170 -1000
+  make_wire -780 -920 -730 -920
+  make_wire -650 -920 -590 -920
+  make_wire -240 -1200 -210 -1200
+  make_wire -270 -1200 -240 -1200
+  make_wire -170 -1120 -270 -1120
+  make_wire -170 -1360 -580 -1360
+  make_wire -510 -920 -590 -920
+  make_wire 770 -1040 770 -1150
+  make_wire -340 -1060 -330 -1060
+  make_wire -110 -1060 10 -1060
+  make_wire -330 -1060 -110 -1060
+  make_wire -170 -1360 -170 -1120
+  make_wire -170 -1120 -170 -1000
+  make_text -origin {-350 -1510} -text {Flipflop (with mux on input)}
+  make_text -origin {-350 -1480} -text {B Size}
+  make_text -origin {270 -700} -text {^.ic N4=0V}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_FF MMI_FFMB -Size MB -DeMorgan 0
+        make MMI_FFMB -origin "$urx $ury"
+    }
+
+    NCB {
+
+  make input -name clk -origin {-210 -770}
+  generate name_net_s name_net -cell name_net
+  make name_net -name clk_L -origin {20 -770}
+  make global -name gnd -origin {220 -1120}
+  make global -orient RY -name vdd -origin {220 -1440}
+  make global -name gnd -origin {670 -1110}
+  make global -orient RY -name vdd -origin {670 -1430}
+  make name_net -name N1 -origin {-70 -1060}
+  make name_net -name N2 -origin {140 -1280}
+  make name_net -name N3 -origin {370 -1060}
+  make name_net -name N4 -origin {590 -1270}
+  make name_net -name N5 -origin {760 -1390}
+  make inverter -WP 1.54 -WN 0.77 -origin {840 -1020}
+  make inverter -WP 0.77 -WN 0.385 -origin {-100 -770}
+  make nmos -orient RX -W 0.35 -origin {670 -1150}
+  make pmos -orient RX -W 0.35 -origin {670 -1310}
+  make nmos -orient RX -W 0.35 -origin {670 -1230}
+  make pmos -orient RX -W 0.35 -origin {670 -1390}
+  make pmos -orient RX -W 0.35 -origin {220 -1400}
+  make pmos -orient RX -W 0.35 -origin {220 -1320}
+  make nmos -orient RX -W 0.35 -origin {220 -1240}
+  make nmos -orient RX -W 0.35 -origin {220 -1160}
+  make xgate -orient RY -WP 0.77 -WN 0.35 -origin {450 -1060}
+  make xgate -orient RXY -WP 0.77 -WN 0.35 -origin {40 -1060}
+  make name_net -name clear -origin {20 -890}
+  make nand2 -WP 0.77 -WN 1.04 -origin {640 -1020}
+  make nor2 -orient RY -WP 1.54 -WN 0.385 -origin {200 -1020}
+  make input -name clrb -origin {-210 -890}
+  make input -name d -origin {-300 -1060}
+  make output -name q -origin {910 -1020}
+  make inverter -WP 1.54 -WN 0.77 -origin {-200 -1060}
+  make name_net -orient RX -name clk_L -origin {40 -1100}
+  make name_net -orient RXY -name clk -origin {40 -1030}
+  make name_net -orient RX -name clk_L -origin {280 -1240}
+  make name_net -orient RX -name clk -origin {280 -1320}
+  make name_net -name clk -origin {450 -1100}
+  make name_net -orient RY -name clk_L -origin {450 -1010}
+  make name_net -orient RX -name clk -origin {730 -1230}
+  make name_net -orient RX -name clk_L -origin {730 -1310}
+  make inverter -WP 1.005 -WN 0.505 -origin {-100 -890}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 08/05/01 -last_modified_by dweisner -origin {90 -520}
+  make_wire -130 -770 -210 -770
+  make_wire 270 -1020 320 -1020
+  make_wire -50 -770 20 -770
+  make_wire 280 -1160 320 -1160
+  make_wire 320 -1160 320 -1060
+  make_wire 320 -1400 320 -1160
+  make_wire 280 -1400 320 -1400
+  make_wire 730 -1150 770 -1150
+  make_wire 450 -1030 450 -1010
+  make_wire 480 -1060 570 -1060
+  make_wire 70 -1060 120 -1060
+  make_wire 890 -1020 910 -1020
+  make_wire 140 -1280 120 -1280
+  make_wire 140 -1280 220 -1280
+  make_wire 370 -1060 420 -1060
+  make_wire 370 -1060 320 -1060
+  make_wire 590 -1270 570 -1270
+  make_wire 590 -1270 670 -1270
+  make_wire 760 -1390 730 -1390
+  make_wire 760 -1390 770 -1390
+  make_wire 570 -1040 620 -1040
+  make_wire 570 -1270 570 -1060
+  make_wire 570 -1060 570 -1040
+  make_wire 120 -1040 180 -1040
+  make_wire 120 -1280 120 -1060
+  make_wire 120 -1060 120 -1040
+  make_wire 320 -1060 320 -1020
+  make_wire -50 -890 20 -890
+  make_wire 560 -1000 620 -1000
+  make_wire 110 -1000 180 -1000
+  make_wire 110 -890 20 -890
+  make_wire 110 -1000 110 -890
+  make_wire -180 -890 -180 -830
+  make_wire -180 -830 560 -830
+  make_wire 560 -830 560 -1000
+  make_wire -180 -890 -130 -890
+  make_wire -180 -890 -210 -890
+  make_wire 770 -1390 770 -1150
+  make_wire 770 -1150 770 -1020
+  make_wire 710 -1020 770 -1020
+  make_wire 770 -1020 810 -1020
+  make_wire -150 -1060 -70 -1060
+  make_wire -70 -1060 10 -1060
+  make_wire -300 -1060 -230 -1060
+  make_text -origin {-160 -1570} -text {Neg Edge Flipflop with asynchronous clear (active low)}
+  make_text -origin {-150 -1540} -text {B Size}
+  make_text -origin {530 -800} -text {^.ic N4=0V}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_FF MMI_FFNCB -Size NCB -DeMorgan 0
+        make MMI_FFNCB -origin "$urx $ury"
+    }
+
+  }
+}
+
+
+proc NAME_MMI_FF args {
+  call_use_keyword $args {{Size "B"}}
+
+  set nom MMI_FF[string toupper $Size]
+
+  return $nom
+}
+
+
+proc ICON_MMI_FF args {
+  icon_generator $args {{Size "B" {radio B CB SB HB MB NCB}} }
+
+  set size [string toupper $Size]
+  set DeMorgan 0
+
+  # check for acceptable response on Size
+  if {($size != "B") && ($size != "CB") && ($size != "SB") && ($size != "HB") && ($size != "MB") && ($size != "NCB")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  switch $size {
+    B {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_property -origin {0 -50} -size large -anchor center -label FF
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+    }
+    CB {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-30 100} -orient R270 -name clrb
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 80 -20 100 -start 0 -extent 359
+  icon_property -origin {0 -50} -size large -anchor center -label FFC
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label clrb
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+    }
+    SB {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-30 100} -orient R270 -name setb
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 80 -20 100 -start 0 -extent 359
+  icon_property -origin {0 -50} -size large -anchor center -label FFS
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label setb
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+    }
+    HB {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-60 30} -name hold
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_property -origin {0 -50} -size large -anchor center -label FFH
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+  icon_property -origin {-50 30} -label hold
+
+    }
+    MB {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type output -origin {60 0} -name q
+  icon_term -type input -origin {-60 30} -name sel
+  icon_term -type input -origin {-60 -20} -name d0
+  icon_term -type input -origin {-60 0} -name d1
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_property -origin {0 -50} -size large -anchor center -label FFM
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d1
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+  icon_property -origin {-50 30} -label sel
+  icon_property -origin {-50 -20} -label d0
+
+    }
+    NCB {
+
+  icon_term -type input -origin {-10 100} -orient R270 -name clk
+  icon_term -type input -origin {-30 100} -orient R270 -name clrb
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 80 -20 100 -start 0 -extent 359
+  icon_property -origin {0 -50} -size large -anchor center -label FFNC
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label clrb
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+  icon_arc -20 80 0 100 -start 0 -extent 359
+
+    }
+  }
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_FF -Size $Size]
+  set nname [NAME_MMI_FF -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    B {
+    set pnames ".d(\$d), .clk(\$clk), .q(\$q)"
+    }
+    CB {
+    set pnames ".d(\$d), .clk(\$clk), .clrb(\$clrb), .q(\$q)"
+    }
+    SB {
+    set pnames ".d(\$d), .clk(\$clk), .setb(\$setb), .q(\$q)"
+    }
+    HB {
+    set pnames ".d(\$d), .clk(\$clk), .hold(\$hold), .q(\$q)"
+    }
+    MB {
+    set pnames ".d0(\$d0), .d1(\$d1), .sel(\$sel), .clk(\$clk), .q(\$q)"
+    }
+    NCB {
+    set pnames ".d(\$d), .clk(\$clk), .clrb(\$clrb), .q(\$q)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

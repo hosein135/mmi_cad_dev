@@ -1,1 +1,135 @@
-../../adm_go
+#!/bin/csh -f
+
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# wish script to run anagram's adm (now Avanti star-sim but still called
+# adm in this script) on a remote server and optionally call back
+# when adm is finished.
+
+###########################################################################
+
+# READ AND MODIFY THIS AREA FOR INSTALLATION
+
+# How to call adm executable.
+set adm "adm -n"
+
+# execute any setup commands, such as sourcing adm setup or
+# set the flexlm license variable.  Separate commands with a semicolon (;)
+
+#set setup "source /home/cad/anagram/adm_setup"
+set setup ""
+
+# run adm on the following host.  If node locked to a particular
+# host, set the hostname here.  Otherwise set to [exec uname -n].
+
+set host [exec uname -n]
+
+###########################################################################
+
+# First define some useful procedures.
+
+
+# send a message back to the caller using the CALLBACK variable.  CALLBACK
+# should be of the form "send <interp> <proc>"  where <interp> can be 
+# found from [winfo name .]
+
+proc call_back code {
+
+  global CALLBACK
+
+  if {$CALLBACK == ""} {
+    exit $code
+  }
+
+  # hide wish window just in case this takes a while
+  wm withdraw .
+
+  # more choking
+  regsub " \#" $CALLBACK {\ \#} CALLBACK 
+
+  # send the code to the callback
+  set error [catch "$CALLBACK $code" error_msg]
+
+  # error usually have to do with xauth.  Must do an "xhost -" and have
+  # no host shown during xhost.
+  if {$error != 0} {
+    puts $error_msg
+  }
+
+  exit $code
+}
+
+
+###########################################################################
+
+# Now execute
+
+# read in the arguments
+
+# Special case of csh choking on quotes.  If CALLBACK option then group
+# together all next arguments.  Requires CALLBACK to be last argument
+set index [lsearch $argv -CALLBACK]
+if {$index != -1 && [expr $index + 2] != [llength $argv]} {
+  set argv "[lrange $argv 0 $index] \"[lrange $argv [expr $index + 1] end]\""
+}
+
+set filename [call_with_keyword $argv {{CALLBACK ""} {QUIET ""}}]
+
+set cell [file rootname $filename]
+set dir [file dirname $filename]
+if {$dir == "."} {
+  set dir [pwd]
+}
+set errfile $cell.err
+set outfile $cell.admout
+
+# get rid of any bogus prefixes from the automounter
+#set bogus [lindex [split $dir /] 1]
+#if {$bogus == "tmp_mnt" || $bogus == "export" || $bogus == "a"} {
+#  set dir /[join [lrange [split $dir /] 2 end] /]
+#}
+
+
+# run adm
+puts "Starting adm on $host at [exec date]"
+
+# unfortunately, adm doesn't return whether is succeeded or not.
+# need to use rsh so that sourcing works (exec bug).
+if {$QUIET == ""} {
+  # show all output to screen -- doesn't work if a different host
+  exec rsh -n $host "cd $dir ; $setup ; ($adm $filename >! $outfile)" >& [exec tty]
+
+  # alert the user that powermill finished
+  bell
+
+} else {
+  # send output to a file
+  exec rsh -n $host "cd $dir ; $setup ; ($adm $filename >! $outfile) >& $errfile"
+}
+
+
+###############################################################################
+#	Check for errors in adm 
+###############################################################################
+
+cd $dir
+
+# if this string in the error file, we won
+if {[catch "exec grep {job done} $cell.info" result] == 0 && \
+      $result != ""} {
+  # adm completed successfully
+  call_back 1
+
+} else {
+  # error
+  puts "adm exited with an error."
+  catch "exec grep *error* $outfile" result
+  puts $result
+
+  call_back 0
+} 
+
+# Note: call_back includes an exit statement
+
+

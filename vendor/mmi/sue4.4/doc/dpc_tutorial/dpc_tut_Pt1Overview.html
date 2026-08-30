@@ -1,0 +1,763 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_Tutorial">
+<meta name="LASTUPDATED" content="12/04/01 15:02:12">
+<title>Part 1   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler Tutorial </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_tut_Preface.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_tut_Ch2Basics.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_tut_Ch2Basics.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 1 </font>
+</h2>
+
+
+<h2>
+  <a name="1036960"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running DPC</font>
+</h2>
+
+
+<h3>
+  <a name="1035662"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035663"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Welcome to the Data Path Compiler (DPC) from Micro Magic Tools. DPC runs on top of SUE and hence is sometimes referred to as the SUE Data Path Compiler or SUE DPC. Because DPC relies on SUE, you should be familiar with SUE before running this tutorial. We suggest you first run the SUE Tutorial or at least look at the <em class="Emphasis">SUE Manual</em> before proceeding. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1035664"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DPC Overview</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035665"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC quickly converts SUE schematics into high performance data paths using icon positions, annotations, and hierarchy. Every time you run DPC, it creates the following three files: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035666"> </a>A Verilog gate-level netlist, </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035667"> </a>A DEF placement file, AND </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035668"> </a>An estimated wire parasitic file </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1035669"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the gates in the Verilog netlist are also included in the DEF placement file with their associated positions and orientations. Thus, to route the data path you need only pass the Verilog netlist and the DEF placement file to a router like Cadence's <em class="Emphasis">Silicon Ensemble</em> or Avant!'s <em class="Emphasis">Apollo</em>. Note that you might also want to massage the Verilog netlist and/or placement file with your own scripts to add scan-stitching and/or clock insertion if you didn't add them explicitly to the schematics. </font>
+<p>
+<p>
+  <dt> <a name="1035670"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since DPC knows where all of the cells in the design are, it can estimate the wires quite precisely. DPC does this by performing a Steiner Route on each net in the design and computing the RC parasitics from that route given the capacitance per unit length and resistance per unit length of the technology, including millering. This estimated parasitic file is typically in DSPF format. </font>
+<p>
+<p>
+  <dt> <a name="1035671"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For timing verification and optimization, DPC sends the Verilog Netlist and the estimated parasitic file to a Static Timing Analyzer such as <em class="Emphasis">Pearl</em> from Cadence or <em class="Emphasis">Pathmill</em> or <em class="Emphasis">PrimeTime</em> from Synopsys. It then annotates the critical path directly on the graphical view in SUE. In addition, the placement view can also be shown with the critical paths displayed directly on the placement as shown in <a href="dpc_tut_Pt1Overview.html#1035684">Figure 1</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035684"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 1:   Composite Figure Of Critical Path</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig01.gif" height="576" width="864">
+</div></font><a name="1037132"> </a>
+</pre>
+
+<h3>
+  <a name="1035685"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DPC Features</font>
+</h3>
+
+<ul><ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035687"> </a>Quickly builds custom-like data paths using standard cell libraries. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035689"> </a>Can also build full custom data paths using your own custom library. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035691"> </a>Does bit-slice or packed data path designs. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035693"> </a>Interfaces to industry standard timing verifiers (<em class="Emphasis">Pearl</em>, <em class="Emphasis">PrimeTime</em>, <em class="Emphasis">Pathmill</em>). 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035695"> </a>Handles both combinational and sequential circuits. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035697"> </a>Control logic can be intermixed with data path. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035699"> </a>Outputs Verilog netlist and DEF file to be used with any router. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1035701"> </a>Fast -- 10K gates in less than a minute. 
+</li><p>
+</font>
+</ul></ul></ul>
+</>
+<dl><dl>
+<p>
+  <dt> <a name="1035702"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This tutorial will carefully walk you through these features and many more. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1035703"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Getting Started </font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035704"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we get started make sure someone has already installed SUE at your site. This Tutorial is entirely self-contained using a special demo mode. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1043969"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Although not needed for the tutorial, it would be helpful to have a static timing analyzer like Cadence's <em class="Emphasis">Pearl</em> or Synopsys's <em class="Emphasis">PrimeTime</em> or <em class="Emphasis">Pathmill</em> installed. If you have one of these programs at your site and someone has setup DPC to use it, you don't need to run DPC in DEMO mode for this tutorial. To cancel demo mode start SUE with the command "<b><code class="CodeStrong">sue -SET DEMO=0</code></b>". We suggest, however, that you FIRST go through the tutorial with demo mode left ON.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1035708"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Remember, this DPC tutorial assumes that you have completed the SUE Tutorial.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1035709"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running the Tutorial</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035710"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To run the tutorials, you need to make a personal copy of the DPC tutorial example files using <b><code class="CodeStrong">mmi_tutorial</code></b>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1049860"> </a>To install the DPC tutorial, at the UNIX prompt type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">mmi_tutorial
+</font><a name="1035712"> </a>
+</p></pre>
+   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1035713"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Make sure that the appropriate tutorial is selected and then click on "<b><code class="CodeStrong">Install Tutorial</code></b>". The default installation directory is <b><code class="CodeStrong">mmi_private/tutorial</code></b> in your home directory. You can also select a different directory for installation. Don't worry if the directory doesn't exist, the <b><code class="CodeStrong">mmi_tutorial</code></b> script will make it if it can. You can also use this to reinstall a clean copy of the tutorial.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035714"> </a>To start the tutorial, you must first "cd" (change directory) to the directory that you installed the tutorial into. If you used the default directory, type:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">cd ~/mmi_private/tutorial/dpc 
+</font><a name="1035715"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1035716"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Otherwise, replace the above directory with the directory you selected. This directory contains files that you will need to run the tutorial. <center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl>  <dl>
+<p> <dt> <a name="1050129"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"> If you are running the DPC tutorial in <b><code class="CodeStrong">demo mode</code></b>, you need to reinstall the tutorial every time you install a new version of SUE or DPC.</font>
+<p>  </dl>
+</dl></font></td>
+  </tr>
+</table>
+
+
+</center>
+</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1035717"> </a>Now start SUE with the following command: </font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">sue alu8
+</font><a name="1035718"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035719"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You just brought up SUE and loaded the schematic "<b><code class="CodeStrong">alu8</code></b>". However, a lot more got done from the <b><strong class="Strong">.</strong></b><b><code class="CodeStrong">suerc</code></b> file in this directory. The <b><code class="CodeStrong">.suerc</code></b> file loaded a standard cell library provided with the demo. It set up DPC variables for the design as described in the<em class="Emphasis"> DPC Manual</em>. Finally, it put you in DPC mode which you could have also done with <b><code class="CodeStrong">Change Simulation Mode</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1035723"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now see something like <a href="dpc_tut_Pt1Overview.html#1035733">Figure 2</a> on your screen. When you ran the SUE tutorial, you started out with the basics and worked your way forward. In this tutorial, we start from the end and look at a finished schematic to see just what DPC can do. Later we'll go back to simple examples. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035733"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 2:   Schematic Of "alu8"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig02.gif">
+</div></font><a name="1037607"> </a>
+</pre>
+
+<h3>
+  <a name="1035734"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Running the DPC Example</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035735"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we go through the "<b><code class="CodeStrong">alu8</code></b>" example, Let's think about what is really important when designing data paths. For data paths to be fast, the wire lengths have to be minimized which means things need to be lined up in bit slices just as in custom design. The problem with custom design is that you don't know exactly how fast or how big it will be until you are done with the design, and then it's too late to make any changes. DPC works its magic by doing a very fast placement and then accurately predicting wire lengths. By introducing accurate wire predictions at the beginning of the design flow, DPC allows designers to accurately size and time their designs early. Changes made early are far less costly than those made late in the design process. Also, DPC makes iterations quickly - one minute per 10,000 gates. Fast iteration means fast improvement, yielding faster and smaller designs. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035736"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Placing the Adder</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035737"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">alu8</code></b> schematic describes a simple 8-bit alu with a barrel shifter and adder/subtracter in it. The data flows from the left to the right and the MSB is on the top and LSB is on the bottom. Let's start with the adder. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1035738"> </a>Select the adder icon and push into it with the<b><strong class="Strong"> </strong></b><b><strong class="Strong">e</strong></b><b><strong class="Strong"> </strong></b>hotkey. You should see <a href="dpc_tut_Pt1Overview.html#1035751">Figure 3</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035751"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 3:   Schematic Of "adder8"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig03.gif">
+</div></font><a name="1037836"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035752"> </a>Hit <b><strong class="Strong">Shift-n</strong></b> or <b><code class="CodeStrong">DPC Netlist</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035753"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You just ran the first part of DPC and created the Verilog netlist, DEF placement file, and estimated parasitic file for the adder! Look at the window you started SUE from. You should see statistics about the size, cell utilization, and number of cells in your design. Let's now look at the results of the placement (later we will described the placement algorithm): </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1035754"> </a>Type <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to see the placement. You should see two columns of cells as shown in <a href="dpc_tut_Pt1Overview.html#1035767">Figure 4</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035767"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 4:   Placement View Of "adder8"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig04.gif">
+</div></font><a name="1038205"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035768"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Typically you create a data path by creating/changing the schematic, running </strong></b><b><code class="CodeStrong">DPC Netlist</code></b><b><strong class="Strong">, and looking at the placement. You iterate until the placement is satisfactory. Then you time the design. </strong></b></font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035769"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Timing the Adder</em></font>
+</h4>
+
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1035770"> </a>Return to the schematic view with <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035771"> </a>Now type <b><strong class="Strong">h</strong></b> or <b><code class="CodeStrong">DPC It</code></b> in the <b><code class="CodeStrong">Sim</code></b> netlist. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035772"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC just ran <b><code class="CodeStrong">DPC Netlist</code></b> again but then followed that with <b><code class="CodeStrong">Time It</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. If you weren't in DEMO mode, you would have just run the <em class="Emphasis">Static Timing Analyzer</em>. In DEMO mode, we save the output from the last time we ran the Static Timing Analyzer so you can't change anything. </font>
+<p>
+<p>
+  <dt> <a name="1035773"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When DPC is done, it will pop up a timing control window called <b><code class="CodeStrong">SUE Timing</code></b>. This window lists the top critical paths in the design and has some push buttons which we will describe below. If you close the window or it gets buried under other windows, you can always bring it back with <b><code class="CodeStrong">Display Timing</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1035774"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should also see the critical path through the adder highlighted in blue (assuming you are using the default colors) and the timing values annotated on the schematic in white. Do you see that the critical path goes from the LSB (<b><code class="CodeStrong">a[0]</code></b><b><strong class="Strong"> </strong></b>in this case) to the MSB (<b><code class="CodeStrong">cout</code></b> in this case)? In most data paths with arithmetic elements like adders, you get critical paths from LSB to MSB because even the lowest bit of the adder can affect the carry out. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1035775"> </a>Zoom in around the lower left hand corner of the schematic using <b><strong class="Strong">z</strong></b> until you can read the numbers around the first two gates in the critical path, as in <a href="dpc_tut_Pt1Overview.html#1035788">Figure 5</a>. Don't worry if the numbers are not the same.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035788"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 5:   "adder8" Detail With Timing Numbers And Critical Path</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/crit_path.gif">
+</div></font><a name="1038630"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1050339"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should see that all of the inputs arrive at time "0". This is because this is a combinational circuit (more about this later). </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1050340"> </a>Now click on the <b><code class="CodeStrong">Display CP</code></b> button in the <b><code class="CodeStrong">SUE Timing</code></b> window. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1050341"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now, only the values for the critical path are displayed, along with their rise/fall times. If you look at the window that you opened SUE from, you will see the full critical path report from the static timing analyzer shown there, also. </font>
+<p>
+<p>
+  <dt> <a name="1035792"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's say you wanted to speed up this critical path by increasing the speed of the first gate in the critical path which is <b><code class="CodeStrong">MMI_NOR2B</code></b><b><strong class="Strong">.</strong></b> Assuming we could make this gate faster, we must first determine if that would even improve the critical path. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1035793"> </a>Click the <b><code class="CodeStrong">Display All</code></b> button on the <b><code class="CodeStrong">SUE Timing </code></b>window. You should now see timing values for each net, not just the critical path. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1035794"> </a>Look at the inputs to the second gate in the critical path (<b><code class="CodeStrong">MMI_OAI21B</code></b>). Do you see that the critical path arrives at 159ps but that the input directly below arrives at 153ps, only 6ps earlier? (NOTE: your values may differ by a few ps). </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035795"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This is probably not a good place to try to improve the critical path. Not only are the signals on the inputs arriving at nearly the same time, but the slower one goes into the input marked with an <b><strong class="Strong">â€œ</strong></b><b><code class="CodeStrong">f</code></b><b><strong class="Strong">â€</strong></b>. The <b><strong class="Strong">â€œ</strong></b><b><code class="CodeStrong">f</code></b><b><strong class="Strong">â€</strong></b> means that this is the <b><strong class="Strong">fast input</strong></b> on the gate and thus can handle a slightly slower input. In some gates, the differences between fast and slow inputs can be substantial (on the order of 50ps) and thus you should always consider this when designing. </font>
+<p>
+<p>
+  <dt> <a name="1035796"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's look at some of the other critical paths in the adder. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1035797"> </a>Type <b><strong class="Strong">v</strong></b> or <b><code class="CodeStrong">Zoom to Fit</code></b> in the <b><code class="CodeStrong">View</code></b> menu so we can see the entire adder again. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1035798"> </a>Click on <b><code class="CodeStrong">Display CP</code></b> in the <b><code class="CodeStrong">SUE Timing</code></b> window again to display the critical path. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1035799"> </a>Now click on the radio button next to the second critical path in the<b><code class="CodeStrong"> SUE Timing</code></b> window and then hit <b><code class="CodeStrong">Display CP</code></b> again. Do you see that the critical path is similar but now ends at <b><code class="CodeStrong">sum[7]</code></b>instead of <b><code class="CodeStrong">cout</code></b>? </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035800"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We could probably improve the critical path of the entire adder by about 50ps if we could fix the center of this critical path. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1044254"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><font  face="Verdana, Arial, Helvetica, sans-serif">To resize a gate, you need only hold down the Shift key and double click on it. This brings up the gate's generator menu, which lists the available gate sizes. The new gate will remain in the correct position, eliminating the need to remove one gate, then add and rewire a new one.</font></font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</strong></b></font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1035802"> </a>Take a look at the rest of the adder critical paths by selecting them in the <b><code class="CodeStrong">SUE Timing</code></b> window and then hitting <b><code class="CodeStrong">Display CP</code></b>. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035803"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Are you starting to get the feeling that you could make this adder quite a bit faster? If so, you are starting to understand the power of DPC. Remember that you can't be in DEMO mode to see the effects of any changes you make to the adder. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035804"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Placing the ALU</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035805"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's look at the whole ALU design which includes the adder in it. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1035806"> </a>Click on "<b><code class="CodeStrong">alu8</code></b>" in the<b><code class="CodeStrong"> Schematics List Box </code></b>to return to the ALU. Note: you can't simply pop up from the adder, since you reset the hierarchy when you netlist. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035807"> </a>Hit <b><strong class="Strong">Shift-n</strong></b> or <b><code class="CodeStrong">DPC Netlist</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu and then <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to see the placement as shown in <a href="dpc_tut_Pt1Overview.html#1035820">Figure 6</a>. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035820"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 6:   Placement View Of "alu8"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig06.gif">
+</div></font><a name="1039053"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035821"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC shows the placement hierarchically, so even as your data path gets big, it will still be manageable. You should easily see the shifter (<b><code class="CodeStrong">shift8</code></b>) and the adder (<b><code class="CodeStrong">adder8</code></b>) in the design. For placement purposes, hierarchical cells are similar to large custom cells, except that DPC handles the row flipping. In fact, if you weren't happy with the speed of your adder (or any other circuit) using standard cells, you could layout a full custom adder and use it instead without having to modify your flow or do any other parts full custom. Now that's mix and match! </font>
+<p>
+<p>
+  <dt> <a name="1035822"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that the standard cells are arranged in bit slices like a custom design. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1051061"> </a>If you are having trouble seeing where the bit slices begin and end, try turning on the grid with <b><strong class="Strong">g </strong></b>or <b><code class="CodeStrong">Toggle Grid</code></b> in the <b><code class="CodeStrong">View</code></b> menu (see <a href="dpc_tut_Pt1Overview.html#1035831">Figure 7</a>). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1051102"> </a>The grid should be set to a pitch of 22. If it is not, you can change it using <b><strong class="Strong">Shift-g</strong></b> or <b><code class="CodeStrong">Change Grid Spacing</code></b> in the <b><code class="CodeStrong">View</code></b> menu. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1051359"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We have set this example up so that the bit pitch is equal to the width of the biggest cell in the standard cell library, which is a Flip Flop. We have found this works about the best.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1035831"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 7:   DPC Grid View</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig07.gif">
+</div></font><a name="1039340"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035832"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can still see the flattened design if you want to. Let's look at the adder cells: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1035833"> </a>Select the<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">adder8</code></b> cell in the placement by clicking on it. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1035834"> </a>Now, hit <b><strong class="Strong">e</strong></b> or select <b><code class="CodeStrong">Push Into</code></b> in the <b><code class="CodeStrong">View</code></b> menu and, presto, DPC displays the internals of the cell. This should look like the adder we were working with in the previous example. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1035835"> </a>Now, hit <b><strong class="Strong">Ctrl-e</strong></b> or <b><code class="CodeStrong">Pop Out Of </code></b>in the <b><code class="CodeStrong">View</code></b> menu. This will close any selected hierarchy. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1035836"> </a>Zoom in (<b><strong class="Strong">z</strong></b>) to the upper right corner of the adder. You should see an "<b><code class="CodeStrong">H</code></b>" as shown in <a href="dpc_tut_Pt1Overview.html#1035849">Figure 8</a>. This tells you that this is a hierarchical cell that you can push in to.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035849"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 8:   Zoom View Of Hierarchical "adder8" Cell</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig08.gif">
+</div></font><a name="1039897"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1035850"> </a>Look to the right of the adder, you should see leaf cells. Find the hash mark ("/") in the corners of the cells. This shows their orientations. You should see that the cells in the last column are flipped from those in the second-to-the-last column. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1035851"> </a>Make sure that the adder is still selected and then hit <b><strong class="Strong">Shift-s</strong></b> or <b><code class="CodeStrong">Display in Other View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. You should now see the selected adder in the schematic. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1035852"> </a>Now push into the adder with the <b><strong class="Strong">e</strong></b> hotkey, and select a single gate in the <b><code class="CodeStrong">adder8</code></b> schematic. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1035853"> </a>Hit <b><strong class="Strong">Shift-s</strong></b> or <b><code class="CodeStrong">Display in Other View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. You should now see that gate highlighted in the placement, as shown in <a href="dpc_tut_Pt1Overview.html#1035866">Figure 9</a>. Since the gate wasn't currently expanded (it's in the <b><code class="CodeStrong">adder8</code></b> hierarchical cell), DPC just shows you a temporary version of it. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035866"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 9:   DPC `Display Other View'</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig09.gif">
+</div></font><a name="1040170"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="13"><a name="1035867"> </a>Try selecting various cells, one at a time, in the placement and running <b><strong class="Strong">Shift-s </strong></b>or <b><code class="CodeStrong">Display in Other View</code></b> to see where they are in the schematic. I think you can see how useful this is. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035868"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Timing the ALU</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035869"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to time the ALU (<b><code class="CodeStrong">alu8</code></b>). Since this is a sequential circuit, we had to set up a few parameters beforehand like the clock period, the clock signal name (example: <b><code class="CodeStrong">clk</code></b>), and so forth, which we will describe later. Otherwise timing the ALU is just as easy as timing the adder, as you will see now: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1035870"> </a>Return to the <b><code class="CodeStrong">alu8</code></b> schematic. If you are lost, you can just click on it in the <b><code class="CodeStrong">Schematics List Box</code></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035871"> </a>Now type <b><strong class="Strong">h</strong></b> or <b><code class="CodeStrong">DPC It</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to DPC netlist and run timing on the ALU. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1035872"> </a>Notice that the <b><code class="CodeStrong">SUE Timing</code></b> window reports values in terms of slack time to the clock period, which is set to 3ns in this case, as illustrated in <a href="dpc_tut_Pt1Overview.html#1035885">Figure 10</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035885"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 10:   SUE Timing Window Showing "alu8" Timing Values</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig10.gif">
+</div></font><a name="1040260"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1035886"> </a>Take a look at the critical path and the timing numbers by zooming in and around the <b><code class="CodeStrong">alu8</code></b> schematic. Do you see that the <b><code class="CodeStrong">shift_ctrl[2:0]</code></b> signal arrives at 600ps? This is different from the adder where all the inputs arrived at 0ps. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035887"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">An entire design can rarely be captured in a single static timing analysis and hence external I/O timing must be identified. In most cases, this involves specifying the input arrival times of external inputs, and the output setup and hold times of external outputs. </font>
+<p>
+<p>
+  <dt> <a name="1035888"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In a clocked, sequential circuit, the only signal which arrives at time 0ps is the clock (for example, "<b><code class="CodeStrong">clk</code></b>" in <b><code class="CodeStrong">alu8</code></b>). The rest of the signals should arrive at a minimum of one clock-to-q later, since they must be latched/registered elsewhere. This is known as the <em class="Emphasis">arrival time</em>. In reality, input signals typically have additional delay from wires and other logic. Furthermore, outputs must have time to be latched/registered elsewhere and also need time for wires or additional logic -- the <em class="Emphasis">departure time</em>. (The sum of the arrival and departure times should be greater than the cycle time to insure that sections verified separately will pass when verified together.)</font>
+<p>
+<p>
+  <dt> <a name="1035889"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note also that this example assumes "ideal clocks": there is no skew between the clock inputs to each register. In order to see the effects of clock skew, you need to add your clock tree into DPC. </font>
+<p>
+<p>
+  <dt> <a name="1035890"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's get back to the <b><code class="CodeStrong">alu8</code></b> now. You see that the first critical path goes through the shifter. Let's find the critical path through the adder. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1035891"> </a>Select the second critical path by clicking on the radio button next to "<b><strong class="Strong">2</strong></b>" in the <b><code class="CodeStrong">SUE Timing</code></b> window and then hit <b><code class="CodeStrong">Display CP</code></b>. You should see that the adder is in this critical path. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1035892"> </a>Zoom in around the adder. You should see that the "<b><code class="CodeStrong">b</code></b>" input arrives at 886ps. </font>
+</p> 
+<font face="ITC Franklin Gothic Book"><center>
+<p>
+
+
+
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1052049"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Don't worry if the timing numbers are not exactly the same. They may differ by a few ps.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+</font><a name="1052033"> </a>
+</pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1035893"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to push into the adder. The adder is already selected but so are some other icons, so we can't just hit <b><strong class="Strong">e</strong></b> because SUE won't know which icon to push into. In addition, we would rather not click on the adder to select only it because then all the timing annotations would go away (<b><code class="CodeStrong">Display CP/Display All</code></b> brings them back).</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1035894"> </a>Instead, highlight the adder icon (move the cursor over it until it turns yellow) and then hit <b><strong class="Strong">e</strong></b>. This tells SUE which selected icon to push into. NOTE: this can only be done with the hotkey for obvious reasons. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1035895"> </a>You should now be in the <b><code class="CodeStrong">adder8</code></b> schematic. Click on <b><code class="CodeStrong">Display CP</code></b> in the <b><code class="CodeStrong">SUE Timing</code></b> window. Do you see that the critical path goes through <b><code class="CodeStrong">sum[7]</code></b> instead of <b><code class="CodeStrong">cout</code></b>? This is because the <b><code class="CodeStrong">sum[7]</code></b> output has additional logic to go through in the <b><code class="CodeStrong">alu8</code></b> schematic. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1035896"> </a>Zoom in around the start of the critical path in the adder (in the lower left-hand corner of the schematic). Do you see that the <b><code class="CodeStrong">b[0]</code></b> input arrives at 886ps, which is the same time you saw in the adder schematic, and different from when you ran the adder by itself? </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1035897"> </a>Now hit <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to see the placement of the ALU. You don't have to be in the top-level schematic to run this. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1035898"> </a>Click on <b><code class="CodeStrong">Display CP</code></b> in the <b><code class="CodeStrong">SUE Timing</code></b> window. You should see something like <a href="dpc_tut_Pt1Overview.html#1035911">Figure 11</a>. The critical path is now annotated onto the placement! This is really useful for tracing critical paths, especially on big designs. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035911"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 11:   Critical Path Annotated Onto Placement</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig11.gif">
+</div></font><a name="1040480"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035912"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at one more feature for searching through critical paths. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1035913"> </a>Return to the <b><code class="CodeStrong">alu8</code></b> schematic with <b><strong class="Strong">Ctrl-a</strong></b> or <b><code class="CodeStrong">Toggle Placement View</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu if you were still in the placement view. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="13"><a name="1035914"> </a>Click on <b><code class="CodeStrong">CP Instances</code></b> in the <b><code class="CodeStrong">SUE Timing</code></b> window. You should get a new popup window (and who says computers aren't fun?) that lists each of the gates in the current critical path. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="14"><a name="1035915"> </a>Click on one of the lines in the <b><code class="CodeStrong">CP Instances</code></b> window. DPC will push into the appropriate schematic for you, select the instance you specified, and zoom in around it. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="15"><a name="1035916"> </a>Try selecting a few more. Note: this feature also works in the placement view. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="16"><a name="1035917"> </a>Close this window by hitting the <b><code class="CodeStrong">Close</code></b> button. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035918"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Changing Timing Parameters inside DPC</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1035919"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While all of the setup parameters for DPC are found in the <b><code class="CodeStrong">.suerc</code></b> file and described in the <em class="Emphasis">Micro Magic Tools DPC Manual</em>, there are some that can be changed when running DPC. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1035920"> </a>Return to the <b><code class="CodeStrong">alu8</code></b> schematic. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1035921"> </a>Go to the <b><code class="CodeStrong">Sim</code></b> menu and hit <b><code class="CodeStrong">Time It</code></b>. You should see a popup window that looks like <a href="dpc_tut_Pt1Overview.html#1035934">Figure 12</a>. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1035934"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 12:   `Time It' Timing Setup Popup Menu</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/dpct4_fig12.gif">
+</div></font><a name="1040754"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1035935"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can see and/or change any of these parameters. For example, if you want to see more than just the top five critical paths, change <b><code class="CodeStrong">max_paths</code></b> to a bigger number. When you hit <b><code class="CodeStrong">Done</code></b>, a new timing run will be performed. Remember that if you are in DEMO mode, no changes are actually made. </font>
+<p>
+<p>
+  <dt> <a name="1035936"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Here's a quick description of the fields in the <b><code class="CodeStrong">Timing Setup </code></b>menu: </font>
+<p>
+  <dl>
+<p> <dt> <a name="1035937"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">clk_names</code></b> must contain a space-separated list of all of the top-level clock names in your design. DPC also figures out that your circuit is sequential if it finds any of these names in the circuit. </font>
+<p><p> <dt> <a name="1035938"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">clk_period</code></b> is the clock period for computing slack/violations. You should already account for clock skew (unless the clock tree is fully in DPC) and jitter. For example, if you are trying to achieve 400MHz (2.5 ns) and you know that your additional clock skew/jitter is 300ps, then you would want to set this to 2.2ns. </font>
+<p><p> <dt> <a name="1035939"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">timing_type</code></b> is either <b><strong class="Strong">setup</strong></b> or <b><strong class="Strong">hold</strong></b>. If set to <b><strong class="Strong">hold</strong></b> and you are using <em class="Emphasis">Pearl</em>, this will look for hold violations instead of setup violations. </font>
+<p><p> <dt> <a name="1035940"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">constraint_file</code></b> is the path to a file that contains specific hand-entered constraints for your design. This must be in the syntax of the specific static timing analyzer that you are using and will simply be included into the run. You might block false or multi-cycle paths here, or set specific arrival/departure times for known signals like reset. Note that any constraints set here will override DPC defaults. </font>
+<p><p> <dt> <a name="1035941"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">cap_file</code></b> is the path to the parasitic file used for static timing analysis. This is typically the file generated by DPC during DPC Netlisting. However, once you have routed your design, you can put the path to the extracted parasitic file here to run timing using extracted instead of estimated timing in the same DPC environment. Although routers often do strange and unexpected things, if the route is a good one DPC typically predicts timing within 100 ps. This accuracy is something wire load models can't come close to. </font>
+<p><p> <dt> <a name="1035942"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">verilog_file</code></b> is the Verilog gate level netlist used for static timing analysis. Typically, this is the file generated by DPC but can be different; for example, for post-route analysis where you have modified your netlist with scripts to add the scan chain or clock tree. </font>
+<p><p> <dt> <a name="1035943"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">driver_cell</code></b> is used to specify a cell to drive all of the inputs with (timing verifier dependent). If this is left blank, a fixed slope signal is applied to all external inputs, which can hide the effects of heavily loaded external inputs. </font>
+<p><p> <dt> <a name="1035944"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">max_paths</code></b>, described above, specifies the number of paths to be displayed in the <b><code class="CodeStrong">SUE Timing</code></b> window. If you want to display the top 10 paths for instance, you would change the number from 5 to 10. </font>
+<p><p> <dt> <a name="1035945"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">max_transition</code></b> specifies a threshold such that any nodes slower than that threshold will be displayed in the shell window from which you started DPC. <b><code class="CodeStrong">max_transition</code></b> is a good option for reducing power and for helping to uncover potential bugs or problems in your implementation. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1035946"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There is one last parameter that you should know: the default <b><strong class="Strong">output load</strong></b>. All external outputs must drive into some load to give reasonable timing values. This value defaults, in this example, to 20fF and is set in the <b><code class="CodeStrong">.suerc</code></b> file. It can also be overridden, on a net by net basis, in the <b><code class="CodeStrong">constraint_file</code></b>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1035947"> </a>Now hit the <b><code class="CodeStrong">Cancel</code></b> button to remove the <b><code class="CodeStrong">Timing Setup</code></b> menu. </font>
+</p>   </ol>
+</ol>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+  </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="DPC_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="dpc_tut_Preface.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_tut_Ch2Basics.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_tut_Ch2Basics.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 18:16:46">
+<title>MCC: Mega Cell Compiler</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> MCC MegaCell Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="mcc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="mcc_man_Preface.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="mcc_man_Ch2runningMCC.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 1 </font>
+</h2>
+
+
+<h1>
+  <a name="1024688"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">MCC: Mega Cell Compiler</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1028057"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028058"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The MegaCell Compiler (MCC) makes building all types of regular structures such as RAMs, Register Files, FIFOs, ROMs, PLAs, fast and easy. Throughout this manual, we talk about building "memories" since those are the most common, but not only, structures built by the MegaCell Compiler. For example, the MegaCell Compiler can also build pad rings. </font>
+<p>
+<p>
+  <dt> <a name="1028059"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC is a designer's helper. It does not synthesize memories; rather, it enables the designer to easily generate and verify memories that have already been designed and for which the leaf cells have already been laid out. MCC is fast, constructing the largest designs in a matter of minutes. Typically, MCC can create memories almost as fast as it would take to load them from disk. </font>
+<p>
+<p>
+  <dt> <a name="1028060"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC allows the designer to parameterize the memory, by building different sizes and configurations of the same basic memory structure simply by changing key parameters such as the number of rows or columns. In the past, building structures that were parameterizable added significantly to the implementation time of the structure and was only practical if many configurations were required. In contrast, parameterizing structures in MCC is so easy that designs where only one size is required are also parameterized. MCC vastly speeds construction and verification, especially in large memory designs. By doing all construction and verification first on a very small memory, the iteration time is minimized. When the small memory passes verification, you can then build the full-size memory, which typically passes on the first try. Hence, parameterization helps in all but the smallest designs, irrespective of the number of final sizes or configurations desired. </font>
+<p>
+<p>
+  <dt> <a name="1028061"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC runs from the MAX Layout Editor, giving you all the power of a full custom layer editor to view, edit, and modify your megacells before and after creation. MCC requires both a MAX license and an MCC license to run. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1028063"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Memory Design Basics</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1028064"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typically, a designer must go through four stages to create a complete and functional memory: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1028065"> </a>Design the memory. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1028534"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This includes picking a memory architecture that meets the design goals, choosing the circuit structures, and sizing the circuits. Typically, the designer generates a design schematic that includes the main critical path of the memory with estimated loadings and wire resistances. Key components, in particular the memory cell, are laid out at this stage to help in estimating parasitics and determining key device sizes. Because the design schematic only contains the critical path, simulating with HSPICE or other device-level simulators is quick and the design can be quickly iterated to yield the desired goals. </font>
+<p><p> <dt> <a name="1028069"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE Design Manager with cross-probing to the New Spice Tool (NST) waveform viewer is ideal for this stage of the design. </font>
+<p>  </dl>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1028071"> </a>Lay out the leaf cells. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1028539"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Except for the memory cell, all leaf cells are typically laid out once the design is complete. The cells must all pitch-match appropriately, typically to either a multiple of the row height or bit pitch, depending on their position. The abutment bounding boxes for the cells need to be indicated, usually through a special drawn abutment layer over the cell. This allows cells to partially overlap and to share contacts, source/drains areas, and wires. Furthermore, power and feedthroughs are typically included in the leaf cell. </font>
+<p><p> <dt> <a name="1028073"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MAX works well for laying out the leaf cells. Alternatively, leaf cells designed in other tools can be imported into MAX using the GDSII interface. </font>
+<p>  </dl>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1028075"> </a>Create the entire memory. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1028540"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This stage is broken into three parts: </font>
+<p>  </dl>
+   <ol type="a">
+<p><ul>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028077"> </a>Tiling up the memory </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028079"> </a>Programming the rows, MUXs, and so forth. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028081"> </a>Propagating and naming ports such as the data inputs and outputs, address lines, and control lines. </font>
+</p>  </ul> </ol>
+  <dl>
+<p> <dt> <a name="1028485"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">These three parts are accomplished easily with MCC and are described in Chapter 3, "<a href="mcc_man_Ch3create-megacells.html#1028486">Creating Megacells</a>".<b><strong class="Strong"> </strong></b></font>
+<p>  </dl>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1028489"> </a>Verify the memory. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1028541"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Memories are very difficult to fully verify because they can be very large and contain analog circuits (where the digital approximation cannot be used). Typically, there are four distinct types of verification required: </font>
+<p>  </dl>
+   <ol type="a">
+<p><ul>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028087"> </a>Physical verification, such as DRC, ERC, electromigration, and supply drops. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028088"> </a>Functional verification, typically through digital simulators like Verilog. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028089"> </a>Performance verification with a device-level simulator. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1028090"> </a>Process verification issues, such as noise susceptibility from crosstalk, uneven supply rejection, inability to write reliably over process corners, and sense amp input offsets.</font>
+</p>  </ul> </ol>
+  <dl>
+<p> <dt> <a name="1028492"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC provides excellent solutions for functional verification (4c) and performance verification (4c). See <a href="mcc_man_Ch3create-megacells.html#1028977"><b><code class="CodeStrong">Netlisting </code></b> </a>, and <a href="mcc_man_Ch2runningMCC.html#1043712"><b><code class="CodeStrong">MC Critical Path </code></b> </a>.</font>
+<p><p> <dt> <a name="1028496"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Even if you are only building one size memory, MCC is very useful for verification purposes. You build a very small memory to test functionality, (functional verification, DRC or LVS). Then when the small memory is correct, you generate the full size memory and run a final verification.</font>
+<p><p> <dt> <a name="1028096"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC can extract the specified critical paths with all of the termination info and allow the user to simulate only the critical paths in SPICE.</font>
+<p><p> <dt> <a name="1028097"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">MCC can also generate a Verilog netlist of the memory for use in functional verification.</font>
+<p><p> <dt> <a name="1028098"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Creation of the SPICE netlist for a critical path and creation of a Verilog netlist is covered more fully in Chapter 3.</font>
+<p>  </dl>
+<p>
+  <dt> <a name="1028533"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic -----   
+  </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="mcc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="mcc_man_Preface.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="mcc_man_Ch2runningMCC.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="mcc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

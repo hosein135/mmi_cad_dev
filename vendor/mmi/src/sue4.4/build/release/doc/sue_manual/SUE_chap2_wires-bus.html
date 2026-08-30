@@ -1,0 +1,600 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:41:59">
+<title>Wires And Buses</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_chap1_overview.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_chap3_property_gen.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 2 </font>
+</h2>
+
+
+<h1>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wires And Buses</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1025238"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Introduction</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1024216"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Wires are used in SUE to represent connectivity. In this chapter, we will cover how wires and busses are named.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1024192"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Wires and Buses</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023152"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Wires in SUE inherit the name of any attached and named I/O or global terminal. (Unnamed I/O or global terminals will flag an error, and will otherwise be ignored.) If neither exists, SUE will generate a unique name of the form <b><code class="CodeStrong">net_&lt;number&gt;</code></b> or <b><code class="CodeStrong">uc_net_&lt;number&gt;</code></b> for netlisting purposes. </font>
+<p>
+<p>
+  <dt> <a name="1023154"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Nets are assigned <b><code class="CodeStrong">uc_net_&lt;number&gt;</code></b>, for <b><strong class="Strong">u</strong></b>n<b><strong class="Strong">c</strong></b>onnected net, if they are only connected to one terminal (remember that I/O's are also icons so a wire connected from a terminal to a gate is not unconnected) and SUE will emit a warning in the SUE command window alerting you to any unconnected nets during netlisting. If you have a net that is giving you an unconnected net warning and the net is correct, you have a number of choices: </font>
+<p>
+   <ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023155"> </a>Ignore the warning. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023157"> </a>Add a <b><code class="CodeStrong">name_net</code></b> icon without a name to the net. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023159"> </a>You can tell SUE to ignore reporting unconnected nets on certain pins that typically don't get connected by adding the pin names to the list <code class="Code">NETLIST(ignore_unconnected)</code> in your <b><strong class="Strong">.suerc</strong></b> file. For example, you might add <b><code class="CodeStrong">scan_in</code></b> to this list.</font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023160"> </a>You can turn off all netlist warnings for unconnected nets by setting <b><code class="CodeStrong">NETLIST(warning)</code></b> to <b><code class="CodeStrong">0</code></b> in your <b><strong class="Strong">.suerc</strong></b> file. Note that you will still see unconnected net warnings from cached files if you do this. </font>
+</p>   </ul>
+<p>
+  <dt> <a name="1023165"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Globals should only be used for constants and power supplies as they are not included in the input/output specifications of the cell when netlisting. SUE recognizes and converts (when needed) Verilog constant syntax of the form: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">        &lt;# of bits&gt;'(b|o|h|d)&lt;number&gt;</font><a name="1023167"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1023168"> </a>
+      </pre>
+<p>
+  <dt> <a name="1023169"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">as, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">        2'b0</font><a name="1023170"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">        4'hdf</font><a name="1023171"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">        4'd11</font><a name="1023172"> </a>
+      </pre>
+<p>
+  <dt> <a name="1028283"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024426"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><br>SUE will also pad numbers, when needed, like <b><code class="CodeStrong">31'b0</code></b>. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1023175"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><code class="CodeStrong">I/O</code></b>'s, <b><code class="CodeStrong">Globals</code></b>, and <b><code class="CodeStrong">name_nets</code></b> cannot overlap - their terminals cannot occupy the exact same SUE grid point. The only exception to this is for <b><code class="CodeStrong">I/O</code></b>'s and <b><code class="CodeStrong">name_nets</code></b> that have the exact same name. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023176"> </a>If you want to name a net that is not otherwise named by an <b><code class="CodeStrong">I/O</code></b> or <b><code class="CodeStrong">global</code></b>, attach a <b><code class="CodeStrong">name_net</code></b> icon to the wire at any place and name the name_net as desired. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024357"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">name_net</code></b>, <b><code class="CodeStrong">name_net_s</code></b>, and <b><code class="CodeStrong">name_net_sw</code></b> icons are all identical in function but look slightly different. The three icons are provided to enhance the look of your schematics. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1023179"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Net names are SUE's only clue as to the type of wire - or sometimes its connection. For example, two nets will be netlisted as one if they have the same net name as determined by either the <b><code class="CodeStrong">name_net</code></b> icon, an <b><code class="CodeStrong">I/O</code></b> name, or a <b><code class="CodeStrong">global</code></b> name. </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023180"> </a>This connection of nets "feature" can be used (sparingly) to connect nets together where actual wires may be awkward or clutter the drawing. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1023182"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Buses are just specially-named wires. The wire itself looks no different whether it's a bus or a wire until you netlist the schematic or you run<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">generate term names</code></b> on it. Then the buses will be displayed as fat wires. Wires with the following type of names are buses: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">bus_name[msb:lsb]   or</font><a name="1023184"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">[msb:lsb]           or</font><a name="1023185"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">&lt;name1&gt;,&lt;name2&gt;,...</font><a name="1023186"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1024219"> </a>
+      </pre>
+<p>
+  <dt> <a name="1023187"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">where "<i><strong class="StrongItalic">msb</strong></i>" and "<i><strong class="StrongItalic">lsb</strong></i>" must be integers. (If "<code class="Code">msb</code>" and "<code class="Code">lsb</code>" are the same, then the wire is not a bus. This is mostly legal syntax but redundant and should be avoided.) "<code class="Code">msb</code>" may be smaller than "<code class="Code">lsb</code>". Buses made from comma-separated wires, buses, or bus_ranges are called <em class="Emphasis">concatenated buses</em> and discussed below. </font>
+<p>
+<p>
+  <dt> <a name="1023188"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Individual wires in a given bus can then be specified by one of the following formats:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">bus_name[num]   or</font><a name="1023189"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">[num]           or</font><a name="1023190"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">&lt;name&gt;</font><a name="1023191"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1024244"> </a>
+      </pre>
+<p>
+  <dt> <a name="1023193"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the <b><code class="CodeStrong">bus_name</code></b> is absent, (for example, <b><code class="CodeStrong">[3:0]</code></b> or <b><code class="CodeStrong">[1]</code></b>), then the bus name is inferred from the rest of the net or, if none is specified, then it is uniquely generated with the form <b><code class="CodeStrong">net_#</code></b> or <b><code class="CodeStrong">uc_net_#</code></b>. </font>
+<p>
+<p>
+  <dt> <a name="1023194"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">No special icons or incantations are required for composing buses or extracting wires or buses from existing buses. Just name the nets unambiguously and SUE should netlist them correctly. Below is a cleverly constructed example which demonstrates how easy it is: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023195"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 2:   Busses in SUE</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/diag01.gif" border="1">
+</div></font><a name="1025264"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023200"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, the two-bit bus named "<i><strong class="StrongItalic">bar</strong></i>" enters the schematic via the input terminal on the left. The individual bits of <b><code class="CodeStrong">bar</code></b> are peeled off using the <b><code class="CodeStrong">name_net</code></b> icons named <b><code class="CodeStrong">[0]</code></b> and <b><code class="CodeStrong">[1]</code></b>. There is no need to label these <b><code class="CodeStrong">name_net</code></b> icons <b><code class="CodeStrong">bar[0] </code></b>and <b><code class="CodeStrong">bar[1]</code></b> since the name <b><code class="CodeStrong">bar</code></b> is already inferred from the input, and would, in fact, make it harder to rename the net to something else if you ever wanted to, since you would have to rename three things then instead of just one. However, you may do so if you think it schematic makes the schematic more readable. </font>
+<p>
+<p>
+  <dt> <a name="1023203"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">On wires with multiple named sections, like the above case, SUE determines the bit/bus designation of each wire or terminal by the following algorithm: </font>
+<p>
+<ul><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023204"> </a>A segment of a wire or instance terminal is assigned a name based on the largest (widest bus) of the named terminals connected to it.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023205"> </a>Wires with similar root names (for example, bus names with "<b><code class="CodeStrong">[...]</code></b>" removed) are connected together.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023206"> </a>Net names on<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">name_nets</code></b> on buses without bus specifiers are replaced with the largest bus range.  
+</li><p>
+</font>
+</ul></ul></ul>
+<p>
+  <dt> <a name="1023208"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Small movements of<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">name_nets</code></b> can produce unwanted results. The following example displays a common example with the correct way and the incorrect way of drawing it: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023209"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 3:   Bus Naming</font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1023213"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><div align="center"><img src="images/diag03B.gif" border="1">
+</div></font>
+<p>
+<p>
+  <dt> <a name="1023215"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In the "correct" circuit, each of the <b><code class="CodeStrong">name_nets</code></b>, `<b><code class="CodeStrong">[0]</code></b>', `<b><code class="CodeStrong">[1]</code></b>', and `<b><code class="CodeStrong">[2]</code></b>', are connected to the entire bus "<b><code class="CodeStrong">[2:0]</code></b>". In contrast, only `<b><code class="CodeStrong">[0]</code></b>' in the "incorrect" circuit is connected to `<b><code class="CodeStrong">[2:0]</code></b>'. The input terminal on inverter `<b><code class="CodeStrong">A</code></b>' will be arbitrarily connected to either `<b><code class="CodeStrong">[2]</code></b>' or `<b><code class="CodeStrong">[1]</code></b>' since both of these have the same bus width and thus neither is preferred. A similar ambiguity arises with inverter `<b><code class="CodeStrong">B</code></b>'. </font>
+<p>
+<p>
+  <dt> <a name="1023216"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If a wire has no bus specification (neither a <b><code class="CodeStrong">[msb:lsb] </code></b>or a "<b><code class="CodeStrong">,</code></b>" concatenation), then SUE will check if it is an implicit bus. Implicit buses are inferred by either bused terminals such as `<b><code class="CodeStrong">sel[2:0]</code></b>' or bused instances such as those shown in the following circuit: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023220"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 4:   Bussed Icons</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/diag04.gif" border="1">
+</div></font><a name="1025460"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023225"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of the wires in this example are implicit 3-bit buses (<b><code class="CodeStrong">[2:0]</code></b>) because all of the terminals are three bits wide (one bit wide times the three-bit wide bused instance). The wire named `<b><code class="CodeStrong">foo</code></b>' is also inferred to be<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">foo[2:0]</code></b> since no bit specifier is given. If <b><code class="CodeStrong">foo</code></b> were renamed `<b><code class="CodeStrong">foo[0]</code></b>', however, then the wire attached to <b><code class="CodeStrong">foo</code></b> would not be a bus. Instead, all of the outputs of the second inverter would be tied together. </font>
+<p>
+<p>
+  <dt> <a name="1023226"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that implicit buses are always numbered as <b><code class="CodeStrong">[bus_width-1:0]</code></b>. Thus the wires in the following 2 circuits will still have the same bus designations <b><code class="CodeStrong">[2:0]</code></b> as those above: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023227"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 5:   Implicit buses</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/implicit_buses.gif" border="1">
+</div></font><a name="1025598"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023232"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE will also infer buses when the terminals are buses and the icons are not buses, as shown in the following example: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023233"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 6:   Terminal Buses</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/term_r_buses.gif" border="1">
+</div></font><a name="1028152"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023238"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Again, all of wires in this example will be inferred to be three-bit buses <code class="Code">[2:0]</code>. Mixing and matching of the above two forms also works as expected. </font>
+<p>
+<p>
+  <dt> <a name="1023239"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A common case occurs when you only want to use a subset of an output bus from an icon.</font>
+<p>
+<p>
+  <dt> <a name="1024253"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Consider the following example: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023240"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 7:   Naming Buses</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/subset_busv2.gif" border="1">
+</div></font><a name="1025750"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023245"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, you want to ignore bit [2] coming out of `<b><code class="CodeStrong">foo</code></b>'. In order for this to work, you need to label the width of both sides of the net as shown above. This seems redundant but is necessary. </font>
+<p>
+<p>
+  <dt> <a name="1023246"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE gives precedence to output terminals over input terminals when inferring implicit buses. Typically outputs are never tied together while inputs can be, and thus SUE attempts to follow this circuit design rule. For example, in the following common circuit used to buffer up a tree</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023247"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 8:   Bused and Non-bused Icons</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/buffer_up_a_tree.gif" border="1">
+</div></font><a name="1025855"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023252"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The wire labeled `<b><code class="CodeStrong">a</code></b>' is not a bus but `<b><code class="CodeStrong">b</code></b>' is inferred to be a bus. </font>
+<p>
+<p>
+  <dt> <a name="1023253"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While SUE can't handle two-dimensional buses, it does handle some complicated cases. Below are the three allowable cases with bused input pins: </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023254"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 9:   More Busing Examples</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/3_allow_cases.gif" border="1">
+</div></font><a name="1025961"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023259"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In all cases the input terminal is a bus and the instance is arrayed. In this example, the input terminal "<code class="Code">in</code>" is a two-bit bus and the instance is arrayed 4 times, and hence there are really 8 (2 bits x 4 instances) inputs. In the first case, all 8 inputs are tied to the scalar input `<b><code class="CodeStrong">foo</code></b>'. In the second case, <b><code class="CodeStrong">in[1]</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>in each instance is tied to<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">foo[1]</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>and <b><code class="CodeStrong">in[0]</code></b> in each instance is tied to <b><code class="CodeStrong">foo[0]</code></b>. In the last case, <b><code class="CodeStrong">foo[7]</code></b> and <b><code class="CodeStrong">foo[6]</code></b> are tied to <b><code class="CodeStrong">in[1]</code></b> and <b><code class="CodeStrong">in[0]</code></b> in instance <b><code class="CodeStrong">[3]</code></b>, <b><code class="CodeStrong">foo[5]</code></b> and <b><code class="CodeStrong">foo[4]</code></b> are tied to <b><code class="CodeStrong">in[1]</code></b> and <b><code class="CodeStrong">in[0]</code></b> in instance <b><code class="CodeStrong">[2]</code></b>, and so on.</font>
+<p>
+<p>
+  <dt> <a name="1023260"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you inadvertently use a form that is not consistent with one of the three above, SUE will flag it with a warning during netlisting. For example, if the input pin in the last example were labeled <b><code class="CodeStrong">foo[8:0]</code></b> instead of <b><code class="CodeStrong">foo[7:0]</code></b>, SUE would produce the following warning: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">NETLIST WARNING: illegal bused array size - foo[8:0] into in[1:0] with an instance width of 4.</font><a name="1023261"> </a>
+      </pre>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1023263"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Concatenated Buses </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1023264"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In actual circuits, you typically need to combine and separate various bits of various buses. SUE allows you to do this using the "," concatenation operator on <b><code class="CodeStrong">name_nets</code></b>, but not on <b><code class="CodeStrong">I/O</code></b>'s, <b><code class="CodeStrong">globals</code></b>, or <b><code class="CodeStrong">instance</code></b> names. Buses built from concatenations are based on Verilog syntax rules for concatenation (except you don't need the braces {}). Thus wires, bus ranges, or entire buses can be concatenated by simply writing them in <b><strong class="Strong">msb-to-lsb</strong></b> order, separated by commas (,). </font>
+<p>
+<p>
+  <dt> <a name="1023266"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">a,b,c</font><a name="1023267"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023268"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">foo[3],hi[3:0] </font><a name="1023269"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023270"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">bar[3],bar[3],bar[2]</font><a name="1023271"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1023272"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023273"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">are all legal bus names. Note that the order of the signals is very important. For example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"><code class="Code">a,b,c 	 	 	 	 	</code>is not equal to 	 	 	 <code class="Code">c,b,a
+</code></font><a name="1023274"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"><code class="Code">foo[3],hi[3:0]</code>  	 	 	 	is equal to 	 	 	 	<code class="Code">foo[3],hi[3],hi[2],hi[1:0]
+</code></font><a name="1023276"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"><code class="Code">bar[3],bar[3],bar[2</code>] 			is equal to 	  	 	 	<code class="Code">bar[3],bar[3:2]</code></font><a name="1023278"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1028319"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1023280"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Concatenated buses are simply made by adding<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">name_nets</code></b> with comma-separated names. When connecting concatenated buses to other wires/buses, the names must be a subset/superset of each other. This is illustrated in the following diagram:</font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023282"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 10:   Concatenated Buses</font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1023286"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><div align="center"><img src="images/comma_sep_names.gif" border="1">
+</div></font>
+<p>
+<p>
+  <dt> <a name="1023287"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When concatenating buses, you always have to specify the bus root except for the following special case. </font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023288"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 11:   More Concatenated Buses</font></i>
+</align>
+</h5>
+</ul>
+
+
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"><div align="center"><img src="images/bus_root.gif" border="1">
+</div></font><a name="1023982"> </a>
+      </pre>
+<dl><dl>
+<p>
+  <dt> <a name="1023293"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In this case, it is obvious that the bus root is `<b><code class="CodeStrong">a</code></b>' and thus you don't need to specify it when rearranging the bits with `<b><code class="CodeStrong">[2],[3],[0],[1]</code></b>'. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1023294"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Bus_combine </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1023297"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you really need to rename a bus/wire, use the <b><code class="CodeStrong">bus_combine</code></b> icon which will introduce an assign statement into your Verilog netlist or a 0 volt voltage source into your SPICE netlist. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024485"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">bus_combine</code></b> icon uses the <b><code class="CodeStrong">assign</code></b> operator when Verilog netlisting which is a unidirectional operator. Furthermore, some tools that read Verilog netlists don't handle the <b><code class="CodeStrong">assign</code></b> operator. <br><br>LVS and other operations on SPICE netlists often don't handle 0 volt voltage sources. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1023303"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Below is an example of the use of the <b><code class="CodeStrong">bus_combine</code></b>. The `<code class="Code">0</code>' denotes the <b><strong class="Strong">lsb</strong></b><b><strong class="Strong"> </strong></b>end<b><strong class="Strong"> </strong></b>of the bus combine. This example replaces bit 10 in a 32-bit bus called <b><code class="CodeStrong">qux</code></b> with the input <b><code class="CodeStrong">baz</code></b><b><strong class="Strong">: </strong></b></font>
+<p>
+</dl></dl>
+
+<ul>
+<h5>
+<align="left">
+  <a name="1023304"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Figure 12:   Bus Combine Example</font></i>
+</align>
+</h5>
+</ul>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1023308"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><div align="center"><img src="images/diag06.gif" border="1">
+</div></font>
+<p>
+<p>
+  <dt> <a name="1023310"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This bus combine would create the following assign statement (in Verilog netlisting mode): </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">assign out[31:0] = {qux[31:11],baz,qux[9:0]};</font><a name="1023311"> </a>
+      </pre>
+<pre>
+<font face="Courier"></font><a name="1023312"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1023313"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that the <b><code class="CodeStrong">bus_combine</code></b> icon is a generator so you can change it to merge as many buses together as you want. You can also change the <b><code class="CodeStrong">bus_combine</code></b> icon to have a width of one if you want to simply rename a bus. </font>
+<p>
+<p>
+  <dt> <a name="1023314"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While the <b><code class="CodeStrong">bus_combine</code></b> icon makes it possible to tie an output to an input, you should be very careful in using it this way. While simulators can handle this, few other backend tools can. In general, this is not a good way to add feedthroughs to cells. </font>
+<p>
+</dl></dl>
+
+<h5>
+<align="left">
+  <a name="1023316"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Debugging Buses </font></i>
+</align>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1023317"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes SUE gets confused with more complex buses. Sometimes, the user gets confused about what he or she can and cannot do. How to solve this? Easy, let SUE tell you what it thinks a net name is. </font>
+<p>
+   <ul>
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023318"> </a>Draw your schematic and label your nets. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023320"> </a>Then hit <b><code class="CodeStrong">generate term names</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2"><a name="1023321"> </a>Now select individual nets and SUE will display what it has determined to be the net name in the message window along with the rest of the selection. If the name is not what you desire, change the circuit and repeat. </font>
+</p>   </ul>
+<p>
+  <dt> <a name="1014140"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_chap1_overview.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_chap3_property_gen.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

@@ -1,1 +1,108 @@
-../sue_param/.suerc
+
+# These parameters control the fet sizes.
+# If you add a "u" after WNA, etc, it will fail!
+# But the "u" is required after lp_min/ln_min.  Go figure.
+
+set SIM_PARAMS(WNA)  0.46    ;# nmos size for A driver, pmos will be 2x this
+set SIM_PARAMS(WMIN) 0.42    ;# don't adjust this
+set SIM_PARAMS(WMN2) 0.62    ;# should be 4/3*WNA, rounded up to nearest 0.02u
+set SIM_PARAMS(lp_min) 0.18u    ;# gate width
+set SIM_PARAMS(ln_min) 0.18u    ;# gate width
+
+
+# netlists schematics in directory that are newer than spice
+# netlists in the "todir".  Move spice netlist to "todir".
+
+# to run, use:
+#   sue -CMD gensp -CMD exit
+
+# make sure we are in spice mode
+set NETLIST_TYPE spice
+set NETLIST_PROPS spice
+
+set NETLIST(no_header) 1
+
+proc gensp {{todir ../extract}} {
+
+  global SUFFIX
+
+  foreach file [lsort [glob *$SUFFIX(default)]] {
+
+    set cell [file rootname $file]
+
+    set to $todir/$cell$SUFFIX(spice)
+    if {[file readable $to] && [file mtime $to] > [file mtime $file]} {
+      # this one is up-to-date
+      puts "Skipping \"$file\", up-to-date."
+      continue
+    }
+
+    # load the cell into SUE
+    api_load_cell $cell
+
+    # spice netlist it
+    api_netlist
+
+    # move netlist to "todir"
+    puts "Moving \"$cell$SUFFIX(spice)\" to \"$to\"."
+    if {[catch "exec mv $cell$SUFFIX(spice) $to" msg]} {
+      puts $msg
+    }
+  }
+}
+    
+
+# Procedure extracts .sim files for all files in current directory.
+proc sim_all {} {
+    global BATCH  ;# Disables popup menus.
+    set BATCH 1
+
+
+    set save_cd [pwd]
+
+    # Sue aborts the first time it tries to load something that
+    # is already loaded. Setting ERROR_POPUP does not fix it.
+    # Redefining sue_error does.
+    # Lee fixed: use BATCH variable.
+    if {0} {
+    proc sue_error {message {cell ""}} {
+	if {$message == "flush"} { return; }
+	puts "error: $message $cell"
+	return 0
+    }
+    }
+
+    # make sure we are in the right place
+    # cd $EXTRACTDIR
+
+    # first remove all old .sim files, need sh to expand *.sim
+    #catch {exec sh -c "rm -f *.sim"}
+
+    foreach cell [lsort [glob *.sue]] {
+
+	set cell_name [file root [file tail $cell]]
+
+	# load the cell into sue
+	# load_schematic does not work - get errors about
+	# schematic already loaded half-way through when sue
+	# loads cells that were used by previous cells.
+	#global ERROR_POPUP; set ERROR_POPUP 0
+	# goto_schematic $cell 1
+	load_schematic $cell
+	#set ERROR_POPUP 1
+
+	# Generate sim netlist
+	# Note that changing NETLIST_TYPE is not sufficient.
+	# You MUST change NETLIST_PROPS as well.
+	# This is a bug: netlist should take care of this.
+	# Actually, the netlist type should be an argument to netlist.
+	global NETLIST_TYPE NETLIST_PROPS
+	set NETLIST_TYPE "sim"
+	set NETLIST_PROPS "sim"
+	netlist
+    }
+
+    cd $save_cd
+    puts "sim_all done."
+    set BATCH 0
+}

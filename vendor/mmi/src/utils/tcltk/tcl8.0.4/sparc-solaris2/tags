@@ -1,1 +1,125 @@
-../unix/tags
+AlarmHandler	tclUnixTest.c	/^AlarmHandler()$/
+CopyFile	tclUnixFCmd.c	/^CopyFile(src, dst, srcStatBufPtr) $/
+CopyFileAtts	tclUnixFCmd.c	/^CopyFileAtts(src, dst, statBufPtr) $/
+CreateSocket	tclUnixChan.c	/^CreateSocket(interp, port, host, server, myaddr, m/
+CreateSocketAddress	tclUnixChan.c	/^CreateSocketAddress(sockaddrPtr, host, port)$/
+FileBlockModeProc	tclUnixChan.c	/^FileBlockModeProc(instanceData, mode)$/
+FileCloseProc	tclUnixChan.c	/^FileCloseProc(instanceData, interp)$/
+FileGetHandleProc	tclUnixChan.c	/^FileGetHandleProc(instanceData, direction, handleP/
+FileHandlerEventProc	tclUnixNotfy.c	/^FileHandlerEventProc(evPtr, flags)$/
+FileInputProc	tclUnixChan.c	/^FileInputProc(instanceData, buf, toRead, errorCode/
+FileOutputProc	tclUnixChan.c	/^FileOutputProc(instanceData, buf, toWrite, errorCo/
+FileProc	tclXtNotify.c	/^FileProc(clientData, fd, id)$/
+FileSeekProc	tclUnixChan.c	/^FileSeekProc(instanceData, offset, mode, errorCode/
+FileWatchProc	tclUnixChan.c	/^FileWatchProc(instanceData, mask)$/
+FindLibraries	tclLoadAout.c	/^FindLibraries (interp, fileName, buf)$/
+FreeCurrentDir	tclUnixFile.c	/^FreeCurrentDir(clientData)$/
+FreeExecutableName	tclUnixFile.c	/^FreeExecutableName(clientData)$/
+GetFd	tclUnixPipe.c	/^#define GetFd(file) (((int)file)-1)$/
+GetGroupAttribute	tclUnixFCmd.c	/^GetGroupAttribute(interp, objIndex, fileName, attr/
+GetOwnerAttribute	tclUnixFCmd.c	/^GetOwnerAttribute(interp, objIndex, fileName, attr/
+GetPermissionsAttribute	tclUnixFCmd.c	/^GetPermissionsAttribute(interp, objIndex, fileName/
+InitNotifier	tclUnixNotfy.c	/^InitNotifier()$/
+MakeFile	tclUnixPipe.c	/^#define MakeFile(fd) ((TclFile)(((int)fd)+1))$/
+MtclAppInit	tclAppInit.c	/^main(argc, argv)$/
+NotifierExitHandler	tclUnixNotfy.c	/^NotifierExitHandler(clientData)$/
+PipeBlockModeProc	tclUnixPipe.c	/^PipeBlockModeProc(instanceData, mode)$/
+PipeCloseProc	tclUnixPipe.c	/^PipeCloseProc(instanceData, interp)$/
+PipeGetHandleProc	tclUnixPipe.c	/^PipeGetHandleProc(instanceData, direction, handleP/
+PipeInputProc	tclUnixPipe.c	/^PipeInputProc(instanceData, buf, toRead, errorCode/
+PipeOutputProc	tclUnixPipe.c	/^PipeOutputProc(instanceData, buf, toWrite, errorCo/
+PipeWatchProc	tclUnixPipe.c	/^PipeWatchProc(instanceData, mask)$/
+PlatformInitExitHandler	tclUnixInit.c	/^PlatformInitExitHandler(clientData)$/
+RestoreSignals	tclUnixPipe.c	/^RestoreSignals()$/
+SetGroupAttribute	tclUnixFCmd.c	/^SetGroupAttribute(interp, objIndex, fileName, attr/
+SetOwnerAttribute	tclUnixFCmd.c	/^SetOwnerAttribute(interp, objIndex, fileName, attr/
+SetPermissionsAttribute	tclUnixFCmd.c	/^SetPermissionsAttribute(interp, objIndex, fileName/
+SetupStdFile	tclUnixPipe.c	/^SetupStdFile(file, type)$/
+TclChdir	tclUnixFile.c	/^TclChdir(interp, dirName)$/
+TclGetAndDetachPids	tclUnixPipe.c	/^TclGetAndDetachPids(interp, chan)$/
+TclGetCwd	tclUnixFile.c	/^TclGetCwd(interp)$/
+TclGetDefaultStdChannel	tclUnixChan.c	/^TclGetDefaultStdChannel(type)$/
+TclGetUserHome	tclUnixFile.c	/^TclGetUserHome(name, bufferPtr)$/
+TclGuessPackageName	tclLoadAout.c	/^TclGuessPackageName(fileName, bufPtr)$/
+TclLoadFile	tclLoadAout.c	/^TclLoadFile(interp, fileName, sym1, sym2, proc1Ptr/
+TclMatchFiles	tclUnixFile.c	/^TclMatchFiles(interp, separators, dirPtr, pattern,/
+TclPlatformInit	tclUnixInit.c	/^TclPlatformInit(interp)$/
+TclSetAppContext	tclXtNotify.c	/^TclSetAppContext(appContext)$/
+TclUnixWaitForFile	tclUnixChan.c	/^TclUnixWaitForFile(fd, mask, timeout)$/
+Tcl_AppInit	tclAppInit.c	/^Tcl_AppInit(interp)$/
+Tcl_CreateFileHandler	tclUnixNotfy.c	/^Tcl_CreateFileHandler(fd, mask, proc, clientData)$/
+Tcl_DeleteFileHandler	tclUnixNotfy.c	/^Tcl_DeleteFileHandler(fd)$/
+Tcl_FindExecutable	tclUnixFile.c	/^Tcl_FindExecutable(argv0)$/
+Tcl_GetHostName	tclUnixSock.c	/^Tcl_GetHostName()$/
+Tcl_GetOpenFile	tclUnixChan.c	/^Tcl_GetOpenFile(interp, string, forWriting, checkU/
+Tcl_Init	tclUnixInit.c	/^Tcl_Init(interp)$/
+Tcl_MakeFileChannel	tclUnixChan.c	/^Tcl_MakeFileChannel(handle, mode)$/
+Tcl_MakeTcpClientChannel	tclUnixChan.c	/^Tcl_MakeTcpClientChannel(sock)$/
+Tcl_OpenTcpClient	tclUnixChan.c	/^Tcl_OpenTcpClient(interp, port, host, myaddr, mypo/
+Tcl_OpenTcpServer	tclUnixChan.c	/^Tcl_OpenTcpServer(interp, port, myHost, acceptProc/
+Tcl_PidObjCmd	tclUnixPipe.c	/^Tcl_PidObjCmd(dummy, interp, objc, objv)$/
+Tcl_SetTimer	tclUnixNotfy.c	/^Tcl_SetTimer(timePtr)$/
+Tcl_Sleep	tclUnixEvent.c	/^Tcl_Sleep(ms)$/
+Tcl_SourceRCFile	tclUnixInit.c	/^Tcl_SourceRCFile(interp)$/
+Tcl_WaitForEvent	tclUnixNotfy.c	/^Tcl_WaitForEvent(timePtr)$/
+Tcl_WaitPid	tclUnixPipe.c	/^Tcl_WaitPid(pid, statPtr, options)$/
+TclpCloseFile	tclUnixPipe.c	/^TclpCloseFile(file)$/
+TclpCopyDirectory	tclUnixFCmd.c	/^TclpCopyDirectory(src, dst, errorPtr)$/
+TclpCopyFile	tclUnixFCmd.c	/^TclpCopyFile(src, dst)$/
+TclpCreateCommandChannel	tclUnixPipe.c	/^TclpCreateCommandChannel(readFile, writeFile, erro/
+TclpCreateDirectory	tclUnixFCmd.c	/^TclpCreateDirectory(path)$/
+TclpCreatePipe	tclUnixPipe.c	/^TclpCreatePipe(readPipe, writePipe)$/
+TclpCreateProcess	tclUnixPipe.c	/^TclpCreateProcess(interp, argc, argv, inputFile, o/
+TclpCreateTempFile	tclUnixPipe.c	/^TclpCreateTempFile(contents, namePtr)$/
+TclpDeleteFile	tclUnixFCmd.c	/^TclpDeleteFile(path) $/
+TclpGetClicks	tclUnixTime.c	/^TclpGetClicks()$/
+TclpGetSeconds	tclUnixTime.c	/^TclpGetSeconds()$/
+TclpGetTime	tclUnixTime.c	/^TclpGetTime(timePtr)$/
+TclpGetTimeZone	tclUnixTime.c	/^TclpGetTimeZone (currentTime)$/
+TclpListVolumes	tclUnixFCmd.c	/^TclpListVolumes(interp)$/
+TclpMakeFile	tclUnixPipe.c	/^TclpMakeFile(channel, direction)$/
+TclpOpenFile	tclUnixPipe.c	/^TclpOpenFile(fname, mode)$/
+TclpOpenFileChannel	tclUnixChan.c	/^TclpOpenFileChannel(interp, fileName, modeString, /
+TclpRemoveDirectory	tclUnixFCmd.c	/^TclpRemoveDirectory(path, recursive, errorPtr) $/
+TclpRenameFile	tclUnixFCmd.c	/^TclpRenameFile(src, dst)$/
+TclplatformtestInit	tclUnixTest.c	/^TclplatformtestInit(interp)$/
+Tclxttest_Init	tclXtTest.c	/^Tclxttest_Init(interp)$/
+TcpAccept	tclUnixChan.c	/^TcpAccept(data, mask)$/
+TcpBlockModeProc	tclUnixChan.c	/^TcpBlockModeProc(instanceData, mode)$/
+TcpCloseProc	tclUnixChan.c	/^TcpCloseProc(instanceData, interp)$/
+TcpGetHandleProc	tclUnixChan.c	/^TcpGetHandleProc(instanceData, direction, handlePt/
+TcpGetOptionProc	tclUnixChan.c	/^TcpGetOptionProc(instanceData, interp, optionName,/
+TcpInputProc	tclUnixChan.c	/^TcpInputProc(instanceData, buf, bufSize, errorCode/
+TcpOutputProc	tclUnixChan.c	/^TcpOutputProc(instanceData, buf, toWrite, errorCod/
+TcpWatchProc	tclUnixChan.c	/^TcpWatchProc(instanceData, mask)$/
+TestFileHandlerProc	tclUnixTest.c	/^static void TestFileHandlerProc(clientData, mask)$/
+TestalarmCmd	tclUnixTest.c	/^TestalarmCmd(clientData, interp, argc, argv)$/
+TesteventloopCmd	tclXtTest.c	/^TesteventloopCmd(clientData, interp, argc, argv)$/
+TestfilehandlerCmd	tclUnixTest.c	/^TestfilehandlerCmd(clientData, interp, argc, argv)/
+TestfilewaitCmd	tclUnixTest.c	/^TestfilewaitCmd(clientData, interp, argc, argv)$/
+TestfindexecutableCmd	tclUnixTest.c	/^TestfindexecutableCmd(clientData, interp, argc, ar/
+TestgetopenfileCmd	tclUnixTest.c	/^TestgetopenfileCmd(clientData, interp, argc, argv)/
+TestgotsigCmd	tclUnixTest.c	/^TestgotsigCmd(clientData, interp, argc, argv)$/
+TimerProc	tclXtNotify.c	/^TimerProc(data, id)$/
+TraversalCopy	tclUnixFCmd.c	/^TraversalCopy(src, dst, sbPtr, type, errorPtr) $/
+TraversalDelete	tclUnixFCmd.c	/^TraversalDelete(src, ignore, sbPtr, type, errorPtr/
+TraverseUnixTree	tclUnixFCmd.c	/^TraverseUnixTree(traverseProc, sourcePtr, targetPt/
+TtyGetAttributes	tclUnixChan.c	/^TtyGetAttributes(fd, ttyPtr)$/
+TtyGetBaud	tclUnixChan.c	/^#   define TtyGetBaud(speed)   ((int) (speed))$/
+TtyGetOptionProc	tclUnixChan.c	/^TtyGetOptionProc(instanceData, interp, optionName,/
+TtyGetSpeed	tclUnixChan.c	/^#   define TtyGetSpeed(baud)   ((unsigned) (baud))/
+TtyInit	tclUnixChan.c	/^TtyInit(fd)$/
+TtyParseMode	tclUnixChan.c	/^TtyParseMode(interp, mode, speedPtr, parityPtr, da/
+TtySetAttributes	tclUnixChan.c	/^TtySetAttributes(fd, ttyPtr)$/
+TtySetOptionProc	tclUnixChan.c	/^TtySetOptionProc(instanceData, interp, optionName,/
+UnlinkSymbolTable	tclLoadAout.c	/^UnlinkSymbolTable ()$/
+WaitForConnect	tclUnixChan.c	/^WaitForConnect(statePtr, errorCodePtr)$/
+caterr	tclLoadAix.c	/^static void caterr(char *s)$/
+dlclose	tclLoadAix.c	/^int dlclose(void *handle)$/
+dlerror	tclLoadAix.c	/^char *dlerror(void)$/
+dlopen	tclLoadAix.c	/^VOID *dlopen(const char *path, int mode)$/
+dlsym	tclLoadAix.c	/^VOID *dlsym(void *handle, const char *symbol)$/
+findMain	tclLoadAix.c	/^static void * findMain(void)$/
+matherr	tclMtherr.c	/^matherr(xPtr)$/
+readExports	tclLoadAix.c	/^static int readExports(ModulePtr mp)$/
+terminate	tclLoadAix.c	/^static void terminate(void)$/

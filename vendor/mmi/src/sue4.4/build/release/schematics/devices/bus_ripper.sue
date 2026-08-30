@@ -1,0 +1,78 @@
+# Used to rip buses.
+# Don't modify this in SUE and save or you will lose the "bus_rip" procedure.
+
+proc ICON_bus_ripper args {
+  icon_setup $args {{origin {0 0}} {orient R0} {rip {}}}
+  icon_term -type output -origin {20 0} -name out
+  icon_term -type input -origin {-20 0} -name in
+  icon_property -origin {-220 140} -type fixed -name verilog -text {\tassign $out = \\{[bus_rip $rip $in]\\}\;}
+  icon_property -origin {-220 160} -type fixed -name spice -text {[spice_rip $out $rip $in]}
+  icon_property -origin {-220 180} -type fixed -name primitive -text 1
+  icon_property -origin {-120 80} -type user -name rip
+  icon_line -20 -10 -20 10 20 10 20 -10 -20 -10
+  icon_line -10 0 10 -10
+  icon_line -10 0 10 10
+  icon_property -origin {0 -30} -anchor center -label {$rip}
+}
+
+
+# special bus_rip procedure
+# returns a comma separated list of bits from the input bus that match
+# the pattern in "name".  For example:
+
+#        rip [3:0:2] a[3:0]
+#        --> a[2],a[0]
+#        rip [3:1:2] a[3:0]
+#        --> a[3],a[1]
+
+proc bus_rip {name bus} {
+
+  # lose the square brackets if any, and get values
+  setl {end start step} [split [string trim $name {[]}] :]
+
+  if {$step == "" || $step == 0} {
+    puts "bus_ripper ERROR: bad name \"$name\".  Must be of the form \[<end>:<start>:<step>\]"
+    return ""
+  }
+
+  # get the rootname of the bus
+  set root [lindex [split $bus \[] 0]
+
+  set result ""
+  # build up the result
+  for {set i $start} {$i <= $end} {incr i $step} {
+    lappend result "$root\[$i\]"
+  }
+
+  # return separated by commas
+  return [join [lreverse $result] ,]
+}
+
+
+
+# like bus_rip but for spice netlisting.
+
+proc spice_rip {out name bus} {
+
+  # lose the square brackets if any, and get values
+  setl {end start step} [split [string trim $name {[]}] :]
+
+  if {$step == "" || $step == 0} {
+    puts "bus_ripper ERROR: bad name \"$name\".  Must be of the form \[<end>:<start>:<step>\]"
+    return ""
+  }
+
+  # get the rootname of the bus
+  set root [lindex [split $bus \[] 0]
+  set out_list [bus_expand $out]
+
+  set result ""
+  # build up the result
+  for {set i $start} {$i <= $end} {incr i $step} {
+    lappend result "[unique_name V assign] [lindex $out_list 0] $root\[$i\] 0V"
+    set out_list [lrange $out_list 1 end]
+  }
+
+  # return separated by return characters
+  return [join $result \n]
+}

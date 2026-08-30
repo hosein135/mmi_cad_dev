@@ -69,11 +69,13 @@ install_bin "$ROOT/src/sue4.4/bin.linux/sue_tee" "$bindir/sue_tee"
 
 if [ -x "$ROOT/src/utils/bin.x86_64-linux/tclsh" ]; then
   install_bin "$ROOT/src/utils/bin.x86_64-linux/tclsh" "$bindir/mmi_tclsh"
-  ln -sfn mmi_tclsh "$bindir/mmi_tclsh.8.0"
+  cp -f "$bindir/mmi_tclsh" "$bindir/mmi_tclsh.8.0"
+  chmod +x "$bindir/mmi_tclsh.8.0"
 fi
 if [ -x "$ROOT/src/utils/bin.x86_64-linux/wish" ]; then
   install_bin "$ROOT/src/utils/bin.x86_64-linux/wish" "$bindir/mmi_wish"
-  ln -sfn mmi_wish "$bindir/mmi_wish.8.0"
+  cp -f "$bindir/mmi_wish" "$bindir/mmi_wish.8.0"
+  chmod +x "$bindir/mmi_wish.8.0"
 fi
 
 cat > "$bindir/sue" << 'EOF'

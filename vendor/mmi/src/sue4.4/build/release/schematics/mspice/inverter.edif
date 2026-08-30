@@ -1,0 +1,222 @@
+(edif SUE_EDIF_inverter
+  (edifVersion 2 0 0) (edifLevel 0)
+  (keywordMap (keywordLevel 0))
+  (library inverter
+    (edifLevel 0)
+    (technology
+      (numberDefinition)
+      (figureGroup device (visible (true)))
+      (figureGroup wire (visible (true)))
+      (figureGroup pin (visible (true)))
+      (figureGroup annotate (visible (true)))
+    )
+    (cell global (cellType GENERIC)
+      (view symbol (viewType SCHEMATIC)
+        (interface
+          (port DOLLAR_NAME
+            (direction OUTPUT)
+          )
+          (symbol
+            (boundingBox (rectangle (pt -60 20) (pt 270 -80)))
+            (figure device (path (pointList (pt 0 0) (pt 0 -5) (pt 0 5) (pt 0 0) (pt 5 0) (pt -5 0) )))
+            (figure device (path (pointList (pt 0 0) (pt 0 -10) (pt -20 -10) (pt 20 -10) )))
+            (commentGraphics (annotate
+              (stringDisplay "$name"
+                (display annotate (justify CENTERCENTER) (orientation R0) (origin (pt 0 -20))))))
+            (property comment (string " 1"))
+            (portImplementation DOLLAR_NAME (connectLocation (figure pin (dot (pt 0 0))))  )
+          )
+        )
+      )
+    )
+    (cell nmos (cellType GENERIC)
+      (view symbol (viewType SCHEMATIC)
+        (interface
+          (port d
+            (direction INOUT)
+          )
+          (port s
+            (direction INOUT)
+          )
+          (port g
+            (direction INPUT)
+          )
+          (symbol
+            (boundingBox (rectangle (pt -190 50) (pt 740 -310)))
+            (figure device (path (pointList (pt 0 0) (pt 0 -5) (pt 0 5) (pt 0 0) (pt 5 0) (pt -5 0) )))
+            (figure device (path (pointList (pt -60 0) (pt -30 0) (pt -30 20) (pt -30 -20) (pt -34 -12) )))
+            (figure device (path (pointList (pt 0 -40) (pt 0 -20) (pt -20 -20) (pt -20 20) (pt 0 20) (pt 0 40) )))
+            (commentGraphics (annotate
+              (stringDisplay "$W"
+                (display annotate (justify CENTERLEFT) (orientation R0) (origin (pt 10 10))))))
+            (property comment (string " {[if {$L != %34%ln_min%34%} {set L}]}"))
+            (property comment (string " {[if {$model != %34%n%34%} {set model}]}"))
+            (portImplementation d (connectLocation (figure pin (dot (pt 0 40))))  )
+            (portImplementation s (connectLocation (figure pin (dot (pt 0 -40))))  )
+            (portImplementation g (connectLocation (figure pin (dot (pt -60 0))))  )
+          )
+        )
+        (property M (string "{}"))
+        (property W (string "1"))
+        (property L (string "ln_min"))
+        (property spice (string "-type fixed -name spice -text {[unique_name M $name] $d $g $s gnd $model W='$W*1u' L=$L 
++ ad='arean($W,sdd)' as='arean($W,sdd)' pd='perin($W,sdd)' ps='perin($W,sdd)'}"))
+        (property verilog (string "-type fixed -name verilog -text {nmos [unique_name %34%%34% $name n]($d,$s,$g)\;}"))
+        (property sim (string "-type fixed -name sim -text {n $g $s $d [sim_size $L] [sim_size $W 1.0e-6]}"))
+        (property model (string "n"))
+      )
+    )
+    (cell pmos (cellType GENERIC)
+      (view symbol (viewType SCHEMATIC)
+        (interface
+          (port d
+            (direction INOUT)
+          )
+          (port s
+            (direction INOUT)
+          )
+          (port g
+            (direction INPUT)
+          )
+          (symbol
+            (boundingBox (rectangle (pt -180 50) (pt 740 -320)))
+            (figure device (path (pointList (pt 0 0) (pt 0 -5) (pt 0 5) (pt 0 0) (pt 5 0) (pt -5 0) )))
+            (figure device (path (pointList (pt -60 0) (pt -50 0) )))
+            (figure device (path (pointList (pt -30 20) (pt -30 -20) (pt -34 -12) )))
+            (figure device (path (pointList (pt 0 -40) (pt 0 -20) (pt -20 -20) (pt -20 20) (pt 0 20) (pt 0 40) )))
+            (figure device (circle (pt -50 0) (pt -30 0)))
+            (commentGraphics (annotate
+              (stringDisplay "$W"
+                (display annotate (justify CENTERLEFT) (orientation R0) (origin (pt 10 10))))))
+            (property comment (string " {[if {$L != %34%lp_min%34%} {set L}]}"))
+            (property comment (string " {[if {$model != %34%p%34%} {set model}]}"))
+            (portImplementation d (connectLocation (figure pin (dot (pt 0 -40))))  )
+            (portImplementation s (connectLocation (figure pin (dot (pt 0 40))))  )
+            (portImplementation g (connectLocation (figure pin (dot (pt -60 0))))  )
+          )
+        )
+        (property M (string "{}"))
+        (property W (string "2"))
+        (property L (string "lp_min"))
+        (property spice (string "-type fixed -name spice -text {[unique_name M $name] $d $g $s vdd $model W='$W*1u' L=$L 
++ ad='areap($W,sdd)' as='areap($W,sdd)' pd='perip($W,sdd)' ps='perip($W,sdd)'}"))
+        (property verilog (string "-type fixed -name verilog -text {pmos [unique_name %34%%34% $name p]($d,$s,$g)\;}"))
+        (property sim (string "-type fixed -name sim -text {p $g $s $d [sim_size $L] [sim_size $W 1.0e-6]}"))
+        (property model (string "p"))
+      )
+    )
+    (cell inverter (cellType GENERIC)
+      (view symbol (viewType SCHEMATIC)
+        (interface
+          (port in
+            (direction INPUT)
+          )
+          (port out
+            (direction OUTPUT)
+          )
+          (symbol
+            (boundingBox (rectangle (pt -90 40) (pt 750 -220)))
+            (figure device (path (pointList (pt 0 0) (pt 0 -5) (pt 0 5) (pt 0 0) (pt 5 0) (pt -5 0) )))
+            (figure device (path (pointList (pt -30 30) (pt -30 -30) (pt 30 0) (pt -30 30) )))
+            (figure device (circle (pt 30 0) (pt 50 0)))
+            (property comment (string " {P:$WP[if {$LP != %34%lp_min%34%} {list /$LP}]}"))
+            (property comment (string " {N:$WN[if {$LN != %34%ln_min%34%} {list /$LN}]}"))
+            (portImplementation in (connectLocation (figure pin (dot (pt -30 0))))  )
+            (portImplementation out (connectLocation (figure pin (dot (pt 50 0))))  )
+          )
+        )
+        (property M (string "{}"))
+        (property WP (string "2"))
+        (property LP (string "lp_min"))
+        (property WN (string "1"))
+        (property LN (string "ln_min"))
+        (property delay (string "0"))
+        (property verilog (string "-type fixed -name verilog -text {not \#$delay [unique_name %34%%34% $name inv]\($out, $in\)\;}"))
+        (contents
+          (page PAGE1
+            (portImplementation in
+              (connectLocation (figure pin (dot (pt 450 -280))))
+            )
+            (portImplementation out
+              (connectLocation (figure pin (dot (pt 570 -280))))
+            )
+            (instance GLOBAL_1_gnd
+              (viewRef symbol (cellRef global))
+              (transform (orientation R0) (origin (pt 550 -400)))
+            )
+            (instance GLOBAL_2_vdd
+              (viewRef symbol (cellRef global))
+              (transform (orientation MX) (origin (pt 550 -160)))
+            )
+            (instance THING_3
+              (viewRef symbol (cellRef nmos))
+              (transform (orientation R0) (origin (pt 550 -360)))
+              (property W (string "WN"))
+              (property L (string "LN"))
+            )
+            (instance THING_4
+              (viewRef symbol (cellRef pmos))
+              (transform (orientation R0) (origin (pt 550 -200)))
+              (property W (string "WP"))
+              (property L (string "LP"))
+            )
+            (instance THING_5
+              (viewRef symbol (cellRef inverter))
+              (transform (orientation R0) (origin (pt 750 -280)))
+            )
+            (net THING_8
+              (joined
+                (portRef in (instanceRef THING_5))
+              )
+            )
+            (net THING_9
+              (joined
+                (portRef out (instanceRef THING_5))
+              )
+            )
+            (net gnd
+              (joined
+                (portRef gnd (instanceRef GLOBAL_1_gnd))
+                (portRef s (instanceRef THING_3))
+              )
+            )
+            (net in
+              (joined
+                (portRef g (instanceRef THING_3))
+                (portRef g (instanceRef THING_4))
+                (portRef in)
+              )
+              (figure wire (path (pointList (pt 470 -200) (pt 490 -200))))
+              (figure wire (path (pointList (pt 470 -360) (pt 490 -360))))
+              (figure wire (path (pointList (pt 450 -280) (pt 470 -280))))
+              (figure wire (path (pointList (pt 470 -280) (pt 470 -360))))
+              (figure wire (path (pointList (pt 470 -280) (pt 470 -200))))
+            )
+            (net out
+              (joined
+                (portRef d (instanceRef THING_3))
+                (portRef d (instanceRef THING_4))
+                (portRef out)
+              )
+              (figure wire (path (pointList (pt 550 -280) (pt 570 -280))))
+              (figure wire (path (pointList (pt 550 -280) (pt 550 -240))))
+              (figure wire (path (pointList (pt 550 -280) (pt 550 -320))))
+            )
+            (net vdd
+              (joined
+                (portRef vdd (instanceRef GLOBAL_2_vdd))
+                (portRef s (instanceRef THING_4))
+              )
+            )
+            (commentGraphics (annotate
+              (stringDisplay "Inverter Primitive"
+                (display annotate (justify CENTERLEFT) (orientation R0) (origin (pt 430 -80))))))
+            (commentGraphics (annotate
+              (stringDisplay "Schematic generated from inverter"
+                (display (figureGroupOverride annotate (textHeight 15)) (justify CENTERLEFT) (orientation R0) (origin (pt 396 -19))))))
+          )
+        )
+      )
+    )
+  )
+)

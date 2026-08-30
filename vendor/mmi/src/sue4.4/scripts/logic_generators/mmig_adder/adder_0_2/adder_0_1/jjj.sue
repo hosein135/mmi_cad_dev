@@ -1,0 +1,21 @@
+# SUE version MMI_SUE4.0
+
+proc SCHEMATIC_jjj {} {
+  make output -orient R270 -name cout_h -origin {460 220}
+  make input -orient R270 -name cin_h -origin {460 500}
+  generate adder adder72_CarrySelect_32_40_C_Y -NBITS 72 -Partition {32 40}
+  make adder72_CarrySelect_32_40_C_Y -origin {460 360}
+  make input -name {a_h[71:0]} -origin {320 330}
+  make input -name {b_h[71:0]} -origin {320 390}
+  make output -name {sum_h[71:0]} -origin {570 360}
+  make input -name {inject_h[1:0]} -origin {320 410}
+  make input -name {c_h[1:0]} -origin {320 430}
+  make_wire 510 360 570 360
+  make_wire 460 290 460 220
+  make_wire 460 430 460 500
+  make_wire 320 390 410 390
+  make_wire 320 330 410 330
+  make_wire 320 410 410 410
+  make_wire 320 430 410 430
+}
+

@@ -1,0 +1,81 @@
+#!/bin/csh -f
+
+# Copyright (c) 1999, Micro Magic, Inc.
+
+# Creates max technology files from a gds file and loads gds under
+# that technology file.  
+
+if ("$1" == "" || "$1" == "-h" || "$1" == "-help") then
+  echo ""
+  echo "Usage: gds_input [-file <source_file>] [-tech <name>] <gds_file> [-rebuild]"
+  echo ""
+  echo "where <gds_file> is the full pathname to the gds file to be loaded."
+  echo ""
+  echo 'If you specify "-rebuild" then uses your modified "source file".'
+  echo 'The source file defaults to "tech.source" and technology defaults to "tech".'
+  echo ""
+  exit
+endif
+
+
+# Gather the command line switches and variables.
+
+# default technology name is test
+set tech = ""
+set rebuild = 0
+set source = tech.source
+set gdsfile = ""
+
+while (${#argv})
+    switch($argv[1])
+	case -rebuild:
+		set rebuild = 1
+		breaksw
+	case -tech:
+		shift
+		set tech = $argv[1]
+		breaksw
+	case -file:
+		shift
+		set source = $argv[1]
+		breaksw
+	default:
+		set gdsfile = $argv[1]
+	breaksw
+    endsw
+    shift
+end
+
+if ("$gdsfile" == "") then
+  echo ""
+  echo "Aborting, must supply a gds input file."
+  echo ""
+  exit
+endif
+
+if ("$tech" == "") then
+  # get the basename of the source file for the default tech
+  set tech = `basename $source .source`
+endif
+
+echo "Setting up to load GDS file $gdsfile ..."
+
+if ($rebuild == 0) then
+  # backup existing source file if any
+  cp -p $source $source.BAK >& /dev/null
+
+  # create a barebones layer file from the gds
+  echo "wm iconify .win1 ; format_gds_layers $gdsfile $source ; mn_exit" | max
+else
+endif
+
+# make_tech must be in the path
+make_tech -r -file $source -tech $tech
+if ($status == 1) then
+    # choke, end
+    exit 0
+endif
+
+max -tech $tech $gdsfile
+
+exit 1

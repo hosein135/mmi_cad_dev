@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 17:42:00">
+<title>Properties And Generators</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> SUE Design Manager User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_chap2_wires-bus.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_chap4_netlisting.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 3 </font>
+</h2>
+
+
+<h1>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Properties And Generators</font>
+</h1><hr>
+
+
+<h3>
+  <a name="1023324"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Parameterized Icons</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023326"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE provides a simple, graphical means of creating simple generators (called <em class="Emphasis">parameterized</em> <em class="Emphasis">icons</em>). This mechanism allows any user to add user definable properties to icons by simply adding special text lines to the icon. Just push into any of the included icons to see examples of how this is done. </font>
+<p>
+<p>
+  <dt> <a name="1023329"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Parameterized icons are restricted to only being able to change the text displayed in an instantiated icon and pass properties to the netlister, as a function of changing parameter values. You can't make structural changes to the icons such as adding or deleting I/O's or change the icon shape. If you need the additional features, you need to build REAL SUE generators (see below) in which you write a <b><strong class="Strong">Tcl</strong></b> program to build an icon/schematic from the parameters given. For example, If you wanted to be able to have an icon property -- say <i><strong class="StrongItalic">fanin</strong></i> -- that changed a two input nand gate into a three or higher input nand gate, then you need to write a generator. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1023331"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Defining Properties</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023332"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Defining parameters in cells and telling SUE how to netlist them is as easy as adding text to the icon view of the cell. Any text in an icon view of a cell that doesn't start with a dash (<b><strong class="Strong">-</strong></b>) becomes part of the icon "picture" and is displayed when the icon is instantiated into a schematic. Any text starting with a dash is a property definition and is not displayed when the icon is instantiated. </font>
+<p>
+<p>
+  <dt> <a name="1023337"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Properties come in five flavors, denoted types, which are: "<b><strong class="Strong">user</strong></b>", "<i><strong class="StrongItalic">fixed</strong></i>", "<i><strong class="StrongItalic">auto</strong></i>", "<i><strong class="StrongItalic">text</strong></i>", and "<i><strong class="StrongItalic">comment</strong></i>". <i><strong class="StrongItalic">Text</strong></i> properties are the default. <i><strong class="StrongItalic">User</strong></i> properties will appear in the <font  face="Verdana, Arial, Helvetica, sans-serif"><b>Property Edit </b></font>menu of an instantiated icon. To define a new <i><strong class="StrongItalic">user</strong></i> property, simply add the following text line to an icon: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type user -name &lt;name of property&gt; [-default &lt;default value for prop.&gt;]</font><a name="1023340"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">[-choices {[radio|choice|popup|binary] &lt;choice1&gt; &lt;choice2&gt; ...}]</font><a name="1023341"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1023342"> </a>
+      </pre>
+<p>
+  <dt> <a name="1023343"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If the default value is "" (in other words, the empty list, or null) then the <b><code class="CodeStrong">-default ...</code></b> string can be omitted. The optional <b><code class="CodeStrong">choices</code></b> keyword allows you to help the user by providing a list of choices for the option. For example, if you wanted to make an <b><code class="CodeStrong">nfet</code></b> icon and give the user a choice of three different SPICE models, you might add the following property: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type user -name model -default n -choices {n n_io nlv}</font><a name="1023344"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023345"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023346"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The exact behavior of this property depends on the setting of the SUE variable <b><strong class="Strong">DEFAULT_PROP_MENU_TYPE </strong></b>which is set in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file. This variable can be either <i><strong class="StrongItalic">radio</strong></i>, <i><strong class="StrongItalic">choice</strong></i>, or <i><strong class="StrongItalic">popup</strong></i>, with the following results: </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1023348"> </a><b><strong class="Strong">radio</strong></b> - provides a set of radio buttons for the user to click. No other choices are possible. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1023349"> </a><b><strong class="Strong">popup</strong></b> - provides the list of choices that the user can click on and choose between OR the user can add their own value. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1023350"> </a><b><strong class="Strong">choice</strong></b> - is like popup but the user is restricted to the choices provided. </font>
+</p>   </ol>
+<p>
+  <dt> <a name="1023351"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you want a specific behavior, just add the behavior to the beginning of the list of choices. Don't worry, the behavior won't show up as a choice. For example, if you wanted the user to see the nfet models as radio buttons, just modify the above line to be: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type user -name model -default n -choices {radio n n_io nlv}</font><a name="1023352"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023353"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023354"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The final type of behavior is called <b><strong class="Strong">binary</strong></b>. This behavior is useful if a property only has two choices: 1 (on) or 0 (off). This can't be the default behavior since it is restricted to either on or off. If you have a property called <b><code class="CodeStrong">verbose</code></b>, for example, you might use the binary choice: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type user -name verbose -default 0 -choices binary</font><a name="1023355"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1024005"> </a>
+      </pre>
+      </pre>
+     <pre> <font face="Usherwood Book">SUMMARY: </font><a name="1023356"> </a>    </pre>
+<p>
+  <dt> <a name="1023357"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Text lines in icons are understood to be property definitions if their first character is a "-", so don't start a piece of text with a "-" unless you really want to add a property. </font>
+<p>
+<p>
+  <dt> <a name="1023358"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Property definitions are not displayed when the icon is instantiated. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1023359"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Default Properties in New Icons</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023361"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you ask SUE to make a new icon, either by the <b><code class="CodeStrong">new icon</code></b> command in the <font  face="Verdana, Arial, Helvetica, sans-serif"><b>File</b></font> menu or by the <b><code class="CodeStrong">make other view </code></b>command in the <b><code class="CodeStrong">View</code></b> menu from a schematic, SUE will automatically add certain default properties to the icon. These defaults are contained in the <b><strong class="Strong">D</strong></b><b><strong class="Strong">EFAULT_PROPERTIES</strong></b> variable in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file. Typical defaults are for the name, spice "<i><strong class="StrongItalic">m</strong></i>" or <i><strong class="StrongItalic">multiplier</strong></i>, and DPC properties, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DEFAULT_PROPERTIES {{-type user -name name} {-type user -name M} {-type user -name dpc}}</font><a name="1023367"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1023369"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Displaying Properties</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023370"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you have defined a property, you can display it with a text string (no "-") which contains the property name prefixed with a <b><code class="CodeStrong">"$"</code></b>. So if you created an nfet icon with the properties <b><code class="CodeStrong">"W"</code></b> and <b><code class="CodeStrong">"L"</code></b>, you could display them in the icon with, for example, <b><code class="CodeStrong">$W/$L</code></b>. The dollar sign syntax is, <i><strong class="StrongItalic">surprise</strong></i>, the same syntax which is used in <b><strong class="Strong">Tcl</strong></b>. </font>
+<p>
+<p>
+  <dt> <a name="1023372"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that any properties included in the <b><strong class="Strong">DISPLAY_PROPS</strong></b> variable as set in the <b><strong class="Strong">.</strong></b><b><strong class="Strong">suerc</strong></b> file will automatically be displayed on every instantiated icon. These properties can be displayed in any one of the following locations on the icon: </font>
+<p>
+<ol type="1"><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023373"> </a><b><strong class="Strong">c</strong></b> - the center of the icon  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023374"> </a><b><strong class="Strong">ul</strong></b> - the upper left hand corner of the icon  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023375"> </a><b><strong class="Strong">ll</strong></b> - the lower left hand corner of the icon  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023376"> </a><b><strong class="Strong">ur</strong></b> - the upper right hand corner of the icon  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1023377"> </a><b><strong class="Strong">lr</strong></b> - the lower right hand corner of the icon  
+</li><p>
+</font>
+</ul></ul></ol>
+<p>
+  <dt> <a name="1023378"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All of these positions are with respect to an icon in the "R0" orientation and rotate and mirror with the icon. </font>
+<p>
+<p>
+  <dt> <a name="1023379"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Example:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DISPLAY_PROPS {{name ul} {M ur M=} {dpc ll "dpc "}}</font><a name="1023380"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023381"> </a>
+      </pre>
+      </pre>
+  <dl>
+<p> <dt> <a name="1023382"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">will place the icons name (or, the value of its <b><code class="CodeStrong">name</code></b> property) in the upper left hand side of the icon, its "<i><strong class="StrongItalic">M</strong></i>" property in the upper right prefixed by "<b><code class="CodeStrong">M=</code></b>", etc. </font>
+<p>  </dl>
+<p>
+  <dt> <a name="1023383"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If any of the properties in the <b><strong class="Strong">DISPLAY_PROPS</strong></b> variable are specifically added to the icon, as for example, <b><code class="CodeStrong">$name</code></b> in the icon view of the cell, then the default placement will be ignored. Thus, if you don't like the automatic placement in only a few cells, you can manually pick a new spot and override it just on those icons. However, you cannot have a property in one place on one instance of an icon and in a different place on a different instance of the same icon. </font>
+<p>
+<p>
+  <dt> <a name="1023385"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">All text gets run through the <b><strong class="Strong">Tcl</strong></b> parser and thus we must be careful not to trip over any special <b><strong class="Strong">Tcl</strong></b> characters in any simple text. The [] (left and right square bracket) characters in <b><strong class="Strong">Tcl</strong></b> cause evaluation to occur; however, they are commonly used to delimit buses, for example <b><code class="CodeStrong">foo[3]</code></b> or <b><code class="CodeStrong">in[31:0]</code></b> in icons. Therefore, SUE automatically quotes the [] characters to make the common case of buses easier to use. SUE quotes more than just [], it actually quotes the characters "[]{}\ . </font>
+<p>
+<p>
+  <dt> <a name="1023386"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes you really want to do more that just evaluate variables, like calling procedures and evaluating complex expressions. In this case, you must use a slightly more complicated syntax. An example of this is in the nmos icon. We don't want to clutter up our schematics with nmos channel lengths since they are mostly minimum. Thus, we only want to display the channel length if it is different from minimum (which in this example is 0.6<font  face="Symbol">&#181;</font>m). So instead of a text line of just <b><code class="CodeStrong">$L</code></b> to display the channel length, we use: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-text {[if {$L != "0.6u"} {set L}]}</font><a name="1023387"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023388"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023389"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you use the <b><code class="CodeStrong">-text &lt;expression&gt;</code></b> syntax, SUE will not quote any special characters and thus the <b><strong class="Strong">Tcl</strong></b> parser can have a field day. For information on how to write crafty <b><strong class="Strong">Tcl</strong></b> commands to embed into SUE icons, consult the <b><strong class="Strong">Tcl</strong></b> book or the voluminous <b><strong class="Strong">Tcl</strong></b> man pages. </font>
+<p>
+<p>
+  <dt> <a name="1023390"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you make a mistake in creating property lines, the entire property will be ignored and a message displayed in the SUE command window when the icon is instantiated into a schematic or if this icon is already instantiated in a schematic when you go to that schematic and the icon must be "remade". Sometimes, the mistake will cause the entire icon to barf. Not to worry, just find your way back to the icon and fix it. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1023391"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Properties and Netlisting</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023393"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Parameterized icons are mostly useful when netlisting. For example, you don't just want to define the width (W) and length (L) of an nfet, you also want to pass it to the SPICE netlist. When netlisting, the netlister will first attempt to include the text which corresponds to the <b><strong class="Strong">NETLIST_PROP</strong></b> in the icon, if it is defined (see <i><strong class="StrongItalic">Chapter 3, "Netlisting, Simulation and Cross-probing"</strong></i>). Thus, to SPICE netlist the nfet, you might add: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type fixed -name spice -text {[unique_name M $name] $d $g $s gnd $model W=$W L=$L</font><a name="1023396"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023397"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023398"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><b><strong class="Strong">Fixed</strong></b> and <i><strong class="StrongItalic">auto</strong></i> types are useful for this. </font>
+<p>
+<p>
+  <dt> <a name="1023399"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <i><strong class="StrongItalic">auto</strong></i> type is special in that it will recreate itself when the icon changes. <i><strong class="StrongItalic">Auto</strong></i> types are created with <b><code class="CodeStrong">create verilog property</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. It is presently only defined for the Verilog properties. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1023402"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Comments</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023403"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Sometimes you want to remind the user of something only when they edit the icon view of the cell. The <b><strong class="Strong">comment</strong></b> type is set up for this purpose, for example, the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">-type comment -text {Please don't edit this icon}</font><a name="1023405"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023406"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023407"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">does nothing (or does it). </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1023410"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Generators</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1023411"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As you've probably figured out by now (especially if you looked at one of the <b><strong class="Strong">.sue</strong></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>files or carefully read this document), most things like schematics and icons are actually <b><strong class="Strong">Tcl</strong></b> procedures. Furthermore, the command line (i.e. the window from which you invoked SUE) is a <b><strong class="Strong">Tcl</strong></b> interpreter. So what are we getting at? You should be able to write generators (i.e. real <b><strong class="Strong">Tcl</strong></b> programs with loops and expressions, etc.) for icons and schematics. Unfortunately, this does not work transparently because of optimizations in SUE to make icons draw quickly. Remember, much of SUE is done in <b><strong class="Strong">Tcl</strong></b> which is basically interpreted and (sorry, John) pretty slow. To make the icons draw quickly, SUE "compiles" them into much simpler <b><strong class="Strong">Tcl</strong></b> code and then executes that code. This breaks generators. However, do not despair because... </font>
+<p>
+<p>
+  <dt> <a name="1023414"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Yes, Virginia, there are generators in SUE. A SUE generator takes arguments that can structurally change its icon and schematic (unlike parameterized icons) and create a new icon and schematic. Hence, for every generator, a multitude of cells can be generated, depending on the combinations of its arguments. </font>
+<p>
+<p>
+  <dt> <a name="1023415"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The cell with the default arguments has the same name as the <b><strong class="Strong">.</strong></b><b><strong class="Strong">sue</strong></b> file. Others need to have different names. For example, a nand generator might be called <b><code class="CodeStrong">nand2</code></b>, and be in the file <b><code class="CodeStrong">nand2.sue</code></b>, since its default arguments are for 2 inputs. The three input version would be called <b><code class="CodeStrong">nand3</code></b>, despite there not being a file called<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">nand3.sue</code></b>. This cell is derived from <b><code class="CodeStrong">nand2</code></b>, and if you look into a schematic that instantiates a <b><code class="CodeStrong">nand3</code></b> icon, you will see that the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">generate nand2 nand3 -ninputs 3</font><a name="1023416"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023417"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023418"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">must be added before calling any <b><code class="CodeStrong">nand3</code></b> icons. SUE will automatically add this line. </font>
+<p>
+<p>
+  <dt> <a name="1023419"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE will attempt to construct a unique name for the newly generated cell from the root of the generator and the concatenation of its non-nil arguments. <b><strong class="Strong"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/notewarning.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+</font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024529"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Changing generator argument names may cause unforeseen problems because they are referred to in already-existing schematics with the old argument names. Also, rearranging argument names may cause unforseen problems because SUE's unique names are based on the argument names and order. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</strong></b></font>
+<p>
+<p>
+  <dt> <a name="1023421"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you do not like the automatically-created generator name, you can define your own naming procedure for the generator. Just define a procedure called <b><code class="CodeStrong">NAME_&lt;generator&gt;</code></b> which takes the same arguments as the <b><code class="CodeStrong">ICON</code></b> and <b><code class="CodeStrong">SCHEMATIC</code></b> procedures and returns a unique name for that generator given a unique set of arguments.</font>
+<p>
+<p>
+  <dt> <a name="1023422"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">proc NAME_nor2 args {</font><a name="1027926"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">call_use_keyword $args {{ninputs 2} {name nor2}}</font><a name="1027930"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">return "nor$ninputs"</font><a name="1027931"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">}</font><a name="1027932"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027920"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><center>
+<p>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" cellpadding="10">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1024547"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This naming procedure must be in the same <b><code class="CodeStrong">.sue</code></b> file as the <b><code class="CodeStrong">ICON</code></b> procedure for its generator or it will be ignored. Also, names should not contain any special characters or spaces. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+
+
+</center>
+<p>
+</font>
+<p>
+<p>
+  <dt> <a name="1023425"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE icon and schematic procedures for non-generators consist of a list of commands (see<a href="SUE_chap6_fileformats.html#1013100"></a> <a href="SUE_chap6_fileformats.html#1013100"></a><a href="SUE_chap6_fileformats.html#1013100"></a><a href="SUE_chap6_fileformats.html#1013100"></a>Chapter 6, <a href="SUE_chap6_fileformats.html#1027023">SUE File Formats</a>) which each create a single object in the icon and schematic. A generator is a <b><strong class="Strong">Tcl</strong></b> program which, when executed, must create the same list of commands, but is not limited to just a simple list of those commands. Instead, any valid <b><strong class="Strong">Tcl</strong></b> program can be written to create those commands, including calling other procedures, reading files, looping, etc. This new icon and schematic then looks exactly like the standard parameterized ones and can be compiled by SUE just the same. </font>
+<p>
+<p>
+  <dt> <a name="1023426"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you make changes to non-generator icons and schematics inside SUE, SUE knows how to recreate their procedures, since they are simply a list of commands. Generators, on the other hand, are derived from possibly complex programs, and hence SUE cannot recreate them. Thus generators cannot be edited inside SUE. If you want to change a specific incantation of the cell (i.e. one with a specific set of arguments), you can SUE copy it to another name, and then modify it and save it out. If you attempt to directly edit a generator cell, SUE will warn you that it is ignoring the changes. </font>
+<p>
+<p>
+  <dt> <a name="1023427"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To tell if an instantiated icon is a generator or not, select it and look at the message window. For example, if you select a nand2, you might see: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">selected: nand2 (generator) R0 #65</font><a name="1023428"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023429"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023430"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">A generator has two sets of arguments. One set defines its structure, like its number of inputs. The other defines the specific properties of this instance of the icon, as, for example, its name or size. The first, or generator, set of inputs, can be changed by double clicking on this icon while holding the Shift key down. The second, or parameter set, can be changed by simply double-clicking on the icon. </font>
+<p>
+<p>
+  <dt> <a name="1023431"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example, the default cells <b><code class="CodeStrong">nor2</code></b> and <b><code class="CodeStrong">nand2</code></b> are both generators. They both have an input called <b><code class="CodeStrong">ninputs</code></b> which can be used to change these gates to have an arbitrary number of inputs. So to create a 4-input CMOS nand gate, <b><strong class="Strong">Shift-double-click</strong></b> on the <b><code class="CodeStrong">nand2</code></b> icon in a schematic, then change the <b><code class="CodeStrong">ninputs</code></b> field from 2 to 4, and it is done. Oh, and remember to push into the new icon. You will see that the schematic changed, too! </font>
+<p>
+<p>
+  <dt> <a name="1023432"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to create an icon generator, you must add the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">icon_generator $args {{ninputs 2}} </font><a name="1023434"> </a>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier"></font><a name="1023435"> </a>
+      </pre>
+      </pre>
+<p>
+  <dt> <a name="1023436"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">as the first line of the icon where<font  face="Verdana, Arial, Helvetica, sans-serif"> </font><b><code class="CodeStrong">{{ninputs 2}}</code></b> should be replaced with a list of lists of argument-default pairs of your choosing. </font>
+<p>
+<p>
+  <dt> <a name="1023437"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The associated schematic procedure must be modified from: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">proc SCHEMATIC_&lt;cell_name&gt; {} { 
+</font><a name="1023438"> </a>
+      </pre>
+<p>
+  <dt> <a name="1023440"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">to: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">proc SCHEMATIC_&lt;cell_name&gt; args { </font><a name="1023441"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">call_use_keyword $args {{ninputs 2} {name nor2}} </font><a name="1027933"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1027934"> </a>
+      </pre>
+<p>
+  <dt> <a name="1023443"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Where <b><code class="CodeStrong">{{ninputs 2} {name nor2}}</code></b> should be replaced with any arguments that need to be used in the schematic. Don't forget the "<b><code class="CodeStrong">args</code></b>" in the procedure definition. Look at the <b><code class="CodeStrong">nand2</code></b> and <b><code class="CodeStrong">nor2</code></b> examples if you are considering making your own generators. Good luck. </font>
+<p>
+<p>
+  <dt> <a name="1014140"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="SUE_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_chap2_wires-bus.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_chap4_netlisting.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

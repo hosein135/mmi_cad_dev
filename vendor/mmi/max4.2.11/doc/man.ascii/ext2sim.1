@@ -1,0 +1,132 @@
+
+
+
+EXT2SIM(1)					       EXT2SIM(1)
+
+
+NAME
+       ext2sim	-  convert  hierarchical ext(5) extracted-circuit
+       files to flat sim(5) files
+
+SYNOPSIS
+       ext2sim [ -a aliasfile ] [ -l labelsfile ] [ -o simfile	]
+       [  -A  ]	 [ -B ] [ -F ] [ -L ] [ -t ] [ extcheck-options ]
+       root
+
+
+DESCRIPTION
+       Ext2sim will convert an extracted circuit from the hierar-
+       chical ext(5) representation produced by Magic to the flat
+       sim(5) representation required by many  simulation  tools.
+       The root of the tree to be extracted is the file root.ext;
+       it and all the files it references are  recursively  flat-
+       tened.  The result is a single, flat representation of the
+       circuit that is written to the file root.sim,  a	 list  of
+       node  aliases  written  to the file root.al, and a list of
+       the locations of all nodenames in CIF format, suitable for
+       plotting,  to  the  file root.nodes.  The file root.sim is
+       suitable	 for  use  with	 programs  such	 as   crystal(1),
+       esim(1), or sim2spice(1).
+
+       The following options are recognized:
+
+       -a aliasfile
+		 Instead  of  leaving  node  aliases  in the file
+		 root.al, leave it in aliasfile.
+
+       -l labelfile
+		 Instead of leaving a CIF file with the locations
+		 of  all node names in the file root.nodes, leave
+		 it in labelfile.
+
+       -o outfile
+		 Instead of leaving output in the file	root.sim,
+		 leave it in outfile.
+
+       -A	 Don't produce the aliases file.
+
+       -B	 Don't	output	transistor  or node attributes in
+		 the .sim file.	 This option  will  also  disable
+		 the  output  of information such as the area and
+		 perimeter of source and drain diffusion and  the
+		 fet  substrate.  For  compatibitlity reasons the
+		 latest version of ext2sim outputs this	 informa-
+		 tion  as  node attibutes.  This option is neces-
+		 sary when  preparing  input  for  programs  that
+		 don't	  know	  about	  attributes,	such   as
+		 sim2spice(1) (which is actually made obsolete by
+		 ext2spice(1), anyway), or rsim(1).
+
+       -F	 Don't output nodes that aren't connected to fets
+
+
+
+								1
+
+
+
+
+
+EXT2SIM(1)					       EXT2SIM(1)
+
+
+		 (floating nodes).
+
+       -L	 Don't produce the label file.
+
+       -tchar	 Trim characters from node names when writing the
+		 output	 file.	Char should be either "#" or "!".
+		 The option may be used twice if both  characters
+		 are desired.
+
+       In  addition,  all  of  the  options  of	 extcheck(1)  are
+       accepted.
+
+       Two more programs come with the latest  ext2sim	distribu-
+       tion  which  maintains  the  diffusion  area and perimeter
+       information and the fet substrate connection  in	 the  sim
+       file  (the  resistance classes of N and P diffusion should
+       be 0 and 1 respectively).  The first  one  sim2simp  is	a
+       filter  that  removes  the parallel transistors from a sim
+       netlist and the second one ext2spi (an  awk  script)  con-
+       verts  the  resulting  sim netlist to a spice netlist with
+       AS,AD,PS,PD in the fet cards and	 with  correct	substrate
+       information.
+
+
+SCALING AND UNITS
+       If  all of the .ext files in the tree read by ext2sim have
+       the same geometrical scale (specified in the scale line in
+       each  .ext  file),  this scale is reflected through to the
+       output, resulting in  substantially  smaller  .sim  files.
+       Otherwise, the geometrical unit in the output .sim file is
+       a centimicron.
+
+       Resistance and capacitance are always output in	ohms  and
+       picofarads, respectively.
+
+
+SEE ALSO
+       extcheck(1), ext2dlys(1), ext2spice(1), magic(1), rsim(1),
+       sim2spice(1), ext(5), sim(5)
+
+
+AUTHOR
+       Walter Scott additions/fixes by Stefanos Sidiropoulos.
+
+
+BUGS
+       Transistor gate capacitance is typically not  included  in
+       node capacitances, as most analysis tools compute the gate
+       capacitance directly from the  gate  area.   The	 -c  flag
+       therefore provides a limit only on non-gate capacitance.
+
+
+
+
+
+
+
+								2
+
+

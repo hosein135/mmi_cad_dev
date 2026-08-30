@@ -1,0 +1,14 @@
+# SUE version MMI_SUE4.0
+
+proc ICON_sign_extend args {
+  icon_setup $args {{origin {0 0}} {orient R0}}
+  icon_term -type input -origin {-10 0} -name In
+  icon_term -type output -origin {10 0} -name out
+  icon_property -origin {-150 90} -type fixed -name verilog -text {\tassign $out = \\{[verilog_expand $out $In]\\}\;}
+  icon_line -10 0 10 -50 10 40 -10 40 -10 0
+  icon_line -10 20 10 20 5 21 0 23 5 20 0 17 5 19 10 20
+  icon_line 10 -10 10 -30 11 -25 13 -20 10 -25 7 -20 9 -25 10 -30
+  icon_property -origin {-150 130} -type fixed -name spice -text {[spice_expand $out $In]}
+  icon_property -origin {-150 170} -type fixed -name primitive -text 1
+}
+

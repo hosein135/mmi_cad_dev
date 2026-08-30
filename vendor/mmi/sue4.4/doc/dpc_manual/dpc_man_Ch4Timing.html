@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 14:38:44">
+<title>Timing the Design</title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch3PlaceAlgorithm.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch5Commands.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Chapter 4 </font>
+</h2>
+
+
+<h1>
+  <a name="1026020"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Timing the Design</font>
+</h1><hr>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026258"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Much of the power of the Data Path Compiler involves timing a design for critical path optimization. How does this differ from taking the output of logic synthesis, or any other netlist, and running it through a static timing analyzer? One word: placement. DPC knows the placement of the cells and the interconnect. Therefore, it can estimate all wire capacitances very accurately. Otherwise, you need to either use a wire-load model, which is only a statistical approximation, or run place and route and extraction. The latter takes your iteration time from about once a minute to once a day. </font>
+<p>
+<p>
+  <dt> <a name="1026262"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">DPC runs static timing analysis for you and back-annotates the results onto the schematic, which makes timing a design a breeze. Most people who use the DPC Data Path Compiler have previously run a static timing analyzer only infrequently if ever. Yet, since DPC handles the interface, you don't need a manual for most tasks. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026265"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Combinational vs. Sequential Circuits</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026267"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are timing a purely combinational circuit, you tend to be interested in different things than if you are timing sequential circuits. Purely combinational circuits have no state (that is, no flip-flops or latches) and are typically functions like adders, shifters, etc. These are usually the building blocks of larger, sequential circuits. </font>
+<p>
+<p>
+  <dt> <a name="1026269"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In a purely combinational circuit, you care about the maximum delay from any input to any output, or the <em class="Emphasis">critical path</em>. You usually don't worry about if a given input is earlier than another since this block may be used in multiple instances in the design. </font>
+<p>
+<p>
+  <dt> <a name="1026271"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In a sequential circuit, you are mostly interested in meeting a given cycle time from any register to any other register. Inputs or outputs must be treated specially (see next section). You need to specify what clocks are in the design. </font>
+<p>
+<p>
+  <dt> <a name="1026274"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For sequential circuits, DPC needs to know all of the clock names in the design, which are kept in the variable <b><code class="CodeStrong">DPC_TIMING(clk_names) </code></b>and the desired cycle time (minus clock skew/jitter) which is kept in the variable<b><code class="CodeStrong"> DPC_TIMING(clk_period)</code></b>. You can also change these on the fly by running <b><code class="CodeStrong">Time it</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu. Note that DPC sets the design up for "ideal clocks", meaning that the clock inputs to all flip-flops arrive at exactly the same time. You can override this with the "<b><code class="CodeStrong">.constraint</code></b>" file. </font>
+<p>
+<p>
+  <dt> <a name="1026283"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When timing a design, DPC looks at all of the primary inputs to the design. If none of them match the predetermined clock names, then DPC assumes you have a purely combinational block and sets up the timing accordingly. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026286"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Setting I/O Timing Constraints</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026287"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">An entire design can rarely be captured in a single static timing analysis and hence external I/O timing must be identified. In most cases, this involves specifying the input arrival times of external inputs and the output setup and hold times of external outputs. </font>
+<p>
+<p>
+  <dt> <a name="1026291"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Since no signal will likely arrive at time zero, but more likely, at the minimum, a clk-to-q delay from a register, the DPC variable<b><code class="CodeStrong"> DPC_TIMING(arrival_time)</code></b> is used to specify the default arrival time for all inputs to sequential logic. So, for example, if you want all inputs to default to a 1ns arrival time: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC_TIMING(arrival_time) 1ns
+</font><a name="1026295"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027833"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Similarly, outputs need to go somewhere, which, at a minimum, is usually into a flip-flop which has a setup time. The default departure time is specified by the variable<b><strong class="Strong"> </strong></b><b><code class="CodeStrong">DPC_TIMING(departure_time)</code></b>. The value is with relation to the next edge of the clock. Thus if you assume that outputs from blocks can go anywhere on the chip, you might want to give them, say, 3ns to get there, which would mean setting: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC_TIMING(departure_time) 3ns
+</font><a name="1027837"> </a>
+      </pre>
+<p>
+  <dt> <a name="1027838"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Typically the arrival times and departure times should be set larger than these minimums to account for wire delay and loading. Furthermore, unless you use a design style that prohibits logic on wires between blocks, you might want to add additional suitable logic delays. </font>
+<p>
+<p>
+  <dt> <a name="1026303"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The .constraint files are used to set timing constraints on individual or groups of I/O signals, overriding the above defaults. A timing constraint file for a schematic should have the same name as the schematic, be in the same directory, and have the suffix "<b><code class="CodeStrong">.constraint</code></b>". This name can be overridden in the "<b><code class="CodeStrong">time it</code></b>" command in the "<b><code class="CodeStrong">Sim</code></b>" menu. </font>
+<p>
+<p>
+  <dt> <a name="1026305"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The timing constraint file is merely included into static timing analyzer during the timing analysis and thus must observe either <em class="Emphasis">Pearl</em>, <em class="Emphasis">Pathmill</em>, or <em class="Emphasis">PrimeTime</em> syntax and semantics- depending on which one you are using. The syntax is different depending on whether you are timing a purely combinational block (no clocks) or a sequential block ( with clocks). </font>
+<p>
+<p>
+  <dt> <a name="1026310"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When using <em class="Emphasis">Pearl</em>, for each input constraint in a purely combinational block, add a line of the following form to the <b><code class="CodeStrong">.constraint</code></b> file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">input &lt;signal&gt; _input_ ^ &lt;rise_min&gt; &lt;rise_max&gt; &lt;fall_min&gt; &lt;fall_max&gt;
+</font><a name="1026311"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026312"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For each input constraint in a sequential block, add a line of the following form to the <b><code class="CodeStrong">.constraint</code></b> file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">arrival &lt;signal&gt; wave ^ &lt;rise_min&gt; &lt;rise_max&gt; &lt;fall_min&gt; &lt;fall_max&gt;
+</font><a name="1026313"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026314"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">and for each output constraint: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">departure &lt;signal&gt; wave ^ &lt;rise_hold&gt; &lt;rise_setup&gt; &lt;fall_hold&gt;&lt;fall_setup&gt;
+</font><a name="1026315"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026317"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that "<b><code class="CodeStrong">wave</code></b>" is the default waveform as specified by the <b><code class="CodeStrong">DPC_TIMING(wave_name)</code></b> variable in the <b><strong class="Strong">.suerc</strong></b> file </font>
+<p>
+<p>
+  <dt> <a name="1026320"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For example (sequential): </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">arrival cin wave ^ 1n 1n 1n 1n</font><a name="1026321"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">departure bus* wave ^ 0n 2n 0n 2n
+</font><a name="1026322"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026323"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Default units are specified in the technology file and thus it is a good idea to put them in (for example,<b><code class="CodeStrong"> p</code></b> or <b><code class="CodeStrong">n</code></b>). </font>
+<p>
+<p>
+  <dt> <a name="1026325"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Wildcarding "*" is permitted in signal names. </font>
+<p>
+<p>
+  <dt> <a name="1026326"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "<b><code class="CodeStrong">arrival</code></b>" command can also be used to trick <em class="Emphasis">Pearl</em> into ignoring certain multicycle paths, such as ones from asynchronous resets. For example, by setting the following:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">arrival reset_L v -2n -2n -2n -2n
+</font><a name="1026327"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026329"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Pearl will assume that the signal "<b><code class="CodeStrong">reset_L</code></b>" arrives very early and hence does not create any critical paths in the design. Note that <em class="Emphasis">Pearl</em> also has specific commands for identifying multicycle paths. </font>
+<p>
+<p>
+  <dt> <a name="1026330"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Consult the <em class="Emphasis">Pearl</em> manual for more information and options. Alternatively consult the <em class="Emphasis">Pathmill</em> or <em class="Emphasis">PrimeTime</em> manual for similar commands and syntax relating to it. </font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1026334"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Input Drivers and Output Loading</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1026336"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to specifying the input and output delays, we must specify how to drive the inputs and what loads to place on the outputs. DPC has two ways of specifying the input driver: fixed transition time, or driver cell. </font>
+<p>
+<p>
+  <dt> <a name="1026339"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To drive all primary inputs with a specific driver cell, use the variable <b><code class="CodeStrong">DPC_TIMING(driver_cell)</code></b>. The format of this variable is a list of the driver cell name and the output port, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC_TIMING(driver_cell) "INVC out"
+</font><a name="1026342"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026343"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">would set the input drive strength to be the output of the <b><code class="CodeStrong">INVC</code></b> cell. If no driver cell is specified, DPC defaults to using a fixed input transition given by the variable <b><code class="CodeStrong">DPC_TIMING(input_transition)</code></b>, for example: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC_TIMING(input_transition) 200ps
+</font><a name="1026346"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026347"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Note that if you use a fixed input transition you can sometimes underestimate timing because you have loaded your inputs too heavily. Also note that <em class="Emphasis">Pathmill</em> does not allow a driver cell and thus DPC defaults to using a fixed input transition. </font>
+<p>
+<p>
+  <dt> <a name="1026349"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Primary outputs automatically get annotated with a default capacitance given by the variable <b><code class="CodeStrong">DPC_TIMING(out_cap)</code></b>. For example, to place 20fF of capacitance on all primary outputs, use the line: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">set DPC_TIMING(out_cap) 20fF
+</font><a name="1026354"> </a>
+      </pre>
+<p>
+  <dt> <a name="1026355"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Both the input drivers and output capacitances can also be specified on a net by net basis with the .constraint file. <img src="images/dpc_man_Ch4Timinga.gif" height="1" width="0" border="1">
+</font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+   </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch3PlaceAlgorithm.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_man_Ch5Commands.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

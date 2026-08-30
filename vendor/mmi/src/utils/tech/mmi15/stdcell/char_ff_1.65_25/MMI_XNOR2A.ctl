@@ -1,1 +1,21 @@
-../ctl/MMI_XNOR2A.ctl
+# cell name matches file name
+
+function out = !(in0 ^ in1)
+
+measure {out v} with {in0 ^} {in1 0} 
+measure {out ^} with {in0 v} {in1 0} 
+measure {out v} with {in0 0} {in1 ^}  
+measure {out ^} with {in0 0} {in1 v} 
+step {in0 ^} 
+measure {out ^} with {in0 1} {in1 ^} 
+measure {out v} with {in0 1} {in1 v}  
+step {in0 v} {in1 ^}
+measure {out ^} with {in0 ^} {in1 1} 
+measure {out v} with {in0 v} {in1 1} 
+
+
+# measure the input capacitance
+cap in0 with {in1 0}
+cap in1 with {in0 0}
+
+

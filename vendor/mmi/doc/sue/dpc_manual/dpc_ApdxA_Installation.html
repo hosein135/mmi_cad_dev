@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="ManualHTML_Template">
+<meta name="LASTUPDATED" content="01/01/02 14:38:45">
+<title>Appendix A   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td><center><font color="003366"><H1> DPC DataPath Compiler User Guide </H1></font></center></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch5Commands.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1021948"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Appendix A </font>
+</h2>
+
+
+<h2>
+  <a name="1022132"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">DPC Installation Including Timing Analyzer Interfaces</font>
+</h2>
+
+
+<h3>
+  <a name="1021950"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Basic DPC Installation</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1021951"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Below is a suggestion for the directory structure for the files needed to run DPC. You can set up the files any way you want. The important thing is that you have specified all the needed variables and files for DPC. An example setup is part of the DPC Tutorial. Please note that tnot all of the files listed below are required, only those that apply to the static timing analyzer you are using. </font>
+<p>
+<p>
+  <dt> <a name="1023086"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">.suerc</code></b> file is the same one used by the SUE Design Manager, with the addition that it sources <b><code class="CodeStrong">$MMI_TOOLS/../mmi_local/mmi25/library/dpc/dpc.suerc</code></b>. The <b><code class="CodeStrong">dpc.suerc</code></b> file is what sets up all the things needed to run DPC and timing analysis.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">mmi_local</font><a name="1023087"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">sue</font><a name="1023088"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">	.suerc</font><a name="1021954"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">	default_spice_header.h</font><a name="1021955"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">	default_verilog_header.h</font><a name="1021956"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">	mmi25</font><a name="1021957"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">		spice (for PathMill only)</font><a name="1021958"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			default_spice_header.h</font><a name="1021959"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			mmi25.l (spice models)</font><a name="1021960"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">		stdcell</font><a name="1021961"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			spi</font><a name="1021962"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				include_params</font><a name="1021963"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				MMI_BUFB.sp</font><a name="1021964"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				...</font><a name="1021965"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			sue</font><a name="1021966"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				MMI_BUFB.sue</font><a name="1021967"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				...</font><a name="1021968"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">		library</font><a name="1021969"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			dpc</font><a name="1021970"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				dpc.suerc</font><a name="1021971"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				mmi25.dpc (not needed if you have LEF for all cells)</font><a name="1021972"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			lef</font><a name="1021973"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				mmi25.lef</font><a name="1021974"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			pathmill</font><a name="1021975"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				include_params</font><a name="1021976"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			pearl (for Pearl only)</font><a name="1021977"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				pearl.tech</font><a name="1021978"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				mmi25.ctlf</font><a name="1021979"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			synopsys (for PrimeTIme only)</font><a name="1021980"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				mmi25.db</font><a name="1021981"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				mmi25.lib</font><a name="1021982"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">			verilog</font><a name="1021983"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="Courier">				mmi25.v
+</font><a name="1021984"> </a>
+      </pre>
+<p>
+  <dt> <a name="1021985"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">There is an example of a <b><code class="CodeStrong">dpc.suerc</code></b> file as part of the DPC Tutorial located in:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	tutorials/dpc/mmi25/library/dpc/dpc.suerc
+</font><a name="1022912"> </a>
+      </pre>
+<p>
+  <dt> <a name="1021987"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The directory structure of the DPC Tutorial is set up to be a self-contained environment which doesn't require any of this setup. </font>
+<p>
+<p>
+  <dt> <a name="1021988"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The DPC setup files should generally be located in the <b><code class="CodeStrong">mmi_local</code></b> directory. The <b><code class="CodeStrong">dpc.suerc</code></b> file contains all of the SUE startup data required to run DPC. Look at the <b><code class="CodeStrong">mmi_local.sample</code></b> directory for an example of the directory structure, and the example <b><code class="CodeStrong">dpc.suerc </code></b>file. Look at the <b><code class="CodeStrong">dpc.suerc</code></b> file. If you want to run <em class="Emphasis">PrimeTime</em>, instead of <em class="Emphasis">Pearl</em>, you simply uncomment the following line:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	#set DPC_TIMING(simulator) "primetime"
+</font><a name="1022918"> </a>
+      </pre>
+<p>
+  <dt> <a name="1021990"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You also need to comment out the <em class="Emphasis">Pearl</em> line. We'll talk more about the timing analyzer setup later. The <b><code class="CodeStrong">dpc.suerc</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>file must be sourced when you start up SUE. This can be done in a number of ways. One way is to add the following lines to the <b><code class="CodeStrong">.suerc</code></b> file in <b><code class="CodeStrong">$MMI_LOCAL/sue</code></b>, or to your home or current directory <b><code class="CodeStrong">.suerc</code></b> files. </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set tech &lt;dir&gt;</font><a name="1022924"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	source $tech/library/dpc/dpc.suerc
+</font><a name="1022927"> </a>
+      </pre>
+<p>
+  <dt> <a name="1021993"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Alternatively, you can add the following lines to <b><code class="CodeStrong">$MMI_LOCAL/sue/.suerc</code></b> or another <b><code class="CodeStrong">.suerc</code></b> file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">switch [use_first PROJECT env(PROJECT)] {</font><a name="1022933"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	mmi25 {</font><a name="1021995"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		set tech &lt;dir&gt;</font><a name="1021996"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		source $tech/library/dpc/dpc.suerc</font><a name="1021997"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		puts "Setting up for DPC with mmi25 library ..."</font><a name="1021998"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">		}</font><a name="1021999"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	}
+</font><a name="1022001"> </a>
+      </pre>
+  <dl>
+<p> <dt> <a name="1023014"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">With this, you can load the DPC example, and invoke SUE by typing:</font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	sue -SET PROJECT=mmi25
+</font><a name="1022966"> </a>
+      </pre>
+<p> <dt> <a name="1022003"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">or by setting the UNIX environment variable <b><code class="CodeStrong">PROJECT</code></b> to <b><code class="CodeStrong">mmi25</code></b>, for example:</font>
+<p>      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	setenv PROJECT mmi25
+</font><a name="1022004"> </a>
+      </pre>
+  </dl>
+<p>
+  <dt> <a name="1022005"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">and then simply invoking SUE by typing:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	sue</font><a name="1022006"> </a>
+      </pre>
+</dl></dl>
+
+<h4>
+  <a name="1022007"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Standard Cell Library Info For DPC</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1022008"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One of the things you need in order to run DPC is the size of the standard cells. This can now be automatically commputer from a LEF file. Simply point to the LEF for your cells in the <b><code class="CodeStrong">dpc.suerc</code></b> file.</font>
+<p>
+<p>
+  <dt> <a name="1023049"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you don't want the LEF files accessible by DPC users, you can create a DPC cell size file from the LEF.</font>
+<p>
+<p>
+  <dt> <a name="1023033"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you run the following command on your <b><code class="CodeStrong">LEF</code></b> file (in this case <b><code class="CodeStrong">mmi25.lef</code></b>), you'll get the information needed for DPC:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	egrep `MACRO|SIZE' mmi25.lef
+</font><a name="1022009"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022010"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Take this information, convert it to grids, and put it in the following format in the <b><code class="CodeStrong">mmi_local/sue/mmi25/library/dpc/mmi25.dpc</code></b> file.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	MMI_AND2B   4.0</font><a name="1022011"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	MMI_AND2C   5.0</font><a name="1022012"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	MMI_AO21B   6.0</font><a name="1022013"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	MMI_AO22B   7.0
+</font><a name="1022014"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022015"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The numbers in the <b><code class="CodeStrong">mmi25.dpc</code></b> file are in terms of grids and not microns. You need to know the grid size used in the <b><code class="CodeStrong">LEF</code></b> file. The values in the <b><code class="CodeStrong">mmi25.dpc</code></b> file are in terms of grids. </font>
+<p>
+<p>
+  <dt> <a name="1022842"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Look in the <b><code class="CodeStrong">dpc.suerc</code></b> file for the following lines which set up the grid for this library:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# grid size</font><a name="1022016"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC(SCALE) 0.74 
+</font><a name="1022017"> </a>
+      </pre>
+</dl></dl>
+
+<h3>
+  <a name="1022019"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Pearl Interface</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1022020"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Edit the following lines in the <b><code class="CodeStrong">dpc.suerc</code></b> file to set up the <em class="Emphasis">Pearl</em> timing analyzer.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# pearl timing setup</font><a name="1022021"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pearl,command) pearl</font><a name="1022022"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# set DPC_TIMING(pearl,command) "rsh mmics1 cd [pwd]\\; \ /users/tools/pearl/bin/pearl"</font><a name="1022023"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(tech_file) $tech/library/pearl/pearl.tech</font><a name="1022024"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(ctlf_file) $tech/library/pearl/$techtype.ctlf</font><a name="1022025"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(filter) {-same_path -similar_path -node_suffix [#]} 
+</font><a name="1022026"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022027"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The second <b><code class="CodeStrong">DPC_TIMING(pearl,command)</code></b><font  face="Verdana, Arial, Helvetica, sans-serif"> </font>statement is how you would set up <em class="Emphasis">Pearl</em> to run remotely. </font>
+<p>
+<p>
+  <dt> <a name="1022028"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One of the things required to run <em class="Emphasis">Pearl</em> is a <em class="Emphasis">technology file</em>. Below is an example of what needs to be in the technology file.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	technology mmi25</font><a name="1022029"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	power_node_name vdd 2.25</font><a name="1022030"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	gnd_node_name gnd</font><a name="1022031"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	logic_threshold  1.125</font><a name="1022032"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	rise_time 20-80 200PS</font><a name="1022945"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	SYNOPSYS_UNITS 1N 1P 1K</font><a name="1022034"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	TEMPERATURE 105</font><a name="1022035"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	PROCESS 1.0</font><a name="1022036"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	LIBRARY_CORNER TYP</font><a name="1022037"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	units time 4.0ps 1e-12</font><a name="1022038"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	units capacitance 4.0fF 1e-15</font><a name="1022039"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	end_technology 
+</font><a name="1022040"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022041"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">ctlf_file</code></b> is the <em class="Emphasis">timing library file</em> required by <em class="Emphasis">Pearl</em>. This file can be created from the Synopsys <b><code class="CodeStrong">.lib</code></b> file by first running <b><code class="CodeStrong">syn2tlf</code></b> and then compiling it with the <b><code class="CodeStrong">ctlf</code></b> compiler. If the customer is already running <em class="Emphasis">Pearl</em>, they should already have the <b><code class="CodeStrong">ctlf</code></b> file generated.</font>
+<p>
+<p>
+  <dt> <a name="1022042"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to run <b><code class="CodeStrong">spice last critical path</code></b> with <em class="Emphasis">Pearl</em>, there are a number of things which need to be set up. If you need to do this, contact Micro Magic Tools at support@micromagic.com.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1022043"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">PathMill Interface</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1022044"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The following lines in the <b><code class="CodeStrong">dpc.suerc</code></b> are edited to set up DPC to run <em class="Emphasis">PathMill</em>. There are two modes in which you can run <em class="Emphasis">PathMill</em>. The typical way to run <em class="Emphasis">PathMill</em> is to run it down to the transistor level. This is how the <em class="Emphasis">PathMill</em> interface is set up for DPC.</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	#set DPC_TIMING(simulator) "pathmill"</font><a name="1022046"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,command) pathmill</font><a name="1022047"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,tech_file) ""</font><a name="1022048"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1022049"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# Points to spice netlists of leaf cells</font><a name="1022050"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,library) ". $tech/stdcell/spi"</font><a name="1022051"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# Header file</font><a name="1022052"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,spice_header) \</font><a name="1022053"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	"$tech/stdcell/spi/include_params"</font><a name="1022054"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1022055"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# For spice last critical path only</font><a name="1022056"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,spice_command) read_spice_deck</font><a name="1022057"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,spice_include) \</font><a name="1022058"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	{{.lib '$tech/spice/mmi25.l' TT}}</font><a name="1022059"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book"></font><a name="1022060"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# optional pathmill configuration commands</font><a name="1022061"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(pathmill,cfg_options) \</font><a name="1022062"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	{{pwl *} {xfer_all_pair} {log_on all} {search_structure mux}} 
+</font><a name="1022063"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022064"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><em class="Emphasis">PathMill</em> can directly read <b><code class="CodeStrong">BSIM3</code></b> models. The SPICE header file (<b><code class="CodeStrong">include_params</code></b> in this example) specifies where the SPICE models are located, as well as the temperature and voltage. <em class="Emphasis">PathMill</em> also requires the SPICE netlist for each of the leaf cells. The <b><code class="CodeStrong">DPC_TIMING(pathmill,library)</code></b> variable points to the SPICE netlists. The <b><code class="CodeStrong">cfg_options </code></b>are some of the standard options used when running <em class="Emphasis">PathMill</em>.</font>
+<p>
+<p>
+  <dt> <a name="1022065"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to run <b><code class="CodeStrong">spice last critical path</code></b> with the <em class="Emphasis">PathMill</em> interface, add the <b><code class="CodeStrong">spice_include</code></b> variable, which is the same as the<b><code class="CodeStrong"> .lib</code></b> statement, at the top of the <b><code class="CodeStrong">include_params</code></b> file. You also need to have the <b><code class="CodeStrong">mmi_local/sue/spice</code></b> script working, which should have been set up for the SUE installation.</font>
+<p>
+</dl></dl>
+
+<h3>
+  <a name="1022066"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">PrimeTime Interface</font>
+</h3>
+
+<dl><dl>
+<p>
+  <dt> <a name="1022067"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To set up the <em class="Emphasis">PrimeTime</em> interface, edit the following lines in the <b><code class="CodeStrong">dpc.suerc </code></b>file: </font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	# if you want to use primetime, comment out next line</font><a name="1022068"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	#set DPC_TIMING(simulator) "primetime"</font><a name="1022069"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(primetime,command) pt_shell</font><a name="1022070"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(db_file) $tech/library/synopsys/$techtype.db</font><a name="1022071"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(db_time_units) 1ns	(must correspond to your <b><code class="CodeStrong">db</code></b> file)</font><a name="1022072"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	set DPC_TIMING(db_cap_units) 1pF	(must correspond to your <b><code class="CodeStrong">db</code></b> file) 
+</font><a name="1022073"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022074"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">db_file</code></b> is the format of the library timing file used by <em class="Emphasis">PrimeTime</em>. This file can be generated from a Synopsys <b><code class="CodeStrong">.lib </code></b>file. To do this, type the following at the UNIX prompt:</font>
+<p>
+      <pre>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	dc_shell</font><a name="1022075"> </a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font face="ITC Franklin Gothic Book">	read_lib &lt;tech&gt;.lib; write_lib
+</font><a name="1022076"> </a>
+      </pre>
+<p>
+  <dt> <a name="1022077"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You may already have a <b><code class="CodeStrong">.db</code></b> file for the library. The <b><code class="CodeStrong">cap</code></b> and <b><code class="CodeStrong">time</code></b> units are the units which are inside the <b><code class="CodeStrong">.db</code></b> file.</font>
+<p>
+<p>
+  <dt> <a name="1018298"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"></font>
+<p>
+</dl></dl>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+  </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="dpc_manualTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="dpc_man_Ch5Commands.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="dpc_manualIX.html"><img src="images/navidx.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

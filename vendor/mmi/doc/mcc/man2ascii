@@ -1,0 +1,14 @@
+#!/bin/csh -f
+
+# converts nroff man pages in man/ to straight text files in man_ascii/
+
+# clear target directory
+touch man.ascii
+rm -rf man.ascii 
+mkdir man.ascii
+
+cd man
+foreach f (*) 
+	cat $f | nroff -man | col -b > ../man.ascii/$f
+end
+

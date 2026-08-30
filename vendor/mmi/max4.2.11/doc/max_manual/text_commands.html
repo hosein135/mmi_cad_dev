@@ -1,0 +1,2269 @@
+<HTML>
+<HEAD><TITLE>MAX Text Commands</TITLE></HEAD>
+<BODY BGCOLOR="ffffff" >
+
+<TABLE width="96%" border="0" align="center">
+  <TR> 
+    <TD rowspan="2" width="31%"><IMG src="images/mmi-logo.gif" width="155" height="79"></TD>
+    <TD width="69%" height="91" valign="bottom"> 
+      <H1 align="left">MAX Text Commands</H1>
+    </TD>
+  </TR>
+</TABLE>
+
+<br>
+
+<HR><P><UL>
+
+<TT><B><LI>:array
+</B></TT><P>
+array everything in selection<P>
+<PRE>
+Usage:   :array xsize ysize OR :array xlo xhi ylo yhi
+
+The second form controls instance name subscripting.
+</PRE>
+<P>
+
+<TT><B><LI>:center
+</B></TT><P>
+center window on the cursor<P>
+<PRE>
+Usage:   :center
+</PRE>
+<P>
+
+<TT><B><LI>:checkpoint
+</B></TT><P>
+save current state of edit cell in file<P>
+<PRE>
+Usage:   :checkpoint file
+
+Does not change file associated with edit cell or clear its modified flag.
+</PRE>
+<P>
+
+<TT><B><LI>:clockwise
+</B></TT><P>
+rotate selection (and box) clockwise<P>
+<PRE>
+Usage:   :clockwise [deg]
+
+
+Valid values for deg are multiples of 90:  
+  90  (the default), 
+  -90 (rotate 90 degrees counterclockwise)
+  180 (rotate upside down)
+</PRE>
+<P>
+
+<TT><B><LI>:copy
+</B></TT><P>
+copy selection (OBSOLETE use sel_duplicate instead)<P>
+<PRE>
+Usage:   :copy [dir [amount]] or :copy to x y
+
+
+Lower-left of box will be copied to cursor location, or, copy 
+will appear amount microns in dir from original.  Valid values 
+for dir are:  N, S, E and W.  The second form copys to location x y.
+</PRE>
+<P>
+
+<TT><B><LI>:corner
+</B></TT><P>
+make L-shaped wires inside box<P>
+<PRE>
+Usage:   :corner d1 d2 [layers]
+
+
+fills first in direction d1, then in d2.  This command is useful 
+for turning a bus through a corner.  (The box should contain the 
+end points of the bus when this command is issued.)
+</PRE>
+<P>
+
+<TT><B><LI>:drc
+</B></TT><P>
+design rule checker<P>
+<PRE>
+Usage:   :drc option
+
+
+DRC commands have the form ":drc option", where option is one of:
+
+  catchup                run checker and wait for it to complete
+  check                  recheck area under box in all cells
+  count                  count error tiles in each cell under box
+  find [nth]             locate next (or nth) error in current cell
+  off                    turn off background checker
+  on                     reenable background checker
+  printrules [file]      print out design rules in file or on tty
+  rulestats              print out stats about design rule database
+  statistics             print out statistics gathered by checker
+  why                    print out reasons for errors under box
+</PRE>
+<P>
+
+<TT><B><LI>:dump
+</B></TT><P>
+copy contents of cell into edit cell<P>
+<PRE>
+Usage:   :dump [-dup_ok] cell [child refPointC] [parent refPointP]
+
+
+Copy is positioned so that refPointC (or lower left) of cell is at
+refPointP (or box lower-left).
+
+RefPoints are either labels or a pair of coordinates (e.g, 100 200)
+
+If -dup_ok, allows duplicate instances on top of each other -
+useful for interactive drags.  NOTE: -dup_ok should eventually be 
+followed by 'sel_move 0 0' to check for duplicates.
+
+See also :getcell.
+</PRE>
+<P>
+
+<TT><B><LI>:feedback
+</B></TT><P>
+access/change feedback information attached to layout<P>
+<PRE>
+Usage:   :feedback option
+
+
+Feedback areas are used by Max to show extraction errors.  They
+can also be used to show results of external drc, or for other
+custom purposes.  
+
+Feedback commands have the form "feedback option",
+where option is one of:
+
+add text [style]                create new feedback area over box
+clear                           clear all feedback info
+count                           count # feedback entries
+find [nth]                      put box over next [or nth] entry
+save file                       save feedback areas in file
+why                             print all feedback messages under box
+
+Valid styles for the 'add' command are:  'dotted', 'medium', 'outline', 
+'pale', and 'solid'.  'pale' is the default.
+</PRE>
+<P>
+
+<TT><B><LI>:fill
+</B></TT><P>
+fill layers from one side of box to other<P>
+<PRE>
+Usage:   :fill dir [layers]
+
+Valid values of dir are:  N, S, E, and W.
+</PRE>
+<P>
+
+<TT><B><LI>:findbox
+</B></TT><P>
+center the view on the box and optionally zoom in<P>
+<PRE>
+Usage:   :findbox [zoom]
+</PRE>
+<P>
+
+<TT><B><LI>:identify
+</B></TT><P>
+set the id of the selected cell instance<P>
+<PRE>
+Usage:   :identify use_id
+</PRE>
+<P>
+
+<TT><B><LI>:load
+</B></TT><P>
+load a cell into a window<P>
+<PRE>
+Usage:   :load [cellname]
+
+
+Low level command.  
+Mostly likely you want cell_load, cell_load_files instead. 
+See also db_cell_new.
+</PRE>
+<P>
+
+<TT><B><LI>:move
+</B></TT><P>
+move box and selection (OBSOLETE use sel_move instead)<P>
+<PRE>
+Usage:   :move [dir [amount]]
+
+If no args, moves box lower-left corner to cursor.
+If args, moves accordingly.
+</PRE>
+<P>
+
+<TT><B><LI>:redo
+</B></TT><P>
+redo commands<P>
+<PRE>
+Usage:   :redo [count]
+
+See also :undo.
+</PRE>
+<P>
+
+<TT><B><LI>:scroll
+</B></TT><P>
+scroll the window<P>
+<PRE>
+Usage:   :scroll dir [amount]
+
+
+dir is N,S,E, or W.
+amount is number of windows to move over (default is .5).
+
+For example, ':scroll N 1' moves the view up one window height.
+</PRE>
+<P>
+
+<TT><B><LI>:see
+</B></TT><P>
+adjust which layers are visible<P>
+<PRE>
+Usage:   :see [no] layers|allSame|flyLines|hiddenLabels|instanceNames|instancePorts
+
+
+If "allSame" is set, non-edit cell paint is not dimmed.
+
+"instanceNames" and "instancePorts" control the appearance of unexpanded instances.
+</PRE>
+<P>
+
+<TT><B><LI>:sideways
+</B></TT><P>
+flip selection and box around vertical axis<P>
+<PRE>
+Usage:   :sideways
+</PRE>
+<P>
+
+<TT><B><LI>:stretch
+</B></TT><P>
+stretch box and selection<P>
+<PRE>
+Usage:   :stretch [dir [amount]]
+</PRE>
+<P>
+
+<TT><B><LI>:undo
+</B></TT><P>
+undo commands<P>
+<PRE>
+Usage:   :undo [count]
+
+See also :redo.
+</PRE>
+<P>
+
+<TT><B><LI>:upsidedown
+</B></TT><P>
+flip selection and box through horizontal axis<P>
+<PRE>
+Usage:   :upsidedown
+</PRE>
+<P>
+
+<TT><B><LI>:view
+</B></TT><P>
+adjust view so everything is visible<P>
+<PRE>
+Usage:   :view
+</PRE>
+<P>
+
+<TT><B><LI>:zoom
+</B></TT><P>
+zoom window by amount<P>
+<PRE>
+Usage:   :zoom amount
+
+
+amount is factor to zoom out by.
+
+Examples:
+':zoom 2' - zooms out by a factor of two.
+':zoom .5' - zooms in by a factor of two.
+</PRE>
+<P>
+
+<TT><B><LI>absolute_path
+</B></TT><P>
+Returns absolute path for fileName.<P>
+Usage:  absolute_path fileName [pwd]<P>
+<PRE>
+Turns filename into a "canonical" absolute path.
+  Handles ~ expansion, and "dereferences" '.' and '..'
+  Deletes automounter prefix?
+  Final '/' stripped, except for root itself.
+
+  If current working dir given as second args, it is used in place
+  of pwd result, for turning relative paths into absolute paths.
+
+  Example:
+    absolute_path ~demo/max/example.max
+  would return
+    /home/user/max/example.max
+</PRE>
+<P>
+
+<TT><B><LI>approx
+</B></TT><P>
+Determines a op b where op is ==, !=, etc.,
+  within floating point round-off error, or error
+  specified by optional &#60res&#62 argument.
+  Example:
+    approx 1.000 &#60= 1.001 .01
+  returns:
+    1   (true)<P>
+Usage:  approx a op b [res]<P>
+<P>
+
+<TT><B><LI>assert
+</B></TT><P>
+if expression is not TRUE, print error message.<P>
+Usage:  assert expression<P>
+<P>
+
+<TT><B><LI>browser_open
+</B></TT><P>
+Display an html file using the browser defined by the
+    MMI_BROWSER or BROWSER environment variable.<P>
+Usage:  browser_open file<P>
+<PRE>
+The file name must not contain tcl special chars: $ "" {}
+</PRE>
+<P>
+
+<TT><B><LI>call_keyword
+</B></TT><P>
+Parse function options using -option syntax.<P>
+Usage:  call_keyword _ARG_LIST _DEFAULT_LIST<P>
+<PRE>
+Like call_with_keyword but: supports binary options;
+  returns a list of arguments not keyworded AND keyworded arguments
+  not in default list.  Unlike call_with_keyword,
+  doesn't error if arguments aren't in default list.
+  Example: (b is a binary option, defaults to 0)
+
+  proc foo {args} {
+     set options [list {a 34} {b} {c {hi there}} {d example}]
+     call_by_keyword $args $options
+     ...
+  }
+
+  With input:
+     foo -a 23 hi -b -c {bar qux} there -x
+
+  Will return:
+    hi there -x
+
+  And will define, in the context of foo:
+    set a 23
+    set b 1
+    set c {bar qux}
+    set d example
+</PRE>
+<P>
+
+<TT><B><LI>cell_exit
+</B></TT><P>
+Exit max, BUT if modified buffers exist query user first.<P>
+Usage:  cell_exit<P>
+<P>
+
+<TT><B><LI>cell_file
+</B></TT><P>
+Returns the path Max file associated with cell.<P>
+Usage:  cell_file cellName<P>
+<PRE>
+Example:
+	cell_file bit_cell
+  would return /home/demo/example/bit_cell.max.
+
+  Returns __NO_SUCH_BUFFER__ if cell not in memory.
+</PRE>
+<P>
+
+<TT><B><LI>cell_flags
+</B></TT><P>
+return flags associated with cell.<P>
+Usage:  cell_flags cellName<P>
+<PRE>
+Returns __NO_SUCH_BUFFER__ if the cell is not in memory.
+
+  The typical flags for a cell are: modified, available (in memory),
+  readOnly, and drcPending.
+</PRE>
+<P>
+
+<TT><B><LI>cell_in_memory
+</B></TT><P>
+returns 1 if buffer exists and is "available", otherwise returns 0<P>
+Usage:  cell_in_memory cellName<P>
+<P>
+
+<TT><B><LI>cell_info
+</B></TT><P>
+Returns info on cell.<P>
+Usage:  cell_info filename<P>
+<PRE>
+Returns a two element list for the Max file associated with cell,
+    in the form: "flags file".
+    This command is a combination of the cell_file and cell_flags commands.
+
+    Returns __NO_SUCH_BUFFER__ if the cell is not in memory.
+
+    See also: db_cells
+</PRE>
+<P>
+
+<TT><B><LI>cell_load
+</B></TT><P>
+load cell into current window and clear edit stack!<P>
+Usage:  cell_load [cell] [dir]<P>
+<PRE>
+Loads given cell into current window, and adds dir to cell search path
+  If buffer already exists for cell with different "dir", an error results.
+  If dir is not given, but cell has a directory, that directory is used.
+
+  If no directory is specified, either in dir or in cell,
+  cell must already be in memory.
+</PRE>
+<P>
+
+<TT><B><LI>cell_load_files
+</B></TT><P>
+Load list of cells and gds files.<P>
+Usage:  cell_load_files names<P>
+<PRE>
+Used to load filenames given on command line.
+  All cells in list are read into memory, and the first cell is loaded
+  into the current layout window.
+
+  Any such names with an extension other than .max are assumed
+  to be gds files and loaded as such.
+
+  The directories containing the cells are added to the cell path.
+</PRE>
+<P>
+
+<TT><B><LI>cell_path_add
+</B></TT><P>
+add arbitrary number of directories to cell search path.<P>
+<PRE>
+Usage: [-optional] cell_path_add [dir1 ...]
+
+  Returns current cell_path if no directories are specified.
+
+  Expands args to absolute paths.
+  Moves args to beginning of path, adding if not already present.
+
+  The specified directories are displayed in the list-boxes,
+  if they are visible.
+</PRE>
+<P>
+
+<TT><B><LI>cell_revert
+</B></TT><P>
+revert edit cell buffer to last version saved to disk<P>
+Usage:  cell_revert<P>
+<P>
+
+<TT><B><LI>cell_save
+</B></TT><P>
+save editcell in current window to disk<P>
+Usage:  cell_save<P>
+<P>
+
+<TT><B><LI>cell_save_tree
+</B></TT><P>
+saves the rootcell if modified and any descendents that are modified.  If passed argument 0, then save even if not modified.<P>
+Usage:  cell_save_tree [modified]<P>
+<P>
+
+<TT><B><LI>center_coords
+</B></TT><P>
+returns center of rectangle (rounded to design grid)<P>
+Usage:  center_coords x1 y1 x2 y2<P>
+<P>
+
+<TT><B><LI>db_bbox
+</B></TT><P>
+get cells bounding box<P>
+<PRE>
+usage:  db_bbox [-cell cell_name]
+
+If no -cell, defaults to edit cell (and root cell coordinates)
+If -cell option, outputs that cells bbox (in cells own coordinates).
+
+Returns cells bounding box as: xbot ybot xtop ytop
+</PRE>
+<P>
+
+<TT><B><LI>db_cell_copy
+</B></TT><P>
+copy the contents of one cell into another<P>
+<PRE>
+usage:  db_cell_copy [-source src_cell] [-offset x y] dest_cell  
+
+If no -source switch, source defaults to edit cell.
+If -offset, translate by specified amounts in x and y.
+
+Copies contents of source cell to dest_cell
+
+NOTE:  If dest_cell doesn't exist, an empty one is created.
+
+NOTE:  If dest_cell is already in memory, the contents of the source cell
+are added to it.
+</PRE>
+<P>
+
+<TT><B><LI>db_cell_delete
+</B></TT><P>
+delete cell<P>
+<PRE>
+usage:  db_cell_delete  [cell]
+
+Clears and deletes in-memory copy of a cell (defaults to edit cell), 
+does not effect disk file.
+
+Since the undo stack may contain references to this cell, it is
+flushed (unless the cell has the no_undo attribute (see db_cell_new).
+
+If the deleted cell was a toplevel cell in any window, that window is reloaded 
+with some other available cell.
+
+If there are any uses of the cell, the cell is cleared but not deleted.
+
+NOTE:  The cell is deleted without warning, even if it has been modifed since
+last change!
+</PRE>
+<P>
+
+<TT><B><LI>db_cell_file_tech
+</B></TT><P>
+Look up technology of<P>
+<PRE>
+usage:  db_cell_file_tech cellName 
+
+Finds file for cellName in search path (MN_PATH_CELL), and returns
+the technology associated with file
+</PRE>
+<P>
+
+<TT><B><LI>db_cell_new
+</B></TT><P>
+create new cell<P>
+<PRE>
+usage:  db_cell_new [-not_available] [-drc_with_parent] [-internal] [-generated] [-no_undo] name [fileName]
+
+If -not_available, the available flag is reset, which will cause Max 
+to attempt to load the cell from disk when it is searched.
+
+If fileName is given that is where the cell will be written when saved.
+
+Internal cells are normally not written out to disk, and are not DRCed.
+Generated cells are loaded via 'gcell_load' rather than reading from disk.
+
+This command does not automatically load the new cell into the current window.
+</PRE>
+<P>
+
+<TT><B><LI>db_cell_rename
+</B></TT><P>
+rename a cell<P>
+<PRE>
+usage:  db_cell_rename oldName cellName fileName
+
+cellName is the new name for the cell
+fileName is where the cell will be written when saved.
+
+NOTE: sets cell modified flag.
+</PRE>
+<P>
+
+<TT><B><LI>db_cells
+</B></TT><P>
+get info on cells in memory<P>
+<PRE>
+Usage: db_cells [cellName]
+
+If cellName, restricts output to that cell, otherwise all
+cell buffers.
+
+    For each buffer, outputs one line:
+    &#60cellname&#62 &#60flaglist&#62 &#60filename&#62 {&#60changes&#62 &#60changesPending&#62}
+
+    changes and changesPending for DEBUGGING of db consistency code.
+
+    See also 'cell_info'
+</PRE>
+<P>
+
+<TT><B><LI>db_chunk
+</B></TT><P>
+find largest rect of paint on given layer and covering given area<P>
+<PRE>
+largest = fattest = maximum minimum dimension (secondarily, maximizes second dimension).
+
+Usage: db_chunk [options] layer xbot ybot xtop ytop
+
+Returns:  xbot ybot xtop ytop
+          or
+          {}, if no chunk containing initial area.
+
+Options:
+-any_cell
+    don't restrict search to edit cell.
+    consider paint in any cell in window with internals displayed
+
+-group 
+    restrict search to active group only
+</PRE>
+<P>
+
+<TT><B><LI>db_flyline
+</B></TT><P>
+add a fly line to the editcell<P>
+<PRE>
+usage:  
+  db_flyline [-delete] [[hier_label_name1] hier_label_name2]]
+
+no names - lists all fly lines in cell.
+one name - lists all fly lines in cell connecting to named label.
+two names - creates fly line between named labels.
+
+if "-delete":
+no names - delete all fly lines in cell.
+one name - delete all fly lines in cell connecting to named label.
+two names - delete fly line between named labels.
+</PRE>
+<P>
+
+<TT><B><LI>db_instance
+</B></TT><P>
+create a cell instance<P>
+<PRE>
+usage:  db_instance [-cell cell_name] [-dup_ok] [-no_notify] [-orientation orientation] [-id instance_name] subcell_name x0 y0
+
+Add an instance of def_name with origin at x0 y0.
+Returns the name of the new instance, or NIL on failure.
+
+If -cell, add instance to cell_name (coordinates are in terms of cell_name).
+If no -cell, add instance to edit cell (coordinates are in terms of root cell)
+
+If -dup_ok, allows duplicate instance to be placed on exact copy
+(Should eventually be followed by selecting instance and 'sel_move 0 0'
+to check for duplicates)
+
+If -no_notify, don't notify database that cell has changed (must do
+explicit notify later).  FOR INTERNAL USE ONLY, DO NOT USE 
+(CAN CAUSE COREDUMPS)!
+
+If no '-id', picks unique instance name.
+
+NOTE:  Max is load on-demand.  db_instance does not load the referenced subcell 
+into memory!  However if the drc is on, the background checker will likely
+reference the cell causing a load to be attempted, potentially generating
+a Cell not-found error message asynchronously.
+</PRE>
+<P>
+
+<TT><B><LI>db_kids
+</B></TT><P>
+list cells that are instances of given cell<P>
+<PRE>
+Usage:  db_kids [cell_name]
+
+if cell_name not given, defaults to current edit cell.
+</PRE>
+<P>
+
+<TT><B><LI>db_label
+</B></TT><P>
+add a label<P>
+<PRE>
+usage:  db_label [options] layer text x0 y0 [x1 y1]
+
+add a label on the given layer.
+
+options:
+
+-cell cell_name
+
+  If -cell, paint into cell_name (coordinates are in terms of cell_name).
+  If no -cell, paint into edit cell (coordinates are in terms of root cell)
+
+-no_notify
+
+  If -no_notify, don't notify database that cell has changed.  FOR INTERNAL
+  USE ONLY, DO NOT USE (CAN CAUSE COREDUMPS)!
+
+-kind comment|hidden|local|global|input|output|inout
+
+  If no -kind, defaults to comment.
+
+-pos n|s|e|w|ne|nw|se|sw|center
+
+  -pos specifies text position with respect to label point or area.
+</PRE>
+<P>
+
+<TT><B><LI>db_paint
+</B></TT><P>
+paint a rectangle<P>
+<PRE>
+usage:  db_paint [-cell cell_name] [-no_notify] layer x0 y0 x1 y1
+
+Paint rectangle on given layer.
+
+If -cell, paint into cell_name (coordinates are in terms of cell_name).
+If no -cell, paint into edit cell (coordinates are in terms of root cell)
+
+If -no_notify, don't notify database that cell has changed.  FOR INTERNAL
+USE ONLY, DO NOT USE (CAN CAUSE COREDUMPS)!
+</PRE>
+<P>
+
+<TT><B><LI>db_parents
+</B></TT><P>
+list cells containing given cell as instance<P>
+<PRE>
+Usage:  db_parents [cell_name]
+
+if cell_name not given, defaults to current edit cell.
+</PRE>
+<P>
+
+<TT><B><LI>db_search
+</B></TT><P>
+search (layout) database<P>
+<PRE>
+Usage:  db_search subcommand [args]
+
+Subcommands:
+    touchingtypes x y
+       returns list of layers present at indicated (rootcell) coordinates
+       (does not look inside unexpanded subcells)
+
+    cells [-cell def_name] [-any_cell] [-area xbot ybot xtop ytop] [-limit n]
+       returns a line for each instance in editcell
+       of the form:
+         "instanceName defName xbot ybot xtop ytop path expansion transform arrayInfo"
+       (root cell coordinates).
+
+       xbot ybot xtop ytop = bounding box
+
+       path = 'EDIT_CELL_PATH' if -any_cell is not specified.
+	      If -any_cell is specified, it is the path from
+	      the root cell to the cell containing the instance,
+	      or {} (null list) if the instance is directly in the rootcell.
+
+       expansion = 'expanded' if internals visible, else {} (null list) 
+       transform = {a b c d e f}  (first two columns of 3x3 transform matrix
+                                   last column is {0 0 1})
+       arrayInfo = {xindex yindex xlo xhi ylo yhi xsep ysep} 
+                   (or NULL if not array)
+
+          NOTES ON ARRAYS:  if an arrayed cell is rotated or flipped,
+	  max modifies the transform and arrayinfo.  If an array
+	  is rotated, the xlo/xhi and ylo/yhi are swapped so that
+	  the x info is always horizontal, and y info is vertical.
+	  The xsep and ysep may be positive or negative to indicate
+	  the direction in which array elements are currently numbered.
+
+       If -any_cell, instances are not restricted to editcell, rather
+       all instances in rootcell and in expanded descendents are given.
+
+       If -cell given, search named cell instead of root (or edit) cell.
+       (coordinates are in terms of def_name)
+
+       If -cell AND -any_cell, gives all descendents of the named cell.
+
+       If -limit n, output is limited to n matchs.
+
+    labels [-cell def_name] [-area xbot ybot xtop ytop] [-limit n] [glob_pattern] 
+       returns a line for each labels in (rootcell or expanded descendents) 
+       of the form:  
+       "layer xbot ybot xtop ytop pos text instance_path group kind"
+       (root cell coordinates).
+
+       If glob_pattern is given, only labels with text matching the 
+       pattern are returned.
+
+       Glob matching uses the characters: * ? [ ]
+       To match one of these characters, precede it with a backslash.
+       Note that both the backslash and bracket characters are special
+       to tcl, and so must be enclosed in curly braces.
+       To search for the label x[1], you must use:
+
+	   db_search labels {x\[1\]}
+
+       If -cell given, search named cell instead of root cell.
+       (coordinates are in terms of def_name)
+
+       If -limit n, output is limited to n matchs.
+
+    paint [-cell def_name] [-any_cell] [-area xbot ybot xtop ytop] [-limit n] [layers]
+       returns a line for each paint rectangle in editcell
+       of the form:
+         "layer xbot ybot xtop ytop instance_path group"
+       (root cell coordinates).
+
+       If -any_cell present, paint is not restricted to editcell, rather
+       any paint in rootcell or expanded descendents, is given.
+
+       If -cell given, search named cell instead of root (or edit) cell.
+       (coordinates are in terms of def_name
+
+       If -cell AND -any_cell, looks inside all descendents of named cell
+       regardless of expansion mask.
+
+       If -limit n, output is limited to n matchs.
+
+    polygons [-cell] [-any_cell] [-area xbot ybot xtop ytop] [-limit n] [layers] 
+       returns a line for each polygon in editcell
+       of the form:
+         "layer bbox coordinates attributes instance_path group"
+       (root cell coordinates).
+
+       If -any_cell present, polygons are not restricted to editcell, rather
+       any polygon in rootcell or expanded descendents, is given.
+
+       If -cell given, search named cell instead of root (or edit) cell.
+       (coordinates are in terms of def_name
+
+       If -cell AND -any_cell, looks inside all descendents of named cell
+       regardless of expansion mask.
+
+       If -limit n, output is limited to n matchs.
+
+    wirepaths [-cell] [-any_cell] [-area xbot ybot xtop ytop] [-limit n] [layers]
+       returns a line for each paint rectangle in editcell
+       of the form:
+         "layer bbox width coordinates attributes instance_path group"
+       (root cell coordinates).
+
+       If -any_cell present, wirepaths are not restricted to editcell, rather
+       any wirepath in rootcell or expanded descendents, is given.
+
+       If -cell given, search named cell instead of root (or edit) cell.
+       (coordinates are in terms of def_name
+
+       If -cell AND -any_cell, looks inside all descendents of named cell
+       regardless of expansion mask.
+
+       If -limit n, output is limited to n matchs.
+</PRE>
+<P>
+
+<TT><B><LI>dbt_frame
+</B></TT><P>
+returns coordinates of visible field<P>
+Usage:  dbt_frame [fx1] [fy1] [fx2] [fy2]<P>
+<P>
+
+<TT><B><LI>dbt_frame_pixels
+</B></TT><P>
+returns number of pixels in visible field in x and y directions.<P>
+Usage:  dbt_frame_pixels<P>
+<P>
+
+<TT><B><LI>dbt_is_visible
+</B></TT><P>
+is layer visible?<P>
+Usage:  dbt_is_visible layer<P>
+<P>
+
+<TT><B><LI>dbt_selectable_layers
+</B></TT><P>
+returns list of selectable layers<P>
+Usage:  dbt_selectable_layers<P>
+<P>
+
+<TT><B><LI>dbt_touchingtypes
+</B></TT><P>
+returns list of layers present at indicated (rootcell) coordinates.<P>
+Usage:  dbt_touchingtypes x y mode<P>
+<PRE>
+mode may be: all, visible, selectable 
+  Layers are returned in order from lowest to highest.
+  Searches in all expanded cells.
+</PRE>
+<P>
+
+<TT><B><LI>dbt_visible_layers
+</B></TT><P>
+returns list of visible layers<P>
+Usage:  dbt_visible_layers<P>
+<P>
+
+<TT><B><LI>define_gcell
+</B></TT><P>
+define a gcell type with the given default properties<P>
+Usage:  define_gcell type default_properties<P>
+<P>
+
+<TT><B><LI>delete
+</B></TT><P>
+delete the selected stuff<P>
+Usage:  delete<P>
+<P>
+
+<TT><B><LI>edit_pop
+</B></TT><P>
+pop back to previous edit and root cells<P>
+Usage:  edit_pop [n]<P>
+<PRE>
+n is number of levels to pop
+</PRE>
+<P>
+
+<TT><B><LI>edit_push
+</B></TT><P>
+push into selected instance<P>
+Usage:  edit_push args<P>
+<PRE>
+Args can be:
+    "": Max will push into the selected instance.
+    "in_place": edit the cell in place.
+    "paint_in_place": edit the cell containing paint under the cursor.
+</PRE>
+<P>
+
+<TT><B><LI>exit
+</B></TT><P>
+exit max<P>
+<PRE>
+USAGE:
+    exit [-force [code]]
+
+  If -force is specified, max exits immediately.
+  If integer &#60code&#62 is also specified, it is the exit code.
+
+  Otherwise, if any cells have been modified, pops up a dialog
+  box that gives the user the option to save modified buffers on
+  normal exit.
+</PRE>
+<P>
+
+<TT><B><LI>ext_geometry
+</B></TT><P>
+returns area and perimeter of selection for each resistance class<P>
+<PRE>
+Usage:  ext_geometry
+
+(Uses current extraction style.)
+</PRE>
+<P>
+
+<TT><B><LI>find_next_error
+</B></TT><P>
+Show next error.  Optional &#60type&#62 is as for _feedback_max::next_error<P>
+Usage:  find_next_error [type]<P>
+<P>
+
+<TT><B><LI>flatten_cells
+</B></TT><P>
+flattens all selected cell instances (only one level of hierarchy).<P>
+<PRE>
+USAGE:
+    flatten_cells [-save_labels] [-show_menu] [-group]
+  
+  If -save_labels, all labels are saved.  Otherwise, use FLATTEN_SETUP
+    to determine how to change labels.
+  If -show_menu, bring up the prop_menu first.
+  if -group, put objects into a new group.
+
+  Flylines are preserved.  They are tricky.  They can be hiearchical
+  into the cell we are flattening, or into a sub-cell of the
+  cell we are flattening.
+
+  Hidden labels that are flattened are renamed with unique names.
+  The FLATTEN_SETUP controls what happens to other flattened label names.
+  Usually I/O ports are preserved by renaming.
+</PRE>
+<P>
+
+<TT><B><LI>gcell_get_props
+</B></TT><P>
+Return the properties for the indicated gcell<P>
+<PRE>
+USAGE:
+    gcell_get_props [-options] inst_name
+  
+  Returns the properties for the cell with id: &#60inst_name&#62
+  Options can be:
+    -default  return the default props for this type of gcell,
+	      instead of the props for this specific id.
+
+  This is an API function for users.
+  Note: This proc modifies the selection.
+</PRE>
+<P>
+
+<TT><B><LI>gcell_paint
+</B></TT><P>
+required paint command for gcells.<P>
+Usage:  gcell_paint layer x1 y1 x2 y2<P>
+<P>
+
+<TT><B><LI>gcell_polygon
+</B></TT><P>
+required polygon command for gcells.<P>
+<PRE>
+Usage:
+  gcell_polygon &#60layer&#62 &#60x1&#62 &#60y1&#62 &#60x2&#62 &#60y2&#62 ...
+</PRE>
+<P>
+
+<TT><B><LI>gcell_source
+</B></TT><P>
+Source the specified filename as a gcell.<P>
+<PRE>
+USAGE:
+    gcell_source [-force] filename
+
+  This command is useful when developing gcells.
+  You can not just use the tcl "source" command to source gcell code.
+  Use this command instead.
+
+  The -force flag forces the gcell to overwrite an existing gcell
+  by the same name that was already loaded into max.  This should
+  be used only for gcell development.  If the gcell is being used
+  by some other cell when you call this function with this flag,
+  havoc (possibly including core dumps) will ensue.
+
+  Example:
+
+    gcell_source /home/cad/mmi_local/max/motor.maxg
+</PRE>
+<P>
+
+<TT><B><LI>gds_info
+</B></TT><P>
+summarize GDSII stream file contents<P>
+<PRE>
+Usage:  gds_info fileName
+
+fileName extension defaults to '.gds' 
+
+for each layer: 
+  {layer_number type_number num_polygons num_wirepaths num_labels}
+
+for each subcell:
+  {def_name num_instances}
+
+for each instance property:
+  {property_number num_occurences}
+</PRE>
+<P>
+
+<TT><B><LI>gds_read
+</B></TT><P>
+read GDSII stream file<P>
+<PRE>
+Usage:  gds_read [-cells names] fileName
+
+If "-cells names" option given, reads in only cells in names list.
+(names is ',' separated list of cell names - no spaces allowed.)
+</PRE>
+<P>
+
+<TT><B><LI>gds_write
+</B></TT><P>
+write gds of current cell to cell's directory<P>
+Usage:  gds_write [file]<P>
+<P>
+
+<TT><B><LI>get_assoc
+</B></TT><P>
+get the value for name in the association list.<P>
+Usage:  get_assoc name list [nth]<P>
+<PRE>
+The &#60list&#62 is an association list, which is a list of sub-lists
+  where each sub-list is an association whose first element is a key
+  to identify the association.
+  This proc returns the value (the &#60nth&#62 element) of the first association
+  in &#60list&#62 whose key matches &#60name&#62.
+  If the optional index is given, get the "nth" value out of the list 
+  (this is used for getting the default value).
+  Example:
+
+    get_assoc yyy {{xxx 3} {yyy 5 7 9}} 2
+    Returns: 7
+</PRE>
+<P>
+
+<TT><B><LI>grid_select
+</B></TT><P>
+Activate the specified grid<P>
+Usage:  grid_select num<P>
+<P>
+
+<TT><B><LI>is_gcell
+</B></TT><P>
+returns 1 if this cell is a gcell, 0 otherwise<P>
+Usage:  is_gcell cell_def [option]<P>
+<P>
+
+<TT><B><LI>lay_bbox
+</B></TT><P>
+get bounding box of rootcell<P>
+<PRE>
+Usage:
+	lay_bbox 
+
+  Result:
+        xbot ybot xtop ytop 
+
+  Bounding box of (current) rootcell in rootcell coordinates.
+
+  NOTE:  Max commands generally use rootcell coordinates.  These
+  differ from the editcell coordinates when doing an edit-in-place.
+</PRE>
+<P>
+
+<TT><B><LI>lay_editcell
+</B></TT><P>
+get current edit cell<P>
+<PRE>
+Usage:
+	lay_editcell 
+
+  Result:
+        name of current edit cell
+
+  NOTE: to set edit cell, use ":edit" command.
+</PRE>
+<P>
+
+<TT><B><LI>lay_grid
+</B></TT><P>
+query/modify grid for current window<P>
+<PRE>
+Usage:
+	lay_grid fine|coarse visibility [0|1]
+ or 
+        lay_grid fine|coarse rect [x0 y0 x1 y1]
+
+ rect gives template for grid.  (x0,y0) is grid origin.
+
+ Result:
+        value of parameter (previous value on set)
+
+ NOTE:  The x and y grid spacings can differ (if desired).
+</PRE>
+<P>
+
+<TT><B><LI>lay_internals
+</B></TT><P>
+show (or hide) instance internals<P>
+<PRE>
+Usage:
+	lay_internals [-area] [-hide] 
+
+ If -area is specified all instances under box are expanded/unexpanded,
+ else selected instances are expanded/unexpanded
+ 
+ If -hide is specified, instances are unexpanded,
+ else instances are expanded.
+</PRE>
+<P>
+
+<TT><B><LI>lay_labels
+</B></TT><P>
+control label display in the current window<P>
+<PRE>
+Usage:
+	lay_labels non_edit_comments [0|1]
+
+ Control display of "comment" and "local" labels in non-edit cells.
+
+ If set (1), "comment " and "local"  labels are displayed for all cells.
+ If reset (0), "comment " and "local"  labels are displayed only for the
+ edit cell.
+
+ Result:
+        value of parameter (previous value on set)
+</PRE>
+<P>
+
+<TT><B><LI>lay_path
+</B></TT><P>
+returns the edit cell path relative to the root for edit in place<P>
+Usage:  lay_path<P>
+<P>
+
+<TT><B><LI>lay_rootcell
+</B></TT><P>
+get current rootcell<P>
+<PRE>
+Usage:
+	lay_rootcell 
+
+  Result:
+        cellName 
+
+  Returns Name of top-level cell in current layout window.
+</PRE>
+<P>
+
+<TT><B><LI>layt_box
+</B></TT><P>
+Set box location to nearest legal units.<P>
+<PRE>
+Usage: layt_box type [x1 y1 x2 y2]
+  If coordinates are specified, sets the visible box location.
+  No warning is issued if the coodinates are not on grid.
+  Returns location of old box, or empty string if no box up.
+  The type field must be one of:
+  "user" : rounds box location to nearest mouse resolution as
+		specified in the Grid Setup Menu.
+  "mask"  : rounds box to nearest foundry mask grid coordinate.
+  "exact" :  rounds box to nearest possible coordinate.
+  "dontcare" :  Dont care what grid it rounds to.  (Mostly used just
+		as a convenient way to document when the code really
+		doesnt care what grid is used.)
+</PRE>
+<P>
+
+<TT><B><LI>layt_point
+</B></TT><P>
+Set cursor location to nearest legal units.<P>
+<PRE>
+Usage: layt_point [-options] type [x y]
+  If coordinates are specified, the current cursor position is changed.
+  No warning is issued if the coordinates are not on grid.
+  Returns previous location of cursor.
+  The type field must be one of:
+  "user" : rounds point location to nearest mouse resolution as
+		specified in the Grid Setup Menu.
+  "mask"  : rounds point to nearest foundry mask grid coordinate.
+  "exact" :  rounds point to nearest possible coordinate.
+  "dontcare" :  Dont care what grid it rounds to.  (Mostly used just
+		as a convenient way to document when the code really
+		doesnt care what grid is used.)
+  The possible options are:
+    -no_clip  cursor location is not clipped to window.
+    -warp     the mouse cursor is moved to the new location.
+</PRE>
+<P>
+
+<TT><B><LI>max
+</B></TT><P>
+Returns the maximum of the arguments.<P>
+<PRE>
+Usage: max arg1 [arg2 ...]
+</PRE>
+<P>
+
+<TT><B><LI>max_auto_load
+</B></TT><P>
+load a library (i.e. directory) of cells automatically (usually on start up)<P>
+Usage:  max_auto_load dir<P>
+<P>
+
+<TT><B><LI>max_error
+</B></TT><P>
+Bring up an error popup in max and also print to screen.<P>
+Usage:  max_error msg<P>
+<PRE>
+This function is similar to the tcl "error" function.
+  The differences are:  1. The calling command is not aborted;
+  instead, max_error just returns;  2. This command is not caught
+  by the msg_catch or catch functions.
+  3.  Unlike msg, no trailing newline is required.
+
+  Note: for gcells, system startup, and command line processing,
+  the tcl "error" function should be used instead of this function; in
+  those cases the max C code has called tcl code and is awaiting its
+  return.  Dialog boxes should not be issued when the C code is
+  awaiting the return of a tcl function.
+
+  Use "max_error" for user errors that should not abort.
+  Use "error" for max internal errors and other errors that should abort.
+</PRE>
+<P>
+
+<TT><B><LI>mc_init
+</B></TT><P>
+Initializes Mega Cell Compiler (usually invoked from .maxrc)<P>
+Usage:  mc_init<P>
+<P>
+
+<TT><B><LI>measure
+</B></TT><P>
+places the box in the largest area unoccupied by visible layers<P>
+Usage:  measure [x] [y]<P>
+<P>
+
+<TT><B><LI>menu_local_cmd
+</B></TT><P>
+add entry to "local" menu (intended for use in .maxrc files)<P>
+Usage:  menu_local_cmd entry_name tcl_script [desc]<P>
+<PRE>
+The menu entry is setup to "i_cmd_eval tcl_script".  This makes the menu entry
+  a bona-fide max command:  undo, history, etc. are handled correctly.
+
+  Deletes any pre-existing entry of same name.
+</PRE>
+<P>
+
+<TT><B><LI>menu_tool_cmd
+</B></TT><P>
+add entry to "tool" menu (intended for use in .maxrc files)<P>
+Usage:  menu_tool_cmd entry_name tcl_script [desc]<P>
+<PRE>
+The menu entry is setup to "i_cmd_eval tcl_script".  This makes the menu entry
+  a bona-fide max command:  undo, history, etc. are handled correctly.
+
+  Deletes any pre-existing entry of same name.
+</PRE>
+<P>
+
+<TT><B><LI>min
+</B></TT><P>
+Returns the minimum of the arguments.<P>
+<PRE>
+Usage: min arg1 [arg2 ...]
+</PRE>
+<P>
+
+<TT><B><LI>mn_exit
+</B></TT><P>
+exit max (with or without backups)<P>
+<PRE>
+Usage:  mn_exit [-nobackup]
+
+Main use of this routine is to exit without backing up modified files.
+(If backups are desired plain 'exit' or even 'abort' works fine.)
+</PRE>
+<P>
+
+<TT><B><LI>mn_sys_find
+</B></TT><P>
+look up file in system library path<P>
+<PRE>
+Usage:  mn_sys_find file_name
+
+Returns full path name of first readable occurance of file_name in 
+system library path (tcl variable MN_PATH_SYS_LIB), or NULL if none.
+</PRE>
+<P>
+
+<TT><B><LI>msg
+</B></TT><P>
+generate a message (info or warning).<P>
+<PRE>
+Usage:
+  msg [-warn] message
+
+  Puts out "info" message by default, or "warning" message if -warn flag
+  given.
+
+  "info"  = message during normal execution (default).
+  "warn"  = message when abnormal situation encountered, but execution continues .
+  "error" = message when abnormal situation encountered, and command aborted.
+              (Use Tcl "error" command for errors.)
+ 
+  See also "msg_catch" and "msg_map" commands.
+</PRE>
+<P>
+
+<TT><B><LI>orientation
+</B></TT><P>
+extract orientation from instance transform<P>
+Usage:  orientation xform<P>
+<PRE>
+xform = first two rows of 3x3 transform from instance coords to rootcell.
+            (this is how transforms are represented internally in Max)
+
+    results:
+
+    ""      - identity
+    r90     - clockwise 90 degrees
+    r180    - clockwise 180 degrees
+    r270    - clockwise 270 degrees
+    
+    fx       - mirrored about y axis
+    fy       - mirrored about x axis
+
+    fx_r90 
+    fy_r90
+</PRE>
+<P>
+
+<TT><B><LI>paint_erase
+</B></TT><P>
+delete selectable layers (paint and labels) under the cursor from box<P>
+Usage:  paint_erase [layer]<P>
+<PRE>
+If no &#60layer&#62 specified, erase the selectable layers under the mouse.
+
+  Clears the selection as a side effect.
+</PRE>
+<P>
+
+<TT><B><LI>parse_pp_number
+</B></TT><P>
+Parse a pretty print number.<P>
+Usage:  parse_pp_number string<P>
+<PRE>
+A pretty print number may contain a suffix of: G M K m u n p f a
+  meaning Giga, Mega, Kilo, milli, micro, nano, pico, femto, atto.
+
+  Example:
+
+    parse_ppp_number 120p
+    Returns: 1.2e-10
+</PRE>
+<P>
+
+<TT><B><LI>place_gcell
+</B></TT><P>
+place a gcell<P>
+Usage:  place_gcell type origin args<P>
+<PRE>
+The &#60type&#62 is the type of gcell, for example, "fet".
+  The &#60origin&#62 is the coordinates where the gcell will be placed,
+  as a single list or string, for example "10 15".  The gcell is placed
+  so that its origin is at the specified coordinates.
+  The &#60args&#62 are optional, and are any number of properties
+  to be passed to the gcell, given as keyword-value pairs,
+  i.e. "-keyword value".
+
+  Example:
+    place_gcell fet "0 0" -type pfet
+</PRE>
+<P>
+
+<TT><B><LI>pp_number
+</B></TT><P>
+Create a pretty print version of the number.<P>
+Usage:  pp_number num [format]<P>
+<PRE>
+A pretty print number may contain a suffix of: G M K m u n p f a
+  meaning Giga, Mega, Kilo, milli, micro, nano, pico, femto, atto.
+
+  Example:
+
+    pp_number 1.0e-7
+    Returns: 100n
+</PRE>
+<P>
+
+<TT><B><LI>prop_menu
+</B></TT><P>
+Displays a dialog box and returns user entries<P>
+Usage:  prop_menu x y message title prop_list<P>
+<PRE>
+Similar to prop_menu2, with the following differences:
+  
+  1.  The prop_list is identical except that the second
+      element for each property is the value of the property
+      instead of the name of a variable containing the value.
+  2.  Arguments are different, as shown.
+  3.  The return value is "" if user hit cancel, otherwise the
+      original prop_list modified to contain the new values.
+  See: prop_menu2
+</PRE>
+<P>
+
+<TT><B><LI>prop_menu2
+</B></TT><P>
+Displays a menu dialog box and returns user entries.<P>
+<PRE>
+USAGE: prop_menu2 [-options ...] prop_list
+
+RETURNS: Return 1 on success, 0 if canceled.
+
+Options are:
+  -title title -message message
+  -x x -y y
+  -atmouse n
+  -apply applyproc
+  -buttons button_list
+
+  This function is similar to prop_menu, which it replaces.
+  The prop_menu function is now just a thin wrapper for this function.
+
+  The title and message are the window title and the first line
+  in the window, respectively.  If only one is given it will
+  be used in both locations.
+
+  If -x and -y are specified, they are the menu position.
+  If -atmouse n is specified, menu position is n pixels right and down
+  from mouse position.  If neither -x -y or -atmouse is specified,
+  then menu position is initially in middle of screen;
+  if user moves the menu, then next time the menu with same
+  title appears, it will be at the same position.
+
+  The applyproc is the name of a procedure to call to perform
+  the "apply" function.  If -apply is specified, an "Apply"
+  button will appear in the menu.  If the Cancel button is pushed
+  after the Apply button, prop_menu2 restores the original values
+  of all variables and then calls the apply function again to attempt
+  to undo the results of the previous apply function.
+
+  If -buttons &#60button_list&#62, the menu will use the specified list of buttons,
+  where each button is of the form "name=value[=options]";
+  name is the button name; value is the return value;
+  the options may be: default to signify the default button,
+  or apply to signify the Apply button.
+  For historical reasons, if the return value is 0, it is a cancel button.
+  The button with an apply option is ignored if no -apply option
+  was specified.
+  If buttons is not specified, it defaults to:
+    -buttons "Done=1=default Apply==apply Cancel=0=cancel"
+  If the value is 0, it is a cancel button, which returns immediately
+  (after undoing any previous "apply" functions).
+  Otherwise, the button acts like a "done" button, which performs
+  all validation checks before returning.
+
+  The prop_list argument is a list of lists, where each leaf list
+  describes one property, and consists of a property name, an optional
+  variable name that contains the value of the property name,
+  followed by optional property options.  The variable need not
+  be a global variable.  The variable name must be specified
+  if property options are specified.
+
+  The return value is 0 if user pressed Cancel, 1 if user pressed Done,
+  or the value from -return option, below.
+  
+  Example:
+
+  set value1 "whatever"
+  set value2 "val1"
+  set prop_list [list [list "This is a Prop List" "" -label]  [list "A property" value1 -entry]  [list "Another property" value2 -radio {val1 val2 val3}]]
+  if {[prop_menu2 -title "My properties" $prop_list] == 0} {
+    return ;# User pressed cancel button.
+  }
+
+  Restrictions:
+      No prop name may contain a dollar sign.
+
+  The first option may be a property type, which may be
+  selected from the following list:
+	-entry			Default - a simple entry box.
+	-filename {args}	A filename entry with a "Find..." button;
+				args are to the fs_box function.
+	-popup {a b c}		An entry with a popup menu for default choices.
+	-binary			A single radio button. Value must be 0/1
+	-radio {a b c}		Multiple choice using Radio buttons.
+				see -values, below.
+	-choice {a b c}		Multiple choice using a button and popup menu.
+				Like a popup, but the entry cant be edited.
+	-enum {a b c}           Like choice, but value is 0/1/2, not a/b/c.
+	-label			The value, if any, is not editable.
+				If the value is empty, the prop name
+				is a full column width label.
+	-number [min [max]]	A number entry with a tiny scrollbar beside it.
+	-scale min max		A number entry with a scale slider below it.
+	-button cmd  		A button that calls cmd as when pushed;
+	 			the variable should be an empty string.
+	-help {string}          Add "string" to the help menu.
+  First option may also be: -hide, -separator, -break, -help.
+
+  The "TRIGGER" property types are: -popup, -choice, -enum, -binary,
+  -radio.  The -filename is also a TRIGGER, but only if the
+  name is changed with the File box (by pushing the "Find..." button),
+  not if the user just types it in.  The TRIGGER property types
+  can trigger a -reload, -command or -return option.
+
+  If no property type is specified, the default is "entry".
+  The following additional -options may appear after the property type.
+	-incr n Increment (eg: .2) for -number or -scale.
+		Puts up/down arrows next to number that increment by
+		this amount.  If -validate is given, then the entered
+		number must be divisible by this amount.
+	-snap n Snap value for -number (but not -scale).
+		Over-rides -incr for the up/down arrows only, but not
+		for validation.  This lets you specify a larger value
+		to snap to than incr.  The number snaps to the nearest
+		multiple of -snap when the arrow buttons next to the
+		number are pushed.
+	-help {message}	 Add "$propname: $message" to the help.
+	-width n  Minimum width for any entry in chars.
+		Works on entry, popup, number, scale.  Default is
+		length of prop value, but since all props are in the
+		same frame, they all default to the min width of
+		the largest prop value.
+	-break	Next item starts a new column.
+	-separator  Separator line drawn after item.
+	-validate [procname]  If -validate is not given, then
+		-number and -scale properties are validated only to be
+		numbers.  If -validate is given without a procname,
+		then -number or -scale numbers entered by the user must
+		match the specified min/max/increment.  If -validate is
+		given with a procname, the named proc is called as:
+		    procname &#60new_value&#62 &#60prop_name&#62
+		If the new value is valid, procname should return "".
+		Otherwise, procname should return an error message,
+		which is displayed.  The -validate option with a procname
+		can appear on any property, not just numbers.
+		The prop_menu will not return until all properties
+		pass validation.
+	-values {...}  The values to be used for the names specified in -radio.
+	-hide  The property is not displayed.  Useful for development.
+		Equivalent to -when 0
+	-when {expr}   The property is only displayed when expr is true.
+		To implement morphing menus, the expr would contain
+		a reference to a variable in this menu with a -reload
+		option.  If the user hits the "Cancel" button,
+		all changes to all variables are canceled,
+		regardless of the current visibility.
+	-reload Reload the menu after a change to this property.
+		Typically used with -when to create morphing menus.
+	-return value
+		Return value immediately when the value is changed.
+		Only works with TRIGGER property types.
+		This can be used to implement morphing menus that are
+		too complicated for -when clauses.  The caller checks
+		the prop_menu2 return value for this -return value and
+		immediately reinvokes prop_menu2 to reflect changes.
+		Note, however, that the "Cancel" button only cancels
+		out changes to the most recent prop_menu2 invocation.
+	-command command
+		Execute command in global context (not the context of
+		the caller) after the prop menu item is changed.
+		Only available with TRIGGER type property types.
+</PRE>
+<P>
+
+<TT><B><LI>put_assoc
+</B></TT><P>
+replace the value in an association list.<P>
+Usage:  put_assoc value name list [index]<P>
+<PRE>
+The &#60list&#62 is an association list, which is a list of sub-lists
+  where each sub-list is an association whose first element is a key
+  to identify the association.
+  For each association whose key matches &#60name&#62, replace the
+  &#60index&#62 (default 1) numbered element in the association with value.
+</PRE>
+<P>
+
+<TT><B><LI>res
+</B></TT><P>
+Returns design grid size (minimum increment)<P>
+<PRE>
+USAGE: res [-userx | -usery | -internal | -mask]
+
+  If -userx or -usery, return user resolution grid size
+     in x or y, as set in the Grid Menu - this is the grid the mouse
+     snaps to.
+  If -mask, return foundry grid.
+  If -internal, return max minimum internal grid.
+  Default is -internal.
+</PRE>
+<P>
+
+<TT><B><LI>rm_assoc
+</B></TT><P>
+Removes name from assocication list.<P>
+Usage:  rm_assoc name list<P>
+<PRE>
+The &#60list&#62 is an association list, which is a list of sub-lists
+  where each sub-list is an association whose first element is a key
+  to identify the association.
+  This proc removes all associations from &#60list&#62 whose
+  key matches &#60name&#62.
+  Example:
+
+    puts [rm_assoc yyy [list {xxx 3} {yyy 5} {zzz 2}]]
+  Returns the following list:
+    {xxx 3} {zzz 2}
+</PRE>
+<P>
+
+<TT><B><LI>saveall
+</B></TT><P>
+saves all modify cells to disk<P>
+Usage:  saveall<P>
+<P>
+
+<TT><B><LI>sel_area
+</B></TT><P>
+select given area<P>
+<PRE>
+usage: sel_area [options] xbot ybot xtop ytop
+
+Options:
+-any_cell
+    don't restrict selection to edit cell.
+    consider any cell in window with internals displayed
+
+-group 
+    restrict selection to active group only
+
+-layers
+    select paint on given layers only
+
+-less
+    removing matching paint from selection!
+
+-more
+    don't clear selection first
+
+-no_labels
+    don't select labels.
+    if not set, labels attached to selected paint are 
+    selected or if -layers option includes 'labels' all 
+    labels are selected.
+
+-no_poly
+    don't select polygons
+
+-no_tiles
+    don't select paint tiles
+
+-no_wp
+    don't select wire paths.
+</PRE>
+<P>
+
+<TT><B><LI>sel_cell
+</B></TT><P>
+select cell instance with given id<P>
+<PRE>
+usage: sel_cell [-more | -less] name 
+
+Options:
+-less
+    removes instance from selection!
+
+-more
+    don't clear selection first (add instance to selection)
+
+The instance name can be a path, to reference an instance down the
+cell hierarchy.  For example:  
+
+  sel_cell Midcell_3/Lowcell_6/Inv_0
+</PRE>
+<P>
+
+<TT><B><LI>sel_chunk
+</B></TT><P>
+selects largest rect of paint (and attached labels) on given layer and covering given area<P>
+<PRE>
+largest = fattest = maximum minimum dimension 
+(secondarily, maximizes second dimension).
+
+usage: sel_chunk [options] layer xbot ybot xtop ytop
+
+Options:
+-any_cell
+    don't restrict selection to edit cell.
+    consider any cell in window with internals displayed
+
+-group 
+    restrict selection to active group only
+
+-less
+    removes matching paint from selection!
+
+-more
+    don't clear selection first (add to selection)
+</PRE>
+<P>
+
+<TT><B><LI>sel_clear
+</B></TT><P>
+clear selection<P>
+<PRE>
+usage: sel_clear
+
+Deselects everything.
+</PRE>
+<P>
+
+<TT><B><LI>sel_labels
+</B></TT><P>
+select labels by name<P>
+<PRE>
+usage: sel_labels [options]
+
+Select labels in edit cell (active group only).
+
+Options:
+-any_cell
+	don't restrict selection to edit cell.
+        consider any cell in window with internals displayed.
+        NOT YET IMPLEMENTED.
+
+-any_group
+        don't restrict selection to active group.
+
+-inside xbot xtop ybot ytop
+	select only labels entirely inside indicated area
+
+-kind kind
+	kind = in, out, in_out, local, global, text, or hidden.
+	select only labels of specified kind.
+
+-layer layer
+	select only labels attached to given layer.
+
+-less
+        removing matching labels from selection.
+
+-more
+	don't clear selection first..
+
+-pos dir
+	dir = North, South et.c
+        select only labels with matching position.
+
+-rect xbot ybot xtop ytop
+       select only labels with matching rects.
+
+-text text
+	select only labels with specified text.
+</PRE>
+<P>
+
+<TT><B><LI>sel_net
+</B></TT><P>
+select net under cursor<P>
+<PRE>
+usage: sel_net [-less | -more] [-no_labels] [-point x y] layer
+
+Starting at layer under the cursor, all electrically connected material 
+is selected.
+
+However the search is stopped at cells whose internals are not displayed
+(i.e. unexpanded cells).
+
+-less
+        remove net from selection!
+
+-more
+	don't clear selection first.
+
+-no_labels
+        don't select labels (speeds up net selection)
+
+-point x y
+        start search at (x,y) instead of cursor.
+</PRE>
+<P>
+
+<TT><B><LI>sel_region
+</B></TT><P>
+select connected region under cursor<P>
+<PRE>
+usage: sel_region [-less | -more] [-point x y] layer
+
+Select connected region on given layer under the cursor, 
+(like sel_net except that search does not follow through layer changes).
+
+The search is stopped at cells whose internals are not displayed
+(i.e. unexpanded cells).
+
+-less
+        remove region from selection!
+
+-more
+	don't clear selection first.
+
+-point x y
+        start search at (x,y) instead of cursor.
+</PRE>
+<P>
+
+<TT><B><LI>sel_what
+</B></TT><P>
+get info on selection<P>
+<PRE>
+usage: sel_what subcommand [args]
+
+Subcommands:
+    cells [-boolean] [-edit_only non_edit_found_var_name]
+        if -boolean, returns boolean indicating whether selection
+        includes any instances.
+
+        Otherwise, lists all instances in selection: 
+        "instanceName defName xbot ybot xtop ytop path expansion transform arrayInfo"
+
+        (rootcell coordinates)
+        xbot ybot xtop ytop = bounding box
+        expansion = 'expanded' if internals visible, else {} (null list) 
+        transform = {a b c d e f}  (first two columns of 3x3 transform matrix
+                                    last column is {0 0 1})
+        arrayInfo = {xlo xhi ylo yhi xsep ysep} (or NULL if not array)
+          See db_search documentation for further notes on arrayInfo.  
+
+    labels [-edit_only non_edit_found_var_name]
+        lists selected labels: 
+        form:  "layer xbot ybot xtop ytop pos text path group kind"
+        (rootcell coordinates)
+
+    paint [-edit_only non_edit_found_var_name]
+        lists selected rectangles: "layer xbot ybot xtop ytop"
+        (rootcell coordinates)
+
+    polygons
+        lists selected polygons:
+        form:  "layer bbox coordinates attributes"
+        coodinates = x0 y0 x1 y1 ...
+        attribute of "dependent" means polygon is part of a wire path. 
+        (rootcell coordinates)
+
+    types
+        lists names of types (layers) in selection.
+
+-edit_only flag:
+
+if -edit_only flag given, only selected objects in the edit cell are listed.
+if non_edit_found_var_name is not {}, that var is set to 1 if the
+selection includes non-edit-cell objects of the type being queried, 
+to 0 otherwise.
+</PRE>
+<P>
+
+<TT><B><LI>setl
+</B></TT><P>
+sets list of variable names to corresponding entries in list of values<P>
+Usage:  setl names values<P>
+<PRE>
+Example:
+
+	setl {a b c} "4 12 foo"
+
+    is the same as the following commands:
+
+	set a 4
+	set b 12
+	set c foo
+</PRE>
+<P>
+
+<TT><B><LI>techinfo
+</B></TT><P>
+Return info about process technology.<P>
+Usage:  techinfo what [l1] [l2] [flags]<P>
+<PRE>
+The &#60what&#62 argument determines the meaning of the &#60l1&#62 and &#60l2&#62
+  arguments, and whether they are required or optional.
+
+  Normally techinfo generates an error if a requested technology rule
+  was not specified in the current technology file.  If &#60flags&#62 is
+  "opt", do not print a warning in these cases, instead just return 0
+  or "", whichever is appropriate.
+
+  To specify the &#60flags&#62 when &#60l1&#62 or &#60l2&#62 are not required, specify an
+  empty string ("") for &#60l1&#62 and/or &#60l2&#62.
+
+  In general, when a layer name is required, it must exactly match the
+  layer name in the technology file.  Use "techinfo layer" to convert
+  MMI canonical layer names to names in the current technology.  See
+  also: techinfo2.
+
+  The following are various ways techinfo can be called:
+
+  techinfo layer &#60l1&#62
+      Return the layer name in the current technology for the
+      mmi canonical layer name: l1.  See techinfo2 for
+      a list of canonical layer names.
+
+  techinfo enclose &#60l1&#62 &#60l2&#62 [all]
+  techinfo overlap &#60l1&#62 &#60l2&#62 [all]
+      These are synonyms.  Return amount layer l1 must enclose layer l2.
+      By default, return a single number, which is the maximum enclosure
+      in either x or y directions.  If optional "all" is specified,
+      return one or two numbers;  if two numbers returned, first is
+      x enclosure and second is y enclosure.
+      Example:
+	[techinfo enclose m1 ct]   returns: 0.06
+
+
+  techinfo extend &#60l1&#62 &#60l2&#62
+      Return amount layer l1 must extend beynod l2.  Mostly used
+      for poly extensions beyond diff in fets.
+      Example:
+	[techinfo extend pfet pdiff]  returns: 0.32
+  
+  techinfo area &#60l1&#62
+      Return min area rule for layer l1.
+  
+  techinfo spacing &#60l1&#62 &#60l2&#62
+  techinfo space_to &#60l1&#62 &#60l2&#62
+  techinfo sep &#60l1&#62 &#60l2&#62
+      These are synonyms.  Return separation between layer l1 and l2.
+  
+  techinfo layer_order
+      Return list of all layers in order from bottom to top
+
+  wire_layers
+      Return list of wire layers in the order they should be tried
+      when searching for a valid wiring layer.  Usually metal first.
+      Note that wire_layers usually includes poly and diff layers,
+      in addition to metal layers.
+  
+  techinfo min_width &#60l1&#62
+  techinfo width &#60l1&#62
+      These are synonyms.  Return min width rule for layer l1.
+  
+  techinfo connect &#60l1&#62
+    Return list of layers to which l1 will electrically connect.
+    Example:
+      [techinfo connect m1]   returns: "ct v12"
+
+  techinfo vianame &#60l1&#62 &#60l2&#62
+    Given two layer names, return the name of the via cell that would
+    be needed to connect the two layers.  These names are chosen by MMI
+    using the following rules:  For simple vias, the via cell name is
+    the same as the name of the via layer, eg: v12.  If there are
+    multiple possible via cells for the same cut layer, the via cell
+    name is created by returning the two layer names separated by an
+    underbar.  Note that depending on the technology, the "ct_poly" via
+    might be called just "ct", if there is no conflict.
+    Examples:
+      [techinfo vianame m1 m2]     returns: v12
+      [techinfo vianame poly m1]   returns: ct_poly
+      [techinfo vianame ndif m1]   returns: ct_ndif
+
+
+  techinfo viawidth &#60l1&#62 &#60l2&#62
+      Return the total minimum width of the specified via structure.
+      l1 and l2 are the two layers that are to be connected by the via,
+      in either order.
+
+  techinfo layers via
+  techinfo vias
+      These are synonyms.
+      Return a list of the layers that are via/contact/cut layers.
+
+  techinfo below &#60l1&#62
+    Return the list of layers that may appear immediately below the
+    specified layer.  If l1 is a metal layer, the return value is the
+    name of the via layer.  If l1 is a via/contact/cut layer, the name
+    is the list of layers that can appear below that layer.
+    Examples:
+      [techinfo below m1]   returns: ct
+      [techinfo below ct]   returns: "ndif pdif nwc pwc poly"
+
+  techinfo above &#60l1&#62
+    Like techinfo above, but return list of layers that may
+    appear above layer l1.
+
+  techinfo devices
+    Return complete list of devices defined in this technology.
+    Example:
+      [techinfo devices]   returns: "nfet pfet"
+
+  techinfo device &#60l1&#62
+    Return the layers that make up the device specified by l1.
+    Example:
+      [techinfo device pfet]  returns: "poly pdif"
+</PRE>
+<P>
+
+<TT><B><LI>techinfo2
+</B></TT><P>
+Like techinfo, but takes mmi canonical layer names.<P>
+Usage:  techinfo2 what [l1] [l2] [flags]<P>
+<PRE>
+This routine is similar to techinfo, but the layer names are assumed
+  to be MMI canonical layer names instead of layer names in the current
+  technology file.  This routine makes it easier to query the
+  technology data-base without knowing what the specific layer names
+  are in the current technology.
+
+  Canonical layer names are:
+    poly = poly layer used to draw fets and stdcell routing;
+    pplus, nplus, pdiff, ndiff, nwell;
+    v0 = contact;
+    v1, v2, ... = other via cut layers;
+    m1, m2, ... = metal layers;
+
+  NOTE: These names may conflict with user defined names!!!  For
+  example, the user may name their metal layers m0, m1, etc.  So only
+  use techinfo2 when supplying MMI canoninical layer names; otherwise
+  use techinfo.
+
+  This routine can only be used for those techinfo calls that require
+  layer names.  For example, you should not use it to replace "techinfo
+  device".
+
+  The mapping of mmi canonical layer names to technology layer names
+  may be specified with the LAYER_NAME array in the technology file.
+</PRE>
+<P>
+
+<TT><B><LI>toggle_grid
+</B></TT><P>
+toggle grid on or off<P>
+Usage:  toggle_grid [value]<P>
+<PRE>
+If value is "off" or "on", set grid visibility accordingly.
+</PRE>
+<P>
+
+<TT><B><LI>undo_disable
+</B></TT><P>
+turn off undo<P>
+<PRE>
+Reenable undo with undo_enable.
+Undo disables can be nested.
+NOTE:  Consider an undo_flush after an undo_disable.
+</PRE>
+<P>
+
+<TT><B><LI>undo_enable
+</B></TT><P>
+turn undo logging back on<P>
+<PRE>
+Reenables undo after  undo_disable.
+Undo disables can be nested.
+</PRE>
+<P>
+
+<TT><B><LI>undo_flush
+</B></TT><P>
+delete everything from undo list<P>
+<P>
+
+<TT><B><LI>use_first
+</B></TT><P>
+return the value of the first variable name that is defined and not "".<P>
+Usage:  use_first args<P>
+<PRE>
+The &#60args&#62 is a list of variable names.
+  Evaluates variable names in &#60args&#62 in the current context in order.
+  If the variable is defined and non-nil, returns its value. If none are
+  defined, returns nil (""), or the value of the final literal argument.
+
+  If the first character of the name is ' then it is a literal
+  that is returned verbatim.  This is useful as the final arg
+  to be returned if none of the variables are defined or have
+  non nil values.
+
+  For example: 
+
+        set b 23
+        sue&#62 use_first a b c
+        23
+        sue&#62 use_first aa bb cc '58
+        58
+</PRE>
+<P>
+
+<TT><B><LI>uusnap
+</B></TT><P>
+Takes any number of values as args, returns list of results<P>
+<PRE>
+USAGE: uusnap [-floor | -ceil] [-user | -mask | -internal]  arg ...
+  Rounds args to nearest legal units (design grid points.)
+  If -user, round to user units.   If the user grid is assymetric,
+  the first arg is assumed to be an X coord, the second a Y coord, etc.
+  if -mask, round to minimum mask units;
+  if -internal, round to nearest legal internal units (default case).
+  if -floor, round value down to the next smaller unit;
+  if -ceil, round value up to the next higher unit;
+  otherwise round to nearest unit.
+</PRE>
+<P>
+
+<TT><B><LI>warning
+</B></TT><P>
+Bring up a warning popup in max and also print to screen.<P>
+Usage:  warning msg [buttons]<P>
+<PRE>
+This function is similar to msg -warn.
+  The differences are: 1. The warning is printed NOW, unlike msg -warn,
+  which, during interactive commands, is defered until the current
+  interactive command completes. (See i_cmd_eval.)
+  2.  The warning message is not intercepted by catch or msg_catch.
+  3.  Unlike msg, no trailing newline is required.
+
+  Note: for gcells, system startup, and command line processing,
+  the msg -warn function should be used instead of this function; in
+  those cases the max C code has called tcl code and is awaiting its
+  return.  Dialog boxes should not be issued when the C code is
+  awaiting the return of a tcl function.
+
+  If buttons is given, it is a list of button names to be
+  put on the menu, and the function returns the zero-based index
+  of the button that is pressed.
+  If buttons is not given, the default buttons is just "ok".
+</PRE>
+<P>
+
+<TT><B><LI>CELL(gds_suffix)
+</B></TT><P>
+default output suffix for gds files<P>
+<PRE>
+sets the search pattern in the file selector box
+</PRE>
+<P>
+
+<TT><B><LI>DIALOG_FONT
+</B></TT><P>
+Default font used for prop menus<P>
+<P>
+
+<TT><B><LI>LISTBOX_FONT
+</B></TT><P>
+Default font used in list-boxes; should be a fixed width font.<P>
+<P>
+
+<TT><B><LI>LIST_BOXES
+</B></TT><P>
+number of list boxes in the max window at startup<P>
+<P>
+
+<TT><B><LI>MENU_FONT
+</B></TT><P>
+Default font used in menus<P>
+<P>
+
+<TT><B><LI>MN_TECH
+</B></TT><P>
+Technology name (without variation part)<P>
+<P>
+
+<TT><B><LI>MN_TECH_VAR
+</B></TT><P>
+Technology variation (if any)<P>
+<P>
+
+<TT><B><LI>SEL_NET_SETUP(display_label_path)
+</B></TT><P>
+Binary value (0 or 1) that controls whether the "Select Net" command will include path names in any displayed label names.  See also SEL_NET_SETUP(display_labels).<P>
+<P>
+
+<TT><B><LI>SEL_NET_SETUP(display_labels)
+</B></TT><P>
+Binary value (0 or 1) that controls whether the "Select Net" command will display label names.<P>
+<P>
+
+<TT><B><LI>SEL_NET_SETUP(via_limit)
+</B></TT><P>
+The "Select Net" command can optionally select attached via cells as well as wires.  You would want to select the via cells if you were planning to move the wire, for example, and want the attached vias to move with it.  However, selecting the via cells is time consuming and unnecessary if all you are doing is viewing the connectivity, which is typically the case when selecting large nets.   So you can control the behavior with this variable.  If the net contains fewer than this number of via cells, then they are selected. If set to 0, via cells are not selected. If set to -1, via cells are always selected.<P>
+<P>
+
+<TT><B><LI>SMALL_FONT
+</B></TT><P>
+Default font used for small text<P>
+<P>
+
+<TT><B><LI>ZOOM_BUTTONS
+</B></TT><P>
+the colors of the zoom buttons in the navigator window<P>
+<P>
+
+</UL>
+
+</BODY></HTML>
+

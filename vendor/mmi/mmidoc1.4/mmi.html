@@ -1,0 +1,493 @@
+<head>
+<title>
+Micro Magic Documentation Guide
+</title>
+</head>
+
+<body>
+
+<h1>
+<img src="../mmi_logo.gif" align=center>
+Micro Magic Documentation Guide
+</h1>
+
+<h2 >Contents</a> </h2>
+
+<p>
+<ul>
+
+
+<li><a href="index.html">
+Micro Magic Tools Overview and Descriptions</a>
+
+<p>
+
+<li>Documentation of Main Micro Magic Tools:
+
+	<ul>
+	<li><a href="#max"> max </a>
+	<li><a href="#mcc"> mcc </a>
+	<li><a href="#sue"> sue </a>
+	<li><a href="#dpc"> dpc </a>
+	<li><a href="#nst"> nst </a>
+	</ul>
+<p>
+
+<li>Installation
+	  <ul>
+	  <li><a href="#install"> Installation of Micro Magic Tools </a>
+	</ul>
+
+<p>
+
+<li>Additional Documentation:
+
+	<ul>
+	<li><a href="#mmidoc"> mmidoc </a>
+	<li><a href="#mmi_tutorial"> mmi_tutorial </a>
+        <li><a href="../edif2sue/user_doc"> edif2sue </a>
+        <li><a href="#sue2edif"> sue2edif </a>
+	<li><a href="#verilog_to_sue"> verilog_to_sue </a>
+	<li><a href="#mmi_tclsh"> mmi_tclsh </a>
+	<li><a href="#mmi_wish"> mmi_wish </a>
+	<li><a href="#tcltk"> Tcl/Tk </a>
+	<li><a href="#gemini"> gemini </a>
+	<li><a href="#ext2sim"> ext2sim </a>
+	<li><a href="#ext2spice"> ext2spice </a>
+	</ul>
+
+<p>
+
+</ul>
+	
+<hr>
+
+<h2 ><a name="alpha"> Documentation of Main Micro Magic Tools </a> </h2>
+
+<h3> <a name = "max"> max </a> </h3>
+MAX is a full function IC Layout tool.  MAX's features include:
+<ul>
+<li> Interactive viewing and editing of hierarchical layout
+<li> Continuous DRC feedback during layout
+<li> Hierarchical and incremental DRC
+<li> Hierarchical and incremental circuit extraction
+<li> Automatic generation of detailed parasitics and netlisting for critical paths 
+<li> Interactive connectivity tracing
+<li> Interactive wiring tool with flylines to show connections not yet completed
+<li> Generators for layout structures, ranging from simple transistors and gates
+to large structures such as complete SRAMS
+<li> Interfaces to other tools, including schematic capture (for example Sue), 
+and batch DRC and LVS (for example Dracula or ICRules).
+<li> Smart palette for easy control and feedback on layers
+<li> Integrated Postscript printing
+<li> Reads/writes GDSII, CIF, and Magic (.mag) in addition to native (.max) format
+<li> Full customization and extension via Tcl/Tk scripting language
+<li> Technology independence via technology description files
+<li> Optimized for large databases using load on demand
+<li> Optimized for Manhattan design, with support for arbitrary-angle 
+data
+<li> Multi-platform, POSIX compliant C code, using Tcl/Tk for GUI interface
+</ul>
+<p>
+Documentation on MAX:
+<ul>
+<li><a href="../max/doc/max_manual/max_manual.html"> MAX Manual </a>
+<li><a href="../max/doc/max_manual/text_commands.html"> MAX Text Commands </a>
+<li><a href="../max/doc/max_tutorial/max_tutorial.html"> MAX Tutorial </a>
+</ul>
+
+<h3> <a name = "mcc"> mcc </a> </h3>
+The MegaCell Compiler (MCC) is a package that runs on top of MAX to
+build regular structures such as SRAMs, ROMs, PLAs, etc. 
+<p>
+Documentation on MCC:
+<ul>
+<li><a href="../max/doc/mcc_manual/mcc_manual.html"> MCC Manual </a>
+<li><a href="../max/doc/mcc_tutorial/mcc_tutorial.html"> MCC Tutorial </a>
+<li> See also, the <a href="#max"> MAX Documentation</a>
+</ul>
+
+<h3> <a name = "sue"> sue </a> </h3>
+Sue is a full featured "Schematic User Environment".
+<p>
+Documentation on Sue and the SUE Data Path Compiler (DPC):
+<ul>
+<li><a href="../sue/README"> Sue README </a>
+<li><a href="../sue/doc/sue_manual/sue_manual.html"> SUE Manual </a>
+<li><a href="../sue/doc/sue_manual/api_manual.html"> SUE API Reference Guide </a>
+<li><a href="../sue/doc/sue_manual/sue_variables.html"> SUE Variables Reference Guide </a>
+<li><a href="../sue/doc/sue_tutorial/sue_tutorial.html"> SUE Tutorial </a>
+<li><a href="../sue/FAQ"> Sue FAQ </a>
+</ul>
+
+<h3> <a name = "dpc"> dpc </a> </h3>
+The Data Path Compiler (DPC) is a package that runs on top of SUE to
+build and analyze high-speed data paths.
+<p>
+Documentation on DPC:
+<ul>
+<li><a href="../sue/doc/dpc_manual/dpc_manual.html"> DPC Manual </a>
+<li><a href="../sue/doc/dpc_tutorial/dpc_tutorial.html"> DPC Tutorial </a>
+<li> See also, the <a href="#sue"> Sue Documentation</a>
+</ul>
+
+<h3> <a name = "nst"> nst </a> </h3>
+Nst (New Spice Tool) is a utility program for viewing waveforms generated
+by programs like HSPICE.  It is designed for use with a schematic front-end
+such as Sue.
+
+<p>
+
+Documentation on Nst:
+<ul>
+<li><a href="../nst/doc/nst_manual/nst_manual.html"> NST User's Manual </a>
+<li> See also, the <a href="#sue"> Sue Documentation</a>
+</ul>
+
+<p>
+
+<h2> <a name = "installation"> Installation </a> </h2>
+
+<p>
+
+<h3> <a name = "install"> Installation of Micro Magic Tools </a> </h3>
+Installation of Micro Magic releases is quite simple: just "untar" the
+release into a directory of your choice.  In addition each (would be) user must set
+one or two environment variables and include the correct bin directory in
+their path.  This is usually done in their .login and .cshrc files.
+<p>
+Documentation on installation:
+<ul>
+<li><a href="../README"> MMI Release README </a>
+</ul>
+
+<p>
+
+<h2 ><a name="add"> Additional Documentation </a> </h2>
+
+
+<h3> <a name = "extcheck"> extcheck </a> </h3>
+Extcheck checks the hierarchical ".ext" format generated by the MAX circuit 
+extractor (netlister) for global connectivity and gives statistics on the total
+number of fets, nodes, etc.
+<p>
+Documentation on Extcheck:
+<ul>
+<li><a href="../max/doc/man.ascii/extcheck.1"> Extcheck Man Page </a>
+<li><a href="../max/doc/man.ascii/ext.5"> Ext Format </a>
+</ul>
+
+<h3> <a name = "ext2sim"> ext2sim </a> </h3>
+Ext2sim converts the hierarchical ".ext" format generated by the MAX circuit 
+extractor (netlister) to the flat ".sim" format used by a number of circuit 
+simulators.
+<p>
+Documentation on Ext2sim:
+<ul>
+<li><a href="../max/doc/man.ascii/ext2sim.1"> Ext2sim Man Page </a>
+<li><a href="../max/doc/man.ascii/extcheck.1"> Extcheck Man Page </a>
+(documents some common command line options)
+<li><a href="../max/doc/man.ascii/ext.5"> Ext Format </a>
+<li><a href="../max/doc/man.ascii/sim.5"> Sim Format </a>
+</ul>
+
+
+<h3> <a name = "ext2spice"> ext2spice </a> </h3>
+Ext2spice converts the hierarchical ".ext" format generated by the MAX circuit 
+extractor (netlister) to spice format. 
+<p>
+Documentation on Ext2spice:
+<ul>
+<li><a href="../max/doc/man.ascii/ext2spice.1"> Ext2spice Man Page </a>
+<li><a href="../max/doc/man.ascii/extcheck.1"> Extcheck Man Page </a>
+(documents some common command line options)
+<li><a href="../max/doc/man.ascii/ext.5"> Ext Format </a>
+</ul>
+
+<h3> <a name = "gemini"> gemini </a> </h3>
+Gemini compares two netlists in ".sim" format.
+Documentation on Ext2spice:
+<ul>
+<li><a href="../max/doc/man.ascii/gemini.1"> Gemini Man Page </a>
+<li><a href="../max/doc/gemini_manual/gemini_manual.ps"> Gemini User's Manual </a> (in postscript form)
+<li><a href="../max/doc/man.ascii/sim.5"> Sim Format </a>
+</ul>
+
+
+<h3> <a name = "mmidoc"> mmidoc </a> </h3>
+
+Mmidoc brings up complete documentation on the Micro Magic tools 
+in Netscape (or your favorite web browser).
+<p>
+Documentation on Mmidoc:
+<ul>
+<li><a href="./README"> Mmidoc README </a>
+</ul>
+
+<h3> <a name = "mmi_tutorial"> mmi_tutorial </a> </h3>
+
+mmi_tutorial brings up a popup that allows you to install, view,
+    and/or print the MMI MAX, MCC, SUE, or DPC tutorials.  To run,
+    just type mmi_tutorial at any unix prompt.
+
+<p>
+
+<h3> <a name = "mmi_tclsh"> mmi_tclsh </a> </h3>
+
+Mmi_tclsh is a version of Tclsh that does not depend on Tcl being installed
+on your system: it uses the Tcl library in ${MMI_TOOLS}/lib/.  It also
+includes special Micro Magic extensions.
+<p>
+Documentation on Mmi_Tclsh:
+<ul>
+<a href="#tcltk"> Tcl/Tk documentation </a>
+</ul>
+
+
+<h3> <a name = "mmi_wish"> mmi_tclsh </a> </h3>
+
+Mmi_wish is a version of Wish that does not depend on Tcl/Tk being installed
+on your system: it uses the libraries in ${MMI_TOOLS}/lib/.  It also
+includes special Micro Magic extensions.
+<p>
+Documentation on Mmi_wish:
+<ul>
+<a href="#tcltk"> Tcl/Tk documentation </a>
+</ul>
+
+
+
+<h3> <a name = "tcltk"> Tcl/Tk </a> </h3>
+The MMI tools use embedded Tcl/Tk.  This provides:
+<ul>
+<li> A complete (and consistent) scripting language for each tool.
+<li> A toolkit for GUI extensions.
+<li> A powerful mechanism for interaction between tools.
+<li> Portability between platforms.
+</ul>
+Documentation on Tcl/Tk:
+<ul>
+<li> <a href="http://www.scriptics.com"> http://www.scriptics.com</a> (the official Tcl/Tk website)
+<li> Tcl and the Tk Toolkit", authored by John Ousterhout, published by Addison-Weseley.
+</ul>
+
+
+<h3> <a name = "sue2edif"> Sue to edif converter (sue2edif) </a> </h3>
+<p>
+
+<ul>
+
+"sue2edif" is a plug-in addition to Sue for writing an EDIF design
+file based on the current design loaded in Sue.  
+
+<p>
+<h4>Installation</h4>
+<p>
+
+To install the EDIF writer, you need to add the following line to your
+.suerc file:
+
+<pre>
+        menu_add -menu file -label "Write EDIF" -command edif_write -position 10 \
+	         -help "Writes the EDIF for the given schematic and descendents."
+</pre>
+
+Typically, this line is added to the site-wide .suerc file in
+$MMI_TOOLS/../mmi_local/sue/.suerc, so that all users can access it.
+The .suerc file in mmi_local.sample provided with the release includes
+this line commented out.  You need only uncomment it.
+
+<p>
+
+When the tool has been properly installed, a new command "Write EDIF"
+will appear in the the Sue "File" menu.
+
+<p>
+<h4>Operation</h4>
+<p>
+
+Display the schematic view of the top-level cell of the design
+file to be written.
+
+<p>
+
+Click on the "Write EDIF" command in the "File" menu.
+
+<p>
+
+The display will be seen to cycle through heirarchically included
+components of the current design.  Progress messages are displayed on
+the console.
+
+<p>
+
+When the command is complete with no errors, the console displays the
+message "done".  the output EDIF file is written to the same directory
+as the top cell but with the ".edif" extension.
+
+<p>
+
+<h4>Output</h4>
+
+<p>
+
+The EDIF file is a correct representation according to Version 2 0 0,
+published as "EIA Recommended Standard EIA-548-1988", dated March 14,
+1988.  Only "level 0" constructs are used.
+
+<p>
+
+The file written is an EDIF representation of the design selected.
+Each SUE cell called for in the design appears as a "cell" definition
+in the EDIF file.  All the cells are organized into a single 
+EDIF library within the file.
+
+<p>
+
+Cells are written for all constructs, includeing library components
+such as transistors and informational constructs such as title bars,
+so the complete design as it appears in SUE will be available to
+be imported into whatever other CAD tool.
+
+<p>
+
+The output file will be accurately read by the MMI EDIF conversion
+tool "edif2sue".  The resulting set of SUE files reconstructs the 
+original design.  The correct operation of readers for other CAD 
+tools is obviously beyond our control, but we would like to hear 
+about difficulties and are willing to try to "make it work".
+
+<p>
+<h4>A note on nets</h4>
+<p>
+
+EDIF contains redundant information describing nets; there is 
+logical connectivity information in "joined" expressions, and
+there is graphical information in "display" expressions.  
+
+<p>
+
+SUE uses the graphical information to construct its internal 
+representation of the design, so "what you see is what you get."
+In other tools this may not be true, and discrepancies between
+the connectivity and graphical information may cause unpredictable
+problems.
+
+<p>
+
+The generated EDIF file contains correct connectivity information.
+
+<p>
+
+In some cases a "name_net_s" component is used to select a subset
+of wires from a bus.  EDIF has no way of representing this kind of
+construction directly, so what the tool does is create separate
+"joined" statements for each bit of buses which are "split" in this
+way.  These individual nets have names like "bit[3]" and contain
+a joined statement that lists the one-bit-wide ports connected by
+this net; there is no graphical information.  There is also a net
+with a name like "bit[7:0]" which contains the graphical information
+for all bits of the net, but no explicit connectivity information.
+The name_net_s's appear as distinct instances in the ordinary way.
+
+<p>
+
+If there is a problem with importing the generated EDIF file into
+other CAD tools, this is likely where it will be, due to the basic
+incompatiblity of the various representations.
+
+</ul>
+<p>
+
+<h3> <a name = "verilog_to_sue"> verilog_to_sue </a> </h3>
+<p>
+<ul>
+
+Verilog_to_sue translates a hierarchical verilog netlist into
+hierarchical sue schematics.  It only translates structural netlists
+and will report warnings on modules that contain behavioral verilog.
+
+<p>
+<h4>Usage:</h4>
+
+To execute verilog_to_sue, type the following at a unix prompt:
+
+<pre>
+        verilog_to_sue *.v
+</pre>
+
+verilog_to_sue reads each of the verilog files (*.v) and generates a
+foo.sue file for every module foo it finds in the verilog files.  You
+then simply load these .sue files like you would load any other .sue
+files.
+
+<p>
+
+All purely structural modules are translated into sue schematics and
+icons.  The icons are rectangles with inputs and inouts on the left and
+outputs on the right.  Schematics contain inputs and inouts on the
+left and outputs on the right.  A matrix of icons and bus combines go
+in between.  The icons are for instantiated modules.  The bus combines
+are for verilog assigns, and for concatenations on instantiation
+ports.
+
+<p>
+
+A module with any behavioral code is translated into a schematic with
+the words "behavioral module".  The structural code is not translated
+in a module of mixed behavioral and structural code.
+
+<p>
+<h4>Installation:</h4>
+<p>
+
+If you've done a standard MMI install, then verilog_to_sue should
+already be in your $path.  Here are the relevant files:
+
+<pre>
+        $MMI_TOOLS/bin.&lt;your machine type>/verilog_to_sue
+	        link to $MMI_TOOLS/scripts/verilog_to_sue
+
+        $MMI_TOOLS/bin.&lt;your machine type>/verilog_preprocessor
+	        link to $MMI_TOOLS/scripts/verilog_preprocessor
+
+        $MMI_TOOLS/bin.&lt;your machine type>/verilog_parser
+    	        binary for verilog parser
+
+        $MMI_TOOLS/scripts/verilog_to_sue
+	        script for verilog_to_sue
+
+        $MMI_TOOLS/scripts/verilog_preprocessor
+	        script for verilog preprocessor
+</pre>
+
+We've assumed you have perl in /usr/local/bin/perl.  If you have it
+somewhere else, you need to go into $MMI_TOOLS/scripts and change the
+path of each of the scripts that has "#!/usr/local/bin/perl" in the
+first line.  Or you can move perl to /usr/local/bin/perl, or put a link
+there to wherever you have it.  If you don't have perl at all, then you
+need to get it.
+
+<p>
+
+Note: verilog_to_sue requires perl5.0 or later.
+
+</ul>
+<p>
+
+<hr>
+<address>
+Micro Magic Documentation Guide - 
+last revised 3/14/2002
+</em>
+</address>
+
+</body>
+</html>
+
+
+
+
+
+
+

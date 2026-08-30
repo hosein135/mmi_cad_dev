@@ -1,0 +1,444 @@
+# Created using mapper from:
+#"MMI_OAI21 {A {MMI_OAI21A {in0 in0} {in1 in1} {in2 in2} {out out}} {MMI_OAI21A_ {in0 in0} {in1 in1} {in2 in2} {out out}}} {B {MMI_OAI21B {in0 in0} {in1 in1} {in2 in2} {out out}} {MMI_OAI21B_ {in0 in0} {in1 in1} {in2 in2} {out out}}} {C {MMI_OAI21C {in0 in0} {in1 in1} {in2 in2} {out out}} {MMI_OAI21C_ {in0 in0} {in1 in1} {in2 in2} {out out}}} "
+
+proc SCHEMATIC_MMI_OAI21 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    A {
+      if {!$DeMorgan} {
+
+  make global -orient RY -name vdd -origin {0 -100}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -name gnd -origin {0 200}
+  make output -name out -origin {410 0}
+  make input -name in0 -origin {-100 -60}
+  make input -name in1 -origin {-60 160}
+  make input -name in2 -origin {150 160}
+  make global -name gnd -origin {250 200}
+  make nmos -W .92 -origin {0 60}
+  make nmos -W .92 -origin {0 160}
+  make nmos -W .92 -origin {250 160}
+  make pmos -W .92 -origin {0 -60}
+  make pmos -W 1.84 -origin {250 -60}
+  make pmos -W 1.84 -origin {250 -160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {60 390}
+  make_wire 0 -20 0 0
+  make_wire 0 20 0 0
+  make_wire 0 0 250 0
+  make_wire 0 120 0 100
+  make_wire 250 -120 250 -100
+  make_wire 250 120 250 100
+  make_wire 0 100 250 100
+  make_wire 410 0 250 0
+  make_wire 250 -20 250 0
+  make_wire -60 60 -80 60
+  make_wire -80 60 -80 -60
+  make_wire -80 -60 -60 -60
+  make_wire -80 -60 -100 -60
+  make_wire -60 160 70 160
+  make_wire 70 160 70 -60
+  make_wire 190 -60 70 -60
+  make_wire 170 160 170 -160
+  make_wire 170 -160 190 -160
+  make_wire 170 160 150 160
+  make_wire 170 160 190 160
+  make_text -origin {-140 -240} -text {A Size}
+  make_text -origin {-140 -260} -text {Inverting OR-AND 2,1 Gate}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_OAI21 MMI_OAI21A -Size A -DeMorgan 0
+        make MMI_OAI21A -origin "$urx $ury"
+      } else {
+        generate MMI_OAI21 MMI_OAI21A -Size A -DeMorgan 0
+        make MMI_OAI21A -origin {0 0}
+        set terms [api_terminal_data MMI_OAI21A]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_OAI21A"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {in2} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in2} -orient $orient
+        } else {
+          make $type -origin $origin -name {in2}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_OAI21 MMI_OAI21A_ -Size A -DeMorgan 1
+        make MMI_OAI21A_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    B {
+      if {!$DeMorgan} {
+
+  make global -orient RY -name vdd -origin {0 -100}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -name gnd -origin {0 200}
+  make output -name out -origin {500 0}
+  make global -orient RY -name vdd -origin {350 -200}
+  make input -name in0 -origin {-100 60}
+  make input -name in1 -origin {-100 160}
+  make input -name in2 -origin {150 160}
+  make global -name gnd -origin {250 200}
+  make nmos -W 1.84 -origin {0 60}
+  make nmos -W 1.84 -origin {0 160}
+  make nmos -W 1.84 -origin {250 160}
+  make pmos -W 1.84 -origin {0 -60}
+  make pmos -W 1.84 -origin {250 -60}
+  make pmos -W 1.84 -origin {350 -60}
+  make pmos -W 1.84 -origin {250 -160}
+  make pmos -W 1.84 -origin {350 -160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {110 430}
+  make_wire 0 -20 0 0
+  make_wire 0 20 0 0
+  make_wire 0 0 250 0
+  make_wire 250 -20 250 0
+  make_wire 0 120 0 100
+  make_wire 250 -120 250 -100
+  make_wire 250 120 250 100
+  make_wire 0 100 250 100
+  make_wire 350 -20 350 0
+  make_wire 350 -120 350 -100
+  make_wire 350 0 250 0
+  make_wire 350 0 500 0
+  make_wire 290 -60 190 -60
+  make_wire -80 60 -80 -60
+  make_wire -80 -60 -60 -60
+  make_wire -80 60 -60 60
+  make_wire -80 60 -100 60
+  make_wire -60 160 -100 160
+  make_wire -60 160 70 160
+  make_wire 70 160 70 -60
+  make_wire 70 -60 190 -60
+  make_wire 170 160 170 -160
+  make_wire 170 160 190 160
+  make_wire 170 -160 190 -160
+  make_wire 190 -160 290 -160
+  make_wire 150 160 170 160
+  make_text -origin {-150 -240} -text {B Size}
+  make_text -origin {-150 -260} -text {Inverting OR-AND 2,1 Gate}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_OAI21 MMI_OAI21B -Size B -DeMorgan 0
+        make MMI_OAI21B -origin "$urx $ury"
+      } else {
+        generate MMI_OAI21 MMI_OAI21B -Size B -DeMorgan 0
+        make MMI_OAI21B -origin {0 0}
+        set terms [api_terminal_data MMI_OAI21B]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_OAI21B"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {in2} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in2} -orient $orient
+        } else {
+          make $type -origin $origin -name {in2}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_OAI21 MMI_OAI21B_ -Size B -DeMorgan 1
+        make MMI_OAI21B_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+    C {
+      if {!$DeMorgan} {
+
+  make global -orient RY -name vdd -origin {0 -100}
+  make global -orient RY -name vdd -origin {250 -200}
+  make global -name gnd -origin {0 200}
+  make output -name out -origin {610 0}
+  make global -orient RY -name vdd -origin {350 -200}
+  make global -orient RY -name vdd -origin {450 -200}
+  make global -orient RY -name vdd -origin {550 -200}
+  make input -name in0 -origin {-100 60}
+  make input -name in1 -origin {-100 160}
+  make input -name in2 -origin {150 160}
+  make global -name gnd -origin {250 200}
+  make nmos -W 3.68 -origin {0 60}
+  make nmos -W 3.68 -origin {0 160}
+  make nmos -W 3.68 -origin {250 160}
+  make pmos -W 3.68 -origin {0 -60}
+  make pmos -W 1.84 -origin {250 -60}
+  make pmos -W 1.84 -origin {350 -60}
+  make pmos -W 1.84 -origin {450 -60}
+  make pmos -W 1.84 -origin {550 -60}
+  make pmos -W 1.84 -origin {250 -160}
+  make pmos -W 1.84 -origin {350 -160}
+  make pmos -W 1.84 -origin {450 -160}
+  make pmos -W 1.84 -origin {550 -160}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {170 370}
+  make_wire 0 -20 0 0
+  make_wire 0 20 0 0
+  make_wire 0 0 250 0
+  make_wire 250 -20 250 0
+  make_wire 0 120 0 100
+  make_wire 250 -120 250 -100
+  make_wire 250 120 250 100
+  make_wire 0 100 250 100
+  make_wire 350 -20 350 0
+  make_wire 350 -120 350 -100
+  make_wire 350 0 250 0
+  make_wire 450 -120 450 -100
+  make_wire 450 0 350 0
+  make_wire 550 -120 550 -100
+  make_wire 550 0 450 0
+  make_wire 550 0 610 0
+  make_wire 450 -20 450 0
+  make_wire 550 -20 550 0
+  make_wire 390 -160 490 -160
+  make_wire 290 -160 390 -160
+  make_wire 290 -60 190 -60
+  make_wire 390 -60 290 -60
+  make_wire 390 -60 490 -60
+  make_wire -80 60 -80 -60
+  make_wire -80 -60 -60 -60
+  make_wire -80 60 -60 60
+  make_wire -80 60 -100 60
+  make_wire -60 160 -100 160
+  make_wire -60 160 60 160
+  make_wire 60 160 60 -60
+  make_wire 60 -60 190 -60
+  make_wire 170 160 170 -160
+  make_wire 170 -160 190 -160
+  make_wire 190 -160 290 -160
+  make_wire 170 160 190 160
+  make_wire 170 160 150 160
+  make_text -origin {-140 -240} -text {C Size}
+  make_text -origin {-140 -260} -text {Inverting OR-AND 2,1 Gate}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+        generate MMI_OAI21 MMI_OAI21C -Size C -DeMorgan 0
+        make MMI_OAI21C -origin "$urx $ury"
+      } else {
+        generate MMI_OAI21 MMI_OAI21C -Size C -DeMorgan 0
+        make MMI_OAI21C -origin {0 0}
+        set terms [api_terminal_data MMI_OAI21C]
+        if {$terms == ""} {
+          error "ERROR: No pin info found for icon MMI_OAI21C"
+        }
+        set data [get_assoc {in0} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in0} -orient $orient
+        } else {
+          make $type -origin $origin -name {in0}
+        }
+        set data [get_assoc {in1} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in1} -orient $orient
+        } else {
+          make $type -origin $origin -name {in1}
+        }
+        set data [get_assoc {in2} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {in2} -orient $orient
+        } else {
+          make $type -origin $origin -name {in2}
+        }
+        set data [get_assoc {out} $terms]
+        set type [get_assoc type $data]
+        set origin [get_assoc origin $data]
+        set orient [get_assoc orient $data]
+        if {$orient != ""} {
+          make $type -origin $origin -name {out} -orient $orient
+        } else {
+          make $type -origin $origin -name {out}
+        }
+        generate MMI_OAI21 MMI_OAI21C_ -Size C -DeMorgan 1
+        make MMI_OAI21C_ -origin {300 200}
+  make sccs_title_bar -origin {0 400} -owner MMI -version 0 -date 0
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_OAI21 args {
+  call_use_keyword $args {{Size "A"} {DeMorgan 0}}
+
+  set nom MMI_OAI21[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_OAI21 args {
+  icon_generator $args {{Size "A" {radio A B C}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "A") && ($size != "B") && ($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_OAI21 icon body
+  if {$DeMorgan} {
+    # or
+    icon_line -10 -30 40 -30
+    icon_line -10 30 40 30
+    icon_arc -20 -30 90 110 -start 35 -extent 50
+    icon_arc -20 -110 90 30 -start 275 -extent 50
+    icon_arc -20 -30 0 30 -start 270 -extent 180
+    # and
+    icon_line -40 -10 -80 -10 -80 50 -40 50
+    icon_arc -80 -10 -10 50 -start 277 -extent 166
+    # bubbles and stubs
+    icon_line -100 -30 -30 -30
+    icon_arc -100 30 -80 50 -start 0 -extent 359
+    icon_arc -100 -10 -80 10 -start 0 -extent 359
+    icon_line 80 0 100 0
+    icon_arc -30 -40 -10 -20 -start 0 -extent 359
+    # properties
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {0 -22} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  } else {
+    # or
+    icon_line -88 -10 -40 -10
+    icon_line -88 50 -40 50
+    icon_arc -100 -10 10 130 -start 35 -extent 50
+    icon_arc -100 -90 10 50 -start 275 -extent 50
+    icon_arc -98 -10 -78 50 -start 270 -extent 180
+    # and
+    icon_line 50 -30 0 -30 0 30 50 30
+    icon_arc 10 -30 80 30 -start 277 -extent 166
+    # stubs
+    icon_line -100 -30 0 -30
+    icon_line -100 0 -80 0
+    icon_line -100 40 -80 40
+    icon_arc 80 -10 100 10 -start 0 -extent 359
+    # properties
+    icon_property -origin {3 -22} -size small -label F
+    icon_property -origin {-77 -2} -size small -label F
+    icon_property -origin {30 0} -size large -anchor center -label $size
+  }
+
+  # inputs
+  icon_term -type input -origin {-100 -30} -name in0
+  icon_term -type input -origin {-100 0} -name in1
+  icon_term -type input -origin {-100 40} -name in2
+
+  # outputs
+  icon_term -type output -origin {100 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_OAI21 -Size $Size]
+  set nname [NAME_MMI_OAI21 -Size $Size -DeMorgan $DeMorgan]
+  if {!$DeMorgan} {
+  switch $size {
+    A {
+    set pnames ".in0(\$in0), .in1(\$in1), .in2(\$in2), .out(\$out)"
+    }
+    B {
+    set pnames ".in0(\$in0), .in1(\$in1), .in2(\$in2), .out(\$out)"
+    }
+    C {
+    set pnames ".in0(\$in0), .in1(\$in1), .in2(\$in2), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+  }
+
+}

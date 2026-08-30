@@ -1,0 +1,187 @@
+# Created using mapper from:
+#"MMI_OR2 {B {MMI_OR2B {in0 in0} {in1 in1} {out out}} {MMI_OR2B_ {in0 in0} {in1 in1} {out out}}} {C {MMI_OR2C {in0 in0} {in1 in1} {out out}} {MMI_OR2C_ {in0 in0} {in1 in1} {out out}}} "
+
+proc SCHEMATIC_MMI_OR2 args {
+  call_use_keyword $args {{Size "B"} {DeMorgan 0}}
+
+  set size [string toupper $Size]
+
+  switch $size {
+    B {
+
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {160 140}
+  make global -orient RY -name vdd -origin {0 -140}
+  make output -name out -origin {410 50}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {220 50}
+  make input -name in0 -origin {-100 0}
+  make input -name in1 -origin {-100 -100}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 1.54 -WN 0.77 -origin {300 50}
+  make nmos -W 0.385 -origin {160 100}
+  make pmos -W 1.54 -origin {0 0}
+  make pmos -W 1.54 -origin {0 -100}
+  make nmos -W 0.385 -origin {0 100}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.2 -date 12/02/99 -origin {60 350}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire 0 50 160 50
+  make_wire -100 0 -60 0
+  make_wire 160 60 160 50
+  make_wire -60 -100 100 -100
+  make_wire 0 -40 0 -60
+  make_wire 100 100 100 -100
+  make_wire -100 -100 -60 -100
+  make_wire 350 50 410 50
+  make_wire 220 50 160 50
+  make_wire 220 50 270 50
+  make_text -origin {-180 -210} -text {2 Input OR}
+  make_text -origin {-180 -190} -text {B Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_OR2 MMI_OR2B -Size B -DeMorgan 0
+        make MMI_OR2B -origin "$urx $ury"
+      } else {
+        generate MMI_OR2 MMI_OR2B_ -Size B -DeMorgan 1
+        make MMI_OR2B_ -origin "$urx $ury"
+      }
+    }
+
+    C {
+
+  make global -name gnd -origin {0 140}
+  make global -name gnd -origin {160 140}
+  make global -orient RY -name vdd -origin {0 -140}
+  make output -name out -origin {470 50}
+  make input -name in1 -origin {-100 -100}
+  make input -name in0 -origin {-100 0}
+  generate name_net_s name_net -cell name_net
+  make name_net -name N1 -origin {230 50}
+  generate inverter inverter1 -demorgan 1
+  make inverter1 -WP 3.08 -WN 1.54 -origin {360 50}
+  make nmos -W 0.52 -origin {160 100}
+  make nmos -W 0.52 -origin {0 100}
+  make pmos -W 2.08 -origin {0 -100}
+  make pmos -W 2.08 -origin {0 0}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner MMI -version 1.3 -date 05/08/00 -origin {90 340}
+  make_wire 0 60 0 50
+  make_wire 0 40 0 50
+  make_wire -60 100 -60 0
+  make_wire 160 60 160 50
+  make_wire 0 -40 0 -60
+  make_wire 410 50 470 50
+  make_wire -100 0 -60 0
+  make_wire -100 -100 -60 -100
+  make_wire 100 -100 100 100
+  make_wire 230 50 160 50
+  make_wire 230 50 330 50
+  make_wire -60 -100 100 -100
+  make_wire 0 50 160 50
+  make_text -origin {-180 -220} -text {2 Input OR}
+  make_text -origin {-180 -200} -text {C Size}
+
+        set bbx [api_bbox]
+        set urx [lindex $bbx 2]
+        set ury [lindex $bbx 1]
+      if {!$DeMorgan} {
+        generate MMI_OR2 MMI_OR2C -Size C -DeMorgan 0
+        make MMI_OR2C -origin "$urx $ury"
+      } else {
+        generate MMI_OR2 MMI_OR2C_ -Size C -DeMorgan 1
+        make MMI_OR2C_ -origin "$urx $ury"
+      }
+    }
+
+  }
+}
+
+
+proc NAME_MMI_OR2 args {
+  call_use_keyword $args {{Size "B"} {DeMorgan 0}}
+
+  set nom MMI_OR2[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_OR2 args {
+  icon_generator $args {{Size "B" {radio B C}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "B") && ($size != "C")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+
+
+  # MMI_OR2 icon body
+  if {$DeMorgan} {
+    icon_arc -30 -30 40 30 -start 277 -extent 166
+    icon_line 10 -30 -40 -30 -40 30 10 30
+    icon_arc 40 -10 60 10 -start 0 -extent 359
+    icon_arc -60 10 -40 30 -start 0 -extent 359
+    icon_arc -60 -30 -40 -10 -start 0 -extent 359
+  } else {
+    icon_arc -60 -30 50 110 -start 35 -extent 50
+    icon_arc -60 -110 50 30 -start 275 -extent 50
+    icon_arc -58 -30 -38 30 -start 270 -extent 180
+    icon_line -48 -30 0 -30
+    icon_line -48 30 0 30
+    icon_line -40 -20 -60 -20
+    icon_line -40 20 -60 20
+    icon_line 40 0 60 0
+  }
+
+  # properties
+  icon_property -origin {-37 -22} -size small -label F
+  icon_property -origin {0 0} -size large -anchor center -label $size
+
+  # inputs
+  icon_term -type input -origin {-60 -20} -name in0
+  icon_term -type input -origin {-60 20} -name in1
+
+  # outputs
+  icon_term -type output -origin {60 0} -name out
+
+
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 300} -type user -name M
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  set fname [NAME_MMI_OR2 -Size $Size]
+  set nname [NAME_MMI_OR2 -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    B {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+    C {
+    set pnames ".in0(\$in0), .in1(\$in1), .out(\$out)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

@@ -1,0 +1,8 @@
+set NETLIST_CACHE(nor2,cells) {{icon nmos {}} {icon pmos {}}}
+set netlist_props spice
+set netlist_level 1000
+set NETLIST_CACHE(nor2,globals) {gnd vdd}
+set NETLIST_CACHE(nor2,version) MMI_SUE4.2.13
+set NETLIST_CACHE(nor2) {{.SUBCKT nor2 in0 in1 out WP=4 WN=1} {M_0 out in1 gnd gnd n W='WN*1u' L=ln_min ad='arean(WN,sdd)' } {+ as='arean(WN,sdd)' pd='perin(WN,sdd)' ps='perin(WN,sdd)' } {M_1 out in1 net_1 vdd p W='WP*1u' L=lp_min ad='areap(WP,sdd)' } {+ as='areap(WP,sdd)' pd='perip(WP,sdd)' ps='perip(WP,sdd)' } {M_2 out in0 gnd gnd n W='WN*1u' L=ln_min ad='arean(WN,sdd)' } {+ as='arean(WN,sdd)' pd='perin(WN,sdd)' ps='perin(WN,sdd)' } {M_3 net_1 in0 vdd vdd p W='WP*1u' L=lp_min ad='areap(WP,sdd)' } {+ as='areap(WP,sdd)' pd='perip(WP,sdd)' ps='perip(WP,sdd)' } {.ENDS	$ nor2} {}}
+set NETLIST_CACHE(nor2,names) {{0 0 {0 M_1}} {0 100 {0 M_0}} {-60 -100 {0 in0}} {0 -40 {0 net_1}} {100 100 {0 in0}} {0 -60 {0 net_1}} {-60 0 {0 in1}} {-60 100 {0 in1}} {0 40 {0 out}} {0 140 {1 gnd} {2 gnd}} {160 60 {0 out}} {0 -100 {0 M_3}} {0 60 {0 out}} {-100 0 {1 in1}} {160 100 {0 M_2}} {320 50 {1 out}} {0 -140 {0 vdd} {2 vdd}} {160 140 {1 gnd} {2 gnd}} {-100 -100 {1 in0}}}
+set NETLIST_CACHE(nor2,wires) {{0 50 0 60 out} {0 40 0 50 out} {-60 0 -60 100 in1} {0 50 160 50 out} {-100 0 -60 0 in1} {160 50 160 60 out} {-60 -100 100 -100 in0} {0 -60 0 -40 net_1} {100 -100 100 100 in0} {160 50 320 50 out} {-100 -100 -60 -100 in0}}

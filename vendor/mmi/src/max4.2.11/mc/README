@@ -1,0 +1,21 @@
+Micro Magic's MegaCell Compiler (MMI_MC2.0).
+
+The Micro Magic MegaCell Compiler (MCC) builds large regular/array
+structures based on an algorithmic description of the cell relative
+positions.  This feature is sometimes referred to as "tiling".  In
+addition, the arrays can be programmed, netlisted, and a critical path
+extracted from the finished structure.
+
+The MegaCell Compiler relies on Micro Magic's MAX to store and
+manipulate the underlying data layout data structures.
+
+
+INSTALLATION
+
+To install the MegaCell Compiler, you must add the line 
+
+	mc_init
+
+to your .maxrc file, typically the one in
+${MMI_TOOLS}/../mmi_local/max/.maxrc.  You also need a special license
+(max_mcc) to run MCC.

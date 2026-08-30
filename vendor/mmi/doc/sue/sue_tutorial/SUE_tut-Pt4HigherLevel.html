@@ -1,0 +1,1156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="GENERATOR" content="Quadralay WebWorks Publisher Professional Edition 6.0.5">
+<meta name="TEMPLATEBASE" content="MMT_tutorial">
+<meta name="LASTUPDATED" content="12/04/01 16:28:50">
+<title>Part 4   </title>
+</head>
+
+<body link="#3366CC" vlink="#9999CC" text="#000000" alink="#0000CC" bgcolor="#FFFFFF"
+background="images/backgrnd.gif">
+
+<table>
+  <tr>
+     <td><img src="images/mmi-logo.gif"> </td>
+
+	<!-- FOLLOWING ENTRY IS THE TITLE OF THE DOCUMENT -->
+
+
+<td>&nbsp;&nbsp;&nbsp;<H1><font color="003366"> SUE Design Manager Tutorial</font></H1></td>
+   </tr>
+</table>
+<p>
+
+<table width="331" border="0" align="right" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><a href="sue_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23"
+    border="0" alt="TOC"> </a></td>
+    <td><a href="SUE_tut-Pt3Simulating.html"><img src="images/navprev.gif" width="81" height="23"
+    border="0" alt="PREV"> </a></td>
+    <td><a href="SUE_tut-Pt5Crossprobe.html"><img src="images/navnext.gif" width="81" height="23"
+    border="0" alt="NEXT"> </a></td>
+    <td><a href="SUE_tut-Pt5Crossprobe.html"><img src="images/navend.gif" width="85" height="23"
+    border="0" alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+<p>
+
+</p>
+
+<hr align="left">
+
+<blockquote>
+<h2>
+  <a name="1013100"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Part 4 </font>
+</h2>
+
+
+<h2>
+  <a name="1019269"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Higher Level Schematics And Verilog Simulation</font>
+</h2>
+
+
+<h3>
+  <a name="1029668"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Higher Level Schematics</font>
+</h3>
+
+
+<h4>
+  <a name="1029669"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Verilog </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029670"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We have already simulated our little pulse generator in IRSIM and in HSPICE. Now we want to run a Verilog simulation. Unfortunately, you can't simply set nodes in Verilog like you can in IRSIM. You need to have a test file to drive them. To accomplish this we will first make an <i><strong class="StrongItalic">icon</strong></i> for our cell, and then wire our icon up to a clock generator that has been provided for you. </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1029671"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Adding Ports </font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029672"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before we make our icon we need to add some I/O ports to our circuit. We are going to place and name them as shown in <a href="SUE_tut-Pt4HigherLevel.html#1029681">Figure 14</a>.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1030836"> </a>To attach the I/O ports, start by getting an <b><code class="CodeStrong">input</code></b> from the <b><code class="CodeStrong">devices</code></b> <b><code class="CodeStrong">Library</code></b> and attach it to the wire above the <b><code class="CodeStrong">pulse</code></b>. Remember, click with the left mouse button (Button-1) to select or get an icon from an <b><code class="CodeStrong">Icon List </code></b>box, and use the middle mouse button (Button-2) to move an instantiated icon.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029679"> </a>Next, attach an <b><code class="CodeStrong">output</code></b> icon to the output of the <b><code class="CodeStrong">nand2</code></b>. Since we would like to look at more than one output, duplicate the output port (<b><code class="CodeStrong">select</code></b>, then <b><strong class="Strong">d</strong></b>) and wire it up to the output of the third inverter as shown in <a href="SUE_tut-Pt4HigherLevel.html#1029681">Figure 14</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029681"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 14:   Adding Ports to a Schematic</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig12.gif">
+</div></font><a name="1029685"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029686"> </a>Now name the I/O ports by double-clicking on the input port to call up the <b><code class="CodeStrong">Edit Properties</code></b> dialog box.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029688"> </a>Type "<b><code class="CodeStrong">in</code></b>" into the name box, then click <b><code class="CodeStrong">Done</code></b> or hit Return.</font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029689"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For the outputs we will use a little trick that allows us to name multiple signals. It's not much for only two I/O's, but when you have 32, it helps a lot. </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1029690"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Naming Multiple Signals</font></i>
+</h5>
+
+
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029692"> </a>Select both of the <b><code class="CodeStrong">output</code></b> icons. You can do this by clicking the left mouse button on one of the outputs and Shift-clicking (hold down the Shift button while clicking with the left mouse button) on the other output. Or you can simply hold down the left mouse button (Button-1) and drag the selection box around both icons. Don't get any other icons (like the <b><code class="CodeStrong">nand2</code></b>) or you will name those also. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029697"> </a>Go to <b><code class="CodeStrong">Name Objects </code></b>in the <b><code class="CodeStrong">Edit</code></b> menu. The <b><code class="CodeStrong">Name Selected</code></b> dialog box (see <a href="SUE_tut-Pt4HigherLevel.html#1029701">Figure 15</a>) will appear. Type "<b><code class="CodeStrong">out</code></b>" in the <b><code class="CodeStrong">name_prefix</code></b> box. Type "<b><code class="CodeStrong">_H</code></b>" for <b><code class="CodeStrong">name_suffix</code></b>. Change the direction from north<b><code class="CodeStrong"> </code></b><code class="Code">(</code><b><strong class="Strong">n</strong></b><code class="Code">)</code> to south, "<b><code class="CodeStrong">s</code></b>". When you are finished click <b><code class="CodeStrong">Done</code></b> or hit Return.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029699"> </a>Save your circuit (hotkey: <b><strong class="Strong">Ctrl-s</strong></b>).</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029701"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 15:   Name Selected Popup</em></font>
+</h4>
+
+</pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig13.gif" height="285" width="216">
+</div></font><a name="1029705"> </a>
+</pre>
+
+<h4>
+  <a name="1029706"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Making An ICON For Our Schematic </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029707"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now ready to create an icon for the <code class="Code">pulsegen</code> schematic. Schematics only need icons when you want to instantiate them into other schematics -- which is what we are going to do. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029708"> </a>To make an icon, select <b><code class="CodeStrong">Make Other View</code></b> from the <b><code class="CodeStrong">View</code></b> menu (or type<b><strong class="Strong"> </strong></b><b><strong class="Strong">Shift-c</strong></b>). This creates an icon for <b><code class="CodeStrong">pulsegen</code></b> and puts you into that icon view. It should look like <a href="SUE_tut-Pt4HigherLevel.html#1029713">Figure 16</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029713"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 16:   Icon View</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig14.gif">
+</div></font><a name="1029717"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029718"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should now be looking at the <b><strong class="Strong">icon view</strong></b> of <b><code class="CodeStrong">pulsegen</code></b>. You can tell it's an icon since the title bar of the SUE window now has as `<b><code class="CodeStrong">I</code></b>' instead of an `<b><code class="CodeStrong">S</code></b>' in it. Also, since <b><code class="CodeStrong">pulsegen</code></b> now has an icon, it appears in the <b><code class="CodeStrong">Icon List</code></b> box for this directory. </font>
+<p>
+<p>
+  <dt> <a name="1029719"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Only the following elements can be placed in icons, which are essentially just pictures: </font>
+<p>
+<ul></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029720"> </a><b><strong class="Strong">I/O</strong></b>'s: <i><strong class="StrongItalic">inputs</strong></i>, <i><strong class="StrongItalic">outputs</strong></i>, and <i><strong class="StrongItalic">inouts</strong></i>. At the locations of the origins of these icons, small solid dots will be displayed when the icon is placed into a schematic. No other icons can be placed into an icon (except a <b><code class="CodeStrong">title_bar</code></b> which is for documentation only). </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029721"> </a><b><strong class="Strong">The origin of the icon</strong></b>, which is notated with a "<b><code class="CodeStrong">+</code></b>". All placement, rotation, flipping, etc. of the instantiated icon is relative to this origin. Schematics don't have origins, only icons do. The only thing you can do to the origin is move it around. </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029722"> </a><b><strong class="Strong">Property Definitions</strong></b>, which are text lines that begin with a dash ("-"). Don't add text to an icon starting with a dash unless it is a <b><code class="CodeStrong">Property Definition</code></b>. The <b><code class="CodeEmphasis">Name Property </code></b>for the icon, for example, is defined by the line "<b><code class="CodeStrong">-type user -name name</code></b>" and will then appear in the <b><code class="CodeStrong">Edit Properties</code></b> dialog box if you double-click on an instantiation of this icon (discussed more fully below). </li>
+ </font>
+
+
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029723"> </a><b><strong class="Strong">Picture elements</strong></b>, like <i><strong class="StrongItalic">lines</strong></i>, <i><strong class="StrongItalic">arcs</strong></i>, and <i><strong class="StrongItalic">text</strong></i>. Don't add wires to icons. </li>
+ </font>
+
+
+</ul><p>
+  <dt> <a name="1029724"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When SUE makes an icon, it places all of the I/O's from the schematic into the icon, with inputs in alphabetical order on the left, and outputs on the right. It also adds some default <b><code class="CodeStrong">Property Definitions</code></b> (<b><code class="CodeStrong">name, M, </code></b>and <b><code class="CodeStrong">dpc</code></b> in this case). </font>
+<p>
+<p>
+  <dt> <a name="1029725"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now we want to draw a picture of what we want our pulsegen icon to look like when we place it into another schematic. For this example, we will just draw a box with some text in it. We are going to make our icon look like <a href="SUE_tut-Pt4HigherLevel.html#1029727">Figure 17</a>:</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029727"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 17:   Icon for Pulse Generator</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig15.gif">
+</div></font><a name="1029731"> </a>
+</pre>
+
+<h5>
+  <a name="1029732"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Drawing the ICON</font></i>
+</h5>
+
+
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029733"> </a>Start by drawing a box. You can make a box out of multiple lines, or by drawing a rectangle. Both generate the same thing in the SUE database, so use the one you find easiest. </font>
+</p><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029734"> </a><em class="Emphasis">To draw a box using lines</em>, use the <b><strong class="Strong">l </strong></b>hotkey, or select <b><code class="CodeStrong">Add Line/Rect</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu. Click with the <em class="Emphasis">left</em> mouse button (Button-1) to start your line and to add new line segments. Click the middle mouse button (Button-2) to end it.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029735"> </a><em class="Emphasis">To draw a rectangle</em>, use the <code class="Code">l</code> hotkey or <b><code class="CodeStrong">Add Line/Rect</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu. Then click and hold down the <em class="Emphasis">middle</em> mouse button (Button-2) and drag out the area you want for your rectangle.  
+</li><p>
+</font>
+</ul></ul>   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1029736"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice the instructions which appear in the <b><code class="CodeStrong">SUE Message Area</code></b> (to the right of the <b><code class="CodeStrong">Help</code></b> menu) when you begin to draw. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029737"> </a>You can resize your rectangle by clicking and holding down the left mouse button (Button-1) on one of the squares (called <em class="Emphasis">edit markers</em>) in the corners of your rectangle, then dragging it to where you want the vertex to be. If you hold down the Shift key, the entire side will move. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029742"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you need to resize the rectangle later, double-click with the left mouse button on the line or rectangle, and the edit markers will reappear.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+</p>   </ol>
+</ol>
+<h5>
+  <a name="1029743"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Adding Text</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029744"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's add some text to our icon. First, we will type in the name of the cell, so we know what the cell is when we look at a schematic with this icon instantiated in it. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029745"> </a>Add text with the<b><strong class="Strong"> t </strong></b>hotkey or by selecting <b><code class="CodeStrong">Add Text</code></b> from the <b><code class="CodeStrong">Edit</code></b> menu. Move the cursor to where you want the text to start and click the left mouse button (Button-1). Notice that directions are provided in the <b><code class="CodeStrong">SUE Message Area</code></b> to the right of the <b><code class="CodeStrong">Help</code></b> menu. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1029746"> </a>Now, simply type in "<b><code class="CodeStrong">pulsegen</code></b>" and hit Return. You can use standard editing commands like the arrow keys, backspace, delete, etc. Emacs users will find that simple Emacs commands also work. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029752"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">To change the font size of the text you must be editing the text, which you can return to by double-clicking (Button-1) on the text. Button-2 then brings up a menu of text sizes. You can also change the text anchor with Button-3. </font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029753"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">As mentioned earlier, the I/O icons get replaced with small solid squares. To help identify these ports, we should add text to them. You can add text to each of them individually, which can get tedious. To make this easier, SUE has a special feature for this called "<b><code class="CodeStrong">Duplicate Text</code></b>". </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1029754"> </a>Select the <b><code class="CodeStrong">input</code></b> icon labeled "<b><code class="CodeStrong">in</code></b>". </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1029755"> </a>Hit the hotkey <b><strong class="Strong">Shift-t</strong></b> or<b><code class="CodeStrong"> Duplicate Text</code></b> in the <b><code class="CodeStrong">Edit</code></b> menu. The text from the selected icon is duplicated out of the icon, and you now use Button-1 to move it to where you want it just like in normal duplication mode. Move the "<code class="Code">in</code>" text to the inside of the icon rectangle. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1029756"> </a>Now select both of the <b><code class="CodeStrong">output</code></b> icons together and hit<b><strong class="Strong"> Shift-t</strong></b>. Move the text inside the rectangle as shown in <a href="SUE_tut-Pt4HigherLevel.html#1029727">Figure 17</a>. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029760"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In order to personalize our icon, let's add a new property called "<b><code class="CodeStrong">my_name</code></b>": </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1029761"> </a>Select the text "<b><code class="CodeStrong">-type user -name name</code></b>" and duplicate it (<b><strong class="Strong">d</strong></b>). This is just to save some typing. Move the duplicated text underneath the other text.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1029762"> </a>Double-click on the copy and change it to read: </font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">-type user -name <b><strong class="Strong">my_name</strong></b> -default <b><strong class="Strong">Bob</strong></b> </font><a name="1029763"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029765"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You just defined a new property called "<b><code class="CodeStrong">my_name</code></b>" and set its default value to "<b><code class="CodeStrong">Bob</code></b>". The "<b><code class="CodeStrong">my_name</code></b>" property will now show up in addition to the other properties when you double-click on the instantiated icon. </font>
+<p>
+<p>
+  <dt> <a name="1029766"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Once you've defined a property, you want to use it. The simplest way to use a property is to display it. The way you display a property is by preceding it with a "<b><code class="CodeStrong">$</code></b>" in a text line. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1029767"> </a>Hit <b><code class="CodeStrong">t </code></b>to <b><code class="CodeStrong">add text</code></b>, and click Button-1 inside the icon rectangle. Now type the line: </font>
+</p><pre>
+<font face="ITC Franklin Gothic Book"><b><strong class="Strong">I'm $my_name</strong></b> </font><a name="1029768"> </a>
+</p><font face="Courier"></font><a name="1029769"> </a>
+</p></pre>
+   </ol>
+  <dl>
+<p> <dt> <a name="1029770"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">and hit Return. </font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1029771"> </a>Now type <b><strong class="Strong">c</strong></b> or select <b><code class="CodeStrong">Swap Views</code></b> in the <b><code class="CodeStrong">View</code></b> menu to get back to the schematic. </font>
+</p>   </ol>
+</ol>
+<h5>
+  <a name="1029772"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Placing Our ICON Into The Schematic</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029773"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to place a copy of the "<b><code class="CodeStrong">pulsegen</code></b>" icon into the "<b><code class="CodeStrong">pulsegen</code></b>" schematic. This is handy for documentation since we can see both the schematic and the icon that goes with it at the same time. Don't worry, SUE is smart enough to know it's the icon for this schematic and to avoid recursive calls when netlisting. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029774"> </a>Select "<b><code class="CodeStrong">pulsegen</code></b>" from the <b><code class="CodeStrong">Icon List</code></b> box (the second list box from the top).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029778"> </a>Place the icon toward the bottom of your schematic, as shown in <a href="SUE_tut-Pt4HigherLevel.html#1029780">Figure 18</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029780"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 18:   Schematic with Icon</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig16.gif">
+</div></font><a name="1029784"> </a>
+</pre>
+
+<h5>
+  <a name="1029785"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Modifying The ICON</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029786"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Just in case your name isn't Bob (yes, I know there are lots of you) let's change the value of `<b><code class="CodeStrong">my_name</code></b>' in this instantiated <b><code class="CodeStrong">pulsegen</code></b> icon. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029787"> </a>Double-click on the <b><code class="CodeStrong">pulsegen</code></b> icon and change "<b><code class="CodeEmphasis">Bob</code></b>" to your name in the <b><code class="CodeStrong">Edit Properties</code></b> dialog box. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029788"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The icon should now say "<b><code class="CodeStrong">I'm &lt;your name&gt;</code></b>". Notice that SUE automatically added the property "<b><code class="CodeStrong">my_name</code></b>" and the default "<b><code class="CodeStrong">Bob</code></b>" to the<b><code class="CodeStrong"> Edit Properties</code></b> dialog box.</font>
+<p>
+<p>
+  <dt> <a name="1029789"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Finally, let's add a<i><strong class="StrongItalic"> </strong></i><b><code class="CodeStrong">title bar</code></b> to our schematic. The title bar is another documentation feature. It automatically includes the schematic name, file name, date modified, and owner to the schematic. You can easily customize it to include your company name, too. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029790"> </a>Select the "<b><code class="CodeStrong">title_bar</code></b>" icon from the <b><code class="CodeStrong">devices Library</code></b> and place it at the bottom of your schematic. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029794"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your schematic should now look like <a href="SUE_tut-Pt4HigherLevel.html#1029796">Figure 19</a>. (The actual text in the title bar will be different than the illustration.)</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029796"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 19:   Schematic With Title Bar</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig17.gif">
+</div></font><a name="1029800"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029807"> </a><font  face="Verdana, Arial, Helvetica, sans-serif"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029805"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "<b><code class="CodeStrong">title_bar</code></b>" icon is a generator. If you Shift-double-click on it and change it to an "<b><code class="CodeStrong">sccs_title_bar</code></b>", then SUE will put your cell under SCCS control, also, when you save it.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029808"> </a>Save your schematic with<b><strong class="Strong"> </strong></b><b><strong class="Strong">Ctrl-s</strong></b>. </font>
+</p>   </ol>
+</ol>
+<h5>
+  <a name="1029809"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Using Pulsegen</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029810"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to build a test circuit to run our <code class="Code">pulsegen</code>. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029811"> </a>Open the file "<b><code class="CodeStrong">clock.sue"</code></b> (<b><strong class="Strong">Ctrl-l </strong></b>or <b><code class="CodeStrong">Open</code></b> in the <b><code class="CodeStrong">File</code></b> menu). This is the clock generator we already made for you. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029812"> </a>Make a new schematic with<b><strong class="Strong"> </strong></b><b><strong class="Strong">Ctrl-n</strong></b> or <b><code class="CodeStrong">New Schematic</code></b> in the <b><code class="CodeStrong">File</code></b> menu. Call the schematic "<b><code class="CodeStrong">test_pg</code></b>". This new schematic is going to look like <a href="SUE_tut-Pt4HigherLevel.html#1029817">Figure 20</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029817"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 20:   Test_pg Schematic</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig18.gif">
+</div></font><a name="1029821"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029822"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now build the circuit. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029823"> </a>Drop a "<b><code class="CodeStrong">pulsegen</code></b>" icon </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029824"> </a>Drop a "<b><code class="CodeStrong">clock</code></b>" icon </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1029825"> </a>Drop three "<b><code class="CodeStrong">flag</code></b>" icons from the <b><code class="CodeStrong">devices Library</code></b>. Attach them to the outputs of the <b><code class="CodeStrong">clock</code></b> and the <b><code class="CodeStrong">pulsegen</code></b> icons (refer to <a href="SUE_tut-Pt4HigherLevel.html#1029817">Figure 20</a> if needed). We will describe these later. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1029829"> </a>Wire it up. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029830"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You are now ready to simulate your circuit in Verilog. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1029831"> </a>Change simulation mode to Verilog (<b><code class="CodeStrong">Change Simulation Mode</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu, click on <b><code class="CodeStrong">Verilog</code></b> and hit <b><code class="CodeStrong">Done</code></b> or Return). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1029832"> </a>Hit<b><strong class="Strong"> Shift-n </strong></b>or <b><code class="CodeStrong">VERILOG Netlist </code></b>from the <b><code class="CodeStrong">Sim</code></b> menu. Notice that the <b><code class="CodeStrong">Sim</code></b> menu changed again since we changed the simulation mode to Verilog. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029833"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You just built a Verilog netlist using our "<b><code class="CodeStrong">pulsegen</code></b><b><code class="CodeStrong">â€</code></b> and a behavioral model of "<b><code class="CodeStrong">clock</code></b>" (which has been provided). </font>
+<p>
+<p>
+  <dt> <a name="1029839"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now to run the simulator: <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029838"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you don't have a Verilog simulator set up, skip the rest of this section. Continue the tutorial at <a href="SUE_tut-Pt4HigherLevel.html#1029855">Creating Behavioral Verilog Models</a>.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1029840"> </a>Hit <b><strong class="Strong">Ctrl-i </strong></b>or<b><code class="CodeStrong"> Init Probe</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. This starts up an interactive Verilog simulation. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1029841"> </a>Type <b><strong class="Strong">s</strong></b> or<b><code class="CodeStrong"> Step Verilog</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to step the time forward. This sends several cryptic lines to your Verilog simulator, which causes it to advance the time step 10 units. A "<b><code class="CodeStrong">0</code></b>" should appear in the flag nearest "<b><code class="CodeStrong">clock</code></b>", and a couple of "<b><code class="CodeStrong">1</code></b>"'s on the output flags, as in <a href="SUE_tut-Pt4HigherLevel.html#1029846">Figure 21</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029846"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 21:   Step Verilog Shows Changes in Flags</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig19.gif">
+</div></font><a name="1029850"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029851"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You probably figured out what the flags are by now. They report the state of the nets they are attached to and are updated after every time step. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1029852"> </a>Step time a few more times. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029853"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The clock is designed to transition every other Verilog time step. Notice that the "<b><code class="CodeStrong">out0_H</code></b>" flag changes every cycle and is the inverse of the clock. This makes sense since it is just the clock followed by three inverters. But what happened to our pulse on "<b><code class="CodeStrong">out1_H</code></b>"? </font>
+<p>
+<p>
+  <dt> <a name="1029854"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In HSPICE and IRSIM all transitions take a finite time, unlike Verilog where you have to specifically add delays to transitions. What's happening is that the inverters are taking no time (or 0ns), so in Verilog our "pulse" lasts for 0ns! To fix this we will change the inverter model to add a delay.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029855"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Creating Behavioral Verilog Models</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1029856"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">We are now going to edit the schematic so that the inverters have a non-zero delay.</font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029857"> </a>Select and push into "<b><code class="CodeStrong">pulsegen</code></b>" (hotkey: <b><strong class="Strong">e</strong></b>). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1032033"> </a>Select and push into an inverter (hotkey: <b><strong class="Strong">e</strong></b>). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1032034"> </a>Now type <b><strong class="Strong">c</strong></b> or <b><code class="CodeStrong">Swap Views</code></b> in the <b><code class="CodeStrong">View</code></b> menu to switch to the icon view of "<b><code class="CodeStrong">inverter</code></b>". </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1029867"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 22:   Changing Name To "my_inverter"</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig22new.gif">
+</div></font><a name="1029871"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1029872"> </a>Look at the Verilog property for the inverter:</font>
+</p><pre>
+<font face="ITC Franklin Gothic Book">-type fixed -name verilog -text {not\#$delay[unique_name]""$name inv]\($out,$in\)\;}</font><a name="1029873"> </a>
+</p><font face="Courier"></font><a name="1029874"> </a>
+</p></pre>
+   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029882"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The text you just edited tells the netlister how to netlist this cell when in Verilog Mode. Notice the "<b><code class="CodeStrong">#$delay</code></b>" in the verilog string above. This adds the value of the delay property to the inverter. Because it is a user property, it shows up in the <b><code class="CodeStrong">Edit Properties</code></b> popup for the icon. Also, the actual net names are substituted for "<b><code class="CodeStrong">$out</code></b>" and "<b><code class="CodeStrong">$in</code></b>" during netlisting. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1029897"> </a>Pop back up to <b><code class="CodeStrong">pulsegen</code></b> (hotkey: <b><strong class="Strong">Ctrl-e</strong></b>).</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1032429"> </a>Double click with Button-1 on each of the inverters and change the delay from <b><code class="CodeStrong">0 </code></b>to <b><code class="CodeStrong">4</code></b>.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1032426"> </a>Save <b><code class="CodeStrong">pulsegen</code></b> with <b><strong class="Strong">Ctrl-s.</strong></b> </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029898"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's get back to our pulse generator test circuit, "<b><code class="CodeStrong">test_pg</code></b>", and simulate it again to see if we get a pulse. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1029899"> </a>Pop back up to <b><code class="CodeStrong">test_pg</code></b> (hotkey: <b><strong class="Strong">Ctrl-e</strong></b>). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1029900"> </a>Re-netlist by hitting the<b><strong class="Strong"> Shift-n</strong></b> hotkey or <b><code class="CodeStrong">VERILOG Netlist</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. Then do an <b><code class="CodeStrong">Init Probe</code></b> (<b><strong class="Strong">Ctrl-i</strong></b>) to restart the simulator. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1029901"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The previous simulation will be stopped and a new one will be started. </font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1029902"> </a>Step time (<b><strong class="Strong">s</strong></b>) a few times and see what happens. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029903"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should see that "<b><code class="CodeStrong">out0_H</code></b>" follows "<b><code class="CodeStrong">in</code></b>", but with a one-cycle delay. Also, now "<b><code class="CodeStrong">out1_H</code></b>" generates our pulse! (negative going). </font>
+<p>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1029904"> </a>Select the <b><code class="CodeStrong">pulsegen</code></b> icon and push into it (<b><strong class="Strong">e</strong></b>). </font>
+</p>   </ol>
+<p>
+  <dt> <a name="1029905"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Hit the <b><strong class="Strong">Ctrl-o</strong></b><b><code class="CodeStrong"> </code></b>hotkey or <b><code class="CodeStrong">Display Term Values</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. Do you see the white 0's and 1's? Look at <a href="SUE_tut-Pt4HigherLevel.html#1029910">Figure 23</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029910"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 23:   Display Term Values</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig22.gif">
+</div></font><a name="1029914"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029915"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition to the flags, you can have SUE display all of the terminal values in a given schematic with <b><code class="CodeStrong">Display Term Values</code></b>. This is great for debugging! </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1029916"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Creating A More Complex Verilog Model</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1029917"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">For the inverter in the above example, the Verilog model could be described in a single line. If you need to write a more complex Verilog model, you can attach a Verilog text file to a schematic. Just because SUE looks like a schematic editor doesn't mean that everything you do has to be with schematics. </font>
+<p>
+<p>
+  <dt> <a name="1029918"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Instead of modeling just the inverter, this time we'll model the entire <b><code class="CodeStrong">pulsegen</code></b> circuit from the above example. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1029919"> </a>Return to the <b><code class="CodeStrong">pulsegen</code></b> schematic if you aren't already there. Make sure none of the icons are selected.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1029920"> </a>Hit the <b><strong class="Strong">Shift-e </strong></b>hotkey or <b><code class="CodeStrong">E</code></b><b><code class="CodeStrong">dit Verilog </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu. A dialog box will come up telling you that it can't find a Verilog file for "<b><code class="CodeStrong">pulsegen</code></b>". Simply hit the <b><code class="CodeStrong">Done</code></b> button and SUE will make one for you, and then bring up the file in your favorite text editor (EMACS, VI, etc.). <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1029925"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE chooses the editor to use based on your <i><strong class="StrongItalic">EDITOR</strong></i> UNIX environment variable. For example, to set to <i><strong class="StrongItalic">Emacs</strong></i>, type "<b><code class="CodeStrong">setenv EDITOR emacs</code></b>" in UNIX, and restart SUE.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1029930"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Your text editor file will look like <a href="SUE_tut-Pt4HigherLevel.html#1029932">Figure 24</a>.</font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1029932"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 24:   Template for Verilog Model</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig23.gif">
+</div></font><a name="1029936"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1029937"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that SUE automatically creates a template for the Verilog model, adding the port information to the file. You only need to add the model for "<b><code class="CodeStrong">pulsegen</code></b>" after the line: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">// Enter verilog here</font><a name="1029938"> </a>
+</p><font face="Courier"></font><a name="1029939"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1029940"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Instead of creating the <b><code class="CodeStrong">pulsegen</code></b> Verilog model, please wait for the next section, which has larger and more interesting example and includes Verilog models at many levels. </font>
+<p>
+</dl></dl><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1029942"> </a>Save the file and close the text editor window. </font>
+</p><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029943"> </a>If your editor is Emacs (the default), type <b><strong class="Strong">Ctrl-x, Ctrl-s</strong></b> to save, followed by <b><strong class="Strong">Ctrl-x, Ctrl-c</strong></b> to exit. 
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1029944"> </a>In VI type<b><strong class="Strong"> :wq </strong></b>to save the file and quit. 
+</li><p>
+</font>
+</ul></ul>   </ol>
+   </ol>
+<dl><dl>
+<p>
+  <dt> <a name="1029945"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE keeps track of your Verilog file and `attaches' it to your schematic. You can view or edit it any time by simply selecting <b><code class="CodeStrong">Edit Verilog</code></b> from the <b><code class="CodeStrong">Sim</code></b> menu, as you did before. Since the file exists now, SUE will bring it up for you automatically. You can do this either from the schematic, or by selecting the icon in a higher level schematic. </font>
+<p>
+<p>
+  <dt> <a name="1029946"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Notice that SUE has named your behavioral Verilog file "<b><code class="CodeStrong">pulsegen.vb</code></b>" (note the "<b><code class="CodeStrong">b</code></b>"). If you want to write and attach your own behavioral Verilog files, they must have the "<b><code class="CodeStrong">.vb</code></b>" extension. Otherwise, SUE won't find them. </font>
+<p>
+<p>
+  <dt> <a name="1029947"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You may have also noticed that when SUE creates a Verilog netlist, it gives us the extension of "<b><code class="CodeStrong">.vh</code></b>". Why doesn't SUE just use the extension "<b><code class="CodeStrong">.v</code></b>" like everyone else? Simple, so SUE doesn't step on your existing "<b><code class="CodeStrong">.v</code></b>" Verilog files. The only time SUE uses the "<b><code class="CodeStrong">.v</code></b>" extension is to import port information from a user-written Verilog RTL file using <b><code class="CodeStrong">Load Verilog I/O's</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. </font>
+<p>
+<p>
+  <dt> <a name="1030760"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Before going on to a more interesting example, let's recap what you have done so far. </font>
+<p>
+  <dl>
+<p> <dt> <a name="1030761"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You have:</font>
+<p><UL><UL></p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030762"> </a>Drawn a schematic and built its associated icon.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030763"> </a>Simulated the schematic in HSPICE, IRSIM, AND Verilog.  
+</li><p>
+</font>
+</p>
+<font  face="Verdana, Arial, Helvetica, sans-serif"><li>
+<a name="1030764"> </a>Learned lots of SUE features.  
+</li><p>
+</font>
+</ul></ul>  </dl>
+<p>
+  <dt> <a name="1030765"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">And you have done all of this from inside of SUE, without once having to run any other tools externally. </font>
+<p>
+<p>
+  <dt> <a name="1030766"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Not bad, huh? </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014757"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>A More Complex Example </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014758"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's look at something a little more complex and which has a few levels of hierarchy. The circuit is a simple 4-bit ripple-carry adder. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014759"> </a>Open the file "<b><code class="CodeStrong">test_ripple4.sue</code></b>" that is in the tutorial directory. You should see something similar to <a href="SUE_tut-Pt4HigherLevel.html#1014763">Figure 25</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014763"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 25:   Demo "4-bit ripple-carry adder" Schematic</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig24.gif">
+</div></font><a name="1014767"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1014768"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This example has text documentation along with it as described in the text in the schematic. Let's look at it. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif">
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/notecaution.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1023570"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you are reading this tutorial in a browser and bring up the documentation, it will replace this tutorial. After reading the documentation, just hit the "Back" arrow in your browser to return to this tutorial.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014770"> </a>Hit <b><strong class="Strong">Shift-d</strong></b> or <b><code class="CodeStrong">Display Cell Doc</code></b> in the <b><code class="CodeStrong">View</code></b> menu to view the attached documentation for this cell. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1014771"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You can also attach plain text files, in place of HTML files. SUE looks for the ".html" or ".doc" extensions to files with the same names as the schematic you are editing. It brings up ".html" files in your browser, and ".doc" files in your text editor.</font>
+<p>  </dl>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014772"> </a>Now look over the <b><code class="CodeStrong">test_ripple4</code></b> example. Push into all of the cells. It has documentation, buses, and lots of other interesting things not covered in your simple <b><code class="CodeStrong">pulsegen</code></b> example. <b><strong class="Strong"><p>
+
+<center>
+<table border="1" cellpadding="5" cellspacing="0" width="600">
+  <caption><b><i><font face="Verdana, Arial, Helvetica, sans-serif"></font></i></b></caption>
+  <tr>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"> 
+<table border="0" align="center">
+<tr>
+<td align="center" width="60"><img src="images/note.gif"></td>
+<td valign="center"></td>
+</tr>
+</table>
+
+<br align="left"></font></td>
+    <td><font face="Verdana, Arial, Helvetica, sans-serif"><dl><dl>
+<p>
+  <dt> <a name="1023623"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">SUE is smart enough to remember where you just were. Let's say you just pushed down five levels and you want to pop back up four levels. To accomplish this just repeat <b><strong class="Strong">Ctrl-e</strong></b> four times. To push back down type<b><strong class="Strong"> e</strong></b> four times. This is because selected objects stay selected even when you switch cells and return.</font>
+<p>
+</dl></dl>
+</font></td>
+  </tr>
+</table>
+</center>
+
+
+
+</strong></b></font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014774"> </a>Select the net which connects to the "<b><code class="CodeStrong">cout</code></b>" pin on the <b><code class="CodeStrong">ripple4</code></b> icon.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014775"> </a>Type hotkey <b><strong class="Strong">e</strong></b> to push into the icon.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014779"> </a>You should see something like <a href="SUE_tut-Pt4HigherLevel.html#1014781">Figure 26</a>. SUE pushed down into the instance the net is connected to, highlights that net in the <b><code class="CodeStrong">ripple4</code></b> schematic and zooms in on it. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014781"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 26:   Push Into Selected Net</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig25.gif">
+</div></font><a name="1014785"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1014786"> </a>Type <b><strong class="Strong">e</strong></b> again, and SUE now pushes you into the <b><code class="CodeStrong">FA </code></b>schematic and highlights the <b><code class="CodeStrong">cout</code></b> net.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1014787"> </a>Type <b><strong class="Strong">Ctrl-e</strong></b> to go back to the <b><code class="CodeStrong">ripple4</code></b> schematic, and then type <b><strong class="Strong">v</strong></b> to view the entire schematic.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1014788"> </a>Select the <b><code class="CodeStrong">a[3:0]</code></b> net, then type <b><strong class="Strong">Alt-e</strong></b> (or select <b><code class="CodeStrong">Pop Connected</code></b> from the <b><code class="CodeStrong">View</code></b> menu). You should see something like <a href="SUE_tut-Pt4HigherLevel.html#1014793">Figure 27</a>. SUE popped up one level of hierarchy, and highlighted the net which connects to <b><code class="CodeStrong">a[3:0]</code></b> and the instances connected to this net.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014793"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 27:   Pop Up In Hierarchy Of A [3:0] Net</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig26.gif">
+</div></font><a name="1014797"> </a>
+</pre>
+
+<h4>
+  <a name="1014799"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Displaying Design Hierarchy, and Controlling The Simulation </em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014800"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">One of the more powerful features in SUE is that it can change what you simulate on the fly. The <b><code class="CodeStrong">Display Design Hierarchy</code></b> feature allows you to not only display the hierarchy, but to control what level of the design gets simulated. </font>
+<p>
+<p>
+  <dt> <a name="1014801"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">During netlisting, SUE uses a very simple algorithm to decide what to do with subcells. If the subcell icon has a Verilog property and you are in Verilog simulation mode, then it uses that property to netlist the cell, ignoring any schematics or hierarchy below it. Otherwise it netlists its schematic.</font>
+<p>
+<p>
+  <dt> <a name="1014802"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Let's look at the <b><code class="CodeStrong">ripple4</code></b> icon to see if there is a Verilog property. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014803"> </a>Select the "<b><code class="CodeStrong">ripple4</code></b>" icon and push into it with the hotkey <b><strong class="Strong">e</strong></b>. You are now looking at the <b><code class="CodeStrong">ripple4</code></b> schematic. We need to look at its icon. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014804"> </a>Hit <b><strong class="Strong">c</strong></b> or <b><code class="CodeStrong">Swap Views</code></b> in the <b><code class="CodeStrong">View</code></b> menu. Now you should be viewing the <b><code class="CodeStrong">ripple4</code></b> icon. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014805"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should see a line that looks like: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">-type auto -name verilog -text ...</font><a name="1014806"> </a>
+</p><pre>
+<font face="ITC Franklin Gothic Book"></font><a name="1014807"> </a>
+</pre>
+</pre>
+</pre>
+<p>
+  <dt> <a name="1014808"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">This is the Verilog property. It tells SUE exactly how to netlist this icon in Verilog. If this seems complicated, realize that it is simply a function of the name of the icon and the port names and can be generated by the <b><code class="CodeStrong">Create Verilog Property</code></b> command. </font>
+<p>
+</dl></dl><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014809"> </a>Hit <b><code class="CodeStrong">Create Verilog Property</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu and move the text it creates below the existing Verilog property (you are in a duplication command now). You should see that these are the same. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014810"> </a>Once you have verified that they are the same, remove the second copy. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014811"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">If you wanted to simulate the <b><code class="CodeStrong">ripple4</code></b> schematic, you would then need to remove this property. Instead of removing the property, we can tell SUE to ignore it with the <b><code class="CodeStrong">Display Design Hierarchy</code></b> command. </font>
+<p>
+</dl></dl>
+
+<h5>
+  <a name="1014812"> </a><i><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif">Using Display Design Hierarchy To Netlist</font></i>
+</h5>
+
+
+<dl><dl>
+<p>
+  <dt> <a name="1014813"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now we are going to use <b><code class="CodeStrong">Display Design Hierarchy</code></b><b><code class="CodeStrong"> </code></b>to control the netlisting. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014814"> </a>Return to "<b><code class="CodeStrong">test_ripple4</code></b>" by hitting <b><strong class="Strong">Ctrl-e </strong></b>or <b><code class="CodeStrong">Pop Out Of</code></b> in the <b><code class="CodeStrong">View</code></b> menu. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014815"> </a>If you aren't already in Verilog mode, change simulation mode to Verilog (<b><code class="CodeStrong">Change Simulation Mode</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu, click on <b><code class="CodeStrong">Verilog</code></b> and hit <b><code class="CodeStrong">Done</code></b> or Return). </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014816"> </a>Now select <b><code class="CodeStrong">Display Design Hierarchy</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. It will netlist your cell and pop up the <b><code class="CodeStrong">Design Hierarchy</code></b> menu on top of your schematic, as shown in <a href="SUE_tut-Pt4HigherLevel.html#1014821">Figure 28</a>.</font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014821"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 28:   Design Hierarchy Dialog Box</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig27.gif">
+</div></font><a name="1018894"> </a>
+</pre>
+<dl><dl>
+<p>
+  <dt> <a name="1018895"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The <b><code class="CodeStrong">Design Hierarchy</code></b> popup tells you that the two icons "<b><code class="CodeStrong">ripple4</code></b>" and "<b><code class="CodeStrong">counter</code></b>" were netlisted with their Verilog properties. Let's tell SUE to netlist the <b><code class="CodeStrong">ripple4</code></b> schematic and ignore its Verilog property: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014827"> </a>Click with Button-1 on "<b><code class="CodeStrong">- I ripple4</code></b>" in the <b><code class="CodeStrong">Design Hierarchy</code></b> popup. </font>
+</p>   </ol>
+  <dl>
+<p> <dt> <a name="1014828"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">The "<b><code class="CodeStrong">I</code></b>" in <b><code class="CodeStrong">- I ripple4</code></b> should have changed to "<b><code class="CodeStrong">S</code></b>", meaning that the Verilog property is now ignored for this icon and the <b><code class="CodeEmphasis">schematic</code></b> will be netlisted. </font>
+<p>  </dl>
+   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014829"> </a>Hit the <b><code class="CodeStrong">Netlist</code></b> button in the <b><code class="CodeStrong">Design Hierarchy</code></b> popup. SUE re-netlists this schematic and now shows you that there is a <b><code class="CodeStrong">FA</code></b> icon whose Verilog property is being used. </font>
+</p><p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014830"> </a>Click with Button-1 on "<b><code class="CodeStrong">- I FA</code></b>" in the <b><code class="CodeStrong">Design Hierarchy</code></b> popup and then click on <b><code class="CodeStrong">Netlist</code></b>. You should see the devices contained in the <b><code class="CodeStrong">FA</code></b> cell (see <a href="SUE_tut-Pt4HigherLevel.html#1014835">Figure 29</a>). Likewise the <b><code class="CodeStrong">test_ripple4.vh</code></b> file will include all of this hierarchy. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014835"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 29:   Expanded Design Hierarchy</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig28.gif">
+</div></font><a name="1014839"> </a>
+</pre>
+
+<h4>
+  <a name="1014840"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Mixed-Mode Verilog Simulation</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014841"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When we simulate our circuit in Verilog, SUE uses the following Verilog command line arguments "<b><code class="CodeStrong">+libext+.vb+.v -y . -y lib.v</code></b>". These instruct Verilog to look for any undefined modules in either the current directory (".") or the subdirectory ("<b><code class="CodeStrong">lib.v</code></b>") and look in files with extensions of "<b><code class="CodeStrong">.vb</code></b>" or "<b><code class="CodeStrong">.v</code></b>". (Note: you can add to or change these options in the <b><code class="CodeStrong">.suerc</code></b> file - see the Micro Magic Tools SUE User Guide for more information.) </font>
+<p>
+<p>
+  <dt> <a name="1014842"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Therefore, we need to make sure that we have defined Verilog modules for any icons whose Verilog properties we use (unless they are included inline in the icon view, like the <b><code class="CodeStrong">inverter/my_inverter</code></b> examples above). Let's make sure we have the "<b><code class="CodeStrong">.vb</code></b>" files: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014843"> </a>You should be in <b><code class="CodeStrong">test_ripple4</code></b>. If not, pop up to it with <b><strong class="Strong">Ctrl-e</strong></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014844"> </a>Select the <b><code class="CodeStrong">ripple4</code></b> icon and hit<b><strong class="Strong"> </strong></b><b><strong class="Strong">Shift-e</strong></b> or <b><code class="CodeStrong">Edit Verilog </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu to view the Verilog. This will bring up the Verilog in an editor. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014845"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">You should see that we have defined the adder behavioral model with the line: </font>
+<p>
+<pre>
+<font face="ITC Franklin Gothic Book">assign {cout, sum[3:0]} = {1'b0, a[3:0]} + {1'b0, b[3:0]} + {4'b0, cin};</font><a name="1014846"> </a>
+</p><font face="Courier"></font><a name="1014847"> </a>
+</p></pre>
+<p>
+  <dt> <a name="1014848"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">So if we netlist <b><code class="CodeStrong">test_ripple4</code></b> with the <b><code class="CodeStrong">ripple4</code></b> Verilog property, our simulation will be very fast since it only executes this one line instead of the underlying hierarchy. Let's do it.</font>
+<p>
+</dl></dl><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014849"> </a>Quit out of the editor.</font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1032978"> </a>In the <b><code class="CodeStrong">Design Hierarchy</code></b> popup, make sure the you see "<b><code class="CodeStrong">- I ripple4</code></b>". If <b><code class="CodeStrong">ripple4</code></b> shows an "<b><code class="CodeStrong">S</code></b>" for <b><code class="CodeEmphasis">schematic</code></b>, click on it to return to "<b><code class="CodeStrong">I</code></b>". Then hit <b><code class="CodeStrong">Netlist</code></b>. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="5"><a name="1014850"> </a>Look at <b><code class="CodeStrong">test_ripple4.vh</code></b> in a text editor. Do you see how short that file is? Look at the <b><code class="CodeStrong">test_ripple4</code></b> module. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="6"><a name="1014851"> </a>Hit <b><strong class="Strong">Ctrl-i </strong></b>or<b><code class="CodeStrong"> Init Probe</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu to start up Verilog. Do you see the Verilog command line arguments "<b><code class="CodeStrong">+libext+.vb+.v -y . -y lib.v</code></b>" in the window you started SUE from? </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="7"><a name="1019030"> </a>Hit <b><strong class="Strong">s</strong></b> a few times to step the time forward. You should see the flags changing. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="8"><a name="1019031"> </a>Select the <b><code class="CodeStrong">ripple4</code></b> icon and push into it (hotkey:<b><strong class="Strong"> e</strong></b>). Select one of the <b><code class="CodeStrong">FA</code></b><b><code class="CodeStrong"> </code></b>icons and push into it (hotkey:<b><strong class="Strong"> </strong></b><b><strong class="Strong">e</strong></b>). Hit<b><strong class="Strong"> Ctrl-o </strong></b>or<b><code class="CodeStrong"> Display Term Values</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. You won't get any values. Why? because this schematic is not part of the simulation. The netlist doesn't include all of this hierarchy. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014854"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Now let's simulate with all of the hierarchy: </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="9"><a name="1014855"> </a>Click with Button-1 on <b><code class="CodeStrong">-I ripple4</code></b> in the <b><code class="CodeStrong">Design Hierarchy</code></b> popup and then hit <b><code class="CodeStrong">Netlist</code></b>. (This will also bring you to your top cell: <b><code class="CodeStrong">test_ripple4</code></b>.) </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="10"><a name="1014856"> </a>If you see "<b><code class="CodeStrong">-I FA</code></b>" then click on that line to get the <b><code class="CodeStrong">FA</code></b> schematic and hit <b><code class="CodeStrong">Netlist</code></b>. Now we will simulate three levels of hierarchy. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="11"><a name="1014857"> </a>Look at <b><code class="CodeStrong">test_ripple4.vh</code></b> in a text editor. Do you see that there are now modules for <b><code class="CodeStrong">FA</code></b> and <b><code class="CodeStrong">ripple4</code></b>? </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="12"><a name="1014858"> </a>Hit<b><strong class="Strong"> </strong></b><b><strong class="Strong">Ctrl-i </strong></b>or <b><code class="CodeStrong">Init Probe </code></b>in the <b><code class="CodeStrong">Sim</code></b> menu to start up Verilog. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="13"><a name="1014859"> </a>Hit<b><strong class="Strong"> </strong></b><b><strong class="Strong">s</strong></b> a few times to step the time forward. You should see the flags changing. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="14"><a name="1014860"> </a>Select the <b><code class="CodeStrong">ripple4</code></b> icon and push into it (hotkey:<b><strong class="Strong"> </strong></b><b><strong class="Strong">e</strong></b>). Select one of the <b><code class="CodeStrong">FA</code></b> icons and push into it (hotkey: <b><strong class="Strong">e</strong></b>). Hit <b><strong class="Strong">Ctrl-o</strong></b> or <b><code class="CodeStrong">Display Term Values</code></b> in the <b><code class="CodeStrong">Sim</code></b> menu. You should now get values since the <b><code class="CodeStrong">FA</code></b> schematic IS part of the netlist. </font>
+</p>   </ol>
+</ol><dl><dl>
+<p>
+  <dt> <a name="1014861"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">By changing the <b><code class="CodeStrong">Display Design Hierarchy</code></b> in SUE, the designer or verification person can change what is being simulated on the fly. Thus, schematics can be "flattened" to verify that they are correct down to the "transistor" level, or simulations can be done at very high-level behavioral levels to increase speed. </font>
+<p>
+<p>
+  <dt> <a name="1014862"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">In addition, mixed-level simulations can also be done. That is, simulate high-level behavioral models for some blocks, and flatten others down to the transistor level. </font>
+<p>
+<p>
+  <dt> <a name="1014863"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">Most importantly, what you see in the<b><code class="CodeStrong"> </code></b><b><code class="CodeStrong">Display Design Hierarchy</code></b> window is what you get when you simulate. You never have to wonder what you are actually simulating! </font>
+<p>
+<p>
+  <dt> <a name="1014864"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">When you are done looking over the adder example go to the next section. You can also run SPICE or IRSIM on this example. </font>
+<p>
+</dl></dl>
+
+<h4>
+  <a name="1014865"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Buses</em></font>
+</h4>
+
+<dl><dl>
+<p>
+  <dt> <a name="1014866"> </a><font  face="Verdana, Arial, Helvetica, sans-serif">While the <code class="Code">ripple4</code> example circuit uses simple bused wires or buses, it doesn't demonstrate bused instances or bus concatenation. An alternative "<code class="Code">ripple4</code>" schematic was created to demonstrate these features. </font>
+<p>
+</dl></dl>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="1"><a name="1014870"> </a>Open up the schematic <b><code class="CodeStrong">alt_ripple4</code></b>. It should look like <a href="SUE_tut-Pt4HigherLevel.html#1014872">Figure 30</a>. </font>
+</p>   </ol>
+</ol>
+<h4>
+  <a name="1014872"> </a><font color="#003366"  face="Verdana, Arial, Helvetica, sans-serif"><em>Figure 30:   "alt_ripple4": Alternative Ripple-Carry Adder Schematic</em></font>
+</h4>
+
+<pre>
+<font face="ITC Franklin Gothic Book"><div align="center"><img src="images/suet4_fig29.gif">
+</div></font><a name="1014876"> </a>
+</pre>
+<ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="2"><a name="1014877"> </a>Notice that the 4 <b><code class="CodeStrong">FA</code></b> icons have been replaced by one icon whose name is "<b><code class="CodeStrong">[3:0]</code></b>". Simply naming an icon with a Verilog bus range will cause it to be duplicated that many times. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="3"><a name="1014878"> </a>Look at the "<b><code class="CodeStrong">a</code></b>" input to the <b><code class="CodeStrong">FA</code></b> icon. We want this to be connected to the "<b><code class="CodeStrong">cout</code></b>" output of the previous <b><code class="CodeStrong">FA</code></b> or "<b><code class="CodeStrong">cin</code></b>" if it is the first one. This is done by labelling the net with a <b><code class="CodeStrong">name_net_s</code></b> icon with the name "<b><code class="CodeStrong">cout_int[2:0],cin</code></b>". The comma (",") causes a Verilog bus concatenation. "<b><code class="CodeStrong">cout_int[2:0]</code></b>" are the three nets that go from "<b><code class="CodeStrong">cout</code></b>" on one <b><code class="CodeStrong">FA</code></b> to "<b><code class="CodeStrong">cin</code></b>" on the next one. For more examples of buses, see the<em class="Emphasis"> </em>Micro Magic Tools SUE User Guide. </font>
+</p>   </ol>
+</ol><ol type="1">   <ol type="1">
+<p>   <font  face="Verdana, Arial, Helvetica, sans-serif"><li class="SmartList2" value="4"><a name="1014879"> </a>You can replace "<b><code class="CodeStrong">ripple4</code></b>" in <b><code class="CodeStrong">test_ripple4</code></b> with "<b><code class="CodeStrong">alt_ripple4</code></b>" and simulate it to see that it works the same way as "<b><code class="CodeStrong">ripple4</code></b>". </font>
+</p>   </ol>
+</ol>
+</blockquote>
+
+<hr>
+
+<table align="left" border="0" cellspacing="0" cellpadding="0">
+  
+  <tr>
+    <td align="left"><font size="1">
+    <b> -----  Micro Magic  -----   
+    </b>
+  </td>
+  </tr>
+
+</table>
+
+<table width="331" border="0" cellpadding="0" cellspacing="0" align="right">
+  <tr>
+    <td><a href="sue_tutorialTOC.html"><img src="images/navtoc.gif" width="84" height="23" border="0"
+    alt="TOC"> </a></td>
+    <td><a href="SUE_tut-Pt3Simulating.html"><img src="images/navprev.gif" width="81" height="23" border="0"
+    alt="PREV"> </a></td>
+    <td><a href="SUE_tut-Pt5Crossprobe.html"><img src="images/navnext.gif" width="81" height="23" border="0"
+    alt="NEXT"> </a></td>
+    <td><a href="SUE_tut-Pt5Crossprobe.html"><img src="images/navend.gif" width="85" height="23" border="0"
+    alt="INDEX"> </a></td>
+  </tr>
+</table>
+
+</body>
+</html>

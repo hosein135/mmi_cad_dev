@@ -1,1 +1,119 @@
-../extract/MMI_SFFHB.sp
+*** Extracted spice netlist generated from MAX ***
+
+.SUBCKT MMI_SFFHB clk d hold q s_en s_in s_out
+C_1 net_1 gnd 5.06888fF
+C_2 s_en gnd 8.60921fF
+C_3 vdd gnd 10.678fF
+C_4 hold gnd 2.96597fF
+C_5 net_2 gnd 2.52096fF
+C_6 net_3 gnd 1.91018fF
+C_7 d gnd 0.94288fF
+C_8 net_5 gnd 3.37037fF
+C_9 net_7 gnd 3.96562fF
+C_10 s_in gnd 1.51632fF
+C_11 clk gnd 5.31264fF
+C_12 net_9 gnd 3.83515fF
+C_13 net_10 gnd 6.38001fF
+C_14 net_12 gnd 2.60283fF
+C_15 net_13 gnd 3.98722fF
+C_16 net_14 gnd 6.08244fF
+C_17 s_out gnd 0.96119fF
+C_18 q gnd 1.15482fF
+C_19 gnd gnd 9.50567fF
+C_20 net_16 gnd 1.37298fF
+Mp_1 net_1 s_en vdd vdd p W=0.92U L=0.18U AD=0.4416P PD=2.8U AS=0.312978P 
++ PS=1.93149U
+Mp_2 vdd hold net_2 vdd p W=0.92U L=0.18U AD=0.312978P PD=1.93149U 
++ AS=0.4416P PS=2.8U
+Mp_3 net_3 s_en vdd vdd p W=1.84U L=0.18U AD=0.69P PD=3.51U AS=0.625956P 
++ PS=3.86298U
+Mp_4 vdd s_en net_3 vdd p W=1.84U L=0.18U AD=0.625956P PD=3.86298U AS=0.69P 
++ PS=3.51U
+Mp_5 net_3 hold net_4 vdd p W=1.84U L=0.18U AD=0.69P PD=3.51U AS=0.3588P 
++ PS=2.23U
+Mp_6 net_4 d net_5 vdd p W=1.84U L=0.18U AD=0.3588P PD=2.23U AS=0.4968P 
++ PS=2.56U
+Mp_7 net_5 net_2 net_6 vdd p W=1.84U L=0.18U AD=0.4968P PD=2.56U AS=0.3588P 
++ PS=2.23U
+Mp_8 net_6 net_7 net_3 vdd p W=1.84U L=0.18U AD=0.3588P PD=2.23U AS=0.69P 
++ PS=3.51U
+Mp_9 vdd s_in net_8 vdd p W=0.92U L=0.18U AD=0.312978P PD=1.93149U 
++ AS=0.1794P PS=1.31U
+Mp_10 net_8 net_1 net_5 vdd p W=0.92U L=0.18U AD=0.1794P PD=1.31U 
++ AS=0.2484P PS=1.28U
+Mp_11 net_5 clk net_9 vdd p W=0.92U L=0.18U AD=0.2484P PD=1.28U 
++ AS=0.332024P PS=2.71881U
+Mp_12 net_9 net_10 net_11 vdd p W=0.42U L=0.18U AD=0.151576P PD=1.24119U 
++ AS=0.0819P PS=0.81U
+Mp_13 net_11 net_12 vdd vdd p W=0.42U L=0.18U AD=0.0819P PD=0.81U 
++ AS=0.142881P PS=0.881768U
+Mp_14 vdd clk net_10 vdd p W=0.92U L=0.18U AD=0.312978P PD=1.93149U 
++ AS=0.4416P PS=2.8U
+Mp_15 vdd net_9 net_12 vdd p W=0.92U L=0.18U AD=0.312978P PD=1.93149U 
++ AS=0.2484P PS=1.46U
+Mp_16 net_12 net_10 net_13 vdd p W=0.92U L=0.18U AD=0.2484P PD=1.46U 
++ AS=0.4416P PS=3.15821U
+Mp_17 net_7 net_14 vdd vdd p W=0.92U L=0.18U AD=0.4416P PD=2.8U 
++ AS=0.312978P PS=1.93149U
+Mp_18 vdd net_13 net_14 vdd p W=0.92U L=0.18U AD=0.312978P PD=1.93149U 
++ AS=0.4416P PS=2.8U
+Mp_19 net_13 clk net_15 vdd p W=0.42U L=0.18U AD=0.2016P PD=1.44179U 
++ AS=0.0819P PS=0.81U
+Mp_20 net_15 net_14 vdd vdd p W=0.42U L=0.18U AD=0.0819P PD=0.81U 
++ AS=0.142881P PS=0.881768U
+Mp_21 vdd net_14 s_out vdd p W=0.84U L=0.18U AD=0.285762P PD=1.76354U 
++ AS=0.2268P PS=1.38U
+Mp_22 s_out s_en vdd vdd p W=0.84U L=0.18U AD=0.2268P PD=1.38U AS=0.285762P 
++ PS=1.76354U
+Mp_23 vdd net_14 q vdd p W=1.84U L=0.18U AD=0.625956P PD=3.86298U 
++ AS=0.8832P PS=4.64U
+Mn_1 net_1 s_en gnd gnd n W=0.46U L=0.18U AD=0.2208P PD=1.88U AS=0.148259P 
++ PS=1.22588U
+Mn_2 gnd hold net_2 gnd n W=0.46U L=0.18U AD=0.148259P PD=1.22588U 
++ AS=0.2208P PS=1.88U
+Mn_3 net_16 net_1 gnd gnd n W=0.92U L=0.18U AD=0.3448P PD=2.29U 
++ AS=0.296518P PS=2.45176U
+Mn_4 gnd net_1 net_16 gnd n W=0.92U L=0.18U AD=0.296518P PD=2.45176U 
++ AS=0.3448P PS=2.29U
+Mn_5 net_16 net_2 net_17 gnd n W=0.92U L=0.18U AD=0.3448P PD=2.29U 
++ AS=0.1794P PS=1.31U
+Mn_6 net_17 d net_5 gnd n W=0.92U L=0.18U AD=0.1794P PD=1.31U AS=0.382476P 
++ PS=2.89529U
+Mn_7 net_16 hold net_18 gnd n W=0.92U L=0.18U AD=0.3448P PD=2.29U 
++ AS=0.1794P PS=1.31U
+Mn_8 net_18 net_7 net_5 gnd n W=0.92U L=0.18U AD=0.1794P PD=1.31U 
++ AS=0.382476P PS=2.89529U
+Mn_9 net_5 net_10 net_9 gnd n W=0.42U L=0.18U AD=0.174609P PD=1.32176U 
++ AS=0.2016P PS=1.8U
+Mn_10 net_5 s_en net_19 gnd n W=0.46U L=0.18U AD=0.191238P PD=1.44765U 
++ AS=0.0897P PS=0.85U
+Mn_11 net_19 s_in gnd gnd n W=0.46U L=0.18U AD=0.0897P PD=0.85U 
++ AS=0.148259P PS=1.22588U
+Mn_12 net_10 clk gnd gnd n W=0.46U L=0.18U AD=0.2208P PD=1.88U AS=0.148259P 
++ PS=1.22588U
+Mn_13 net_9 clk net_20 gnd n W=0.42U L=0.18U AD=0.2016P PD=1.8U AS=0.0819P 
++ PS=0.81U
+Mn_14 net_20 net_12 gnd gnd n W=0.42U L=0.18U AD=0.0819P PD=0.81U 
++ AS=0.135367P PS=1.11928U
+Mn_15 gnd net_9 net_12 gnd n W=0.46U L=0.18U AD=0.148259P PD=1.22588U 
++ AS=0.137373P PS=1.58909U
+Mn_16 net_12 clk net_13 gnd n W=0.42U L=0.18U AD=0.125427P PD=1.45091U 
++ AS=0.2016P PS=1.8U
+Mn_17 net_7 net_14 gnd gnd n W=0.46U L=0.18U AD=0.2208P PD=1.88U 
++ AS=0.148259P PS=1.22588U
+Mn_18 gnd net_13 net_14 gnd n W=0.62U L=0.18U AD=0.199827P PD=1.65228U 
++ AS=0.2976P PS=2.2U
+Mn_19 net_13 net_10 net_21 gnd n W=0.42U L=0.18U AD=0.2016P PD=1.8U 
++ AS=0.0819P PS=0.81U
+Mn_20 net_21 net_14 gnd gnd n W=0.42U L=0.18U AD=0.0819P PD=0.81U 
++ AS=0.135367P PS=1.11928U
+Mn_21 s_out net_14 net_22 gnd n W=0.84U L=0.18U AD=0.4032P PD=2.64U 
++ AS=0.1638P PS=1.23U
+Mn_22 net_22 s_en gnd gnd n W=0.84U L=0.18U AD=0.1638P PD=1.23U 
++ AS=0.270734P PS=2.23857U
+Mn_23 gnd net_14 q gnd n W=0.92U L=0.18U AD=0.296518P PD=2.45176U 
++ AS=0.4416P PS=2.8U
+.ENDS	$ MMI_SFFHB
+
+.GLOBAL gnd vdd
+

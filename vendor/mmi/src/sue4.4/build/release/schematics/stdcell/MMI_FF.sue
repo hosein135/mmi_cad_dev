@@ -1,0 +1,108 @@
+# Created using mapper from:
+#"MMI_FF {B {MMI_FFB {d D} {clk clk} {q Q}}} {CB {MMI_FFCB {d D} {clk clk} {clrb clearn} {q Q}}} {SB {MMI_FFSB {d D} {clk clk} {setb setn} {q Q}}} "
+
+proc NAME_MMI_FF args {
+  call_use_keyword $args {{Size "B"} {DeMorgan 0}}
+
+  set nom MMI_FF[string toupper $Size]
+
+  if {$DeMorgan} {
+    set nom ${nom}_
+  }
+
+  return $nom
+}
+
+
+proc ICON_MMI_FF args {
+  icon_generator $args {{Size "B" {radio B CB SB}}  {DeMorgan 0 binary}}
+
+  set size [string toupper $Size]
+
+  # check for acceptable response on Size
+  if {($size != "B") && ($size != "CB") && ($size != "SB")} {
+    error "ERROR: Size ($size) not supported"
+  }
+
+  # check for acceptable response on DeMorgan
+  if {($DeMorgan != 0) && ($DeMorgan != 1)} {
+    error "ERROR: DeMorgan property ($DeMorgan) must be 0 or 1"
+  }
+
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {dpc {}}}
+
+
+  switch $size {
+    B {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_property -origin {0 -50} -size large -anchor center -label FF
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+    }
+    CB {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-30 100} -orient R270 -name clrb
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 80 -20 100 -start 0 -extent 359
+  icon_property -origin {0 -50} -size large -anchor center -label FFC
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label clrb
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+    }
+    SB {
+
+  icon_term -type input -origin {-10 80} -orient R270 -name clk
+  icon_term -type input -origin {-30 100} -orient R270 -name setb
+  icon_term -type input -origin {-60 0} -name d
+  icon_term -type output -origin {60 0} -name q
+  icon_line -60 80 -60 -80 60 -80 60 80 -60 80
+  icon_arc -40 80 -20 100 -start 0 -extent 359
+  icon_property -origin {0 -50} -size large -anchor center -label FFS
+  icon_property -origin {0 -30} -size large -anchor center -label B
+  icon_property -origin {-50 0} -label d
+  icon_property -origin {50 0} -anchor e -label q
+  icon_property -origin {-30 70} -anchor e -rotate 1 -label setb
+  icon_property -origin {-10 70} -anchor e -rotate 1 -label clk
+
+    }
+  }
+
+  # properties
+  icon_property -origin {-40 280} -type user -name name
+  icon_property -origin {-40 320} -type user -name dpc
+
+  # verilog property
+  switch _$size {
+    _B { set fname MMI_FFB }
+    _CB { set fname MMI_FFCB }
+    _SB { set fname MMI_FFSB }
+  }
+  set nname [NAME_MMI_FF -Size $Size -DeMorgan $DeMorgan]
+  switch $size {
+    B {
+    set pnames ".D(\$d), .clk(\$clk), .Q(\$q)"
+    }
+    CB {
+    set pnames ".D(\$d), .clk(\$clk), .clearn(\$clrb), .Q(\$q)"
+    }
+    SB {
+    set pnames ".D(\$d), .clk(\$clk), .setn(\$setb), .Q(\$q)"
+    }
+  }
+
+  set vprop "$fname \[unique_name \"\" \$name $nname\] ($pnames)\\;"
+  icon_property -origin {-40 360} -type fixed -name verilog -text $vprop
+}

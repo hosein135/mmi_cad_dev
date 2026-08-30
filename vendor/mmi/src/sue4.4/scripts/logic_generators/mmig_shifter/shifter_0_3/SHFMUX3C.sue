@@ -1,1 +1,69 @@
-../shifter_0_1/SHFMUX3C.sue
+# SUE version MMI_SUE4.0p1
+
+proc SCHEMATIC_SHFMUX3C {} {
+  make name_net_s -name N3 -origin {580 430}
+  make name_net_s -name N2 -origin {580 370}
+  make name_net_s -name N1 -origin {580 310}
+  make output -name out -origin {840 370}
+  generate row_spanner row_spanner200 
+  make row_spanner200 -origin {590 120}
+  make input -name in0 -origin {220 290}
+  make input -name in1 -origin {220 350}
+  make input -name in2 -origin {220 410}
+  generate MMI_NAND2 MMI_NAND2B -Size B
+  make MMI_NAND2B -origin {470 310}
+  make MMI_NAND2B -origin {470 370}
+  make MMI_NAND2B -origin {470 430}
+  make name_net_s -name {[0]} -origin {340 330}
+  make name_net_s -name {[1]} -origin {340 390}
+  make name_net_s -name {[2]} -origin {340 450}
+  make input -name {sel[2:0]} -origin {220 330}
+  generate MMI_NAND3 MMI_NAND3C_ -Size C -DeMorgan 1
+  make MMI_NAND3C_ -orient RY -origin {730 370}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.4 -date 04/19/99 -origin {440 650}
+  make_wire 640 430 640 390
+  make_wire 640 390 670 390
+  make_wire 640 310 640 350
+  make_wire 640 350 670 350
+  make_wire 580 310 530 310
+  make_wire 580 310 640 310
+  make_wire 580 370 530 370
+  make_wire 580 370 670 370
+  make_wire 580 430 530 430
+  make_wire 580 430 640 430
+  make_wire 410 290 220 290
+  make_wire 410 350 220 350
+  make_wire 410 410 220 410
+  make_wire 790 370 840 370
+  make_wire 340 330 410 330
+  make_wire 340 390 410 390
+  make_wire 340 450 410 450
+  make_wire 260 330 260 390
+  make_wire 260 330 340 330
+  make_wire 260 330 220 330
+  make_wire 260 390 340 390
+  make_wire 260 390 260 450
+  make_wire 260 450 340 450
+  make_text -origin {150 -10} -text SHFMUX3C -size large
+}
+
+proc ICON_SHFMUX3C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {-60 -60} -name in0
+  icon_term -type input -origin {-60 0} -name in1
+  icon_term -type input -origin {-60 60} -name in2
+  icon_term -type input -origin {0 80} -orient R270 -name {sel[2:0]}
+  icon_property -origin {-50 210} -type user -name name
+  icon_property -origin {-50 230} -type user -name M
+  icon_property -origin {-50 250} -type user -name dpc
+  icon_line -40 -100 40 -60 40 60 -40 100 -40 -100
+  icon_line -60 0 -40 0
+  icon_line -60 -60 -40 -60
+  icon_line -60 60 -40 60
+  icon_property -origin {-30 -60} -size small -label 0
+  icon_property -origin {0 0} -anchor center -label SC
+  icon_line 60 0 40 0
+}
+

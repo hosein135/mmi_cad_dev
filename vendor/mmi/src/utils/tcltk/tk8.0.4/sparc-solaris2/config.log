@@ -1,1 +1,38 @@
-../unix/config.log
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:719: cc -o conftest    conftest.c  1>&5
+configure:753: cc -E  conftest.c >/dev/null 2>conftest.out
+configure:801: cc -E  conftest.c >/dev/null 2>conftest.out
+configure:801: cc -E  conftest.c >/dev/null 2>conftest.out
+configure:980: cc -c   conftest.c 1>&5
+configure:1035: cc -E  conftest.c >/dev/null 2>conftest.out
+configure:1100: cc -o conftest    conftest.c  1>&5
+configure:1263: cc -E  conftest.c >/dev/null 2>conftest.out
+configure:1302: cc -c   conftest.c 1>&5
+configure:1751: cc -o conftest    conftest.c -lXbsd   1>&5
+configure:1745: conflicting types for `main'
+configure:1743: previous declaration of `main'
+configure:1798: cc -o conftest    conftest.c  1>&5
+Undefined			first referenced
+ symbol  			    in file
+connect                             /var/tmp/cca006rF1.o
+ld: fatal: Symbol referencing errors. No output written to conftest
+configure:1835: cc -o conftest    conftest.c -lsocket   1>&5
+configure:1829: conflicting types for `main'
+configure:1827: previous declaration of `main'
+configure:1885: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5
+configure:1931: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5
+configure:2067: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5
+configure:2050: warning: conflicting types for built-in function `sin'
+Undefined			first referenced
+ symbol  			    in file
+sin                                 /var/tmp/cca006s51.o
+ld: fatal: Symbol referencing errors. No output written to conftest
+configure:2103: cc -o conftest    conftest.c -lieee   -lsocket -lnsl 1>&5
+configure:2097: conflicting types for `main'
+configure:2095: previous declaration of `main'
+configure:2154: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5
+configure:2220: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5
+configure:2274: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5
+configure:2313: cc -o conftest    conftest.c  -lsocket -lnsl 1>&5

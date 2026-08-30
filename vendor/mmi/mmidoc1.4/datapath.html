@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Micro Magic Tools - DataPath Compiler - Datasheet</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="STYLESHEET" type="text/css" href="mainstyle.css">
+</head>
+
+<body bgcolor="#ffffff" topmargin="6" leftmargin="6" marginwidth="6" marginheight="6">
+
+<!-- BEGIN HEADER INCLUDE -->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+
+<tr>
+<td rowspan="3"><img src="../mmi-logo.gif"/></td></tr>
+
+<td width="200">
+	<table border="0" cellpadding="0" cellspacing="0">
+	<tr>
+	<td><a class="tbc" href="index.html"><b>Micro Magic Tools Overview</b></a><br /></td></tr>
+	
+	<tr valign="bottom">
+	<td class="tbc" height="35">&nbsp;&#149; <a href="sue.html">SUE Design Manager</a></td></tr>
+	
+	<tr valign="bottom">
+	<td class="tbc" height="35">&nbsp;&#149; <a href="datapath.html">DataPath Compiler</a></td></tr>
+
+	</table>
+<td width="180">
+	<table border="0" cellpadding="0" cellspacing="0">
+
+	<tr valign="bottom">
+	<td class="tbc" height="75">&nbsp;&#149; <a href="max.html">MAX Layout Editor</a> and<br />
+
+	&nbsp;&nbsp;&nbsp;<a href="max.html">MAX-LS Layout System</a></td></tr>
+
+	<tr>
+	<td class="tbc" height="40">&nbsp;&#149; <a href="megacell.html">MegaCell Compiler</a></td></tr>
+	</table>
+
+</td></tr>
+</table>
+
+<!-- END HEADER INCLUDE -->
+
+<p class="doctype">D A T A S H E E T</p>
+
+<h3>DataPath Compiler</h3>
+
+<img src="images/dpc_on.gif" align="right" alt="" border="0" usemap="#mmi_tool" width="263" height="295" />
+
+<p>
+
+The DataPath compiler generates data paths from a schematic view and back-annotate accurate timing information onto the schematic in seconds. It can place custom-style 
+"bit-slice" data paths, minimizing wire lengths for high performance, and can even include control logic, all using an existing standard cell library.</p>
+
+<p class="l3">DataPath Compiler</p>
+
+<ul style="line-height: 20px;">
+<li>Custom performance with ASIC effort</li>
+<li>Three times faster than ASIC designs</li>
+<li>40% smaller than ASIC designs</li>
+<li>One-tenth the effort of full-custom design</li></ul>
+
+
+<p>
+<span class="l3">The Tool for High-Performance Designs</span><br />
+
+The DataPath compiler is the tool of choice for designers of high-performance chips. It provides the performance of full-custom design, but with a much shorter design 
+cycle. Data paths designed with the DataPath compiler are three times faster and 40% smaller than synthesis and place and route, and they take one-tenth the effort of 
+full-custom design.</p>
+
+<p>
+In deep sub micron design, wire length is the dominant factor affecting critical-path timing, and cell placement plays a major role in chip performance. With traditional 
+tools, designers are at the mercy of automatic placement tools. The DataPath compiler provides fine control over placement, giving immediate timing feedback and allowing 
+multiple what-if experiments to be performed. The DataPath compiler graphical display which back-annotates timing to the schematic, allows easy identification of timing 
+problems and rapid iteration through potential solutions. The DataPath compiler is so fast that it can place and then time a 50,000-gate data path in about two 
+minutes.</p>
+
+<span class="l3">Useful Identification of Critical Paths</span><br />
+
+	<table align="right" border="0" cellpadding="4" cellspacing="1">
+	<tr>
+
+	<td class="tbc" width="243">Figure 1. This example shows the placement generated for our sample 8-bit ALU. A critical path is highlighted in red and yellow. 
+	Timing for other nets is indicated in the menu. New nets can be selected and highlighted.</td></tr>
+
+	<tr>
+	<td><a href="images/dpc-fig1a_large.gif"><img src="images/dpc-fig1a.gif" alt="Click to enlarge image" border="0" width="242" height="161" /><br clear="all" />
+	<img src="images/enlarge_sm.gif" alt="Click to enlarge image" border="0" width="68" height="16" /></a></td></tr>
+	</table>
+
+<span class="bcopy">
+The DataPath compiler predicts wire lengths early in the design cycle. The resulting timing iterations are both fast and accurate, allowing designers to quickly iterate to 
+their performance goal. The critical paths are displayed directly on the schematic at all levels of the design hierarchy. In addition, the actual delays of the paths are 
+annotated onto the wires in both the schematic and placement views.</span>
+
+<p>
+<span class="l3">Optimization of Critical Paths</span><br />
+
+The DataPath compiler allows designers to easily specify and modify simple directives to produce speed-optimized layouts when doing data path design. These directives are 
+easily given and modified in the compiler. The placement of components on the schematic directs relative placement in the placement file.</p>
+
+	<table align="right" border="0" cellpadding="4" cellspacing="2">
+	<tr>
+	<td class="tbc" width="230">Figure 2. The DataPath compiler reduces (from days to minutes) the time required for placement and timing analysis.</td></tr>
+
+	<tr>
+
+	<td><img src="images/dpc-fig2a.gif" border="0" hspace="6" width="242" height="127" /></td></tr>
+	</table>
+
+<p>
+Designers can place cells at specific row or column locations and can indicate empty space. The DataPath compiler automatically generates the row and column placement and 
+the predicted wire lengths. Wire predictions can be used to drive timing analyzers including Pearl, PrimeTime, and PathMill.</p>
+
+<p>
+The DataPath compiler reads the output from static timing analysis and displays the critical paths directly on the schematic. Designers can modify the placement to optimize 
+critical paths or can add extra drivers to the critical path, all in the schematic. Designers can then iterate through the placement and timing until the timing criteria 
+are satisfied. The iteration loop is fast and visual. When the design performance is satisfactory, the placement (DEF) file is passed to a routing tool. The routed result 
+can then be read into the MAX layout editor to view and edit if necessary.</p>
+
+<span class="l3">Design Flow</span><br />
+
+	<table align="right" border="0" cellpadding="4" cellspacing="2">
+
+	<tr>
+	<td class="tbc" width="288">Figure 3. The DEF placement file is sent to a router. The resulting GDSII file can then be read into the MAX layout editor.</td></tr>
+
+	<tr>
+	<td><a href="images/dpc-fig2b_large.gif"><img src="images/dpc-fig2b.gif" alt="Click to enlarge image" border="0" width="300" height="230" /><br clear="all" />
+	<img src="images/enlarge_sm.gif" alt="Click to enlarge image" border="0" width="68" height="16" /></a></td></tr>
+	</table>
+
+<span class="bcopy">
+With the DataPath compiler, design begins with entering schematics into the SUE design manager. The compiler then uses the schematic as a basis for placement. When the 
+placement is complete, the DataPath compiler estimates the wiring delays and sends this information to a static timing analyzer. The SUE design manager reads the results of 
+the static timing analysis. The critical path is highlighted in both the schematic and the placement view, and the delay and slope at each node are displayed.</span>
+
+<p class="l3">Features:</p>
+
+<ul>
+<li>Automatically generates parasitics, runs timing verifiers, and displays critical-path timing directly on schematics.</li>
+<li>Integrated with static timing analysis tools including Pearl, PathMill, and PrimeTime.</li>
+<li>Operates quickly, placing and timing a 50,000-gate data path in just a few minutes</li>
+<li>Uses standard cells or custom data path cells.</li>
+<li>Writes DEF placement information and Verilog netlists for integration with routing tools.</li>
+<li>Available on Linux and Solaris platforms.</li></ul>
+
+<p class="footer">
+
+Last Updated: May 26, 2004</div>
+
+</body>
+
+</html>

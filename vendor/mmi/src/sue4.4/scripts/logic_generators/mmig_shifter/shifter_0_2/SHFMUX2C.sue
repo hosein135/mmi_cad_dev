@@ -1,1 +1,55 @@
-../shifter_0_1/SHFMUX2C.sue
+# SUE version MMI_SUE4.0p1
+
+proc SCHEMATIC_SHFMUX2C {} {
+  generate row_spanner row_spanner320 -width 320
+  make row_spanner320 -origin {230 -90}
+  make output -name out -origin {560 230}
+  make input -name in0 -origin {-110 130}
+  make MMI_INV -orient RY -origin {-30 220}
+  generate MMI_INV MMI_INVA_ -DeMorgan 1
+  make MMI_INVA_ -orient RY -origin {120 280}
+  make input -orient RY -name sel -origin {-110 220}
+  make name_net_s -orient RY -name N1 -origin {280 280}
+  make name_net_s -name N2 -origin {280 220}
+  make input -orient RY -name in1 -origin {-110 70}
+  generate MMI_AO22 MMI_AO22C -Size C
+  make MMI_AO22C -origin {460 230}
+  generate title_bar sccs_title_bar -cell sccs_title_bar
+  make sccs_title_bar -owner emc -version 1.3 -date 04/19/99 -origin {180 470}
+  make_wire 60 280 50 280
+  make_wire 50 280 50 220
+  make_wire 50 220 30 220
+  make_wire 280 280 180 280
+  make_wire 280 220 50 220
+  make_wire 360 280 280 280
+  make_wire 360 220 280 220
+  make_wire -110 70 360 70
+  make_wire -110 220 -90 220
+  make_wire 360 70 360 180
+  make_wire 360 240 330 240
+  make_wire 330 240 330 130
+  make_wire 330 130 -110 130
+  make_text -origin {-220 -260} -text SHFMUX2C -size large
+  make_text -origin {-210 -210} -text {Faster for wide datapath applications because it presents less gate loading to the select wire}
+}
+
+proc ICON_SHFMUX2C args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {M {}} {dpc {}}}
+  icon_term -type output -origin {60 0} -name out
+  icon_term -type input -origin {0 50} -orient R270 -name sel
+  icon_term -type input -origin {-60 30} -name in1
+  icon_term -type input -origin {-60 -30} -name in0
+  icon_property -origin {-50 170} -type user -name name
+  icon_property -origin {-50 190} -type user -name M
+  icon_property -origin {-50 210} -type user -name dpc
+  icon_line -40 -70 40 -30
+  icon_line 40 -30 40 30
+  icon_line 40 30 -40 70
+  icon_line -40 -70 -40 70
+  icon_line -40 -30 -60 -30
+  icon_line -40 30 -60 30
+  icon_property -origin {-30 -30} -size small -label 0
+  icon_property -origin {0 0} -anchor center -label SC
+  icon_line 40 0 60 0
+}
+
