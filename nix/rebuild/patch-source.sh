@@ -1055,6 +1055,41 @@ efReadError(char *fmt, ...)
         "nu_error stdarg",
     )
 
+    # GCC 14: ellipsis definitions cannot match old-style extern void f().
+    for hdr, old, new, label in (
+        (
+            f"src/{maxv}/maxaux/irsim/src/ana11/ana_glob.h",
+            "extern void PRINTF( /*  va_alist */ );",
+            "extern void PRINTF(char *format, ...);",
+            "PRINTF prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/irsim/src/include/globals.h",
+            "extern void lprintf( /*  va_alist */ );",
+            "extern void lprintf(FILE *fp, char *fmt, ...);",
+            "lprintf prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/irsim/src/include/globals.h",
+            "extern void error( /*  va_alist */ );",
+            "extern void error(char *filename, int lineno, char *fmt, ...);",
+            "error prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/ext/include/textio.h",
+            "extern void TxPrintf();",
+            "extern void TxPrintf(char *fmt, ...);",
+            "TxPrintf prototype",
+        ),
+        (
+            f"src/{maxv}/maxaux/ext/include/textio.h",
+            "extern void TxError();",
+            "extern void TxError(char *fmt, ...);",
+            "TxError prototype",
+        ),
+    ):
+        subst(hdr, old, new, label)
+
 left = []
 for p in Path("src").glob("max*/maxaux/**/*.c"):
     if "RCS" in p.parts:
