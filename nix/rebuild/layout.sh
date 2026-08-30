@@ -69,6 +69,8 @@ if [ -d bin.linux ] && [ ! -L bin.linux ]; then
   rm -rf bin.linux
 fi
 ln -sfn bin bin.linux
+# Legacy Tcl still names bin.i486-linux on Linux.
+ln -sfn bin bin.i486-linux
 
 # Dangling aliases left after dropping i486 bindirs.
 find . -xtype l -print0 2>/dev/null | while IFS= read -r -d '' l; do

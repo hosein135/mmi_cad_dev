@@ -49,9 +49,26 @@ install_bin() {
   fi
 }
 
-install_bin "$max_bin" "$bindir/max"
+install_bin "$max_bin" "$bindir/max.bin"
 install_bin "$sue_bin" "$bindir/sue.exe"
 install_bin "$nst_bin" "$bindir/nst"
+
+if [ -x "$bindir/max.bin" ]; then
+  cat > "$bindir/max" << 'EOF'
+#!/bin/sh
+export MN_BIN_DIR="${MN_BIN_DIR:-bin.linux}"
+export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-1}"
+exec "$(dirname "$0")/max.bin" "$@"
+EOF
+  chmod +x "$bindir/max"
+fi
+
+maxtcl_src="$ROOT/src/max4.3.16/maxtcl"
+if [ -d "$maxtcl_src" ]; then
+  mkdir -p "$OUT/mmi/max"
+  cp -a "$maxtcl_src" "$OUT/mmi/max/"
+  echo "install: maxtcl -> $OUT/mmi/max/maxtcl"
+fi
 
 for aux in ext2spice ext2sim gemini irsim anXhelper make_tech; do
   found=$(find "$ROOT/src/max4.3.16/o" -type f -name "$aux" 2>/dev/null | head -1 || true)
@@ -85,20 +102,24 @@ EOF
 chmod +x "$bindir/sue"
 
 # Versioned trees some scripts still name: same 64-bit binaries.
-for pair in "sue:sue.exe" "nst:nst" "max:max" "edif2sue:edif2sue"; do
+for pair in "sue:sue.exe" "nst:nst" "max:max.bin" "edif2sue:edif2sue"; do
   prod="${pair%%:*}"
   name="${pair##*:}"
   if [ -d "$OUT/mmi/$prod" ] && [ -x "$bindir/$name" ]; then
     mkdir -p "$OUT/mmi/$prod/bin"
-    cp -f "$bindir/$name" "$OUT/mmi/$prod/bin/$name"
+    cp -f "$bindir/$name" "$OUT/mmi/$prod/bin/$(basename "$name")"
     ln -sfn bin "$OUT/mmi/$prod/bin.linux"
   fi
 done
+if [ -x "$bindir/max" ] && [ -d "$OUT/mmi/max/bin" ]; then
+  cp -f "$bindir/max" "$OUT/mmi/max/bin/max"
+fi
 if [ -x "$bindir/sue" ] && [ -d "$OUT/mmi/sue/bin" ]; then
   cp -f "$bindir/sue" "$OUT/mmi/sue/bin/sue"
 fi
 
 ln -sfn bin "$OUT/mmi/bin.linux"
+ln -sfn bin "$OUT/mmi/bin.i486-linux"
 printf 'linux\n' > "$OUT/BINDIR"
 printf '64\n' > "$OUT/BITS"
 

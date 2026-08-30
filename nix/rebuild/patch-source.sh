@@ -128,6 +128,31 @@ t = t.replace("  nlsh_app_init(interp);", "#ifndef SHARED_OBJECT\n  nlsh_app_ini
 app.write_text(t, encoding="latin-1")
 print("sueAppInit: optional nlsh")
 
+# Flat install: binaries live in $MMI_TOOLS/bin; SUE assets in $MMI_TOOLS/sue.
+sue_init = Path("src/sue4.4/build/sueInit.tcl")
+t = sue_init.read_text(encoding="latin-1")
+if "file join $env(MMI_TOOLS) sue" not in t:
+    t = t.replace(
+        'if {$SUE_DIR == "."} {\n  set SUE_DIR [pwd]\n}\n',
+        'if {$SUE_DIR == "."} {\n  set SUE_DIR [pwd]\n}\n'
+        'if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) ne ""} {\n'
+        '  set SUE_DIR [file join $env(MMI_TOOLS) sue]\n'
+        '}\n',
+    )
+    t = t.replace("set SUE_BIN bin.i486-linux", "set SUE_BIN bin.linux")
+    sue_init.write_text(t, encoding="latin-1")
+    print("sueInit.tcl: MMI_TOOLS/sue, bin.linux")
+
+max0 = Path("src/max4.3.16/maxtcl/max0.tcl")
+t = max0.read_text(encoding="latin-1")
+if 'set MN_BIN_DIR "bin.i486-linux"' in t:
+    t = t.replace(
+        '"Linux" { set MN_BIN_DIR "bin.i486-linux" }',
+        '"Linux" { set MN_BIN_DIR "bin.linux" }',
+    )
+    max0.write_text(t, encoding="latin-1")
+    print("max0.tcl: bin.linux")
+
 # GCC 14: block-scope "static int foo(args);" is invalid. Hoist to file scope.
 nested_proto = re.compile(
     r"^[ \t]+static[ \t]+((?:int|void|bool|char|long|short|unsigned)(?:[ \t]+\*)?[ \t]+\w+[ \t]*\([^;]*\))[ \t]*;[ \t]*$",
