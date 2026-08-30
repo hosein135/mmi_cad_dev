@@ -394,6 +394,7 @@ extern char *malloc();
 new_ext = """/* These were defined to be error strings in malloc.h */
 #undef	malloc
 #undef	free
+#undef	calloc
 
 #include <stdlib.h>
 #include <string.h>
