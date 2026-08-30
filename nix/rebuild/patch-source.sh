@@ -1120,6 +1120,62 @@ if left:
 print("maxaux: K&R varargs converted to stdarg.h")
 PY
 
+# GCC 14: a later "static" (private) definition cannot follow an implicit
+# int foo() from a call that appeared earlier in the file.
+python3 - << 'PY'
+import re
+from pathlib import Path
+
+line_re = re.compile(r"^(private|static)\s+(.+)\(\s*")
+
+def add_fwd(path: Path) -> None:
+    t = path.read_text(encoding="latin-1")
+    if "MMI_PRIVATE_FWD" in t:
+        return
+    seen = []
+    have = set()
+    for line in t.splitlines():
+        m = line_re.match(line)
+        if not m or ";" in line:
+            continue
+        if "..." in line:
+            continue
+        rest = m.group(2).strip()
+        nm = re.search(r"^(.*?)\s*(\w+)$", rest)
+        if not nm or not nm.group(1).strip():
+            continue
+        ret, name = nm.group(1).strip(), nm.group(2)
+        if name in have or name in ("if", "for", "while", "switch", "return"):
+            continue
+        have.add(name)
+        seen.append((m.group(1), ret, name))
+    if not seen:
+        return
+    block = "/* MMI_PRIVATE_FWD: static prototypes before first use */\n"
+    for kind, ret, name in seen:
+        block += f"{kind} {ret} {name}();\n"
+    block += "\n"
+    # Insert before the first private/static function body so local typedefs exist.
+    insert_at = None
+    for i, line in enumerate(t.splitlines(True)):
+        m = line_re.match(line)
+        if m and ";" not in line:
+            insert_at = i
+            break
+    if insert_at is None:
+        return
+    lines = t.splitlines(True)
+    lines.insert(insert_at, block)
+    path.write_text("".join(lines), encoding="latin-1")
+    print("private fwd", path, "n=", len(seen))
+
+for p in Path("src").glob("max*/maxaux/**/*.c"):
+    if "RCS" in p.parts:
+        continue
+    add_fwd(p)
+print("maxaux: private forward decls inserted")
+PY
+
 # Rewrite mkcsue / mknst as bash (csh not required at build time).
 cat > src/sue4.4/build/mkcsue << 'EOF'
 #!/usr/bin/env bash
