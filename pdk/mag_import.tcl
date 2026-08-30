@@ -8,6 +8,28 @@
 if {[info exists _MAG_IMPORT_SOURCED]} { return }
 set _MAG_IMPORT_SOURCED 1
 
+if {[info commands _mmi_file_normalize] == ""} {
+  proc _mmi_file_normalize {path} {
+    if {$path == ""} { return "" }
+    if {![regexp {^/} $path]} {
+      set path [file join [pwd] $path]
+    }
+    set parts {}
+    foreach p [file split $path] {
+      if {$p == "."} continue
+      if {$p == ".."} {
+        if {[llength $parts] > 1} {
+          set parts [lreplace $parts end end]
+        }
+        continue
+      }
+      lappend parts $p
+    }
+    if {[llength $parts] == 0} { return "/" }
+    return [eval file join $parts]
+  }
+}
+
 if {[info commands setl] == ""} {
   proc setl {names vals} {
     set i 0
@@ -197,7 +219,7 @@ proc mag_sample_dir {} {
   lappend cands /mmi-home/cad/mmi_local/max/pdk/samples/caravel_analog_por
   lappend cands /mmi-bundle/samples/caravel_analog_por
   foreach d $cands {
-    set d [file normalize $d]
+    set d [_mmi_file_normalize $d]
     if {[file isdirectory $d] && [file exists [file join $d example_por.mag]]} {
       return $d
     }
@@ -960,7 +982,7 @@ proc mag_magic2gds_script {} {
   }
   lappend cands /mmi-home/cad/mmi_local/max/pdk/mag2gds.sh
   foreach s $cands {
-    set s [file normalize $s]
+    set s [_mmi_file_normalize $s]
     if {[file executable $s] || [file readable $s]} { return $s }
   }
   return ""

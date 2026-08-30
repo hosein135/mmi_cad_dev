@@ -5,6 +5,28 @@
 if {[info exists _PDK_IMPORT_SOURCED]} { return }
 set _PDK_IMPORT_SOURCED 1
 
+if {[info commands _mmi_file_normalize] == ""} {
+  proc _mmi_file_normalize {path} {
+    if {$path == ""} { return "" }
+    if {![regexp {^/} $path]} {
+      set path [file join [pwd] $path]
+    }
+    set parts {}
+    foreach p [file split $path] {
+      if {$p == "."} continue
+      if {$p == ".."} {
+        if {[llength $parts] > 1} {
+          set parts [lreplace $parts end end]
+        }
+        continue
+      }
+      lappend parts $p
+    }
+    if {[llength $parts] == 0} { return "/" }
+    return [eval file join $parts]
+  }
+}
+
 # ── Preset download links ────────────────────────────────────────────────────
 # Official GitHub archives (branch main; importer also tries master).
 set PDK_PRESET(sky130A,label)  "SKY130A — SkyWater 130nm (Google)"
@@ -291,7 +313,7 @@ proc pdk_link_max_private {tech shared} {
     catch {
       if {[file type $link] == "link"} {
         file delete $link
-      } elseif {[file normalize $link] != [file normalize $shared]} {
+      } elseif {[_mmi_file_normalize $link] != [_mmi_file_normalize $shared]} {
         # Keep existing private dir; also keep shared copy.
         return
       }
@@ -317,8 +339,8 @@ proc pdk_install_into_root {src family tech} {
   if {$family == "sg13g2"} { set name ihp-sg13g2 }
 
   set dest [file join $root $name]
-  set srcn [file normalize $src]
-  set rootn [file normalize $root]
+  set srcn [_mmi_file_normalize $src]
+  set rootn [_mmi_file_normalize $root]
 
   # Prefer an open_pdks tree (…/sky130A/libs.tech/magic/*.magicrc)
   set rcs [pdk_find_files $src {*.magicrc}]
@@ -338,7 +360,7 @@ proc pdk_install_into_root {src family tech} {
   if {$from == ""} {
     set from $srcn
   } else {
-    set from [file normalize $from]
+    set from [_mmi_file_normalize $from]
   }
 
   if {[string match ${rootn}* $from]} {

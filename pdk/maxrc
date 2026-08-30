@@ -1,4 +1,27 @@
 # Site-wide MAX startup: PDK import + Magic design import
+# Tcl 8.0 has no [file normalize] (that is 8.4+).
+if {[info commands _mmi_file_normalize] == ""} {
+  proc _mmi_file_normalize {path} {
+    if {$path == ""} { return "" }
+    if {![regexp {^/} $path]} {
+      set path [file join [pwd] $path]
+    }
+    set parts {}
+    foreach p [file split $path] {
+      if {$p == "."} continue
+      if {$p == ".."} {
+        if {[llength $parts] > 1} {
+          set parts [lreplace $parts end end]
+        }
+        continue
+      }
+      lappend parts $p
+    }
+    if {[llength $parts] == 0} { return "/" }
+    return [eval file join $parts]
+  }
+}
+
 proc _mmi_pdk_source {name} {
   global env
   set cands {}
@@ -9,7 +32,7 @@ proc _mmi_pdk_source {name} {
     lappend cands [file join $env(MMI_LOCAL) max pdk $name]
   }
   if {[info exists env(MMI_TOOLS)]} {
-    lappend cands [file normalize $env(MMI_TOOLS)/../mmi_local/max/pdk/$name]
+    lappend cands [_mmi_file_normalize [file join $env(MMI_TOOLS) .. mmi_local max pdk $name]]
   }
   lappend cands /mmi-bundle/$name
   foreach f $cands {
