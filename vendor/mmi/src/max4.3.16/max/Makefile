@@ -54,7 +54,7 @@ M2 = $(addsuffix /, ${M1})
 M3 = $(join ${M2},${MODULES})
 MODULE_OBJS= $(addsuffix .o,${M3})
 
-${OBJDIR}/max:  ${MODULE_OBJS} maxVersion.c
+${OBJ_DIR}/max:  ${MODULE_OBJS} maxVersion.c
 	rm -f ${OBJ_DIR}/max ${OBJ_DIR}/maxVersion.o
 	${CC} ${COMPILE_FLAGS} -c maxVersion.c -o ${OBJ_DIR}/maxVersion.o
 	${CC} ${COMPILE_FLAGS} ${MODULE_OBJS} ${OBJ_DIR}/maxVersion.o ${LIBS} -o ${OBJ_DIR}/max

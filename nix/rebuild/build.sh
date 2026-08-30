@@ -96,20 +96,19 @@ build_blt() {
   CFLAGS="${CFLAGS} ${inc}" bash ./configure --disable-shared --enable-gcc --cache-file=/dev/null \
     --with-tcl="${UTILS}/tcltk/tcl8.0.4/unix" \
     --with-tk="${UTILS}/tcltk/tk8.0.4/unix" \
-    --prefix="${UTILS}/tcltk/install-x64" || true
+    --prefix="${UTILS}/tcltk/install-x64"
   find . -type f \( -name Makefile -o -name Makefile.in \) -print0 \
     | xargs -0 sed -i 's/-fwritable-strings//g; s/-Wtraditional//g'
-  CFLAGS="${CFLAGS} ${inc}" make -e EXTRA_CFLAGS= -j1 \
-    || CFLAGS="${CFLAGS} ${inc}" make -e EXTRA_CFLAGS= -j1 -k || true
+  CFLAGS="${CFLAGS} ${inc}" make -e EXTRA_CFLAGS= -j1
   mkdir -p src
   if ls src/*.o >/dev/null 2>&1; then
     ( cd src && rm -f libBLT.a && ar rcs libBLT.a ./*.o && ranlib libBLT.a )
   fi
-  if [ -f src/libBLT.a ]; then
-    file src/libBLT.a || true
-  else
-    log "WARN: libBLT.a not built"
+  if [ ! -f src/libBLT.a ]; then
+    log "ERROR: libBLT.a not built (NST requires BLT)"
+    exit 1
   fi
+  file src/libBLT.a || true
   cd "${ROOT}"
 }
 
@@ -124,6 +123,10 @@ build_tclmods() {
     if [ -n "${objs}" ]; then
       ar rcs "${LIBDIR}/libtclmods8.0.a" ${objs}
     fi
+  fi
+  if [ ! -f "${LIBDIR}/libtclmods8.0.a" ]; then
+    log "ERROR: libtclmods8.0.a not built"
+    exit 1
   fi
   cd "${ROOT}"
 }
@@ -142,11 +145,12 @@ build_max() {
     touch "o/linux/$name/depend"
   done
   chmod +x make/:makemods
-  make -s -e -j1 max || make -s -e -k max || true
+  make -s -e -j1 max
   if [ -x o/linux/max ]; then
     file o/linux/max
   else
-    log "WARN: max binary not produced"
+    log "ERROR: max binary not produced"
+    exit 1
   fi
   cd "${ROOT}"
 }
@@ -166,9 +170,8 @@ build_edif2sue() {
   cd "$d"
   make -e MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux -j1 || {
     log "edif2sue make failed, trying g++"
-    # gnu89 is for C; these sources are C++.
     ${CXX:-g++} -fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
-      -I. -DE2S_VERSION='"1.2.12"' -c ./*.cc || true
+      -I. -DE2S_VERSION='"1.2.12"' -c ./*.cc ./*.c
     ${CXX:-g++} -o edif2sue.linux ./*.o -lm || true
   }
   cd "${ROOT}"
@@ -187,7 +190,11 @@ build_sue() {
   log "SUE"
   cd "${SRC}/sue4.4/build"
   chmod +x mkcsue
-  CFLAGS="${CFLAGS} -DSHARED_OBJECT=1" bash ./mkcsue || true
+  CFLAGS="${CFLAGS} -DSHARED_OBJECT=1" bash ./mkcsue
+  if [ ! -x "${SRC}/sue4.4/bin.linux/sue.exe" ]; then
+    log "ERROR: sue.exe not produced"
+    exit 1
+  fi
   cd "${ROOT}"
 }
 
@@ -195,7 +202,11 @@ build_nst() {
   log "NST"
   cd "${SRC}/nst2.4"
   chmod +x mknst
-  bash ./mknst || true
+  bash ./mknst
+  if [ ! -x "${SRC}/nst2.4/bin.linux/nst" ]; then
+    log "ERROR: nst not produced"
+    exit 1
+  fi
   cd "${ROOT}"
 }
 
@@ -212,4 +223,23 @@ build_aux
 build_edif2sue
 build_sue_tee
 
-log "Build finished"
+verify_tools() {
+  local ok=0 f
+  for f in \
+    "${SRC}/max4.3.16/o/linux/max" \
+    "${SRC}/sue4.4/bin.linux/sue.exe" \
+    "${SRC}/nst2.4/bin.linux/nst"; do
+    if [ ! -x "$f" ]; then
+      log "ERROR: missing $f"
+      ok=1
+    elif ! file -L "$f" | grep -q 'ELF 64-bit'; then
+      log "ERROR: not ELF 64-bit: $f"
+      file -L "$f" >&2 || true
+      ok=1
+    fi
+  done
+  return "$ok"
+}
+
+verify_tools || exit 1
+log "Build finished (max, sue.exe, nst are ELF 64-bit)"

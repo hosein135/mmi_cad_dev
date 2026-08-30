@@ -40,7 +40,18 @@ for d in src/utils/tcltk/tcl8.0.4/unix src/utils/tcltk/tk8.0.4/unix; do
 done
 
 # Do not treat warnings as errors (gcc 14 vs 1990s C).
-sed -i 's/ -Werror//g; s/-Werror//g' src/max4.3.16/make/config.linux*
+sed -i \
+  -e 's/ -Werror//g' \
+  -e 's/-Werror//g' \
+  -e 's/ -Wuninitialized//g' \
+  -e 's/ -Wreturn-type//g' \
+  src/max4.3.16/make/config.linux*
+
+# MAX link rule typo: ${OBJDIR} was never defined (should be ${OBJ_DIR}).
+sed -i 's/\${OBJDIR}\/max/\${OBJ_DIR}\/max/' src/max4.3.16/max/Makefile
+
+sed -i 's|GEMINI := aux/gemini/gemini|GEMINI := maxaux/gemini/gemini|' \
+  src/max4.3.16/make/Makefile.main
 
 # :makemods is csh — replace with bash.
 cat > src/max4.3.16/make/:makemods << 'EOF'
@@ -70,8 +81,16 @@ import re
 
 p = Path("src/sue4.4/build/Makefile")
 t = p.read_text(encoding="latin-1")
-t = t.replace("steiner.c gr.c", "steiner.c")
-t = t.replace("steiner.o gr.o", "steiner.o")
+t = re.sub(
+    r"(?m)^(\s*SRCS\s+=\s+sueAppInit\.c mmiInterrupt\.c steiner\.c)\s+gr\.c\s*$",
+    r"\1",
+    t,
+)
+t = re.sub(
+    r"(?m)^(\s*OBJS\s+=\s+sueAppInit\.o mmiInterrupt\.o steiner\.o)\s+gr\.o\s*$",
+    r"\1",
+    t,
+)
 t = re.sub(r"(?m)^\s*NL_LIB\s*=.*", "NL_LIB =", t)
 t = re.sub(r"(?m)^\s*NL_INCLUDES\s*=.*", "NL_INCLUDES =", t)
 p.write_text(t, encoding="latin-1")
@@ -215,6 +234,9 @@ PY
 cat > src/sue4.4/build/mkcsue << 'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+: "${MMI_CAD:?MMI_CAD not set}"
+: "${MMI_UTILS:?MMI_UTILS not set}"
+export MMI_CAD MMI_UTILS CC="${CC:-gcc}" CFLAGS="${CFLAGS:-}"
 SUEDIR=../..
 CSUEDIR=..
 rm -rf tmp
@@ -223,8 +245,8 @@ cd tmp
 cp "$SUEDIR"/src/*.tcl .
 cp "$CSUEDIR"/sueInit.tcl "$CSUEDIR"/sueInitA.tcl "$CSUEDIR"/sueInitB.tcl .
 cp "$CSUEDIR"/Makefile "$CSUEDIR"/sueAppInit.c "$CSUEDIR"/mmiInterrupt.c .
-cp "$CSUEDIR"/steiner.c "$CSUEDIR"/gr.c "$CSUEDIR"/nl_include.h .
-make -e sueInit || true
+cp "$CSUEDIR"/steiner.c "$CSUEDIR"/nl_include.h .
+make -e sueInit
 make -e sue
 mkdir -p "$CSUEDIR/../bin.linux"
 mv -f sue "$CSUEDIR/../bin.linux/sue.exe"
@@ -234,6 +256,9 @@ chmod +x src/sue4.4/build/mkcsue
 cat > src/nst2.4/mknst << 'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+: "${MMI_CAD:?MMI_CAD not set}"
+: "${MMI_UTILS:?MMI_UTILS not set}"
+export MMI_CAD MMI_UTILS CC="${CC:-gcc}" CFLAGS="${CFLAGS:-}"
 NSTDIR=..
 rm -rf tmp
 mkdir tmp
