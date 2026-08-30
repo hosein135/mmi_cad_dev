@@ -1,4 +1,5 @@
 # Runs inside the mmi-cad FHS namespace (bubblewrap). Host launcher: run.sh
+# Nix Xvnc functions are prepended (mmi_start_nix_x).
 set -euo pipefail
 
 info()  { printf '%s\n' "[mmi-cad] $*"; }
@@ -79,6 +80,15 @@ mmi_resolve_local_max_font_dir() {
 }
 
 mkdir -p "${CAD_HOME}" "${CAD}" /mmi-pdks 2>/dev/null || true
+
+# Writable PDK_ROOT with store-backed trees (symlinks; MAX tech writes go to /mmi-pdks/max).
+if [ -d /mmi-pdks-nix ]; then
+  for name in sky130A gf180mcuD ihp-sg13g2 src; do
+    if [ -e "/mmi-pdks-nix/${name}" ] && [ ! -e "/mmi-pdks/${name}" ]; then
+      ln -s "/mmi-pdks-nix/${name}" "/mmi-pdks/${name}"
+    fi
+  done
+fi
 
 if [ ! -e "${MMI_TOOLS}/bin/max" ] && [ ! -e "${MMI_TOOLS}/bin/sue.exe" ] && [ ! -e "${MMI_TOOLS}/bin/nst" ]; then
   error "x86_64 CAD tools not found at ${MMI_TOOLS}."
@@ -181,31 +191,29 @@ if [ -f /usr/share/X11/XKeysymDB ]; then
   export XKEYSYMDB=/usr/share/X11/XKeysymDB
 fi
 
-# XLFD bitmap fonts from the Nix store (no host font cache copy).
-FONT_ROOT="${MMI_XFONT_ROOT:-${MMI_FONTS_SRC:-}}"
-if [ -n "${FONT_ROOT}" ] && command -v wslpath >/dev/null 2>&1 && grep -qi microsoft /proc/version 2>/dev/null; then
-  FONT_ROOT="$(wslpath -w "${MMI_FONTS_SRC}")"
-fi
-
 cmd="${1:-/bin/bash}"
-need_display=1
-case "${cmd}" in
-  /bin/bash|bash|/bin/sh|sh|-bash) need_display=0 ;;
-esac
 
-if [ -z "${DISPLAY:-}" ]; then
-  if [ "${need_display}" = "1" ]; then
-    error "DISPLAY is not set. Start a graphical session (or VcXsrv on WSL) first."
+# Default: Nix TigerVNC X server. MMI_NO_X=1 skips GUI. MMI_USE_HOST_X=1 uses host DISPLAY.
+if [ "${MMI_NO_X:-0}" = "1" ]; then
+  info "MMI_NO_X=1 — not starting Xvnc"
+elif [ "${MMI_USE_HOST_X:-0}" = "1" ]; then
+  if [ -z "${DISPLAY:-}" ]; then
+    error "MMI_USE_HOST_X=1 but DISPLAY is not set."
     exit 1
   fi
-  warn "DISPLAY is not set — GUI tools will not work."
+  info "Using host X server DISPLAY=${DISPLAY}"
+else
+  mmi_start_nix_x
 fi
 
 echo "=============================================="
-echo "  Micro Magic CAD (x86_64)"
+echo "  Micro Magic CAD (x86_64, Nix X)"
 echo "=============================================="
 echo "  DISPLAY=${DISPLAY:-<unset>}   MMI_TOOLS=${MMI_TOOLS}"
 echo "  PDK_ROOT=${PDK_ROOT}   Magic: $(command -v magic 2>/dev/null || echo missing)"
+if [ -n "${MMI_NOVNC_URL:-}" ]; then
+  echo "  GUI: ${MMI_NOVNC_URL}"
+fi
 if [ -n "${MMI_MAX_FONTS_DIR:-}" ]; then
   echo "  MAX fonts: ${MMI_MAX_FONTS_DIR}"
 fi
@@ -292,6 +300,12 @@ echo "=============================================="
 echo ""
 
 if [ "$#" -eq 0 ]; then
-  exec /bin/bash
+  set -- /bin/bash
+fi
+if [ "${MMI_NIX_X:-0}" = "1" ]; then
+  "$@"
+  status=$?
+  mmi_x_cleanup
+  exit "${status}"
 fi
 exec "$@"

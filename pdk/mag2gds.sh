@@ -49,10 +49,9 @@ done
 
 if [ -z "$RC" ]; then
   echo "ERROR: No Magic .magicrc under PDK_ROOT=$PDK_ROOT" >&2
-  echo "Tapeout mag2gds needs an open_pdks-style PDK, for example:" >&2
+  echo "Tapeout mag2gds needs an open_pdks-style PDK from the Nix store:" >&2
   echo "  \$PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc" >&2
-  echo "Put that tree in data/pdks (mounted at /mmi-pdks)," >&2
-  echo "or use the Tcl paint-dump converter instead." >&2
+  echo "(seeded from /mmi-pdks-nix). Rebuild: nix build .#mmi-pdks" >&2
   exit 3
 fi
 

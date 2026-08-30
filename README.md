@@ -15,7 +15,7 @@ The CAD tree is **`vendor/mmi/`** (in git, sources only). Binaries are not commi
 | User namespaces | Needed by bubblewrap. Ubuntu 24.04+: if `nix run` fails, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` |
 | Not WSL1 | WSL1 has no real kernel userns. `wsl --set-version <distro> 2` |
 
-Windows-native is not a run target. Clone on Windows if you want, then run inside WSL2 or a Linux VM.
+Windows-native is not a run target. Clone and run on x86_64 Linux (bare metal, VM, or WSL2).
 
 ## Layout
 
@@ -36,15 +36,12 @@ Windows-native is not a run target. Clone on Windows if you want, then run insid
 ## Quick start
 
 ```bash
-chmod +x run.sh scripts/setup-git.sh
-./scripts/setup-git.sh   # once: LF line endings in this clone
+chmod +x run.sh
 ./run.sh --prep-only     # optional: warm the Nix store
 ./run.sh max             # starts Nix Xvnc + noVNC, then MAX
 ```
 
 Open the printed URL (default `http://127.0.0.1:6080/vnc.html?autoconnect=1`).
-
-On Windows (checkout only): `powershell -File scripts/setup-git.ps1`, then run `./run.sh` from **WSL2**.
 
 ## Commands
 
@@ -81,6 +78,6 @@ On Windows (checkout only): `powershell -File scripts/setup-git.ps1`, then run `
 - nixpkgs is `github:NixOS/nixpkgs/nixos-25.05`, locked to a commit + `narHash` (not a moving `nixos-unstable.tar.gz` URL).
 - Vendor CAD sources are the git tree (`vendor/mmi`); the Nix derivation excludes `vendor/mmi/bin`.
 - `SOURCE_DATE_EPOCH=315532800`, `LC_ALL=C`, `-frandom-seed=mmi-cad-040526`, deterministic `ar rcsD`, sorted `tar` and font indexes (`fonts.dir`).
-- `.gitattributes` marks archives/images as binary; `scripts/setup-git.sh` disables `core.autocrlf` so Windows/WSL checkouts do not rewrite sources.
+- `.gitattributes` marks archives/images as binary and forces `eol=lf` on text so checkouts stay Linux line endings.
 
 `nix build --rebuild --check .#mmi-vendor` on x86_64 Linux should reproduce the same output path.

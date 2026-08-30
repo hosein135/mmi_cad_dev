@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Local git settings so vendor/mmi checkouts hash the same on Linux and Windows.
+# Repo-local git: keep working tree as LF (Linux). Run once after clone if
+# your global git has core.autocrlf=true.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 git config core.autocrlf false
 git config core.eol lf
-git config core.symlinks false
-echo "Set core.autocrlf=false core.eol=lf core.symlinks=false for this repo."
+echo "Set core.autocrlf=false core.eol=lf for this repo."

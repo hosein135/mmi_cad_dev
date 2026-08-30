@@ -1,11 +1,11 @@
-**`vendor/mmi/`** is the extracted CAD tree (in git): flattened names, `src/`, and x86_64 tools in `bin/`.
+**`vendor/mmi/`** is the extracted CAD source tree (in git): flattened names and `src/`.
 
-On **Windows**, run once before `git add`:
+x86_64 binaries are **not** stored here. Build them with:
 
-```powershell
-powershell -File scripts/setup-git.ps1
+```bash
+nix build .#mmi-vendor
+# or
+./run.sh --prep-only
 ```
-
-That sets `core.protectNTFS=false` so paths like `maxaux/` (renamed from reserved `aux/`) can be indexed. The tree also has no symlinks (expanded for Windows git).
 
 `vendor/result` is a Nix symlink and is not committed.

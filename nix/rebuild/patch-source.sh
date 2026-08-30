@@ -822,4 +822,27 @@ for max in src/max4.2.11 src/max4.3.16; do
   fi
 done
 
+# Reproducible DATE in packaging rules (not used for the CAD binaries).
+sed -i \
+  -e 's/^DATE[[:space:]]*=.*/DATE = epoch/' \
+  -e 's/^DATETAG[[:space:]]*=.*/DATETAG = 0101/' \
+  src/max4.3.16/make/Makefile.main \
+  src/max4.2.11/make/Makefile.main 2>/dev/null || true
+
+# maxaux: Windows-safe dir name + optional depend include + X11 libs for anXhelper.
+find src/max4.3.16/maxaux src/max4.2.11/maxaux -type f -name Makefile 2>/dev/null \
+  | while IFS= read -r mk; do
+      sed -i \
+        -e 's|/o/${CONFIG}/aux/|/o/${CONFIG}/maxaux/|g' \
+        -e 's|/o/$(CONFIG)/aux/|/o/$(CONFIG)/maxaux/|g' \
+        -e 's|^include \$(OBJ_DIR)/depend|-include $(OBJ_DIR)/depend|' \
+        "$mk"
+    done
+if [ -f src/max4.3.16/maxaux/irsim/src/anXhelper/Makefile ]; then
+  if ! grep -q '^LIBS' src/max4.3.16/maxaux/irsim/src/anXhelper/Makefile; then
+    sed -i '/^MODULE :=/i LIBS = ${CONFIG_LIBS}' \
+      src/max4.3.16/maxaux/irsim/src/anXhelper/Makefile
+  fi
+fi
+
 echo "x86_64 source patches applied under $ROOT"
