@@ -1,7 +1,8 @@
 {
   description = "Micro Magic CAD — Nix FHS environment (no Docker)";
 
-  # Tarball fetch (not a full git clone) so first-time `nix flake lock` stays practical.
+  nixConfig.extra-experimental-features = "nix-command flakes";
+
   inputs.nixpkgs.url = "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
 
   outputs =
@@ -16,8 +17,43 @@
 
       inherit (pkgs) lib;
 
-      # Combined XLFD bitmap fonts for Motif (max/nst). Copied to .mmi-xfonts at runtime
-      # so the host X server (including VcXsrv on WSL) can open the files.
+      pwd = builtins.getEnv "PWD";
+
+      vendorSrc =
+        let
+          hasSrc = p: builtins.pathExists (p + "/src/max4.3.16");
+          home = builtins.getEnv "HOME";
+          cache =
+            if home == "" then
+              null
+            else
+              /. + "${home}/.cache/mmi-cad/vendor";
+          dirCands = lib.filter (p: p != null) (
+            lib.optional (cache != null) cache
+            ++ lib.optionals (pwd != "") [ (/. + "${pwd}/vendor/mmi") ]
+          );
+          tarCands =
+            lib.filter (p: p != null) (
+              [
+                ./vendor/mmi_pd_040526.tar.gz
+                ./vendor/mmi_pd_040526.tar
+              ]
+              ++ lib.optionals (pwd != "") [
+                (/. + "${pwd}/vendor/mmi_pd_040526.tar.gz")
+                (/. + "${pwd}/vendor/mmi_pd_040526.tar")
+              ]
+            );
+          fromDir = lib.findFirst hasSrc null dirCands;
+          fromTar = lib.findFirst builtins.pathExists null tarCands;
+        in
+        if fromDir != null then fromDir else fromTar;
+
+      vendorIsTarball =
+        vendorSrc != null
+        && (
+          lib.hasSuffix ".tar.gz" (toString vendorSrc) || lib.hasSuffix ".tar" (toString vendorSrc)
+        );
+
       mmiFonts = pkgs.runCommand "mmi-xfonts" {
         nativeBuildInputs = [
           pkgs.mkfontscale
@@ -56,9 +92,9 @@
           done
         done
         chmod -R u+w "$out"
-        install -Dm644 ${./nix/fonts.alias} $out/misc/fonts.alias
-        install -Dm644 ${./nix/fonts.alias} $out/75dpi/fonts.alias
-        install -Dm644 ${./nix/fonts.alias} $out/100dpi/fonts.alias
+        install -Dm644 ${./nix/x11/fonts.alias} $out/misc/fonts.alias
+        install -Dm644 ${./nix/x11/fonts.alias} $out/75dpi/fonts.alias
+        install -Dm644 ${./nix/x11/fonts.alias} $out/100dpi/fonts.alias
         for dir in $out/misc $out/75dpi $out/100dpi $out/Type1 $out/cyrillic; do
           if [ -d "$dir" ]; then
             rm -f "$dir/fonts.dir" "$dir/fonts.scale"
@@ -70,9 +106,9 @@
 
       mmiPdk = pkgs.runCommand "mmi-pdk"
         {
-          src = ./max_pdk;
-          xresources = ./nix/Xresources;
-          appDefaults = ./nix/app-defaults-Mmi;
+          src = ./pdk;
+          xresources = ./nix/x11/Xresources;
+          appDefaults = ./nix/x11/app-defaults-Mmi;
         }
         ''
           mkdir -p $out/app-defaults
@@ -86,23 +122,100 @@
           install -Dm644 "$appDefaults" $out/app-defaults/Mmi
         '';
 
+      mmiVendor =
+        if vendorSrc == null then
+          pkgs.runCommand "mmi-vendor-missing" { } ''
+            cat >&2 <<'EOF'
+            mmi-vendor: extract the public-domain archive once:
+              vendor/mmi_pd_040526.tar.gz
+            then: ./run.sh --prep-only
+            That unpacks to vendor/mmi (x86_64 layout) and deletes the tarball.
+            EOF
+            exit 1
+          ''
+        else
+          pkgs.stdenv.mkDerivation (
+            {
+              pname = "mmi-vendor";
+              version = "040526-x86_64";
+              src = vendorSrc;
+              PATCH_INTPTR = ./nix/rebuild/patch-intptr.py;
+              PATCH_PCCTS_H = ./nix/rebuild/pccts-h;
+              nativeBuildInputs = [
+                pkgs.gnumake
+                pkgs.python3
+                pkgs.file
+                pkgs.gawk
+                pkgs.gnused
+                pkgs.gnugrep
+                pkgs.findutils
+                pkgs.bash
+                pkgs.binutils
+                pkgs.gnum4
+                pkgs.tcl
+              ];
+              buildInputs = with pkgs; [
+                libx11
+                libxext
+                libxt
+                libxmu
+                libxpm
+                libxaw
+                libice
+                libsm
+                xorgproto
+                libxi
+                libxrender
+              ];
+              dontConfigure = true;
+              dontUpdateAutotoolsGnuConfigScripts = true;
+              dontCheckForBrokenSymlinks = true;
+              enableParallelBuilding = false;
+              hardeningDisable = [
+                "format"
+                "fortify"
+                "fortify3"
+                "stackprotector"
+                "pic"
+                "strictoverflow"
+              ];
+              # Old C + modern GCC/glibc (FORTIFY aborts Tcl 8.0 / MAX).
+              NIX_CFLAGS_COMPILE = "-std=gnu89 -fcommon -fno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -Wno-error -include float.h -DCLK_TCK=100";
+              postPatch = ''
+                export PATCH_INTPTR="$PATCH_INTPTR"
+                export PATCH_PCCTS_H="$PATCH_PCCTS_H"
+                bash ${./nix/rebuild/patch-source.sh} "$PWD"
+              '';
+              buildPhase = ''
+                bash ${./nix/rebuild/build.sh}
+              '';
+              installPhase = ''
+                export LAYOUT_SH="${./nix/rebuild/layout.sh}"
+                bash ${./nix/rebuild/install.sh} "$PWD" "$out"
+              '';
+              meta = {
+                description = "Micro Magic CAD rebuilt as ELF 64-bit from public-domain sources";
+                platforms = [ "x86_64-linux" ];
+              };
+            }
+            // lib.optionalAttrs vendorIsTarball { sourceRoot = "mmi_pd_040526"; }
+          );
+
       cshCompat = pkgs.runCommand "csh-compat" { } ''
         mkdir -p $out/bin
         ln -s ${pkgs.tcsh}/bin/tcsh $out/bin/csh
       '';
 
-      # 32-bit Motif CAD + 64-bit Magic and CLI tools, FHS layout (/lib, /usr, /bin).
       mmiCad = pkgs.buildFHSEnv {
         pname = "mmi-cad";
         version = "1.0.0";
-        multiArch = true; # 32-bit i486 CAD binaries need /lib/ld-linux.so.2 + lib32
 
-        # Mount points inside the FHS root (not host /home — bwrap cannot mkdir there).
         extraBuildCommands = ''
           mkdir -p $out/mmi-home/work
           mkdir -p $out/mmi-pdks
           mkdir -p $out/mmi-bundle
           mkdir -p $out/mmi-magic
+          mkdir -p $out/mmi-vendor
         '';
 
         targetPkgs =
@@ -150,16 +263,6 @@
             xhost
             mkfontscale
             fontconfig
-          ])
-          ++ lib.optionals (p ? urw-base35-fonts) [ p.urw-base35-fonts ];
-
-        # Installed for both i686 and x86_64 so the 2004 i486 binaries can resolve
-        # libX11/Motif/glibc. OpenSSL 3 only (1.1 is EOL and removed from nixpkgs).
-        multiPkgs =
-          p:
-          with p;
-          [
-            glibc
             libxcrypt
             libGL
             libGLU
@@ -183,43 +286,33 @@
             libxau
             libxdmcp
             freetype
-            fontconfig
             expat
             zlib
-            bzip2
             ncurses
             libpng
             libjpeg
             libtiff
             openssl
-            krb5
-            keyutils
-            libbsd
-            libidn2
-            libunistring
-            gpm
-            motif
             stdenv.cc.cc.lib
-          ]
-          ++ lib.optionals (p ? ncurses5) [ p.ncurses5 ]
-          ++ lib.optionals (p ? libstdcxx5) [ p.libstdcxx5 ]
-          ++ lib.optionals (p ? libnsl) [ p.libnsl ]
-          ++ lib.optionals (p ? libxp) [ p.libxp ];
+          ])
+          ++ lib.optionals (p ? urw-base35-fonts) [ p.urw-base35-fonts ]
+          ++ lib.optionals (p ? psutils) [ p.psutils ];
 
         extraPreBwrapCmds = ''
           if [ -z "''${MMI_CAD_ROOT:-}" ]; then
             export MMI_CAD_ROOT="$PWD"
           fi
           mkdir -p \
-            "$MMI_CAD_ROOT/pdks" \
-            "$MMI_CAD_ROOT/workspace" \
-            "$MMI_CAD_ROOT/.mmi-prefix/home"
+            "$MMI_CAD_ROOT/data/pdks" \
+            "$MMI_CAD_ROOT/data/workspace" \
+            "$MMI_CAD_ROOT/data/home"
         '';
 
         extraBwrapArgs = [
-          "--bind \"$MMI_CAD_ROOT/.mmi-prefix/home\" /mmi-home"
-          "--bind \"$MMI_CAD_ROOT/workspace\" /mmi-home/work"
-          "--bind \"$MMI_CAD_ROOT/pdks\" /mmi-pdks"
+          "--bind \"$MMI_CAD_ROOT/data/home\" /mmi-home"
+          "--bind \"$MMI_CAD_ROOT/data/workspace\" /mmi-home/work"
+          "--bind \"$MMI_CAD_ROOT/data/pdks\" /mmi-pdks"
+          "--ro-bind-try ${mmiVendor} /mmi-vendor"
           "--ro-bind-try ${mmiPdk} /mmi-bundle"
           "--ro-bind-try ${pkgs.magic-vlsi} /mmi-magic"
         ];
@@ -227,6 +320,8 @@
         profile = ''
           export MMI_FONTS_SRC=${mmiFonts}
           export MMI_PDK_DIR=/mmi-bundle
+          export MMI_TOOLS=/mmi-vendor/mmi
+          export MMI_LOCAL=/mmi-home/cad/mmi_local
           export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
           export QT_X11_NO_MITSHM=1
@@ -238,11 +333,11 @@
         '';
 
         runScript = pkgs.writeShellScript "mmi-cad-launch" (
-          builtins.readFile ./nix/mmi-launch.sh
+          builtins.readFile ./nix/launch.sh
         );
 
         meta = {
-          description = "Micro Magic CAD FHS wrapper (32-bit Motif tools + Magic VLSI)";
+          description = "Micro Magic CAD FHS wrapper (x86_64 rebuild from public-domain sources + Magic VLSI)";
           platforms = [ "x86_64-linux" ];
         };
       };
@@ -251,6 +346,7 @@
       packages.${system} = {
         default = mmiCad;
         mmi-cad = mmiCad;
+        mmi-vendor = mmiVendor;
         mmi-xfonts = mmiFonts;
         mmi-pdk = mmiPdk;
       };
@@ -267,13 +363,12 @@
           pkgs.git
         ];
         shellHook = ''
-          echo "Micro Magic CAD — Nix FHS (no Docker)"
+          echo "Micro Magic CAD — Nix FHS"
+          echo "  Vendor: x86_64 (rebuilt from src/)"
           echo "  mmi-cad          # CAD shell"
           echo "  mmi-cad max      # start MAX"
-          echo "Set MMI_CAD_ROOT if you are not in the project directory."
           export MMI_CAD_ROOT="''${MMI_CAD_ROOT:-$PWD}"
         '';
       };
-
     };
 }
