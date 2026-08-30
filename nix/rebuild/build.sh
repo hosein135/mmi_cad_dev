@@ -194,16 +194,32 @@ build_aux() {
 }
 
 build_edif2sue() {
-  log "edif2sue"
+  log "edif2sue (optional)"
   local d="${SRC}/edif2sue1.2.12"
   [ -d "$d" ] || return 0
   cd "$d"
-  make -e MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux -j1 || {
-    log "edif2sue make failed, trying g++"
-    ${CXX:-g++} -fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
-      -I. -DE2S_VERSION='"1.2.12"' -c ./*.cc ./*.c
-    ${CXX:-g++} -o edif2sue.linux ./*.o -lm || true
-  }
+  if make MMI_UTILS="${UTILS}" MMI_CAD="${SRC}" TARGET2=linux -j1; then
+    cd "${ROOT}"
+    return 0
+  fi
+  log "edif2sue make failed, trying g++"
+  shopt -s nullglob
+  local srcs=(./*.cc)
+  shopt -u nullglob
+  if [ "${#srcs[@]}" -eq 0 ]; then
+    log "WARN: edif2sue sources missing; skipping"
+    cd "${ROOT}"
+    return 0
+  fi
+  if ! ${CXX:-g++} -fcommon -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 \
+      -Wno-write-strings -I. -DE2S_VERSION='"1.2.12"' -c "${srcs[@]}"; then
+    log "WARN: edif2sue compile failed; skipping"
+    cd "${ROOT}"
+    return 0
+  fi
+  if ! ${CXX:-g++} -o edif2sue.linux ./*.o -lm; then
+    log "WARN: edif2sue link failed; skipping"
+  fi
   cd "${ROOT}"
 }
 
