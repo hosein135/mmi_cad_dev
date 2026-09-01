@@ -325,6 +325,29 @@ proc pdk_find_tech27 {tech} {
   return ""
 }
 
+# Downloaded open_pdks tree plus MAX .tech27 (usable in max -tech).
+proc pdk_preset_ready {choice} {
+  global PDK_PRESET
+  if {![info exists PDK_PRESET($choice,local)]} { return 0 }
+  if {![pdk_tree_ready $PDK_PRESET($choice,local)]} { return 0 }
+  if {[pdk_find_tech27 $PDK_PRESET($choice,tech)] == ""} { return 0 }
+  return 1
+}
+
+proc pdk_preset_radio_labels {} {
+  global PDK_PRESET
+  set out {}
+  foreach c {sky130A gf180mcu sg13g2} {
+    set lab $PDK_PRESET($c,label)
+    if {[pdk_preset_ready $c]} {
+      append lab " (already imported)"
+    }
+    lappend out $lab
+  }
+  lappend out "Custom URL..."
+  return $out
+}
+
 # Shared PDK folder used by Magic (native open_pdks tree) and MAX
 # (compiled .source / make_tech output under max/tech/). Default /mmi-pdks
 # (host data/pdks inside the Nix FHS env).
@@ -470,18 +493,12 @@ proc pdk_import_dialog {} -desc {
 
   set prop_list ""
   lappend prop_list [list "PDK:" PDK_IMPORT(pdk) \
-      -radio [list \
-          $PDK_PRESET(sky130A,label) \
-          $PDK_PRESET(gf180mcu,label) \
-          $PDK_PRESET(sg13g2,label) \
-          "Custom URL..."] \
+      -radio [pdk_preset_radio_labels] \
       -values {sky130A gf180mcu sg13g2 custom} \
-      -reload \
-      -help {Downloads a Magic-compiled open_pdks tree (stdcells included) when you click OK. Nothing is fetched by Nix or at MAX launch. Already-imported trees under /mmi-pdks are reused.}]
+      -help {Choose a foundry PDK. Names marked (already imported) will not be downloaded again. Custom URL is used only when that row is selected.}]
 
   lappend prop_list [list "Custom URL:" PDK_IMPORT(url) -entry -width 56 \
-      -when {$PDK_IMPORT(pdk) == "custom"} \
-      -help {GitHub repo, tar.gz/zip URL, or a directory already on disk.}]
+      -help {Used only if Custom URL is selected. GitHub repo, tar.gz/zip, or a directory on disk.}]
 
   lappend prop_list [list "MAX technology name (auto = from PDK):" \
       PDK_IMPORT(tech) -entry -width 24]
@@ -509,6 +526,18 @@ proc pdk_import_dialog {} -desc {
     set tech $PDK_IMPORT(tech)
   }
   set local $PDK_PRESET($choice,local)
+
+  set tech27 [pdk_find_tech27 $tech]
+  if {[pdk_tree_ready $local] && $tech27 != ""} {
+    set msg "PDK '$choice' is already imported and ready for MAX.\n\n\
+open_pdks tree:\n  $local\n\
+MAX technology:\n  $tech27\n\n\
+Start MAX with:\n  max -tech $tech\n\n\
+Nothing was downloaded."
+    if {[catch {warning $msg}]} { puts $msg }
+    return
+  }
+
   if {[pdk_tree_ready $local]} {
     pdk_import_start [list $local] $tech $family
     return
