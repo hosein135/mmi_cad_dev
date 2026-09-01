@@ -119,9 +119,9 @@ experimental-features = nix-command flakes
 "
 }
 
-# Nix flakes copy only Git-tracked files. A dirty work tree that deletes or
-# never stages a path interpolated in flake.nix fails with:
-#   Path 'nix/rebuild/patch-intptr.py' does not exist in Git repository
+# Nix flakes copy only Git-tracked files. Git does not track directories, so a
+# dirty eval of ./nix/rebuild/pccts-h fails with:
+#   Path 'nix/rebuild/pccts-h' is not tracked by Git — run: git add -N ...
 mmi_ensure_flake_git_files() {
   local rel f
   if ! command -v git >/dev/null 2>&1; then
@@ -131,25 +131,41 @@ mmi_ensure_flake_git_files() {
     return 0
   fi
 
+  # Git has no directory objects. Nix dirty eval of ./nix/rebuild/pccts-h
+  # needs an index entry: `git add -N <dir>` then `git add <dir>`.
+  local d
+  for d in nix/rebuild/pccts-h pdk nix/rebuild nix/x11; do
+    if [ -d "${SCRIPT_DIR}/${d}" ]; then
+      git -C "${SCRIPT_DIR}" add -N -- "${d}" 2>/dev/null || true
+      git -C "${SCRIPT_DIR}" add -- "${d}"
+    fi
+  done
+
   while IFS= read -r rel; do
     [ -n "${rel}" ] || continue
     f="${SCRIPT_DIR}/${rel}"
-    if [ -e "${f}" ]; then
-      if ! git -C "${SCRIPT_DIR}" ls-files --error-unmatch -- "${rel}" >/dev/null 2>&1; then
-        git -C "${SCRIPT_DIR}" add -- "${rel}"
-        info "git add ${rel} (Nix flakes ignore untracked files)"
+
+    if [ ! -e "${f}" ]; then
+      if git -C "${SCRIPT_DIR}" cat-file -e "HEAD:${rel}" 2>/dev/null \
+        || git -C "${SCRIPT_DIR}" ls-tree -r --name-only HEAD -- "${rel}" | grep -q .; then
+        git -C "${SCRIPT_DIR}" checkout HEAD -- "${rel}"
+        info "Restored ${rel} from git (required by flake.nix)"
+      else
+        error "flake.nix needs '${rel}', but it is not in this Git repository."
+        error "Fix:  git add -N ${rel} && git add ${rel}"
+        return 1
       fi
-      continue
     fi
-    if git -C "${SCRIPT_DIR}" cat-file -e "HEAD:${rel}" 2>/dev/null; then
-      git -C "${SCRIPT_DIR}" checkout HEAD -- "${rel}"
-      info "Restored ${rel} from git (required by flake.nix)"
-      continue
+
+    # Intent-to-add first: Nix dirty eval looks up the path in the index.
+    # Directories only appear after `git add -N` (files after `git add`).
+    git -C "${SCRIPT_DIR}" add -N -- "${rel}" 2>/dev/null || true
+    git -C "${SCRIPT_DIR}" add -- "${rel}"
+    if [ -d "${f}" ] && ! git -C "${SCRIPT_DIR}" ls-files -- "${rel}" | grep -q .; then
+      error "flake.nix needs directory '${rel}', but Git has no files there."
+      error "Fix:  git add ${rel}"
+      return 1
     fi
-    error "flake.nix needs '${rel}', but it is not in this Git repository."
-    error "Fix:  git add ${rel}"
-    error "Nix copies only tracked files; untracked or deleted paths are omitted."
-    return 1
   done < <(
     grep -oE '\./(nix|pdk)[^"[:space:];)}]*' "${SCRIPT_DIR}/flake.nix" \
       | sed 's|^\./||' \

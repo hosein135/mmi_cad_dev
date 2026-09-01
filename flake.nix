@@ -148,12 +148,30 @@
           install -Dm644 "$appDefaults" $out/app-defaults/Mmi
         '';
 
+      # Import each header as a file path. A dirty flake cannot import the
+      # pccts-h directory itself (Git tracks files, not directories).
+      pcctsH = pkgs.runCommand "mmi-pccts-h" { } ''
+        mkdir -p $out
+        cp ${./nix/rebuild/pccts-h/antlr.h} $out/antlr.h
+        cp ${./nix/rebuild/pccts-h/config.h} $out/config.h
+        cp ${./nix/rebuild/pccts-h/dlgauto.h} $out/dlgauto.h
+        cp ${./nix/rebuild/pccts-h/dlgdef.h} $out/dlgdef.h
+        cp ${./nix/rebuild/pccts-h/err.h} $out/err.h
+        cp ${./nix/rebuild/pccts-h/int.h} $out/int.h
+        cp ${./nix/rebuild/pccts-h/pccts_stdarg.h} $out/pccts_stdarg.h
+        cp ${./nix/rebuild/pccts-h/pccts_stdio.h} $out/pccts_stdio.h
+        cp ${./nix/rebuild/pccts-h/pccts_stdlib.h} $out/pccts_stdlib.h
+        cp ${./nix/rebuild/pccts-h/pccts_string.h} $out/pccts_string.h
+        cp ${./nix/rebuild/pccts-h/pcctscfg.h} $out/pcctscfg.h
+        cp ${./nix/rebuild/pccts-h/set.h} $out/set.h
+      '';
+
       mmiVendor = pkgs.stdenv.mkDerivation {
         pname = "mmi-vendor";
         version = "040526-x86_64";
         src = vendorSrc;
         PATCH_INTPTR = ./nix/rebuild/patch-intptr.py;
-        PATCH_PCCTS_H = ./nix/rebuild/pccts-h;
+        PATCH_PCCTS_H = pcctsH;
         nativeBuildInputs = [
           pkgs.gnumake
           pkgs.python3
