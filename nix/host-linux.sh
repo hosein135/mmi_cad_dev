@@ -179,7 +179,8 @@ mmi_ensure_flake_git_files() {
       return 1
     fi
   done < <(
-    grep -oE '\./(nix|pdk)[^"[:space:];)}]*' "${SCRIPT_DIR}/flake.nix" \
+    grep -vE '^[[:space:]]*#' "${SCRIPT_DIR}/flake.nix" \
+      | grep -oE '\./(nix|pdk)[-A-Za-z0-9_./]*' \
       | sed 's|^\./||' \
       | sort -u
   )

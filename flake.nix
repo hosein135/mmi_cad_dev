@@ -123,8 +123,8 @@
       # Scripts + Magic rc fallbacks + samples only. Foundry PDKs are not
       # flake inputs; MAX File → Import PDK downloads them at user request.
       # Copy via fileset from the flake root so nested git-tracked paths
-      # (pdk/samples, pdk/magic) are included. `src = ./pdk` on a dirty tree
-      # can snapshot only top-level files after `git add -N pdk`.
+      # (pdk/samples, pdk/magic) are included. A direct directory import of
+      # pdk on a dirty tree can snapshot only top-level files.
       mmiPdk = pkgs.runCommand "mmi-pdk"
         {
           SOURCE_DATE_EPOCH = sourceDateEpoch;
