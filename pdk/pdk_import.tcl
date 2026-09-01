@@ -561,7 +561,7 @@ proc pdk_import_poll_fetch {} {
   set pct $PDK_IMPORT(stat_pct)
   set msg $PDK_IMPORT(stat_msg)
   if {$msg == ""} { set msg "Downloading compiled open_pdks..." }
-  if {![string is integer -strict $pct]} { set pct 0 }
+  if {![regexp {^[0-9]+$} $pct]} { set pct 0 }
   _pdk_import_progress_update $pct $msg
 
   if {$st == "ok"} {
@@ -1051,8 +1051,8 @@ proc _pdk_import_progress_open {} {
   frame $f -bd 8
   pack $f -fill both -expand 1
 
-  label $f.title -text "Fitting PDK into MAX" -font {Helvetica 12 bold}
-  pack $f.title -anchor w -pady {0 6}
+  label $f.title -text "Fitting PDK into MAX"
+  pack $f.title -anchor w -pady 6
 
   label $f.stage -text "Starting..." -anchor w -width 64
   pack $f.stage -anchor w -fill x
@@ -1066,7 +1066,7 @@ proc _pdk_import_progress_open {} {
   pack $f.pctlab -anchor e
 
   frame $f.btns
-  pack $f.btns -fill x -pady {8 0}
+  pack $f.btns -fill x -pady 8
   button $f.btns.cancel -text "Cancel" -command pdk_import_cancel
   pack $f.btns.cancel -side right
   update idletasks
@@ -1083,7 +1083,7 @@ proc _pdk_import_progress_close {} {
 
 proc _pdk_import_progress_update {percent message} {
   if {![winfo exists .pdkprog.f.bar]} { return }
-  if {![string is integer -strict $percent]} { set percent 0 }
+  if {![regexp {^[0-9]+$} $percent]} { set percent 0 }
   if {$percent < 0} { set percent 0 }
   if {$percent > 100} { set percent 100 }
   set w [winfo width .pdkprog.f.bar]

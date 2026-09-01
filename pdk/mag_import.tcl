@@ -1156,8 +1156,8 @@ proc mag_progress_open {{method mag2gds}} {
   } else {
     set title "Tcl paint dump (not tapeout)  →  MAX .max"
   }
-  label $f.title -text $title -font {Helvetica 12 bold}
-  pack $f.title -anchor w -pady {0 6}
+  label $f.title -text $title
+  pack $f.title -anchor w -pady 6
   label $f.stage -text "Starting..." -anchor w -width 64
   pack $f.stage -anchor w -fill x
   canvas $f.bar -width 420 -height 22 -bd 1 -relief sunken -highlightthickness 0
@@ -1167,7 +1167,7 @@ proc mag_progress_open {{method mag2gds}} {
   label $f.pctlab -text "0%" -anchor e
   pack $f.pctlab -anchor e
   frame $f.btns
-  pack $f.btns -fill x -pady {8 0}
+  pack $f.btns -fill x -pady 8
   button $f.btns.cancel -text "Cancel" -command mag_import_cancel
   pack $f.btns.cancel -side right
   update idletasks
@@ -1184,7 +1184,7 @@ proc mag_progress_close {} {
 
 proc mag_progress_update {percent message} {
   if {![winfo exists .magprog.f.bar]} { return }
-  if {![string is integer -strict $percent]} { set percent 0 }
+  if {![regexp {^[0-9]+$} $percent]} { set percent 0 }
   if {$percent < 0} { set percent 0 }
   if {$percent > 100} { set percent 100 }
   set w [winfo width .magprog.f.bar]
