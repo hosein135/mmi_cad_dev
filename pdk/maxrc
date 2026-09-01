@@ -37,7 +37,7 @@ proc _mmi_pdk_source {name} {
   lappend cands /mmi-bundle/$name
   foreach f $cands {
     if {[file readable $f]} {
-      source $f
+      uplevel #0 [list source $f]
       return
     }
   }

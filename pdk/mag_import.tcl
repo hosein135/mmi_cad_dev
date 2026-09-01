@@ -5,6 +5,8 @@
 # This command walks a directory of .mag files, writes one GDSII library,
 # then asks MAX to read that GDS and save .max cells.
 
+# Sourced from maxrc via a proc; arrays must be global or they vanish.
+global _MAG_IMPORT_SOURCED MAG_IMPORT
 if {[info exists _MAG_IMPORT_SOURCED]} { return }
 set _MAG_IMPORT_SOURCED 1
 

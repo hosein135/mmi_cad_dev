@@ -2,6 +2,7 @@
 # File / Local menu: "Import PDK from URL..."
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
+global _PDK_IMPORT_SOURCED PDK_PRESET PDK_IMPORT
 if {[info exists _PDK_IMPORT_SOURCED]} { return }
 set _PDK_IMPORT_SOURCED 1
 
@@ -31,42 +32,35 @@ if {[info commands _mmi_file_normalize] == ""} {
 # Compiled open_pdks trees (Magic tech + stdcells) from FOSSi ciel-releases.
 # Not Nix flake inputs. GitHub archives of skywater-pdk / gf180mcu-pdk are
 # skeletons (no submodules). fetch_pdk.sh is started from this dialog.
-set PDK_PRESET(sky130A,label)  "SKY130A — SkyWater 130nm (open_pdks)"
-set PDK_PRESET(sky130A,local)  "/mmi-pdks/sky130A"
-set PDK_PRESET(sky130A,fetch)  "sky130A"
-set PDK_PRESET(sky130A,tech)   "sky130A"
+proc pdk_preset_init {} {
+  global PDK_PRESET PDK_IMPORT
+  set PDK_PRESET(sky130A,label)  "SKY130A - SkyWater 130nm (open_pdks)"
+  set PDK_PRESET(sky130A,local)  "/mmi-pdks/sky130A"
+  set PDK_PRESET(sky130A,fetch)  "sky130A"
+  set PDK_PRESET(sky130A,tech)   "sky130A"
 
-set PDK_PRESET(gf180mcu,label) "GF180MCU — GlobalFoundries 180nm (open_pdks)"
-set PDK_PRESET(gf180mcu,local) "/mmi-pdks/gf180mcuD"
-set PDK_PRESET(gf180mcu,fetch)  "gf180mcu"
-set PDK_PRESET(gf180mcu,tech)  "gf180mcu"
+  set PDK_PRESET(gf180mcu,label) "GF180MCU - GlobalFoundries 180nm (open_pdks)"
+  set PDK_PRESET(gf180mcu,local) "/mmi-pdks/gf180mcuD"
+  set PDK_PRESET(gf180mcu,fetch)  "gf180mcu"
+  set PDK_PRESET(gf180mcu,tech)  "gf180mcu"
 
-set PDK_PRESET(sg13g2,label)   "IHP SG13G2 — IHP 130nm SiGe (open_pdks)"
-set PDK_PRESET(sg13g2,local)   "/mmi-pdks/ihp-sg13g2"
-set PDK_PRESET(sg13g2,fetch)   "sg13g2"
-set PDK_PRESET(sg13g2,tech)    "sg13g2"
+  set PDK_PRESET(sg13g2,label)   "IHP SG13G2 - IHP 130nm SiGe (open_pdks)"
+  set PDK_PRESET(sg13g2,local)   "/mmi-pdks/ihp-sg13g2"
+  set PDK_PRESET(sg13g2,fetch)   "sg13g2"
+  set PDK_PRESET(sg13g2,tech)    "sg13g2"
 
-set PDK_IMPORT(pdk)  "sky130A"
-set PDK_IMPORT(url)  ""
-set PDK_IMPORT(tech) "auto"
-set PDK_IMPORT(after) ""
-set PDK_IMPORT(pid) ""
-set PDK_IMPORT(phase) ""
-set PDK_IMPORT(total) 0
-set PDK_IMPORT(dest) ""
-set PDK_IMPORT(urls) ""
-set PDK_IMPORT(url_i) 0
-set PDK_IMPORT(family) ""
-set PDK_IMPORT(work) ""
-set PDK_IMPORT(src) ""
-set PDK_IMPORT(log) ""
-set PDK_IMPORT(cancel) ""
-set PDK_IMPORT(status) ""
-set PDK_IMPORT(stat_status) ""
-set PDK_IMPORT(stat_pct) 0
-set PDK_IMPORT(stat_msg) ""
-set PDK_IMPORT(stat_dest) ""
-set PDK_IMPORT(fetch_dead) 0
+  if {![info exists PDK_IMPORT(pdk)]} { set PDK_IMPORT(pdk) "sky130A" }
+  if {![info exists PDK_IMPORT(url)]} { set PDK_IMPORT(url) "" }
+  if {![info exists PDK_IMPORT(tech)]} { set PDK_IMPORT(tech) "auto" }
+  foreach k {after pid phase dest urls family work src log cancel status
+              stat_status stat_msg stat_dest} {
+    if {![info exists PDK_IMPORT($k)]} { set PDK_IMPORT($k) "" }
+  }
+  foreach k {total url_i stat_pct fetch_dead} {
+    if {![info exists PDK_IMPORT($k)]} { set PDK_IMPORT($k) 0 }
+  }
+}
+pdk_preset_init
 
 # ── Layer maps (name gds txt type width space color) ─────────────────────────
 proc pdk_layers_sky130A {} {
@@ -424,6 +418,7 @@ proc pdk_import_dialog {} -desc {
   Download a preset PDK or a custom URL and install it as a MAX technology.
 } {
   global PDK_IMPORT PDK_PRESET
+  pdk_preset_init
 
   set prop_list ""
   lappend prop_list [list "PDK:" PDK_IMPORT(pdk) \
