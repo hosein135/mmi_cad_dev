@@ -294,6 +294,8 @@
             git
             cacert
             gnumake
+            gcc
+            gnum4
             diffutils
             patch
             perl
@@ -414,7 +416,7 @@
       } ''
         set -euo pipefail
         bin="${mmiVendor}/mmi/bin"
-        for b in max.bin sue.exe nst sue_tee ext2spice ext2sim gemini irsim anXhelper edif2sue make_tech max sue; do
+        for b in max.bin sue.exe nst sue_tee ext2spice ext2sim gemini irsim anXhelper edif2sue make_tech mmi_cpp mmi_m4 max sue; do
           if [ ! -e "$bin/$b" ]; then
             echo "missing $bin/$b" >&2
             ls -la "$bin" >&2 || true

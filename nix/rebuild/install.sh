@@ -132,6 +132,38 @@ else
   exit 1
 fi
 
+# make_tech compiles .tech → .tech27 with mmi_cpp | mmi_m4 (old i486 ELFs).
+# Wrap the FHS GNU tools (gcc's cpp + m4).
+cat > "$bindir/mmi_cpp" << 'EOF'
+#!/bin/bash
+set -e
+cpp_bin="$(command -v cpp || true)"
+if [ -z "$cpp_bin" ]; then
+  echo "mmi_cpp: cpp not on PATH (need gcc in the CAD environment)" >&2
+  exit 1
+fi
+args=()
+for a in "$@"; do
+  if [ "$a" = "-traditional" ]; then
+    args+=(-traditional-cpp)
+  else
+    args+=("$a")
+  fi
+done
+exec "$cpp_bin" "${args[@]}"
+EOF
+chmod 755 "$bindir/mmi_cpp"
+cat > "$bindir/mmi_m4" << 'EOF'
+#!/bin/sh
+m4_bin="$(command -v m4 || true)"
+if [ -z "$m4_bin" ]; then
+  echo "mmi_m4: m4 not on PATH (need GNU m4 in the CAD environment)" >&2
+  exit 1
+fi
+exec "$m4_bin" "$@"
+EOF
+chmod 755 "$bindir/mmi_m4"
+
 if [ -x "$ROOT/src/utils/bin.x86_64-linux/tclsh" ]; then
   install_bin "$ROOT/src/utils/bin.x86_64-linux/tclsh" "$bindir/mmi_tclsh"
   cp -f "$bindir/mmi_tclsh" "$bindir/mmi_tclsh.8.0"

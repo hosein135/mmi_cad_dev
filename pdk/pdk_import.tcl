@@ -277,6 +277,54 @@ proc pdk_which {names} {
   return ""
 }
 
+# make_tech writes .tech then runs mmi_cpp | mmi_m4 to produce .tech27.
+proc pdk_compile_tech27 {techdir tech} {
+  set src [file join $techdir ${tech}.tech]
+  set dst [file join $techdir ${tech}.tech27]
+  if {![file readable $src]} { return 0 }
+  set cpp [pdk_which {mmi_cpp cpp}]
+  set m4 [pdk_which {mmi_m4 m4}]
+  if {$cpp == "" || $m4 == ""} {
+    pdk_log "Need cpp (mmi_cpp) and m4 (mmi_m4) to compile $src"
+    return 0
+  }
+  set save [pwd]
+  if {[catch {cd $techdir}]} { return 0 }
+  set tmp ${tech}.tech27.tmp
+  set ok 0
+  foreach trad {-traditional-cpp -traditional} {
+    catch {file delete $tmp}
+    if {[catch {exec $cpp -P $trad ${tech}.tech | $m4 > $tmp} err]} {
+      pdk_log "cpp $trad | m4: $err"
+      continue
+    }
+    if {[file exists $tmp] && [file size $tmp] > 0} {
+      catch {file delete $dst}
+      catch {file rename $tmp $dst}
+      set ok 1
+      break
+    }
+  }
+  catch {file delete $tmp}
+  catch {cd $save}
+  if {$ok} { pdk_log "Compiled $dst" }
+  return $ok
+}
+
+proc pdk_find_tech27 {tech} {
+  global env
+  set home /mmi-home
+  if {[info exists env(HOME)] && $env(HOME) != ""} { set home $env(HOME) }
+  set cands [list \
+      [file join [pdk_root] max tech $tech ${tech}.tech27] \
+      [file join $home mmi_private max tech $tech ${tech}.tech27] \
+      [file join $home cad mmi_local max tech $tech ${tech}.tech27]]
+  foreach f $cands {
+    if {[file readable $f] && [file size $f] > 0} { return $f }
+  }
+  return ""
+}
+
 # Shared PDK folder used by Magic (native open_pdks tree) and MAX
 # (compiled .source / make_tech output under max/tech/). Default /mmi-pdks
 # (host data/pdks inside the Nix FHS env).
@@ -922,16 +970,33 @@ proc pdk_import_convert {} {
     }
   }
 
+  set home ""
+  if {[info exists env(HOME)]} { set home $env(HOME) }
+  if {$home == ""} { set home /mmi-home }
+  set privdir [file join $home mmi_private max tech $tech]
+
   set mtok failed
   if {$make != ""} {
+    pdk_log "make_tech -r -file $source -tech $tech"
     if {[catch {set out [exec $make -r -file $source -tech $tech]} err]} {
       pdk_log "make_tech: $err"
     } else {
       pdk_log $out
-      set mtok ok
     }
   } else {
     pdk_log "make_tech not found"
+  }
+
+  if {[pdk_find_tech27 $tech] == ""} {
+    foreach dir [list $techdir $privdir] {
+      if {[pdk_compile_tech27 $dir $tech]} { break }
+    }
+  }
+  if {[pdk_find_tech27 $tech] != ""} {
+    set mtok ok
+    pdk_log "MAX tech27 [pdk_find_tech27 $tech]"
+  } else {
+    pdk_log "No ${tech}.tech27 after make_tech (need mmi_cpp + mmi_m4 on PATH)"
   }
 
   set gds ""
@@ -1032,6 +1097,9 @@ PDK_ROOT: [pdk_root]\n\
     puts $summary
   }
 
+  if {$mtok != "ok"} {
+    return
+  }
   if {$gds != "" && [file exists $gds]} {
     catch {exec max -tech $tech $gds &}
   } else {
