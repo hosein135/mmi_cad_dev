@@ -118,3 +118,41 @@ mmi_source_nix() {
 experimental-features = nix-command flakes
 "
 }
+
+# Nix flakes copy only Git-tracked files. A dirty work tree that deletes or
+# never stages a path interpolated in flake.nix fails with:
+#   Path 'nix/rebuild/patch-intptr.py' does not exist in Git repository
+mmi_ensure_flake_git_files() {
+  local rel f
+  if ! command -v git >/dev/null 2>&1; then
+    return 0
+  fi
+  if ! git -C "${SCRIPT_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    return 0
+  fi
+
+  while IFS= read -r rel; do
+    [ -n "${rel}" ] || continue
+    f="${SCRIPT_DIR}/${rel}"
+    if [ -e "${f}" ]; then
+      if ! git -C "${SCRIPT_DIR}" ls-files --error-unmatch -- "${rel}" >/dev/null 2>&1; then
+        git -C "${SCRIPT_DIR}" add -- "${rel}"
+        info "git add ${rel} (Nix flakes ignore untracked files)"
+      fi
+      continue
+    fi
+    if git -C "${SCRIPT_DIR}" cat-file -e "HEAD:${rel}" 2>/dev/null; then
+      git -C "${SCRIPT_DIR}" checkout HEAD -- "${rel}"
+      info "Restored ${rel} from git (required by flake.nix)"
+      continue
+    fi
+    error "flake.nix needs '${rel}', but it is not in this Git repository."
+    error "Fix:  git add ${rel}"
+    error "Nix copies only tracked files; untracked or deleted paths are omitted."
+    return 1
+  done < <(
+    grep -oE '\./(nix|pdk)[^"[:space:];)}]*' "${SCRIPT_DIR}/flake.nix" \
+      | sed 's|^\./||' \
+      | sort -u
+  )
+}

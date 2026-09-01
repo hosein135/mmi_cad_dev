@@ -73,6 +73,8 @@ if [ ! -f "${SCRIPT_DIR}/flake.lock" ]; then
   exit 1
 fi
 
+mmi_ensure_flake_git_files || exit 1
+
 if [ "${PREP_ONLY}" = true ]; then
   info "Building mmi-vendor (pure flake eval, nixpkgs 25.05) ..."
   "${NIX_BIN}" build --accept-flake-config "${SCRIPT_DIR}#mmi-vendor" --out-link "${SCRIPT_DIR}/vendor/result"
