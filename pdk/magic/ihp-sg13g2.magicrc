@@ -1,5 +1,5 @@
-# Nix-pinned Magic startup for IHP SG13G2.
-puts stdout "Sourcing Nix ihp-sg13g2.magicrc"
+# Fallback Magic startup for IHP SG13G2 if the imported tree has no rc.
+puts stdout "Sourcing fallback ihp-sg13g2.magicrc"
 
 if {[catch {set PDK_ROOT [file nativename $env(PDK_ROOT)]}]} {
   set PDK_ROOT /mmi-pdks

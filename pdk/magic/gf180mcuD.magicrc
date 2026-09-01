@@ -1,5 +1,5 @@
-# Nix-pinned Magic startup for gf180mcuD (open_pdks layout).
-puts stdout "Sourcing Nix gf180mcuD.magicrc"
+# Fallback Magic startup for gf180mcuD if the imported tree has no rc.
+puts stdout "Sourcing fallback gf180mcuD.magicrc"
 
 if {[catch {set PDK_ROOT [file nativename $env(PDK_ROOT)]}]} {
   set PDK_ROOT /mmi-pdks

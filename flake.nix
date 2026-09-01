@@ -120,6 +120,8 @@
         chmod -R u+w "$out"
       '';
 
+      # Scripts + Magic rc fallbacks + samples only. Foundry PDKs are not
+      # flake inputs; MAX File → Import PDK downloads them at user request.
       mmiPdk = pkgs.runCommand "mmi-pdk"
         {
           SOURCE_DATE_EPOCH = sourceDateEpoch;
@@ -135,6 +137,7 @@
           install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
           install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
+          install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
           install -Dm644 "$src/maxrc" $out/maxrc
           cp -r "$src/samples" $out/
           if [ -d "$src/magic" ]; then
@@ -253,6 +256,7 @@
             bzip2
             xz
             unzip
+            zstd
             file
             which
             less

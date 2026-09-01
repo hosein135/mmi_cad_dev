@@ -129,7 +129,9 @@ if [ -d /mmi-bundle ]; then
   cp -f /mmi-bundle/pdk_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
   cp -f /mmi-bundle/mag_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
   cp -f /mmi-bundle/mag2gds.sh "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+  cp -f /mmi-bundle/fetch_pdk.sh "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
   chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
+  chmod 755 "${CAD}/mmi_local/max/pdk/fetch_pdk.sh" 2>/dev/null || true
   if [ -d /mmi-bundle/samples ]; then
     cp -a /mmi-bundle/samples/. "${CAD}/mmi_local/max/pdk/samples/"
   fi
@@ -218,6 +220,9 @@ echo "  Micro Magic CAD (x86_64)"
 echo "=============================================="
 echo "  DISPLAY=${DISPLAY:-<unset>}   MMI_TOOLS=${MMI_TOOLS}"
 echo "  PDK_ROOT=${PDK_ROOT}   Magic: $(command -v magic 2>/dev/null || echo missing)"
+if [ ! -d "${PDK_ROOT}/sky130A/libs.ref" ] && [ ! -d "${PDK_ROOT}/gf180mcuD/libs.ref" ] && [ ! -d "${PDK_ROOT}/ihp-sg13g2/libs.ref" ]; then
+  echo "  PDKs: empty — start MAX, then File → Import PDK (not fetched by Nix)"
+fi
 if [ -n "${MMI_NOVNC_URL:-}" ]; then
   echo "  GUI is in the browser, not this terminal:"
   echo "  ${MMI_NOVNC_URL}"

@@ -1,6 +1,6 @@
-# Nix-pinned Magic startup for sky130A (open_pdks layout).
+# Fallback Magic startup for sky130A if the imported tree has no rc.
 # Loaded by mag2gds.sh; does not download anything.
-puts stdout "Sourcing Nix sky130A.magicrc"
+puts stdout "Sourcing fallback sky130A.magicrc"
 
 if {[catch {set PDK_ROOT [file nativename $env(PDK_ROOT)]}]} {
   set PDK_ROOT /mmi-pdks

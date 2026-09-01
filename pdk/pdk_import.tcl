@@ -28,24 +28,26 @@ if {[info commands _mmi_file_normalize] == ""} {
 }
 
 # ── Presets: download only when the user runs Import PDK in MAX ───────────────
-# Prefer a copy already under /mmi-pdks; otherwise fetch the GitHub archive.
-set PDK_PRESET(sky130A,label)  "SKY130A — SkyWater 130nm"
-set PDK_PRESET(sky130A,local)  "/mmi-pdks/src/skywater-pdk"
-set PDK_PRESET(sky130A,url)    "https://github.com/google/skywater-pdk/archive/7198cf647113f56041e02abf3eb623692820c5e1.tar.gz"
+# Compiled open_pdks trees (Magic tech + stdcells) from FOSSi ciel-releases.
+# Not Nix flake inputs. GitHub archives of skywater-pdk / gf180mcu-pdk are
+# skeletons (no submodules). fetch_pdk.sh is started from this dialog.
+set PDK_PRESET(sky130A,label)  "SKY130A — SkyWater 130nm (open_pdks)"
+set PDK_PRESET(sky130A,local)  "/mmi-pdks/sky130A"
+set PDK_PRESET(sky130A,fetch)  "sky130A"
 set PDK_PRESET(sky130A,tech)   "sky130A"
 
-set PDK_PRESET(gf180mcu,label) "GF180MCU — GlobalFoundries 180nm"
-set PDK_PRESET(gf180mcu,local) "/mmi-pdks/src/gf180mcu-pdk"
-set PDK_PRESET(gf180mcu,url)   "https://github.com/google/gf180mcu-pdk/archive/de3240d7529a6970437ac3344820aaae7839f215.tar.gz"
+set PDK_PRESET(gf180mcu,label) "GF180MCU — GlobalFoundries 180nm (open_pdks)"
+set PDK_PRESET(gf180mcu,local) "/mmi-pdks/gf180mcuD"
+set PDK_PRESET(gf180mcu,fetch)  "gf180mcu"
 set PDK_PRESET(gf180mcu,tech)  "gf180mcu"
 
-set PDK_PRESET(sg13g2,label)   "IHP SG13G2 — IHP 130nm SiGe"
+set PDK_PRESET(sg13g2,label)   "IHP SG13G2 — IHP 130nm SiGe (open_pdks)"
 set PDK_PRESET(sg13g2,local)   "/mmi-pdks/ihp-sg13g2"
-set PDK_PRESET(sg13g2,url)     "https://github.com/IHP-GmbH/IHP-Open-PDK/archive/refs/heads/main.tar.gz"
+set PDK_PRESET(sg13g2,fetch)   "sg13g2"
 set PDK_PRESET(sg13g2,tech)    "sg13g2"
 
 set PDK_IMPORT(pdk)  "sky130A"
-set PDK_IMPORT(url)  $PDK_PRESET(sky130A,url)
+set PDK_IMPORT(url)  ""
 set PDK_IMPORT(tech) "auto"
 set PDK_IMPORT(after) ""
 set PDK_IMPORT(pid) ""
@@ -59,6 +61,12 @@ set PDK_IMPORT(work) ""
 set PDK_IMPORT(src) ""
 set PDK_IMPORT(log) ""
 set PDK_IMPORT(cancel) ""
+set PDK_IMPORT(status) ""
+set PDK_IMPORT(stat_status) ""
+set PDK_IMPORT(stat_pct) 0
+set PDK_IMPORT(stat_msg) ""
+set PDK_IMPORT(stat_dest) ""
+set PDK_IMPORT(fetch_dead) 0
 
 # ── Layer maps (name gds txt type width space color) ─────────────────────────
 proc pdk_layers_sky130A {} {
@@ -286,6 +294,36 @@ proc pdk_root {} {
   return /mmi-pdks
 }
 
+# True when dir is a compiled open_pdks tree (Magic rc + at least one library).
+proc pdk_tree_ready {dir} {
+  if {$dir == "" || ![file isdirectory $dir]} { return 0 }
+  set mag [file join $dir libs.tech magic]
+  if {![file isdirectory $mag]} { return 0 }
+  set rcs [glob -nocomplain [file join $mag *.magicrc]]
+  if {![llength $rcs]} { return 0 }
+  set ref [file join $dir libs.ref]
+  if {![file isdirectory $ref]} { return 0 }
+  set kids [glob -nocomplain [file join $ref *]]
+  if {![llength $kids]} { return 0 }
+  return 1
+}
+
+proc pdk_fetch_script {} {
+  global env
+  set cands {}
+  if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
+    lappend cands [file join $env(MMI_PDK_DIR) fetch_pdk.sh]
+  }
+  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
+    lappend cands [file join $env(MMI_LOCAL) max pdk fetch_pdk.sh]
+  }
+  lappend cands /mmi-bundle/fetch_pdk.sh
+  foreach f $cands {
+    if {[file readable $f]} { return $f }
+  }
+  return ""
+}
+
 proc pdk_shared_max_techdir {tech} {
   set d [file join [pdk_root] max tech $tech]
   catch {file mkdir $d}
@@ -365,7 +403,9 @@ proc pdk_install_into_root {src family tech} {
     return $from
   }
 
-  if {[file isdirectory [file join $dest libs.tech magic]]} {
+  if {[file isdirectory [file join $dest libs.ref]] && \
+      [llength [glob -nocomplain [file join $dest libs.ref *]]] && \
+      [file isdirectory [file join $dest libs.tech magic]]} {
     pdk_log "Shared PDK already present: $dest"
     return $dest
   }
@@ -394,7 +434,7 @@ proc pdk_import_dialog {} -desc {
           "Custom URL..."] \
       -values {sky130A gf180mcu sg13g2 custom} \
       -reload \
-      -help {Downloads a PDK when you click OK. Already-imported trees under /mmi-pdks are reused.}]
+      -help {Downloads a Magic-compiled open_pdks tree (stdcells included) when you click OK. Nothing is fetched by Nix or at MAX launch. Already-imported trees under /mmi-pdks are reused.}]
 
   lappend prop_list [list "Custom URL:" PDK_IMPORT(url) -entry -width 56 \
       -when {$PDK_IMPORT(pdk) == "custom"} \
@@ -412,33 +452,30 @@ proc pdk_import_dialog {} -desc {
     set url [string trim $PDK_IMPORT(url)]
     set family ""
     set tech $PDK_IMPORT(tech)
-    set urls [list $url]
-  } else {
-    set family $choice
-    set tech $PDK_PRESET($choice,tech)
-    if {$PDK_IMPORT(tech) != "auto" && $PDK_IMPORT(tech) != ""} {
-      set tech $PDK_IMPORT(tech)
+    if {$url == ""} {
+      max_error "PDK URL is empty."
+      return
     }
-    set local $PDK_PRESET($choice,local)
-    if {[file isdirectory $local]} {
-      set url $local
-    } else {
-      set url $PDK_PRESET($choice,url)
-    }
-    set urls [list $url]
-  }
-
-  if {$url == ""} {
-    max_error "PDK URL is empty."
+    pdk_import_start [list $url] $tech $family
     return
   }
-  pdk_import_start $urls $tech $family
+
+  set family $choice
+  set tech $PDK_PRESET($choice,tech)
+  if {$PDK_IMPORT(tech) != "auto" && $PDK_IMPORT(tech) != ""} {
+    set tech $PDK_IMPORT(tech)
+  }
+  set local $PDK_PRESET($choice,local)
+  if {[pdk_tree_ready $local]} {
+    pdk_import_start [list $local] $tech $family
+    return
+  }
+  pdk_import_fetch $PDK_PRESET($choice,fetch) $tech $family
 }
 
 # ── Engine ───────────────────────────────────────────────────────────────────
-proc pdk_import_start {urls tech family} {
-  global PDK_IMPORT env
-
+proc pdk_import_prepare_work {tech family} {
+  global PDK_IMPORT
   set stamp [clock seconds]
   set work [file join /tmp pdk_import_$stamp]
   file mkdir $work
@@ -447,16 +484,137 @@ proc pdk_import_start {urls tech family} {
   file mkdir $PDK_IMPORT(src)
   set PDK_IMPORT(log) [file join $work convert.log]
   set PDK_IMPORT(cancel) [file join $work CANCEL]
+  set PDK_IMPORT(status) [file join $work status]
   set PDK_IMPORT(dest) [file join $work pdk_download.bin]
-  set PDK_IMPORT(urls) $urls
+  set PDK_IMPORT(urls) ""
   set PDK_IMPORT(url_i) 0
   set PDK_IMPORT(tech) [pdk_sanitize $tech]
   set PDK_IMPORT(family) $family
   set PDK_IMPORT(pid) ""
   set PDK_IMPORT(total) 0
+  set PDK_IMPORT(stat_status) ""
+  set PDK_IMPORT(stat_pct) 0
+  set PDK_IMPORT(stat_msg) ""
+  set PDK_IMPORT(stat_dest) ""
+  set PDK_IMPORT(fetch_dead) 0
   catch {file delete $PDK_IMPORT(cancel)}
   catch {file delete $PDK_IMPORT(log)}
+  catch {file delete $PDK_IMPORT(status)}
   pdk_log "PDK import workdir $work"
+}
+
+proc pdk_import_read_status {} {
+  global PDK_IMPORT
+  set PDK_IMPORT(stat_status) running
+  set PDK_IMPORT(stat_pct) 0
+  set PDK_IMPORT(stat_msg) ""
+  if {![file exists $PDK_IMPORT(status)]} { return }
+  if {[catch {set fh [open $PDK_IMPORT(status) r]}]} { return }
+  while {[gets $fh line] >= 0} {
+    if {[regexp {^STATUS=(.*)$} $line -> v]} {
+      set PDK_IMPORT(stat_status) $v
+    } elseif {[regexp {^PCT=(.*)$} $line -> v]} {
+      set PDK_IMPORT(stat_pct) $v
+    } elseif {[regexp {^MSG=(.*)$} $line -> v]} {
+      set PDK_IMPORT(stat_msg) $v
+    } elseif {[regexp {^DEST=(.*)$} $line -> v]} {
+      set PDK_IMPORT(stat_dest) $v
+    }
+  }
+  close $fh
+}
+
+# Fetch a compiled open_pdks tree (ciel-releases) into PDK_ROOT, then convert.
+proc pdk_import_fetch {fetch_family tech family} {
+  global PDK_IMPORT env
+
+  pdk_import_prepare_work $tech $family
+
+  set script [pdk_fetch_script]
+  if {$script == ""} {
+    pdk_import_fail "fetch_pdk.sh not found (expected in /mmi-bundle)."
+    return
+  }
+  set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
+  if {$bash == ""} {
+    pdk_import_fail "bash is not installed."
+    return
+  }
+
+  catch {set env(MMI_PDK_FETCH_LOG) $PDK_IMPORT(log)}
+  catch {set env(PDK_ROOT) [pdk_root]}
+
+  _pdk_import_progress_open
+  _pdk_import_progress_update 1 "Downloading compiled open_pdks ($fetch_family)..."
+  pdk_log "fetch_pdk.sh $fetch_family"
+
+  if {[catch {set PDK_IMPORT(pid) [exec $bash $script $fetch_family \
+      $PDK_IMPORT(status) $PDK_IMPORT(cancel) &]} err]} {
+    pdk_import_fail "Could not start fetch_pdk.sh:\n$err"
+    return
+  }
+  set PDK_IMPORT(phase) fetch
+  set PDK_IMPORT(after) [after 400 pdk_import_poll_fetch]
+}
+
+proc pdk_import_poll_fetch {} {
+  global PDK_IMPORT
+  set PDK_IMPORT(after) ""
+
+  pdk_import_read_status
+  set st $PDK_IMPORT(stat_status)
+  set pct $PDK_IMPORT(stat_pct)
+  set msg $PDK_IMPORT(stat_msg)
+  if {$msg == ""} { set msg "Downloading compiled open_pdks..." }
+  if {![string is integer -strict $pct]} { set pct 0 }
+  _pdk_import_progress_update $pct $msg
+
+  if {$st == "ok"} {
+    set dest $PDK_IMPORT(stat_dest)
+    if {$dest == "" || ![pdk_tree_ready $dest]} {
+      pdk_import_fail "fetch_pdk.sh finished but no open_pdks tree was found.\nLog: $PDK_IMPORT(log)"
+      return
+    }
+    set PDK_IMPORT(src) $dest
+    _pdk_import_progress_update 85 "Converting to MAX technology..."
+    pdk_import_convert
+    return
+  }
+  if {$st == "fail"} {
+    pdk_import_fail $msg
+    return
+  }
+  if {$st == "cancelled"} {
+    pdk_import_fail "Cancelled."
+    return
+  }
+
+  set alive 1
+  if {$PDK_IMPORT(pid) != ""} {
+    if {[catch {exec kill -0 $PDK_IMPORT(pid)}]} {
+      set alive 0
+    }
+  }
+  if {!$alive && $st != "ok"} {
+    incr PDK_IMPORT(fetch_dead)
+    if {$PDK_IMPORT(fetch_dead) < 8} {
+      set PDK_IMPORT(after) [after 400 pdk_import_poll_fetch]
+      return
+    }
+    pdk_import_fail "PDK fetch exited early.\n$msg\nLog: $PDK_IMPORT(log)"
+    return
+  }
+
+  set PDK_IMPORT(after) [after 400 pdk_import_poll_fetch]
+}
+
+proc pdk_import_start {urls tech family} {
+  global PDK_IMPORT env
+
+  pdk_import_prepare_work $tech $family
+  set PDK_IMPORT(urls) $urls
+  set PDK_IMPORT(url_i) 0
+  set PDK_IMPORT(dest) [file join $PDK_IMPORT(work) pdk_download.bin]
 
   _pdk_import_progress_open
 
@@ -782,35 +940,51 @@ proc pdk_import_convert {} {
   }
 
   set gds ""
-  set gds_files [pdk_find_files $PDK_IMPORT(src) {*.gds *.gds.gz *.strm}]
-  if {[llength $gds_files]} {
-    set gds [lindex $gds_files 0]
-  }
-
   set libpaths {}
-  foreach f [pdk_find_files $PDK_IMPORT(src) {*.gds *.lef *.max}] {
-    set d [file dirname $f]
-    set dl [string tolower $d]
-    if {[string match *gds* $dl] || [string match *lef* $dl] || \
-        [string match *libs.ref* $dl] || [string match *library* $dl]} {
-      if {[lsearch -exact $libpaths $d] < 0} {
-        lappend libpaths $d
+  set ref [file join $PDK_IMPORT(src) libs.ref]
+  if {[file isdirectory $ref]} {
+    foreach lib [glob -nocomplain [file join $ref *]] {
+      if {![file isdirectory $lib]} continue
+      foreach sub {gds mag maglef lef} {
+        set p [file join $lib $sub]
+        if {[file isdirectory $p]} {
+          lappend libpaths $p
+        }
       }
     }
-    if {[llength $libpaths] >= 12} break
+  } else {
+    set gds_files [pdk_find_files $PDK_IMPORT(src) {*.gds *.gds.gz *.strm}]
+    if {[llength $gds_files]} {
+      set gds [lindex $gds_files 0]
+    }
+    foreach f [pdk_find_files $PDK_IMPORT(src) {*.gds *.lef *.max}] {
+      set d [file dirname $f]
+      set dl [string tolower $d]
+      if {[string match *gds* $dl] || [string match *lef* $dl] || \
+          [string match *libs.ref* $dl] || [string match *library* $dl]} {
+        if {[lsearch -exact $libpaths $d] < 0} {
+          lappend libpaths $d
+        }
+      }
+      if {[llength $libpaths] >= 12} break
+    }
   }
 
   _pdk_import_progress_update 88 "Installing into shared PDK_ROOT [pdk_root]..."
   set shared [pdk_install_into_root $PDK_IMPORT(src) $family $tech]
   if {$shared != ""} {
     pdk_log "Shared PDK at $shared"
-    set extra [pdk_find_files $shared {*.gds *.lef *.max}]
-    foreach f $extra {
-      set d [file dirname $f]
-      if {[lsearch -exact $libpaths $d] < 0} {
-        lappend libpaths $d
+    set sref [file join $shared libs.ref]
+    if {[file isdirectory $sref]} {
+      foreach lib [glob -nocomplain [file join $sref *]] {
+        if {![file isdirectory $lib]} continue
+        foreach sub {gds mag maglef lef} {
+          set p [file join $lib $sub]
+          if {[file isdirectory $p] && [lsearch -exact $libpaths $p] < 0} {
+            lappend libpaths $p
+          }
+        }
       }
-      if {[llength $libpaths] >= 16} break
     }
   }
 
@@ -840,11 +1014,11 @@ proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}
     set note "\n\nmake_tech did not compile the tech. Source is still at:\n  $source\nRun:  make_tech -r -file $source -tech $tech"
   }
 
-  set magicrc_note "Magic mag2gds looks for:\n  [pdk_root]/<pdk>/libs.tech/magic/<pdk>.magicrc\nGoogle/skywater-pdk archives often lack that file; drop an open_pdks (volare) tree into [pdk_root] for tapeout GDS."
-  if {$shared != "" && [file exists [file join $shared libs.tech magic ${tech}.magicrc]]} {
-    set magicrc_note "Magic-ready PDK installed at:\n  $shared\nmag2gds can use this shared folder."
+  set magicrc_note "Magic mag2gds looks for:\n  [pdk_root]/<pdk>/libs.tech/magic/<pdk>.magicrc\nUse File → Import PDK (not a skywater-pdk GitHub zip) so stdcells and Magic tech are present."
+  if {$shared != "" && [pdk_tree_ready $shared]} {
+    set magicrc_note "Magic-compiled open_pdks tree at:\n  $shared\nlibs.tech/magic + libs.ref (stdcells) are in place for mag2gds."
   } elseif {$shared != ""} {
-    set magicrc_note "Copied into shared PDK_ROOT:\n  $shared\nIf libs.tech/magic/*.magicrc is missing, mag2gds cannot run until you add an open_pdks tree."
+    set magicrc_note "Copied into shared PDK_ROOT:\n  $shared\nlibs.tech/magic/*.magicrc or libs.ref is still missing."
   }
 
   set summary "PDK converted and installed (shared folder, no extra copy for MAX tech).\n\n\
@@ -945,13 +1119,13 @@ proc pdk_import_cancel {} {
 proc _pdk_import_install_menus {} {
   catch {
     menu_local_cmd "Import PDK..." pdk_import_dialog \
-        "Download a PDK (SKY130A, GF180MCU, IHP, or custom URL) into PDK_ROOT"
+        "Download a compiled open_pdks tree (SKY130A, GF180MCU, IHP) after MAX starts"
   }
   if {![catch {_menu_get_widget File}]} {
     catch {
       menu_add_cmd [_menu_get_widget File] "Import PDK..." \
           pdk_import_dialog \
-          -desc "Download a PDK into /mmi-pdks when you choose to"
+          -desc "Download a PDK into /mmi-pdks when you choose to (not via Nix)"
     }
   }
 }

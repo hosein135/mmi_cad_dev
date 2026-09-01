@@ -12,8 +12,20 @@ Both live under one directory so you do not keep two full foundry trees.
   Inside Nix FHS:  /mmi-pdks   (PDK_ROOT)
   Designs:    data/workspace → /mmi-home/work
 
-Foundry PDKs are not fetched by ./run.sh. Import them from MAX when you want
-(File / Local → Import PDK). They land in data/pdks.
+Foundry PDKs are not Nix flake inputs and are not fetched by ./run.sh.
+After MAX is running, use File → Import PDK (or Local → Import PDK).
+That downloads a Magic-compiled open_pdks tree (stdcells included) from
+FOSSi ciel-releases into data/pdks.
 
-Tapeout mag2gds needs $PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc after
-you have imported a sky130 tree (or copied a Magic rc into that path).
+Do not use a GitHub zip of google/skywater-pdk or google/gf180mcu-pdk:
+those archives omit git submodules, so standard-cell libraries are missing.
+open_pdks source templates (preproc.py) are not a compiled install.
+IHP is the full ihp-sg13g2 tree, not a lone Magic rc.
+
+Tapeout mag2gds needs $PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc
+and $PDK_ROOT/sky130A/libs.ref/... after you have imported SKY130A.
+
+Optional:
+
+  MMI_CIEL_TAG    override the ciel-releases tag
+  MMI_PDK_LIBS    extra .tar.zst names (space-separated), e.g. sky130_sram_macros

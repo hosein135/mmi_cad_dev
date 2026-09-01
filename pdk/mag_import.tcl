@@ -870,7 +870,7 @@ proc mag_import_dialog {} -desc {
     return
   }
   if {$MAG_IMPORT(tech) == ""} {
-    max_error "Select a destination MAX technology (Import PDK from URL if none are listed)."
+    max_error "Select a destination MAX technology (Import PDK if none are listed)."
     return
   }
   mag_import_run $dir $MAG_IMPORT(top) $MAG_IMPORT(tech) $MAG_IMPORT(method)

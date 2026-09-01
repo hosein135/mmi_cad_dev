@@ -24,10 +24,9 @@ Windows-native is not a run target. Clone and run on x86_64 Linux (bare metal, V
 ├── flake.nix / flake.lock
 ├── run.sh
 ├── vendor/mmi/                   # CAD sources + data (no store ELFs)
-├── pdk/                          # MAX import Tcl + Magic rc files
+├── pdk/                          # MAX import Tcl, fetch script, Magic rc fallbacks
 ├── nix/rebuild/                  # patch + compile + install
 ├── nix/x11/                      # fonts, Xresources, Xvnc helper
-├── nix/pdk/                      # assemble flake-locked PDKs
 ├── nix/host-linux.sh             # distro/VM/WSL2 preflight
 ├── nix/launch.sh
 └── data/{pdks,workspace,home}
@@ -69,7 +68,7 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. If you have no 
 | `/mmi-vendor/mmi` | Rebuilt 64-bit CAD + scripts/tech |
 | `/mmi-bundle` | From `pdk/` |
 | `/mmi-magic` | Magic VLSI (nixpkgs 25.05) |
-| `/mmi-pdks` | Writable PDK overlay (`data/pdks`; empty until you import in MAX) |
+| `/mmi-pdks` | Writable PDK overlay (`data/pdks`; empty until File → Import PDK in MAX) |
 | `/mmi-xfonts` | Bitmap fonts for Nix Xvnc |
 | `/mmi-home` | `data/home` |
 
@@ -81,3 +80,5 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. If you have no 
 - `.gitattributes` marks archives/images as binary and forces `eol=lf` on text so checkouts stay Linux line endings.
 
 `nix build --rebuild --check .#mmi-vendor` on x86_64 Linux should reproduce the same output path.
+
+Foundry PDKs are **not** in the flake. After `./run.sh max`, use **File → Import PDK** to download a compiled open_pdks tree (SkyWater, GF180MCU, or IHP) into `data/pdks`.
