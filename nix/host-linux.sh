@@ -131,13 +131,25 @@ mmi_ensure_flake_git_files() {
     return 0
   fi
 
-  # Git has no directory objects. Nix dirty eval of ./nix/rebuild/pccts-h
-  # needs an index entry: `git add -N <dir>` then `git add <dir>`.
+  # Restore nested trees Nix omits when they are missing from the work tree.
+  if [ ! -d "${SCRIPT_DIR}/pdk/samples" ] \
+    && git -C "${SCRIPT_DIR}" ls-tree -r --name-only HEAD -- pdk/samples | grep -q .; then
+    git -C "${SCRIPT_DIR}" checkout HEAD -- pdk/samples
+    info "Restored pdk/samples from git"
+  fi
+
+  # Git has no directory objects. Only `git add -N` when the path has no
+  # index entries; -N on an already-tracked dir can drop nested files from the
+  # dirty flake copy (pdk/samples).
   local d
   for d in nix/rebuild/pccts-h pdk nix/rebuild nix/x11; do
     if [ -d "${SCRIPT_DIR}/${d}" ]; then
-      git -C "${SCRIPT_DIR}" add -N -- "${d}" 2>/dev/null || true
-      git -C "${SCRIPT_DIR}" add -- "${d}"
+      if git -C "${SCRIPT_DIR}" ls-files -- "${d}" | grep -q .; then
+        git -C "${SCRIPT_DIR}" add -A -- "${d}"
+      else
+        git -C "${SCRIPT_DIR}" add -N -- "${d}" 2>/dev/null || true
+        git -C "${SCRIPT_DIR}" add -- "${d}"
+      fi
     fi
   done
 

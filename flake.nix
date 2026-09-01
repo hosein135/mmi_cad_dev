@@ -122,26 +122,34 @@
 
       # Scripts + Magic rc fallbacks + samples only. Foundry PDKs are not
       # flake inputs; MAX File → Import PDK downloads them at user request.
+      # Copy via fileset from the flake root so nested git-tracked paths
+      # (pdk/samples, pdk/magic) are included. `src = ./pdk` on a dirty tree
+      # can snapshot only top-level files after `git add -N pdk`.
       mmiPdk = pkgs.runCommand "mmi-pdk"
         {
           SOURCE_DATE_EPOCH = sourceDateEpoch;
           TZ = "UTC";
           LC_ALL = "C";
-          src = ./pdk;
+          src = lib.fileset.toSource {
+            root = ./.;
+            fileset = ./pdk;
+          };
           xresources = ./nix/x11/Xresources;
           appDefaults = ./nix/x11/app-defaults-Mmi;
         }
         ''
           export LC_ALL=C
-          mkdir -p $out/app-defaults $out/magic
-          install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
-          install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
-          install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
-          install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
-          install -Dm644 "$src/maxrc" $out/maxrc
-          cp -r "$src/samples" $out/
-          if [ -d "$src/magic" ]; then
-            cp -a "$src/magic/." $out/magic/
+          mkdir -p $out/app-defaults $out/magic $out/samples
+          install -Dm644 "$src/pdk/pdk_import.tcl" $out/pdk_import.tcl
+          install -Dm644 "$src/pdk/mag_import.tcl" $out/mag_import.tcl
+          install -Dm755 "$src/pdk/mag2gds.sh" $out/mag2gds.sh
+          install -Dm755 "$src/pdk/fetch_pdk.sh" $out/fetch_pdk.sh
+          install -Dm644 "$src/pdk/maxrc" $out/maxrc
+          if [ -d "$src/pdk/samples" ]; then
+            cp -a "$src/pdk/samples/." $out/samples/
+          fi
+          if [ -d "$src/pdk/magic" ]; then
+            cp -a "$src/pdk/magic/." $out/magic/
           fi
           chmod -R u+w "$out"
           install -Dm644 "$xresources" $out/Xresources
