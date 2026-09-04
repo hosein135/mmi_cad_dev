@@ -138,10 +138,12 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
     cp -f "${src}/mag2gds.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/fetch_pdk.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/compile_tech.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/source_to_tech27.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/maxrc" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/fetch_pdk.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/compile_tech.sh" 2>/dev/null || true
+    chmod 644 "${CAD}/mmi_local/max/pdk/source_to_tech27.tcl" 2>/dev/null || true
     if [ -f "${src}/app-defaults/Mmi" ]; then
       cp -f "${src}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi" 2>/dev/null || true
     fi

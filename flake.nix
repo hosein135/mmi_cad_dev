@@ -145,6 +145,7 @@
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
           install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
           install -Dm755 "$src/compile_tech.sh" $out/compile_tech.sh
+          install -Dm644 "$src/source_to_tech27.tcl" $out/source_to_tech27.tcl
           install -Dm644 "$src/maxrc" $out/maxrc
           if [ -d "$src/samples" ]; then
             cp -a "$src/samples/." $out/samples/
