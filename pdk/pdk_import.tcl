@@ -358,12 +358,15 @@ proc pdk_import_state {choice tech} {
 proc pdk_fetch_can_resume {fetch_family} {
   set root [pdk_root]
   set dirs [list [file join $root .fetch-$fetch_family]]
-  foreach d [glob -nocomplain [file join $root .fetch-${fetch_family}.*]] {
-    lappend dirs $d
+  catch {
+    foreach d [glob -nocomplain [file join $root .fetch-${fetch_family}.*]] {
+      lappend dirs $d
+    }
   }
   foreach d $dirs {
-    set n [glob -nocomplain [file join $d dl *.tar.zst] \
-        [file join $d dl *.tar.zst.ok]]
+    if {![file isdirectory $d]} continue
+    set n {}
+    catch {set n [glob -nocomplain [file join $d dl *.tar.zst]]}
     if {[llength $n]} { return 1 }
   }
   return 0
@@ -395,8 +398,19 @@ proc pdk_purge_incomplete_tech {tech} {
   catch {exec rm -rf $dir}
 }
 
+# warning/max_error only log in release MAX (msg_flush popups are developer-only).
 proc pdk_import_tell {msg} {
-  if {[catch {warning $msg}]} { puts $msg }
+  set title "Import PDK"
+  set x 80
+  set y 80
+  catch {set x [winfo pointerx .]}
+  catch {set y [winfo pointery .]}
+  if {[catch {prop_dialog -title $title -buttons OK -width 70 -height 16 \
+      -x $x -y $y $msg}]} {
+    if {[catch {tk_dialog .pdkmsg $title $msg {} 0 OK}]} {
+      catch {puts $msg}
+    }
+  }
 }
 
 proc pdk_import_already_ok {choice tech local} {
@@ -591,16 +605,36 @@ proc pdk_import_dialog {} -desc {
     return
   }
 
+  # MAX C code is still waiting until this menu command returns.
+  # Post windows on the next idle so they actually map.
+  after idle pdk_import_after_dialog
+}
+
+proc pdk_import_after_dialog {} {
+  if {[catch {pdk_import_go} err]} {
+    catch {_pdk_import_progress_close}
+    pdk_import_tell "PDK import failed:\n$err"
+  }
+}
+
+proc pdk_import_go {} {
+  global PDK_IMPORT PDK_PRESET
+
   set choice $PDK_IMPORT(pdk)
   if {$choice == "custom"} {
     set url [string trim $PDK_IMPORT(url)]
     set family ""
     set tech $PDK_IMPORT(tech)
     if {$url == ""} {
-      max_error "PDK URL is empty."
+      pdk_import_tell "PDK URL is empty."
       return
     }
     pdk_import_start [list $url] $tech $family
+    return
+  }
+
+  if {![info exists PDK_PRESET($choice,local)]} {
+    pdk_import_tell "Unknown PDK selection '$choice'."
     return
   }
 
@@ -624,6 +658,9 @@ proc pdk_import_dialog {} -desc {
   }
 
   if {$state == "restart"} {
+    _pdk_import_progress_open
+    _pdk_import_progress_update 1 "Removing incomplete PDK files..."
+    update
     pdk_log "Incomplete PDK '$choice' - removing leftover files and importing again"
     pdk_remove_incomplete_tree $local
     pdk_purge_incomplete_tech $tech
@@ -1182,7 +1219,7 @@ proc pdk_import_fail {msg} {
   global PDK_IMPORT
   _pdk_import_progress_close
   pdk_log "ERROR: $msg"
-  max_error "PDK import failed.\n$msg\nLog: $PDK_IMPORT(log)"
+  pdk_import_tell "PDK import failed.\n$msg\nLog: $PDK_IMPORT(log)"
 }
 
 proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}} {
@@ -1200,7 +1237,7 @@ proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}
     set note "\n\nmake_tech did not compile the tech. Source is still at:\n  $source\nRun:  make_tech -r -file $source -tech $tech"
   }
 
-  set magicrc_note "Magic mag2gds looks for:\n  [pdk_root]/<pdk>/libs.tech/magic/<pdk>.magicrc\nUse File → Import PDK (not a skywater-pdk GitHub zip) so stdcells and Magic tech are present."
+  set magicrc_note "Magic mag2gds looks for:\n  [pdk_root]/<pdk>/libs.tech/magic/<pdk>.magicrc\nUse File -> Import PDK (not a skywater-pdk GitHub zip) so stdcells and Magic tech are present."
   if {$shared != "" && [pdk_tree_ready $shared]} {
     set magicrc_note "Magic-compiled open_pdks tree at:\n  $shared\nlibs.tech/magic + libs.ref (stdcells) are in place for mag2gds."
   } elseif {$shared != ""} {
@@ -1237,9 +1274,7 @@ $note\n\nImport PDK again to resume conversion."
   if {$gds != "" && [file exists $gds]} {
     append summary "\n\nSample GDS:\n  $gds"
   }
-  if {[catch {warning $summary}]} {
-    puts $summary
-  }
+  pdk_import_tell $summary
 
   if {$mtok != "ok"} {
     return
@@ -1256,8 +1291,14 @@ proc _pdk_import_progress_open {} {
   catch {destroy .pdkprog}
   toplevel .pdkprog
   wm title .pdkprog "Import PDK"
-  wm geometry .pdkprog +80+80
-  catch {wm transient .pdkprog .}
+  catch {wm withdraw .pdkprog}
+  set x 80
+  set y 80
+  catch {set x [winfo pointerx .]}
+  catch {set y [winfo pointery .]}
+  if {$x < 20} { set x 80 }
+  if {$y < 20} { set y 80 }
+  wm geometry .pdkprog "+$x+$y"
 
   set f .pdkprog.f
   frame $f -bd 8
@@ -1281,7 +1322,11 @@ proc _pdk_import_progress_open {} {
   pack $f.btns -fill x -pady 8
   button $f.btns.cancel -text "Cancel" -command pdk_import_cancel
   pack $f.btns.cancel -side right
-  update idletasks
+
+  catch {wm deiconify .pdkprog}
+  catch {raise .pdkprog}
+  catch {focus -force .pdkprog}
+  update
 }
 
 proc _pdk_import_progress_close {} {
