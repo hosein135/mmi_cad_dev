@@ -234,7 +234,6 @@ foreach name $layers {
   set gnum [lindex $pr 0]
   set gdt [lindex $pr 1]
   set paint $name
-  # include composed devices that use this layer
   foreach d $devices {
     if {[lindex $d 1] == $name || [lindex $d 2] == $name} {
       append paint ",[lindex $d 0]"
@@ -259,13 +258,14 @@ foreach name $layers {
   puts $fh ""
 }
 
+# Text labels use Magic/MAX "space" plane — never "labels *"
 if {$text_layer != ""} {
   set tsrc $txt_of($text_layer)
   if {$tsrc == "-" || $tsrc == ""} { set tsrc $gds_of($text_layer) }
   set tpr [parse_gds_pair $tsrc]
   if {$tpr != ""} {
     puts $fh "\tlayer TXT_$text_layer"
-    puts $fh "\tlabels *"
+    puts $fh "\tlabels space"
     puts $fh "\tcalma [lindex $tpr 0] [lindex $tpr 1]"
     puts $fh ""
   }
@@ -296,7 +296,6 @@ foreach name $layers {
   }
   puts $fh ""
 }
-puts $fh ""
 foreach name $layers {
   set gds $gds_of($name)
   if {$gds == "-" || $gds == "derived"} continue
@@ -316,17 +315,22 @@ if {$text_layer != ""} {
   if {$tsrc == "-" || $tsrc == ""} { set tsrc $gds_of($text_layer) }
   set tpr [parse_gds_pair $tsrc]
   if {$tpr != ""} {
+    puts $fh "\tlayer space"
+    puts $fh "\tlabels TXT_$text_layer"
     puts $fh "\tcalma TXT_$text_layer\t[lindex $tpr 0] *"
   }
 }
 puts $fh "end"
 puts $fh ""
 
-puts $fh "cifstyle $tech"
+puts $fh "mzrouter"
+puts $fh "end"
 puts $fh ""
 
-# Minimal DRC (width/space when provided)
+# cifstyle belongs inside drc (not a top-level section)
 puts $fh "drc"
+puts $fh "cifstyle $tech"
+puts $fh ""
 foreach name $layers {
   set w $width_of($name)
   set s $space_of($name)
@@ -342,6 +346,16 @@ foreach name $layers {
     puts $fh "\t\t\"$name minimum spacing = $s um.\""
     puts $fh ""
   }
+}
+if {[llength $devices]} {
+  set dnames {}
+  foreach d $devices { lappend dnames [lindex $d 0] }
+  puts $fh "\tno_overlap\t[join $dnames ,]\t[join $dnames ,]"
+  puts $fh ""
+}
+if {[llength $via_layers]} {
+  puts $fh "\texact_overlap\t[join $via_layers ,]"
+  puts $fh ""
 }
 puts $fh "end"
 puts $fh ""
@@ -363,7 +377,6 @@ foreach name $metal_layers {
 }
 foreach d $devices {
   set dname [lindex $d 0]
-  set gate [lindex $d 1]
   set act [lindex $d 2]
   set bulk GND!
   if {[string match {p*} [string tolower $dname]]} { set bulk Vdd! }

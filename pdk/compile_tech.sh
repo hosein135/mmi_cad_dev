@@ -142,7 +142,7 @@ have_tech27() {
   [ -s "$priv/${tech}.tech27" ] || [ -s "$loc/${tech}.tech27" ] || [ -s "$dest/${tech}.tech27" ]
 }
 
-# ── Primary: generate .tech27 directly from .source ─────────────────────────
+# Always rebuild .tech27 from .source (fixes older broken generators).
 st 95 "Generating ${tech}.tech27 from .source..."
 gen="$(find_generator)"
 tclsh="$(find_bin /usr/bin/tclsh tclsh /bin/tclsh mmi_tclsh)"
@@ -160,11 +160,12 @@ if cancelled; then
   finish_fail "Cancelled."
 fi
 
+rm -f "$dest/${tech}.tech27" "$priv/${tech}.tech27" "$loc/${tech}.tech27" 2>/dev/null || true
+
 # Prefer system tclsh: mmi_tclsh is Tcl 8.0 and shares MAX command names.
 echo "running: $tclsh $gen $source_file $tech $dest"
 if ! "$tclsh" "$gen" "$source_file" "$tech" "$dest"; then
   echo "source_to_tech27 exit $?"
-  # Retry with whatever other tclsh we can find
   alt="$(find_bin tclsh /usr/bin/tclsh)"
   if [ -n "$alt" ] && [ "$alt" != "$tclsh" ]; then
     echo "retry with $alt"
@@ -177,6 +178,17 @@ ls -la "$dest" 2>/dev/null || true
 
 if [ ! -s "$dest/${tech}.tech27" ]; then
   finish_fail "source_to_tech27.tcl did not write $dest/${tech}.tech27"
+fi
+
+# Sanity: reject known-bad patterns from older generators
+if grep -q 'labels \*' "$dest/${tech}.tech27" 2>/dev/null; then
+  finish_fail "generated tech27 still has invalid 'labels *'"
+fi
+if grep -q '^cifstyle ' "$dest/${tech}.tech27" 2>/dev/null; then
+  # cifstyle must be inside drc, not a top-level section start
+  if ! awk '/^drc$/{d=1} d&&/^cifstyle /{ok=1} END{exit !ok}' "$dest/${tech}.tech27"; then
+    finish_fail "generated tech27 has top-level cifstyle (must be under drc)"
+  fi
 fi
 
 copy_tech "$dest" "$priv"
