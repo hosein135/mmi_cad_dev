@@ -7,7 +7,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 2
+set _MAG_IMPORT_REV 3
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -330,38 +330,77 @@ proc mag_import_tell {msg {opt ""}} {
 }
 
 proc mag_list_max_techs {} {
-  global env MMI_TOOLS MMI_LOCAL MN_TECH
+  global env MMI_TOOLS MMI_LOCAL MN_TECH PDK_PRESET
   set roots {}
-  if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
-    lappend roots [file join $MMI_TOOLS max tech]
-  }
-  if {[info exists MMI_LOCAL] && $MMI_LOCAL != ""} {
-    lappend roots [file join $MMI_LOCAL max tech]
-  } elseif {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
-    lappend roots [file join $MMI_TOOLS ../mmi_local/max/tech]
-  }
-  set home ""
-  if {[info exists env(HOME)]} { set home $env(HOME) }
-  if {$home != ""} {
-    lappend roots [file join $home mmi_private max tech]
-  }
+  # Prefer shared PDK_ROOT and private/local overlays (imported PDKs).
   if {[info commands pdk_root] != ""} {
     lappend roots [file join [pdk_root] max tech]
   }
+  lappend roots /mmi-pdks/max/tech
+  set home ""
+  if {[info exists env(HOME)] && $env(HOME) != ""} { set home $env(HOME) }
+  if {$home == ""} { set home /mmi-home }
+  lappend roots [file join $home mmi_private max tech]
+  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
+    lappend roots [file join $env(MMI_LOCAL) max tech]
+  } elseif {[info exists MMI_LOCAL] && $MMI_LOCAL != ""} {
+    lappend roots [file join $MMI_LOCAL max tech]
+  } else {
+    lappend roots [file join $home cad mmi_local max tech]
+  }
+  if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
+    lappend roots [file join $MMI_TOOLS max tech]
+  }
+  lappend roots /mmi-vendor/mmi/max/tech
+
   set names {}
   foreach root $roots {
     if {![file isdirectory $root]} { continue }
-    if {[catch {set kids [glob -nocomplain -directory $root -types d *]}]} continue
+    # Tcl 8.0 has no glob -directory / -types — use a path pattern.
+    set kids {}
+    catch {set kids [glob -nocomplain [file join $root *]]}
     foreach d $kids {
+      if {![file isdirectory $d]} continue
       set bn [file tail $d]
-      if {$bn == "." || $bn == ".."} continue
+      if {$bn == "." || $bn == ".." || $bn == "tech_target" || \
+          $bn == "template"} continue
+      # Only list techs MAX can actually load (.tech27), or a readable .tech.
+      set ok 0
+      if {[file readable [file join $d ${bn}.tech27]] && \
+          [file size [file join $d ${bn}.tech27]] > 0} {
+        set ok 1
+      } elseif {[file readable [file join $d ${bn}.tech]] && \
+          [file size [file join $d ${bn}.tech]] > 0} {
+        set ok 1
+      }
+      if {!$ok} continue
       if {[lsearch -exact $names $bn] < 0} {
         lappend names $bn
       }
     }
   }
+
+  # Also pick up imported presets via pdk_find_tech27 when available.
+  if {[info commands pdk_find_tech27] != ""} {
+    foreach c {sky130A gf180mcu sg13g2} {
+      set t $c
+      if {[info exists PDK_PRESET($c,tech)]} {
+        set t $PDK_PRESET($c,tech)
+      }
+      if {$t == ""} continue
+      if {[pdk_find_tech27 $t] != "" && [lsearch -exact $names $t] < 0} {
+        lappend names $t
+      }
+    }
+  }
+
   if {[info exists MN_TECH] && $MN_TECH != "" && [lsearch -exact $names $MN_TECH] < 0} {
     lappend names $MN_TECH
+  }
+
+  # Built-in vendor techs as last resort so the radio is never empty.
+  if {![llength $names]} {
+    set names {mmi18 mmi25}
   }
   return [lsort -dictionary $names]
 }
