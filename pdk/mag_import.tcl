@@ -6,9 +6,13 @@
 # then asks MAX to read that GDS and save .max cells.
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
-global _MAG_IMPORT_SOURCED MAG_IMPORT
-if {[info exists _MAG_IMPORT_SOURCED]} { return }
+global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
+set _MAG_IMPORT_REV 2
+if {[info exists _MAG_IMPORT_REV_LOADED]} {
+  if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
+}
 set _MAG_IMPORT_SOURCED 1
+set _MAG_IMPORT_REV_LOADED $_MAG_IMPORT_REV
 
 if {[info commands _mmi_file_normalize] == ""} {
   proc _mmi_file_normalize {path} {
@@ -43,7 +47,7 @@ if {[info commands setl] == ""} {
   }
 }
 
-set MAG_IMPORT(source)  "sample"
+set MAG_IMPORT(source)  "fetch"
 set MAG_IMPORT(dir)     ""
 set MAG_IMPORT(top)     "auto"
 set MAG_IMPORT(tech)    ""
@@ -53,6 +57,12 @@ set MAG_IMPORT(after)   ""
 set MAG_IMPORT(cancel)  ""
 set MAG_IMPORT(log)     ""
 set MAG_IMPORT(work)    ""
+set MAG_IMPORT(status)  ""
+set MAG_IMPORT(stat_status) ""
+set MAG_IMPORT(stat_pct) 0
+set MAG_IMPORT(stat_msg) ""
+set MAG_IMPORT(stat_dest) ""
+set MAG_IMPORT(fetch_dead) 0
 
 # ── Magic paint name → GDS layer:datatype (sky130 / gf180 / ihp) ─────────────
 # Direct paint dump (not Magic cifoutput boolean generation).
@@ -209,6 +219,10 @@ proc mag_pdk_magicrc_ok {} {
 proc mag_sample_dir {} {
   global env MMI_TOOLS
   set cands {}
+  if {[info commands pdk_root] != ""} {
+    lappend cands [file join [pdk_root] samples caravel_analog_por]
+  }
+  lappend cands /mmi-pdks/samples/caravel_analog_por
   if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
     lappend cands [file join $env(MMI_PDK_DIR) samples caravel_analog_por]
   }
@@ -219,14 +233,100 @@ proc mag_sample_dir {} {
     lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk/samples/caravel_analog_por]
   }
   lappend cands /mmi-home/cad/mmi_local/max/pdk/samples/caravel_analog_por
+  lappend cands /mmi-pdk-live/samples/caravel_analog_por
   lappend cands /mmi-bundle/samples/caravel_analog_por
   foreach d $cands {
     set d [_mmi_file_normalize $d]
-    if {[file isdirectory $d] && [file exists [file join $d example_por.mag]]} {
+    if {[file isdirectory $d] && \
+        ([file exists [file join $d example_por.mag]] || \
+         [file exists [file join $d simple_por.mag]])} {
       return $d
     }
   }
   return ""
+}
+
+proc mag_sample_dest {} {
+  # Writable place for a downloaded Caravel Mag sample.
+  if {[info commands pdk_root] != ""} {
+    set d [file join [pdk_root] samples caravel_analog_por]
+    catch {file mkdir $d}
+    if {[file isdirectory $d]} { return $d }
+  }
+  set d /mmi-pdks/samples/caravel_analog_por
+  catch {file mkdir $d}
+  if {[file isdirectory $d]} { return $d }
+  set d /mmi-home/cad/mmi_local/max/pdk/samples/caravel_analog_por
+  catch {file mkdir $d}
+  return $d
+}
+
+proc mag_fetch_script {} {
+  global env
+  set cands {}
+  lappend cands /mmi-pdk-live/fetch_caravel_mag.sh
+  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
+    lappend cands [file join $env(MMI_LOCAL) max pdk fetch_caravel_mag.sh]
+  }
+  if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
+    lappend cands [file join $env(MMI_PDK_DIR) fetch_caravel_mag.sh]
+  }
+  lappend cands /mmi-bundle/fetch_caravel_mag.sh
+  foreach f $cands {
+    if {[file readable $f]} { return $f }
+  }
+  return ""
+}
+
+proc mag_which {names} {
+  global env
+  set path ""
+  if {[info exists env(PATH)]} { set path $env(PATH) }
+  if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) != ""} {
+    set path "[file join $env(MMI_TOOLS) bin]:$path"
+  }
+  foreach name $names {
+    if {[file executable $name]} { return $name }
+    foreach dir [split $path :] {
+      if {$dir == ""} continue
+      set cand [file join $dir $name]
+      if {[file executable $cand]} { return $cand }
+    }
+  }
+  return ""
+}
+
+proc mag_import_tell {msg {opt ""}} {
+  set title "Import Magic Design"
+  set x 80
+  set y 80
+  catch {set x [winfo pointerx .]}
+  catch {set y [winfo pointery .]}
+  set buttons OK
+  if {$opt == "-copy" || $opt == "copy"} {
+    set buttons {OK Copy}
+  }
+  while {1} {
+    set ret OK
+    if {[catch {set ret [prop_dialog -title $title -buttons $buttons \
+        -width 78 -height 18 -x $x -y $y $msg]}]} {
+      if {[catch {set ret [tk_dialog .magmsg $title $msg {} 0 OK Copy]}]} {
+        catch {puts $msg}
+        return
+      }
+      if {$ret == 1} { set ret Copy } else { set ret OK }
+    }
+    if {$ret == "Copy"} {
+      if {[info commands pdk_import_copy_text] != ""} {
+        pdk_import_copy_text $msg
+      } else {
+        catch {clipboard clear}
+        catch {clipboard append -- $msg}
+      }
+      continue
+    }
+    return
+  }
 }
 
 proc mag_list_max_techs {} {
@@ -808,22 +908,30 @@ proc mag_import_dialog {} -desc {
     }
   }
 
-  set src_labels {"Caravel analog sample (example_por, sky130A)" "Choose Magic design folder..."}
-  set src_values {sample custom}
-  if {$sample == ""} {
-    set src_labels {"Choose Magic design folder..."}
-    set src_values {custom}
-    set MAG_IMPORT(source) custom
+  set src_labels {}
+  set src_values {}
+  lappend src_labels "Download Caravel Mag sample from GitHub (sky130A)"
+  lappend src_values fetch
+  if {$sample != ""} {
+    lappend src_labels "Local Caravel sample (example_por, already on disk)"
+    lappend src_values sample
+  }
+  lappend src_labels "Choose Magic design folder..."
+  lappend src_values custom
+  if {$MAG_IMPORT(source) == "sample" && $sample == ""} {
+    set MAG_IMPORT(source) fetch
   }
 
   set prop_list ""
+  # No -reload: rebuilding the prop_menu jumps the window (same as Import PDK).
   lappend prop_list [list "Magic source:" MAG_IMPORT(source) \
-      -radio $src_labels -values $src_values -reload \
-      -help {The bundled sample is Efabless caravel_user_project_analog/mag example_por (power-on-reset).}]
+      -radio $src_labels -values $src_values \
+      -help {Download pulls Efabless caravel_user_project_analog/mag (Apache-2.0) into PDK_ROOT/samples, converts example_por to MAX, and opens it with sky130A.}]
 
   lappend prop_list [list "Magic design folder:" MAG_IMPORT(dir) \
       -filename [list -message {Magic design directory} -dironly -pattern *.mag] \
-      -width 56 -when {$MAG_IMPORT(source) == "custom"}]
+      -width 56 \
+      -help {Used when "Choose Magic design folder" is selected.}]
 
   lappend prop_list [list "Top cell (auto = hierarchy root):" MAG_IMPORT(top) -entry -width 40]
 
@@ -832,35 +940,65 @@ proc mag_import_dialog {} -desc {
           "Magic mag2gds — tapeout-quality (needs Magic + shared PDK)" \
           "Tcl paint dump — fast, no Magic (NOT tapeout-quality)"] \
       -values {mag2gds tcl} \
-      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules (contacts, derived layers, correct units). Requires \$PDK_ROOT/<pdk>/libs.tech/magic/*.magicrc (data/pdks → /mmi-pdks). Tcl dump: MAX Tcl copies paint rectangles to GDS layers; no Magic binary; missing stdcells become empty boxes.}]
+      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules. Requires Import PDK (sky130A) first. Tcl dump: copies paint rectangles only.}]
 
   lappend prop_list [list "Destination MAX PDK / technology:" MAG_IMPORT(tech) \
       -radio $labels -values $values \
-      -help {Must match the process of the .mag files (sky130A for the Caravel sample). Import a PDK first if the list is only mmi18/mmi25. MAX tech files live under \$PDK_ROOT/max/tech/ (same shared folder Magic uses).}]
+      -help {Caravel Mag sample requires sky130A. Import a PDK first if the list is only mmi18/mmi25.}]
 
   if {![prop_menu2 -title "Import Magic Design Folder" $prop_list]} {
     return
   }
 
-  if {$MAG_IMPORT(source) == "sample"} {
+  # Defer so progress/dialogs map after the menu returns.
+  after idle mag_import_after_dialog
+}
+
+proc mag_import_after_dialog {} {
+  if {[catch {mag_import_go} err]} {
+    catch {mag_progress_close}
+    mag_import_tell "Magic import failed:\n$err" -copy
+  }
+}
+
+proc mag_import_go {} {
+  global MAG_IMPORT
+
+  set src $MAG_IMPORT(source)
+  if {$src == "fetch" || $src == "sample"} {
+    # Caravel Mag is sky130A — force destination tech when available.
+    set techs [mag_list_max_techs]
+    if {[lsearch -exact $techs sky130A] >= 0} {
+      set MAG_IMPORT(tech) sky130A
+    }
     set tl [string tolower $MAG_IMPORT(tech)]
     if {![string match *sky130* $tl]} {
       set w 0
       catch {
         set w [tk_dialog .magwarn "PDK mismatch?" \
-            "The Caravel analog sample (example_por) is a sky130A Magic design.\nDestination technology is '$MAG_IMPORT(tech)'.\n\nImport SKY130A first unless you know this tech maps those GDS layers.\nContinue anyway?" \
+            "The Caravel Mag sample is a sky130A Magic design.\nDestination technology is '$MAG_IMPORT(tech)'.\n\nImport SKY130A first (File → Import PDK), then retry.\nContinue anyway with '$MAG_IMPORT(tech)'?" \
             {} 0 Continue Cancel]
       }
       if {$w != 0} { return }
     }
-  }
-
-  set dir ""
-  if {$MAG_IMPORT(source) == "sample"} {
-    set dir $sample
     if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == ""} {
       set MAG_IMPORT(top) example_por
     }
+  }
+
+  if {$MAG_IMPORT(tech) == ""} {
+    mag_import_tell "Select a destination MAX technology (Import PDK if none are listed)." -copy
+    return
+  }
+
+  if {$src == "fetch"} {
+    mag_import_fetch_start
+    return
+  }
+
+  set dir ""
+  if {$src == "sample"} {
+    set dir [mag_sample_dir]
   } else {
     set dir [string trim $MAG_IMPORT(dir)]
   }
@@ -868,14 +1006,134 @@ proc mag_import_dialog {} -desc {
     set dir [file dirname $dir]
   }
   if {$dir == "" || ![file isdirectory $dir]} {
-    max_error "Select a Magic design directory (folder that contains .mag files)."
-    return
-  }
-  if {$MAG_IMPORT(tech) == ""} {
-    max_error "Select a destination MAX technology (Import PDK if none are listed)."
+    mag_import_tell "Select a Magic design directory (folder that contains .mag files)." -copy
     return
   }
   mag_import_run $dir $MAG_IMPORT(top) $MAG_IMPORT(tech) $MAG_IMPORT(method)
+}
+
+proc mag_import_read_status {} {
+  global MAG_IMPORT
+  set MAG_IMPORT(stat_status) running
+  set MAG_IMPORT(stat_pct) 0
+  set MAG_IMPORT(stat_msg) ""
+  set MAG_IMPORT(stat_dest) ""
+  if {![file exists $MAG_IMPORT(status)]} { return }
+  if {[catch {set fh [open $MAG_IMPORT(status) r]}]} { return }
+  while {[gets $fh line] >= 0} {
+    if {[regexp {^STATUS=(.*)$} $line -> v]} {
+      set MAG_IMPORT(stat_status) $v
+    } elseif {[regexp {^PCT=(.*)$} $line -> v]} {
+      set MAG_IMPORT(stat_pct) $v
+    } elseif {[regexp {^MSG=(.*)$} $line -> v]} {
+      set MAG_IMPORT(stat_msg) $v
+    } elseif {[regexp {^DEST=(.*)$} $line -> v]} {
+      set MAG_IMPORT(stat_dest) $v
+    }
+  }
+  close $fh
+}
+
+proc mag_import_fetch_start {} {
+  global MAG_IMPORT
+
+  set dest [mag_sample_dest]
+  set stamp [clock seconds]
+  set work [file join /tmp mag_fetch_$stamp]
+  catch {file mkdir $work}
+  set MAG_IMPORT(work) $work
+  set MAG_IMPORT(log) [file join $work fetch.log]
+  set MAG_IMPORT(cancel) [file join $work CANCEL]
+  set MAG_IMPORT(status) [file join $work status]
+  set MAG_IMPORT(pid) ""
+  set MAG_IMPORT(fetch_dead) 0
+  catch {file delete $MAG_IMPORT(cancel)}
+  catch {file delete $MAG_IMPORT(status)}
+
+  set sh [mag_fetch_script]
+  if {$sh == ""} {
+    mag_import_tell "fetch_caravel_mag.sh not found.\nRe-run ./run.sh so pdk scripts are installed." -copy
+    return
+  }
+  set bash [mag_which {bash /bin/bash /usr/bin/bash}]
+  if {$bash == ""} {
+    mag_import_tell "bash is not installed." -copy
+    return
+  }
+
+  mag_progress_open $MAG_IMPORT(method)
+  mag_progress_update 1 "Downloading Caravel Mag sample from GitHub..."
+  mag_log "fetch_caravel_mag.sh -> $dest"
+
+  if {[catch {set MAG_IMPORT(pid) [exec $bash $sh $dest \
+      $MAG_IMPORT(status) $MAG_IMPORT(cancel) $MAG_IMPORT(log) &]} err]} {
+    mag_import_fail "Could not start fetch_caravel_mag.sh:\n$err"
+    return
+  }
+  set MAG_IMPORT(phase) fetch
+  set MAG_IMPORT(after) [after 400 mag_import_poll_fetch]
+}
+
+proc mag_import_poll_fetch {} {
+  global MAG_IMPORT
+  set MAG_IMPORT(after) ""
+
+  if {[mag_cancelled]} {
+    catch {exec kill $MAG_IMPORT(pid)}
+    mag_import_fail "Cancelled."
+    return
+  }
+
+  mag_import_read_status
+  set st $MAG_IMPORT(stat_status)
+  set pct $MAG_IMPORT(stat_pct)
+  set msg $MAG_IMPORT(stat_msg)
+  if {$msg == ""} { set msg "Downloading Caravel Mag sample..." }
+  if {![regexp {^[0-9]+$} $pct]} { set pct 1 }
+  mag_progress_update $pct $msg
+
+  if {$st == "ok"} {
+    set dest $MAG_IMPORT(stat_dest)
+    if {$dest == ""} { set dest [mag_sample_dest] }
+    if {![file isdirectory $dest]} {
+      mag_import_fail "Download finished but sample dir missing:\n$dest\nLog: $MAG_IMPORT(log)"
+      return
+    }
+    if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == ""} {
+      set MAG_IMPORT(top) example_por
+    }
+    if {![file exists [file join $dest example_por.mag]] && \
+        [file exists [file join $dest simple_por.mag]]} {
+      set MAG_IMPORT(top) simple_por
+    }
+    mag_progress_update 55 "Converting Caravel Mag → GDS → MAX (sky130A)..."
+    mag_import_run $dest $MAG_IMPORT(top) $MAG_IMPORT(tech) $MAG_IMPORT(method)
+    return
+  }
+  if {$st == "fail"} {
+    set msg $MAG_IMPORT(stat_msg)
+    if {$msg == ""} { set msg "Caravel Mag download failed." }
+    mag_import_fail "$msg\nLog: $MAG_IMPORT(log)"
+    return
+  }
+
+  set alive 1
+  if {$MAG_IMPORT(pid) != ""} {
+    if {[catch {exec kill -0 $MAG_IMPORT(pid)}]} {
+      set alive 0
+    }
+  }
+  if {!$alive && $st != "ok"} {
+    incr MAG_IMPORT(fetch_dead)
+    if {$MAG_IMPORT(fetch_dead) < 8} {
+      set MAG_IMPORT(after) [after 400 mag_import_poll_fetch]
+      return
+    }
+    mag_import_fail "Caravel Mag download exited early.\nLog: $MAG_IMPORT(log)"
+    return
+  }
+
+  set MAG_IMPORT(after) [after 400 mag_import_poll_fetch]
 }
 
 proc mag_import_run {dir top tech {method mag2gds}} {
@@ -1099,7 +1357,9 @@ GDS method: $MAG_IMPORT(method)\n\
 GDS: $gds\n\
 .max files: $outdir\n\
 Log: $MAG_IMPORT(log)"
-    if {[catch {warning $msg}]} { puts $msg }
+    if {[catch {warning $msg}]} {
+      mag_import_tell $msg
+    }
     return
   }
 
@@ -1107,6 +1367,9 @@ Log: $MAG_IMPORT(log)"
   set maxbin max
   if {[info commands pdk_which] != ""} {
     set m [pdk_which {max}]
+    if {$m != ""} { set maxbin $m }
+  } else {
+    set m [mag_which {max}]
     if {$m != ""} { set maxbin $m }
   }
   # Launch from $outdir so GDS→.max files are written next to the GDS.
@@ -1131,14 +1394,16 @@ GDS: $gds\n\
 Log: $MAG_IMPORT(log)\n\n\
 If the current MAX was started with a different PDK, that is expected:\n\
 GDS→.max must use the destination technology."
-  if {[catch {warning $msg}]} { puts $msg }
+  if {[catch {warning $msg}]} {
+    mag_import_tell $msg
+  }
 }
 
 proc mag_import_fail {msg} {
   global MAG_IMPORT
   mag_progress_close
   mag_log "ERROR: $msg"
-  max_error "Magic import failed.\n$msg\nLog: $MAG_IMPORT(log)"
+  mag_import_tell "Magic import failed.\n$msg\nLog: $MAG_IMPORT(log)" -copy
 }
 
 proc mag_progress_open {{method mag2gds}} {
