@@ -69,6 +69,39 @@ if [ -f "$dest/example_por.mag" ] || [ -f "$dest/simple_por.mag" ]; then
 fi
 
 mkdir -p "$dest" || fail "cannot create $dest"
+
+# Prefer copying the bundled sample (no network) when present.
+seed=""
+for d in \
+  /mmi-pdk-live/samples/caravel_analog_por \
+  /mmi-bundle/samples/caravel_analog_por \
+  /mmi-home/cad/mmi_local/max/pdk/samples/caravel_analog_por
+do
+  if [ -f "$d/example_por.mag" ] || [ -f "$d/simple_por.mag" ]; then
+    seed="$d"
+    break
+  fi
+done
+
+if [ -n "$seed" ] && [ "$seed" != "$dest" ]; then
+  st 30 "Installing bundled Caravel Mag sample..."
+  echo "seeding from $seed"
+  cp -f "$seed"/*.mag "$dest/" 2>/dev/null || true
+  if [ -f "$seed/SOURCE.txt" ]; then
+    cp -f "$seed/SOURCE.txt" "$dest/" 2>/dev/null || true
+  fi
+  if [ ! -f "$dest/example_por.mag" ] && [ -f "$dest/simple_por.mag" ]; then
+    cp -f "$dest/simple_por.mag" "$dest/example_por.mag"
+  fi
+  n=$(find "$dest" -maxdepth 1 -name '*.mag' 2>/dev/null | wc -l | tr -d ' ')
+  echo "seeded $n mag files"
+  if [ -f "$dest/example_por.mag" ] || [ -f "$dest/simple_por.mag" ]; then
+    if [ "${n:-0}" -ge 1 ]; then
+      ok
+    fi
+  fi
+fi
+
 stage=$(mktemp -d /tmp/caravel_mag_XXXXXX) || fail "mktemp failed"
 trap 'rm -rf "$stage"' EXIT
 
@@ -120,8 +153,13 @@ echo "magdir=$magdir"
 ls -la "$magdir" | head -40
 
 st 70 "Installing Mag files into $dest..."
+# Copy every .mag under magdir (not only top-level glob — safer if layout differs).
+find "$magdir" -maxdepth 1 -type f -name '*.mag' -exec cp -f {} "$dest/" \;
 # Prefer the POR + leaf devices; also keep user_analog_proj_example.
-cp -f "$magdir"/*.mag "$dest/" 2>/dev/null || fail "copy .mag failed"
+n=$(find "$dest" -maxdepth 1 -name '*.mag' 2>/dev/null | wc -l | tr -d ' ')
+if [ "${n:-0}" -lt 1 ]; then
+  fail "copy .mag failed (0 files from $magdir)"
+fi
 # Upstream historically used simple_por; our importer expects example_por.
 if [ ! -f "$dest/example_por.mag" ] && [ -f "$dest/simple_por.mag" ]; then
   cp -f "$dest/simple_por.mag" "$dest/example_por.mag"

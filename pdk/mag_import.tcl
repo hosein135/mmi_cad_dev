@@ -7,7 +7,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 3
+set _MAG_IMPORT_REV 4
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -720,7 +720,11 @@ proc mag_collect_mags {root} {
   while {[llength $dirs] && $n < 8000} {
     set dir [lindex $dirs 0]
     set dirs [lrange $dirs 1 end]
-    if {[catch {set names [glob -nocomplain -directory $dir *]}]} continue
+    # Tcl 8.0: no glob -directory
+    set names {}
+    if {[catch {set names [glob -nocomplain [file join $dir *]]}]} {
+      continue
+    }
     foreach f $names {
       incr n
       set bn [file tail $f]
@@ -1134,8 +1138,18 @@ proc mag_import_poll_fetch {} {
   if {$st == "ok"} {
     set dest $MAG_IMPORT(stat_dest)
     if {$dest == ""} { set dest [mag_sample_dest] }
-    if {![file isdirectory $dest]} {
-      mag_import_fail "Download finished but sample dir missing:\n$dest\nLog: $MAG_IMPORT(log)"
+    set mags [mag_collect_mags $dest]
+    if {![llength $mags]} {
+      # Fall back to bundled sample if download dir is empty.
+      set bundled [mag_sample_dir]
+      if {$bundled != "" && $bundled != $dest} {
+        mag_log "fetch dest empty; using bundled sample $bundled"
+        set dest $bundled
+        set mags [mag_collect_mags $dest]
+      }
+    }
+    if {![llength $mags]} {
+      mag_import_fail "No .mag files in:\n$dest\nLog: $MAG_IMPORT(log)"
       return
     }
     if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == ""} {
