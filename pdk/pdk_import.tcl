@@ -3,7 +3,7 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 10
+set _PDK_IMPORT_REV 11
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -489,13 +489,16 @@ proc pdk_tech27_ok {f} {
   set tech [file rootname [file tail $f]]
   if {![file readable [file join $dir ${tech}.palette]]} { return 0 }
   if {![file readable [file join $dir ${tech}.tcl]]} { return 0 }
-  # Broken: set DRC_DATA(...) a b  (missing braces)
+  # Broken: set DRC_DATA(...) a b  (missing braces → multi-word value)
   if {[catch {set tfh [open [file join $dir ${tech}.tcl] r]}]} { return 0 }
   set tcl_bad 0
   while {[gets $tfh tline] >= 0} {
-    if {[regexp {^set DRC_DATA\([^)]+\) [^{].* } $tline]} {
-      set tcl_bad 1
-      break
+    if {[regexp {^set DRC_DATA\([^)]+\) (.*)$} $tline -> val]} {
+      # Braced lists have llength 1; unbraced "poly diff" has llength 2.
+      if {[llength $val] > 1} {
+        set tcl_bad 1
+        break
+      }
     }
   }
   close $tfh
