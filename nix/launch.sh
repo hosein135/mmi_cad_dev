@@ -125,22 +125,30 @@ if [ -d "${MMI_TOOLS}/max/fonts" ] && [ ! -d "${CAD}/mmi_local/max/fonts" ]; the
 fi
 chmod -R u+w "${CAD}/mmi_local" 2>/dev/null || true
 
-if [ -d /mmi-bundle ]; then
-  cp -f /mmi-bundle/pdk_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
-  cp -f /mmi-bundle/mag_import.tcl "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
-  cp -f /mmi-bundle/mag2gds.sh "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
-  cp -f /mmi-bundle/fetch_pdk.sh "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
-  chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
-  chmod 755 "${CAD}/mmi_local/max/pdk/fetch_pdk.sh" 2>/dev/null || true
-  if [ -d /mmi-bundle/samples ]; then
-    cp -a /mmi-bundle/samples/. "${CAD}/mmi_local/max/pdk/samples/"
-  fi
-  if [ -f /mmi-bundle/app-defaults/Mmi ]; then
-    cp -f /mmi-bundle/app-defaults/Mmi "${CAD}/mmi_pd/app-defaults/Mmi"
-  fi
-  if [ -f /mmi-bundle/Xresources ]; then
-    cp -f /mmi-bundle/Xresources "${CAD_HOME}/.Xresources"
-  fi
+if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
+  mkdir -p "${CAD}/mmi_local/max/pdk/samples"
+  for src in /mmi-bundle /mmi-pdk-live; do
+    [ -d "${src}" ] || continue
+    cp -f "${src}/pdk_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/mag_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/mag2gds.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/fetch_pdk.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/compile_tech.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/maxrc" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
+    chmod 755 "${CAD}/mmi_local/max/pdk/fetch_pdk.sh" 2>/dev/null || true
+    chmod 755 "${CAD}/mmi_local/max/pdk/compile_tech.sh" 2>/dev/null || true
+    if [ -d "${src}/samples" ]; then
+      cp -a "${src}/samples/." "${CAD}/mmi_local/max/pdk/samples/"
+    fi
+    if [ -f "${src}/app-defaults/Mmi" ]; then
+      mkdir -p "${CAD}/mmi_pd/app-defaults"
+      cp -f "${src}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi"
+    fi
+    if [ -f "${src}/Xresources" ]; then
+      cp -f "${src}/Xresources" "${CAD_HOME}/.Xresources"
+    fi
+  done
 fi
 if [ -f "${MMI_TOOLS}/app-defaults/Mmi" ]; then
   cp -f "${MMI_TOOLS}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi" 2>/dev/null || true
@@ -160,7 +168,11 @@ ensure_maxrc() {
   fi
   touch "${f}"
   chmod u+w "${f}" 2>/dev/null || true
-  if ! grep -q "${MARKER}" "${f}" 2>/dev/null; then
+  if [ -f /mmi-pdk-live/maxrc ]; then
+    if ! grep -q 'source /mmi-pdk-live/maxrc' "${f}" 2>/dev/null; then
+      printf '\n%s\nsource /mmi-pdk-live/maxrc\n' "${MARKER}" >> "${f}"
+    fi
+  elif ! grep -q "${MARKER}" "${f}" 2>/dev/null; then
     printf '\n%s\nsource /mmi-bundle/maxrc\n' "${MARKER}" >> "${f}"
   fi
 }

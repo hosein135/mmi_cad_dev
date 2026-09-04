@@ -2,9 +2,13 @@
 # File / Local menu: "Import PDK from URL..."
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
-global _PDK_IMPORT_SOURCED PDK_PRESET PDK_IMPORT
-if {[info exists _PDK_IMPORT_SOURCED]} { return }
+global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
+set _PDK_IMPORT_REV 4
+if {[info exists _PDK_IMPORT_REV_LOADED]} {
+  if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
+}
 set _PDK_IMPORT_SOURCED 1
+set _PDK_IMPORT_REV_LOADED $_PDK_IMPORT_REV
 
 if {[info commands _mmi_file_normalize] == ""} {
   proc _mmi_file_normalize {path} {
@@ -403,28 +407,76 @@ proc pdk_log_tech_dir {dir} {
 # make_tech writes into ~/mmi_private unless that dir is a symlink to PDK_ROOT.
 proc pdk_finish_max_tech {tech techdir privdir} {
   pdk_prepend_tools_path
+  foreach dir [pdk_max_tech_dirs $tech] {
+    pdk_harvest_tech_files $tech $dir
+  }
   pdk_harvest_tech_files $tech $techdir
-  pdk_log_tech_dir $techdir
-  pdk_log_tech_dir $privdir
-  foreach dir [list $techdir $privdir] {
+  foreach dir [pdk_max_tech_dirs $tech] {
+    pdk_log_tech_dir $dir
     if {![file isdirectory $dir]} continue
     pdk_compile_tech27 $dir $tech
   }
-  pdk_harvest_tech_files $tech $techdir
+  if {$techdir != ""} {
+    pdk_compile_tech27 $techdir $tech
+  }
+  foreach dir [pdk_max_tech_dirs $tech] {
+    pdk_harvest_tech_files $tech $dir
+  }
 }
 
-proc pdk_find_tech27 {tech} {
+proc pdk_max_tech_dirs {tech} {
   global env
   set home /mmi-home
   if {[info exists env(HOME)] && $env(HOME) != ""} { set home $env(HOME) }
-  set cands [list \
-      [file join [pdk_root] max tech $tech ${tech}.tech27] \
-      [file join $home mmi_private max tech $tech ${tech}.tech27] \
-      [file join $home cad mmi_local max tech $tech ${tech}.tech27]]
-  foreach f $cands {
+  set local [file join $home cad mmi_local]
+  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
+    set local $env(MMI_LOCAL)
+  }
+  return [list \
+      [file join $home mmi_private max tech $tech] \
+      [file join $local max tech $tech] \
+      [file join [pdk_root] max tech $tech]]
+}
+
+proc pdk_find_tech27 {tech} {
+  foreach dir [pdk_max_tech_dirs $tech] {
+    set f [file join $dir ${tech}.tech27]
     if {[file readable $f] && [file size $f] > 0} { return $f }
   }
   return ""
+}
+
+proc pdk_compile_script {} {
+  global env
+  set cands {}
+  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
+    lappend cands [file join $env(MMI_LOCAL) max pdk compile_tech.sh]
+  }
+  lappend cands /mmi-pdk-live/compile_tech.sh
+  if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
+    lappend cands [file join $env(MMI_PDK_DIR) compile_tech.sh]
+  }
+  lappend cands /mmi-bundle/compile_tech.sh
+  foreach f $cands {
+    if {[file readable $f]} { return $f }
+  }
+  return ""
+}
+
+proc pdk_log_tail {{n 30}} {
+  global PDK_IMPORT
+  if {![info exists PDK_IMPORT(log)] || ![file readable $PDK_IMPORT(log)]} {
+    return ""
+  }
+  if {[catch {set fh [open $PDK_IMPORT(log) r]}]} { return "" }
+  set lines {}
+  while {[gets $fh line] >= 0} {
+    lappend lines $line
+  }
+  close $fh
+  set start [expr {[llength $lines] - $n}]
+  if {$start < 0} { set start 0 }
+  return [join [lrange $lines $start end] \n]
 }
 
 # Downloaded open_pdks tree plus MAX .tech27 (usable in max -tech).
@@ -507,7 +559,7 @@ proc pdk_import_tell {msg} {
   set y 80
   catch {set x [winfo pointerx .]}
   catch {set y [winfo pointery .]}
-  if {[catch {prop_dialog -title $title -buttons OK -width 70 -height 16 \
+  if {[catch {prop_dialog -title $title -buttons OK -width 78 -height 22 \
       -x $x -y $y $msg}]} {
     if {[catch {tk_dialog .pdkmsg $title $msg {} 0 OK}]} {
       catch {puts $msg}
@@ -1227,31 +1279,38 @@ proc pdk_import_convert {} {
   }
   pdk_log "Wrote $source ([llength $rows] layers)"
 
-  _pdk_import_progress_update 94 "Running make_tech..."
+  _pdk_import_progress_update 94 "Compiling MAX technology..."
   pdk_prepend_tools_path
-  set make [pdk_which {make_tech}]
-  if {$make == "" && [info exists env(MMI_TOOLS)]} {
-    foreach cand [list [file join $env(MMI_TOOLS) bin make_tech]] {
-      if {[file executable $cand]} { set make $cand; break }
-    }
-  }
-
   set home ""
   if {[info exists env(HOME)]} { set home $env(HOME) }
   if {$home == ""} { set home /mmi-home }
   set privdir [file join $home mmi_private max tech $tech]
 
   set mtok failed
-  if {$make != ""} {
-    pdk_log "make_tech -r -file $source -tech $tech"
-    pdk_log "PATH=$env(PATH)"
-    if {[catch {set out [exec $make -r -file $source -tech $tech]} err]} {
-      pdk_log "make_tech: $err"
+  set sh [pdk_compile_script]
+  set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
+  pdk_log "pdk_import rev 4 compile_tech.sh=$sh bash=$bash"
+  if {$sh != "" && $bash != ""} {
+    pdk_log "compile_tech.sh $source $tech $techdir"
+    set err ""
+    if {[catch {set out [exec $bash $sh $source $tech $techdir]} err]} {
+      pdk_log $err
     } else {
       pdk_log $out
     }
   } else {
-    pdk_log "make_tech not found"
+    set make [pdk_which {make_tech}]
+    if {$make != ""} {
+      pdk_log "make_tech -r -file $source -tech $tech"
+      if {[catch {set out [exec $make -r -file $source -tech $tech]} err]} {
+        pdk_log "make_tech: $err"
+      } else {
+        pdk_log $out
+      }
+    } else {
+      pdk_log "make_tech not found"
+    }
+    pdk_finish_max_tech $tech $techdir $privdir
   }
 
   pdk_finish_max_tech $tech $techdir $privdir
@@ -1259,9 +1318,8 @@ proc pdk_import_convert {} {
     set mtok ok
     pdk_log "MAX tech27 [pdk_find_tech27 $tech]"
   } else {
-    pdk_log "No ${tech}.tech27 after make_tech (need gcc cpp + GNU m4)"
-    pdk_log_tech_dir $techdir
-    pdk_log_tech_dir $privdir
+    pdk_log "No ${tech}.tech27 (need gcc cpp + GNU m4)"
+    foreach d [pdk_max_tech_dirs $tech] { pdk_log_tech_dir $d }
   }
 
   set gds ""
@@ -1336,7 +1394,14 @@ proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}
 
   set note ""
   if {$mtok != "ok"} {
-    set note "\n\nmake_tech did not compile ${tech}.tech27. Source is still at:\n  $source\nRestart MAX (./run.sh) and Import PDK again to finish conversion."
+    set tail [pdk_log_tail 20]
+    set note "\n\nMAX did not get ${tech}.tech27. Source is at:\n  $source"
+    if {$tail != ""} {
+      append note "\n\nLast log lines:\n$tail"
+    }
+    if {[info exists PDK_IMPORT(log)]} {
+      append note "\n\nFull log: $PDK_IMPORT(log)"
+    }
   }
 
   set magicrc_note "Magic mag2gds looks for:\n  [pdk_root]/<pdk>/libs.tech/magic/<pdk>.magicrc\nUse File -> Import PDK (not a skywater-pdk GitHub zip) so stdcells and Magic tech are present."

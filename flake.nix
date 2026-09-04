@@ -144,6 +144,7 @@
           install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
           install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
+          install -Dm755 "$src/compile_tech.sh" $out/compile_tech.sh
           install -Dm644 "$src/maxrc" $out/maxrc
           if [ -d "$src/samples" ]; then
             cp -a "$src/samples/." $out/samples/
@@ -373,6 +374,7 @@
           "--bind \"$MMI_CAD_ROOT/data/home\" /mmi-home"
           "--bind \"$MMI_CAD_ROOT/data/workspace\" /mmi-home/work"
           "--bind \"$MMI_CAD_ROOT/data/pdks\" /mmi-pdks"
+          "--ro-bind-try \"$MMI_CAD_ROOT/pdk\" /mmi-pdk-live"
           "--bind-try /tmp/.X11-unix /tmp/.X11-unix"
           "--ro-bind-try \"$HOME/.Xauthority\" \"$HOME/.Xauthority\""
           "--ro-bind-try ${mmiVendor} /mmi-vendor"
