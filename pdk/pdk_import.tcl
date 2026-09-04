@@ -263,13 +263,26 @@ proc pdk_parse_magic_tech {path} {
   return $rows
 }
 
+proc pdk_prepend_tools_path {} {
+  global env
+  if {![info exists env(PATH)]} { set env(PATH) "" }
+  if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) != ""} {
+    set bin [file join $env(MMI_TOOLS) bin]
+    if {$bin != "" && ![string match ${bin}:* $env(PATH)] && $env(PATH) != $bin} {
+      set env(PATH) "${bin}:$env(PATH)"
+    }
+  }
+}
+
 proc pdk_which {names} {
   global env
+  pdk_prepend_tools_path
   set path ""
   if {[info exists env(PATH)]} { set path $env(PATH) }
   foreach name $names {
     if {[file executable $name]} { return $name }
     foreach dir [split $path :] {
+      if {$dir == ""} continue
       set cand [file join $dir $name]
       if {[file executable $cand]} { return $cand }
     }
@@ -277,38 +290,127 @@ proc pdk_which {names} {
   return ""
 }
 
+proc pdk_sh_quote {s} {
+  regsub -all {'} $s {'\''} s
+  return "'$s'"
+}
+
+proc pdk_ensure_drc_macros {techdir} {
+  global env
+  set dest [file join $techdir drc_macros.i]
+  if {[file readable $dest]} { return 1 }
+  set cands {}
+  if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) != ""} {
+    lappend cands [file join $env(MMI_TOOLS) max tech tech_target drc_macros.i]
+  }
+  lappend cands /mmi-vendor/mmi/max/tech/tech_target/drc_macros.i
+  foreach f $cands {
+    if {[file readable $f]} {
+      catch {file copy -force $f $dest}
+      if {[file readable $dest]} { return 1 }
+    }
+  }
+  pdk_log "drc_macros.i not found (needed to compile .tech27)"
+  return 0
+}
+
+proc pdk_harvest_tech_files {tech dest} {
+  global env
+  set home /mmi-home
+  if {[info exists env(HOME)] && $env(HOME) != ""} { set home $env(HOME) }
+  set srcs [list \
+      [file join $home mmi_private max tech $tech] \
+      [file join $home cad mmi_local max tech $tech]]
+  catch {file mkdir $dest}
+  foreach src $srcs {
+    if {![file isdirectory $src]} continue
+    if {[_mmi_file_normalize $src] == [_mmi_file_normalize $dest]} continue
+    foreach pat [list ${tech}.tech ${tech}.tech27 ${tech}.tcl \
+        ${tech}.palette drc_macros.i] {
+      set f [file join $src $pat]
+      if {[file readable $f]} {
+        catch {file copy -force $f [file join $dest $pat]}
+      }
+    }
+  }
+}
+
 # make_tech writes .tech then runs mmi_cpp | mmi_m4 to produce .tech27.
+# Tcl 8.0 exec treats any cpp warning on stderr as failure, so compile
+# with a bash script and keep the output if the file was written.
 proc pdk_compile_tech27 {techdir tech} {
   set src [file join $techdir ${tech}.tech]
   set dst [file join $techdir ${tech}.tech27]
   if {![file readable $src]} { return 0 }
-  set cpp [pdk_which {mmi_cpp cpp}]
-  set m4 [pdk_which {mmi_m4 m4}]
-  if {$cpp == "" || $m4 == ""} {
-    pdk_log "Need cpp (mmi_cpp) and m4 (mmi_m4) to compile $src"
+  pdk_ensure_drc_macros $techdir
+  set cpp [pdk_which {mmi_cpp cpp /usr/bin/cpp}]
+  set m4 [pdk_which {mmi_m4 m4 /usr/bin/m4}]
+  set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
+  if {$cpp == "" || $m4 == "" || $bash == ""} {
+    pdk_log "Need cpp (mmi_cpp), m4 (mmi_m4), and bash to compile $src (cpp=$cpp m4=$m4 bash=$bash)"
     return 0
   }
-  set save [pwd]
-  if {[catch {cd $techdir}]} { return 0 }
-  set tmp ${tech}.tech27.tmp
+  pdk_log "Compiling $src with $cpp | $m4"
+  set tmp [file join $techdir ${tech}.tech27.tmp]
+  set sh [file join $techdir .compile_tech27.sh]
   set ok 0
   foreach trad {-traditional-cpp -traditional} {
     catch {file delete $tmp}
-    if {[catch {exec $cpp -P $trad ${tech}.tech | $m4 > $tmp} err]} {
-      pdk_log "cpp $trad | m4: $err"
-      continue
+    if {[catch {
+      set fh [open $sh w]
+      puts $fh {#!/bin/bash}
+      puts $fh "cd [pdk_sh_quote $techdir] || exit 1"
+      puts $fh "[pdk_sh_quote $cpp] -P $trad [pdk_sh_quote ${tech}.tech] 2>/dev/null | [pdk_sh_quote $m4] > [pdk_sh_quote $tmp] 2>/dev/null"
+      puts $fh {exit 0}
+      close $fh
+    } err]} {
+      pdk_log "Could not write $sh: $err"
+      break
     }
-    if {[file exists $tmp] && [file size $tmp] > 0} {
+    set err ""
+    catch {exec $bash $sh} err
+    if {$err != ""} { pdk_log "cpp $trad | m4: $err" }
+    if {[file exists $tmp] && [file size $tmp] > 100} {
       catch {file delete $dst}
-      catch {file rename $tmp $dst}
+      if {[catch {file rename $tmp $dst}]} {
+        catch {file copy -force $tmp $dst}
+        catch {file delete $tmp}
+      }
       set ok 1
       break
     }
   }
   catch {file delete $tmp}
-  catch {cd $save}
+  catch {file delete $sh}
   if {$ok} { pdk_log "Compiled $dst" }
   return $ok
+}
+
+proc pdk_log_tech_dir {dir} {
+  if {![file isdirectory $dir]} {
+    pdk_log "tech dir missing: $dir"
+    return
+  }
+  set names {}
+  foreach f [glob -nocomplain [file join $dir *]] {
+    set sz "?"
+    catch {set sz [file size $f]}
+    lappend names "[file tail $f]($sz)"
+  }
+  pdk_log "tech dir $dir: [join $names { }]"
+}
+
+# make_tech writes into ~/mmi_private unless that dir is a symlink to PDK_ROOT.
+proc pdk_finish_max_tech {tech techdir privdir} {
+  pdk_prepend_tools_path
+  pdk_harvest_tech_files $tech $techdir
+  pdk_log_tech_dir $techdir
+  pdk_log_tech_dir $privdir
+  foreach dir [list $techdir $privdir] {
+    if {![file isdirectory $dir]} continue
+    pdk_compile_tech27 $dir $tech
+  }
+  pdk_harvest_tech_files $tech $techdir
 }
 
 proc pdk_find_tech27 {tech} {
@@ -501,19 +603,19 @@ proc pdk_link_max_private {tech shared} {
   set priv [file join $home mmi_private max tech]
   catch {file mkdir $priv}
   set link [file join $priv $tech]
-  if {[file exists $link] && ![file exists [file join $shared ${tech}.source]]} {
-    return
-  }
-  if {[file exists $link] && ![file isdirectory $link]} {
-    return
-  }
   if {[file exists $link]} {
-    catch {
-      if {[file type $link] == "link"} {
-        file delete $link
-      } elseif {[_mmi_file_normalize $link] != [_mmi_file_normalize $shared]} {
-        # Keep existing private dir; also keep shared copy.
-        return
+    set typ ""
+    catch {set typ [file type $link]}
+    if {$typ == "link"} {
+      catch {file delete $link}
+    } elseif {$typ == "directory"} {
+      pdk_harvest_tech_files $tech $shared
+      if {[_mmi_file_normalize $link] != [_mmi_file_normalize $shared]} {
+        set privtech [file join $link ${tech}.tech]
+        set shtech [file join $shared ${tech}.tech]
+        if {![file readable $privtech] || [file readable $shtech]} {
+          catch {exec rm -rf $link}
+        }
       }
     }
   }
@@ -1126,6 +1228,7 @@ proc pdk_import_convert {} {
   pdk_log "Wrote $source ([llength $rows] layers)"
 
   _pdk_import_progress_update 94 "Running make_tech..."
+  pdk_prepend_tools_path
   set make [pdk_which {make_tech}]
   if {$make == "" && [info exists env(MMI_TOOLS)]} {
     foreach cand [list [file join $env(MMI_TOOLS) bin make_tech]] {
@@ -1141,6 +1244,7 @@ proc pdk_import_convert {} {
   set mtok failed
   if {$make != ""} {
     pdk_log "make_tech -r -file $source -tech $tech"
+    pdk_log "PATH=$env(PATH)"
     if {[catch {set out [exec $make -r -file $source -tech $tech]} err]} {
       pdk_log "make_tech: $err"
     } else {
@@ -1150,16 +1254,14 @@ proc pdk_import_convert {} {
     pdk_log "make_tech not found"
   }
 
-  if {[pdk_find_tech27 $tech] == ""} {
-    foreach dir [list $techdir $privdir] {
-      if {[pdk_compile_tech27 $dir $tech]} { break }
-    }
-  }
+  pdk_finish_max_tech $tech $techdir $privdir
   if {[pdk_find_tech27 $tech] != ""} {
     set mtok ok
     pdk_log "MAX tech27 [pdk_find_tech27 $tech]"
   } else {
-    pdk_log "No ${tech}.tech27 after make_tech (need mmi_cpp + mmi_m4 on PATH)"
+    pdk_log "No ${tech}.tech27 after make_tech (need gcc cpp + GNU m4)"
+    pdk_log_tech_dir $techdir
+    pdk_log_tech_dir $privdir
   }
 
   set gds ""
@@ -1234,7 +1336,7 @@ proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}
 
   set note ""
   if {$mtok != "ok"} {
-    set note "\n\nmake_tech did not compile the tech. Source is still at:\n  $source\nRun:  make_tech -r -file $source -tech $tech"
+    set note "\n\nmake_tech did not compile ${tech}.tech27. Source is still at:\n  $source\nRestart MAX (./run.sh) and Import PDK again to finish conversion."
   }
 
   set magicrc_note "Magic mag2gds looks for:\n  [pdk_root]/<pdk>/libs.tech/magic/<pdk>.magicrc\nUse File -> Import PDK (not a skywater-pdk GitHub zip) so stdcells and Magic tech are present."

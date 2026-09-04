@@ -136,7 +136,6 @@ fi
 # Wrap the FHS GNU tools (gcc's cpp + m4).
 cat > "$bindir/mmi_cpp" << 'EOF'
 #!/bin/bash
-set -e
 cpp_bin="$(command -v cpp || true)"
 if [ -z "$cpp_bin" ]; then
   echo "mmi_cpp: cpp not on PATH (need gcc in the CAD environment)" >&2
@@ -150,7 +149,8 @@ for a in "$@"; do
     args+=("$a")
   fi
 done
-exec "$cpp_bin" "${args[@]}"
+# make_tech uses Tcl exec; any cpp warning on stderr is treated as failure.
+exec "$cpp_bin" "${args[@]}" 2>/dev/null
 EOF
 chmod 755 "$bindir/mmi_cpp"
 cat > "$bindir/mmi_m4" << 'EOF'
@@ -160,7 +160,7 @@ if [ -z "$m4_bin" ]; then
   echo "mmi_m4: m4 not on PATH (need GNU m4 in the CAD environment)" >&2
   exit 1
 fi
-exec "$m4_bin" "$@"
+exec "$m4_bin" "$@" 2>/dev/null
 EOF
 chmod 755 "$bindir/mmi_m4"
 
