@@ -125,8 +125,12 @@ if [ -d "${MMI_TOOLS}/max/fonts" ] && [ ! -d "${CAD}/mmi_local/max/fonts" ]; the
 fi
 chmod -R u+w "${CAD}/mmi_local" 2>/dev/null || true
 
+# Overlay PDK Tcl from the Nix bundle, then the live checkout (wins).
+# Never cp -a from the Nix store: that leaves 555 dirs and the next copy dies
+# under set -e (Permission denied on samples/caravel_analog_por).
 if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
-  mkdir -p "${CAD}/mmi_local/max/pdk/samples"
+  mkdir -p "${CAD}/mmi_local/max/pdk/samples" "${CAD}/mmi_pd/app-defaults"
+  chmod -R u+w "${CAD}/mmi_local/max/pdk" 2>/dev/null || true
   for src in /mmi-bundle /mmi-pdk-live; do
     [ -d "${src}" ] || continue
     cp -f "${src}/pdk_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
@@ -138,17 +142,27 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
     chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/fetch_pdk.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/compile_tech.sh" 2>/dev/null || true
-    if [ -d "${src}/samples" ]; then
-      cp -a "${src}/samples/." "${CAD}/mmi_local/max/pdk/samples/"
-    fi
     if [ -f "${src}/app-defaults/Mmi" ]; then
-      mkdir -p "${CAD}/mmi_pd/app-defaults"
-      cp -f "${src}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi"
+      cp -f "${src}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi" 2>/dev/null || true
     fi
     if [ -f "${src}/Xresources" ]; then
-      cp -f "${src}/Xresources" "${CAD_HOME}/.Xresources"
+      cp -f "${src}/Xresources" "${CAD_HOME}/.Xresources" 2>/dev/null || true
     fi
   done
+  sample_src=""
+  if [ -d /mmi-pdk-live/samples ]; then
+    sample_src=/mmi-pdk-live/samples
+  elif [ -d /mmi-bundle/samples ]; then
+    sample_src=/mmi-bundle/samples
+  fi
+  if [ -n "${sample_src}" ]; then
+    chmod -R u+w "${CAD}/mmi_local/max/pdk/samples" 2>/dev/null || true
+    cp -rf --no-preserve=mode,ownership "${sample_src}/." \
+      "${CAD}/mmi_local/max/pdk/samples/" 2>/dev/null \
+      || cp -rf "${sample_src}/." "${CAD}/mmi_local/max/pdk/samples/" 2>/dev/null \
+      || true
+  fi
+  chmod -R u+w "${CAD}/mmi_local" 2>/dev/null || true
 fi
 if [ -f "${MMI_TOOLS}/app-defaults/Mmi" ]; then
   cp -f "${MMI_TOOLS}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi" 2>/dev/null || true
