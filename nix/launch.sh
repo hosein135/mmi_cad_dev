@@ -218,7 +218,7 @@ fi
 
 # Rebuild broken MAX tech27 left by older PDK converters (before max -tech).
 mmi_repair_tech27() {
-  local tech source dest gen sh tclsh
+  local tech source dest sh
   for tech in sky130A gf180mcu sg13g2; do
     dest=""
     source=""
@@ -233,12 +233,17 @@ mmi_repair_tech27() {
       fi
     done
     [ -n "$source" ] || continue
-    if [ -s "${dest}/${tech}.tech27" ] \
-      && ! grep -qE 'labels[[:space:]]+\*' "${dest}/${tech}.tech27" 2>/dev/null \
-      && grep -qE '^drc[[:space:]]*$' "${dest}/${tech}.tech27" 2>/dev/null \
-      && grep -qE '^cifstyle[[:space:]]' "${dest}/${tech}.tech27" 2>/dev/null; then
-      continue
-    fi
+    local need=0
+    if [ ! -s "${dest}/${tech}.tech27" ]; then need=1; fi
+    if [ ! -s "${dest}/${tech}.palette" ]; then need=1; fi
+    if [ ! -s "${dest}/${tech}.tcl" ]; then need=1; fi
+    if grep -qE 'labels[[:space:]]+\*' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
+    if grep -qE '[[:space:]]width[[:space:]]+[^[:space:]]+[[:space:]]+-' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
+    if grep -qE '[[:space:]]spacing[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+[[:space:]]+-' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
+    if ! grep -qE '^drc[[:space:]]*$' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
+    if ! grep -qE '^cifstyle[[:space:]]' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
+    if grep -qE '^set DRC_DATA\([^)]+\) [^{].* ' "${dest}/${tech}.tcl" 2>/dev/null; then need=1; fi
+    [ "$need" = "1" ] || continue
     sh=""
     for cand in /mmi-pdk-live/compile_tech.sh \
       "${CAD}/mmi_local/max/pdk/compile_tech.sh" \
@@ -247,7 +252,7 @@ mmi_repair_tech27() {
       if [ -f "$cand" ]; then sh="$cand"; break; fi
     done
     [ -n "$sh" ] || continue
-    info "Repairing broken ${tech}.tech27..."
+    info "Repairing broken ${tech} technology files..."
     bash "$sh" "$source" "$tech" "$dest" || true
   done
 }

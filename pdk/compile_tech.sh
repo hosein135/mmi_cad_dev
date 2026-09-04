@@ -184,6 +184,21 @@ fi
 if grep -q 'labels \*' "$dest/${tech}.tech27" 2>/dev/null; then
   finish_fail "generated tech27 still has invalid 'labels *'"
 fi
+if grep -qE '[[:space:]]width[[:space:]]+[^[:space:]]+[[:space:]]+-' "$dest/${tech}.tech27" 2>/dev/null; then
+  finish_fail "generated tech27 still has invalid DRC width '-'"
+fi
+if grep -qE '[[:space:]]spacing[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+[[:space:]]+-' "$dest/${tech}.tech27" 2>/dev/null; then
+  finish_fail "generated tech27 still has invalid DRC spacing '-'"
+fi
+if [ ! -s "$dest/${tech}.palette" ]; then
+  finish_fail "generator did not write ${tech}.palette"
+fi
+if [ ! -s "$dest/${tech}.tcl" ]; then
+  finish_fail "generator did not write ${tech}.tcl"
+fi
+if grep -qE '^set DRC_DATA\([^)]+\) [^{].* ' "$dest/${tech}.tcl" 2>/dev/null; then
+  finish_fail "generated tcl has unbraced multi-word DRC_DATA set"
+fi
 if grep -q '^cifstyle ' "$dest/${tech}.tech27" 2>/dev/null; then
   # cifstyle must be inside drc, not a top-level section start
   if ! awk '/^drc$/{d=1} d&&/^cifstyle /{ok=1} END{exit !ok}' "$dest/${tech}.tech27"; then

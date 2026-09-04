@@ -3,7 +3,7 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 9
+set _PDK_IMPORT_REV 10
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -452,6 +452,15 @@ proc pdk_tech27_ok {f} {
       set bad 1
       break
     }
+    # "expr - + 0" accepted "-" as a dimension — MAX rejects it.
+    if {[regexp {[ \t]width[ \t]+\S+[ \t]+-} $line]} {
+      set bad 1
+      break
+    }
+    if {[regexp {[ \t]spacing[ \t]+\S+[ \t]+\S+[ \t]+-} $line]} {
+      set bad 1
+      break
+    }
     set t [string trim $line]
     if {$t == "drc"} {
       set in_drc 1
@@ -475,6 +484,22 @@ proc pdk_tech27_ok {f} {
   if {$bad} { return 0 }
   if {!$has_drc} { return 0 }
   if {!$has_cifstyle_in_drc} { return 0 }
+  # Companion files MAX requires after tech27 loads
+  set dir [file dirname $f]
+  set tech [file rootname [file tail $f]]
+  if {![file readable [file join $dir ${tech}.palette]]} { return 0 }
+  if {![file readable [file join $dir ${tech}.tcl]]} { return 0 }
+  # Broken: set DRC_DATA(...) a b  (missing braces)
+  if {[catch {set tfh [open [file join $dir ${tech}.tcl] r]}]} { return 0 }
+  set tcl_bad 0
+  while {[gets $tfh tline] >= 0} {
+    if {[regexp {^set DRC_DATA\([^)]+\) [^{].* } $tline]} {
+      set tcl_bad 1
+      break
+    }
+  }
+  close $tfh
+  if {$tcl_bad} { return 0 }
   return 1
 }
 
