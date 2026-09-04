@@ -145,7 +145,7 @@ have_tech27() {
 # ── Primary: generate .tech27 directly from .source ─────────────────────────
 st 95 "Generating ${tech}.tech27 from .source..."
 gen="$(find_generator)"
-tclsh="$(find_bin mmi_tclsh /usr/bin/tclsh tclsh)"
+tclsh="$(find_bin /usr/bin/tclsh tclsh /bin/tclsh mmi_tclsh)"
 echo "  generator=$gen"
 echo "  tclsh=$tclsh"
 
@@ -160,9 +160,19 @@ if cancelled; then
   finish_fail "Cancelled."
 fi
 
-# Write into dest first (canonical under PDK_ROOT), then mirror.
-"$tclsh" "$gen" "$source_file" "$tech" "$dest"
-echo "source_to_tech27 exit $?"
+# Prefer system tclsh: mmi_tclsh is Tcl 8.0 and shares MAX command names.
+echo "running: $tclsh $gen $source_file $tech $dest"
+if ! "$tclsh" "$gen" "$source_file" "$tech" "$dest"; then
+  echo "source_to_tech27 exit $?"
+  # Retry with whatever other tclsh we can find
+  alt="$(find_bin tclsh /usr/bin/tclsh)"
+  if [ -n "$alt" ] && [ "$alt" != "$tclsh" ]; then
+    echo "retry with $alt"
+    "$alt" "$gen" "$source_file" "$tech" "$dest"
+    echo "retry exit $?"
+  fi
+fi
+echo "after generator:"
 ls -la "$dest" 2>/dev/null || true
 
 if [ ! -s "$dest/${tech}.tech27" ]; then

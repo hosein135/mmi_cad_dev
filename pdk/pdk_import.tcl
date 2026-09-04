@@ -3,7 +3,7 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 7
+set _PDK_IMPORT_REV 8
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -1332,7 +1332,7 @@ proc pdk_import_convert {} {
 
   set sh [pdk_compile_script]
   set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
-  pdk_log "pdk_import rev 7 compile_tech.sh=$sh bash=$bash"
+  pdk_log "pdk_import rev 8 compile_tech.sh=$sh bash=$bash"
   if {$sh == "" || $bash == ""} {
     pdk_log "compile_tech.sh or bash missing; trying in-process compile"
     pdk_finish_max_tech $tech $techdir $privdir

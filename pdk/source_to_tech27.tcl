@@ -28,33 +28,35 @@ proc parse_gds_pair {s} {
 }
 
 set layers {}
-set gds_of {}
-set txt_of {}
-set type_of {}
-set width_of {}
-set space_of {}
-set color_of {}
 set connects {}
 set devices {}
 set text_layer ""
 set bbox_layer ""
+# Must be arrays (not scalars). "set gds_of {}" makes a string and breaks gds_of($name).
+array set gds_of {}
+array set txt_of {}
+array set type_of {}
+array set width_of {}
+array set space_of {}
+array set color_of {}
 
 set fh [open $source_file r]
-while {[gets $fh line] >= 0} {
-  set line [string trim $line]
-  if {$line == ""} continue
-  if {[string index $line 0] == "#"} continue
+while {[gets $fh src_line] >= 0} {
+  # Strip CR so Windows-synced checkouts still parse.
+  set src_line [string trim [string trimright $src_line "\r"]]
+  if {$src_line == ""} { continue }
+  if {[string index $src_line 0] == "#"} { continue }
 
-  set cmd [string tolower [lindex $line 0]]
+  set cmd [string tolower [lindex $src_line 0]]
   if {$cmd == "device"} {
     # device nfet from poly diff
-    if {[llength $line] >= 5 && [string tolower [lindex $line 2]] == "from"} {
-      lappend devices [list [lindex $line 1] [lindex $line 3] [lindex $line 4]]
+    if {[llength $src_line] >= 5 && [string tolower [lindex $src_line 2]] == "from"} {
+      lappend devices [list [lindex $src_line 1] [lindex $src_line 3] [lindex $src_line 4]]
     }
     continue
   }
   if {$cmd == "connect"} {
-    lappend connects [list [lindex $line 1] [lindex $line 2]]
+    lappend connects [list [lindex $src_line 1] [lindex $src_line 2]]
     continue
   }
   if {$cmd == "derive" || $cmd == "drc" || $cmd == "set" || \
@@ -63,14 +65,14 @@ while {[gets $fh line] >= 0} {
   }
 
   # layer gds txt type width space color
-  set name [lindex $line 0]
-  set gds [lindex $line 1]
-  set txt [lindex $line 2]
-  set typ [lindex $line 3]
-  set wid [lindex $line 4]
-  set spc [lindex $line 5]
-  set col [lindex $line 6]
-  if {$name == "" || $name == "-"} continue
+  set name [lindex $src_line 0]
+  set gds [lindex $src_line 1]
+  set txt [lindex $src_line 2]
+  set typ [lindex $src_line 3]
+  set wid [lindex $src_line 4]
+  set spc [lindex $src_line 5]
+  set col [lindex $src_line 6]
+  if {$name == "" || $name == "-"} { continue }
   if {$gds == ""} { set gds "-" }
   if {$txt == ""} { set txt "-" }
   if {$typ == ""} { set typ "-" }
