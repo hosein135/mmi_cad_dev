@@ -364,10 +364,12 @@ proc mag_list_max_techs {} {
       set bn [file tail $d]
       if {$bn == "." || $bn == ".." || $bn == "tech_target" || \
           $bn == "template"} continue
-      # Only list techs MAX can actually load (.tech27), or a readable .tech.
+      # Only list techs MAX can actually load (valid .tech27).
       set ok 0
-      if {[file readable [file join $d ${bn}.tech27]] && \
-          [file size [file join $d ${bn}.tech27]] > 0} {
+      set t27 [file join $d ${bn}.tech27]
+      if {[info commands pdk_tech27_ok] != ""} {
+        if {[pdk_tech27_ok $t27]} { set ok 1 }
+      } elseif {[file readable $t27] && [file size $t27] > 0} {
         set ok 1
       } elseif {[file readable [file join $d ${bn}.tech]] && \
           [file size [file join $d ${bn}.tech]] > 0} {

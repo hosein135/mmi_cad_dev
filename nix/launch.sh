@@ -216,6 +216,43 @@ if [ -f /usr/share/X11/XKeysymDB ]; then
   export XKEYSYMDB=/usr/share/X11/XKeysymDB
 fi
 
+# Rebuild broken MAX tech27 left by older PDK converters (before max -tech).
+mmi_repair_tech27() {
+  local tech source dest gen sh tclsh
+  for tech in sky130A gf180mcu sg13g2; do
+    dest=""
+    source=""
+    for dest in \
+      "/mmi-pdks/max/tech/${tech}" \
+      "${CAD_HOME}/mmi_private/max/tech/${tech}" \
+      "${CAD}/mmi_local/max/tech/${tech}"
+    do
+      if [ -f "${dest}/${tech}.source" ]; then
+        source="${dest}/${tech}.source"
+        break
+      fi
+    done
+    [ -n "$source" ] || continue
+    if [ -s "${dest}/${tech}.tech27" ] \
+      && ! grep -qE 'labels[[:space:]]+\*' "${dest}/${tech}.tech27" 2>/dev/null \
+      && grep -qE '^drc[[:space:]]*$' "${dest}/${tech}.tech27" 2>/dev/null \
+      && grep -qE '^cifstyle[[:space:]]' "${dest}/${tech}.tech27" 2>/dev/null; then
+      continue
+    fi
+    sh=""
+    for cand in /mmi-pdk-live/compile_tech.sh \
+      "${CAD}/mmi_local/max/pdk/compile_tech.sh" \
+      /mmi-bundle/compile_tech.sh
+    do
+      if [ -f "$cand" ]; then sh="$cand"; break; fi
+    done
+    [ -n "$sh" ] || continue
+    info "Repairing broken ${tech}.tech27..."
+    bash "$sh" "$source" "$tech" "$dest" || true
+  done
+}
+mmi_repair_tech27
+
 cmd="${1:-/bin/bash}"
 
 # Prefer the VM/desktop X server when DISPLAY already points at a local socket.

@@ -3,7 +3,7 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 8
+set _PDK_IMPORT_REV 9
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -438,12 +438,102 @@ proc pdk_max_tech_dirs {tech} {
       [file join [pdk_root] max tech $tech]]
 }
 
+proc pdk_tech27_ok {f} {
+  if {$f == "" || ![file readable $f]} { return 0 }
+  if {[catch {set sz [file size $f]}] || $sz < 200} { return 0 }
+  if {[catch {set fh [open $f r]}]} { return 0 }
+  set has_drc 0
+  set has_cifstyle_in_drc 0
+  set in_drc 0
+  set bad 0
+  while {[gets $fh line] >= 0} {
+    # Older generator wrote invalid "labels *" (MAX needs "labels space").
+    if {[regexp {labels[ \t]+\*} $line]} {
+      set bad 1
+      break
+    }
+    set t [string trim $line]
+    if {$t == "drc"} {
+      set in_drc 1
+      set has_drc 1
+      continue
+    }
+    if {$in_drc && [regexp {^end$} $t]} {
+      set in_drc 0
+      continue
+    }
+    if {$in_drc && [regexp {^cifstyle[ \t]} $t]} {
+      set has_cifstyle_in_drc 1
+    }
+    # Top-level cifstyle (not inside drc) breaks the tech parser.
+    if {!$in_drc && [regexp {^cifstyle[ \t]} $t]} {
+      set bad 1
+      break
+    }
+  }
+  close $fh
+  if {$bad} { return 0 }
+  if {!$has_drc} { return 0 }
+  if {!$has_cifstyle_in_drc} { return 0 }
+  return 1
+}
+
 proc pdk_find_tech27 {tech} {
+  foreach dir [pdk_max_tech_dirs $tech] {
+    set f [file join $dir ${tech}.tech27]
+    if {[pdk_tech27_ok $f]} { return $f }
+  }
+  return ""
+}
+
+proc pdk_find_tech27_any {tech} {
   foreach dir [pdk_max_tech_dirs $tech] {
     set f [file join $dir ${tech}.tech27]
     if {[file readable $f] && [file size $f] > 0} { return $f }
   }
   return ""
+}
+
+# Rebuild broken .tech27 files left by older generators (labels *, missing drc).
+proc pdk_autofix_tech27 {} {
+  global env
+  set bash ""
+  if {[info commands pdk_which] != ""} {
+    set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
+  }
+  if {$bash == ""} {
+    foreach c {/bin/bash /usr/bin/bash bash} {
+      if {[file executable $c]} { set bash $c; break }
+    }
+  }
+  set sh ""
+  if {[info commands pdk_compile_script] != ""} {
+    set sh [pdk_compile_script]
+  }
+  if {$bash == "" || $sh == ""} { return }
+
+  foreach tech {sky130A gf180mcu sg13g2} {
+    set bad [pdk_find_tech27_any $tech]
+    if {$bad != "" && [pdk_tech27_ok $bad]} continue
+    set source ""
+    set dest ""
+    foreach dir [pdk_max_tech_dirs $tech] {
+      set s [file join $dir ${tech}.source]
+      if {[file readable $s]} {
+        set source $s
+        set dest $dir
+        break
+      }
+    }
+    if {$source == "" || $dest == ""} continue
+    catch {puts "pdk: repairing broken $tech.tech27 ..."}
+    catch {exec $bash $sh $source $tech $dest}
+    if {[pdk_find_tech27 $tech] != ""} {
+      catch {puts "pdk: repaired $tech.tech27"}
+    } else {
+      catch {puts "pdk: repair of $tech.tech27 failed (Import PDK again)"}
+    }
+  }
 }
 
 proc pdk_compile_script {} {
@@ -1649,3 +1739,6 @@ proc _pdk_import_install_menus {} {
 }
 
 _pdk_import_install_menus
+
+# Repair tech27 files left by older generators (labels *, missing drc).
+catch {after idle pdk_autofix_tech27}
