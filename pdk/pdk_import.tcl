@@ -3,7 +3,7 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 5
+set _PDK_IMPORT_REV 6
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -552,18 +552,56 @@ proc pdk_purge_incomplete_tech {tech} {
   catch {exec rm -rf $dir}
 }
 
+# PRIMARY selection callback for middle-click paste on X11.
+proc pdk_import_selection_get {offset maxBytes} {
+  global _PDK_IMPORT_CLIP
+  if {![info exists _PDK_IMPORT_CLIP]} { return "" }
+  set end [expr {$offset + $maxBytes - 1}]
+  return [string range $_PDK_IMPORT_CLIP $offset $end]
+}
+
+proc pdk_import_copy_text {msg} {
+  global _PDK_IMPORT_CLIP
+  set _PDK_IMPORT_CLIP $msg
+  catch {clipboard clear}
+  if {[catch {clipboard append -- $msg}]} {
+    catch {clipboard append $msg}
+  }
+  # Also PRIMARY so middle-click paste works in terminals.
+  catch {
+    selection own .
+    selection handle . pdk_import_selection_get
+  }
+}
+
 # warning/max_error only log in release MAX (msg_flush popups are developer-only).
-proc pdk_import_tell {msg} {
+# Pass -copy to show a Copy button next to OK (error / incomplete dialogs).
+proc pdk_import_tell {msg {opt ""}} {
   set title "Import PDK"
   set x 80
   set y 80
   catch {set x [winfo pointerx .]}
   catch {set y [winfo pointery .]}
-  if {[catch {prop_dialog -title $title -buttons OK -width 78 -height 22 \
-      -x $x -y $y $msg}]} {
-    if {[catch {tk_dialog .pdkmsg $title $msg {} 0 OK}]} {
-      catch {puts $msg}
+  set buttons OK
+  if {$opt == "-copy" || $opt == "copy"} {
+    set buttons {OK Copy}
+  }
+  while {1} {
+    set ret OK
+    if {[catch {set ret [prop_dialog -title $title -buttons $buttons \
+        -width 78 -height 22 -x $x -y $y $msg]}]} {
+      if {[catch {set ret [tk_dialog .pdkmsg $title $msg {} 0 OK Copy]}]} {
+        catch {puts $msg}
+        return
+      }
+      # tk_dialog returns button index
+      if {$ret == 1} { set ret Copy } else { set ret OK }
     }
+    if {$ret == "Copy"} {
+      pdk_import_copy_text $msg
+      continue
+    }
+    return
   }
 }
 
@@ -767,7 +805,7 @@ proc pdk_import_dialog {} -desc {
 proc pdk_import_after_dialog {} {
   if {[catch {pdk_import_go} err]} {
     catch {_pdk_import_progress_close}
-    pdk_import_tell "PDK import failed:\n$err"
+    pdk_import_tell "PDK import failed:\n$err" -copy
   }
 }
 
@@ -780,7 +818,7 @@ proc pdk_import_go {} {
     set family ""
     set tech $PDK_IMPORT(tech)
     if {$url == ""} {
-      pdk_import_tell "PDK URL is empty."
+      pdk_import_tell "PDK URL is empty." -copy
       return
     }
     pdk_import_start [list $url] $tech $family
@@ -788,7 +826,7 @@ proc pdk_import_go {} {
   }
 
   if {![info exists PDK_PRESET($choice,local)]} {
-    pdk_import_tell "Unknown PDK selection '$choice'."
+    pdk_import_tell "Unknown PDK selection '$choice'." -copy
     return
   }
 
@@ -1436,7 +1474,7 @@ proc pdk_import_fail {msg} {
   global PDK_IMPORT
   _pdk_import_progress_close
   pdk_log "ERROR: $msg"
-  pdk_import_tell "PDK import failed.\n$msg\nLog: $PDK_IMPORT(log)"
+  pdk_import_tell "PDK import failed.\n$msg\nLog: $PDK_IMPORT(log)" -copy
 }
 
 proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}} {
@@ -1498,7 +1536,11 @@ $note\n\nImport PDK again to resume conversion."
   if {$gds != "" && [file exists $gds]} {
     append summary "\n\nSample GDS:\n  $gds"
   }
-  pdk_import_tell $summary
+  if {$mtok == "ok"} {
+    pdk_import_tell $summary
+  } else {
+    pdk_import_tell $summary -copy
+  }
 
   if {$mtok != "ok"} {
     return
