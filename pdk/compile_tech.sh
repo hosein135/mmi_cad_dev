@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 # Build MAX $tech.tech from a .source (make_tech) and compile $tech.tech27.
 #
-# Tcl 8.0 exec treats any stderr as failure, so this script never writes
-# to stderr: all diagnostics go to stdout.
+# Nested mmi_wish inside MAX deadlocks on Xvnc. make_tech's mmi_cpp|m4 pipe
+# also hangs under Tcl 8.0. This script:
+#   - uses tclsh only (never wish)
+#   - stops make_tech once .tech is fully written
+#   - compiles .tech27 with system cpp|m4
+#   - writes STATUS= for the Import PDK progress dialog
 #
-# Usage: compile_tech.sh SOURCE TECH DEST_TECHDIR
-exec 2>&1
+# Usage: compile_tech.sh SOURCE TECH DEST_TECHDIR [STATUS_FILE] [CANCEL_FILE] [LOG_FILE]
 set +e
 export LC_ALL=C
 export LANG=C
@@ -13,9 +16,18 @@ export LANG=C
 source_file="${1:-}"
 tech="${2:-}"
 dest="${3:-}"
+status_file="${4:-}"
+cancel_file="${5:-}"
+log_file="${6:-}"
+
+if [ -n "$log_file" ]; then
+  exec >>"$log_file" 2>&1
+else
+  exec 2>&1
+fi
 
 if [ -z "$source_file" ] || [ -z "$tech" ] || [ -z "$dest" ]; then
-  echo "usage: compile_tech.sh SOURCE TECH DEST_TECHDIR"
+  echo "usage: compile_tech.sh SOURCE TECH DEST_TECHDIR [STATUS] [CANCEL] [LOG]"
   exit 1
 fi
 
@@ -29,8 +41,48 @@ home="${HOME:-/mmi-home}"
 local_root="${MMI_LOCAL:-$home/cad/mmi_local}"
 priv="${home}/mmi_private/max/tech/${tech}"
 loc="${local_root}/max/tech/${tech}"
+mtpid=""
 
-echo "compile_tech.sh start"
+st() {
+  local pct="${1:-94}"
+  local msg="${2:-Compiling MAX technology...}"
+  local status="${3:-running}"
+  echo "$msg"
+  if [ -n "$status_file" ]; then
+    {
+      echo "STATUS=$status"
+      echo "PCT=$pct"
+      echo "MSG=$msg"
+    } > "${status_file}.tmp"
+    mv -f "${status_file}.tmp" "$status_file"
+  fi
+}
+
+cancelled() {
+  [ -n "$cancel_file" ] && [ -f "$cancel_file" ]
+}
+
+cleanup() {
+  if [ -n "${mtpid:-}" ]; then
+    kill "$mtpid" 2>/dev/null
+    sleep 0.2 2>/dev/null || sleep 1
+    kill -9 "$mtpid" 2>/dev/null
+    wait "$mtpid" 2>/dev/null
+    mtpid=""
+  fi
+}
+trap cleanup EXIT TERM INT
+
+finish_fail() {
+  st 94 "${1:-compile failed}" fail
+  exit 1
+}
+
+if cancelled; then
+  finish_fail "Cancelled."
+fi
+
+st 94 "compile_tech.sh starting" running
 echo "  source=$source_file"
 echo "  tech=$tech"
 echo "  dest=$dest"
@@ -75,6 +127,18 @@ ensure_drc_macros() {
   return 1
 }
 
+tech_bytes() {
+  local f sz
+  for f in "$priv/${tech}.tech" "$dest/${tech}.tech" "$loc/${tech}.tech"; do
+    if [ -f "$f" ]; then
+      sz=$(wc -c < "$f" 2>/dev/null | tr -d ' ')
+      echo "${sz:-0}"
+      return 0
+    fi
+  done
+  echo 0
+}
+
 compile_dir() {
   local dir="$1"
   local src="$dir/${tech}.tech"
@@ -88,8 +152,8 @@ compile_dir() {
   echo "compiling $src ($(wc -c < "$src" | tr -d ' ') bytes)"
 
   local cpp m4 gccb trad sz
-  cpp="$(find_bin cpp /usr/bin/cpp mmi_cpp)"
-  m4="$(find_bin m4 /usr/bin/m4 mmi_m4)"
+  cpp="$(find_bin cpp /usr/bin/cpp)"
+  m4="$(find_bin m4 /usr/bin/m4)"
   gccb="$(find_bin gcc /usr/bin/gcc)"
   echo "  cpp=$cpp"
   echo "  m4=$m4"
@@ -142,40 +206,91 @@ copy_tech() {
   fi
 }
 
-echo "running make_tech..."
-make_bin="$(find_bin make_tech)"
-wish_bin="$(find_bin mmi_tclsh mmi_wish)"
-echo "  make_tech=$make_bin"
-echo "  tcl=$wish_bin"
+# make_tech writes .tech then blocks forever on mmi_cpp|m4 under MAX.
+# Stop it once .tech size is stable; we compile .tech27 ourselves.
+run_make_tech_limited() {
+  local sz last same i tclsh make_bin
+  sz=$(tech_bytes)
+  if [ "$sz" -gt 1000 ]; then
+    echo "reusing existing .tech ($sz bytes)"
+    return 0
+  fi
 
-if [ -n "$wish_bin" ] && [ -n "$make_bin" ]; then
-  "$wish_bin" -f "$make_bin" -- -r -file "$source_file" -tech "$tech"
-  echo "make_tech (mmi_wish) exit $?"
-elif [ -n "$make_bin" ]; then
-  "$make_bin" -r -file "$source_file" -tech "$tech"
-  echo "make_tech exit $?"
-else
-  echo "make_tech not found"
+  make_bin="$(find_bin make_tech)"
+  # Never mmi_wish: nested Tk vs MAX freezes the Import PDK dialog.
+  tclsh="$(find_bin mmi_tclsh /usr/bin/tclsh tclsh)"
+  echo "  make_tech=$make_bin"
+  echo "  tclsh=$tclsh"
+  if [ -z "$make_bin" ]; then
+    echo "make_tech not found"
+    return 1
+  fi
+
+  st 94 "Running make_tech (writing .tech)..."
+  if [ -n "$tclsh" ]; then
+    "$tclsh" -f "$make_bin" -- -r -file "$source_file" -tech "$tech" &
+  else
+    echo "WARNING: no tclsh; skipping make_tech shebang (it would start wish and hang)"
+    return 1
+  fi
+  mtpid=$!
+  echo "make_tech pid $mtpid"
+
+  last=0
+  same=0
+  i=0
+  while [ "$i" -lt 90 ]; do
+    i=$((i + 1))
+    if cancelled; then
+      echo "cancelled during make_tech"
+      cleanup
+      return 1
+    fi
+    if ! kill -0 "$mtpid" 2>/dev/null; then
+      wait "$mtpid"
+      echo "make_tech exited $?"
+      mtpid=""
+      return 0
+    fi
+    sz=$(tech_bytes)
+    st 94 "make_tech writing .tech (${sz} bytes)..."
+    if [ "$sz" -gt 1000 ]; then
+      if [ "$sz" = "$last" ]; then
+        same=$((same + 1))
+      else
+        same=0
+        last=$sz
+      fi
+      if [ "$same" -ge 2 ]; then
+        echo ".tech stable at $sz bytes; stopping make_tech before hung cpp|m4"
+        cleanup
+        return 0
+      fi
+    fi
+    sleep 1
+  done
+  echo "make_tech timed out after 90s"
+  cleanup
+  return 0
+}
+
+run_make_tech_limited
+
+if cancelled; then
+  finish_fail "Cancelled."
 fi
 
 echo "after make_tech:"
 ls -la "$priv" 2>/dev/null || echo "  missing $priv"
 ls -la "$dest" 2>/dev/null || echo "  missing $dest"
 
-# make_tech writes ~/mmi_private/max/tech/<tech>/ ; also try DEST.
 copy_tech "$priv" "$dest"
 copy_tech "$dest" "$priv"
 
-ok=0
-if compile_dir "$priv"; then
-  :
-fi
-if compile_dir "$dest"; then
-  :
-fi
-if compile_dir "$loc"; then
-  :
-fi
+st 96 "Compiling .tech27 (cpp | m4)..."
+compile_dir "$priv" || true
+compile_dir "$dest" || true
+compile_dir "$loc" || true
 
 copy_tech "$priv" "$dest"
 copy_tech "$dest" "$priv"
@@ -188,8 +303,8 @@ ls -la "$loc" 2>/dev/null || true
 ls -la "$dest" 2>/dev/null || true
 
 if [ -s "$priv/${tech}.tech27" ] || [ -s "$loc/${tech}.tech27" ] || [ -s "$dest/${tech}.tech27" ]; then
+  st 99 "Compiled ${tech}.tech27" ok
   echo "compile_tech.sh ok"
   exit 0
 fi
-echo "compile_tech.sh failed: no ${tech}.tech27"
-exit 1
+finish_fail "compile_tech.sh failed: no ${tech}.tech27"

@@ -3,7 +3,7 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 4
+set _PDK_IMPORT_REV 5
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -60,7 +60,7 @@ proc pdk_preset_init {} {
               stat_status stat_msg stat_dest} {
     if {![info exists PDK_IMPORT($k)]} { set PDK_IMPORT($k) "" }
   }
-  foreach k {total url_i stat_pct fetch_dead} {
+  foreach k {total url_i stat_pct fetch_dead compile_dead} {
     if {![info exists PDK_IMPORT($k)]} { set PDK_IMPORT($k) 0 }
   }
 }
@@ -449,10 +449,10 @@ proc pdk_find_tech27 {tech} {
 proc pdk_compile_script {} {
   global env
   set cands {}
+  lappend cands /mmi-pdk-live/compile_tech.sh
   if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
     lappend cands [file join $env(MMI_LOCAL) max pdk compile_tech.sh]
   }
-  lappend cands /mmi-pdk-live/compile_tech.sh
   if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
     lappend cands [file join $env(MMI_PDK_DIR) compile_tech.sh]
   }
@@ -849,6 +849,7 @@ proc pdk_import_prepare_work {tech family} {
   set PDK_IMPORT(stat_msg) ""
   set PDK_IMPORT(stat_dest) ""
   set PDK_IMPORT(fetch_dead) 0
+  set PDK_IMPORT(compile_dead) 0
   catch {file delete $PDK_IMPORT(cancel)}
   catch {file delete $PDK_IMPORT(log)}
   catch {file delete $PDK_IMPORT(status)}
@@ -1285,35 +1286,91 @@ proc pdk_import_convert {} {
   if {[info exists env(HOME)]} { set home $env(HOME) }
   if {$home == ""} { set home /mmi-home }
   set privdir [file join $home mmi_private max tech $tech]
+  set PDK_IMPORT(source) $source
+  set PDK_IMPORT(techdir) $techdir
+  set PDK_IMPORT(privdir) $privdir
+  set PDK_IMPORT(layers) [llength $rows]
+  set PDK_IMPORT(compile_dead) 0
 
-  set mtok failed
   set sh [pdk_compile_script]
   set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
-  pdk_log "pdk_import rev 4 compile_tech.sh=$sh bash=$bash"
-  if {$sh != "" && $bash != ""} {
-    pdk_log "compile_tech.sh $source $tech $techdir"
-    set err ""
-    if {[catch {set out [exec $bash $sh $source $tech $techdir]} err]} {
-      pdk_log $err
-    } else {
-      pdk_log $out
-    }
-  } else {
-    set make [pdk_which {make_tech}]
-    if {$make != ""} {
-      pdk_log "make_tech -r -file $source -tech $tech"
-      if {[catch {set out [exec $make -r -file $source -tech $tech]} err]} {
-        pdk_log "make_tech: $err"
-      } else {
-        pdk_log $out
-      }
-    } else {
-      pdk_log "make_tech not found"
-    }
+  pdk_log "pdk_import rev 5 compile_tech.sh=$sh bash=$bash"
+  if {$sh == "" || $bash == ""} {
+    pdk_log "compile_tech.sh or bash missing; trying in-process compile"
     pdk_finish_max_tech $tech $techdir $privdir
+    pdk_import_after_compile
+    return
   }
 
+  catch {file delete $PDK_IMPORT(status)}
+  pdk_log "compile_tech.sh $source $tech $techdir (background)"
+  if {[catch {set PDK_IMPORT(pid) [exec $bash $sh $source $tech $techdir \
+      $PDK_IMPORT(status) $PDK_IMPORT(cancel) $PDK_IMPORT(log) &]} err]} {
+    pdk_log "compile_tech.sh failed to start: $err"
+    pdk_finish_max_tech $tech $techdir $privdir
+    pdk_import_after_compile
+    return
+  }
+  set PDK_IMPORT(phase) compile
+  set PDK_IMPORT(after) [after 400 pdk_import_poll_compile]
+}
+
+proc pdk_import_poll_compile {} {
+  global PDK_IMPORT
+  set PDK_IMPORT(after) ""
+
+  if {[pdk_cancelled]} {
+    catch {exec kill $PDK_IMPORT(pid)}
+    pdk_import_fail "Cancelled."
+    return
+  }
+
+  pdk_import_read_status
+  set st $PDK_IMPORT(stat_status)
+  set pct $PDK_IMPORT(stat_pct)
+  set msg $PDK_IMPORT(stat_msg)
+  if {$msg == ""} { set msg "Compiling MAX technology..." }
+  if {![regexp {^[0-9]+$} $pct]} { set pct 94 }
+  _pdk_import_progress_update $pct $msg
+
+  if {$st == "ok" || $st == "fail"} {
+    set PDK_IMPORT(pid) ""
+    pdk_import_after_compile
+    return
+  }
+
+  set alive 1
+  if {$PDK_IMPORT(pid) != ""} {
+    if {[catch {exec kill -0 $PDK_IMPORT(pid)}]} {
+      set alive 0
+    }
+  }
+  if {!$alive} {
+    incr PDK_IMPORT(compile_dead)
+    if {$PDK_IMPORT(compile_dead) < 8} {
+      set PDK_IMPORT(after) [after 400 pdk_import_poll_compile]
+      return
+    }
+    pdk_log "compile_tech.sh exited without status"
+    pdk_import_after_compile
+    return
+  }
+
+  set PDK_IMPORT(after) [after 400 pdk_import_poll_compile]
+}
+
+proc pdk_import_after_compile {} {
+  global PDK_IMPORT env
+
+  set tech $PDK_IMPORT(tech)
+  set family $PDK_IMPORT(family)
+  set source $PDK_IMPORT(source)
+  set techdir $PDK_IMPORT(techdir)
+  set privdir $PDK_IMPORT(privdir)
+  set rows $PDK_IMPORT(layers)
+
   pdk_finish_max_tech $tech $techdir $privdir
+  set mtok failed
   if {[pdk_find_tech27 $tech] != ""} {
     set mtok ok
     pdk_log "MAX tech27 [pdk_find_tech27 $tech]"
@@ -1353,7 +1410,7 @@ proc pdk_import_convert {} {
     }
   }
 
-  _pdk_import_progress_update 88 "Installing into shared PDK_ROOT [pdk_root]..."
+  _pdk_import_progress_update 98 "Installing into shared PDK_ROOT [pdk_root]..."
   set shared [pdk_install_into_root $PDK_IMPORT(src) $family $tech]
   if {$shared != ""} {
     pdk_log "Shared PDK at $shared"
@@ -1372,7 +1429,7 @@ proc pdk_import_convert {} {
   }
 
   _pdk_import_progress_update 100 "PDK ready as MAX technology '$tech'"
-  pdk_import_succeed $tech $family [llength $rows] $mtok $gds $libpaths $source $shared
+  pdk_import_succeed $tech $family $rows $mtok $gds $libpaths $source $shared
 }
 
 proc pdk_import_fail {msg} {
