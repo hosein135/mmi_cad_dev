@@ -334,13 +334,97 @@ proc pdk_preset_ready {choice} {
   return 1
 }
 
-proc pdk_preset_radio_labels {} {
+# complete | convert | resume | restart | missing
+proc pdk_import_state {choice tech} {
   global PDK_PRESET
+  if {![info exists PDK_PRESET($choice,local)]} { return missing }
+  set local $PDK_PRESET($choice,local)
+  set fetch $PDK_PRESET($choice,fetch)
+  if {[pdk_tree_ready $local] && [pdk_find_tech27 $tech] != ""} {
+    return complete
+  }
+  if {[pdk_tree_ready $local]} {
+    return convert
+  }
+  if {[pdk_fetch_can_resume $fetch]} {
+    return resume
+  }
+  if {[file exists $local]} {
+    return restart
+  }
+  return missing
+}
+
+proc pdk_fetch_can_resume {fetch_family} {
+  set root [pdk_root]
+  set dirs [list [file join $root .fetch-$fetch_family]]
+  foreach d [glob -nocomplain [file join $root .fetch-${fetch_family}.*]] {
+    lappend dirs $d
+  }
+  foreach d $dirs {
+    set n [glob -nocomplain [file join $d dl *.tar.zst] \
+        [file join $d dl *.tar.zst.ok]]
+    if {[llength $n]} { return 1 }
+  }
+  return 0
+}
+
+proc pdk_path_under_root {path} {
+  if {$path == ""} { return 0 }
+  set root [_mmi_file_normalize [pdk_root]]
+  set p [_mmi_file_normalize $path]
+  if {$p == $root} { return 0 }
+  return [string match ${root}/* $p]
+}
+
+proc pdk_remove_incomplete_tree {dir} {
+  if {![pdk_path_under_root $dir]} { return }
+  if {![file exists $dir]} { return }
+  if {[pdk_tree_ready $dir]} { return }
+  pdk_log "Removing incomplete PDK tree $dir"
+  catch {exec rm -rf $dir}
+}
+
+proc pdk_purge_incomplete_tech {tech} {
+  if {$tech == "" || $tech == "auto"} { return }
+  if {[pdk_find_tech27 $tech] != ""} { return }
+  set dir [file join [pdk_root] max tech $tech]
+  if {![pdk_path_under_root $dir]} { return }
+  if {![file isdirectory $dir]} { return }
+  pdk_log "Removing incomplete MAX tech $dir"
+  catch {exec rm -rf $dir}
+}
+
+proc pdk_import_tell {msg} {
+  if {[catch {warning $msg}]} { puts $msg }
+}
+
+proc pdk_import_already_ok {choice tech local} {
+  set tech27 [pdk_find_tech27 $tech]
+  set msg "PDK import was successfully added.\n\n\
+PDK: $choice\n\
+open_pdks tree:\n  $local\n\
+MAX technology:\n  $tech27\n\n\
+Start MAX with:\n  max -tech $tech\n\n\
+Nothing was downloaded."
+  pdk_import_tell $msg
+}
+
+proc pdk_preset_radio_labels {} {
+  global PDK_PRESET PDK_IMPORT
   set out {}
   foreach c {sky130A gf180mcu sg13g2} {
     set lab $PDK_PRESET($c,label)
-    if {[pdk_preset_ready $c]} {
-      append lab " (already imported)"
+    set tech $PDK_PRESET($c,tech)
+    if {[info exists PDK_IMPORT(tech)] && $PDK_IMPORT(tech) != "auto" \
+        && $PDK_IMPORT(tech) != "" && $PDK_IMPORT(pdk) == $c} {
+      set tech $PDK_IMPORT(tech)
+    }
+    switch -- [pdk_import_state $c $tech] {
+      complete { append lab " (imported)" }
+      convert  { append lab " (will finish convert)" }
+      resume   { append lab " (will resume download)" }
+      restart  { append lab " (incomplete - retry)" }
     }
     lappend out $lab
   }
@@ -495,7 +579,7 @@ proc pdk_import_dialog {} -desc {
   lappend prop_list [list "PDK:" PDK_IMPORT(pdk) \
       -radio [pdk_preset_radio_labels] \
       -values {sky130A gf180mcu sg13g2 custom} \
-      -help {Choose a foundry PDK. Names marked (already imported) will not be downloaded again. Custom URL is used only when that row is selected.}]
+      -help {Choose a foundry PDK. Imported names are skipped. Incomplete downloads resume; broken leftovers are removed and retried.}]
 
   lappend prop_list [list "Custom URL:" PDK_IMPORT(url) -entry -width 56 \
       -help {Used only if Custom URL is selected. GitHub repo, tar.gz/zip, or a directory on disk.}]
@@ -526,22 +610,27 @@ proc pdk_import_dialog {} -desc {
     set tech $PDK_IMPORT(tech)
   }
   set local $PDK_PRESET($choice,local)
+  set state [pdk_import_state $choice $tech]
 
-  set tech27 [pdk_find_tech27 $tech]
-  if {[pdk_tree_ready $local] && $tech27 != ""} {
-    set msg "PDK '$choice' is already imported and ready for MAX.\n\n\
-open_pdks tree:\n  $local\n\
-MAX technology:\n  $tech27\n\n\
-Start MAX with:\n  max -tech $tech\n\n\
-Nothing was downloaded."
-    if {[catch {warning $msg}]} { puts $msg }
+  if {$state == "complete"} {
+    pdk_import_already_ok $choice $tech $local
     return
   }
 
-  if {[pdk_tree_ready $local]} {
+  if {$state == "convert"} {
+    pdk_log "Resuming MAX convert for $choice (open_pdks tree is already in place)"
     pdk_import_start [list $local] $tech $family
     return
   }
+
+  if {$state == "restart"} {
+    pdk_log "Incomplete PDK '$choice' - removing leftover files and importing again"
+    pdk_remove_incomplete_tree $local
+    pdk_purge_incomplete_tech $tech
+  } elseif {$state == "resume"} {
+    pdk_log "Resuming PDK download for $choice"
+  }
+
   pdk_import_fetch $PDK_PRESET($choice,fetch) $tech $family
 }
 
@@ -617,7 +706,11 @@ proc pdk_import_fetch {fetch_family tech family} {
   catch {set env(PDK_ROOT) [pdk_root]}
 
   _pdk_import_progress_open
-  _pdk_import_progress_update 1 "Downloading compiled open_pdks ($fetch_family)..."
+  if {[pdk_fetch_can_resume $fetch_family]} {
+    _pdk_import_progress_update 1 "Resuming PDK download ($fetch_family)..."
+  } else {
+    _pdk_import_progress_update 1 "Downloading compiled open_pdks ($fetch_family)..."
+  }
   pdk_log "fetch_pdk.sh $fetch_family"
 
   if {[catch {set PDK_IMPORT(pid) [exec $bash $script $fetch_family \
@@ -693,7 +786,11 @@ proc pdk_import_start {urls tech family} {
   set first [lindex $urls 0]
   if {[file isdirectory $first]} {
     set PDK_IMPORT(src) $first
-    _pdk_import_progress_update 80 "Local PDK directory — converting..."
+    if {[pdk_tree_ready $first]} {
+      _pdk_import_progress_update 80 "Resuming MAX conversion (open_pdks already downloaded)..."
+    } else {
+      _pdk_import_progress_update 80 "Converting local PDK directory..."
+    }
     pdk_import_convert
     return
   }
@@ -1110,14 +1207,32 @@ proc pdk_import_succeed {tech family layers mtok gds libpaths source {shared ""}
     set magicrc_note "Copied into shared PDK_ROOT:\n  $shared\nlibs.tech/magic/*.magicrc or libs.ref is still missing."
   }
 
-  set summary "PDK converted and installed (shared folder, no extra copy for MAX tech).\n\n\
+  if {$mtok == "ok"} {
+    set summary "PDK import was successfully added.\n\n\
 Technology: $tech\n\
 Family: $family\n\
 Layers: $layers\n\
 MAX tech: [file dirname $source]\n\
 PDK_ROOT: [pdk_root]\n\
 \n$magicrc_note\n\
-\nStart MAX with:\n  max -tech $tech\n$note"
+\nStart MAX with:\n  max -tech $tech"
+    catch {
+      set stamp [file join [file dirname $source] MMI_MAX_IMPORT]
+      set fh [open $stamp w]
+      puts $fh "mmi-cad MAX import ok"
+      puts $fh "  tech $tech"
+      close $fh
+    }
+  } else {
+    set summary "PDK download finished but MAX conversion is not complete.\n\n\
+Technology: $tech\n\
+Family: $family\n\
+Layers: $layers\n\
+MAX tech: [file dirname $source]\n\
+PDK_ROOT: [pdk_root]\n\
+\n$magicrc_note\n\
+$note\n\nImport PDK again to resume conversion."
+  }
 
   if {$gds != "" && [file exists $gds]} {
     append summary "\n\nSample GDS:\n  $gds"

@@ -9,6 +9,7 @@
 #   https://github.com/fossi-foundation/ciel-releases
 #
 # Usage: fetch_pdk.sh <sky130A|gf180mcu|sg13g2> [status_file] [cancel_file]
+# Incomplete runs keep $PDK_ROOT/.fetch-<family>/ so the next Import PDK resumes.
 set -euo pipefail
 
 FAMILY="${1:-}"
@@ -100,7 +101,7 @@ download_one() {
   write_status running "$pct_lo" "Downloading $label"
   log "GET $url"
   mkdir -p "$(dirname "$dest")"
-  rm -f "$dest" "${dest}.part"
+  rm -f "$dest" "${dest}.part" "${dest}.ok"
   curl -fL --retry 3 --retry-delay 2 --connect-timeout 30 \
     -A "mmi-cad-pdk-fetch" -o "${dest}.part" "$url" &
   CURL_PID=$!
@@ -128,11 +129,19 @@ download_one() {
   CURL_PID=""
   set -e
   if [ "$rc" -ne 0 ] || [ ! -s "${dest}.part" ]; then
-    rm -f "${dest}.part"
+    rm -f "${dest}.part" "${dest}.ok"
     die "Download failed: $label ($url)"
   fi
   mv -f "${dest}.part" "$dest"
+  : >"${dest}.ok"
   write_status running "$pct_hi" "Downloaded $label"
+}
+
+archive_ready() {
+  local a="$1"
+  [ -s "$a" ] || return 1
+  [ -f "${a}.ok" ] || return 1
+  zstd -t "$a" >/dev/null 2>&1
 }
 
 extract_zst() {
@@ -194,13 +203,16 @@ if tree_ready "$DEST"; then
   exit 0
 fi
 
-# Skeleton leftover (Magic rc, no stdcells) — replace, keep max/tech.
+# Incomplete DEST cannot be resumed in-place; keep download cache, drop the tree.
+# Do not delete $PDK_ROOT/max (MAX tech files).
 if [ -d "$DEST" ] && ! tree_ready "$DEST"; then
-  log "Replacing incomplete tree $DEST"
+  log "Removing incomplete tree $DEST"
   rm -rf "$DEST"
 fi
 
-STAGE=""
+STAGE="$PDK_ROOT/.fetch-${FAMILY}"
+DL="$STAGE/dl"
+UNPACK="$STAGE/unpack"
 CURL_PID=""
 
 on_exit() {
@@ -208,33 +220,66 @@ on_exit() {
     kill "$CURL_PID" 2>/dev/null || true
     wait "$CURL_PID" 2>/dev/null || true
   fi
-  if [ -n "${STAGE:-}" ]; then
-    rm -rf "$STAGE"
-  fi
+  # Keep $STAGE on failure/cancel so the next Import PDK can resume.
 }
 trap on_exit EXIT
 
-STAGE="$PDK_ROOT/.fetch-${FAMILY}.$$"
-DL="$STAGE/dl"
-UNPACK="$STAGE/unpack"
-mkdir -p "$DL" "$UNPACK"
+mkdir -p "$DL"
+rm -f "$DL"/*.part
+
+# Fold leftover per-PID stage dirs from older fetch_pdk.sh into the stable cache.
+for old in "$PDK_ROOT"/.fetch-"${FAMILY}".*; do
+  [ -d "$old" ] || continue
+  [ "$old" = "$STAGE" ] && continue
+  log "Merging leftover fetch dir $old"
+  if [ -d "$old/dl" ]; then
+    for f in "$old/dl"/*.tar.zst "$old/dl"/*.tar.zst.ok; do
+      [ -e "$f" ] || continue
+      base="$(basename "$f")"
+      if [ ! -e "$DL/$base" ]; then
+        mv "$f" "$DL/$base" 2>/dev/null || cp -a "$f" "$DL/$base"
+      fi
+    done
+  fi
+  rm -rf "$old"
+done
+
+rm -rf "$UNPACK"
+mkdir -p "$UNPACK"
 
 write_status running 1 "Fetching compiled open_pdks ($TAG)"
-log "PDK_ROOT=$PDK_ROOT tag=$TAG variant=$VARIANT"
+log "PDK_ROOT=$PDK_ROOT tag=$TAG variant=$VARIANT stage=$STAGE"
 
 set -- $ASSETS
 N=$#
 i=0
+have=0
+for asset in $ASSETS; do
+  if archive_ready "$DL/${asset}.tar.zst"; then
+    have=$((have + 1))
+  fi
+done
+if [ "$have" -gt 0 ]; then
+  log "Resuming: $have/$N assets already downloaded"
+  write_status running 2 "Resuming download ($have/$N assets already fetched)"
+fi
+
 for asset in $ASSETS; do
   i=$((i + 1))
   check_cancel
   pct_lo=$((5 + (i - 1) * 70 / N))
   pct_hi=$((5 + i * 70 / N))
   archive="$DL/${asset}.tar.zst"
-  download_one "${CIEL_BASE}/${TAG}/${asset}.tar.zst" "$archive" "$asset.tar.zst" "$pct_lo" "$pct_hi"
+  if archive_ready "$archive"; then
+    log "Resume: skip download $asset"
+    write_status running "$pct_hi" "Already downloaded $asset"
+  else
+    rm -f "$archive" "${archive}.part" "${archive}.ok"
+    download_one "${CIEL_BASE}/${TAG}/${asset}.tar.zst" "$archive" "$asset.tar.zst" "$pct_lo" "$pct_hi"
+    archive_ready "$archive" || die "Downloaded archive is not valid zstd: $asset"
+  fi
   write_status running "$pct_hi" "Unpacking $asset"
   extract_zst "$archive" "$UNPACK"
-  rm -f "$archive"
 done
 
 write_status running 88 "Installing into $PDK_ROOT"
@@ -278,6 +323,7 @@ tree_ready "$DEST" || die "Install incomplete: $DEST (need libs.tech/magic/*.mag
   echo "  source  ${CIEL_BASE}/${TAG}/"
 } >"$DEST/MMI_PDK_SOURCE"
 
+rm -rf "$STAGE"
 write_status ok 100 "Installed $DEST" "$DEST"
 log "Ready: $DEST"
 exit 0
