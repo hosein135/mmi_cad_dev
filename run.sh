@@ -74,6 +74,7 @@ if [ ! -f "${SCRIPT_DIR}/flake.lock" ]; then
 fi
 
 mmi_ensure_flake_git_files || exit 1
+mmi_warn_if_git_dirty
 
 if [ "${PREP_ONLY}" = true ]; then
   info "Building mmi-vendor (pure flake eval, nixpkgs 25.05) ..."

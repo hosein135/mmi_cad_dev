@@ -27,17 +27,19 @@
       # the space-padded day breaks the cc-wrapper). Also used for ar/tar.
       sourceDateEpoch = "315532800";
 
+      # Take CAD sources from the flake copy already in the Nix store
+      # (`self`), not from `./vendor/mmi` on the worktree. A Tcl-only commit
+      # or a dirty eval used to recopy that tree from disk and freeze small VMs.
       vendorSrc =
         if !builtins.pathExists ./vendor/mmi/src/max4.3.16 then
           throw "vendor/mmi/src/max4.3.16 missing — this git tree must include the public-domain CAD sources"
         else
-          lib.fileset.toSource {
-            root = ./vendor/mmi;
-            fileset = lib.fileset.difference ./vendor/mmi (
-              lib.fileset.unions (
-                lib.optional (builtins.pathExists ./vendor/mmi/bin) ./vendor/mmi/bin
-              )
-            );
+          lib.cleanSourceWith {
+            name = "mmi-vendor-src";
+            src = "${self}/vendor/mmi";
+            filter =
+              path: type:
+              !(type == "directory" && baseNameOf path == "bin" && baseNameOf (dirOf path) == "mmi");
           };
 
       xkbRoot =
@@ -122,16 +124,14 @@
 
       # Scripts + Magic rc fallbacks + samples only. Foundry PDKs are not
       # flake inputs; MAX File → Import PDK downloads them at user request.
-      # Copy via fileset from the flake root so nested git-tracked paths
-      # (pdk/samples, pdk/magic) are included. A direct directory import of
-      # pdk on a dirty tree can snapshot only top-level files.
+      # Copy root is ./pdk (not ./.) so a Tcl-only change does not walk vendor/mmi.
       mmiPdk = pkgs.runCommand "mmi-pdk"
         {
           SOURCE_DATE_EPOCH = sourceDateEpoch;
           TZ = "UTC";
           LC_ALL = "C";
           src = lib.fileset.toSource {
-            root = ./.;
+            root = ./pdk;
             fileset = ./pdk;
           };
           xresources = ./nix/x11/Xresources;
@@ -140,16 +140,16 @@
         ''
           export LC_ALL=C
           mkdir -p $out/app-defaults $out/magic $out/samples
-          install -Dm644 "$src/pdk/pdk_import.tcl" $out/pdk_import.tcl
-          install -Dm644 "$src/pdk/mag_import.tcl" $out/mag_import.tcl
-          install -Dm755 "$src/pdk/mag2gds.sh" $out/mag2gds.sh
-          install -Dm755 "$src/pdk/fetch_pdk.sh" $out/fetch_pdk.sh
-          install -Dm644 "$src/pdk/maxrc" $out/maxrc
-          if [ -d "$src/pdk/samples" ]; then
-            cp -a "$src/pdk/samples/." $out/samples/
+          install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
+          install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
+          install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
+          install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
+          install -Dm644 "$src/maxrc" $out/maxrc
+          if [ -d "$src/samples" ]; then
+            cp -a "$src/samples/." $out/samples/
           fi
-          if [ -d "$src/pdk/magic" ]; then
-            cp -a "$src/pdk/magic/." $out/magic/
+          if [ -d "$src/magic" ]; then
+            cp -a "$src/magic/." $out/magic/
           fi
           chmod -R u+w "$out"
           install -Dm644 "$xresources" $out/Xresources

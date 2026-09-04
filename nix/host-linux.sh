@@ -119,9 +119,9 @@ experimental-features = nix-command flakes
 "
 }
 
-# Nix flakes copy only Git-tracked files. Git does not track directories, so a
-# dirty eval of ./nix/rebuild/pccts-h fails with:
-#   Path 'nix/rebuild/pccts-h' is not tracked by Git — run: git add -N ...
+# Restore flake paths that are missing from the work tree. Do not `git add`:
+# staging on every ./run.sh dirties the tree, and a dirty flake recopies
+# vendor/mmi from disk (can OOM a small VM).
 mmi_ensure_flake_git_files() {
   local rel f
   if ! command -v git >/dev/null 2>&1; then
@@ -131,27 +131,17 @@ mmi_ensure_flake_git_files() {
     return 0
   fi
 
-  # Restore nested trees Nix omits when they are missing from the work tree.
+  # Older run.sh staged pdk/nix on every launch. Unstage those paths so Nix
+  # can use the Git commit already in the store instead of recopying vendor/mmi.
+  if ! git -C "${SCRIPT_DIR}" diff --cached --quiet -- nix pdk 2>/dev/null; then
+    git -C "${SCRIPT_DIR}" reset -q HEAD -- nix pdk
+  fi
+
   if [ ! -d "${SCRIPT_DIR}/pdk/samples" ] \
     && git -C "${SCRIPT_DIR}" ls-tree -r --name-only HEAD -- pdk/samples | grep -q .; then
     git -C "${SCRIPT_DIR}" checkout HEAD -- pdk/samples
     info "Restored pdk/samples from git"
   fi
-
-  # Git has no directory objects. Only `git add -N` when the path has no
-  # index entries; -N on an already-tracked dir can drop nested files from the
-  # dirty flake copy (pdk/samples).
-  local d
-  for d in nix/rebuild/pccts-h pdk nix/rebuild nix/x11; do
-    if [ -d "${SCRIPT_DIR}/${d}" ]; then
-      if git -C "${SCRIPT_DIR}" ls-files -- "${d}" | grep -q .; then
-        git -C "${SCRIPT_DIR}" add -A -- "${d}"
-      else
-        git -C "${SCRIPT_DIR}" add -N -- "${d}" 2>/dev/null || true
-        git -C "${SCRIPT_DIR}" add -- "${d}"
-      fi
-    fi
-  done
 
   while IFS= read -r rel; do
     [ -n "${rel}" ] || continue
@@ -164,18 +154,14 @@ mmi_ensure_flake_git_files() {
         info "Restored ${rel} from git (required by flake.nix)"
       else
         error "flake.nix needs '${rel}', but it is not in this Git repository."
-        error "Fix:  git add -N ${rel} && git add ${rel}"
+        error "Fix:  git add ${rel} && git commit"
         return 1
       fi
     fi
 
-    # Intent-to-add first: Nix dirty eval looks up the path in the index.
-    # Directories only appear after `git add -N` (files after `git add`).
-    git -C "${SCRIPT_DIR}" add -N -- "${rel}" 2>/dev/null || true
-    git -C "${SCRIPT_DIR}" add -- "${rel}"
     if [ -d "${f}" ] && ! git -C "${SCRIPT_DIR}" ls-files -- "${rel}" | grep -q .; then
       error "flake.nix needs directory '${rel}', but Git has no files there."
-      error "Fix:  git add ${rel}"
+      error "Fix:  git add ${rel} && git commit"
       return 1
     fi
   done < <(
@@ -184,4 +170,18 @@ mmi_ensure_flake_git_files() {
       | sed 's|^\./||' \
       | sort -u
   )
+}
+
+mmi_warn_if_git_dirty() {
+  if ! command -v git >/dev/null 2>&1; then
+    return 0
+  fi
+  if ! git -C "${SCRIPT_DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    return 0
+  fi
+  if [ -n "$(git -C "${SCRIPT_DIR}" status --porcelain --untracked-files=normal 2>/dev/null)" ]; then
+    warn "Git working tree is dirty. Nix may recopy vendor/mmi and freeze a small VM."
+    warn "If stuck on 'copying .../vendor/mmi', press Ctrl-C, run git status, then"
+    warn "commit, stash, or restore accidental edits so the tree is clean and retry."
+  fi
 }
