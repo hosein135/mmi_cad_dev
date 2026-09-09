@@ -2,11 +2,13 @@
 # File / Local menu: "Import Magic Design Folder..."
 #
 # Magic's native .mag reader (db_magic) was removed from this MAX package.
-# Preferred path: mag2gds.sh runs Magic VLSI with the open_pdks tech so the
-# GDS carries the real cifoutput geometry (implants, contact cuts, ...).
+# Preferred path: mag2gds.sh runs nixpkgs magic-vlsi with the open_pdks tech
+# so the GDS carries the real cifoutput geometry (implants, contact cuts, ...).
 # Fallback path: this file parses the .mag files itself and writes a GDSII
 # library from the paint (no boolean generation), then MAX reads the GDS
 # with the imported PDK technology and saves .max cells.
+# After a successful convert, open_mag.sh starts Magic GUI on the original
+# .mag (same X display as MAX) so the two layouts can be compared.
 #
 # MAX embeds Tcl 8.0: no [ \t] / \S regexp classes (a tab inside [] is a
 # literal "t"), no wide(), no string repeat, no glob -directory, no lset.
@@ -14,7 +16,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 6
+set _MAG_IMPORT_REV 7
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -71,6 +73,7 @@ set MAG_IMPORT(stat_msg) ""
 set MAG_IMPORT(stat_dest) ""
 set MAG_IMPORT(fetch_dead) 0
 set MAG_IMPORT(magic_polls) 0
+if {![info exists MAG_IMPORT(open_magic)]} { set MAG_IMPORT(open_magic) 1 }
 
 # ── Small Tcl 8.0-safe helpers ───────────────────────────────────────────────
 
@@ -1395,6 +1398,10 @@ proc mag_import_dialog {} -desc {
       -radio $labels -values $values \
       -help {Caravel Mag sample requires sky130A. Import a PDK first if the list is only mmi18/mmi25.}]
 
+  lappend prop_list [list "Also open original Mag in Magic VLSI (compare with MAX):" \
+      MAG_IMPORT(open_magic) -binary \
+      -help {Starts nixpkgs magic-vlsi on the same top cell so you can compare the Mag layout with the converted MAX view.}]
+
   if {![prop_menu2 -title "Import Magic Design Folder" $prop_list]} {
     return
   }
@@ -1613,7 +1620,8 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAG_IMPORT(log) [file join $work convert.log]
   set MAG_IMPORT(cancel) [file join $work CANCEL]
   catch {file delete $MAG_IMPORT(cancel)}
-  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 6)"
+  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 7)"
+  set MAG_IMPORT(magdir) $dir
 
   mag_progress_open $method
   mag_progress_update 5 "Scanning .mag files..."
@@ -1699,26 +1707,66 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   mag_import_open_max $gds $topcell $tech $outdir
 }
 
-proc mag_magic2gds_script {} {
+proc mag_pdk_script {basename} {
   global MMI_TOOLS env
   set cands {}
-  lappend cands /mmi-pdk-live/mag2gds.sh
+  lappend cands /mmi-pdk-live/$basename
   if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
-    lappend cands [file join $env(MMI_LOCAL) max pdk mag2gds.sh]
+    lappend cands [file join $env(MMI_LOCAL) max pdk $basename]
   }
   if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
-    lappend cands [file join $env(MMI_PDK_DIR) mag2gds.sh]
+    lappend cands [file join $env(MMI_PDK_DIR) $basename]
   }
-  lappend cands /mmi-bundle/mag2gds.sh
+  lappend cands /mmi-bundle/$basename
   if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
-    lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk/mag2gds.sh]
+    lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk $basename]
   }
-  lappend cands /mmi-home/cad/mmi_local/max/pdk/mag2gds.sh
+  lappend cands /mmi-home/cad/mmi_local/max/pdk/$basename
   foreach s $cands {
     set s [_mmi_file_normalize $s]
     if {[file executable $s] || [file readable $s]} { return $s }
   }
   return ""
+}
+
+proc mag_magic2gds_script {} {
+  return [mag_pdk_script mag2gds.sh]
+}
+
+proc mag_find_bin {} {
+  if {[info commands pdk_which] != ""} {
+    set b [pdk_which {magic /mmi-magic/bin/magic /usr/bin/magic}]
+    if {$b != ""} { return $b }
+  }
+  return [mag_which {magic /mmi-magic/bin/magic /usr/bin/magic}]
+}
+
+proc mag_want_gui {} {
+  global MAG_IMPORT
+  if {![info exists MAG_IMPORT(open_magic)]} { return 1 }
+  set v $MAG_IMPORT(open_magic)
+  if {$v == "" || $v == "0" || $v == "no" || $v == "false"} { return 0 }
+  return 1
+}
+
+# Side-by-side: original Mag in nixpkgs magic-vlsi next to the converted MAX view.
+proc mag_open_in_magic {dir top family} {
+  global MAG_IMPORT
+  if {![mag_want_gui]} { return }
+  if {$dir == "" || $top == ""} { return }
+  set sh [mag_pdk_script open_mag.sh]
+  if {$sh == ""} {
+    mag_log "open_mag.sh not found; skip Magic GUI compare"
+    return
+  }
+  if {[mag_find_bin] == ""} {
+    mag_log "magic-vlsi not on PATH (/mmi-magic); skip Magic GUI compare"
+    return
+  }
+  mag_log "Opening Magic VLSI GUI: $sh $dir $top $family"
+  if {[catch {exec /bin/bash $sh $dir $top $family &} err]} {
+    mag_log "Could not start Magic GUI: $err"
+  }
 }
 
 proc mag_import_run_magic {dir topcell gds family tech outdir} {
@@ -1730,15 +1778,9 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
     return
   }
 
-  set magicbin ""
-  if {[info commands pdk_which] != ""} {
-    set magicbin [pdk_which {magic /mmi-magic/bin/magic}]
-  }
+  set magicbin [mag_find_bin]
   if {$magicbin == ""} {
-    set magicbin [mag_which {magic /mmi-magic/bin/magic}]
-  }
-  if {$magicbin == ""} {
-    mag_import_fail "Magic VLSI is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./run.sh so magic is on PATH."
+    mag_import_fail "Magic VLSI (nixpkgs magic-vlsi) is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./run.sh so /mmi-magic is bound."
     return
   }
   if {[mag_pdk_dir $family] == ""} {
@@ -1807,6 +1849,13 @@ proc mag_import_poll_magic {} {
 proc mag_import_open_max {gds top tech outdir} {
   global MAG_IMPORT MN_TECH GDS_READ_PARTIAL
 
+  set MAG_IMPORT(topcell) $top
+  set MAG_IMPORT(tech) $tech
+  set MAG_IMPORT(outdir) $outdir
+  set family [mag_family_from_tech $tech]
+  set magdir ""
+  if {[info exists MAG_IMPORT(magdir)]} { set magdir $MAG_IMPORT(magdir) }
+
   set here [pwd]
   set same 0
   if {[info exists MN_TECH] && $MN_TECH == $tech} { set same 1 }
@@ -1835,6 +1884,7 @@ proc mag_import_open_max {gds top tech outdir} {
     catch {cell_load $topCell}
     catch {cell_save_tree 0}
     catch {cd $here}
+    mag_open_in_magic $magdir $topCell $family
     mag_progress_close
     set msg "Magic design converted.\n\n\
 Top cell: $topCell\n\
@@ -1843,6 +1893,9 @@ GDS method: $MAG_IMPORT(method)\n\
 GDS: $gds\n\
 .max files: $outdir\n\
 Log: $MAG_IMPORT(log)"
+    if {[mag_want_gui]} {
+      set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
+    }
     if {[catch {warning $msg}]} {
       mag_import_tell $msg
     }
@@ -1858,7 +1911,6 @@ Log: $MAG_IMPORT(log)"
     set m [mag_which {max}]
     if {$m != ""} { set maxbin $m }
   }
-  # Launch from $outdir so GDS→.max files are written next to the GDS.
   set script [file join $MAG_IMPORT(work) launch_max.sh]
   set fh [open $script w]
   puts $fh "#!/bin/sh"
@@ -1871,6 +1923,7 @@ Log: $MAG_IMPORT(log)"
     mag_import_fail "Could not launch MAX:\n$err\nGDS is at:\n$gds"
     return
   }
+  mag_open_in_magic $magdir $top $family
   mag_progress_close
   set msg "Magic design converted.\n\n\
 Top cell: $top\n\
@@ -1880,6 +1933,9 @@ GDS: $gds\n\
 Log: $MAG_IMPORT(log)\n\n\
 If the current MAX was started with a different PDK, that is expected:\n\
 GDS→.max must use the destination technology."
+  if {[mag_want_gui]} {
+    set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
+  }
   if {[catch {warning $msg}]} {
     mag_import_tell $msg
   }

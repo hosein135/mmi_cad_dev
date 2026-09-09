@@ -67,7 +67,7 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. If you have no 
 |------|----------|
 | `/mmi-vendor/mmi` | Rebuilt 64-bit CAD + scripts/tech |
 | `/mmi-bundle` | From `pdk/` |
-| `/mmi-magic` | Magic VLSI (nixpkgs 25.05) |
+| `/mmi-magic` | nixpkgs **`magic-vlsi`** (not built from this repo) |
 | `/mmi-pdks` | Writable PDK overlay (`data/pdks`; empty until File → Import PDK in MAX) |
 | `/mmi-xfonts` | Bitmap fonts for Nix Xvnc |
 | `/mmi-home` | `data/home` |
@@ -82,3 +82,9 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. If you have no 
 `nix build --rebuild --check .#mmi-vendor` on x86_64 Linux should reproduce the same output path.
 
 Foundry PDKs are **not** in the flake. After `./run.sh max`, use **File → Import PDK** to download a compiled open_pdks tree (SkyWater, GF180MCU, or IHP) into `data/pdks`.
+
+## Magic VLSI (`magic-vlsi`)
+
+Magic is the **nixpkgs 25.05 `magic-vlsi` package**. The flake does not compile Magic; it puts that package on `PATH` and bind-mounts it at `/mmi-magic` inside the FHS sandbox (`/mmi-magic/bin/magic`).
+
+**File → Import Magic Design Folder** converts `.mag` → GDS (via Magic `cifoutput`) → MAX `.max`. When the convert finishes, MAX also starts Magic on the **original** `.mag` (same X/Xvnc display) so you can compare Magic’s layout with the converted MAX view. Uncheck *Also open original Mag in Magic VLSI* in the import dialog to skip that.

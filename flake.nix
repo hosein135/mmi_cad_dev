@@ -143,6 +143,7 @@
           install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
           install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
+          install -Dm755 "$src/open_mag.sh" $out/open_mag.sh
           install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
           install -Dm755 "$src/compile_tech.sh" $out/compile_tech.sh
           install -Dm755 "$src/fetch_caravel_mag.sh" $out/fetch_caravel_mag.sh
@@ -255,6 +256,9 @@
         ln -s ${pkgs.tcsh}/bin/tcsh $out/bin/csh
       '';
 
+      # Official nixpkgs Magic VLSI (not a local build). FHS bind: /mmi-magic.
+      mmiMagic = pkgs.magic-vlsi;
+
       mmiCad = pkgs.buildFHSEnv {
         pname = "mmi-cad";
         version = "1.0.0";
@@ -309,6 +313,7 @@
             xdg-utils
             strace
             magic-vlsi
+            cairo
             xorg.xset
             xorg.xlsfonts
             xorg.xrdb
@@ -381,7 +386,7 @@
           "--ro-bind-try \"$HOME/.Xauthority\" \"$HOME/.Xauthority\""
           "--ro-bind-try ${mmiVendor} /mmi-vendor"
           "--ro-bind-try ${mmiPdk} /mmi-bundle"
-          "--ro-bind-try ${pkgs.magic-vlsi} /mmi-magic"
+          "--ro-bind-try ${mmiMagic} /mmi-magic"
           "--ro-bind-try ${mmiFonts} /mmi-xfonts"
         ];
 
@@ -393,6 +398,7 @@
           export MMI_FONT_CACHE="''${MMI_FONT_CACHE:-''${MMI_CAD_ROOT}/data/fonts/max}"
           export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
+          export PATH=/mmi-magic/bin:$PATH
           export MMI_XKB_ROOT=${xkbRoot}
           export QT_X11_NO_MITSHM=1
           export LC_ALL=C
@@ -444,6 +450,7 @@
         mmi-vendor = mmiVendor;
         mmi-xfonts = mmiFonts;
         mmi-pdk = mmiPdk;
+        magic-vlsi = mmiMagic;
       };
 
       apps.${system}.default = {
@@ -464,6 +471,7 @@
           echo "Micro Magic CAD — NixOS 25.05 FHS (x86_64 Linux: bare metal / VM / WSL2)"
           echo "  nix run .#mmi-cad          # CAD shell (Nix Xvnc + noVNC)"
           echo "  nix run .#mmi-cad -- max   # start MAX"
+          echo "  Magic VLSI: nixpkgs magic-vlsi (inside FHS: /mmi-magic and PATH)"
           export MMI_CAD_ROOT="''${MMI_CAD_ROOT:-$PWD}"
         '';
       };
