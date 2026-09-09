@@ -205,6 +205,10 @@ fi
 if grep -qE '^[[:space:]]+calma[[:space:]]+GDS_[^[:space:]]+[[:space:]]+[0-9]+[[:space:]]+\*' "$dest/${tech}.tech27" 2>/dev/null; then
   finish_fail "generated tech27 still maps GDS layers with a wildcard datatype"
 fi
+nsolid=$(grep -cE '^pal_layer .* solid$' "$dest/${tech}.palette" 2>/dev/null || echo 0)
+if [ "${nsolid:-0}" -gt 10 ]; then
+  finish_fail "palette has $nsolid solid layers (MAX allows 10)"
+fi
 if grep -q '^cifstyle ' "$dest/${tech}.tech27" 2>/dev/null; then
   # cifstyle must be inside drc, not a top-level section start
   if ! awk '/^drc$/{d=1} d&&/^cifstyle /{ok=1} END{exit !ok}' "$dest/${tech}.tech27"; then

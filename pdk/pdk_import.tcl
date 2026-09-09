@@ -4,7 +4,7 @@
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
 global PDK_GEN_REQUIRED PDK_SOURCE_REV
-set _PDK_IMPORT_REV 13
+set _PDK_IMPORT_REV 14
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -13,7 +13,7 @@ set _PDK_IMPORT_REV_LOADED $_PDK_IMPORT_REV
 
 # Generator revision a usable .tech27 must carry (set MMI_PDK_GEN in TECH.tcl,
 # written by source_to_tech27.tcl). Older techs are re-converted, not re-downloaded.
-set PDK_GEN_REQUIRED 4
+set PDK_GEN_REQUIRED 5
 # Revision of the built-in layer tables below ("# source-rev N" in TECH.source).
 set PDK_SOURCE_REV 4
 

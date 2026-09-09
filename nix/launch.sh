@@ -245,6 +245,8 @@ mmi_repair_tech27() {
     if grep -qE '^set DRC_DATA\([^)]+\) [^{].* ' "${dest}/${tech}.tcl" 2>/dev/null; then need=1; fi
     # Wildcard GDS datatypes smear sky130 layers that share a layer number.
     if grep -qE '^[[:space:]]+calma[[:space:]]+GDS_[^[:space:]]+[[:space:]]+[0-9]+[[:space:]]+\*' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
+    nsolid=$(grep -cE '^pal_layer .* solid$' "${dest}/${tech}.palette" 2>/dev/null || true)
+    if [ "${nsolid:-0}" -gt 10 ]; then need=1; fi
     sh=""
     for cand in /mmi-pdk-live/compile_tech.sh \
       "${CAD}/mmi_local/max/pdk/compile_tech.sh" \
