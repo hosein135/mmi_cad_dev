@@ -64,28 +64,52 @@ SCRIPT="$(mktemp /tmp/mag2gds_XXXXXX.tcl)"
 cleanup() { rm -f "$SCRIPT"; }
 trap cleanup EXIT
 
+TECHFILE="$PDKPATH/libs.tech/magic/${pdk_name}.tech"
+
 {
   echo "drc off"
   echo "crashbackups stop"
+  # Some .magicrc files hard-code the build prefix: make sure the PDK tech is
+  # really loaded (otherwise Magic silently keeps its built-in tech and every
+  # cell loads empty).
+  echo "catch {"
+  echo "  set _want [string tolower {$pdk_name}]"
+  echo "  set _fam  [string tolower {$FAMILY}]"
+  echo "  set _have [string tolower [tech name]]"
+  echo "  if {\$_have != \$_want && \$_have != \$_fam && [file exists {$TECHFILE}]} {"
+  echo "    puts \"mag2gds: rc loaded tech '\$_have'; loading {$TECHFILE}\""
+  echo "    tech load {$TECHFILE}"
+  echo "  }"
+  echo "  puts \"mag2gds: tech [tech name], lambda [tech lambda]\""
+  echo "}"
   echo "gds rescale false"
   echo "gds readonly false"
   echo "cif *hier write disable"
   echo "cif *array write disable"
   echo "addpath {$DIR}"
-  # Every directory that contains .mag in the design (Tcl 8.x-safe walk via find)
+  # Every directory that contains .mag in the design. Skip maglef abstracts.
   find "$DIR" -type d \( -name .git -o -name maglef -o -name max_import \) -prune -o \
-      -type f -name '*.mag' -printf '%h\n' 2>/dev/null | sort -u | while read -r d; do
+      -type f -name '*.mag' -print 2>/dev/null | while read -r f; do dirname "$f"; done \
+      | sort -u | while read -r d; do
     echo "addpath {$d}"
   done
-  # Shared PDK mag views (stdcells, primitives)
+  # Shared PDK views: full mag first so maglef abstracts cannot shadow them.
+  # MAGTYPE=mag also prefers mag/, but a direct maglef path still wins if first.
   if [ -d "$PDKPATH/libs.ref" ]; then
-    find "$PDKPATH/libs.ref" -type d \( -name mag -o -name maglef \) 2>/dev/null | while read -r d; do
+    find "$PDKPATH/libs.ref" -type d -name mag 2>/dev/null | sort | while read -r d; do
+      echo "addpath {$d}"
+    done
+    find "$PDKPATH/libs.ref" -type d -name maglef 2>/dev/null | sort | while read -r d; do
       echo "addpath {$d}"
     done
   fi
-  echo "load $TOP -dereference"
+  # -force: accept cells whose "tech" header differs from the loaded tech
+  # (caravel .mag files carry "tech \$PDK"; PDK is exported above, but older
+  # Magic builds do not expand it). Unknown options only print a notice.
+  echo "load {$TOP} -force -dereference"
   echo "select top cell"
   echo "expand"
+  echo "catch {puts \"mag2gds: top [cellname list window], bbox [box values]\"}"
   echo "gds write {$OUT}"
   echo "quit -noprompt"
 } > "$SCRIPT"

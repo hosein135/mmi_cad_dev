@@ -243,7 +243,8 @@ mmi_repair_tech27() {
     if ! grep -qE '^drc[[:space:]]*$' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
     if ! grep -qE '^cifstyle[[:space:]]' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
     if grep -qE '^set DRC_DATA\([^)]+\) [^{].* ' "${dest}/${tech}.tcl" 2>/dev/null; then need=1; fi
-    [ "$need" = "1" ] || continue
+    # Wildcard GDS datatypes smear sky130 layers that share a layer number.
+    if grep -qE '^[[:space:]]+calma[[:space:]]+GDS_[^[:space:]]+[[:space:]]+[0-9]+[[:space:]]+\*' "${dest}/${tech}.tech27" 2>/dev/null; then need=1; fi
     sh=""
     for cand in /mmi-pdk-live/compile_tech.sh \
       "${CAD}/mmi_local/max/pdk/compile_tech.sh" \
@@ -252,6 +253,13 @@ mmi_repair_tech27() {
       if [ -f "$cand" ]; then sh="$cand"; break; fi
     done
     [ -n "$sh" ] || continue
+    # Older generator output: source_to_tech27.tcl stamps "set MMI_PDK_GEN N".
+    local gen_want
+    gen_want="$(sed -n 's/^set GEN_REV[[:space:]]\+\([0-9]\+\).*/\1/p' "$(dirname "$sh")/source_to_tech27.tcl" 2>/dev/null | head -n 1)"
+    if [ -n "$gen_want" ] && ! grep -qE "^set MMI_PDK_GEN[[:space:]]+${gen_want}([^0-9]|$)" "${dest}/${tech}.tcl" 2>/dev/null; then
+      need=1
+    fi
+    [ "$need" = "1" ] || continue
     info "Repairing broken ${tech} technology files..."
     bash "$sh" "$source" "$tech" "$dest" || true
   done

@@ -3,12 +3,19 @@
 # Downloads a PDK, converts layers to a MAX .source file, runs make_tech.
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
-set _PDK_IMPORT_REV 11
+global PDK_GEN_REQUIRED PDK_SOURCE_REV
+set _PDK_IMPORT_REV 13
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
 set _PDK_IMPORT_SOURCED 1
 set _PDK_IMPORT_REV_LOADED $_PDK_IMPORT_REV
+
+# Generator revision a usable .tech27 must carry (set MMI_PDK_GEN in TECH.tcl,
+# written by source_to_tech27.tcl). Older techs are re-converted, not re-downloaded.
+set PDK_GEN_REQUIRED 4
+# Revision of the built-in layer tables below ("# source-rev N" in TECH.source).
+set PDK_SOURCE_REV 4
 
 if {[info commands _mmi_file_normalize] == ""} {
   proc _mmi_file_normalize {path} {
@@ -66,82 +73,315 @@ proc pdk_preset_init {} {
 }
 pdk_preset_init
 
-# ── Layer maps (name gds txt type width space color) ─────────────────────────
+# ── Layer maps (name gds:dt txt:dt type width space color) ───────────────────
+# Read by source_to_tech27.tcl. Conventions:
+#   gds "derived"  paint type built from GDS layers on input (derive ... below)
+#   type gdsonly   GDS layer only, written from the paint listed in its derive
+#   txt L:D1,D2    GDS text layers (label + pin) whose labels attach to the paint
+# Diffusion is typed (ndiff/pdiff/ntap/ptap) so nfet = poly over ndiff and
+# pfet = poly over pdiff, and MAX extraction / device generators work.
+# Width/space are the public minimum rules (microns).
+
 proc pdk_layers_sky130A {} {
   return {
-    {nwell 64:20 - - - - 0,160,0}
-    {diff 65:20 - act - - 110,110,110}
-    {tap 65:44 - act - - 180,180,180}
-    {poly 66:20 - poly - - 236,67,0}
-    {licon1 66:44 - via - - 80,80,80}
-    {li1 67:20 - metal - - 8,139,255}
-    {mcon 67:44 - via - - 90,90,90}
-    {met1 68:20 - metal - - 182,134,222}
-    {via 68:44 - via - - 100,100,100}
-    {met2 69:20 - metal - - 255,160,65}
-    {via2 69:44 - via - - 110,110,110}
-    {met3 70:20 - metal - - 61,122,188}
-    {via3 70:44 - via - - 120,120,120}
-    {met4 71:20 - metal - - 200,80,80}
-    {via4 71:44 - via - - 130,130,130}
-    {met5 72:20 - metal - - gold}
-    {pwell 64:13 - - - - 0,80,0}
-    {dnwell 64:18 - - - - 0,100,0}
-    {mimcap 89:44 - - - - 180,180,80}
-    {mimcap2 97:44 - - - - 200,200,80}
-    {hvi 75:20 - - - - 0,80,160}
-    {nsdm 93:44 - - - - 0,200,200}
-    {psdm 94:20 - - - - 200,0,200}
-    {npc 95:20 - - - - 160,80,0}
-    {hvntm 125:20 - - - - 0,80,160}
-    {areaid_sl 81:4 - bbox - - -}
-    {text - 64:5 text - - -}
+    {nwell 64:20 64:5,16 - 0.84 1.27 0,160,0}
+    {pwell 64:13 64:59 - - - 0,80,0}
+    {dnwell 64:18 - - 3.0 6.3 0,100,0}
+    {diff 65:20 65:6,16 gdsonly 0.15 0.27 -}
+    {tap 65:44 65:5,48 gdsonly 0.15 0.27 -}
+    {ndiff derived - act 0.15 0.27 66,213,66}
+    {pdiff derived - act 0.15 0.27 202,160,115}
+    {ntap derived - act 0.15 0.27 120,200,120}
+    {ptap derived - act 0.15 0.27 200,170,140}
+    {nsdm 93:44 - - 0.38 0.38 0,200,200}
+    {psdm 94:20 - - 0.38 0.38 200,0,200}
+    {poly 66:20 66:5,16 poly 0.15 0.21 236,67,0}
+    {npc 95:20 - - 0.27 0.27 160,80,0}
+    {licon1 66:44 - via 0.17 0.17 80,80,80}
+    {li1 67:20 67:5,16 metal 0.17 0.17 8,139,255}
+    {mcon 67:44 - via 0.17 0.19 90,90,90}
+    {met1 68:20 68:5,16 metal 0.14 0.14 182,134,222}
+    {via1 68:44 - via 0.15 0.17 100,100,100}
+    {met2 69:20 69:5,16 metal 0.14 0.14 255,160,65}
+    {via2 69:44 - via 0.2 0.2 110,110,110}
+    {met3 70:20 70:5,16 metal 0.3 0.3 61,122,188}
+    {via3 70:44 - via 0.2 0.2 120,120,120}
+    {met4 71:20 71:5,16 metal 0.3 0.3 200,80,80}
+    {via4 71:44 - via 0.8 0.8 130,130,130}
+    {met5 72:20 72:5,16 metal 1.6 1.6 gold}
+    {capm 89:44 - - 1.0 0.84 180,180,80}
+    {cap2m 97:44 - - 1.0 0.84 200,200,80}
+    {hvi 75:20 - - 0.6 0.7 0,80,160}
+    {hvntm 125:20 - - 0.7 0.7 0,120,160}
+    {lvtn 125:44 - - 0.38 0.38 120,120,200}
+    {hvtp 78:44 - - 0.38 0.38 200,120,120}
+    {tunm 80:20 - - - - 160,160,60}
+    {rpm 86:20 - - - - 160,60,160}
+    {urpm 79:20 - - - - 120,60,160}
+    {pad 76:20 - - - - 200,200,200}
+    {areaid_sl 81:4 - - - - 90,90,90}
+    {prBoundary 235:4 - bbox - - -}
+    {text - 83:44 text - - -}
+  }
+}
+
+proc pdk_rules_sky130A {} {
+  return {
+    "device nfet from poly ndiff"
+    "device pfet from poly pdiff"
+    ""
+    "connect licon1 poly,ndiff,pdiff,ntap,ptap,li1"
+    "connect mcon li1,met1"
+    "connect via1 met1,met2"
+    "connect via2 met2,met3"
+    "connect via3 met3,met4"
+    "connect via4 met4,met5"
+    ""
+    "# GDS out: typed diffusion -> diff/tap; implants from diffusion (0.125 enclosure) or drawn"
+    "derive diff from ndiff,pdiff"
+    "derive tap from ntap,ptap"
+    "derive nsdm from ndiff,ntap grow 0.125 or nsdm"
+    "derive psdm from pdiff,ptap grow 0.125 or psdm"
+    "# GDS in: diff/tap typed by the psdm implant (everything else is n-type)"
+    "derive ndiff from diff and-not psdm"
+    "derive pdiff from diff and psdm"
+    "derive ntap from tap and-not psdm"
+    "derive ptap from tap and psdm"
+    ""
+    "# pin datatypes (Magic/KLayout \"port\" texts) read as ports and written back as pins"
+    "port inout 64:16"
+    "port inout 65:16"
+    "port inout 65:48"
+    "port inout 66:16"
+    "port inout 67:16"
+    "port inout 68:16"
+    "port inout 69:16"
+    "port inout 70:16"
+    "port inout 71:16"
+    "port inout 72:16"
+    ""
+    "square_vias"
+    "set GRID(resolution) 0.005"
+    "set GRID(mask) 0.005"
+    "set LAYER_NAME(ndiff) ndiff"
+    "set LAYER_NAME(pdiff) pdiff"
+    "set LAYER_NAME(nplus) nsdm"
+    "set LAYER_NAME(pplus) psdm"
+    "set LAYER_NAME(nwell) nwell"
+    "set LAYER_NAME(poly) poly"
+    "set LAYER_NAME(contact) licon1"
   }
 }
 
 proc pdk_layers_gf180mcu {} {
   return {
-    {nwell 21:0 - - - - 0,160,0}
-    {dnwell 12:0 - - - - 0,100,0}
-    {comp 22:0 - act - - 110,110,110}
-    {poly2 30:0 - poly - - 236,67,0}
-    {nplus 32:0 - - - - 0,200,200}
-    {pplus 31:0 - - - - 200,0,200}
-    {contact 33:0 - via - - 80,80,80}
-    {metal1 34:0 - metal - - 8,139,255}
-    {via1 35:0 - via - - 90,90,90}
-    {metal2 36:0 - metal - - 182,134,222}
-    {via2 38:0 - via - - 100,100,100}
-    {metal3 42:0 - metal - - 255,160,65}
-    {via3 40:0 - via - - 110,110,110}
-    {metal4 46:0 - metal - - 61,122,188}
-    {via4 41:0 - via - - 120,120,120}
-    {metal5 81:0 - metal - - gold}
-    {text - 31:0 text - - -}
+    {nwell 21:0 21:10 - 0.86 0.6 0,160,0}
+    {dnwell 12:0 - - 1.7 2.5 0,100,0}
+    {comp 22:0 22:10 gdsonly 0.3 0.28 -}
+    {ndiff derived - act 0.3 0.28 66,213,66}
+    {pdiff derived - act 0.3 0.28 202,160,115}
+    {ntap derived - act 0.3 0.28 120,200,120}
+    {ptap derived - act 0.3 0.28 200,170,140}
+    {nplus 32:0 - - 0.4 0.4 0,200,200}
+    {pplus 31:0 - - 0.4 0.4 200,0,200}
+    {poly2 30:0 30:10 poly 0.18 0.24 236,67,0}
+    {dualgate 55:0 - - 0.7 0.44 0,80,160}
+    {sab 49:0 - - - - 160,60,160}
+    {esd 24:0 - - - - 120,60,160}
+    {contact 33:0 - via 0.22 0.25 80,80,80}
+    {metal1 34:0 34:10 metal 0.23 0.23 8,139,255}
+    {via1 35:0 - via 0.26 0.26 90,90,90}
+    {metal2 36:0 36:10 metal 0.28 0.28 182,134,222}
+    {via2 38:0 - via 0.26 0.26 100,100,100}
+    {metal3 42:0 42:10 metal 0.28 0.28 255,160,65}
+    {via3 40:0 - via 0.26 0.26 110,110,110}
+    {metal4 46:0 46:10 metal 0.28 0.28 61,122,188}
+    {via4 41:0 - via 0.26 0.26 120,120,120}
+    {metal5 81:0 81:10 metal 0.44 0.46 gold}
+    {pr_bndry 63:0 - bbox - - -}
+  }
+}
+
+proc pdk_rules_gf180mcu {} {
+  return {
+    "device nfet from poly2 ndiff"
+    "device pfet from poly2 pdiff"
+    ""
+    "connect contact poly2,ndiff,pdiff,ntap,ptap,metal1"
+    "connect via1 metal1,metal2"
+    "connect via2 metal2,metal3"
+    "connect via3 metal3,metal4"
+    "connect via4 metal4,metal5"
+    ""
+    "# GDS out: all typed diffusion on COMP; implants from diffusion (0.16 enclosure) or drawn"
+    "derive comp from ndiff,pdiff,ntap,ptap"
+    "derive nplus from ndiff,ntap grow 0.16 or nplus"
+    "derive pplus from pdiff,ptap grow 0.16 or pplus"
+    "# GDS in: COMP split by Pplus and Nwell (no separate tap layer in GF180)"
+    "derive ndiff from comp and-not pplus and-not nwell"
+    "derive pdiff from comp and pplus and nwell"
+    "derive ntap from comp and-not pplus and nwell"
+    "derive ptap from comp and pplus and-not nwell"
+    ""
+    "square_vias"
+    "set GRID(resolution) 0.005"
+    "set GRID(mask) 0.005"
+    "set LAYER_NAME(ndiff) ndiff"
+    "set LAYER_NAME(pdiff) pdiff"
+    "set LAYER_NAME(nplus) nplus"
+    "set LAYER_NAME(pplus) pplus"
+    "set LAYER_NAME(nwell) nwell"
+    "set LAYER_NAME(poly) poly2"
+    "set LAYER_NAME(contact) contact"
   }
 }
 
 proc pdk_layers_sg13g2 {} {
   return {
-    {Activ 1:0 - act - - 110,110,110}
-    {GatPoly 5:0 - poly - - 236,67,0}
-    {NWell 31:0 - - - - 0,160,0}
-    {nSD 7:0 - - - - 0,200,200}
-    {pSD 14:0 - - - - 200,0,200}
-    {Cont 6:0 - via - - 80,80,80}
-    {Metal1 8:0 - metal - - 8,139,255}
-    {Via1 19:0 - via - - 90,90,90}
-    {Metal2 10:0 - metal - - 182,134,222}
-    {Via2 29:0 - via - - 100,100,100}
-    {Metal3 30:0 - metal - - 255,160,65}
-    {Via3 49:0 - via - - 110,110,110}
-    {Metal4 50:0 - metal - - 61,122,188}
-    {Via4 66:0 - via - - 120,120,120}
-    {Metal5 67:0 - metal - - gold}
+    {Activ 1:0 1:25 gdsonly 0.15 0.21 -}
+    {ndiff derived - act 0.15 0.21 66,213,66}
+    {pdiff derived - act 0.15 0.21 202,160,115}
+    {ntap derived - act 0.15 0.21 120,200,120}
+    {ptap derived - act 0.15 0.21 200,170,140}
+    {GatPoly 5:0 5:25 poly 0.13 0.18 236,67,0}
+    {NWell 31:0 31:25 - 0.62 0.62 0,160,0}
+    {nSD 7:0 - - 0.31 0.31 0,200,200}
+    {pSD 14:0 - - 0.31 0.31 200,0,200}
+    {ThickGateOx 44:0 - - - - 0,80,160}
+    {SalBlock 28:0 - - - - 160,60,160}
+    {Cont 6:0 - via 0.16 0.18 80,80,80}
+    {Metal1 8:0 8:25,2 metal 0.16 0.18 8,139,255}
+    {Via1 19:0 - via 0.19 0.22 90,90,90}
+    {Metal2 10:0 10:25,2 metal 0.2 0.21 182,134,222}
+    {Via2 29:0 - via 0.19 0.22 100,100,100}
+    {Metal3 30:0 30:25,2 metal 0.2 0.21 255,160,65}
+    {Via3 49:0 - via 0.19 0.22 110,110,110}
+    {Metal4 50:0 50:25,2 metal 0.2 0.21 61,122,188}
+    {Via4 66:0 - via 0.19 0.22 120,120,120}
+    {Metal5 67:0 67:25,2 metal 0.2 0.21 100,180,220}
+    {TopVia1 125:0 - via 0.42 0.42 130,130,130}
+    {TopMetal1 126:0 126:25,2 metal 1.64 1.64 gold}
+    {TopVia2 133:0 - via 0.9 1.06 140,140,140}
+    {TopMetal2 134:0 134:25,2 metal 2.0 2.0 220,180,60}
+    {MIM 36:0 - - - - 180,180,80}
+    {Passiv 9:0 - - - - 200,200,200}
+    {prBoundary 189:4 - bbox - - -}
     {TEXT - 63:0 text - - -}
   }
 }
 
+proc pdk_rules_sg13g2 {} {
+  return {
+    "device nfet from GatPoly ndiff"
+    "device pfet from GatPoly pdiff"
+    ""
+    "connect Cont GatPoly,ndiff,pdiff,ntap,ptap,Metal1"
+    "connect Via1 Metal1,Metal2"
+    "connect Via2 Metal2,Metal3"
+    "connect Via3 Metal3,Metal4"
+    "connect Via4 Metal4,Metal5"
+    "connect TopVia1 Metal5,TopMetal1"
+    "connect TopVia2 TopMetal1,TopMetal2"
+    ""
+    "# GDS out: all typed diffusion on Activ; pSD from p-type diffusion (0.18 enclosure) or drawn"
+    "derive Activ from ndiff,pdiff,ntap,ptap"
+    "derive pSD from pdiff,ptap grow 0.18 or pSD"
+    "# GDS in: Activ is n-type unless covered by pSD; NWell picks tap vs. diffusion"
+    "derive ndiff from Activ and-not pSD and-not NWell"
+    "derive pdiff from Activ and pSD and NWell"
+    "derive ntap from Activ and-not pSD and NWell"
+    "derive ptap from Activ and pSD and-not NWell"
+    ""
+    "# .pin texts (datatype 2) are ports; .text (25) stay plain labels"
+    "port inout 8:2"
+    "port inout 10:2"
+    "port inout 30:2"
+    "port inout 50:2"
+    "port inout 67:2"
+    "port inout 126:2"
+    "port inout 134:2"
+    ""
+    "square_vias"
+    "set GRID(resolution) 0.005"
+    "set GRID(mask) 0.005"
+    "set LAYER_NAME(ndiff) ndiff"
+    "set LAYER_NAME(pdiff) pdiff"
+    "set LAYER_NAME(pplus) pSD"
+    "set LAYER_NAME(nwell) NWell"
+    "set LAYER_NAME(poly) GatPoly"
+    "set LAYER_NAME(contact) Cont"
+  }
+}
+
+proc pdk_family_layers {family} {
+  switch -exact -- $family {
+    sky130A { return [pdk_layers_sky130A] }
+    gf180mcu { return [pdk_layers_gf180mcu] }
+    sg13g2 { return [pdk_layers_sg13g2] }
+  }
+  return {}
+}
+
+proc pdk_family_rules {family} {
+  switch -exact -- $family {
+    sky130A { return [pdk_rules_sky130A] }
+    gf180mcu { return [pdk_rules_gf180mcu] }
+    sg13g2 { return [pdk_rules_sg13g2] }
+  }
+  return {}
+}
+
+# Write TECH.source for source_to_tech27.tcl. rows/rules empty = use the
+# built-in tables for family; a Magic-tech-derived row list gets generic
+# connect/device lines from pdk_connect_lines.
+proc pdk_write_source {family tech path {rows {}} {rules {}}} {
+  global PDK_SOURCE_REV
+  if {![llength $rows]} { set rows [pdk_family_layers $family] }
+  if {![llength $rows]} { return 0 }
+  if {![llength $rules]} { set rules [pdk_family_rules $family] }
+  if {![llength $rules]} { set rules [pdk_connect_lines $rows] }
+  catch {file mkdir [file dirname $path]}
+  set fh [open $path w]
+  puts $fh "# MAX technology source generated by pdk_import.tcl"
+  puts $fh "# family $family"
+  puts $fh "# source-rev $PDK_SOURCE_REV"
+  puts $fh ""
+  puts $fh "# layer\tgds:dt\ttxt:dt\ttype\twidth\tspace\tcolor"
+  puts $fh "#======\t======\t======\t====\t=====\t=====\t====="
+  foreach rec $rows {
+    puts $fh [join $rec "\t"]
+  }
+  puts $fh ""
+  foreach line $rules {
+    puts $fh $line
+  }
+  close $fh
+  return [llength $rows]
+}
+
+# "# source-rev N" of an existing .source (0 when absent / older generator).
+proc pdk_source_rev {path} {
+  if {![file readable $path]} { return 0 }
+  if {[catch {set fh [open $path r]}]} { return 0 }
+  set rev 0
+  set n 0
+  while {[gets $fh line] >= 0 && $n < 20} {
+    incr n
+    set toks {}
+    foreach w [split [string trim $line] " \t"] {
+      if {$w != ""} { lappend toks $w }
+    }
+    if {[lindex $toks 0] == "#" && [lindex $toks 1] == "source-rev"} {
+      set rev [lindex $toks 2]
+      break
+    }
+  }
+  close $fh
+  if {[catch {expr {int($rev)}} rev]} { return 0 }
+  return $rev
+}
+
+# Generic fallback for PDKs parsed from a Magic .tech (no typed diffusion).
 proc pdk_connect_lines {rows} {
   set metals {}
   set vias {}
@@ -187,13 +427,19 @@ proc pdk_connect_lines {rows} {
 }
 
 proc pdk_guess_type {name} {
+  # Whole-name globs only: "MET1PIN" / "DIFFMASK" must not become metal/act.
   set n [string tolower $name]
-  if {[regexp {text|label} $n]} { return text }
-  if {[regexp {bbox|prb|boundary|areaid} $n]} { return bbox }
-  if {[regexp {via|licon|mcon|ncon|pcon|cont|^ct} $n]} { return via }
-  if {[regexp {poly|gate|gpoly|gatpoly} $n]} { return poly }
-  if {[regexp {diff|active|activ|comp|^od} $n]} { return act }
-  if {[regexp {metal|^met[0-9]|^m[0-9]|^li[0-9]} $n]} { return metal }
+  switch -glob -- $n {
+    text - comment { return text }
+    bbox - prb - prboundary - pr_bndry - areaid* { return bbox }
+    via - via[0-9] - via[0-9][0-9] - cont - contact - ct - \
+    licon - licon[0-9] - mcon - ncon - pcon - topvia* { return via }
+    poly - poly[0-9] - poly2 - gatpoly - gpoly - gate { return poly }
+    diff - ndiff - pdiff - ndif - pdif - activ - active - \
+    nsd - psd - ntap - ptap - comp - od { return act }
+    metal[0-9] - metal[0-9][0-9] - met[0-9] - met[0-9][0-9] - \
+    m[0-9] - m[0-9][0-9] - li[0-9] - li1 - locali - topmetal* { return metal }
+  }
   return "-"
 }
 
@@ -228,7 +474,8 @@ proc pdk_find_files {root patterns} {
   while {[llength $dirs] && $n < 8000} {
     set dir [lindex $dirs 0]
     set dirs [lrange $dirs 1 end]
-    if {[catch {set names [glob -nocomplain -directory $dir *]}]} {
+    # Tcl 8.0 (MAX) has no glob -directory: use a path pattern.
+    if {[catch {set names [glob -nocomplain [file join $dir *]]}]} {
       continue
     }
     foreach f $names {
@@ -251,15 +498,67 @@ proc pdk_find_files {root patterns} {
   return $out
 }
 
+# Tcl 8.0 regexp has no [ \t] / \S classes (a tab in [] is a literal "t"),
+# so tokenize with split instead of regexp everywhere .mag/.tech text is read.
+proc pdk_words {line} {
+  set out {}
+  foreach w [split $line " \t"] {
+    if {$w != ""} { lappend out $w }
+  }
+  return $out
+}
+
+proc pdk_is_int {s} {
+  if {$s == ""} { return 0 }
+  set n [string length $s]
+  for {set i 0} {$i < $n} {incr i} {
+    if {[string first [string index $s $i] 0123456789] < 0} { return 0 }
+  }
+  return 1
+}
+
+# Layer rows from a Magic .tech cifoutput section (first "layer X ... calma L D").
 proc pdk_parse_magic_tech {path} {
   set rows {}
+  set seen {}
   if {[catch {set fh [open $path r]}]} { return $rows }
   set current ""
+  set section ""
   while {[gets $fh line] >= 0} {
-    set line [string trim $line]
-    if {[regexp {^layer[ \t]+([^ \t]+)} $line -> current]} continue
-    if {$current != "" && [regexp {^calma[ \t]+([0-9]+)[ \t]+([0-9]+)} $line -> l d]} {
-      lappend rows [list $current "$l:$d" - [pdk_guess_type $current] - - -]
+    set toks [pdk_words $line]
+    set cmd [lindex $toks 0]
+    if {$cmd == "cifoutput" || $cmd == "cifinput" || $cmd == "drc" || \
+        $cmd == "extract" || $cmd == "end"} {
+      if {$cmd != "end"} { set section $cmd }
+      set current ""
+      continue
+    }
+    if {$section != "cifoutput"} continue
+    if {$cmd == "layer" && [llength $toks] >= 2} {
+      set current [lindex $toks 1]
+      continue
+    }
+    if {$current != "" && $cmd == "calma" && [llength $toks] >= 3} {
+      set l [lindex $toks 1]
+      set d [lindex $toks 2]
+      if {[pdk_is_int $l] && [pdk_is_int $d]} {
+        set name [pdk_sanitize $current]
+        set low [string tolower $name]
+        # Drawing layers only. PIN/TXT/MASK/FILL overlays blow MAX's 127-type cap.
+        set skip 0
+        foreach suf {pin txt mask fill block norcx} {
+          set n [string length $low]
+          set s [string length $suf]
+          if {$n > $s && [string range $low [expr {$n - $s}] end] == $suf} {
+            set skip 1
+            break
+          }
+        }
+        if {!$skip && [lsearch -exact $seen $name] < 0} {
+          lappend seen $name
+          lappend rows [list $name "$l:$d" - [pdk_guess_type $name] - - -]
+        }
+      }
       set current ""
     }
   }
@@ -411,12 +710,15 @@ proc pdk_finish_max_tech {tech techdir privdir} {
     pdk_harvest_tech_files $tech $dir
   }
   pdk_harvest_tech_files $tech $techdir
+  # source_to_tech27.tcl already wrote a final .tech27; only fall back to the
+  # cpp|m4 make_tech pipeline when that file is missing or unusable.
   foreach dir [pdk_max_tech_dirs $tech] {
     pdk_log_tech_dir $dir
     if {![file isdirectory $dir]} continue
+    if {[pdk_tech27_ok [file join $dir ${tech}.tech27]]} continue
     pdk_compile_tech27 $dir $tech
   }
-  if {$techdir != ""} {
+  if {$techdir != "" && ![pdk_tech27_ok [file join $techdir ${tech}.tech27]]} {
     pdk_compile_tech27 $techdir $tech
   }
   foreach dir [pdk_max_tech_dirs $tech] {
@@ -446,18 +748,27 @@ proc pdk_tech27_ok {f} {
   set has_cifstyle_in_drc 0
   set in_drc 0
   set bad 0
+  # Token checks, not regexp: MAX's Tcl 8.0 has no \S and treats the tab in
+  # [ \t] as a literal "t".
   while {[gets $fh line] >= 0} {
+    set toks [pdk_words $line]
+    set kw [lindex $toks 0]
     # Older generator wrote invalid "labels *" (MAX needs "labels space").
-    if {[regexp {labels[ \t]+\*} $line]} {
+    if {$kw == "labels" && [lindex $toks 1] == "*"} {
       set bad 1
       break
     }
-    # "expr - + 0" accepted "-" as a dimension — MAX rejects it.
-    if {[regexp {[ \t]width[ \t]+\S+[ \t]+-} $line]} {
+    # "expr - + 0" accepted "-" as a dimension - MAX rejects it.
+    if {($kw == "width" || $kw == "cifwidth") && [lindex $toks 2] == "-"} {
       set bad 1
       break
     }
-    if {[regexp {[ \t]spacing[ \t]+\S+[ \t]+\S+[ \t]+-} $line]} {
+    if {($kw == "spacing" || $kw == "cifspacing") && [lindex $toks 3] == "-"} {
+      set bad 1
+      break
+    }
+    # Wildcard datatypes smear sky130 layers sharing one GDS number.
+    if {$kw == "calma" && [llength $toks] == 4 && [lindex $toks 3] == "*"} {
       set bad 1
       break
     }
@@ -467,17 +778,18 @@ proc pdk_tech27_ok {f} {
       set has_drc 1
       continue
     }
-    if {$in_drc && [regexp {^end$} $t]} {
+    if {$in_drc && $t == "end"} {
       set in_drc 0
       continue
     }
-    if {$in_drc && [regexp {^cifstyle[ \t]} $t]} {
-      set has_cifstyle_in_drc 1
-    }
-    # Top-level cifstyle (not inside drc) breaks the tech parser.
-    if {!$in_drc && [regexp {^cifstyle[ \t]} $t]} {
-      set bad 1
-      break
+    if {$kw == "cifstyle"} {
+      if {$in_drc} {
+        set has_cifstyle_in_drc 1
+      } else {
+        # Top-level cifstyle (not inside drc) breaks the tech parser.
+        set bad 1
+        break
+      }
     }
   }
   close $fh
@@ -492,17 +804,26 @@ proc pdk_tech27_ok {f} {
   # Broken: set DRC_DATA(...) a b  (missing braces → multi-word value)
   if {[catch {set tfh [open [file join $dir ${tech}.tcl] r]}]} { return 0 }
   set tcl_bad 0
+  set gen 0
   while {[gets $tfh tline] >= 0} {
     if {[regexp {^set DRC_DATA\([^)]+\) (.*)$} $tline -> val]} {
       # Braced lists have llength 1; unbraced "poly diff" has llength 2.
-      if {[llength $val] > 1} {
+      if {[catch {llength $val} n] || $n > 1} {
         set tcl_bad 1
         break
       }
     }
+    set toks [pdk_words $tline]
+    if {[lindex $toks 0] == "set" && [lindex $toks 1] == "MMI_PDK_GEN"} {
+      set gen [lindex $toks 2]
+      if {![pdk_is_int $gen]} { set gen 0 }
+    }
   }
   close $tfh
   if {$tcl_bad} { return 0 }
+  # Older generator output (wildcard datatypes, untyped diffusion): re-convert.
+  global PDK_GEN_REQUIRED
+  if {$gen < $PDK_GEN_REQUIRED} { return 0 }
   return 1
 }
 
@@ -540,9 +861,8 @@ proc pdk_autofix_tech27 {} {
   }
   if {$bash == "" || $sh == ""} { return }
 
+  global PDK_SOURCE_REV
   foreach tech {sky130A gf180mcu sg13g2} {
-    set bad [pdk_find_tech27_any $tech]
-    if {$bad != "" && [pdk_tech27_ok $bad]} continue
     set source ""
     set dest ""
     foreach dir [pdk_max_tech_dirs $tech] {
@@ -554,7 +874,20 @@ proc pdk_autofix_tech27 {} {
       }
     }
     if {$source == "" || $dest == ""} continue
-    catch {puts "pdk: repairing broken $tech.tech27 ..."}
+    # Preset tables changed (typed diffusion, text layers): rewrite the .source
+    # before compiling, otherwise the old table is just re-emitted.
+    set stale_source 0
+    if {[pdk_source_rev $source] < $PDK_SOURCE_REV} {
+      if {[catch {pdk_write_source $tech $tech $source} err]} {
+        catch {puts "pdk: could not rewrite $source: $err"}
+      } else {
+        set stale_source 1
+        catch {puts "pdk: updated $tech.source to table rev $PDK_SOURCE_REV"}
+      }
+    }
+    set bad [pdk_find_tech27_any $tech]
+    if {!$stale_source && $bad != "" && [pdk_tech27_ok $bad]} continue
+    catch {puts "pdk: rebuilding $tech.tech27 ..."}
     catch {exec $bash $sh $source $tech $dest}
     if {[pdk_find_tech27 $tech] != ""} {
       catch {puts "pdk: repaired $tech.tech27"}
@@ -1367,14 +1700,8 @@ proc pdk_import_convert {} {
     set PDK_IMPORT(family) $family
   }
 
-  set rows {}
-  if {$family == "sky130A"} {
-    set rows [pdk_layers_sky130A]
-  } elseif {$family == "gf180mcu"} {
-    set rows [pdk_layers_gf180mcu]
-  } elseif {$family == "sg13g2"} {
-    set rows [pdk_layers_sg13g2]
-  }
+  set rows [pdk_family_layers $family]
+  set rules [pdk_family_rules $family]
 
   if {![llength $rows]} {
     set techs [pdk_find_files $PDK_IMPORT(src) {*.tech}]
@@ -1383,6 +1710,7 @@ proc pdk_import_convert {} {
       set rows [pdk_parse_magic_tech $t]
       if {[llength $rows]} {
         pdk_log "Parsed Magic tech $t ([llength $rows] layers)"
+        set rules [pdk_connect_lines $rows]
         break
       }
     }
@@ -1415,26 +1743,11 @@ proc pdk_import_convert {} {
   set source [file join $techdir ${tech}.source]
 
   _pdk_import_progress_update 90 "Writing $source"
-  if {[catch {
-    set fh [open $source w]
-    puts $fh "# MAX technology source generated by pdk_import.tcl"
-    puts $fh "# family $family"
-    puts $fh ""
-    puts $fh "# layer\tgds:dt\ttxt:dt\ttype\twidth\tspace\tcolor"
-    puts $fh "#======\t======\t======\t====\t=====\t=====\t====="
-    foreach rec $rows {
-      puts $fh [join $rec "\t"]
-    }
-    puts $fh ""
-    foreach line [pdk_connect_lines $rows] {
-      puts $fh $line
-    }
-    close $fh
-  } err]} {
+  if {[catch {pdk_write_source $family $tech $source $rows $rules} err]} {
     pdk_import_fail "Could not write $source:\n$err"
     return
   }
-  pdk_log "Wrote $source ([llength $rows] layers)"
+  pdk_log "Wrote $source ([llength $rows] layers, [llength $rules] rule lines)"
 
   _pdk_import_progress_update 94 "Compiling MAX technology..."
   pdk_prepend_tools_path
@@ -1450,7 +1763,8 @@ proc pdk_import_convert {} {
 
   set sh [pdk_compile_script]
   set bash [pdk_which {bash /bin/bash /usr/bin/bash}]
-  pdk_log "pdk_import rev 8 compile_tech.sh=$sh bash=$bash"
+  global _PDK_IMPORT_REV
+  pdk_log "pdk_import rev $_PDK_IMPORT_REV compile_tech.sh=$sh bash=$bash"
   if {$sh == "" || $bash == ""} {
     pdk_log "compile_tech.sh or bash missing; trying in-process compile"
     pdk_finish_max_tech $tech $techdir $privdir
@@ -1531,7 +1845,7 @@ proc pdk_import_after_compile {} {
     set mtok ok
     pdk_log "MAX tech27 [pdk_find_tech27 $tech]"
   } else {
-    pdk_log "No ${tech}.tech27 (need gcc cpp + GNU m4)"
+    pdk_log "No usable ${tech}.tech27 (see compile_tech.sh / source_to_tech27.tcl output above)"
     foreach d [pdk_max_tech_dirs $tech] { pdk_log_tech_dir $d }
   }
 

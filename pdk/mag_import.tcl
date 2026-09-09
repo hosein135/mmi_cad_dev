@@ -2,12 +2,19 @@
 # File / Local menu: "Import Magic Design Folder..."
 #
 # Magic's native .mag reader (db_magic) was removed from this MAX package.
-# This command walks a directory of .mag files, writes one GDSII library,
-# then asks MAX to read that GDS and save .max cells.
+# Preferred path: mag2gds.sh runs Magic VLSI with the open_pdks tech so the
+# GDS carries the real cifoutput geometry (implants, contact cuts, ...).
+# Fallback path: this file parses the .mag files itself and writes a GDSII
+# library from the paint (no boolean generation), then MAX reads the GDS
+# with the imported PDK technology and saves .max cells.
+#
+# MAX embeds Tcl 8.0: no [ \t] / \S regexp classes (a tab inside [] is a
+# literal "t"), no wide(), no string repeat, no glob -directory, no lset.
+# Everything below sticks to what 8.0 has.
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 4
+set _MAG_IMPORT_REV 6
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -63,112 +70,267 @@ set MAG_IMPORT(stat_pct) 0
 set MAG_IMPORT(stat_msg) ""
 set MAG_IMPORT(stat_dest) ""
 set MAG_IMPORT(fetch_dead) 0
+set MAG_IMPORT(magic_polls) 0
 
-# ── Magic paint name → GDS layer:datatype (sky130 / gf180 / ihp) ─────────────
-# Direct paint dump (not Magic cifoutput boolean generation).
+# ── Small Tcl 8.0-safe helpers ───────────────────────────────────────────────
+
+# Whitespace-split without regexp character classes.
+proc mag_words {line} {
+  set out {}
+  foreach w [split $line " \t"] {
+    if {$w != ""} { lappend out $w }
+  }
+  return $out
+}
+
+proc mag_is_int {s} {
+  if {$s == ""} { return 0 }
+  set i 0
+  if {[string index $s 0] == "-"} { set i 1 }
+  set n [string length $s]
+  if {$i >= $n} { return 0 }
+  for {} {$i < $n} {incr i} {
+    if {[string first [string index $s $i] 0123456789] < 0} { return 0 }
+  }
+  return 1
+}
+
+proc mag_all_int {items} {
+  foreach x $items {
+    if {![mag_is_int $x]} { return 0 }
+  }
+  return 1
+}
+
+# ── Magic paint name → GDS layers (fallback Tcl dump) ────────────────────────
+# Each record is {layer datatype grow_nm}. Magic contact / transistor tiles
+# stand for several masks (ndiffc = diff + licon + li + nsdm), and implant
+# layers are generated around diffusion, so one paint may emit several GDS
+# layers; grow_nm approximates the implant enclosure. This is NOT the
+# foundry cifoutput — use the Magic mag2gds method for tapeout.
 
 proc mag_gds_map_sky130 {layer} {
   set n [string tolower $layer]
+  set diff {65 20 0}
+  set tap {65 44 0}
+  set nsdm {93 44 125}
+  set psdm {94 20 125}
+  set hvi {75 20 180}
+  set poly {66 20 0}
+  set licon {66 44 0}
+  set npc {95 20 100}
+  set li {67 20 0}
+  set mcon {67 44 0}
+  set m1 {68 20 0}
+  set v1 {68 44 0}
+  set m2 {69 20 0}
+  set v2 {69 44 0}
+  set m3 {70 20 0}
+  set v3 {70 44 0}
+  set m4 {71 20 0}
+  set v4 {71 44 0}
+  set m5 {72 20 0}
+  set capm {89 44 0}
+  set cap2m {97 44 0}
   switch -exact -- $n {
-    nwell { return {64 20} }
-    pwell { return {64 13} }
-    dnwell { return {64 18} }
-    diff - ndiff - pdiff - mvndiff - mvpdiff - mvnmos - mvpmos -
-    ndiode - pdiode { return {65 20} }
-    tap - nsd - psd - mvpsubdiff - mvnsubdiff - psubdiff - mvnsd - mvpsd { return {65 44} }
-    poly - xpolyres { return {66 20} }
-    polyres - res0p69 { return {66 13} }
-    licon1 - polycont - xpolycontact - mvndiffc - mvpdiffc -
-    mvpsubdiffcont - mvnsubdiffcont - psubdiffcont { return {66 44} }
-    li1 - locali - li { return {67 20} }
-    mcon - viali - vial { return {67 44} }
-    met1 - metal1 - m1 { return {68 20} }
-    via - via1 { return {68 44} }
-    met2 - metal2 - m2 { return {69 20} }
-    via2 { return {69 44} }
-    met3 - metal3 - m3 { return {70 20} }
-    via3 { return {70 44} }
-    met4 - metal4 - m4 { return {71 20} }
-    via4 { return {71 44} }
-    met5 - metal5 - m5 { return {72 20} }
-    mimcap { return {89 44} }
-    mimcapcontact - mimcc { return {70 44} }
-    mimcap2 { return {97 44} }
-    mimcap2contact { return {71 44} }
-    nsdm { return {93 44} }
-    psdm { return {94 20} }
-    npc { return {95 20} }
-    hvntm { return {125 20} }
-    hvi { return {75 20} }
-    bound - bbox - areaid_sl { return {235 4} }
-    text { return {64 5} }
+    nwell { return {{64 20 0}} }
+    pwell { return {{64 13 0}} }
+    dnwell { return {{64 18 0}} }
+    ndiff - ndif - ndiode { return [list $diff $nsdm] }
+    pdiff - pdif - pdiode { return [list $diff $psdm] }
+    mvndiff - mvndif { return [list $diff $nsdm $hvi] }
+    mvpdiff - mvpdif { return [list $diff $psdm $hvi] }
+    nsubdiff - nsd - ntap - nsubdiffusion { return [list $tap $nsdm] }
+    psubdiff - psd - ptap - psubdiffusion { return [list $tap $psdm] }
+    mvnsubdiff - mvnsd { return [list $tap $nsdm $hvi] }
+    mvpsubdiff - mvpsd { return [list $tap $psdm $hvi] }
+    nmos - ntransistor - nfet - nnmos - nnfet - scnmos { return [list $poly $diff $nsdm] }
+    pmos - ptransistor - pfet - scpmos { return [list $poly $diff $psdm] }
+    nmoslvt - nfetlvt { return [list $poly $diff $nsdm {125 44 180}] }
+    pmoshvt - pfethvt { return [list $poly $diff $psdm {78 44 180}] }
+    mvnmos - mvnfet - mvnnmos { return [list $poly $diff $nsdm $hvi] }
+    mvpmos - mvpfet { return [list $poly $diff $psdm $hvi] }
+    poly - polysilicon - p { return [list $poly] }
+    polyres - ppolyres - res0p35 - res1p41 - res2p85 - res5p73 - rpoly {
+      return [list $poly {66 13 0} {86 20 200} $psdm]
+    }
+    xpolyres - xpolyresistor - res0p69 { return [list $poly {66 13 0} {79 20 200} $psdm] }
+    ndiffc - ndc - ndiffcont - ndiffcontact { return [list $diff $licon $li $nsdm] }
+    pdiffc - pdc - pdiffcont - pdiffcontact { return [list $diff $licon $li $psdm] }
+    mvndiffc - mvndc - mvndiffcont { return [list $diff $licon $li $nsdm $hvi] }
+    mvpdiffc - mvpdc - mvpdiffcont { return [list $diff $licon $li $psdm $hvi] }
+    nsubdiffcont - nsc - nsubdiffc - ntapc - nsubdiffcontact { return [list $tap $licon $li $nsdm] }
+    psubdiffcont - psc - psubdiffc - ptapc - psubdiffcontact { return [list $tap $licon $li $psdm] }
+    mvnsubdiffcont - mvnsc - mvnsubdiffc { return [list $tap $licon $li $nsdm $hvi] }
+    mvpsubdiffcont - mvpsc - mvpsubdiffc { return [list $tap $licon $li $psdm $hvi] }
+    polycont - pc - polycontact - xpolycontact - xpc { return [list $poly $licon $li $npc] }
+    licon1 - licon { return [list $licon] }
+    locali - li1 - li - l1 { return [list $li] }
+    viali - mcon - vial - l1c { return [list $mcon $li $m1] }
+    metal1 - met1 - m1 { return [list $m1] }
+    via - via1 - v1 - m1c { return [list $v1 $m1 $m2] }
+    metal2 - met2 - m2 { return [list $m2] }
+    via2 - v2 - m2c { return [list $v2 $m2 $m3] }
+    metal3 - met3 - m3 { return [list $m3] }
+    via3 - v3 - m3c { return [list $v3 $m3 $m4] }
+    metal4 - met4 - m4 { return [list $m4] }
+    via4 - v4 - m4c { return [list $v4 $m4 $m5] }
+    metal5 - met5 - m5 { return [list $m5] }
+    mimcap { return [list $capm $m3] }
+    mimcapcontact - mimcc { return [list $v3 $capm $m3 $m4] }
+    mimcap2 { return [list $cap2m $m4] }
+    mimcap2contact - mimcc2 { return [list $v4 $cap2m $m4 $m5] }
+    nsdm { return [list {93 44 0}] }
+    psdm { return [list {94 20 0}] }
+    npc { return [list {95 20 0}] }
+    hvi { return [list {75 20 0}] }
+    hvntm { return {{125 20 0}} }
+    lvtn { return {{125 44 0}} }
+    hvtp { return {{78 44 0}} }
+    tunm { return {{80 20 0}} }
+    rpm { return {{86 20 0}} }
+    urpm { return {{79 20 0}} }
+    pad { return {{76 20 0}} }
+    bound - bbox - prboundary - areaid_sl { return {{235 4 0}} }
+    text - comment { return {{83 44 0}} }
   }
   return {}
 }
 
 proc mag_gds_map_gf180 {layer} {
   set n [string tolower $layer]
+  set comp {22 0 0}
+  set nplus {32 0 160}
+  set pplus {31 0 160}
+  set dg {55 0 240}
+  set poly {30 0 0}
+  set ct {33 0 0}
+  set m1 {34 0 0}
+  set v1 {35 0 0}
+  set m2 {36 0 0}
+  set v2 {38 0 0}
+  set m3 {42 0 0}
+  set v3 {40 0 0}
+  set m4 {46 0 0}
+  set v4 {41 0 0}
+  set m5 {81 0 0}
   switch -exact -- $n {
-    nwell { return {21 0} }
-    dnwell { return {12 0} }
-    comp - diff - ndiff - pdiff { return {22 0} }
-    poly - poly2 { return {30 0} }
-    nplus { return {32 0} }
-    pplus { return {31 0} }
-    contact - licon1 { return {33 0} }
-    metal1 - met1 { return {34 0} }
-    via1 - via { return {35 0} }
-    metal2 - met2 { return {36 0} }
-    via2 { return {38 0} }
-    metal3 - met3 { return {42 0} }
-    via3 { return {40 0} }
-    metal4 - met4 { return {46 0} }
-    via4 { return {41 0} }
-    metal5 - met5 { return {81 0} }
-    text { return {31 0} }
+    nwell { return {{21 0 0}} }
+    dnwell { return {{12 0 0}} }
+    pwell { return {} }
+    comp - diff - ndiff - ndif { return [list $comp $nplus] }
+    pdiff - pdif { return [list $comp $pplus] }
+    nsd - ntap - nsubdiff { return [list $comp $nplus] }
+    psd - ptap - psubdiff { return [list $comp $pplus] }
+    mvndiff - mvnsd { return [list $comp $nplus $dg] }
+    mvpdiff - mvpsd { return [list $comp $pplus $dg] }
+    nmos - nfet - ntransistor { return [list $poly $comp $nplus] }
+    pmos - pfet - ptransistor { return [list $poly $comp $pplus] }
+    mvnmos - mvnfet { return [list $poly $comp $nplus $dg] }
+    mvpmos - mvpfet { return [list $poly $comp $pplus $dg] }
+    poly - poly2 - polysilicon { return [list $poly] }
+    ndiffc - ndc - nsc - nsubc - nsubdiffcont { return [list $comp $ct $m1 $nplus] }
+    pdiffc - pdc - psc - psubc - psubdiffcont { return [list $comp $ct $m1 $pplus] }
+    mvndiffc - mvndc - mvnsc { return [list $comp $ct $m1 $nplus $dg] }
+    mvpdiffc - mvpdc - mvpsc { return [list $comp $ct $m1 $pplus $dg] }
+    polycont - pc - polycontact { return [list $poly $ct $m1] }
+    contact - licon1 { return [list $ct] }
+    metal1 - met1 - m1 { return [list $m1] }
+    via1 - via - v1 { return [list $v1 $m1 $m2] }
+    metal2 - met2 - m2 { return [list $m2] }
+    via2 - v2 { return [list $v2 $m2 $m3] }
+    metal3 - met3 - m3 { return [list $m3] }
+    via3 - v3 { return [list $v3 $m3 $m4] }
+    metal4 - met4 - m4 { return [list $m4] }
+    via4 - v4 { return [list $v4 $m4 $m5] }
+    metal5 - met5 - m5 - metaltop - mtop { return [list $m5] }
+    nplus { return {{32 0 0}} }
+    pplus { return {{31 0 0}} }
+    dualgate - dg { return {{55 0 0}} }
+    sab { return {{49 0 0}} }
+    esd { return {{24 0 0}} }
+    bound - bbox - pr_bndry - prboundary { return {{63 0 0}} }
   }
   return {}
 }
 
 proc mag_gds_map_sg13g2 {layer} {
   set n [string tolower $layer]
+  set act {1 0 0}
+  set psd {14 0 180}
+  set poly {5 0 0}
+  set ct {6 0 0}
+  set m1 {8 0 0}
+  set v1 {19 0 0}
+  set m2 {10 0 0}
+  set v2 {29 0 0}
+  set m3 {30 0 0}
+  set v3 {49 0 0}
+  set m4 {50 0 0}
+  set v4 {66 0 0}
+  set m5 {67 0 0}
+  set tv1 {125 0 0}
+  set tm1 {126 0 0}
+  set tv2 {133 0 0}
+  set tm2 {134 0 0}
   switch -exact -- $n {
-    activ - diff { return {1 0} }
-    gatpoly - poly { return {5 0} }
-    nwell { return {31 0} }
-    nsd { return {7 0} }
-    psd { return {14 0} }
-    cont - contact { return {6 0} }
-    metal1 - met1 { return {8 0} }
-    via1 { return {19 0} }
-    metal2 - met2 { return {10 0} }
-    via2 { return {29 0} }
-    metal3 - met3 { return {30 0} }
-    via3 { return {49 0} }
-    metal4 - met4 { return {50 0} }
-    via4 { return {66 0} }
-    metal5 - met5 { return {67 0} }
-    text { return {63 0} }
+    activ - diff - ndiff - ndif - nsd - ntap { return [list $act] }
+    pdiff - pdif - psd - ptap { return [list $act $psd] }
+    nmos - nfet { return [list $poly $act] }
+    pmos - pfet { return [list $poly $act $psd] }
+    gatpoly - poly { return [list $poly] }
+    nwell { return {{31 0 0}} }
+    pwell { return {} }
+    ndiffc - ndc - nsc { return [list $act $ct $m1] }
+    pdiffc - pdc - psc { return [list $act $ct $m1 $psd] }
+    polycont - pc { return [list $poly $ct $m1] }
+    cont - contact { return [list $ct] }
+    metal1 - met1 - m1 { return [list $m1] }
+    via1 - v1 { return [list $v1 $m1 $m2] }
+    metal2 - met2 - m2 { return [list $m2] }
+    via2 - v2 { return [list $v2 $m2 $m3] }
+    metal3 - met3 - m3 { return [list $m3] }
+    via3 - v3 { return [list $v3 $m3 $m4] }
+    metal4 - met4 - m4 { return [list $m4] }
+    via4 - v4 { return [list $v4 $m4 $m5] }
+    metal5 - met5 - m5 { return [list $m5] }
+    topvia1 - tv1 { return [list $tv1 $m5 $tm1] }
+    topmetal1 - tm1 - metal6 - m6 { return [list $tm1] }
+    topvia2 - tv2 { return [list $tv2 $tm1 $tm2] }
+    topmetal2 - tm2 - metal7 - m7 { return [list $tm2] }
+    mim { return {{36 0 0}} }
+    thickgateox - hvi { return {{44 0 0}} }
+    salblock - sab { return {{28 0 0}} }
+    bound - bbox - prboundary { return {{189 4 0}} }
+    text - comment { return {{63 0 0}} }
   }
   return {}
 }
 
+# List of {layer datatype grow_nm}; unknown paint gets a private layer ≥ 200.
 proc mag_gds_map {family layer} {
   global MAG_GDS_UNKNOWN
-  set rec {}
+  set recs {}
   if {$family == "gf180mcu"} {
-    set rec [mag_gds_map_gf180 $layer]
+    set recs [mag_gds_map_gf180 $layer]
   } elseif {$family == "sg13g2"} {
-    set rec [mag_gds_map_sg13g2 $layer]
+    set recs [mag_gds_map_sg13g2 $layer]
   } else {
-    set rec [mag_gds_map_sky130 $layer]
+    set recs [mag_gds_map_sky130 $layer]
   }
-  if {[llength $rec]} { return $rec }
+  if {[llength $recs]} { return $recs }
   if {![info exists MAG_GDS_UNKNOWN($layer)]} {
     set MAG_GDS_UNKNOWN($layer) [expr {200 + [array size MAG_GDS_UNKNOWN]}]
-    mag_log "Unmapped Magic layer '$layer' → GDS $MAG_GDS_UNKNOWN($layer)/0"
+    mag_log "Unmapped Magic layer '$layer' -> GDS $MAG_GDS_UNKNOWN($layer)/0"
   }
-  return [list $MAG_GDS_UNKNOWN($layer) 0]
+  return [list [list $MAG_GDS_UNKNOWN($layer) 0 0]]
+}
+
+# GDS text datatype used for labels on a paint layer (same layer number).
+proc mag_text_dt {family} {
+  if {$family == "gf180mcu"} { return 10 }
+  if {$family == "sg13g2"} { return 25 }
+  return 5
 }
 
 proc mag_family_from_tech {tech} {
@@ -179,13 +341,70 @@ proc mag_family_from_tech {tech} {
   return sky130A
 }
 
+proc mag_pdk_dir {family} {
+  set root /mmi-pdks
+  if {[info commands pdk_root] != ""} { set root [pdk_root] }
+  set names sky130A
+  if {$family == "gf180mcu"} { set names {gf180mcuD gf180mcuC gf180mcu} }
+  if {$family == "sg13g2"} { set names {ihp-sg13g2 sg13g2} }
+  foreach n $names {
+    if {[file isdirectory [file join $root $n libs.tech magic]]} {
+      return [file join $root $n]
+    }
+  }
+  return ""
+}
+
+# Nanometers per Magic lambda: "scalefactor N nanometers" of the PDK's
+# Magic cifoutput style when the PDK is installed, else the known defaults.
+proc mag_scalefactor_nm {family} {
+  global MAG_IMPORT
+  if {[info exists MAG_IMPORT(scale,$family)]} { return $MAG_IMPORT(scale,$family) }
+  # open_pdks: sky130 "scalefactor 10 nanometers", gf180mcu "50 nanometers",
+  # IHP sg13g2 "10 nanometers" (the .mag magscale n/d then gives the grid).
+  set nm 10.0
+  if {$family == "gf180mcu"} { set nm 50.0 }
+  set pdk [mag_pdk_dir $family]
+  if {$pdk != ""} {
+    set techs {}
+    catch {set techs [lsort [glob -nocomplain [file join $pdk libs.tech magic *.tech]]]}
+    foreach t $techs {
+      if {![file isfile $t]} continue
+      if {[catch {set fh [open $t r]}]} continue
+      set in_out 0
+      set found ""
+      while {[gets $fh line] >= 0} {
+        set toks [mag_words $line]
+        set c [lindex $toks 0]
+        if {$c == "cifoutput"} { set in_out 1; continue }
+        if {$in_out && ($c == "cifinput" || $c == "drc" || $c == "extract")} break
+        if {$in_out && $c == "scalefactor" && [llength $toks] >= 2} {
+          set found [lindex $toks 1]
+          set unit [string tolower [lindex $toks 2]]
+          # Magic's default scalefactor unit is centimicrons (10 nm).
+          if {$unit == "" || [string match centi* $unit]} {
+            set found [expr {double($found) * 10.0}]
+          } elseif {[string match ang* $unit]} {
+            set found [expr {double($found) / 10.0}]
+          }
+          break
+        }
+      }
+      close $fh
+      if {$found != "" && ![catch {expr {double($found) > 0}} ok] && $ok} {
+        set nm [expr {double($found)}]
+        break
+      }
+    }
+  }
+  set MAG_IMPORT(scale,$family) $nm
+  return $nm
+}
+
+# Nanometers per .mag file unit: lambda * magscale n/d.
 proc mag_nm_per_unit {family n d} {
   if {$d == 0} { set d 1 }
-  # open_pdks sky130 cifoutput: scalefactor 10 nanometers at magscale 1 1
-  set base 10.0
-  if {$family == "gf180mcu"} { set base 5.0 }
-  if {$family == "sg13g2"} { set base 1.0 }
-  return [expr {$base * double($n) / double($d)}]
+  return [expr {[mag_scalefactor_nm $family] * double($n) / double($d)}]
 }
 
 proc mag_log {msg} {
@@ -248,17 +467,45 @@ proc mag_sample_dir {} {
 
 proc mag_sample_dest {} {
   # Writable place for a downloaded Caravel Mag sample.
+  set cands {}
   if {[info commands pdk_root] != ""} {
-    set d [file join [pdk_root] samples caravel_analog_por]
-    catch {file mkdir $d}
-    if {[file isdirectory $d]} { return $d }
+    lappend cands [file join [pdk_root] samples caravel_analog_por]
   }
-  set d /mmi-pdks/samples/caravel_analog_por
-  catch {file mkdir $d}
-  if {[file isdirectory $d]} { return $d }
-  set d /mmi-home/cad/mmi_local/max/pdk/samples/caravel_analog_por
-  catch {file mkdir $d}
-  return $d
+  lappend cands /mmi-pdks/samples/caravel_analog_por
+  lappend cands /mmi-home/cad/mmi_local/max/pdk/samples/caravel_analog_por
+  foreach d $cands {
+    catch {file mkdir $d}
+    if {[file isdirectory $d] && [file writable $d]} { return $d }
+  }
+  return [lindex $cands end]
+}
+
+# Directory for GDS + .max output. Bundled samples live on read-only mounts
+# (/mmi-bundle, /mmi-pdk-live), so fall back to PDK_ROOT or /tmp.
+proc mag_output_dir {dir top} {
+  set cands [list [file join $dir max_import]]
+  set base [file tail $dir]
+  if {$base == ""} { set base design }
+  if {[info commands pdk_root] != ""} {
+    lappend cands [file join [pdk_root] mag_import $base]
+  }
+  lappend cands [file join /mmi-pdks mag_import $base]
+  lappend cands [file join /mmi-home/cad/mmi_local/max/mag_import $base]
+  lappend cands [file join /tmp mag_import_out $base]
+  foreach d $cands {
+    catch {file mkdir $d}
+    if {![file isdirectory $d] || ![file writable $d]} continue
+    # mkdir can succeed on a bind mount that still refuses files: probe it.
+    set probe [file join $d .mag_import_write_test]
+    if {[catch {
+      set fh [open $probe w]
+      puts $fh ok
+      close $fh
+      file delete $probe
+    }]} continue
+    return $d
+  }
+  return [file join /tmp mag_import_out $base]
 }
 
 proc mag_fetch_script {} {
@@ -404,14 +651,15 @@ proc mag_list_max_techs {} {
   if {![llength $names]} {
     set names {mmi18 mmi25}
   }
-  return [lsort -dictionary $names]
+  # Tcl 8.0 has no lsort -dictionary.
+  return [lsort $names]
 }
 
 proc mag_skip_layer {layer} {
   set n [string tolower $layer]
   switch -exact -- $n {
     labels - properties - end - error_p - error - checkpaint -
-    comment - authors - plots - watch { return 1 }
+    comment - authors - plots - watch - space { return 1 }
   }
   return 0
 }
@@ -433,6 +681,8 @@ proc mag_gds_i32 {n} {
   return $hex
 }
 
+# 8-byte GDS real: sign, 7-bit excess-64 base-16 exponent, 56-bit mantissa.
+# Mantissa bytes are peeled off one at a time (Tcl 8.0 has no wide()).
 proc mag_gds_real8 {x} {
   set x [expr {double($x)}]
   if {$x == 0.0} { return 0000000000000000 }
@@ -450,13 +700,23 @@ proc mag_gds_real8 {x} {
     set x [expr {$x * 16.0}]
     incr exp -1
   }
-  set mant [expr {wide($x * 72057594037927936.0 + 0.5)}]
-  if {$mant < 0} { set mant 0 }
   set b0 [expr {($sign * 128) + (($exp + 64) & 127)}]
   set hex [format %02x $b0]
-  for {set sh 48} {$sh >= 0} {incr sh -8} {
-    append hex [format %02x [expr {(wide($mant) >> $sh) & 255}]]
-  }
+  # 56-bit mantissa as 24 + 24 + 8 bit chunks: each fits a 32-bit int and the
+  # float error stays below one unit of the last byte (peeling single bytes
+  # multiplies the error by 256 per step and drifts).
+  set v [expr {$x * 16777216.0}]
+  set hi [expr {int($v)}]
+  if {$hi > 16777215} { set hi 16777215 }
+  set v [expr {($v - $hi) * 16777216.0}]
+  set mid [expr {int($v)}]
+  if {$mid > 16777215} { set mid 16777215 }
+  if {$mid < 0} { set mid 0 }
+  set v [expr {($v - $mid) * 256.0}]
+  set lo [expr {int($v)}]
+  if {$lo > 255} { set lo 255 }
+  if {$lo < 0} { set lo 0 }
+  append hex [format %06x $hi] [format %06x $mid] [format %02x $lo]
   return $hex
 }
 
@@ -465,7 +725,7 @@ proc mag_gds_ascii {s} {
   set n [string length $s]
   for {set i 0} {$i < $n} {incr i} {
     scan [string index $s $i] %c c
-    append hex [format %02x $c]
+    append hex [format %02x [expr {$c & 255}]]
   }
   if {[expr {$n % 2}] == 1} {
     append hex 00
@@ -486,8 +746,7 @@ proc mag_gds_rec {fh type dtype hexdata} {
   puts -nonewline $fh [binary format H* $hdr$hexdata]
 }
 
-proc mag_gds_header {fh libname} {
-  mag_gds_rec $fh 0 2 [mag_gds_i16 600]
+proc mag_gds_dates {} {
   set now [clock seconds]
   set y [clock format $now -format %Y]
   set mo [clock format $now -format %m]
@@ -495,13 +754,25 @@ proc mag_gds_header {fh libname} {
   set h [clock format $now -format %H]
   set mi [clock format $now -format %M]
   set s [clock format $now -format %S]
-  set dates ""
-  foreach _ {1 2} {
-    append dates [mag_gds_i16 $y][mag_gds_i16 $mo][mag_gds_i16 $d]
-    append dates [mag_gds_i16 $h][mag_gds_i16 $mi][mag_gds_i16 $s]
+  # %m etc. are zero padded; "08" would be an octal error in expr.
+  set vals {}
+  foreach v [list $y $mo $d $h $mi $s] {
+    set v [string trimleft $v 0]
+    if {$v == ""} { set v 0 }
+    lappend vals $v
   }
-  mag_gds_rec $fh 1 2 $dates
+  set out ""
+  foreach _ {1 2} {
+    foreach v $vals { append out [mag_gds_i16 $v] }
+  }
+  return $out
+}
+
+proc mag_gds_header {fh libname} {
+  mag_gds_rec $fh 0 2 [mag_gds_i16 600]
+  mag_gds_rec $fh 1 2 [mag_gds_dates]
   mag_gds_rec $fh 2 6 [mag_gds_ascii $libname]
+  # 1 database unit = 0.001 user units (um) = 1e-9 m
   mag_gds_rec $fh 3 5 [mag_gds_real8 0.001][mag_gds_real8 1.0e-9]
 }
 
@@ -510,7 +781,7 @@ proc mag_gds_endlib {fh} {
 }
 
 proc mag_gds_bgnstr {fh name} {
-  mag_gds_rec $fh 5 2 [string repeat [mag_gds_i16 0] 12]
+  mag_gds_rec $fh 5 2 [mag_gds_dates]
   mag_gds_rec $fh 6 6 [mag_gds_ascii $name]
 }
 
@@ -566,7 +837,8 @@ proc mag_gds_text {fh lay dt x y str} {
   mag_gds_rec $fh 17 0 ""
 }
 
-# Magic manhattan transform → (reflect, angle_deg)
+# Magic manhattan transform (a b c d e f): x' = a x + b y + c, y' = d x + e y + f
+# → GDS (reflect-about-x-first, angle_deg)
 proc mag_sref_orient {a b d e} {
   set a [expr {int($a)}]
   set b [expr {int($b)}]
@@ -590,18 +862,43 @@ proc mag_scale_xy {x y scale} {
   return [list $gx $gy]
 }
 
-# ── .mag parser ──────────────────────────────────────────────────────────────
-
-proc mag_gets {fh} {
-  upvar 1 lookahead lookahead
-  if {$lookahead != ""} {
-    set line $lookahead
-    set lookahead ""
-    return $line
-  }
-  if {[gets $fh line] < 0} { return "" }
-  return $line
+# True when a GDS file holds at least one structure (BGNSTR record).
+proc mag_gds_has_structs {path} {
+  if {![file exists $path]} { return 0 }
+  if {[file size $path] < 100} { return 0 }
+  # Walk the record chain with binary scan (NUL-safe in Tcl 8.0); the first
+  # BGNSTR follows the header within a few records, so 64 KiB is plenty.
+  set found 0
+  set rc [catch {
+    set fh [open $path r]
+    fconfigure $fh -translation binary
+    set data [read $fh 65536]
+    close $fh
+    set n [string length $data]
+    set off 0
+    set guard 0
+    while {$off + 4 <= $n && $guard < 20000} {
+      incr guard
+      if {[binary scan $data "@${off}Scc" len type dt] != 3} break
+      if {$len < 4} break
+      if {$type == 5} { set found 1; break }
+      set off [expr {$off + $len}]
+    }
+  }]
+  if {$rc} { return 1 }   ;# could not inspect: do not block the import
+  return $found
 }
+
+# ── .mag parser ──────────────────────────────────────────────────────────────
+#
+# magic / tech T / magscale n d / timestamp
+# << layer >> then rect x1 y1 x2 y2 | tri x1 y1 x2 y2 dir(nw|ne|sw|se)
+# << labels >> rlabel LAYER [s] x1 y1 x2 y2 pos TEXT
+#              flabel LAYER [s] x1 y1 x2 y2 pos FONT SIZE ROT DX DY TEXT
+#              port N dirs ...
+# use CELL [INST [PATH]] / timestamp / transform a b c d e f
+#     array xlo xhi xsep ylo yhi ysep / box x1 y1 x2 y2
+# << end >>
 
 proc mag_parse_file {path} {
   global MAGDB
@@ -612,6 +909,7 @@ proc mag_parse_file {path} {
   }
   set MAGDB($name,n) 1
   set MAGDB($name,d) 1
+  set MAGDB($name,tech) ""
   set MAGDB($name,layers) {}
   set MAGDB($name,uses) {}
   set MAGDB($name,labels) {}
@@ -619,14 +917,20 @@ proc mag_parse_file {path} {
   set MAGDB($name,file) $path
   set layer ""
   set section paint
-  set lookahead ""
-  while {1} {
-    set raw [mag_gets $fh]
-    if {$raw == "" && $lookahead == "" && [eof $fh]} { break }
+  set use ""
+  while {[gets $fh raw] >= 0} {
     set line [string trim $raw]
-    if {$line == "" || [string match #* $line]} continue
-    if {[regexp {^<<[ \t]*([^>]+)[ \t]*>>} $line -> sec]} {
-      set sec [string trim $sec]
+    if {$line == "" || [string index $line 0] == "#"} continue
+
+    if {[string range $line 0 1] == "<<"} {
+      # flush a pending use
+      if {$use != ""} {
+        lappend MAGDB($name,uses) $use
+        set use ""
+      }
+      set close [string first ">>" $line]
+      if {$close < 0} { set close [string length $line] }
+      set sec [string trim [string range $line 2 [expr {$close - 1}]]]
       set layer $sec
       set sl [string tolower $sec]
       if {$sl == "labels"} {
@@ -643,71 +947,99 @@ proc mag_parse_file {path} {
       }
       continue
     }
-    if {$section == "props"} continue
+
+    set toks [mag_words $line]
+    set kw [lindex $toks 0]
+
+    if {$section == "props"} {
+      if {$kw == "string" && [lindex $toks 1] == "FIXED_BBOX" && \
+          [llength $toks] >= 6 && [mag_all_int [lrange $toks 2 5]]} {
+        set MAGDB($name,bbox) [lrange $toks 2 5]
+      }
+      continue
+    }
+
     if {$section == "labels"} {
-      if {[regexp {^(rlabel|flabel)[ \t]+([^ \t]+)[ \t]+[^ \t]+[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(.*)$} $line -> kind lname x1 y1 x2 y2 rest]} {
-        set rest [string trim $rest]
-        if {$kind == "flabel"} {
-          set toks [split $rest]
-          if {[llength $toks] > 6} {
-            set text [join [lrange $toks 6 end] " "]
-          } else {
-            set text [lindex $toks end]
-          }
-        } else {
-          set text $rest
+      if {$kw == "rlabel" || $kw == "flabel"} {
+        set lname [lindex $toks 1]
+        set i 2
+        if {[lindex $toks $i] == "s"} { incr i }
+        set coords [lrange $toks $i [expr {$i + 3}]]
+        if {[llength $coords] < 4 || ![mag_all_int $coords]} continue
+        set i [expr {$i + 5}]     ;# skip x1 y1 x2 y2 pos
+        if {$kw == "flabel"} {
+          set i [expr {$i + 5}]   ;# font size rotation offx offy
         }
-        set text [string trim $text]
+        set text [string trim [join [lrange $toks $i end] " "]]
+        if {$text == ""} continue
+        setl {x1 y1 x2 y2} $coords
         lappend MAGDB($name,labels) [list $lname $x1 $y1 $x2 $y2 $text]
       }
       continue
     }
-    if {[regexp {^tech[ \t]+} $line]} continue
-    if {[regexp {^timestamp[ \t]+} $line]} continue
-    if {[regexp {^magic$} $line]} continue
-    if {[regexp {^magscale[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)} $line -> n d]} {
-      set MAGDB($name,n) $n
-      set MAGDB($name,d) $d
-      continue
-    }
-    if {[regexp {^rect[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)} $line -> x1 y1 x2 y2]} {
-      if {$layer != "" && ![mag_skip_layer $layer]} {
-        lappend MAGDB($name,$layer) [list rect $x1 $y1 $x2 $y2]
+
+    switch -exact -- $kw {
+      magic - timestamp {
+        continue
       }
-      continue
-    }
-    if {[regexp {^tri[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)} $line -> x1 y1 x2 y2 x3 y3]} {
-      if {$layer != "" && ![mag_skip_layer $layer]} {
-        lappend MAGDB($name,$layer) [list tri $x1 $y1 $x2 $y2 $x3 $y3]
+      tech {
+        set MAGDB($name,tech) [lindex $toks 1]
+        continue
       }
-      continue
-    }
-    if {[regexp {^use[ \t]+([^ \t]+)[ \t]+([^ \t]+)} $line -> cell inst]} {
-      set a 1; set b 0; set c 0; set d 0; set e 1; set f 0
-      set arr ""
-      set box ""
-      while {1} {
-        set raw [mag_gets $fh]
-        if {$raw == "" && [eof $fh]} { break }
-        set peek [string trim $raw]
-        if {$peek == "" || [string match #* $peek]} continue
-        if {[regexp {^timestamp[ \t]+} $peek]} continue
-        if {[regexp {^transform[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)} $peek -> a b c d e f]} continue
-        if {[regexp {^array[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)} $peek -> xlo xhi xsep ylo yhi ysep]} {
-          set arr [list $xlo $xhi $xsep $ylo $yhi $ysep]
-          continue
+      magscale {
+        if {[llength $toks] >= 3 && [mag_all_int [lrange $toks 1 2]]} {
+          set MAGDB($name,n) [lindex $toks 1]
+          set MAGDB($name,d) [lindex $toks 2]
         }
-        if {[regexp {^box[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)} $peek -> bx1 by1 bx2 by2]} {
-          set box [list $bx1 $by1 $bx2 $by2]
-          continue
-        }
-        set lookahead $raw
-        break
+        continue
       }
-      lappend MAGDB($name,uses) [list $cell $inst $a $b $c $d $e $f $arr $box]
-      continue
+      rect {
+        if {[llength $toks] >= 5 && [mag_all_int [lrange $toks 1 4]]} {
+          if {$layer != "" && ![mag_skip_layer $layer]} {
+            lappend MAGDB($name,$layer) [concat rect [lrange $toks 1 4]]
+          }
+        }
+        continue
+      }
+      tri {
+        # tri x1 y1 x2 y2 dir — dir is the corner holding the right angle
+        if {[llength $toks] >= 6 && [mag_all_int [lrange $toks 1 4]]} {
+          if {$layer != "" && ![mag_skip_layer $layer]} {
+            lappend MAGDB($name,$layer) [concat tri [lrange $toks 1 4] [list [string tolower [lindex $toks 5]]]]
+          }
+        }
+        continue
+      }
+      use {
+        if {$use != ""} { lappend MAGDB($name,uses) $use }
+        set cell [lindex $toks 1]
+        set inst [lindex $toks 2]
+        if {$inst == ""} { set inst $cell }
+        # {cell inst a b c d e f array box}
+        set use [list $cell $inst 1 0 0 0 1 0 "" ""]
+        continue
+      }
+      transform {
+        if {$use != "" && [llength $toks] >= 7 && [mag_all_int [lrange $toks 1 6]]} {
+          set use [concat [lrange $use 0 1] [lrange $toks 1 6] [lrange $use 8 9]]
+        }
+        continue
+      }
+      array {
+        if {$use != "" && [llength $toks] >= 7 && [mag_all_int [lrange $toks 1 6]]} {
+          set use [lreplace $use 8 8 [lrange $toks 1 6]]
+        }
+        continue
+      }
+      box {
+        if {$use != "" && [llength $toks] >= 5 && [mag_all_int [lrange $toks 1 4]]} {
+          set use [lreplace $use 9 9 [lrange $toks 1 4]]
+        }
+        continue
+      }
     }
   }
+  if {$use != ""} { lappend MAGDB($name,uses) $use }
   close $fh
   if {[lsearch -exact $MAGDB(cells) $name] < 0} {
     lappend MAGDB(cells) $name
@@ -732,10 +1064,10 @@ proc mag_collect_mags {root} {
       set bn [file tail $f]
       if {[file isdirectory $f]} {
         set low [string tolower $bn]
-        if {$bn == ".git" || $low == "maglef"} continue
+        if {$bn == ".git" || $low == "maglef" || $low == "max_import"} continue
         lappend dirs $f
       } else {
-        if {[string match *.mag $bn] && ![string match *.maglef $bn]} {
+        if {[string match *.mag $bn]} {
           lappend out $f
         }
       }
@@ -749,8 +1081,10 @@ proc mag_pick_top {hint} {
   if {$hint != "" && $hint != "auto" && [info exists MAGDB($hint,n)]} {
     return $hint
   }
-  set used {}
+  catch {unset used}
+  set used(__none__) 1
   foreach name $MAGDB(cells) {
+    if {![info exists MAGDB($name,uses)]} continue
     foreach u $MAGDB($name,uses) {
       set child [lindex $u 0]
       set used($child) 1
@@ -758,15 +1092,30 @@ proc mag_pick_top {hint} {
   }
   set roots {}
   foreach name $MAGDB(cells) {
-    if {![info exists used($name)]} {
+    if {![info exists used($name)] && [info exists MAGDB($name,file)]} {
       lappend roots $name
     }
   }
   foreach prefer {example_por user_analog_proj_example} {
     if {[lsearch -exact $roots $prefer] >= 0} { return $prefer }
+  }
+  foreach prefer {example_por user_analog_proj_example} {
     if {[info exists MAGDB($prefer,n)]} { return $prefer }
   }
-  if {[llength $roots]} { return [lindex $roots 0] }
+  if {[llength $roots] == 1} { return [lindex $roots 0] }
+  if {[llength $roots] > 1} {
+    # Several roots: take the one with the most instances (the assembly).
+    set best [lindex $roots 0]
+    set bestn -1
+    foreach r $roots {
+      set c [llength $MAGDB($r,uses)]
+      if {$c > $bestn} {
+        set best $r
+        set bestn $c
+      }
+    }
+    return $best
+  }
   if {[llength $MAGDB(cells)]} { return [lindex $MAGDB(cells) 0] }
   return ""
 }
@@ -816,6 +1165,38 @@ proc mag_topo_order {} {
   return $done
 }
 
+# Rectangle grown by g (file units, may be fractional) → 5-point GDS polygon.
+proc mag_rect_xy {x1 y1 x2 y2 g scale} {
+  if {$x1 > $x2} { set t $x1; set x1 $x2; set x2 $t }
+  if {$y1 > $y2} { set t $y1; set y1 $y2; set y2 $t }
+  set x1 [expr {$x1 - $g}]
+  set y1 [expr {$y1 - $g}]
+  set x2 [expr {$x2 + $g}]
+  set y2 [expr {$y2 + $g}]
+  setl {gx1 gy1} [mag_scale_xy $x1 $y1 $scale]
+  setl {gx2 gy2} [mag_scale_xy $x2 $y2 $scale]
+  return [list $gx1 $gy1 $gx2 $gy1 $gx2 $gy2 $gx1 $gy2 $gx1 $gy1]
+}
+
+# Magic split tile: bbox plus the corner that holds the right angle.
+proc mag_tri_xy {x1 y1 x2 y2 dir scale} {
+  if {$x1 > $x2} { set t $x1; set x1 $x2; set x2 $t }
+  if {$y1 > $y2} { set t $y1; set y1 $y2; set y2 $t }
+  switch -exact -- $dir {
+    ne { set pts [list $x2 $y2 $x1 $y2 $x2 $y1] }
+    nw { set pts [list $x1 $y2 $x1 $y1 $x2 $y2] }
+    sw { set pts [list $x1 $y1 $x2 $y1 $x1 $y2] }
+    default { set pts [list $x2 $y1 $x2 $y2 $x1 $y1] }
+  }
+  set out {}
+  for {set i 0} {$i < 6} {incr i 2} {
+    setl {gx gy} [mag_scale_xy [lindex $pts $i] [lindex $pts [expr {$i + 1}]] $scale]
+    lappend out $gx $gy
+  }
+  lappend out [lindex $out 0] [lindex $out 1]
+  return $out
+}
+
 proc mag_write_cell {fh name family} {
   global MAGDB
   mag_gds_bgnstr $fh $name
@@ -824,26 +1205,32 @@ proc mag_write_cell {fh name family} {
   if {[info exists MAGDB($name,n)]} { set n $MAGDB($name,n) }
   if {[info exists MAGDB($name,d)]} { set d $MAGDB($name,d) }
   set scale [mag_nm_per_unit $family $n $d]
+  if {$scale <= 0} { set scale 1.0 }
+  set text_dt [mag_text_dt $family]
 
   if {[info exists MAGDB($name,layers)]} {
     foreach layer $MAGDB($name,layers) {
       if {![info exists MAGDB($name,$layer)]} continue
-      setl {lay dt} [mag_gds_map $family $layer]
+      set recs [mag_gds_map $family $layer]
       foreach geom $MAGDB($name,$layer) {
         set kind [lindex $geom 0]
-        if {$kind == "rect"} {
-          setl {x1 y1 x2 y2} [lrange $geom 1 4]
-          setl {gx1 gy1} [mag_scale_xy $x1 $y1 $scale]
-          setl {gx2 gy2} [mag_scale_xy $x2 $y2 $scale]
-          mag_gds_boundary $fh $lay $dt \
-              [list $gx1 $gy1 $gx2 $gy1 $gx2 $gy2 $gx1 $gy2 $gx1 $gy1]
-        } elseif {$kind == "tri"} {
-          setl {x1 y1 x2 y2 x3 y3} [lrange $geom 1 6]
-          setl {gx1 gy1} [mag_scale_xy $x1 $y1 $scale]
-          setl {gx2 gy2} [mag_scale_xy $x2 $y2 $scale]
-          setl {gx3 gy3} [mag_scale_xy $x3 $y3 $scale]
-          mag_gds_boundary $fh $lay $dt \
-              [list $gx1 $gy1 $gx2 $gy2 $gx3 $gy3 $gx1 $gy1]
+        foreach rec $recs {
+          setl {lay dt grow_nm} $rec
+          set g 0
+          if {$grow_nm != "" && $grow_nm > 0} {
+            set g [expr {double($grow_nm) / $scale}]
+          }
+          if {$kind == "rect"} {
+            setl {x1 y1 x2 y2} [lrange $geom 1 4]
+            mag_gds_boundary $fh $lay $dt [mag_rect_xy $x1 $y1 $x2 $y2 $g $scale]
+          } elseif {$kind == "tri"} {
+            setl {x1 y1 x2 y2 dir} [lrange $geom 1 5]
+            if {$g > 0} {
+              mag_gds_boundary $fh $lay $dt [mag_rect_xy $x1 $y1 $x2 $y2 $g $scale]
+            } else {
+              mag_gds_boundary $fh $lay $dt [mag_tri_xy $x1 $y1 $x2 $y2 $dir $scale]
+            }
+          }
         }
       }
     }
@@ -853,11 +1240,23 @@ proc mag_write_cell {fh name family} {
     foreach lab $MAGDB($name,labels) {
       setl {lname x1 y1 x2 y2 text} $lab
       if {$text == ""} continue
-      setl {lay dt} [mag_gds_map $family $lname]
+      set lay 999
+      set dt $text_dt
+      if {![mag_skip_layer $lname]} {
+        set recs [mag_gds_map $family $lname]
+        set lay [lindex [lindex $recs 0] 0]
+      }
+      if {$lay >= 200} {
+        # label on space / unknown paint → the PDK text layer if there is one
+        set trec [mag_gds_map $family text]
+        set lay [lindex [lindex $trec 0] 0]
+        set dt [lindex [lindex $trec 0] 1]
+        if {$lay >= 200} continue
+      }
       set mx [expr {($x1 + $x2) / 2.0}]
       set my [expr {($y1 + $y2) / 2.0}]
       setl {gx gy} [mag_scale_xy $mx $my $scale]
-      mag_gds_text $fh $lay 5 $gx $gy $text
+      mag_gds_text $fh $lay $dt $gx $gy $text
     }
   }
 
@@ -875,16 +1274,22 @@ proc mag_write_cell {fh name family} {
       setl {gx gy} [mag_scale_xy $c $f $scale]
       if {$arr != ""} {
         setl {xlo xhi xsep ylo yhi ysep} $arr
-        set cols [expr {$xhi - $xlo + 1}]
-        set rows [expr {$yhi - $ylo + 1}]
-        if {$cols < 1} { set cols 1 }
-        if {$rows < 1} { set rows 1 }
-        set ox [expr {$c + $xlo * $xsep}]
-        set oy [expr {$f + $ylo * $ysep}]
-        setl {gox goy} [mag_scale_xy $ox $oy $scale]
-        setl {gcx gcy} [mag_scale_xy [expr {$ox + $cols * $xsep}] $oy $scale]
-        setl {grx gry} [mag_scale_xy $ox [expr {$oy + $rows * $ysep}] $scale]
-        mag_gds_aref $fh $cell $refl $ang $cols $rows $gox $goy $gcx $gcy $grx $gry
+        # Magic (DBcellsrch.c): element (i,j) is at T(xsep*(i-xlo), ysep*(j-ylo)),
+        # i.e. element xlo,ylo sits at the transform origin and the steps are
+        # taken in the child frame (rotated by T); xsep flips when xlo > xhi.
+        set cols [expr {$xhi - $xlo}]
+        set rows [expr {$yhi - $ylo}]
+        if {$cols < 0} { set cols [expr {0 - $cols}]; set xsep [expr {0 - $xsep}] }
+        if {$rows < 0} { set rows [expr {0 - $rows}]; set ysep [expr {0 - $ysep}] }
+        incr cols
+        incr rows
+        set cxv [expr {$a * $cols * $xsep}]
+        set cyv [expr {$d * $cols * $xsep}]
+        set rxv [expr {$b * $rows * $ysep}]
+        set ryv [expr {$e * $rows * $ysep}]
+        setl {gcx gcy} [mag_scale_xy [expr {$c + $cxv}] [expr {$f + $cyv}] $scale]
+        setl {grx gry} [mag_scale_xy [expr {$c + $rxv}] [expr {$f + $ryv}] $scale]
+        mag_gds_aref $fh $cell $refl $ang $cols $rows $gx $gy $gcx $gcy $grx $gry
       } else {
         mag_gds_sref $fh $cell $refl $ang $gx $gy
       }
@@ -895,10 +1300,9 @@ proc mag_write_cell {fh name family} {
   if {![info exists MAGDB($name,layers)] || ![llength $MAGDB($name,layers)]} {
     if {[info exists MAGDB($name,stubbox)] && $MAGDB($name,stubbox) != ""} {
       setl {x1 y1 x2 y2} $MAGDB($name,stubbox)
-      setl {gx1 gy1} [mag_scale_xy $x1 $y1 $scale]
-      setl {gx2 gy2} [mag_scale_xy $x2 $y2 $scale]
-      mag_gds_boundary $fh 235 4 \
-          [list $gx1 $gy1 $gx2 $gy1 $gx2 $gy2 $gx1 $gy2 $gx1 $gy1]
+      set brec [mag_gds_map $family bbox]
+      mag_gds_boundary $fh [lindex [lindex $brec 0] 0] [lindex [lindex $brec 0] 1] \
+          [mag_rect_xy $x1 $y1 $x2 $y2 0 $scale]
     }
   }
 
@@ -943,7 +1347,7 @@ proc mag_import_dialog {} -desc {
     lappend values $t
   }
 
-  if {$MAG_IMPORT(tech) == ""} {
+  if {$MAG_IMPORT(tech) == "" || [lsearch -exact $techs $MAG_IMPORT(tech)] < 0} {
     if {[lsearch -exact $techs sky130A] >= 0} {
       set MAG_IMPORT(tech) sky130A
     } elseif {[info exists MN_TECH] && [lsearch -exact $techs $MN_TECH] >= 0} {
@@ -1066,14 +1470,15 @@ proc mag_import_read_status {} {
   if {![file exists $MAG_IMPORT(status)]} { return }
   if {[catch {set fh [open $MAG_IMPORT(status) r]}]} { return }
   while {[gets $fh line] >= 0} {
-    if {[regexp {^STATUS=(.*)$} $line -> v]} {
-      set MAG_IMPORT(stat_status) $v
-    } elseif {[regexp {^PCT=(.*)$} $line -> v]} {
-      set MAG_IMPORT(stat_pct) $v
-    } elseif {[regexp {^MSG=(.*)$} $line -> v]} {
-      set MAG_IMPORT(stat_msg) $v
-    } elseif {[regexp {^DEST=(.*)$} $line -> v]} {
-      set MAG_IMPORT(stat_dest) $v
+    set eq [string first = $line]
+    if {$eq < 1} continue
+    set key [string range $line 0 [expr {$eq - 1}]]
+    set val [string range $line [expr {$eq + 1}] end]
+    switch -exact -- $key {
+      STATUS { set MAG_IMPORT(stat_status) $val }
+      PCT { set MAG_IMPORT(stat_pct) $val }
+      MSG { set MAG_IMPORT(stat_msg) $val }
+      DEST { set MAG_IMPORT(stat_dest) $val }
     }
   }
   close $fh
@@ -1134,7 +1539,7 @@ proc mag_import_poll_fetch {} {
   set pct $MAG_IMPORT(stat_pct)
   set msg $MAG_IMPORT(stat_msg)
   if {$msg == ""} { set msg "Downloading Caravel Mag sample..." }
-  if {![regexp {^[0-9]+$} $pct]} { set pct 1 }
+  if {![mag_is_int $pct]} { set pct 1 }
   mag_progress_update $pct $msg
 
   if {$st == "ok"} {
@@ -1199,6 +1604,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAGDB(cells) {}
   set MAG_IMPORT(method) $method
   set MAG_IMPORT(pid) ""
+  set dir [_mmi_file_normalize $dir]
 
   set stamp [clock seconds]
   set work [file join /tmp mag_import_$stamp]
@@ -1207,7 +1613,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAG_IMPORT(log) [file join $work convert.log]
   set MAG_IMPORT(cancel) [file join $work CANCEL]
   catch {file delete $MAG_IMPORT(cancel)}
-  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method"
+  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 6)"
 
   mag_progress_open $method
   mag_progress_update 5 "Scanning .mag files..."
@@ -1222,6 +1628,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   mag_progress_update 12 "Parsing Magic cells (top-cell / hierarchy)..."
   set i 0
   set nfiles [llength $files]
+  set mag_techs {}
   foreach f $files {
     if {[mag_cancelled]} {
       mag_import_fail "Cancelled."
@@ -1230,7 +1637,14 @@ proc mag_import_run {dir top tech {method mag2gds}} {
     incr i
     set pct [expr {12 + int(18.0 * $i / $nfiles)}]
     mag_progress_update $pct "Parsing [file tail $f] ($i / $nfiles)"
-    mag_parse_file $f
+    set cname [mag_parse_file $f]
+    if {$cname != "" && [info exists MAGDB($cname,tech)]} {
+      set mt $MAGDB($cname,tech)
+      if {$mt != "" && [lsearch -exact $mag_techs $mt] < 0} { lappend mag_techs $mt }
+    }
+  }
+  if {[llength $mag_techs]} {
+    mag_log "Magic tech line(s): [join $mag_techs {, }] (\$PDK = env PDK when set)"
   }
 
   foreach name $MAGDB(cells) {
@@ -1245,7 +1659,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
         set MAGDB($child,labels) {}
         set MAGDB($child,stubbox) $box
         lappend MAGDB(cells) $child
-        mag_log "Placeholder cell $child (no .mag in folder)"
+        mag_log "Placeholder cell $child (no .mag in folder; Magic mag2gds resolves it from the PDK libs.ref mag views)"
       }
     }
   }
@@ -1258,8 +1672,10 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   mag_log "Top cell $topcell"
 
   set family [mag_family_from_tech $tech]
-  set outdir [file join $dir max_import]
-  catch {file mkdir $outdir}
+  set outdir [mag_output_dir $dir $topcell]
+  if {[_mmi_file_normalize $outdir] != [_mmi_file_normalize [file join $dir max_import]]} {
+    mag_log "Design folder is not writable; output goes to $outdir"
+  }
   set gds [file join $outdir ${topcell}.gds]
 
   if {$method == "mag2gds"} {
@@ -1268,13 +1684,14 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   }
 
   mag_progress_update 70 "Tcl paint dump → $gds (not tapeout-quality)"
+  mag_log "Tcl dump scale: [mag_scalefactor_nm $family] nm per lambda"
   set err [mag_write_gds $gds $family]
   if {$err != ""} {
     mag_import_fail $err
     return
   }
-  if {![file exists $gds] || [file size $gds] < 64} {
-    mag_import_fail "GDS write produced an empty file:\n$gds"
+  if {![mag_gds_has_structs $gds]} {
+    mag_import_fail "GDS write produced an empty library:\n$gds"
     return
   }
   mag_log "Wrote $gds ([file size $gds] bytes) via Tcl dump"
@@ -1285,13 +1702,14 @@ proc mag_import_run {dir top tech {method mag2gds}} {
 proc mag_magic2gds_script {} {
   global MMI_TOOLS env
   set cands {}
+  lappend cands /mmi-pdk-live/mag2gds.sh
+  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
+    lappend cands [file join $env(MMI_LOCAL) max pdk mag2gds.sh]
+  }
   if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
     lappend cands [file join $env(MMI_PDK_DIR) mag2gds.sh]
   }
   lappend cands /mmi-bundle/mag2gds.sh
-  if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
-    lappend cands [file join $env(MMI_LOCAL) max pdk mag2gds.sh]
-  }
   if {[info exists MMI_TOOLS] && $MMI_TOOLS != ""} {
     lappend cands [file join $MMI_TOOLS ../mmi_local/max/pdk/mag2gds.sh]
   }
@@ -1304,7 +1722,7 @@ proc mag_magic2gds_script {} {
 }
 
 proc mag_import_run_magic {dir topcell gds family tech outdir} {
-  global MAG_IMPORT
+  global MAG_IMPORT env
 
   set sh [mag_magic2gds_script]
   if {$sh == ""} {
@@ -1316,11 +1734,17 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
   if {[info commands pdk_which] != ""} {
     set magicbin [pdk_which {magic /mmi-magic/bin/magic}]
   }
-  if {$magicbin == "" && [file executable /mmi-magic/bin/magic]} {
-    set magicbin /mmi-magic/bin/magic
+  if {$magicbin == ""} {
+    set magicbin [mag_which {magic /mmi-magic/bin/magic}]
   }
   if {$magicbin == ""} {
     mag_import_fail "Magic VLSI is not installed in this Nix env.\nUse the Tcl paint-dump converter, or re-run ./run.sh so magic is on PATH."
+    return
+  }
+  if {[mag_pdk_dir $family] == ""} {
+    set root /mmi-pdks
+    if {[info commands pdk_root] != ""} { catch {set root [pdk_root]} }
+    mag_import_fail "No open_pdks tree for $family under $root\n(Magic needs <pdk>/libs.tech/magic/<pdk>.tech).\nRun File → Import PDK first, or use the Tcl paint-dump converter."
     return
   }
 
@@ -1337,6 +1761,7 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
   set MAG_IMPORT(topcell) $topcell
   set MAG_IMPORT(tech) $tech
   set MAG_IMPORT(outdir) $outdir
+  set MAG_IMPORT(magic_polls) 0
   set MAG_IMPORT(after) [after 500 mag_import_poll_magic]
 }
 
@@ -1350,7 +1775,9 @@ proc mag_import_poll_magic {} {
     return
   }
 
-  mag_progress_update 55 "Magic mag2gds running..."
+  incr MAG_IMPORT(magic_polls)
+  set pct [expr {45 + ($MAG_IMPORT(magic_polls) % 30)}]
+  mag_progress_update $pct "Magic mag2gds running ([expr {$MAG_IMPORT(magic_polls) / 2}] s)..."
 
   set alive 1
   if {$MAG_IMPORT(pid) != ""} {
@@ -1366,6 +1793,10 @@ proc mag_import_poll_magic {} {
   set gds $MAG_IMPORT(gds)
   if {![file exists $gds] || [file size $gds] < 64} {
     mag_import_fail "Magic mag2gds failed (no GDS).\nNeed \$PDK_ROOT/<pdk>/libs.tech/magic/<pdk>.magicrc\nin data/pdks (→ /mmi-pdks).\nLog: $MAG_IMPORT(log)"
+    return
+  }
+  if {![mag_gds_has_structs $gds]} {
+    mag_import_fail "Magic wrote an empty GDS library (top cell not loaded).\nCheck the tech line of the .mag files against the PDK and the log:\n$MAG_IMPORT(log)"
     return
   }
   mag_log "Wrote $gds ([file size $gds] bytes) via Magic mag2gds"
@@ -1504,7 +1935,7 @@ proc mag_progress_close {} {
 
 proc mag_progress_update {percent message} {
   if {![winfo exists .magprog.f.bar]} { return }
-  if {![regexp {^[0-9]+$} $percent]} { set percent 0 }
+  if {![mag_is_int $percent]} { set percent 0 }
   if {$percent < 0} { set percent 0 }
   if {$percent > 100} { set percent 100 }
   set w [winfo width .magprog.f.bar]

@@ -199,6 +199,12 @@ fi
 if grep -qE '^set DRC_DATA\([^)]+\) [^{].* ' "$dest/${tech}.tcl" 2>/dev/null; then
   finish_fail "generated tcl has unbraced multi-word DRC_DATA set"
 fi
+if ! grep -q '^set MMI_PDK_GEN ' "$dest/${tech}.tcl" 2>/dev/null; then
+  finish_fail "generator did not stamp MMI_PDK_GEN (stale source_to_tech27.tcl at $gen?)"
+fi
+if grep -qE '^[[:space:]]+calma[[:space:]]+GDS_[^[:space:]]+[[:space:]]+[0-9]+[[:space:]]+\*' "$dest/${tech}.tech27" 2>/dev/null; then
+  finish_fail "generated tech27 still maps GDS layers with a wildcard datatype"
+fi
 if grep -q '^cifstyle ' "$dest/${tech}.tech27" 2>/dev/null; then
   # cifstyle must be inside drc, not a top-level section start
   if ! awk '/^drc$/{d=1} d&&/^cifstyle /{ok=1} END{exit !ok}' "$dest/${tech}.tech27"; then
