@@ -32,7 +32,7 @@
 #   drc ... / preserve_ports / iname   accepted and ignored
 
 # Bump when the emitted files change; pdk_import.tcl re-converts older techs.
-set GEN_REV 5
+set GEN_REV 6
 
 if {[llength $argv] < 3} {
   puts stderr "usage: source_to_tech27.tcl SOURCE TECH OUTDIR"

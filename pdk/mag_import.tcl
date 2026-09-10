@@ -9,6 +9,8 @@
 # with the imported PDK technology and saves .max cells.
 # After a successful convert, open_mag.sh starts Magic GUI on the original
 # .mag (same X display as MAX) so the two layouts can be compared.
+# MAX then expands all instances (Magic's expanded view) so resistor
+# subcells are paint, not empty bboxes with instance names.
 #
 # MAX embeds Tcl 8.0: no [ \t] / \S regexp classes (a tab inside [] is a
 # literal "t"), no wide(), no string repeat, no glob -directory, no lset.
@@ -16,7 +18,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 7
+set _MAG_IMPORT_REV 8
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -154,9 +156,11 @@ proc mag_gds_map_sky130 {layer} {
     mvnmos - mvnfet - mvnnmos { return [list $poly $diff $nsdm $hvi] }
     mvpmos - mvpfet { return [list $poly $diff $psdm $hvi] }
     poly - polysilicon - p { return [list $poly] }
-    polyres - ppolyres - res0p35 - res1p41 - res2p85 - res5p73 - rpoly {
+    polyres - ppolyres - npolyres - mrp1 - res0p35 - res1p41 - res2p85 - res5p73 - rpoly {
       return [list $poly {66 13 0} {86 20 200} $psdm]
     }
+    polyshort - rmp { return [list $poly {66 15 0}] }
+    diffres { return [list {65 13 0}] }
     xpolyres - xpolyresistor - res0p69 { return [list $poly {66 13 0} {79 20 200} $psdm] }
     ndiffc - ndc - ndiffcont - ndiffcontact { return [list $diff $licon $li $nsdm] }
     pdiffc - pdc - pdiffcont - pdiffcontact { return [list $diff $licon $li $psdm] }
@@ -1620,7 +1624,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAG_IMPORT(log) [file join $work convert.log]
   set MAG_IMPORT(cancel) [file join $work CANCEL]
   catch {file delete $MAG_IMPORT(cancel)}
-  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 7)"
+  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 8)"
   set MAG_IMPORT(magdir) $dir
 
   mag_progress_open $method
@@ -1749,7 +1753,44 @@ proc mag_want_gui {} {
   return 1
 }
 
-# Side-by-side: original Mag in nixpkgs magic-vlsi next to the converted MAX view.
+# Match Magic's expanded view: show subcell paint (the xhigh poly resistors,
+# HVL stdcells, ...) instead of empty instance bboxes + giant cell names.
+proc mag_max_show_converted {} {
+  catch {
+    set bb [db_bbox]
+    if {[llength $bb] == 4} {
+      eval lay_box $bb
+      catch {lay_internals -area}
+    }
+  }
+  catch {:expand}
+  catch {expand}
+  catch {:see no instanceNames}
+  catch {:see no instancePorts}
+  catch {view_cell}
+}
+
+proc mag_max_after_gds_script {path} {
+  set fh [open $path w]
+  puts $fh "# Expand Mag→MAX import to match Magic's expanded layout view."
+  puts $fh "after idle {"
+  puts $fh "  catch {"
+  puts $fh "    set bb \[db_bbox\]"
+  puts $fh "    if {\[llength \$bb\] == 4} {"
+  puts $fh "      eval lay_box \$bb"
+  puts $fh "      catch {lay_internals -area}"
+  puts $fh "    }"
+  puts $fh "  }"
+  puts $fh "  catch {:expand}"
+  puts $fh "  catch {expand}"
+  puts $fh "  catch {:see no instanceNames}"
+  puts $fh "  catch {:see no instancePorts}"
+  puts $fh "  catch {view_cell}"
+  puts $fh "  catch {cell_save_tree 0}"
+  puts $fh "}"
+  close $fh
+}
+
 proc mag_open_in_magic {dir top family} {
   global MAG_IMPORT
   if {![mag_want_gui]} { return }
@@ -1882,6 +1923,7 @@ proc mag_import_open_max {gds top tech outdir} {
     if {[info exists GDS_READ_PARTIAL]} { set GDS_READ_PARTIAL $oldp }
     if {$topCell == ""} { set topCell $top }
     catch {cell_load $topCell}
+    mag_max_show_converted
     catch {cell_save_tree 0}
     catch {cd $here}
     mag_open_in_magic $magdir $topCell $family
@@ -1896,6 +1938,7 @@ Log: $MAG_IMPORT(log)"
     if {[mag_want_gui]} {
       set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
     }
+    set msg "$msg\n\nMAX instances are expanded (like Magic) so resistor and stdcell paint is visible."
     if {[catch {warning $msg}]} {
       mag_import_tell $msg
     }
@@ -1912,10 +1955,12 @@ Log: $MAG_IMPORT(log)"
     if {$m != ""} { set maxbin $m }
   }
   set script [file join $MAG_IMPORT(work) launch_max.sh]
+  set aftertcl [file join $MAG_IMPORT(work) after_gds.tcl]
+  mag_max_after_gds_script $aftertcl
   set fh [open $script w]
   puts $fh "#!/bin/sh"
   puts $fh "cd \"$outdir\" || exit 1"
-  puts $fh "exec \"$maxbin\" -tech \"$tech\" -command 'cell_save_tree 0' \"$gds\""
+  puts $fh "exec \"$maxbin\" -tech \"$tech\" -command \"source {$aftertcl}\" \"$gds\""
   close $fh
   catch {exec chmod +x $script}
   if {[catch {exec /bin/sh $script &} err]} {
@@ -1936,6 +1981,7 @@ GDS→.max must use the destination technology."
   if {[mag_want_gui]} {
     set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
   }
+  set msg "$msg\n\nMAX instances are expanded (like Magic) so resistor and stdcell paint is visible."
   if {[catch {warning $msg}]} {
     mag_import_tell $msg
   }

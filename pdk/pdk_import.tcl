@@ -4,7 +4,7 @@
 
 global _PDK_IMPORT_SOURCED _PDK_IMPORT_REV_LOADED PDK_PRESET PDK_IMPORT
 global PDK_GEN_REQUIRED PDK_SOURCE_REV
-set _PDK_IMPORT_REV 14
+set _PDK_IMPORT_REV 15
 if {[info exists _PDK_IMPORT_REV_LOADED]} {
   if {$_PDK_IMPORT_REV_LOADED >= $_PDK_IMPORT_REV} { return }
 }
@@ -13,9 +13,9 @@ set _PDK_IMPORT_REV_LOADED $_PDK_IMPORT_REV
 
 # Generator revision a usable .tech27 must carry (set MMI_PDK_GEN in TECH.tcl,
 # written by source_to_tech27.tcl). Older techs are re-converted, not re-downloaded.
-set PDK_GEN_REQUIRED 5
+set PDK_GEN_REQUIRED 6
 # Revision of the built-in layer tables below ("# source-rev N" in TECH.source).
-set PDK_SOURCE_REV 4
+set PDK_SOURCE_REV 5
 
 if {[info commands _mmi_file_normalize] == ""} {
   proc _mmi_file_normalize {path} {
@@ -85,10 +85,11 @@ pdk_preset_init
 proc pdk_layers_sky130A {} {
   return {
     {nwell 64:20 64:5,16 - 0.84 1.27 0,160,0}
-    {pwell 64:13 64:59 - - - 0,80,0}
+    {pwell 64:13 64:59 - - - 210,130,110}
     {dnwell 64:18 - - 3.0 6.3 0,100,0}
     {diff 65:20 65:6,16 gdsonly 0.15 0.27 -}
     {tap 65:44 65:5,48 gdsonly 0.15 0.27 -}
+    {diffres 65:13 - - - - 80,160,80}
     {ndiff derived - act 0.15 0.27 66,213,66}
     {pdiff derived - act 0.15 0.27 202,160,115}
     {ntap derived - act 0.15 0.27 120,200,120}
@@ -96,6 +97,8 @@ proc pdk_layers_sky130A {} {
     {nsdm 93:44 - - 0.38 0.38 0,200,200}
     {psdm 94:20 - - 0.38 0.38 200,0,200}
     {poly 66:20 66:5,16 poly 0.15 0.21 236,67,0}
+    {polyres 66:13 - - 0.69 0.69 220,80,120}
+    {polyshort 66:15 - - - - 200,100,70}
     {npc 95:20 - - 0.27 0.27 160,80,0}
     {licon1 66:44 - via 0.17 0.17 80,80,80}
     {li1 67:20 67:5,16 metal 0.17 0.17 8,139,255}
@@ -116,8 +119,8 @@ proc pdk_layers_sky130A {} {
     {lvtn 125:44 - - 0.38 0.38 120,120,200}
     {hvtp 78:44 - - 0.38 0.38 200,120,120}
     {tunm 80:20 - - - - 160,160,60}
-    {rpm 86:20 - - - - 160,60,160}
-    {urpm 79:20 - - - - 120,60,160}
+    {rpm 86:20 - - - - 180,70,140}
+    {urpm 79:20 - - - - 200,90,150}
     {pad 76:20 - - - - 200,200,200}
     {areaid_sl 81:4 - - - - 90,90,90}
     {prBoundary 235:4 - bbox - - -}
