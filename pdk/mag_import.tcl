@@ -18,7 +18,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 8
+set _MAG_IMPORT_REV 9
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -515,6 +515,132 @@ proc mag_output_dir {dir top} {
   return [file join /tmp mag_import_out $base]
 }
 
+# Map FHS bind paths to the host/VM folder (MMI_CAD_ROOT/data/...).
+proc mag_host_path {path} {
+  global env
+  set path [_mmi_file_normalize $path]
+  set root ""
+  if {[info exists env(MMI_CAD_ROOT)] && $env(MMI_CAD_ROOT) != ""} {
+    set root $env(MMI_CAD_ROOT)
+  }
+  if {$root == ""} { return $path }
+  foreach map {
+    {/mmi-pdks data/pdks}
+    {/mmi-home data/home}
+    {/mmi-pdk-live pdk}
+  } {
+    set pre [lindex $map 0]
+    set sub [lindex $map 1]
+    set n [string length $pre]
+    if {[string range $path 0 [expr {$n - 1}]] != $pre} continue
+    set rest [string range $path $n end]
+    if {[string match /* $rest]} {
+      set rest [string range $rest 1 end]
+    }
+    if {$rest == ""} {
+      return [file join $root $sub]
+    }
+    return [file join $root $sub $rest]
+  }
+  return $path
+}
+
+proc mag_list_max_files {dir} {
+  set files {}
+  catch {set files [glob -nocomplain [file join $dir *.max]]}
+  set names {}
+  foreach f $files {
+    lappend names [file tail $f]
+  }
+  return [lsort $names]
+}
+
+proc mag_storage_report {outdir top} {
+  set outdir [_mmi_file_normalize $outdir]
+  set host [mag_host_path $outdir]
+  set names [mag_list_max_files $outdir]
+  set n [llength $names]
+  set lines {}
+  lappend lines "File storage (converted .max files):"
+  lappend lines "  $outdir"
+  if {$host != $outdir} {
+    lappend lines "On the VM / host disk:"
+    lappend lines "  $host"
+  }
+  lappend lines ""
+  lappend lines "Top cell .max:"
+  lappend lines "  [file join $outdir ${top}.max]"
+  if {[file exists [file join $outdir ${top}.gds]]} {
+    lappend lines "GDS:"
+    lappend lines "  [file join $outdir ${top}.gds]"
+  }
+  if {$n > 0} {
+    lappend lines ""
+    lappend lines ".max files in that folder ($n):"
+    set i 0
+    foreach nm $names {
+      incr i
+      if {$i > 16} {
+        lappend lines "  ... and [expr {$n - 16}] more"
+        break
+      }
+      lappend lines "  $nm"
+    }
+  } else {
+    lappend lines ""
+    lappend lines "(MAX is still writing .max into that folder.)"
+  }
+  lappend lines ""
+  lappend lines "A WHERE.txt file in that folder repeats these paths."
+  lappend lines "Click Show to open the folder in the file manager."
+  return [join $lines \n]
+}
+
+proc mag_write_where {outdir top} {
+  set outdir [_mmi_file_normalize $outdir]
+  set host [mag_host_path $outdir]
+  set f [file join $outdir WHERE.txt]
+  if {[catch {set fh [open $f w]}]} { return }
+  puts $fh "MAX conversion output"
+  puts $fh "CAD folder:  $outdir"
+  if {$host != $outdir} {
+    puts $fh "Host folder: $host"
+  }
+  puts $fh "Top cell:    ${top}.max"
+  puts $fh "GDS:         ${top}.gds"
+  puts $fh ""
+  set names [mag_list_max_files $outdir]
+  if {[llength $names]} {
+    puts $fh ".max files:"
+    foreach nm $names {
+      puts $fh "  $nm"
+    }
+  }
+  close $fh
+}
+
+proc mag_open_storage_folder {{dir ""}} {
+  global MAG_IMPORT env
+  if {$dir == ""} {
+    if {[info exists MAG_IMPORT(outdir)]} { set dir $MAG_IMPORT(outdir) }
+  }
+  if {$dir == "" || ![file isdirectory $dir]} { return }
+  set dir [_mmi_file_normalize $dir]
+  if {[info exists env(MMI_BROWSER)] && $env(MMI_BROWSER) != ""} {
+    if {![catch {exec $env(MMI_BROWSER) $dir &}]} { return }
+  }
+  if {![catch {exec xdg-open $dir &}]} { return }
+  catch {exec gio open $dir &}
+}
+
+proc mag_finish_storage {outdir top} {
+  global MAG_IMPORT
+  set MAG_IMPORT(outdir) $outdir
+  mag_write_where $outdir $top
+  mag_open_storage_folder $outdir
+  return [mag_storage_report $outdir $top]
+}
+
 proc mag_fetch_script {} {
   global env
   set cands {}
@@ -558,17 +684,23 @@ proc mag_import_tell {msg {opt ""}} {
   catch {set y [winfo pointery .]}
   set buttons OK
   if {$opt == "-copy" || $opt == "copy"} {
-    set buttons {OK Copy}
+    set buttons {OK Copy Show}
   }
   while {1} {
     set ret OK
     if {[catch {set ret [prop_dialog -title $title -buttons $buttons \
-        -width 78 -height 18 -x $x -y $y $msg]}]} {
-      if {[catch {set ret [tk_dialog .magmsg $title $msg {} 0 OK Copy]}]} {
+        -width 78 -height 22 -x $x -y $y $msg]}]} {
+      if {[catch {set ret [tk_dialog .magmsg $title $msg {} 0 OK Copy Show]}]} {
         catch {puts $msg}
         return
       }
-      if {$ret == 1} { set ret Copy } else { set ret OK }
+      if {$ret == 1} {
+        set ret Copy
+      } elseif {$ret == 2} {
+        set ret Show
+      } else {
+        set ret OK
+      }
     }
     if {$ret == "Copy"} {
       if {[info commands pdk_import_copy_text] != ""} {
@@ -577,6 +709,10 @@ proc mag_import_tell {msg {opt ""}} {
         catch {clipboard clear}
         catch {clipboard append -- $msg}
       }
+      continue
+    }
+    if {$ret == "Show"} {
+      mag_open_storage_folder
       continue
     }
     return
@@ -1400,7 +1536,7 @@ proc mag_import_dialog {} -desc {
 
   lappend prop_list [list "Destination MAX PDK / technology:" MAG_IMPORT(tech) \
       -radio $labels -values $values \
-      -help {Caravel Mag sample requires sky130A. Import a PDK first if the list is only mmi18/mmi25.}]
+      -help {Converted .max files are written to <design>/max_import (opened in the file manager when import finishes). Caravel Mag sample requires sky130A. Import a PDK first if the list is only mmi18/mmi25.}]
 
   lappend prop_list [list "Also open original Mag in Magic VLSI (compare with MAX):" \
       MAG_IMPORT(open_magic) -binary \
@@ -1624,7 +1760,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAG_IMPORT(log) [file join $work convert.log]
   set MAG_IMPORT(cancel) [file join $work CANCEL]
   catch {file delete $MAG_IMPORT(cancel)}
-  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 8)"
+  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 9)"
   set MAG_IMPORT(magdir) $dir
 
   mag_progress_open $method
@@ -1928,20 +2064,18 @@ proc mag_import_open_max {gds top tech outdir} {
     catch {cd $here}
     mag_open_in_magic $magdir $topCell $family
     mag_progress_close
+    set store [mag_finish_storage $outdir $topCell]
     set msg "Magic design converted.\n\n\
 Top cell: $topCell\n\
 MAX technology: $tech\n\
 GDS method: $MAG_IMPORT(method)\n\
-GDS: $gds\n\
-.max files: $outdir\n\
-Log: $MAG_IMPORT(log)"
+Log: $MAG_IMPORT(log)\n\n\
+$store"
     if {[mag_want_gui]} {
       set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
     }
     set msg "$msg\n\nMAX instances are expanded (like Magic) so resistor and stdcell paint is visible."
-    if {[catch {warning $msg}]} {
-      mag_import_tell $msg
-    }
+    mag_import_tell $msg -copy
     return
   }
 
@@ -1970,21 +2104,19 @@ Log: $MAG_IMPORT(log)"
   }
   mag_open_in_magic $magdir $top $family
   mag_progress_close
+  set store [mag_finish_storage $outdir $top]
   set msg "Magic design converted.\n\n\
 Top cell: $top\n\
 Opened a new MAX with technology '$tech'.\n\
-GDS: $gds\n\
-.max files: $outdir\n\
 Log: $MAG_IMPORT(log)\n\n\
+$store\n\n\
 If the current MAX was started with a different PDK, that is expected:\n\
 GDS→.max must use the destination technology."
   if {[mag_want_gui]} {
     set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
   }
   set msg "$msg\n\nMAX instances are expanded (like Magic) so resistor and stdcell paint is visible."
-  if {[catch {warning $msg}]} {
-    mag_import_tell $msg
-  }
+  mag_import_tell $msg -copy
 }
 
 proc mag_import_fail {msg} {
