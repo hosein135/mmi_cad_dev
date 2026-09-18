@@ -2,16 +2,159 @@
 # x86_64 Linux preflight: bare metal, VM, or WSL2 (not WSL1, not Windows-native).
 # Sourced from run.sh. Expects info/warn/error.
 
+# Completed `nix run .#mmi-cad` runtime closure (nixos-25.05), measured:
+# 934120792 bytes ≈ 891 MiB across 258 store paths. About 1 GiB remains
+# on disk after install. First run also unpacks NARs, copies vendor
+# sources (~313 MiB), and compiles CAD — keep several extra GiB free.
+MMI_STORE_AFTER_INSTALL_BYTES=$((1024 * 1024 * 1024))
+MMI_FIRST_INSTALL_FREE_BYTES=$((6 * 1024 * 1024 * 1024))
+MMI_RUNTIME_FREE_BYTES=$((1024 * 1024 * 1024))
+
 mmi_is_wsl() {
-  grep -qi microsoft /proc/version 2>/dev/null
+  if [ -n "${WSL_DISTRO_NAME:-}" ] || [ -n "${WSL_INTEROP:-}" ]; then
+    return 0
+  fi
+  [ -f /proc/sys/fs/binfmt_misc/WSLInterop ] && return 0
+  grep -qi microsoft /proc/version 2>/dev/null && return 0
+  grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null && return 0
+  return 1
 }
 
 mmi_is_wsl2() {
-  uname -r | grep -qiE 'microsoft-standard|WSL2'
+  [ -d /run/WSL ] && return 0
+  uname -r | grep -qiE 'microsoft-standard|WSL2' && return 0
+  grep -qiE 'microsoft-standard|WSL2' /proc/version 2>/dev/null && return 0
+  return 1
 }
 
 mmi_is_wsl1() {
   mmi_is_wsl && ! mmi_is_wsl2
+}
+
+# True if this Linux install has a GUI desktop (session files, DM, or live X/Wayland).
+mmi_has_gui_desktop() {
+  local f unit
+  [ -n "${WAYLAND_DISPLAY:-}" ] && return 0
+  [ -n "${DISPLAY:-}" ] && return 0
+  [ -n "${XDG_CURRENT_DESKTOP:-}" ] && return 0
+  [ -n "${DESKTOP_SESSION:-}" ] && return 0
+
+  for f in \
+    /usr/share/xsessions/*.desktop \
+    /usr/share/wayland-sessions/*.desktop \
+    /usr/local/share/xsessions/*.desktop \
+    /usr/local/share/wayland-sessions/*.desktop \
+    /run/current-system/sw/share/xsessions/*.desktop \
+    /run/current-system/sw/share/wayland-sessions/*.desktop
+  do
+    [ -f "$f" ] && return 0
+  done
+
+  for f in /tmp/.X11-unix/X[0-9]*; do
+    [ -S "$f" ] && return 0
+  done
+
+  if command -v systemctl >/dev/null 2>&1; then
+    for unit in display-manager gdm gdm3 sddm lightdm lxdm xdm greetd; do
+      systemctl is-active --quiet "$unit" 2>/dev/null && return 0
+    done
+  fi
+
+  return 1
+}
+
+mmi_fs_free_bytes() {
+  local kb
+  kb="$(df -P -k "$1" 2>/dev/null | awk 'NR==2 {print $4}')"
+  if [ -z "${kb}" ] || ! [ "${kb}" -ge 0 ] 2>/dev/null; then
+    return 1
+  fi
+  printf '%s' $((kb * 1024))
+}
+
+mmi_fs_mount() {
+  df -P -k "$1" 2>/dev/null | awk 'NR==2 {print $6}'
+}
+
+mmi_fmt_bytes() {
+  awk -v b="$1" 'BEGIN {
+    if (b >= 1073741824) printf "%.1f GiB", b / 1073741824
+    else if (b >= 1048576) printf "%.0f MiB", b / 1048576
+    else printf "%s B", b
+  }'
+}
+
+# vendor/result is created by ./run.sh --prep-only (not by plain nix run).
+mmi_cad_already_built() {
+  [ -x "${SCRIPT_DIR}/vendor/result/mmi/bin/max.bin" ] \
+    || [ -x "${SCRIPT_DIR}/vendor/result/mmi/bin/max" ]
+}
+
+mmi_check_free_space() {
+  local store_need work_need tmp_need
+  local store_path store_mnt tmp_mnt
+  local path mount free need fail seen
+  local -a check_paths
+
+  if mmi_cad_already_built; then
+    store_need="${MMI_RUNTIME_FREE_BYTES}"
+  else
+    store_need="${MMI_FIRST_INSTALL_FREE_BYTES}"
+  fi
+  work_need="${MMI_RUNTIME_FREE_BYTES}"
+  tmp_need=$((512 * 1024 * 1024))
+
+  if [ -d /nix/store ]; then
+    store_path=/nix/store
+  elif [ -d /nix ]; then
+    store_path=/nix
+  else
+    store_path=/
+  fi
+  store_mnt="$(mmi_fs_mount "${store_path}" || true)"
+  tmp_mnt="$(mmi_fs_mount /tmp || true)"
+
+  check_paths=("${store_path}" "${SCRIPT_DIR}" /tmp)
+  seen="|"
+  fail=0
+  for path in "${check_paths[@]}"; do
+    mount="$(mmi_fs_mount "${path}" || true)"
+    [ -n "${mount}" ] || mount="${path}"
+    case "${seen}" in
+      *"|${mount}|"*) continue ;;
+    esac
+    seen="${seen}${mount}|"
+
+    need="${work_need}"
+    if [ -n "${tmp_mnt}" ] && [ "${mount}" = "${tmp_mnt}" ]; then
+      need="${tmp_need}"
+    fi
+    # Nix store filesystem wins when it shares a mount with /tmp or the repo.
+    if [ -n "${store_mnt}" ] && [ "${mount}" = "${store_mnt}" ]; then
+      need="${store_need}"
+    fi
+
+    if ! free="$(mmi_fs_free_bytes "${path}")"; then
+      warn "Could not measure free space on ${path}."
+      continue
+    fi
+    if [ "${free}" -lt "${need}" ]; then
+      if [ "${fail}" -eq 0 ]; then
+        error "Not enough free space is available."
+        error "Need $(mmi_fmt_bytes "${store_need}") free for the Nix store (about $(mmi_fmt_bytes "${MMI_STORE_AFTER_INSTALL_BYTES}") stays after install)."
+      fi
+      error "  ${path}: $(mmi_fmt_bytes "${free}") free, need $(mmi_fmt_bytes "${need}")"
+      fail=1
+    fi
+  done
+
+  if [ "${fail}" -ne 0 ]; then
+    error "Free disk space and retry."
+    return 1
+  fi
+
+  info "Disk: Nix store needs $(mmi_fmt_bytes "${store_need}") free (~$(mmi_fmt_bytes "${MMI_STORE_AFTER_INSTALL_BYTES}") remains after install)"
+  return 0
 }
 
 mmi_check_linux_host() {
@@ -34,19 +177,27 @@ mmi_check_linux_host() {
     return 1
   fi
 
-  if mmi_is_wsl1; then
-    error "WSL1 detected (kernel $(uname -r)). Nix FHS/bubblewrap needs a real Linux kernel."
+  if mmi_is_wsl && ! mmi_is_wsl2; then
+    error "WSL1 is not supported (kernel $(uname -r)). Use WSL2."
     error "Switch this distro to WSL2:  wsl --set-version <distro> 2"
-    error "Or run on bare-metal Linux / a Linux VM."
+    error "Then open that WSL2 distro and run ./run.sh there."
     return 1
   fi
 
   if mmi_is_wsl2; then
     info "Host: WSL2 x86_64"
-  elif [ -f /sys/class/dmi/id/product_name ] || [ -d /sys/hypervisor ]; then
-    info "Host: x86_64 Linux (bare metal or VM)"
   else
-    info "Host: x86_64 Linux"
+    if ! mmi_has_gui_desktop; then
+      error "This Linux system has no GUI desktop (no X/Wayland session and no desktop environment)."
+      error "Install a desktop (GNOME, KDE Plasma, XFCE, Cinnamon, MATE, ...) or use a graphical VM."
+      error "Headless servers are not supported. WSL users must use WSL2."
+      return 1
+    fi
+    if [ -f /sys/class/dmi/id/product_name ] || [ -d /sys/hypervisor ]; then
+      info "Host: x86_64 Linux (bare metal or VM) with GUI desktop"
+    else
+      info "Host: x86_64 Linux with GUI desktop"
+    fi
   fi
 
   if [ -f /proc/sys/kernel/unprivileged_userns_clone ]; then

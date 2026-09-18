@@ -27,9 +27,13 @@ Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
   ./run.sh --prep-only  build vendor + wrapper into the Nix store
   ./run.sh --clean      remove data/home (CAD overlay)
 
-Needs x86_64 Linux: bare metal, a VM, or WSL2 (not WSL1, not Windows-native).
-On a graphical VM, windows open on your desktop. Headless: open the printed
-http://127.0.0.1:6080 URL. Force VNC: MMI_USE_XVNC=1 ./run.sh max
+Needs x86_64 Linux: bare metal, a VM with a GUI desktop, or WSL2
+(not WSL1, not Windows-native). First install keeps ~1 GiB in the Nix
+store and needs ~6 GiB free to download and compile.
+
+On a graphical VM, windows open on your desktop. If CAD starts its own
+X server, open the printed http://127.0.0.1:6080 URL.
+Force VNC: MMI_USE_XVNC=1 ./run.sh max
 Force host X: MMI_USE_HOST_X=1 DISPLAY=:0 ./run.sh max
 EOF
       exit 0
@@ -45,6 +49,10 @@ done
 
 [ ${#CMD_ARGS[@]} -eq 0 ] && CMD_ARGS=("/bin/bash")
 
+# Preflight before Nix, vendor checks, or any store writes.
+mmi_check_linux_host || exit 1
+mmi_check_free_space || exit 1
+
 if [ "${CLEAN}" = true ]; then
   info "Removing data/home (CAD overlay) ..."
   rm -rf "${SCRIPT_DIR}/data/home"/*
@@ -59,8 +67,6 @@ else
   error "NixOS: nix is already on PATH. Other distros: the multi-user daemon installer."
   exit 1
 fi
-
-mmi_check_linux_host || exit 1
 
 if [ ! -d "${SCRIPT_DIR}/vendor/mmi/src/max4.3.16" ]; then
   error "vendor/mmi/src/max4.3.16 is missing. CAD sources must be in git."

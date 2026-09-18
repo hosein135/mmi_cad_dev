@@ -11,6 +11,8 @@ The CAD tree is **`vendor/mmi/`** (in git, sources only). Binaries are not commi
 | Need | Notes |
 |------|--------|
 | x86_64 Linux | NixOS, Debian, Ubuntu, Fedora, etc. — install, VM, or **WSL2** |
+| GUI desktop | Required on bare metal and VMs (GNOME, KDE, XFCE, ...). WSL must be **WSL2** (not WSL1) |
+| ~6 GiB free | First `./run.sh` / `--prep-only` (~1 GiB stays in the Nix store after install) |
 | Nix (flakes) | [Install Nix](https://nixos.org/download.html); NixOS already has it |
 | User namespaces | Needed by bubblewrap. Ubuntu 24.04+: if `nix run` fails, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` |
 | Not WSL1 | WSL1 has no real kernel userns. `wsl --set-version <distro> 2` |
@@ -40,7 +42,7 @@ chmod +x run.sh
 ./run.sh max             # MAX on your desktop if DISPLAY is set, else noVNC
 ```
 
-On a graphical VM the MAX/SUE/NST windows appear on the desktop. If you have no `DISPLAY`, open the printed URL (`http://127.0.0.1:6080/vnc.html?autoconnect=1`). Force the browser desktop with `MMI_USE_XVNC=1`.
+On a graphical VM the MAX/SUE/NST windows appear on the desktop. `./run.sh` checks for WSL2, a GUI desktop on Linux, and free disk before it starts. If CAD starts Nix Xvnc instead of your session, open the printed URL (`http://127.0.0.1:6080/vnc.html?autoconnect=1`). Force the browser desktop with `MMI_USE_XVNC=1`.
 
 ## Commands
 
