@@ -142,6 +142,7 @@
           mkdir -p $out/app-defaults $out/magic $out/samples
           install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
           install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
+          install -Dm644 "$src/image_layout.tcl" $out/image_layout.tcl
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
           install -Dm755 "$src/open_mag.sh" $out/open_mag.sh
           install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
@@ -313,6 +314,7 @@
             xdg-utils
             strace
             magic-vlsi
+            imagemagick
             cairo
             xorg.xset
             xorg.xlsfonts

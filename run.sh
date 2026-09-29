@@ -28,8 +28,9 @@ Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
   ./run.sh --clean      remove data/home (CAD overlay)
 
 Needs x86_64 Linux: bare metal, a VM with a GUI desktop, or WSL2
-(not WSL1, not Windows-native). First install keeps ~1 GiB in the Nix
-store and needs ~6 GiB free to download and compile.
+(not WSL1, not Windows-native). Nix must be 2.28 or newer (NixOS 25.05).
+An older Nix already on the machine has to be upgraded first.
+First install keeps ~1 GiB in the Nix store and needs ~6 GiB free.
 
 On a graphical VM, windows open on your desktop. If CAD starts its own
 X server, open the printed http://127.0.0.1:6080 URL.
@@ -67,6 +68,7 @@ else
   error "NixOS: nix is already on PATH. Other distros: the multi-user daemon installer."
   exit 1
 fi
+mmi_check_existing_nix || exit 1
 
 if [ ! -d "${SCRIPT_DIR}/vendor/mmi/src/max4.3.16" ]; then
   error "vendor/mmi/src/max4.3.16 is missing. CAD sources must be in git."

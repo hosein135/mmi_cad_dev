@@ -135,6 +135,7 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
     [ -d "${src}" ] || continue
     cp -f "${src}/pdk_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/mag_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/image_layout.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/mag2gds.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/open_mag.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/fetch_pdk.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true

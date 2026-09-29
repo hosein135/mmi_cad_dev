@@ -268,6 +268,245 @@ mmi_source_nix() {
   export NIX_CONFIG="${NIX_CONFIG:-}
 experimental-features = nix-command flakes
 "
+  # A previous nix-channel / NIX_PATH must not replace the locked nixpkgs.
+  export NIX_PATH=""
+}
+
+# NixOS 25.05 ships Nix 2.28 (nixpkgs nixVersions.stable = nix_2_28).
+# flake.lock version 7 needs Nix >= 2.18; 25.05 itself is evaluated with 2.28.
+MMI_NIX_MIN_MAJOR=2
+MMI_NIX_MIN_MINOR=28
+MMI_NIX_MIN_PATCH=0
+
+mmi_nix_parse_version() {
+  local line
+  line="$("$1" --version 2>/dev/null | head -n 1 || true)"
+  if [[ "$line" =~ ([0-9]+)\.([0-9]+)(\.([0-9]+))? ]]; then
+    printf '%s %s %s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[4]:-0}"
+    return 0
+  fi
+  return 1
+}
+
+mmi_nix_ver_ge() {
+  local maj="$1" min="$2" pat="$3"
+  local need_maj="$4" need_min="$5" need_pat="$6"
+  if [ "$maj" -gt "$need_maj" ]; then return 0; fi
+  if [ "$maj" -lt "$need_maj" ]; then return 1; fi
+  if [ "$min" -gt "$need_min" ]; then return 0; fi
+  if [ "$min" -lt "$need_min" ]; then return 1; fi
+  [ "$pat" -ge "$need_pat" ]
+}
+
+# Newest Nix binary among PATH and the usual install locations.
+# Prints one path. Returns 1 when none of them run.
+mmi_select_nix_bin() {
+  local cand resolved seen best best_key key maj min pat
+  local -a cands
+  seen="|"
+  best=""
+  best_key=-1
+  cands=()
+  if command -v nix >/dev/null 2>&1; then
+    cands+=("$(command -v nix)")
+  fi
+  cands+=(
+    /nix/var/nix/profiles/default/bin/nix
+    "${HOME:-}/.nix-profile/bin/nix"
+    /run/current-system/sw/bin/nix
+    /usr/bin/nix
+  )
+  for cand in "${cands[@]}"; do
+    [ -n "$cand" ] && [ -x "$cand" ] || continue
+    resolved="$(readlink -f "$cand" 2>/dev/null || printf '%s' "$cand")"
+    case "$seen" in
+      *"|${resolved}|"*) continue ;;
+    esac
+    seen="${seen}${resolved}|"
+    if ! read -r maj min pat < <(mmi_nix_parse_version "$cand"); then
+      continue
+    fi
+    key=$((maj * 1000000 + min * 1000 + pat))
+    if [ "$key" -gt "$best_key" ]; then
+      best_key="$key"
+      best="$cand"
+    fi
+  done
+  [ -n "$best" ] || return 1
+  printf '%s\n' "$best"
+}
+
+# Description of a nixpkgs channel that is not nixos-25.05. Empty when
+# there is no channel, or the channel is already 25.05.
+mmi_foreign_nixpkgs_channel() {
+  local url="" ver="" f
+  if command -v nix-channel >/dev/null 2>&1; then
+    url="$(nix-channel --list 2>/dev/null | awk '$1=="nixpkgs" || $1=="nixos" { print $2; exit }' || true)"
+  fi
+  for f in \
+    "${HOME:-}/.nix-defexpr/channels/nixpkgs/.version" \
+    "/nix/var/nix/profiles/per-user/${USER:-}/channels/nixpkgs/.version" \
+    "/nix/var/nix/profiles/per-user/root/channels/nixpkgs/.version"
+  do
+    [ -f "$f" ] || continue
+    ver="$(tr -d '[:space:]' <"$f" || true)"
+    [ -n "$ver" ] && break
+  done
+  if [ -z "$url" ] && [ -z "$ver" ]; then
+    return 0
+  fi
+  if [[ "$url" =~ nixos-25\.05([^0-9]|$) ]]; then
+    return 0
+  fi
+  if [ -z "$url" ] && [[ "$ver" =~ ^25\.05([^0-9]|$) ]]; then
+    return 0
+  fi
+  if [ -n "$url" ] && [ -n "$ver" ]; then
+    printf '%s (checkout %s)\n' "$url" "$ver"
+  elif [ -n "$url" ]; then
+    printf '%s\n' "$url"
+  else
+    printf 'checkout %s\n' "$ver"
+  fi
+}
+
+mmi_nix_store_error() {
+  local msg="$1" line
+  error "Nix is installed, but the existing store cannot be used."
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    error "$line"
+  done <<<"$(printf '%s\n' "$msg" | head -n 6)"
+  case "$msg" in
+    *experimental*feature*|*flakes*)
+      error "Enable flakes, then retry. In ~/.config/nix/nix.conf or /etc/nix/nix.conf:"
+      error "  experimental-features = nix-command flakes"
+      ;;
+    *daemon*|*socket*|*Connection\ refused*|*disconnected*)
+      error "Start the Nix daemon:  sudo systemctl start nix-daemon"
+      error "If this user was just added to the nix-daemon group, log out and back in."
+      ;;
+    *Permission\ denied*|*Operation\ not\ permitted*|*not\ allowed*)
+      error "This user cannot access the store from the previous Nix install."
+      error "Multi-user Nix: add the user to nix-daemon and log in again."
+      error "Single-user Nix: run as the user who originally installed Nix."
+      ;;
+    *database*|*schema*|*not\ compatible*)
+      error "The Nix database was written by a different Nix version."
+      error "Upgrade or reinstall Nix so it matches that database: https://nixos.org/download.html"
+      ;;
+    *)
+      error "Reinstall Nix from https://nixos.org/download.html if this install is broken."
+      ;;
+  esac
+}
+
+# Previous Nix install: too old for NixOS 25.05, wrong channel, or a
+# broken daemon/store left behind by an earlier install.
+mmi_check_existing_nix() {
+  local best maj min pat channel err json url sver
+  local smaj smin sys feats
+
+  if ! best="$(mmi_select_nix_bin)"; then
+    error "Nix was found, but every Nix binary failed to run."
+    error "Reinstall from https://nixos.org/download.html"
+    return 1
+  fi
+  if [ "$best" != "$NIX_BIN" ]; then
+    info "Using ${best} (newer Nix than ${NIX_BIN})."
+    NIX_BIN="$best"
+  fi
+
+  if ! read -r maj min pat < <(mmi_nix_parse_version "$NIX_BIN"); then
+    error "Nix at ${NIX_BIN} did not report a version."
+    error "Reinstall from https://nixos.org/download.html"
+    return 1
+  fi
+
+  channel="$(mmi_foreign_nixpkgs_channel || true)"
+
+  if ! mmi_nix_ver_ge "$maj" "$min" "$pat" \
+      "$MMI_NIX_MIN_MAJOR" "$MMI_NIX_MIN_MINOR" "$MMI_NIX_MIN_PATCH"; then
+    error "Nix is already installed, but its release is older than NixOS 25.05."
+    error "  ${NIX_BIN}: Nix ${maj}.${min}.${pat}"
+    error "NixOS 25.05 uses Nix 2.28 or newer. This repository's nixpkgs is locked to that release."
+    if [ -n "$channel" ]; then
+      error "Existing nixpkgs channel: ${channel}"
+    fi
+    error "Upgrade the installed Nix, then open a new shell and retry:"
+    error "  nix --extra-experimental-features \"nix-command flakes\" upgrade-nix"
+    error "Multi-user Nix:  sudo nix --extra-experimental-features \"nix-command flakes\" upgrade-nix"
+    error "If the upgrade fails, reinstall from https://nixos.org/download.html"
+    return 1
+  fi
+
+  if [ -n "$channel" ]; then
+    warn "A previous nixpkgs channel is ${channel}."
+    warn "That channel is outside NixOS 25.05. This run ignores it."
+    warn "Packages come from flake.lock (github:NixOS/nixpkgs/nixos-25.05)."
+  fi
+
+  err="${TMPDIR:-/tmp}/mmi-nix-check.$$"
+  json="$("$NIX_BIN" store info --json 2>"$err" || true)"
+  if [ -z "$json" ]; then
+    json="$("$NIX_BIN" store ping --json 2>"$err" || true)"
+  fi
+  if [ -z "$json" ]; then
+    mmi_nix_store_error "$(cat "$err" 2>/dev/null || true)"
+    rm -f "$err"
+    return 1
+  fi
+  rm -f "$err"
+
+  url="$(printf '%s' "$json" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+  sver="$(printf '%s' "$json" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+  if [[ "$sver" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+    smaj="${BASH_REMATCH[1]}"
+    smin="${BASH_REMATCH[2]}"
+    if [ "$smaj" != "$maj" ] || [ "$smin" != "$min" ]; then
+      error "Nix client ${maj}.${min}.${pat} does not match the Nix store (${sver})."
+      error "A previous upgrade left two Nix versions installed."
+      error "Upgrade so the client and the daemon are the same release, then open a new shell:"
+      error "  sudo nix --extra-experimental-features \"nix-command flakes\" upgrade-nix"
+      return 1
+    fi
+  fi
+
+  if [ -S /nix/var/nix/daemon-socket/socket ] && [[ "${url}" != daemon* ]]; then
+    warn "A Nix daemon socket exists, but ${NIX_BIN} is using a local store."
+    warn "A single-user Nix and a multi-user Nix are both installed."
+  fi
+
+  if [[ "${url}" == daemon* ]] && ! grep -q '^nixbld1:' /etc/passwd 2>/dev/null; then
+    error "The Nix daemon is installed, but the nixbld build users are missing."
+    error "Re-run the multi-user installer from https://nixos.org/download.html"
+    return 1
+  fi
+
+  sys="$("$NIX_BIN" config show system 2>/dev/null || true)"
+  if [ -n "$sys" ] && [ "$sys" != "x86_64-linux" ]; then
+    error "Nix is configured for system ${sys}. CAD needs x86_64-linux."
+    error "Fix the system setting in /etc/nix/nix.conf or ~/.config/nix/nix.conf."
+    return 1
+  fi
+
+  if [ "$("$NIX_BIN" config show restrict-eval 2>/dev/null || true)" = "true" ]; then
+    error "Nix restrict-eval is enabled, so this flake cannot fetch NixOS 25.05."
+    error "Set restrict-eval = false in the Nix configuration and retry."
+    return 1
+  fi
+
+  feats="$("$NIX_BIN" config show experimental-features 2>/dev/null || true)"
+  if ! printf '%s' "$feats" | grep -q 'flakes' \
+    || ! printf '%s' "$feats" | grep -q 'nix-command'; then
+    error "This Nix install does not have flakes enabled."
+    error "Add this to ~/.config/nix/nix.conf or /etc/nix/nix.conf and retry:"
+    error "  experimental-features = nix-command flakes"
+    return 1
+  fi
+
+  info "Nix ${maj}.${min}.${pat}"
+  return 0
 }
 
 # Restore flake paths that are missing from the work tree. Do not `git add`:

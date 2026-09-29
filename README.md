@@ -13,7 +13,7 @@ The CAD tree is **`vendor/mmi/`** (in git, sources only). Binaries are not commi
 | x86_64 Linux | NixOS, Debian, Ubuntu, Fedora, etc. — install, VM, or **WSL2** |
 | GUI desktop | Required on bare metal and VMs (GNOME, KDE, XFCE, ...). WSL must be **WSL2** (not WSL1) |
 | ~6 GiB free | First `./run.sh` / `--prep-only` (~1 GiB stays in the Nix store after install) |
-| Nix (flakes) | [Install Nix](https://nixos.org/download.html); NixOS already has it |
+| Nix 2.28+ | Nix shipped with NixOS 25.05. An older Nix already on the machine is rejected; other nixpkgs channels are ignored |
 | User namespaces | Needed by bubblewrap. Ubuntu 24.04+: if `nix run` fails, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` |
 | Not WSL1 | WSL1 has no real kernel userns. `wsl --set-version <distro> 2` |
 
@@ -90,3 +90,5 @@ Foundry PDKs are **not** in the flake. After `./run.sh max`, use **File → Impo
 Magic is the **nixpkgs 25.05 `magic-vlsi` package**. The flake does not compile Magic; it puts that package on `PATH` and bind-mounts it at `/mmi-magic` inside the FHS sandbox (`/mmi-magic/bin/magic`).
 
 **File → Import Magic Design Folder** converts `.mag` → GDS (via Magic `cifoutput`) → MAX `.max`. When the convert finishes, MAX also starts Magic on the **original** `.mag` (same X/Xvnc display) so you can compare Magic’s layout with the converted MAX view. Uncheck *Also open original Mag in Magic VLSI* in the import dialog to skip that.
+
+**File → Import Image as Layout** traces a bitmap onto the open edit cell. Dark pixels become rectangles on a layer you pick. Touching pixels are merged, so a logo is a few hundred shapes instead of one rectangle per pixel. PBM, PGM, PPM, and GIF are read in MAX. PNG and JPEG are resized with ImageMagick (`imagemagick` in the CAD environment). Undo removes the paste.
