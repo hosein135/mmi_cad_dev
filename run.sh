@@ -8,9 +8,16 @@ error() { printf '%s\n' "[run] ERROR: $*" >&2; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SCRIPT_DIR}"
+MMI_ORIG_ARGS=("$@")
 
 # shellcheck source=nix/host-linux.sh
 . "${SCRIPT_DIR}/nix/host-linux.sh"
+
+# sudo looks like "Nix is not installed" because root does not see the
+# desktop user's profile. Switch back before checks or installs.
+if [ "${1:-}" != "--help" ] && [ "${1:-}" != "-h" ]; then
+  mmi_rerun_as_desktop_user "$@" || exit 1
+fi
 
 CMD_ARGS=()
 PREP_ONLY=false
@@ -28,8 +35,9 @@ Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
   ./run.sh --clean      remove data/home (CAD overlay)
 
 Needs x86_64 Linux: bare metal, a VM with a GUI desktop, or WSL2
-(not WSL1, not Windows-native). Nix must be 2.28 or newer (NixOS 25.05).
-An older Nix already on the machine has to be upgraded first.
+(not WSL1, not Windows-native). Run as your desktop user. sudo is
+accepted and continues as that user. Nix 2.28+ (NixOS 25.05) is
+installed or upgraded automatically when the current one cannot be used.
 First install keeps ~1 GiB in the Nix store and needs ~6 GiB free.
 
 On a graphical VM, windows open on your desktop. If CAD starts its own
@@ -61,12 +69,13 @@ fi
 
 mmi_source_nix
 NIX_BIN=""
-if NIX_BIN="$(mmi_find_nix)"; then
-  :
-else
-  error "Nix is not installed. Install from https://nixos.org/download.html"
-  error "NixOS: nix is already on PATH. Other distros: the multi-user daemon installer."
-  exit 1
+if ! NIX_BIN="$(mmi_find_nix)"; then
+  mmi_install_nix || exit 1
+  mmi_source_nix
+  if ! NIX_BIN="$(mmi_find_nix)"; then
+    error "Nix install finished, but the nix command is still missing."
+    exit 1
+  fi
 fi
 mmi_check_existing_nix || exit 1
 

@@ -224,6 +224,75 @@ mmi_check_linux_host() {
   return 0
 }
 
+mmi_is_nixos() {
+  [ -f /etc/os-release ] && grep -q '^ID=nixos$' /etc/os-release
+}
+
+# sudo sets USER=root and hides the caller's Nix profile. The account that
+# ran sudo is SUDO_USER; assign that to USER and continue as $USER.
+mmi_rerun_as_desktop_user() {
+  local home uid quoted a login
+  [ "$(id -u)" -eq 0 ] || return 0
+  if [ "${MMI_AS_DESKTOP_USER:-}" = "1" ]; then
+    error "Could not switch from root to \$USER."
+    return 1
+  fi
+  if [ -n "${SUDO_USER:-}" ] && [ "${SUDO_USER}" != "root" ]; then
+    USER="${SUDO_USER}"
+  else
+    login=""
+    if command -v logname >/dev/null 2>&1; then
+      login="$(logname 2>/dev/null || true)"
+    fi
+    if [ -n "$login" ] && [ "$login" != "root" ]; then
+      USER="$login"
+    else
+      error "Run ./run.sh as your own user. Under sudo, \$USER is root."
+      error "The account that ran sudo was not in \$SUDO_USER."
+      return 1
+    fi
+  fi
+  export USER
+  export LOGNAME="$USER"
+  home="$(getent passwd "$USER" | awk -F: '{ print $6; exit }')"
+  if [ -z "$home" ] || [ ! -d "$home" ]; then
+    error "No home directory for \$USER (${USER})."
+    return 1
+  fi
+  uid="$(id -u "$USER")"
+  info "Continuing as \$USER (${USER})."
+  export MMI_AS_DESKTOP_USER=1
+  export HOME="$home"
+  export PATH="${home}/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  if [ -z "${XDG_RUNTIME_DIR:-}" ] || [ ! -d "${XDG_RUNTIME_DIR}" ]; then
+    if [ -d "/run/user/${uid}" ]; then
+      export XDG_RUNTIME_DIR="/run/user/${uid}"
+    fi
+  fi
+  cd "$SCRIPT_DIR"
+  if command -v runuser >/dev/null 2>&1; then
+    exec runuser -u "$USER" --preserve-environment -- "$SCRIPT_DIR/run.sh" "$@"
+  fi
+  quoted=""
+  for a in "$@"; do
+    quoted="${quoted} $(printf '%q' "$a")"
+  done
+  exec su -m "$USER" -s /bin/bash -c "cd $(printf '%q' "$SCRIPT_DIR") && exec ./run.sh${quoted}"
+  error "Could not switch from root to \$USER (${USER})."
+  return 1
+}
+
+mmi_as_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  elif command -v sudo >/dev/null 2>&1; then
+    sudo "$@"
+  else
+    error "Need root to run: $*"
+    return 1
+  fi
+}
+
 mmi_find_nix() {
   local dir old_ifs
   if command -v nix >/dev/null 2>&1; then
@@ -243,7 +312,8 @@ mmi_find_nix() {
   IFS="${old_ifs}"
   for dir in \
     /nix/var/nix/profiles/default/bin \
-    "${HOME}/.nix-profile/bin" \
+    "${HOME:-}/.nix-profile/bin" \
+    "/nix/var/nix/profiles/per-user/${USER:-}/profile/bin" \
     /run/current-system/sw/bin
   do
     if [ -x "${dir}/nix" ]; then
@@ -270,6 +340,184 @@ experimental-features = nix-command flakes
 "
   # A previous nix-channel / NIX_PATH must not replace the locked nixpkgs.
   export NIX_PATH=""
+}
+
+# Official installer: single-user, no nixpkgs-unstable channel.
+# A previous /nix is removed only when it blocks this install.
+mmi_run_nix_installer() {
+  local sh="$1"
+  export NIX_INSTALLER_YES=1
+  export NIX_INSTALLER_NO_CHANNEL_ADD=1
+  bash "$sh" --no-daemon --yes --no-channel-add
+}
+
+mmi_download_nix_installer() {
+  local dest="${TMPDIR:-/tmp}/mmi-nix-install.$$.sh"
+  if [ -n "${MMI_NIX_INSTALLER:-}" ]; then
+    printf '%s\n' "${MMI_NIX_INSTALLER}"
+    return 0
+  fi
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL https://nixos.org/nix/install -o "$dest"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$dest" https://nixos.org/nix/install
+  else
+    error "curl or wget is required to install Nix."
+    return 1
+  fi
+  printf '%s\n' "$dest"
+}
+
+mmi_remove_nix() {
+  local u f
+  if mmi_is_nixos; then
+    error "This is NixOS. Refusing to delete /nix."
+    error "Upgrade Nix with the system: sudo nixos-rebuild switch"
+    return 1
+  fi
+  info "Removing the previous Nix installation."
+  if command -v systemctl >/dev/null 2>&1; then
+    mmi_as_root systemctl stop nix-daemon.socket nix-daemon.service >/dev/null 2>&1 || true
+    mmi_as_root systemctl disable nix-daemon.socket nix-daemon.service >/dev/null 2>&1 || true
+    mmi_as_root systemctl daemon-reload >/dev/null 2>&1 || true
+  fi
+  for f in /etc/bashrc /etc/bash.bashrc /etc/profile /etc/zsh/zshrc /etc/zshrc; do
+    if [ -f "${f}.backup-before-nix" ]; then
+      mmi_as_root cp -a "${f}.backup-before-nix" "$f" || true
+    fi
+  done
+  mmi_as_root rm -rf \
+    /nix \
+    /etc/nix \
+    /etc/profile.d/nix.sh \
+    /etc/profile.d/nix-daemon.sh \
+    /etc/tmpfiles.d/nix-daemon.conf \
+    /usr/lib/systemd/system/nix-daemon.service \
+    /usr/lib/systemd/system/nix-daemon.socket \
+    /etc/systemd/system/nix-daemon.service \
+    /etc/systemd/system/nix-daemon.socket \
+    /root/.nix-profile /root/.nix-defexpr /root/.nix-channels \
+    /root/.local/state/nix /root/.cache/nix \
+    || return 1
+  rm -rf \
+    "${HOME:-}/.nix-profile" "${HOME:-}/.nix-defexpr" "${HOME:-}/.nix-channels" \
+    "${HOME:-}/.local/state/nix" "${HOME:-}/.cache/nix" \
+    "${HOME:-}/.config/nix"
+  if getent group nixbld >/dev/null 2>&1; then
+    while IFS= read -r u; do
+      [ -n "$u" ] || continue
+      mmi_as_root userdel "$u" >/dev/null 2>&1 || true
+    done < <(getent passwd | awk -F: '$1 ~ /^nixbld[0-9]+$/ { print $1 }')
+    mmi_as_root groupdel nixbld >/dev/null 2>&1 || true
+  fi
+  if getent group nix-daemon >/dev/null 2>&1; then
+    mmi_as_root groupdel nix-daemon >/dev/null 2>&1 || true
+  fi
+}
+
+mmi_install_nix() {
+  local sh
+  if mmi_is_nixos; then
+    error "Nix is not available on this NixOS system."
+    error "Boot a generation that includes nix, then run ./run.sh again."
+    return 1
+  fi
+  info "Installing Nix so CAD can run. This may ask for your sudo password."
+  if ! sh="$(mmi_download_nix_installer)"; then
+    return 1
+  fi
+  if ! mmi_run_nix_installer "$sh"; then
+    if [ "${MMI_NIX_REPLACE:-}" = "1" ] || { [ -d /nix ] && ! mmi_find_nix >/dev/null 2>&1; }; then
+      info "A previous Nix install is in the way. Removing it and installing again."
+      mmi_remove_nix || return 1
+      mmi_run_nix_installer "$sh" || return 1
+    else
+      error "Nix installer failed."
+      return 1
+    fi
+  fi
+  if [ -z "${MMI_NIX_INSTALLER:-}" ]; then
+    rm -f "$sh"
+  fi
+  hash -r || true
+}
+
+mmi_try_upgrade_nix() {
+  info "Upgrading the installed Nix to 2.28 or newer."
+  if [ -S /nix/var/nix/daemon-socket/socket ]; then
+    mmi_as_root "$NIX_BIN" --extra-experimental-features "nix-command flakes" upgrade-nix
+    if command -v systemctl >/dev/null 2>&1; then
+      mmi_as_root systemctl restart nix-daemon.socket nix-daemon.service >/dev/null 2>&1 || true
+    fi
+  else
+    "$NIX_BIN" --extra-experimental-features "nix-command flakes" upgrade-nix
+  fi
+}
+
+mmi_reload_nix_bin() {
+  hash -r || true
+  mmi_source_nix
+  if ! NIX_BIN="$(mmi_find_nix)"; then
+    error "Nix install finished, but the nix command is still missing."
+    return 1
+  fi
+}
+
+mmi_repair_nix_and_recheck() {
+  if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+    error "Nix is still not usable after replacing the previous install."
+    return 1
+  fi
+  export MMI_NIX_REPAIR=1
+  export MMI_NIX_REPLACE=1
+  mmi_install_nix || return 1
+  mmi_reload_nix_bin || return 1
+  mmi_check_existing_nix
+}
+
+# Start a stopped daemon, or re-enter the script with the nix-daemon group.
+# Returns 0 when the caller should run the Nix check again.
+mmi_revive_nix_store() {
+  local msg="$1" members
+  case "$msg" in
+    *daemon*|*socket*|*Connection\ refused*|*disconnected*)
+      if command -v systemctl >/dev/null 2>&1; then
+        info "Starting the Nix daemon from the previous install."
+        mmi_as_root systemctl start nix-daemon.socket nix-daemon.service >/dev/null 2>&1 || true
+        return 0
+      fi
+      ;;
+  esac
+  case "$msg" in
+    *Permission\ denied*|*Operation\ not\ permitted*|*not\ allowed*)
+      if [ "${MMI_NIX_SG:-}" = "1" ]; then
+        return 1
+      fi
+      if getent group nix-daemon >/dev/null 2>&1; then
+        members="$(getent group nix-daemon | awk -F: '{ print $4 }')"
+        case ",${members}," in
+          *",${USER},"*) ;;
+          *)
+            info "Adding ${USER} to the nix-daemon group."
+            mmi_as_root usermod -aG nix-daemon "${USER}" || return 1
+            ;;
+        esac
+        if command -v sg >/dev/null 2>&1; then
+          info "Opening the Nix store as a member of nix-daemon."
+          export MMI_NIX_SG=1
+          local q a
+          q="./run.sh"
+          if [ "${MMI_ORIG_ARGS+set}" = "set" ]; then
+            for a in "${MMI_ORIG_ARGS[@]}"; do
+              q="${q} $(printf '%q' "$a")"
+            done
+          fi
+          exec sg nix-daemon -c "cd $(printf '%q' "$SCRIPT_DIR") && exec ${q}"
+        fi
+      fi
+      ;;
+  esac
+  return 1
 }
 
 # NixOS 25.05 ships Nix 2.28 (nixpkgs nixVersions.stable = nix_2_28).
@@ -313,6 +561,7 @@ mmi_select_nix_bin() {
   cands+=(
     /nix/var/nix/profiles/default/bin/nix
     "${HOME:-}/.nix-profile/bin/nix"
+    "/nix/var/nix/profiles/per-user/${USER:-}/profile/bin/nix"
     /run/current-system/sw/bin/nix
     /usr/bin/nix
   )
@@ -405,12 +654,16 @@ mmi_nix_store_error() {
 # broken daemon/store left behind by an earlier install.
 mmi_check_existing_nix() {
   local best maj min pat channel err json url sver
-  local smaj smin sys feats
+  local smaj smin sys feats store_msg
 
   if ! best="$(mmi_select_nix_bin)"; then
-    error "Nix was found, but every Nix binary failed to run."
-    error "Reinstall from https://nixos.org/download.html"
-    return 1
+    if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+      error "Nix binaries still do not run after reinstall."
+      return 1
+    fi
+    info "The Nix binary on this machine does not run. Replacing it."
+    mmi_repair_nix_and_recheck || return 1
+    return 0
   fi
   if [ "$best" != "$NIX_BIN" ]; then
     info "Using ${best} (newer Nix than ${NIX_BIN})."
@@ -418,26 +671,38 @@ mmi_check_existing_nix() {
   fi
 
   if ! read -r maj min pat < <(mmi_nix_parse_version "$NIX_BIN"); then
-    error "Nix at ${NIX_BIN} did not report a version."
-    error "Reinstall from https://nixos.org/download.html"
-    return 1
+    if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+      error "Nix at ${NIX_BIN} still does not report a version."
+      return 1
+    fi
+    info "Nix at ${NIX_BIN} did not report a version. Replacing it."
+    mmi_repair_nix_and_recheck || return 1
+    return 0
   fi
 
   channel="$(mmi_foreign_nixpkgs_channel || true)"
 
   if ! mmi_nix_ver_ge "$maj" "$min" "$pat" \
       "$MMI_NIX_MIN_MAJOR" "$MMI_NIX_MIN_MINOR" "$MMI_NIX_MIN_PATCH"; then
-    error "Nix is already installed, but its release is older than NixOS 25.05."
-    error "  ${NIX_BIN}: Nix ${maj}.${min}.${pat}"
-    error "NixOS 25.05 uses Nix 2.28 or newer. This repository's nixpkgs is locked to that release."
-    if [ -n "$channel" ]; then
-      error "Existing nixpkgs channel: ${channel}"
+    if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+      error "Nix ${maj}.${min}.${pat} is still older than Nix 2.28 after reinstall."
+      return 1
     fi
-    error "Upgrade the installed Nix, then open a new shell and retry:"
-    error "  nix --extra-experimental-features \"nix-command flakes\" upgrade-nix"
-    error "Multi-user Nix:  sudo nix --extra-experimental-features \"nix-command flakes\" upgrade-nix"
-    error "If the upgrade fails, reinstall from https://nixos.org/download.html"
-    return 1
+    info "Nix ${maj}.${min}.${pat} is older than Nix 2.28 (NixOS 25.05)."
+    if [ -n "$channel" ]; then
+      info "Existing nixpkgs channel: ${channel}"
+    fi
+    if [ "${MMI_NIX_UPGRADED:-}" != "1" ]; then
+      export MMI_NIX_UPGRADED=1
+      if mmi_try_upgrade_nix; then
+        mmi_reload_nix_bin || return 1
+        mmi_check_existing_nix || return 1
+        return 0
+      fi
+    fi
+    info "Upgrade failed. Replacing this Nix install."
+    mmi_repair_nix_and_recheck || return 1
+    return 0
   fi
 
   if [ -n "$channel" ]; then
@@ -452,8 +717,21 @@ mmi_check_existing_nix() {
     json="$("$NIX_BIN" store ping --json 2>"$err" || true)"
   fi
   if [ -z "$json" ]; then
-    mmi_nix_store_error "$(cat "$err" 2>/dev/null || true)"
+    store_msg="$(cat "$err" 2>/dev/null || true)"
     rm -f "$err"
+    if [ "${MMI_NIX_STORE_RETRY:-}" != "1" ]; then
+      export MMI_NIX_STORE_RETRY=1
+      if mmi_revive_nix_store "$store_msg"; then
+        mmi_check_existing_nix || return 1
+        return 0
+      fi
+    fi
+    if [ "${MMI_NIX_REPAIR:-}" != "1" ]; then
+      info "The existing Nix store is unusable. Installing a fresh Nix."
+      mmi_repair_nix_and_recheck || return 1
+      return 0
+    fi
+    mmi_nix_store_error "$store_msg"
     return 1
   fi
   rm -f "$err"
@@ -464,11 +742,13 @@ mmi_check_existing_nix() {
     smaj="${BASH_REMATCH[1]}"
     smin="${BASH_REMATCH[2]}"
     if [ "$smaj" != "$maj" ] || [ "$smin" != "$min" ]; then
-      error "Nix client ${maj}.${min}.${pat} does not match the Nix store (${sver})."
-      error "A previous upgrade left two Nix versions installed."
-      error "Upgrade so the client and the daemon are the same release, then open a new shell:"
-      error "  sudo nix --extra-experimental-features \"nix-command flakes\" upgrade-nix"
-      return 1
+      if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+        error "Nix client ${maj}.${min}.${pat} still does not match the store (${sver})."
+        return 1
+      fi
+      info "Nix client ${maj}.${min}.${pat} does not match the store (${sver}). Replacing Nix."
+      mmi_repair_nix_and_recheck || return 1
+      return 0
     fi
   fi
 
@@ -478,9 +758,13 @@ mmi_check_existing_nix() {
   fi
 
   if [[ "${url}" == daemon* ]] && ! grep -q '^nixbld1:' /etc/passwd 2>/dev/null; then
-    error "The Nix daemon is installed, but the nixbld build users are missing."
-    error "Re-run the multi-user installer from https://nixos.org/download.html"
-    return 1
+    if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+      error "The Nix daemon still has no nixbld build users."
+      return 1
+    fi
+    info "The Nix daemon has no nixbld build users. Replacing Nix."
+    mmi_repair_nix_and_recheck || return 1
+    return 0
   fi
 
   sys="$("$NIX_BIN" config show system 2>/dev/null || true)"

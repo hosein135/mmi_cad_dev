@@ -13,7 +13,7 @@ The CAD tree is **`vendor/mmi/`** (in git, sources only). Binaries are not commi
 | x86_64 Linux | NixOS, Debian, Ubuntu, Fedora, etc. — install, VM, or **WSL2** |
 | GUI desktop | Required on bare metal and VMs (GNOME, KDE, XFCE, ...). WSL must be **WSL2** (not WSL1) |
 | ~6 GiB free | First `./run.sh` / `--prep-only` (~1 GiB stays in the Nix store after install) |
-| Nix 2.28+ | Nix shipped with NixOS 25.05. An older Nix already on the machine is rejected; other nixpkgs channels are ignored |
+| Nix 2.28+ | Installed or replaced automatically when missing, too old, or broken. `sudo ./run.sh` continues as your desktop user |
 | User namespaces | Needed by bubblewrap. Ubuntu 24.04+: if `nix run` fails, `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0` |
 | Not WSL1 | WSL1 has no real kernel userns. `wsl --set-version <distro> 2` |
 
