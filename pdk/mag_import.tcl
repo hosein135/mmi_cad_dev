@@ -2171,7 +2171,7 @@ MAX technology: $tech\n\
 Log: $log\n\n\
 Source is efabless/caravel mag (padframe, management core, top caravel) plus the example design user_proj_example from efabless/caravel_user_project, placed by user_project_wrapper.\n\n\
 Magic writes a hierarchical GDS. MAX draws that GDS without flattening every standard cell.\n\n\
-Stdcells and IO pads come from the sky130A PDK. RAM128 (management SRAM) is not published as a .mag file, so those three instances have no layout.\n\n\
+Stdcells and IO pads come from the sky130A PDK. RAM128 is not published as a Magic layout, so each of the three management SRAMs is the placement rectangle from caravel_core (about 404 um by 438 um), not the memory array.\n\n\
 $store"
   if {[mag_want_gui]} {
     set msg "$msg\n\nMagic VLSI is also opening the original .mag so you can compare it with MAX. Drawing the full chip can take several minutes."

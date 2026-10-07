@@ -92,6 +92,7 @@ if big_ok "$dest/caravel.mag" 1000 && \
    big_ok "$dest/user_proj_example.mag" 20000000 && \
    big_ok "$dest/hexdigits/alpha_0.mag" 50 && \
    big_ok "$dest/primitives/sky130_fd_pr__res_xhigh_po_0p69_S5N9F3.mag" 1000 && \
+   big_ok "$dest/RAM128.mag" 100 && \
    wrapper_ok
 then
   st 100 "Using existing Caravel harness Magic tree" ok
@@ -234,6 +235,24 @@ fi
 st 94 "Downloading example design user_proj_example.mag (about 85 MB)..."
 fetch_one "$DESIGN/user_proj_example.mag" "$dest/user_proj_example.mag" 20000000
 
+# OpenRAM never published RAM128.mag. caravel_core still instances it three
+# times (box 492 0 81236 87584). Without a cell, Magic aborts the GDS write.
+# This outline keeps that placement and lets the rest of the chip convert.
+st 97 "Writing RAM128 placement outline..."
+cat > "$dest/RAM128.mag" << 'EOF'
+magic
+tech sky130A
+magscale 1 2
+timestamp 0
+<< metal1 >>
+rect 492 0 81236 87584
+<< metal2 >>
+rect 1492 1000 79736 86584
+<< properties >>
+string FIXED_BBOX 492 0 81236 87584
+<< end >>
+EOF
+
 cat > "$dest/SOURCE.txt" << EOF
 Caravel harness + example design (Magic)
 
@@ -252,8 +271,8 @@ user_project_wrapper instances user_proj_example (the Caravel counter).
 caravel_core instances that wrapper, chip_io is the padframe.
 simple_por instances device cells from primitives/ (resistor, FETs, MIM caps).
 
-Not in these repositories as .mag:
-  RAM128 (management SRAM, three instances in caravel_core)
+Not published as a transistor-level .mag (a placement outline is written instead):
+  RAM128 (management SRAM, three instances in caravel_core, box 492 0 81236 87584)
 
 Stdcells (sky130_fd_sc_hd) and IO pads (sky130_fd_io, sky130_ef_io)
 come from the imported sky130A PDK when Magic writes GDS.
