@@ -36,7 +36,9 @@ RC=""
 for cand in \
     "$PDK_ROOT/$pdk_name/libs.tech/magic/${pdk_name}.magicrc" \
     "$PDK_ROOT/$pdk_name/libs.tech/magic/${FAMILY}.magicrc" \
+    "$PDK_ROOT/$pdk_name/libs.tech/magic/current/${pdk_name}.magicrc" \
     "$PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc" \
+    "$PDK_ROOT/sky130A/libs.tech/magic/current/sky130A.magicrc" \
     "$PDK_ROOT/gf180mcuD/libs.tech/magic/gf180mcuD.magicrc" \
     "$PDK_ROOT/ihp-sg13g2/libs.tech/magic/ihp-sg13g2.magicrc"
 do
@@ -45,11 +47,22 @@ do
     break
   fi
 done
+if [ -z "$RC" ] && [ -d "$PDK_ROOT/$pdk_name/libs.tech/magic" ]; then
+  RC="$(find "$PDK_ROOT/$pdk_name/libs.tech/magic" -name '*.magicrc' -print -quit 2>/dev/null || true)"
+fi
 
 export PDK_ROOT
 export PDK="$pdk_name"
 export PDKPATH="${PDK_ROOT}/${pdk_name}"
 export MAGTYPE=mag
+
+# Same font-instance strip as mag2gds.sh. Otherwise the compare window
+# segfaults on caravel motto/copyright before the chip is drawn.
+find "$DIR" -type f -name '*.mag' -print 2>/dev/null | while read -r f; do
+  grep -q '^use font_' "$f" 2>/dev/null || continue
+  grep -v '^use font_' "$f" > "$f.nofont" && mv -f "$f.nofont" "$f"
+  echo "stripped PDK font instances from $f"
+done || true
 
 TECHFILE="$PDKPATH/libs.tech/magic/${pdk_name}.tech"
 SCRIPT="$(mktemp /tmp/open_mag_XXXXXX.tcl)"

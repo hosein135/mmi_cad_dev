@@ -40,7 +40,9 @@ RC=""
 for cand in \
     "$PDK_ROOT/$pdk_name/libs.tech/magic/${pdk_name}.magicrc" \
     "$PDK_ROOT/$pdk_name/libs.tech/magic/${FAMILY}.magicrc" \
+    "$PDK_ROOT/$pdk_name/libs.tech/magic/current/${pdk_name}.magicrc" \
     "$PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc" \
+    "$PDK_ROOT/sky130A/libs.tech/magic/current/sky130A.magicrc" \
     "$PDK_ROOT/gf180mcuD/libs.tech/magic/gf180mcuD.magicrc" \
     "$PDK_ROOT/ihp-sg13g2/libs.tech/magic/ihp-sg13g2.magicrc"
 do
@@ -49,6 +51,9 @@ do
     break
   fi
 done
+if [ -z "$RC" ] && [ -d "$PDK_ROOT/$pdk_name/libs.tech/magic" ]; then
+  RC="$(find "$PDK_ROOT/$pdk_name/libs.tech/magic" -name '*.magicrc' -print -quit 2>/dev/null || true)"
+fi
 
 if [ -z "$RC" ]; then
   echo "ERROR: No Magic .magicrc under PDK_ROOT=$PDK_ROOT" >&2
@@ -62,6 +67,15 @@ export PDK_ROOT
 export PDK="$pdk_name"
 export PDKPATH="${PDK_ROOT}/${pdk_name}"
 export MAGTYPE=mag
+
+# sky130_ml_xx_hd font cells are scaled by a large factor while Magic reads
+# caravel's motto/copyright. That scale segfaults some magic builds before
+# gds write. The chip geometry does not use these font instances.
+find "$DIR" -type f -name '*.mag' -print 2>/dev/null | while read -r f; do
+  grep -q '^use font_' "$f" 2>/dev/null || continue
+  grep -v '^use font_' "$f" > "$f.nofont" && mv -f "$f.nofont" "$f"
+  echo "stripped PDK font instances from $f"
+done || true
 
 SCRIPT="$(mktemp /tmp/mag2gds_XXXXXX.tcl)"
 cleanup() { rm -f "$SCRIPT"; }
@@ -133,10 +147,14 @@ echo "Top:   $TOP"
 echo "GDS:   $OUT"
 
 cd "$DIR"
+set +e
 "$magic_bin" -noconsole -dnull -rcfile "$RC" "$SCRIPT" </dev/null
+magic_rc=$?
+set -e
+echo "magic exit $magic_rc"
 
 if [ ! -s "$OUT" ]; then
-  echo "ERROR: Magic did not write $OUT" >&2
+  echo "ERROR: Magic did not write $OUT (exit $magic_rc)" >&2
   exit 4
 fi
 echo "Wrote $OUT ($(wc -c < "$OUT") bytes)"

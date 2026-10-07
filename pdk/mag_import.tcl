@@ -23,7 +23,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 11
+set _MAG_IMPORT_REV 12
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -2303,7 +2303,12 @@ proc mag_import_poll_magic {} {
 
   set gds $MAG_IMPORT(gds)
   if {![file exists $gds] || [file size $gds] < 64} {
-    mag_import_fail "Magic mag2gds failed (no GDS).\nNeed \$PDK_ROOT/<pdk>/libs.tech/magic/<pdk>.magicrc\nin data/pdks (→ /mmi-pdks).\nLog: $MAG_IMPORT(log)"
+    set why "Magic mag2gds failed (no GDS was written)."
+    set tail [mag_log_tail 40]
+    if {[string match {*magicrc*} $tail] || [string match {*No Magic*} $tail]} {
+      set why "$why\nImport sky130A first (File → Import PDK) so this file exists:\n  /mmi-pdks/sky130A/libs.tech/magic/sky130A.magicrc"
+    }
+    mag_import_fail "$why\nLog: $MAG_IMPORT(log)"
     return
   }
   if {![mag_gds_has_structs $gds]} {
@@ -2426,11 +2431,31 @@ GDS→.max must use the destination technology."
   mag_import_tell $msg -copy
 }
 
+proc mag_log_tail {{n 40}} {
+  global MAG_IMPORT
+  if {![info exists MAG_IMPORT(log)] || ![file readable $MAG_IMPORT(log)]} {
+    return ""
+  }
+  if {[catch {set fh [open $MAG_IMPORT(log) r]}]} { return "" }
+  set lines {}
+  while {[gets $fh line] >= 0} {
+    lappend lines $line
+  }
+  close $fh
+  set start [expr {[llength $lines] - $n}]
+  if {$start < 0} { set start 0 }
+  return [join [lrange $lines $start end] \n]
+}
+
 proc mag_import_fail {msg} {
   global MAG_IMPORT
   mag_progress_close
+  set tail [mag_log_tail 40]
   mag_log "ERROR: $msg"
-  mag_import_tell "Magic import failed.\n$msg\nLog: $MAG_IMPORT(log)" -copy
+  if {$tail != ""} {
+    append msg "\n\nLast log lines:\n$tail"
+  }
+  mag_import_tell "Magic import failed.\n$msg" -copy
 }
 
 proc mag_progress_open {{method mag2gds}} {
