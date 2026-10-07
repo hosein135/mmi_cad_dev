@@ -11,6 +11,8 @@
 # .mag (same X display as MAX) so the two layouts can be compared.
 # MAX then expands all instances (Magic's expanded view) so resistor
 # subcells are paint, not empty bboxes with instance names.
+# The Caravel download option is the published harness die (caravel.gds),
+# opened hierarchical. It is not the example_por Mag sample.
 #
 # MAX embeds Tcl 8.0: no [ \t] / \S regexp classes (a tab inside [] is a
 # literal "t"), no wide(), no string repeat, no glob -directory, no lset.
@@ -18,7 +20,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 9
+set _MAG_IMPORT_REV 10
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -76,6 +78,7 @@ set MAG_IMPORT(stat_dest) ""
 set MAG_IMPORT(fetch_dead) 0
 set MAG_IMPORT(magic_polls) 0
 if {![info exists MAG_IMPORT(open_magic)]} { set MAG_IMPORT(open_magic) 1 }
+if {![info exists MAG_IMPORT(view)]} { set MAG_IMPORT(view) cell }
 
 # ── Small Tcl 8.0-safe helpers ───────────────────────────────────────────────
 
@@ -485,6 +488,28 @@ proc mag_sample_dest {} {
     if {[file isdirectory $d] && [file writable $d]} { return $d }
   }
   return [lindex $cands end]
+}
+
+# Writable place for the downloaded Caravel harness GDS (not the POR sample).
+proc mag_die_dest {} {
+  set cands {}
+  if {[info commands pdk_root] != ""} {
+    lappend cands [file join [pdk_root] samples caravel_die]
+  }
+  lappend cands /mmi-pdks/samples/caravel_die
+  lappend cands /mmi-home/cad/mmi_local/max/pdk/samples/caravel_die
+  foreach d $cands {
+    catch {file mkdir $d}
+    if {[file isdirectory $d] && [file writable $d]} { return $d }
+  }
+  return [lindex $cands end]
+}
+
+proc mag_import_is_chip {} {
+  global MAG_IMPORT
+  if {![info exists MAG_IMPORT(view)]} { return 0 }
+  if {$MAG_IMPORT(view) == "chip"} { return 1 }
+  return 0
 }
 
 # Directory for GDS + .max output. Bundled samples live on read-only mounts
@@ -1502,7 +1527,7 @@ proc mag_import_dialog {} -desc {
 
   set src_labels {}
   set src_values {}
-  lappend src_labels "Download Caravel Mag sample from GitHub (sky130A)"
+  lappend src_labels "Download full Caravel die from GitHub (sky130A GDS)"
   lappend src_values fetch
   if {$sample != ""} {
     lappend src_labels "Local Caravel sample (example_por, already on disk)"
@@ -1518,7 +1543,7 @@ proc mag_import_dialog {} -desc {
   # No -reload: rebuilding the prop_menu jumps the window (same as Import PDK).
   lappend prop_list [list "Magic source:" MAG_IMPORT(source) \
       -radio $src_labels -values $src_values \
-      -help {Download pulls Efabless caravel_user_project_analog/mag (Apache-2.0) into PDK_ROOT/samples, converts example_por to MAX, and opens it with sky130A.}]
+      -help {Download pulls chipfoundry/caravel gds/caravel.gds.gz (Apache-2.0, about 55 MB) into PDK_ROOT/samples/caravel_die and opens top cell caravel with sky130A. That is the harness: pad ring, management core, and an empty user-project wrapper. It is not example_por. Import SKY130A first. The chip stays hierarchical.}]
 
   lappend prop_list [list "Magic design folder:" MAG_IMPORT(dir) \
       -filename [list -message {Magic design directory} -dironly -pattern *.mag] \
@@ -1562,7 +1587,7 @@ proc mag_import_go {} {
 
   set src $MAG_IMPORT(source)
   if {$src == "fetch" || $src == "sample"} {
-    # Caravel Mag is sky130A — force destination tech when available.
+    # Caravel layouts are sky130A — force destination tech when available.
     set techs [mag_list_max_techs]
     if {[lsearch -exact $techs sky130A] >= 0} {
       set MAG_IMPORT(tech) sky130A
@@ -1570,16 +1595,32 @@ proc mag_import_go {} {
     set tl [string tolower $MAG_IMPORT(tech)]
     if {![string match *sky130* $tl]} {
       set w 0
+      set what "The Caravel layout is sky130A."
+      if {$src == "fetch"} {
+        set what "The Caravel die is a sky130A GDS."
+      }
       catch {
         set w [tk_dialog .magwarn "PDK mismatch?" \
-            "The Caravel Mag sample is a sky130A Magic design.\nDestination technology is '$MAG_IMPORT(tech)'.\n\nImport SKY130A first (File → Import PDK), then retry.\nContinue anyway with '$MAG_IMPORT(tech)'?" \
+            "$what\nDestination technology is '$MAG_IMPORT(tech)'.\n\nImport SKY130A first (File → Import PDK), then retry.\nContinue anyway with '$MAG_IMPORT(tech)'?" \
             {} 0 Continue Cancel]
       }
       if {$w != 0} { return }
     }
-    if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == ""} {
+  }
+  if {$src == "fetch"} {
+    if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == "" || \
+        $MAG_IMPORT(top) == "example_por" || $MAG_IMPORT(top) == "simple_por"} {
+      set MAG_IMPORT(top) caravel
+    }
+    set MAG_IMPORT(view) chip
+  } elseif {$src == "sample"} {
+    set MAG_IMPORT(view) cell
+    if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == "" || \
+        $MAG_IMPORT(top) == "caravel"} {
       set MAG_IMPORT(top) example_por
     }
+  } else {
+    set MAG_IMPORT(view) cell
   }
 
   if {$MAG_IMPORT(tech) == ""} {
@@ -1634,7 +1675,7 @@ proc mag_import_read_status {} {
 proc mag_import_fetch_start {} {
   global MAG_IMPORT
 
-  set dest [mag_sample_dest]
+  set dest [mag_die_dest]
   set stamp [clock seconds]
   set work [file join /tmp mag_fetch_$stamp]
   catch {file mkdir $work}
@@ -1647,9 +1688,9 @@ proc mag_import_fetch_start {} {
   catch {file delete $MAG_IMPORT(cancel)}
   catch {file delete $MAG_IMPORT(status)}
 
-  set sh [mag_fetch_script]
+  set sh [mag_pdk_script fetch_caravel_die.sh]
   if {$sh == ""} {
-    mag_import_tell "fetch_caravel_mag.sh not found.\nRe-run ./run.sh so pdk scripts are installed." -copy
+    mag_import_tell "fetch_caravel_die.sh not found.\nRe-run ./run.sh so pdk scripts are installed." -copy
     return
   }
   set bash [mag_which {bash /bin/bash /usr/bin/bash}]
@@ -1658,13 +1699,13 @@ proc mag_import_fetch_start {} {
     return
   }
 
-  mag_progress_open $MAG_IMPORT(method)
-  mag_progress_update 1 "Downloading Caravel Mag sample from GitHub..."
-  mag_log "fetch_caravel_mag.sh -> $dest"
+  mag_progress_open die
+  mag_progress_update 1 "Downloading Caravel die from GitHub..."
+  mag_log "fetch_caravel_die.sh -> $dest"
 
   if {[catch {set MAG_IMPORT(pid) [exec $bash $sh $dest \
       $MAG_IMPORT(status) $MAG_IMPORT(cancel) $MAG_IMPORT(log) &]} err]} {
-    mag_import_fail "Could not start fetch_caravel_mag.sh:\n$err"
+    mag_import_fail "Could not start fetch_caravel_die.sh:\n$err"
     return
   }
   set MAG_IMPORT(phase) fetch
@@ -1685,41 +1726,25 @@ proc mag_import_poll_fetch {} {
   set st $MAG_IMPORT(stat_status)
   set pct $MAG_IMPORT(stat_pct)
   set msg $MAG_IMPORT(stat_msg)
-  if {$msg == ""} { set msg "Downloading Caravel Mag sample..." }
+  if {$msg == ""} { set msg "Downloading Caravel die..." }
   if {![mag_is_int $pct]} { set pct 1 }
   mag_progress_update $pct $msg
 
   if {$st == "ok"} {
     set dest $MAG_IMPORT(stat_dest)
-    if {$dest == ""} { set dest [mag_sample_dest] }
-    set mags [mag_collect_mags $dest]
-    if {![llength $mags]} {
-      # Fall back to bundled sample if download dir is empty.
-      set bundled [mag_sample_dir]
-      if {$bundled != "" && $bundled != $dest} {
-        mag_log "fetch dest empty; using bundled sample $bundled"
-        set dest $bundled
-        set mags [mag_collect_mags $dest]
-      }
-    }
-    if {![llength $mags]} {
-      mag_import_fail "No .mag files in:\n$dest\nLog: $MAG_IMPORT(log)"
+    if {$dest == ""} { set dest [mag_die_dest] }
+    set gds [file join $dest caravel.gds]
+    if {![file exists $gds] || [file size $gds] < 20000000} {
+      mag_import_fail "caravel.gds missing or too small in:\n$dest\nLog: $MAG_IMPORT(log)"
       return
     }
-    if {$MAG_IMPORT(top) == "auto" || $MAG_IMPORT(top) == ""} {
-      set MAG_IMPORT(top) example_por
-    }
-    if {![file exists [file join $dest example_por.mag]] && \
-        [file exists [file join $dest simple_por.mag]]} {
-      set MAG_IMPORT(top) simple_por
-    }
-    mag_progress_update 55 "Converting Caravel Mag → GDS → MAX (sky130A)..."
-    mag_import_run $dest $MAG_IMPORT(top) $MAG_IMPORT(tech) $MAG_IMPORT(method)
+    mag_progress_update 80 "Opening Caravel die in MAX (sky130A)..."
+    mag_import_open_die $gds $MAG_IMPORT(top) $MAG_IMPORT(tech)
     return
   }
   if {$st == "fail"} {
     set msg $MAG_IMPORT(stat_msg)
-    if {$msg == ""} { set msg "Caravel Mag download failed." }
+    if {$msg == ""} { set msg "Caravel die download failed." }
     mag_import_fail "$msg\nLog: $MAG_IMPORT(log)"
     return
   }
@@ -1736,7 +1761,7 @@ proc mag_import_poll_fetch {} {
       set MAG_IMPORT(after) [after 400 mag_import_poll_fetch]
       return
     }
-    mag_import_fail "Caravel Mag download exited early.\nLog: $MAG_IMPORT(log)"
+    mag_import_fail "Caravel die download exited early.\nLog: $MAG_IMPORT(log)"
     return
   }
 
@@ -1760,7 +1785,7 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAG_IMPORT(log) [file join $work convert.log]
   set MAG_IMPORT(cancel) [file join $work CANCEL]
   catch {file delete $MAG_IMPORT(cancel)}
-  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 9)"
+  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 10)"
   set MAG_IMPORT(magdir) $dir
 
   mag_progress_open $method
@@ -1927,6 +1952,102 @@ proc mag_max_after_gds_script {path} {
   close $fh
 }
 
+# Draw the harness without flattening every standard cell into the top
+# and without writing one .max per cell (that tree is the whole SoC).
+proc mag_max_show_chip {} {
+  catch {:see no instanceNames}
+  catch {:see no instancePorts}
+  catch {
+    set bb [db_bbox]
+    if {[llength $bb] == 4} {
+      eval lay_box $bb
+      catch {lay_internals -area}
+    }
+  }
+  catch {view_cell}
+}
+
+proc mag_max_after_chip_script {path top} {
+  if {$top == ""} { set top caravel }
+  set fh [open $path w]
+  puts $fh "# Show the Caravel die hierarchical. Do not expand or save the tree."
+  puts $fh "after idle {"
+  puts $fh "  catch {cell_load $top}"
+  puts $fh "  catch {:see no instanceNames}"
+  puts $fh "  catch {:see no instancePorts}"
+  puts $fh "  catch {"
+  puts $fh "    set bb \[db_bbox\]"
+  puts $fh "    if {\[llength \$bb\] == 4} {"
+  puts $fh "      eval lay_box \$bb"
+  puts $fh "      catch {lay_internals -area}"
+  puts $fh "    }"
+  puts $fh "  }"
+  puts $fh "  catch {view_cell}"
+  puts $fh "}"
+  close $fh
+}
+
+proc mag_finish_die {outdir top gds} {
+  global MAG_IMPORT
+  set MAG_IMPORT(outdir) $outdir
+  set outdir [_mmi_file_normalize $outdir]
+  set gds [_mmi_file_normalize $gds]
+  set host [mag_host_path $outdir]
+  set f [file join $outdir WHERE.txt]
+  if {![catch {set fh [open $f w]}]} {
+    puts $fh "Caravel die GDS opened in MAX."
+    puts $fh "Cells are not flattened and are not written out as one .max per cell."
+    puts $fh "CAD folder:  $outdir"
+    if {$host != $outdir} {
+      puts $fh "Host folder: $host"
+    }
+    puts $fh "Top cell:    $top"
+    puts $fh "GDS:         $gds"
+    close $fh
+  }
+  mag_open_storage_folder $outdir
+  set lines {}
+  lappend lines "GDS (reopen this file):"
+  lappend lines "  $gds"
+  set hostgds [mag_host_path $gds]
+  if {$hostgds != $gds} {
+    lappend lines "On the VM / host disk:"
+    lappend lines "  $hostgds"
+  }
+  lappend lines ""
+  lappend lines "A WHERE.txt file in that folder repeats these paths."
+  lappend lines "Click Show to open the folder in the file manager."
+  return [join $lines \n]
+}
+
+proc mag_die_done_msg {top tech gds store} {
+  global MAG_IMPORT
+  set log ""
+  if {[info exists MAG_IMPORT(log)]} { set log $MAG_IMPORT(log) }
+  return "Caravel die opened in MAX.\n\n\
+Top cell: $top\n\
+MAX technology: $tech\n\
+Log: $log\n\n\
+This is the published ChipFoundry harness: pad ring, management core, and an empty user-project wrapper. It is not example_por. A filled user project (the numbered macros) is not in this GDS.\n\n\
+Internals are drawn, but the chip is not flattened and cells are not saved one-by-one. Expanding every instance can exhaust memory.\n\n\
+$store"
+}
+
+proc mag_import_open_die {gds top tech} {
+  global MAG_IMPORT
+  set MAG_IMPORT(gds) $gds
+  set MAG_IMPORT(view) chip
+  set MAG_IMPORT(method) gds
+  set MAG_IMPORT(magdir) ""
+  if {$top == "" || $top == "auto"} { set top caravel }
+  set outdir [file dirname $gds]
+  if {![info exists MAG_IMPORT(work)] || $MAG_IMPORT(work) == ""} {
+    set MAG_IMPORT(work) [file join /tmp mag_die_[clock seconds]]
+    catch {file mkdir $MAG_IMPORT(work)}
+  }
+  mag_import_open_max $gds $top $tech $outdir
+}
+
 proc mag_open_in_magic {dir top family} {
   global MAG_IMPORT
   if {![mag_want_gui]} { return }
@@ -2059,6 +2180,15 @@ proc mag_import_open_max {gds top tech outdir} {
     if {[info exists GDS_READ_PARTIAL]} { set GDS_READ_PARTIAL $oldp }
     if {$topCell == ""} { set topCell $top }
     catch {cell_load $topCell}
+    if {[mag_import_is_chip]} {
+      mag_progress_update 95 "Drawing Caravel die (this can take several minutes)..."
+      mag_max_show_chip
+      catch {cd $here}
+      mag_progress_close
+      set store [mag_finish_die $outdir $topCell $gds]
+      mag_import_tell [mag_die_done_msg $topCell $tech $gds $store] -copy
+      return
+    }
     mag_max_show_converted
     catch {cell_save_tree 0}
     catch {cd $here}
@@ -2090,7 +2220,11 @@ $store"
   }
   set script [file join $MAG_IMPORT(work) launch_max.sh]
   set aftertcl [file join $MAG_IMPORT(work) after_gds.tcl]
-  mag_max_after_gds_script $aftertcl
+  if {[mag_import_is_chip]} {
+    mag_max_after_chip_script $aftertcl $top
+  } else {
+    mag_max_after_gds_script $aftertcl
+  }
   set fh [open $script w]
   puts $fh "#!/bin/sh"
   puts $fh "cd \"$outdir\" || exit 1"
@@ -2100,6 +2234,12 @@ $store"
   if {[catch {exec /bin/sh $script &} err]} {
     mag_progress_close
     mag_import_fail "Could not launch MAX:\n$err\nGDS is at:\n$gds"
+    return
+  }
+  if {[mag_import_is_chip]} {
+    mag_progress_close
+    set store [mag_finish_die $outdir $top $gds]
+    mag_import_tell [mag_die_done_msg $top $tech $gds $store] -copy
     return
   }
   mag_open_in_magic $magdir $top $family
@@ -2136,7 +2276,9 @@ proc mag_progress_open {{method mag2gds}} {
   frame $f -bd 8
   pack $f -fill both -expand 1
   set title "Magic .mag  →  GDS  →  MAX .max"
-  if {$method == "mag2gds"} {
+  if {$method == "die"} {
+    set title "Caravel die GDS  →  MAX"
+  } elseif {$method == "mag2gds"} {
     set title "Magic mag2gds (tapeout)  →  MAX .max"
   } else {
     set title "Tcl paint dump (not tapeout)  →  MAX .max"

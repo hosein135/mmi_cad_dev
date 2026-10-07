@@ -1,8 +1,10 @@
 # Caravel analog design converted to MAX
 
-The Magic design this project converts to MAX is the Caravel analog power-on-reset cell **example_por** (sky130A), from the Efabless analog user project.
+The **Download full Caravel die** choice in File → Import Magic Design Folder fetches the published harness [`caravel.gds.gz`](https://github.com/chipfoundry/caravel/blob/main/gds/caravel.gds.gz) (about 55 MB compressed) and opens top cell `caravel` under sky130A. That GDS is the pad ring, the management core, and an empty user-project wrapper.
 
-The importer downloads the whole `mag/` folder (Apache-2.0) and converts `example_por` to MAX under sky130A. Converted `.max` files are written to `<design>/max_import`.
+This folder is the separate small sample: the Caravel analog power-on-reset cell **example_por** (sky130A), from the Efabless analog user project. Choose **Local Caravel sample** to convert it.
+
+`fetch_caravel_mag.sh` can still download that analog `mag/` folder (Apache-2.0) if you want the POR files on disk. Converted `.max` files for a Magic folder are written to `<design>/max_import`. The full die stays as GDS under `samples/caravel_die` and is not flattened into one `.max` per cell.
 
 ## URLs
 
@@ -12,7 +14,8 @@ The importer downloads the whole `mag/` folder (Apache-2.0) and converts `exampl
 | Magic layouts (`mag/`) | https://github.com/efabless/caravel_user_project_analog/tree/main/mag |
 | Upstream repository | https://github.com/efabless/caravel_user_project_analog |
 | Download archive used by `fetch_caravel_mag.sh` | https://github.com/efabless/caravel_user_project_analog/archive/refs/heads/main.tar.gz |
-| ChipFoundry Caravel | https://github.com/chipfoundry/caravel |
+| ChipFoundry Caravel harness | https://github.com/chipfoundry/caravel |
+| Full die downloaded by the menu (`gds/caravel.gds.gz`) | https://github.com/chipfoundry/caravel/raw/main/gds/caravel.gds.gz |
 
 ## What is included
 
