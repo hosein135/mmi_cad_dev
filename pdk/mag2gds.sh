@@ -87,8 +87,15 @@ TECHFILE="$PDKPATH/libs.tech/magic/${pdk_name}.tech"
   echo "}"
   echo "gds rescale false"
   echo "gds readonly false"
-  echo "cif *hier write disable"
-  echo "cif *array write disable"
+  # Full-chip Caravel stays hierarchical. Flattening caravel_core plus the
+  # example counter is hundreds of thousands of stdcells.
+  if [ "${MAG2GDS_KEEP_HIER:-0}" = "1" ]; then
+    echo "cif *hier write enable"
+    echo "puts \"mag2gds: hierarchical GDS\""
+  else
+    echo "cif *hier write disable"
+    echo "cif *array write disable"
+  fi
   echo "addpath {$DIR}"
   # Every directory that contains .mag in the design. Skip maglef abstracts.
   find "$DIR" -type d \( -name .git -o -name maglef -o -name max_import \) -prune -o \
@@ -111,7 +118,9 @@ TECHFILE="$PDKPATH/libs.tech/magic/${pdk_name}.tech"
   # Magic builds do not expand it). Unknown options only print a notice.
   echo "load {$TOP} -force -dereference"
   echo "select top cell"
-  echo "expand"
+  if [ "${MAG2GDS_KEEP_HIER:-0}" != "1" ]; then
+    echo "expand"
+  fi
   echo "catch {puts \"mag2gds: top [cellname list window], bbox [box values]\"}"
   echo "gds write {$OUT}"
   echo "quit -noprompt"

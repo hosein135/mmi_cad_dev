@@ -149,6 +149,7 @@
           install -Dm755 "$src/compile_tech.sh" $out/compile_tech.sh
           install -Dm755 "$src/fetch_caravel_mag.sh" $out/fetch_caravel_mag.sh
           install -Dm755 "$src/fetch_caravel_die.sh" $out/fetch_caravel_die.sh
+          install -Dm755 "$src/fetch_caravel_harness_mag.sh" $out/fetch_caravel_harness_mag.sh
           install -Dm644 "$src/source_to_tech27.tcl" $out/source_to_tech27.tcl
           install -Dm644 "$src/maxrc" $out/maxrc
           if [ -d "$src/samples" ]; then
