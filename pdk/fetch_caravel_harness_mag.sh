@@ -69,7 +69,7 @@ if cancelled; then
   fail "Cancelled."
 fi
 
-mkdir -p "$dest/hexdigits" || fail "cannot create $dest"
+mkdir -p "$dest/hexdigits" "$dest/primitives" || fail "cannot create $dest"
 
 big_ok() {
   local f="$1" min="$2"
@@ -91,6 +91,7 @@ if big_ok "$dest/caravel.mag" 1000 && \
    big_ok "$dest/chip_io.mag" 100000 && \
    big_ok "$dest/user_proj_example.mag" 20000000 && \
    big_ok "$dest/hexdigits/alpha_0.mag" 50 && \
+   big_ok "$dest/primitives/sky130_fd_pr__res_xhigh_po_0p69_S5N9F3.mag" 1000 && \
    wrapper_ok
 then
   st 100 "Using existing Caravel harness Magic tree" ok
@@ -175,20 +176,46 @@ $harness_files
 EOF
 
 tick "Downloading caravel_core.mag.gz..."
-fetch_one "$HARNESS/caravel_core.mag.gz" "$dest/caravel_core.mag.gz" 40000000
-if ! gzip -t "$dest/caravel_core.mag.gz" 2>/dev/null; then
-  fail "caravel_core.mag.gz is not gzip"
-fi
-st 82 "Uncompressing caravel_core.mag..."
-tmp="$dest/caravel_core.mag.partial"
-rm -f "$tmp"
-gzip -dc "$dest/caravel_core.mag.gz" > "$tmp" || fail "could not decompress caravel_core.mag.gz"
-if ! big_ok "$tmp" 20000000; then
+if ! big_ok "$dest/caravel_core.mag" 20000000; then
+  fetch_one "$HARNESS/caravel_core.mag.gz" "$dest/caravel_core.mag.gz" 40000000
+  if ! gzip -t "$dest/caravel_core.mag.gz" 2>/dev/null; then
+    fail "caravel_core.mag.gz is not gzip"
+  fi
+  st 82 "Uncompressing caravel_core.mag..."
+  tmp="$dest/caravel_core.mag.partial"
   rm -f "$tmp"
-  fail "caravel_core.mag uncompressed too small"
+  gzip -dc "$dest/caravel_core.mag.gz" > "$tmp" || fail "could not decompress caravel_core.mag.gz"
+  if ! big_ok "$tmp" 20000000; then
+    rm -f "$tmp"
+    fail "caravel_core.mag uncompressed too small"
+  fi
+  mv -f "$tmp" "$dest/caravel_core.mag"
+  rm -f "$dest/caravel_core.mag.gz"
+else
+  echo "have $dest/caravel_core.mag"
 fi
-mv -f "$tmp" "$dest/caravel_core.mag"
-rm -f "$dest/caravel_core.mag.gz"
+
+# simple_por instances these with a relative path "primitives/".
+prims="
+sky130_fd_pr__cap_mim_m3_1_WRT4AW.mag 100
+sky130_fd_pr__cap_mim_m3_2_W5U4AW.mag 100
+sky130_fd_pr__nfet_g5v0d10v5_PKVMTM.mag 500
+sky130_fd_pr__nfet_g5v0d10v5_TGFUGS.mag 1000
+sky130_fd_pr__nfet_g5v0d10v5_ZK8HQC.mag 500
+sky130_fd_pr__pfet_g5v0d10v5_3YBPVB.mag 500
+sky130_fd_pr__pfet_g5v0d10v5_YEUEBV.mag 1000
+sky130_fd_pr__pfet_g5v0d10v5_YUHPBG.mag 500
+sky130_fd_pr__pfet_g5v0d10v5_YUHPXE.mag 500
+sky130_fd_pr__pfet_g5v0d10v5_ZEUEFZ.mag 1000
+sky130_fd_pr__res_xhigh_po_0p69_S5N9F3.mag 1000
+"
+while read -r name min; do
+  [ -n "$name" ] || continue
+  tick "Downloading primitives/${name}..."
+  fetch_one "$HARNESS/primitives/$name" "$dest/primitives/$name" "$min"
+done << EOF
+$prims
+EOF
 
 hex="alpha_0 alpha_1 alpha_2 alpha_3 alpha_4 alpha_5 alpha_6 alpha_7 alpha_8 alpha_9 alpha_A alpha_B alpha_C alpha_D alpha_E alpha_F"
 for name in $hex; do
@@ -223,6 +250,7 @@ Example user design, copied over the harness wrapper:
 
 user_project_wrapper instances user_proj_example (the Caravel counter).
 caravel_core instances that wrapper, chip_io is the padframe.
+simple_por instances device cells from primitives/ (resistor, FETs, MIM caps).
 
 Not in these repositories as .mag:
   RAM128 (management SRAM, three instances in caravel_core)
