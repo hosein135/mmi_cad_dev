@@ -157,6 +157,44 @@ mmi_check_free_space() {
   return 0
 }
 
+# Ubuntu/Debian set this to 1, which makes bubblewrap fail with
+# "bwrap: setting up uid map: Permission denied".
+mmi_relax_apparmor_userns() {
+  local proc="/proc/sys/kernel/apparmor_restrict_unprivileged_userns"
+  local key="kernel.apparmor_restrict_unprivileged_userns"
+  local dropin="/etc/sysctl.d/99-mmi-cad-userns.conf"
+  local value
+
+  [ -f "$proc" ] || return 0
+  value="$(cat "$proc" 2>/dev/null || echo 0)"
+  [ "$value" = "1" ] || return 0
+
+  info "AppArmor is blocking unprivileged user namespaces (bubblewrap needs them)."
+  if [ "$(id -u)" -ne 0 ]; then
+    info "Setting ${key}=0. This may ask for your sudo password."
+  fi
+  if ! mmi_as_root sysctl -w "${key}=0"; then
+    error "Could not set ${key}=0."
+    error "Run:  sudo sysctl -w ${key}=0"
+    return 1
+  fi
+  value="$(cat "$proc" 2>/dev/null || echo 1)"
+  if [ "$value" != "0" ]; then
+    error "${key} is still ${value} after sysctl."
+    return 1
+  fi
+
+  if [ ! -f "$dropin" ] || ! grep -qx "${key}=0" "$dropin" 2>/dev/null; then
+    if printf '%s\n' "${key}=0" | mmi_as_root tee "$dropin" >/dev/null; then
+      info "Saved ${key}=0 in ${dropin} (kept across reboot)."
+    else
+      warn "The setting applies until reboot. To keep it:"
+      warn "  echo '${key}=0' | sudo tee ${dropin}"
+    fi
+  fi
+  return 0
+}
+
 mmi_check_linux_host() {
   local os arch
   os="$(uname -s)"
@@ -209,12 +247,7 @@ mmi_check_linux_host() {
     fi
   fi
 
-  if [ -f /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
-    if [ "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null || echo 0)" = "1" ]; then
-      warn "Ubuntu/Debian AppArmor may block bubblewrap (apparmor_restrict_unprivileged_userns=1)."
-      warn "If nix run fails: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0"
-    fi
-  fi
+  mmi_relax_apparmor_userns || return 1
 
   if [ ! -w /tmp ]; then
     error "/tmp is not writable. The X11 socket and Nix builds need it."
@@ -291,6 +324,309 @@ mmi_as_root() {
     error "Need root to run: $*"
     return 1
   fi
+}
+
+mmi_os_release_value() {
+  local key="$1" line file
+  # MMI_OS_RELEASE overrides /etc/os-release so distro detection can be tested.
+  file="${MMI_OS_RELEASE:-/etc/os-release}"
+  [ -r "$file" ] || return 1
+  line="$(grep -m1 "^${key}=" "$file" 2>/dev/null || true)"
+  [ -n "$line" ] || return 1
+  line="${line#${key}=}"
+  line="${line#\"}"
+  line="${line%\"}"
+  line="${line#\'}"
+  line="${line%\'}"
+  printf '%s' "$line"
+}
+
+mmi_blob_has() {
+  local blob="$1" word
+  shift
+  for word in "$@"; do
+    case "$blob" in
+      *" ${word} "*) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+mmi_prepend_path_dir() {
+  local dir="$1"
+  [ -d "$dir" ] || return 0
+  case ":${PATH}:" in
+    *":${dir}:"*) return 0 ;;
+  esac
+  PATH="${dir}:${PATH}"
+  export PATH
+}
+
+# True when the binaries for a package-manager id are on PATH.
+mmi_pkg_manager_ready() {
+  case "$1" in
+    apt) command -v apt-get >/dev/null 2>&1 || command -v apt >/dev/null 2>&1 ;;
+    dnf) command -v dnf >/dev/null 2>&1 ;;
+    yum) command -v yum >/dev/null 2>&1 ;;
+    microdnf) command -v microdnf >/dev/null 2>&1 ;;
+    tdnf) command -v tdnf >/dev/null 2>&1 ;;
+    pacman) command -v pacman >/dev/null 2>&1 ;;
+    zypper) command -v zypper >/dev/null 2>&1 ;;
+    apk) command -v apk >/dev/null 2>&1 ;;
+    xbps) command -v xbps-install >/dev/null 2>&1 ;;
+    emerge) command -v emerge >/dev/null 2>&1 ;;
+    eopkg) command -v eopkg >/dev/null 2>&1 ;;
+    slackpkg) command -v slackpkg >/dev/null 2>&1 ;;
+    swupd) command -v swupd >/dev/null 2>&1 ;;
+    urpmi) command -v urpmi >/dev/null 2>&1 ;;
+    guix) command -v guix >/dev/null 2>&1 ;;
+    nixos) command -v nix-env >/dev/null 2>&1 || command -v nix >/dev/null 2>&1 ;;
+    *) return 1 ;;
+  esac
+}
+
+mmi_first_ready_pm() {
+  local name
+  for name in "$@"; do
+    if mmi_pkg_manager_ready "$name"; then
+      printf '%s\n' "$name"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Package manager for this distro, from /etc/os-release, then from PATH.
+# Prints one id: apt, dnf, yum, pacman, zypper, apk, ...
+mmi_linux_pkg_manager() {
+  local id like blob picked=""
+  id="$(mmi_os_release_value ID || true)"
+  like="$(mmi_os_release_value ID_LIKE || true)"
+  blob=" $(printf '%s %s' "$id" "$like" | tr '[:upper:]' '[:lower:]') "
+
+  if mmi_blob_has "$blob" nixos || mmi_is_nixos; then
+    printf '%s\n' nixos
+    return 0
+  fi
+
+  if mmi_blob_has "$blob" \
+    debian ubuntu linuxmint pop elementary zorin kali raspbian \
+    devuan parrot deepin neon mx pureos trisquel linuxlite tails
+  then
+    picked=apt
+  elif mmi_blob_has "$blob" photon; then
+    picked=tdnf
+  elif mmi_blob_has "$blob" \
+    fedora rhel centos rocky almalinux ol amzn nobara scientific \
+    eurolinux openeuler anolis openmandriva
+  then
+    picked="$(mmi_first_ready_pm dnf microdnf yum || true)"
+  elif mmi_blob_has "$blob" mageia mandriva; then
+    picked="$(mmi_first_ready_pm dnf urpmi || true)"
+  elif mmi_blob_has "$blob" \
+    arch manjaro endeavouros garuda artix arcolinux cachyos parabola
+  then
+    picked=pacman
+  elif mmi_blob_has "$blob" \
+    suse opensuse opensuse-leap opensuse-tumbleweed sles sled
+  then
+    picked=zypper
+  elif mmi_blob_has "$blob" alpine postmarketos; then
+    picked=apk
+  elif mmi_blob_has "$blob" void; then
+    picked=xbps
+  elif mmi_blob_has "$blob" gentoo funtoo; then
+    picked=emerge
+  elif mmi_blob_has "$blob" solus; then
+    picked=eopkg
+  elif mmi_blob_has "$blob" slackware; then
+    picked=slackpkg
+  elif mmi_blob_has "$blob" clear-linux-os; then
+    picked=swupd
+  elif mmi_blob_has "$blob" guix; then
+    picked=guix
+  fi
+
+  if [ -n "$picked" ] && mmi_pkg_manager_ready "$picked"; then
+    printf '%s\n' "$picked"
+    return 0
+  fi
+
+  if picked="$(mmi_first_ready_pm \
+    apt dnf microdnf yum tdnf pacman zypper apk xbps emerge \
+    eopkg urpmi slackpkg swupd guix nixos)"
+  then
+    printf '%s\n' "$picked"
+    return 0
+  fi
+  return 1
+}
+
+mmi_install_nixos_packages() {
+  local p
+  local -a attrs=() flake=()
+  for p in "$@"; do
+    attrs+=("nixos.${p}")
+    flake+=("nixpkgs#${p}")
+  done
+  if command -v nix-env >/dev/null 2>&1; then
+    if nix-env -iA "${attrs[@]}"; then
+      return 0
+    fi
+    warn "nix-env could not install $*. Trying nix profile."
+  fi
+  if command -v nix >/dev/null 2>&1; then
+    nix --extra-experimental-features "nix-command flakes" profile install "${flake[@]}" \
+      || return 1
+    return 0
+  fi
+  error "This NixOS system cannot install $*."
+  error "Add $* to configuration.nix, then run: sudo nixos-rebuild switch"
+  return 1
+}
+
+# Install package names with a manager id from mmi_linux_pkg_manager.
+mmi_install_host_packages() {
+  local pm="$1"
+  shift
+  local p aptbin
+  local -a pkgs=("$@") atoms=()
+  [ ${#pkgs[@]} -gt 0 ] || return 0
+
+  case "$pm" in
+    apt)
+      aptbin=apt-get
+      if ! command -v apt-get >/dev/null 2>&1; then
+        aptbin=apt
+      fi
+      mmi_as_root env DEBIAN_FRONTEND=noninteractive "$aptbin" update || return 1
+      mmi_as_root env DEBIAN_FRONTEND=noninteractive "$aptbin" install -y "${pkgs[@]}" || return 1
+      ;;
+    dnf)
+      mmi_as_root dnf install -y "${pkgs[@]}" || return 1
+      ;;
+    yum)
+      mmi_as_root yum install -y "${pkgs[@]}" || return 1
+      ;;
+    microdnf)
+      mmi_as_root microdnf install -y "${pkgs[@]}" || return 1
+      ;;
+    tdnf)
+      mmi_as_root tdnf install -y "${pkgs[@]}" || return 1
+      ;;
+    pacman)
+      mmi_as_root pacman -Sy --needed --noconfirm "${pkgs[@]}" || return 1
+      ;;
+    zypper)
+      mmi_as_root zypper --non-interactive install "${pkgs[@]}" || return 1
+      ;;
+    apk)
+      mmi_as_root apk add --no-cache "${pkgs[@]}" || return 1
+      ;;
+    xbps)
+      mmi_as_root xbps-install -Sy "${pkgs[@]}" || return 1
+      ;;
+    emerge)
+      for p in "${pkgs[@]}"; do
+        case "$p" in
+          git) atoms+=(dev-vcs/git) ;;
+          curl) atoms+=(net-misc/curl) ;;
+          *) atoms+=("$p") ;;
+        esac
+      done
+      mmi_as_root emerge --ask=n --noreplace "${atoms[@]}" || return 1
+      ;;
+    eopkg)
+      mmi_as_root eopkg update-repo || return 1
+      mmi_as_root eopkg install -y "${pkgs[@]}" || return 1
+      ;;
+    urpmi)
+      mmi_as_root urpmi --auto "${pkgs[@]}" || return 1
+      ;;
+    slackpkg)
+      mmi_as_root slackpkg -batch=on -default_answer=y update || return 1
+      mmi_as_root slackpkg -batch=on -default_answer=y install "${pkgs[@]}" || return 1
+      ;;
+    swupd)
+      mmi_as_root swupd bundle-add --assume=yes "${pkgs[@]}" || return 1
+      ;;
+    guix)
+      guix install "${pkgs[@]}" || return 1
+      ;;
+    nixos)
+      mmi_install_nixos_packages "${pkgs[@]}" || return 1
+      ;;
+    *)
+      error "No install command for package manager '${pm}'."
+      return 1
+      ;;
+  esac
+}
+
+# git (flake work tree) and curl (Nix installer) before Nix is installed.
+mmi_ensure_git_and_curl() {
+  local tool pm pretty
+  local -a missing=() still=()
+  for tool in git curl; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+      missing+=("$tool")
+    fi
+  done
+  if [ ${#missing[@]} -eq 0 ]; then
+    return 0
+  fi
+
+  if ! pm="$(mmi_linux_pkg_manager)"; then
+    error "Need ${missing[*]} before Nix is installed."
+    error "Could not find a package manager for this Linux distro."
+    error "Install ${missing[*]} and run ./run.sh again."
+    return 1
+  fi
+
+  pretty="$(mmi_os_release_value PRETTY_NAME || true)"
+  if [ -n "$pretty" ]; then
+    info "Installing missing ${missing[*]} with ${pm} (${pretty})."
+  else
+    info "Installing missing ${missing[*]} with ${pm}."
+  fi
+  case "$pm" in
+    nixos|guix) ;;
+    *)
+      if [ "$(id -u)" -ne 0 ]; then
+        info "This may ask for your sudo password."
+      fi
+      ;;
+  esac
+
+  if ! mmi_install_host_packages "$pm" "${missing[@]}"; then
+    error "Could not install ${missing[*]} with ${pm}."
+    return 1
+  fi
+
+  mmi_prepend_path_dir /usr/local/sbin
+  mmi_prepend_path_dir /usr/local/bin
+  mmi_prepend_path_dir /usr/sbin
+  mmi_prepend_path_dir /usr/bin
+  mmi_prepend_path_dir /bin
+  if [ -n "${HOME:-}" ]; then
+    mmi_prepend_path_dir "${HOME}/.nix-profile/bin"
+    mmi_prepend_path_dir "${HOME}/.guix-profile/bin"
+  fi
+  mmi_prepend_path_dir /run/current-system/sw/bin
+  hash -r || true
+
+  for tool in "${missing[@]}"; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+      still+=("$tool")
+    fi
+  done
+  if [ ${#still[@]} -ne 0 ]; then
+    error "Package install finished, but still missing: ${still[*]}"
+    error "Install ${still[*]} and run ./run.sh again."
+    return 1
+  fi
+  info "Installed ${missing[*]}."
+  return 0
 }
 
 mmi_find_nix() {

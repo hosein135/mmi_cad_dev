@@ -36,7 +36,8 @@ Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
 
 Needs x86_64 Linux: bare metal, a VM with a GUI desktop, or WSL2
 (not WSL1, not Windows-native). Run as your desktop user. sudo is
-accepted and continues as that user. Nix 2.28+ (NixOS 25.05) is
+accepted and continues as that user. Missing git and curl are installed
+with that distro's package manager. Nix 2.28+ (NixOS 25.05) is
 installed or upgraded automatically when the current one cannot be used.
 First install keeps ~1 GiB in the Nix store and needs ~6 GiB free.
 
@@ -61,6 +62,7 @@ done
 # Preflight before Nix, vendor checks, or any store writes.
 mmi_check_linux_host || exit 1
 mmi_check_free_space || exit 1
+mmi_ensure_git_and_curl || exit 1
 
 if [ "${CLEAN}" = true ]; then
   info "Removing data/home (CAD overlay) ..."
