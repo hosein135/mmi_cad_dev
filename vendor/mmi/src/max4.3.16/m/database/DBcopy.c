@@ -164,6 +164,10 @@ static int dbCopyPaintFunc(register Tile *tile, TreeContext *cxp)
     {
       type = DBgetTileType(tile);
     }
+    /* Plane-edge sentinels used to show up as type 255 and then
+     * indexed DBPlane() / the paint table off the end. */
+    if (type < TT_SPACE || type >= DBNumTypes)
+	return 0;
 
     /* Construct the rect for the tile in source coordinates */
     TITORECT(tile, &sourceRect);
@@ -177,6 +181,9 @@ static int dbCopyPaintFunc(register Tile *tile, TreeContext *cxp)
     /* paint into target def, using current "copy" paint func and tables */
     pNum = DBPlane(type);
     ui.pu_def = def = arg->caa_targetUse->cu_def;
+    if (pNum < PL_PAINTBASE || pNum >= DBNumPlanes
+	|| def->cd_planes[pNum] == (Plane *) NULL)
+	return 0;
     ui.pu_pNum = pNum;
     (*dbCurPaintPlane)(def->cd_planes[pNum], 
 		       &targetRect,

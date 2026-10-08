@@ -440,6 +440,8 @@ dbCellDefAlloc(void)
     cellDef->cd_portCount = 0;
     cellDef->cd_nodeCount = 0;
 
+    for (pNum = 0; pNum < PL_MAXPLANES; pNum++)
+      cellDef->cd_planes[pNum] = (Plane *) NULL;
     for (pNum = PL_PAINTBASE; pNum < DBNumPlanes; pNum++)
     {
       cellDef->cd_planes[pNum] = DBPlaneNew((ClientData) TT_SPACE);

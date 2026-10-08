@@ -50,6 +50,7 @@ static char rcsid[] = "$Header: DBio.c,v 6.0 90/08/28 18:09:53 mayo Exp $";
 #endif  not lint
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -962,7 +963,8 @@ dbReadCell1(CellDef *cellDef)
     /* generated cell */
     if (cellDef->cd_flags & CD_GENERATED)
     {
-      char script[BUFSIZ];
+      char *script;
+      int scriptLen;
       bool loadResult;
 
       SigDisableInterrupts();
@@ -973,9 +975,20 @@ dbReadCell1(CellDef *cellDef)
        */
       cellDef->cd_flags |= CD_AVAILABLE;
 
+      /* FET/via names carry every non-default property. A fixed
+       * BUFSIZ buffer overflows and segfaults; simplefet stays short. */
+      scriptLen = (int) strlen(cellDef->cd_name) + 32;
+      script = (char *) malloc((size_t) scriptLen);
+      if (script == (char *) NULL)
+      {
+	UndoEnable();
+	SigEnableInterrupts();
+	return FALSE;
+      }
       sprintf(script,"gcell_load {%s}", cellDef->cd_name);
       loadResult = MnTclEvalBg(script,
 			       "gcell_load call from DBReadCell");
+      free(script);
 
       UndoEnable();
       SigEnableInterrupts();

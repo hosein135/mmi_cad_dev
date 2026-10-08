@@ -108,6 +108,13 @@ static void dbCopyBodyAndGroups_multiGroup(Tile *tsrc, Tile *tdest)
 
     glSrc = (GroupList *) TiGetGroups(tsrc);
 
+    /* Sentinel tiles set the multi-group flag (body -1) but have no list. */
+    if (glSrc == (GroupList *) NULL)
+    {
+	TiSetGroups(tdest, (ClientData) NULL);
+	return;
+    }
+
     /* copy head of list (must stay at head in case group NULL) */
     MALLOC(GroupList *, glDest, sizeof(GroupList));
     glDest->gl_type = glSrc->gl_type;

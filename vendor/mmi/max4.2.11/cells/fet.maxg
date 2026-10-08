@@ -164,6 +164,11 @@ proc _gcell_fet_contact {x width type gate poly diff contact metal cnums contact
     }
   }
   set cw [techinfo width $contact]
+  if {$contact == "" || $cw == "" || $cw == 0} {
+    # Missing contact rule. Painting with a zero cut size divides by
+    # zero and then hands max a bad rectangle.
+    return $x
+  }
 
   # Min fet width before having to create dog-bone.
   set min_width [uusnap -mask [expr 2.0 * $diff_enc_contact + $cw]]
@@ -189,6 +194,9 @@ proc _gcell_fet_contact {x width type gate poly diff contact metal cnums contact
   # If paint, actually paint it.  Otherwise, just compute and return size.
   if {$paint} {
     set cs [techinfo spacing $contact]
+    if {$cs == "" || [expr {$cw + $cs}] == 0} {
+      return $x
+    }
 
     # Default contact y extent.
     set cy1 $diff_enc_contact

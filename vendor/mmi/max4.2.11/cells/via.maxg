@@ -24,7 +24,14 @@ proc gcell_make {prop_list} -desc {
   # compute extent of matrix of cuts
   set via_width [techinfo width $via]
   set via_space [techinfo spacing $via]
+  if {$via == "" || $via_width == "" || $via_width == 0} {
+    return "bad via $type"
+  }
+  if {$via_space == ""} { set via_space 0 }
   set via_pitch [expr $via_width + $via_space]
+  if {$via_pitch == 0} {
+    return "bad via $type"
+  }
 
   # The center of the via is used for the origin.
   # If number of cuts is odd, then the origin is in the middle of a cut,
@@ -35,6 +42,7 @@ proc gcell_make {prop_list} -desc {
   # If not, jiggle the origin one grid to make the geometry come out on grid.
   set originx 0; set originy 0
   set mres [res -mask]
+  if {$mres == "" || $mres == 0} { set mres 0.001 }
   set mres2 [expr $mres * 2.0]
   # We should use fmod like this: fmod($via_space,$mres2) < $mres2*1.9
   # but fmod is apparently buggy, so do it manually:
@@ -74,9 +82,11 @@ proc gcell_make {prop_list} -desc {
   }
 
   # draw the top and bot layers
-  foreach layer "$bot $top" {
+  foreach layer [concat $bot $top] {
+    if {$layer == ""} continue
     setl {enc_x enc_y} [techinfo enclose $layer $via all]
-    if { $symmetric != 0 || $enc_y == "" } { set enc_y $enc_x }
+    if {[scan $enc_x %f] != 1} { set enc_x 0 }
+    if { $symmetric != 0 || $enc_y == "" || [scan $enc_y %f] != 1 } { set enc_y $enc_x }
     gcell_paint $layer \
 	[expr $originx - $w2 - $enc_x] [expr $originy - $h2 - $enc_y] \
 	[expr $originx + $w2 + $enc_x] [expr $originy + $h2 + $enc_y]

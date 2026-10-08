@@ -106,6 +106,9 @@ DBPaint(CellDef *cellDef, Rect *rect, TileType type)
       /* nonspace - only effects types home plane */
 
       pNum = DBPlane(type);
+      if (pNum < PL_PAINTBASE || pNum >= DBNumPlanes
+	  || cellDef->cd_planes[pNum] == (Plane *) NULL)
+	return;
       ui.pu_pNum = pNum;
       DBPaintPlane(cellDef->cd_planes[pNum], 
 		   rect,
@@ -169,6 +172,9 @@ DBErase (CellDef *cellDef,
     {
       /* Ordinary type is being erased. */
       pNum = DBPlane(type);
+      if (pNum < PL_PAINTBASE || pNum >= DBNumPlanes
+	  || cellDef->cd_planes[pNum] == (Plane *) NULL)
+	return;
       ui.pu_pNum = pNum;
       DBPaintPlane(cellDef->cd_planes[pNum], 
 		   rect,
@@ -235,6 +241,9 @@ DBEraseG (CellDef *cellDef, Rect *rect, TileType type)
     {
       /* Ordinary type is being erased. */
       pNum = DBPlane(type);
+      if (pNum < PL_PAINTBASE || pNum >= DBNumPlanes
+	  || cellDef->cd_planes[pNum] == (Plane *) NULL)
+	return;
       ui.pu_pNum = pNum;
 
       DBPaintPlaneG(cellDef->cd_planes[pNum], 

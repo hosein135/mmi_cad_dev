@@ -216,6 +216,18 @@ static __inline__ Tile *TiAlloc(Plane *plane) /* plane tile is being added to */
   if(!TileFreeList) TileBlockMalloc();
   ti = TileFreeList;
   TileFreeList = (Tile *) ti->ti_client;
+  /* Recycled tiles otherwise keep the previous body, group list, and
+   * stitches. A sentinel body of -1 sets the multi-group flag; following
+   * a stale group pointer segfaults. */
+  ti->ti_body = (ClientData) 0;
+  ti->ti_groups = (ClientData) NULL;
+  ti->ti_lb = (Tile *) NULL;
+  ti->ti_bl = (Tile *) NULL;
+  ti->ti_tr = (Tile *) NULL;
+  ti->ti_rt = (Tile *) NULL;
+  ti->ti_ll.p_x = 0;
+  ti->ti_ll.p_y = 0;
+  ti->ti_client = (ClientData) MINFINITY;
   return ti;
 }
 

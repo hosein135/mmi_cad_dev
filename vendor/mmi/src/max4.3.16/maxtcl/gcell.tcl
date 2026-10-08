@@ -149,9 +149,11 @@ proc gcell_load {cell} -desc {
   set _GCELL_(active) $prev_active
 
   if { $errstat } {
-    # TODO: We need to delete the cell def, because otherwise
-    # max keeps it forever and you have to restart max
-    # to work on the gcell.
+    # The database marked this cell available before we ran. If we
+    # return without notifying, the following redisplay walks an
+    # unfinished cell and segfaults. simplefet rarely hits this path;
+    # fet and via do whenever a tech rule or coordinate is bad.
+    db_gcell_notify $cell
   } else {
     # Notify max that gcell has changed.
     db_gcell_notify $cell
@@ -189,6 +191,19 @@ proc gcell_paint {layer x1 y1 x2 y2} -desc {
 
   global _GCELL_
 
+  # A techinfo result is sometimes a list of layers ("ndif pdif poly").
+  # Left unquoted, that shifts the coordinates and db_paint treats the
+  # next layer name as a number. Keep a single layer name.
+  set layer [lindex $layer 0]
+  if {$layer == "" || $_GCELL_(active) == ""} {
+    return
+  }
+  foreach c [list $x1 $y1 $x2 $y2] {
+    if {[scan $c %f] != 1} {
+      return
+    }
+  }
+
   # 4/4/00 Note: db_paint -cell requires a canonical rectangle,
   # even though db_paint does not.  Who knows why, but lets comply.
   setl {x1 y1 x2 y2} [can_rect [list $x1 $y1 $x2 $y2]]
@@ -217,6 +232,11 @@ Usage:
 } {
 
   global _GCELL_
+
+  set layer [lindex $layer 0]
+  if {$layer == "" || $_GCELL_(active) == ""} {
+    return
+  }
 
   if {$x2 == ""} {
     set x2 $x1

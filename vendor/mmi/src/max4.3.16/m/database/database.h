@@ -58,6 +58,8 @@
 #include <tcl.h>
 #endif
 
+#include <stdint.h>
+
 #ifndef	_MAGIC
 #include "magic.h"
 #endif	_MAGIC
@@ -118,14 +120,24 @@
  */
 typedef int TileType;
 
-#define	DBgetTileType(tp)       (((TileType) (tp)->ti_body) & 0xff)  
-#define	DBsetTileType(tp, b) ( (tp)->ti_body = \
-   (ClientData) (((TileType) (tp)->ti_body) & ~0xff | ((TileType) (b))) )
-#define DBisSetTileFlag(tp,f)      (((int) (tp)->ti_body) & (f))    
-#define DBsetTileFlag(tp,f)	(((int) (tp)->ti_body) |= (f))
-#define DBresetTileFlag(tp,f)   (((int) (tp)->ti_body) &= ~(f))
-
 #define	TT_MAXTYPES		127			/* See above! */
+
+/* Tile bodies store a type in the low 8 bits plus flags above that.
+ * Sentinel tiles use body -1, so the low byte is 255. Indexing a
+ * TT_MAXTYPES table with that value walks off the end (SIGSEGV).
+ * Clamp those bodies back to space. intptr_t keeps the flag bits
+ * intact on LP64; a 32-bit cast would truncate the pointer. */
+#define	DBgetTileType(tp) \
+    ((((intptr_t) (tp)->ti_body) & 0xff) >= TT_MAXTYPES \
+	? TT_SPACE \
+	: (TileType) (((intptr_t) (tp)->ti_body) & 0xff))
+#define	DBsetTileType(tp, b) ( (tp)->ti_body = \
+   (ClientData) ((((intptr_t) (tp)->ti_body) & ~0xff) | ((intptr_t) (b) & 0xff)) )
+#define DBisSetTileFlag(tp,f)      (((intptr_t) (tp)->ti_body) & (f))
+#define DBsetTileFlag(tp,f) \
+    ((tp)->ti_body = (ClientData) (((intptr_t) (tp)->ti_body) | (intptr_t) (f)))
+#define DBresetTileFlag(tp,f) \
+    ((tp)->ti_body = (ClientData) (((intptr_t) (tp)->ti_body) & ~(intptr_t) (f)))
 #define	TT_RESERVEDTYPES	3			/* See above! */
 
 #define	TT_BPW			(8 * sizeof (unsigned))
@@ -174,9 +186,17 @@ typedef unsigned char PaintResultType;
 #define	ttMask(t)	((unsigned int)1 << ttBit(t))
 
 /* Operations for manipulating TileTypeBitMasks */
-#define TTMaskSetType(m, t)	((m)->tt_words[ttWord(t)] |= ttMask(t))
-#define	TTMaskClearType(m, t)	((m)->tt_words[ttWord(t)] &= ~ttMask(t))
-#define	TTMaskHasType(m, t)	(((m)->tt_words[ttWord(t)] & ttMask(t)) != 0)
+/* Type masks have TT_MASKWORDS entries (types 0..TT_MAXTYPES-1).
+ * A sentinel body of -1 looks like type 255 and would index word 7. */
+#define TTMaskSetType(m, t) \
+    (((unsigned) (t) < (unsigned) TT_MAXTYPES) \
+	? ((m)->tt_words[ttWord(t)] |= ttMask(t)) : 0)
+#define	TTMaskClearType(m, t) \
+    (((unsigned) (t) < (unsigned) TT_MAXTYPES) \
+	? ((m)->tt_words[ttWord(t)] &= ~ttMask(t)) : 0)
+#define	TTMaskHasType(m, t) \
+    (((unsigned) (t) < (unsigned) TT_MAXTYPES) && \
+	(((m)->tt_words[ttWord(t)] & ttMask(t)) != 0))
 #define	TTMaskSetOnlyType(m, t)	(TTMaskZero(m), TTMaskSetType(m, t))
 
 /* If TT_MASKWORDS (currently 3) changes, the following must also change */
@@ -2188,10 +2208,15 @@ static __inline__ TileType DBgetTypeG(Tile *tile, Group *group)
     }
     else
     {
-      TileType type = DBgetTileType(tile);
-      GroupList *gl;
-    
-      for(gl=(GroupList *) TiGetGroups(tile); gl; gl=gl->gl_next)
+      /* Body -1 (plane sentinel) sets TF_MULTIGROUP because bit 0x100
+       * is set, but the sentinel has no group list. Following a null
+       * or leftover pointer here is a segfault. */
+      GroupList *gl = (GroupList *) TiGetGroups(tile);
+
+      if (gl == (GroupList *) NULL)
+	return DBgetTileType(tile);
+
+      for(; gl; gl=gl->gl_next)
       {
         if(gl->gl_group == group) return gl->gl_type;
       }

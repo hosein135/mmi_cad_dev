@@ -49,6 +49,13 @@ proc _tech_error {msg {flags ""}} -desc {
 	  }
       }
       set _techinfo_errors($msg) $i_cmd(num)
+      # gcell_load runs inside DBReadCell. A warning dialog from here
+      # is re-entered from C and has been crashing max.bin. Print it.
+      global _GCELL_
+      if {[info exists _GCELL_(active)] && $_GCELL_(active) != ""} {
+	puts "techinfo: $msg"
+	return
+      }
       msg -warn "$msg\n"
 }
 
@@ -538,7 +545,7 @@ proc techinfo {what {l1 ""} {l2 ""} {flags ""}} -desc {
       if { $layers == "" } {
 	return ""
       }
-      set pos [lsearch $layers $l1]
+      set pos [lsearch -exact $layers $l1]
       if {$pos == -1} {
 	_tech_error "illegal layer $l1 in tech info request: techinfo $what $l1" $flags
 	return ""
@@ -546,7 +553,7 @@ proc techinfo {what {l1 ""} {l2 ""} {flags ""}} -desc {
 
       set ret ""
       foreach layer [techinfo connect $l1] {
-	set pos2 [lsearch $layers $layer]
+	set pos2 [lsearch -exact $layers $layer]
 
 	if {$pos2 != -1 && $pos2 < $pos} {
 	  lappend ret $layer
@@ -560,7 +567,7 @@ proc techinfo {what {l1 ""} {l2 ""} {flags ""}} -desc {
       if { $layers == "" } {
 	return ""
       }
-      set pos [lsearch $layers $l1]
+      set pos [lsearch -exact $layers $l1]
       if {$pos == -1} {
 	_tech_error "illegal layer $l1 in tech info request: techinfo $what $l1" $flags
 	return ""
@@ -568,7 +575,7 @@ proc techinfo {what {l1 ""} {l2 ""} {flags ""}} -desc {
 
       set ret ""
       foreach layer [techinfo connect $l1] {
-	set pos2 [lsearch $layers $layer]
+	set pos2 [lsearch -exact $layers $layer]
 
 	if {$pos2 != -1 && $pos2 > $pos} {
 	  lappend ret $layer
