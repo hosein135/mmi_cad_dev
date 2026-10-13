@@ -198,8 +198,11 @@ proc gcell_paint {layer x1 y1 x2 y2} -desc {
   if {$layer == "" || $_GCELL_(active) == ""} {
     return
   }
+  # Tcl 8.0 scan requires one variable per % conversion. With none,
+  # it errors ("different numbers of variable names and field
+  # specifiers") and gcell_load throws away the whole cell.
   foreach c [list $x1 $y1 $x2 $y2] {
-    if {[scan $c %f] != 1} {
+    if {[scan $c "%f" _gcell_num] != 1} {
       return
     }
   }

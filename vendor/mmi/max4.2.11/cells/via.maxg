@@ -85,8 +85,9 @@ proc gcell_make {prop_list} -desc {
   foreach layer [concat $bot $top] {
     if {$layer == ""} continue
     setl {enc_x enc_y} [techinfo enclose $layer $via all]
-    if {[scan $enc_x %f] != 1} { set enc_x 0 }
-    if { $symmetric != 0 || $enc_y == "" || [scan $enc_y %f] != 1 } { set enc_y $enc_x }
+    # Tcl 8.0 scan requires one variable per % conversion.
+    if {[scan $enc_x "%f" _enc] != 1} { set enc_x 0 }
+    if { $symmetric != 0 || $enc_y == "" || [scan $enc_y "%f" _enc] != 1 } { set enc_y $enc_x }
     gcell_paint $layer \
 	[expr $originx - $w2 - $enc_x] [expr $originy - $h2 - $enc_y] \
 	[expr $originx + $w2 + $enc_x] [expr $originy + $h2 + $enc_y]
