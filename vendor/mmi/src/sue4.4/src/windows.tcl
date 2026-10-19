@@ -490,9 +490,19 @@ proc make_window {win} {
   # change default window when user resizes
   bind $win <Configure> {set DEFAULT_VISIBLE_BBOX [visible_bbox default]}
 
-  # this binding changes focus to current canvas when entered
-  bind $win <Any-Enter> {enter_canvas $cur_s}
-  bind $win <Any-Leave> {leave_canvas}
+  # this binding changes focus to current canvas when entered.
+  # Skip menus: enter_canvas focuses the canvas and can run while the
+  # dropdown is mapping, which unposts it on the opening click.
+  bind $win <Any-Enter> {
+    if {[winfo class %W] != "Menu"} {
+      enter_canvas $cur_s
+    }
+  }
+  bind $win <Any-Leave> {
+    if {[winfo class %W] != "Menu"} {
+      leave_canvas
+    }
+  }
 
   return $win
 }

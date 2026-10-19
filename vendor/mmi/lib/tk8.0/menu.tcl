@@ -92,6 +92,17 @@ bind Menubutton <Leave> {
 }
 bind Menubutton <1> {
     if {$tkPriv(inMenubutton) != ""} {
+	# The release of this click must not unpost the menu. On current
+	# X servers (and in SUE, where entering the menu refocuses the
+	# canvas) that release is delivered to the menu or arrives after
+	# a Leave has cleared inMenubutton, so the dropdown vanished on
+	# the same click that opened it. A later click selects or dismisses.
+	set tkPriv(suppressReleaseUnpost) $tkPriv(inMenubutton)
+	if {$tkPriv(postedMb) == $tkPriv(inMenubutton)} {
+	    set tkPriv(mbRepress) 1
+	} else {
+	    set tkPriv(mbRepress) 0
+	}
 	tkMbPost $tkPriv(inMenubutton) %X %Y
     }
 }
@@ -499,6 +510,27 @@ proc tkMbButtonUp w {
     global tkPriv
     global tcl_platform
 
+    # Opening click: leave the menu posted. A second click on the same
+    # menubutton unposts it. A release that belongs to some other button
+    # falls through to the original test.
+    if {[info exists tkPriv(suppressReleaseUnpost)]
+	    && ($tkPriv(suppressReleaseUnpost) == $w)} {
+	set tkPriv(suppressReleaseUnpost) {}
+	set repress [expr {[info exists tkPriv(mbRepress)] && $tkPriv(mbRepress)}]
+	set tkPriv(mbRepress) 0
+	if {$tkPriv(postedMb) == $w} {
+	    if {$repress} {
+		tkMenuUnpost {}
+	    } else {
+		set menu [$w cget -menu]
+		if {$menu != ""} {
+		    tkMenuFirstEntry $menu
+		}
+	    }
+	    return
+	}
+    }
+
     set tearoff [expr {($tcl_platform(platform) == "unix") \
 		     || ([[$w cget -menu] cget -type] == "tearoff")}]
     if {($tearoff != 0) && ($tkPriv(postedMb) == $w) 
@@ -630,6 +662,23 @@ proc tkMenuLeave {menu rootx rooty state} {
 
 proc tkMenuInvoke {w buttonRelease} {
     global tkPriv
+
+    # Same click that posted a menubutton menu. The menu may have mapped
+    # under the pointer, so this release is reported here instead of to
+    # the menubutton. Keep the menu up; the next click invokes or dismisses.
+    if {$buttonRelease && [info exists tkPriv(suppressReleaseUnpost)]
+	    && ($tkPriv(suppressReleaseUnpost) != "")} {
+	set mb $tkPriv(suppressReleaseUnpost)
+	set tkPriv(suppressReleaseUnpost) {}
+	set tkPriv(mbRepress) 0
+	if {($tkPriv(postedMb) == $mb) && ($mb != "")} {
+	    set menu [$mb cget -menu]
+	    if {$menu != ""} {
+		tkMenuFirstEntry $menu
+	    }
+	    return
+	}
+    }
 
     if {$buttonRelease && ($tkPriv(window) == "")} {
 	# Mouse was pressed over a menu without a menu button, then
