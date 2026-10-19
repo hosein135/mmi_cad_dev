@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # x86_64 Linux preflight: bare metal, VM, or WSL2 (not WSL1, not Windows-native).
 # Sourced from run.sh. Expects info/warn/error.
+# Missing git and curl are installed with the distro package manager. If that
+# cannot provide curl, a static binary is used. Nix is pinned to 2.28.5
+# (the NixOS 25.05 package manager). Any other Nix is replaced. On NixOS,
+# /nix is kept and 2.28.5 is installed into the user profile.
 
 # Completed `nix run .#mmi-cad` runtime closure (nixos-25.05), measured:
 # 934120792 bytes ≈ 891 MiB across 258 store paths. About 1 GiB remains
@@ -9,6 +13,19 @@
 MMI_STORE_AFTER_INSTALL_BYTES=$((1024 * 1024 * 1024))
 MMI_FIRST_INSTALL_FREE_BYTES=$((6 * 1024 * 1024 * 1024))
 MMI_RUNTIME_FREE_BYTES=$((1024 * 1024 * 1024))
+
+# stunnel/static-curl release used when the distro cannot install curl.
+MMI_CURL_STATIC_VERSION="8.20.0"
+# NixOS 25.05's package manager is Nix 2.28.5 (nixpkgs nixVersions.stable).
+# Any other Nix, including a newer 2.35, is replaced. nix upgrade-nix is not
+# used: it installs the latest manager and changes flake.lock behavior.
+MMI_NIX_PIN_VERSION="2.28.5"
+MMI_NIX_PIN_MAJOR=2
+MMI_NIX_PIN_MINOR=28
+MMI_NIX_PIN_PATCH=5
+MMI_NIX_INSTALL_URL="https://releases.nixos.org/nix/nix-${MMI_NIX_PIN_VERSION}/install"
+MMI_BOOTSTRAP_DIR="${SCRIPT_DIR}/.mmi-bootstrap"
+MMI_BOOTSTRAP_BIN="${MMI_BOOTSTRAP_DIR}/bin"
 
 mmi_is_wsl() {
   if [ -n "${WSL_DISTRO_NAME:-}" ] || [ -n "${WSL_INTEROP:-}" ]; then
@@ -531,6 +548,7 @@ mmi_install_host_packages() {
         case "$p" in
           git) atoms+=(dev-vcs/git) ;;
           curl) atoms+=(net-misc/curl) ;;
+          xz) atoms+=(app-arch/xz-utils) ;;
           *) atoms+=("$p") ;;
         esac
       done
@@ -563,13 +581,51 @@ mmi_install_host_packages() {
   esac
 }
 
-# git (flake work tree) and curl (Nix installer) before Nix is installed.
-mmi_ensure_git_and_curl() {
-  local tool pm pretty
-  local -a missing=() still=()
-  for tool in git curl; do
-    if ! command -v "$tool" >/dev/null 2>&1; then
-      missing+=("$tool")
+mmi_prepend_bootstrap_path() {
+  if [ -d "${MMI_BOOTSTRAP_BIN}" ]; then
+    case ":${PATH}:" in
+      *":${MMI_BOOTSTRAP_BIN}:"*) ;;
+      *) export PATH="${MMI_BOOTSTRAP_BIN}:${PATH}" ;;
+    esac
+  fi
+}
+
+mmi_refresh_tool_path() {
+  mmi_prepend_bootstrap_path
+  mmi_prepend_path_dir /usr/local/sbin
+  mmi_prepend_path_dir /usr/local/bin
+  mmi_prepend_path_dir /usr/sbin
+  mmi_prepend_path_dir /usr/bin
+  mmi_prepend_path_dir /bin
+  if [ -n "${HOME:-}" ]; then
+    mmi_prepend_path_dir "${HOME}/.nix-profile/bin"
+    mmi_prepend_path_dir "${HOME}/.guix-profile/bin"
+    mmi_prepend_path_dir "${HOME}/.local/bin"
+  fi
+  mmi_prepend_path_dir /run/current-system/sw/bin
+  hash -r || true
+}
+
+# Command name -> distro package. Debian's xz binary is in xz-utils.
+mmi_package_name() {
+  local pm="$1" tool="$2"
+  case "${pm}:${tool}" in
+    apt:xz) printf '%s\n' xz-utils ;;
+    emerge:git) printf '%s\n' dev-vcs/git ;;
+    emerge:curl) printf '%s\n' net-misc/curl ;;
+    emerge:xz) printf '%s\n' app-arch/xz-utils ;;
+    *) printf '%s\n' "${tool}" ;;
+  esac
+}
+
+# Install whichever of the named commands is missing. Returns 1 when the
+# package manager cannot do it; the caller may still fetch a static curl.
+mmi_ensure_commands() {
+  local tool pm pretty pkg
+  local -a missing=() pkgs=() still=()
+  for tool in "$@"; do
+    if ! command -v "${tool}" >/dev/null 2>&1; then
+      missing+=("${tool}")
     fi
   done
   if [ ${#missing[@]} -eq 0 ]; then
@@ -577,11 +633,14 @@ mmi_ensure_git_and_curl() {
   fi
 
   if ! pm="$(mmi_linux_pkg_manager)"; then
-    error "Need ${missing[*]} before Nix is installed."
-    error "Could not find a package manager for this Linux distro."
-    error "Install ${missing[*]} and run ./run.sh again."
+    warn "Need ${missing[*]} before Nix is installed."
+    warn "No package manager found. Install ${missing[*]} and retry."
     return 1
   fi
+  for tool in "${missing[@]}"; do
+    pkg="$(mmi_package_name "${pm}" "${tool}")"
+    pkgs+=("${pkg}")
+  done
 
   pretty="$(mmi_os_release_value PRETTY_NAME || true)"
   if [ -n "$pretty" ]; then
@@ -598,35 +657,216 @@ mmi_ensure_git_and_curl() {
       ;;
   esac
 
-  if ! mmi_install_host_packages "$pm" "${missing[@]}"; then
-    error "Could not install ${missing[*]} with ${pm}."
+  if ! mmi_install_host_packages "$pm" "${pkgs[@]}"; then
+    warn "Could not install ${missing[*]} with ${pm}."
     return 1
   fi
 
-  mmi_prepend_path_dir /usr/local/sbin
-  mmi_prepend_path_dir /usr/local/bin
-  mmi_prepend_path_dir /usr/sbin
-  mmi_prepend_path_dir /usr/bin
-  mmi_prepend_path_dir /bin
-  if [ -n "${HOME:-}" ]; then
-    mmi_prepend_path_dir "${HOME}/.nix-profile/bin"
-    mmi_prepend_path_dir "${HOME}/.guix-profile/bin"
-  fi
-  mmi_prepend_path_dir /run/current-system/sw/bin
-  hash -r || true
-
+  mmi_refresh_tool_path
   for tool in "${missing[@]}"; do
     if ! command -v "$tool" >/dev/null 2>&1; then
       still+=("$tool")
     fi
   done
   if [ ${#still[@]} -ne 0 ]; then
-    error "Package install finished, but still missing: ${still[*]}"
-    error "Install ${still[*]} and run ./run.sh again."
+    warn "Package install finished, but still missing: ${still[*]}"
     return 1
   fi
   info "Installed ${missing[*]}."
   return 0
+}
+
+# git (flake work tree) and curl (Nix installer) before Nix is installed.
+mmi_ensure_git_and_curl() {
+  mmi_ensure_commands git curl
+}
+
+# curl, else wget, else python3. Used for the Nix installer and static curl.
+mmi_http_get() {
+  local url="$1" dest="$2" dir
+  dir="$(dirname "$dest")"
+  mkdir -p "$dir"
+  rm -f "$dest"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --proto '=https' --tlsv1.2 --retry 3 --retry-delay 2 -o "$dest" "$url" \
+      || { rm -f "$dest"; return 1; }
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$dest" "$url" || { rm -f "$dest"; return 1; }
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 - "$url" "$dest" <<'PY' || { rm -f "$dest"; return 1; }
+import sys
+from urllib.request import urlopen
+url, dest = sys.argv[1], sys.argv[2]
+with urlopen(url, timeout=180) as src, open(dest, "wb") as out:
+    while True:
+        chunk = src.read(1024 * 1024)
+        if not chunk:
+            break
+        out.write(chunk)
+PY
+  else
+    error "Cannot download ${url}: need curl, wget, or python3."
+    return 1
+  fi
+  if [ ! -s "$dest" ]; then
+    rm -f "$dest"
+    error "Download was empty: ${url}"
+    return 1
+  fi
+}
+
+mmi_extract_tar_xz() {
+  local archive="$1" dest="$2"
+  mkdir -p "$dest"
+  if tar -xJf "$archive" -C "$dest" 2>/dev/null; then
+    return 0
+  fi
+  error "Cannot extract ${archive}: need tar with xz support (tar -xJf)."
+  return 1
+}
+
+mmi_static_curl_asset() {
+  local os arch
+  os="$(uname -s)"
+  arch="$(uname -m)"
+  case "$os" in
+    Linux)
+      case "$arch" in
+        x86_64|amd64) printf '%s\n' "curl-linux-x86_64-musl-${MMI_CURL_STATIC_VERSION}.tar.xz" ;;
+        *)
+          error "Unsupported Linux arch for static curl: ${arch}"
+          return 1
+          ;;
+      esac
+      ;;
+    *)
+      error "Unsupported OS for static curl: ${os}"
+      return 1
+      ;;
+  esac
+}
+
+mmi_ensure_static_curl() {
+  local asset url archive extract_dir found
+  mmi_prepend_bootstrap_path
+  if command -v curl >/dev/null 2>&1; then
+    info "curl: $(curl --version 2>/dev/null | head -1)"
+    return 0
+  fi
+
+  info "curl not found — downloading a static binary ..."
+  asset="$(mmi_static_curl_asset)" || return 1
+  url="https://github.com/stunnel/static-curl/releases/download/${MMI_CURL_STATIC_VERSION}/${asset}"
+  mkdir -p "${MMI_BOOTSTRAP_BIN}" "${MMI_BOOTSTRAP_DIR}/tmp"
+  archive="${MMI_BOOTSTRAP_DIR}/tmp/${asset}"
+  extract_dir="${MMI_BOOTSTRAP_DIR}/tmp/curl-extract-$$"
+  rm -rf "$extract_dir"
+  mkdir -p "$extract_dir"
+
+  if ! command -v xz >/dev/null 2>&1; then
+    mmi_install_python_xz || true
+  fi
+  mmi_http_get "$url" "$archive" || return 1
+  mmi_extract_tar_xz "$archive" "$extract_dir" || return 1
+
+  found="$(find "$extract_dir" -type f -name curl 2>/dev/null | head -1 || true)"
+  if [ -z "$found" ]; then
+    error "Static curl archive had no 'curl' binary: ${asset}"
+    return 1
+  fi
+  cp -f "$found" "${MMI_BOOTSTRAP_BIN}/curl"
+  chmod +x "${MMI_BOOTSTRAP_BIN}/curl"
+  rm -rf "$extract_dir" "$archive"
+  mmi_prepend_bootstrap_path
+  info "curl installed (static): $(curl --version 2>/dev/null | head -1)"
+}
+
+# The Nix installer refuses to unpack its .tar.xz unless xz is on PATH.
+# tar -xJf is what actually extracts; this command only has to exist and
+# decompress stdin when tar shells out to it.
+mmi_install_python_xz() {
+  command -v python3 >/dev/null 2>&1 || return 1
+  python3 -c 'import lzma' >/dev/null 2>&1 || return 1
+  mkdir -p "${MMI_BOOTSTRAP_BIN}"
+  cat > "${MMI_BOOTSTRAP_BIN}/xz" <<'EOF'
+#!/bin/sh
+# tar runs "xz -d" with the archive on stdin. A filename is used when one
+# is passed. Flags stay in this shell: Python treats a leading -dc as its
+# own options and drops the path.
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -*) shift ;;
+    *) break ;;
+  esac
+done
+if [ $# -gt 0 ]; then
+  exec python3 -c 'import lzma, sys
+src = lzma.open(sys.argv[1], "rb")
+while True:
+    chunk = src.read(1024 * 1024)
+    if not chunk:
+        break
+    sys.stdout.buffer.write(chunk)
+' "$1"
+fi
+exec python3 -c 'import lzma, sys
+src = lzma.open(sys.stdin.buffer, "rb")
+while True:
+    chunk = src.read(1024 * 1024)
+    if not chunk:
+        break
+    sys.stdout.buffer.write(chunk)
+'
+EOF
+  chmod 755 "${MMI_BOOTSTRAP_BIN}/xz"
+  mmi_prepend_bootstrap_path
+}
+
+mmi_ensure_xz() {
+  if command -v xz >/dev/null 2>&1; then
+    return 0
+  fi
+  mmi_ensure_commands xz \
+    || warn "Could not install xz with the system package manager."
+  if command -v xz >/dev/null 2>&1; then
+    info "xz: $(xz --version 2>/dev/null | head -1)"
+    return 0
+  fi
+  info "xz not found — using Python's lzma so the Nix installer can unpack."
+  if ! mmi_install_python_xz; then
+    error "The Nix installer needs xz to unpack its tarball."
+    error "Install it and re-run. On Debian/Ubuntu: sudo apt-get install -y xz-utils"
+    return 1
+  fi
+  info "xz: python lzma helper at ${MMI_BOOTSTRAP_BIN}/xz"
+}
+
+# Distro packages first (git + curl). Static curl covers hosts whose package
+# manager cannot install curl. A git checkout still needs git itself.
+mmi_ensure_bootstrap_tools() {
+  local had_git=0 had_curl=0
+  command -v git >/dev/null 2>&1 && had_git=1
+  command -v curl >/dev/null 2>&1 && had_curl=1
+  if [ "$had_git" -eq 0 ] || [ "$had_curl" -eq 0 ]; then
+    mmi_ensure_git_and_curl \
+      || warn "Could not install missing git/curl with the system package manager."
+    if ! command -v curl >/dev/null 2>&1; then
+      mmi_ensure_static_curl || return 1
+    elif [ "$had_curl" -eq 0 ]; then
+      info "curl: $(curl --version 2>/dev/null | head -1)"
+    fi
+    if ! command -v git >/dev/null 2>&1; then
+      if [ -e "${SCRIPT_DIR}/.git" ]; then
+        error "This checkout is a Git work tree, but git is not installed."
+        error "Install git and run ./run.sh again."
+        return 1
+      fi
+      warn "git is not installed. Nix can still fetch flake inputs; local Git checks are skipped."
+    elif [ "$had_git" -eq 0 ]; then
+      info "git: $(git --version 2>/dev/null | head -1)"
+    fi
+  fi
+  mmi_ensure_xz || return 1
 }
 
 mmi_find_nix() {
@@ -676,31 +916,154 @@ experimental-features = nix-command flakes
 "
   # A previous nix-channel / NIX_PATH must not replace the locked nixpkgs.
   export NIX_PATH=""
+  mmi_prepend_bootstrap_path
 }
 
-# Official installer: single-user, no nixpkgs-unstable channel.
-# A previous /nix is removed only when it blocks this install.
-mmi_run_nix_installer() {
-  local sh="$1"
-  export NIX_INSTALLER_YES=1
-  export NIX_INSTALLER_NO_CHANNEL_ADD=1
-  bash "$sh" --no-daemon --yes --no-channel-add
+mmi_systemd_running() {
+  [ -d /run/systemd/system ] || return 1
+  command -v systemctl >/dev/null 2>&1 || return 1
+  case "$(systemctl is-system-running 2>/dev/null || true)" in
+    running|degraded) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+mmi_can_install_nix_daemon() {
+  if [ "$(id -u)" -eq 0 ]; then
+    return 0
+  fi
+  command -v sudo >/dev/null 2>&1
+}
+
+# Multi-user (--daemon) when systemd and sudo work. WSL stays single-user:
+# the daemon installer starts units that can kill the distro.
+mmi_detect_nix_install_mode() {
+  if mmi_is_wsl; then
+    printf '%s\n' "no-daemon"
+    return 0
+  fi
+  if mmi_systemd_running && mmi_can_install_nix_daemon; then
+    printf '%s\n' "daemon"
+    return 0
+  fi
+  printf '%s\n' "no-daemon"
+}
+
+mmi_explain_nix_install_choice() {
+  local mode="$1"
+  case "$mode" in
+    daemon)
+      info "Nix install: multi-user (--daemon) — Linux with systemd + sudo"
+      ;;
+    *)
+      if mmi_is_wsl; then
+        info "Nix install: single-user (--no-daemon) — WSL does not use the daemon installer"
+      else
+        info "Nix install: single-user (--no-daemon) — no systemd or no sudo for multi-user"
+      fi
+      ;;
+  esac
+  info "Manual equivalent:"
+  if [ "$mode" = "daemon" ]; then
+    info "  curl --proto '=https' --tlsv1.2 -L ${MMI_NIX_INSTALL_URL} | sh -s -- --daemon"
+  else
+    info "  curl --proto '=https' --tlsv1.2 -L ${MMI_NIX_INSTALL_URL} | sh -s -- --no-daemon"
+  fi
+  info "This run uses pinned installer: ${MMI_NIX_INSTALL_URL}"
+}
+
+# Nix's installer calls tcgetattr. Without a TTY it aborts. A synthetic PTY
+# can crash WSL, so WSL only runs when stdin/stdout or /dev/tty is real.
+mmi_run_with_pty() {
+  local wrapper st
+  if mmi_is_wsl; then
+    if [ -t 0 ] && [ -t 1 ]; then
+      "$@"
+      return $?
+    fi
+    if [ -r /dev/tty ] && [ -w /dev/tty ]; then
+      "$@" < /dev/tty > /dev/tty 2>&1
+      return $?
+    fi
+    error "Nix install on WSL needs an interactive terminal."
+    error "Run ./run.sh from a WSL shell, not a background job."
+    return 1
+  fi
+  if [ -t 0 ] && [ -t 1 ]; then
+    "$@"
+    return $?
+  fi
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import pty,sys; raise SystemExit(pty.spawn(sys.argv[1:]))' "$@"
+    return $?
+  fi
+  if command -v script >/dev/null 2>&1; then
+    mkdir -p "${MMI_BOOTSTRAP_DIR}/tmp"
+    wrapper="$(mktemp "${MMI_BOOTSTRAP_DIR}/tmp/pty-XXXXXX")"
+    {
+      printf '#!/usr/bin/env bash\nset -- '
+      printf '%q ' "$@"
+      printf '\nexec "$@"\n'
+    } > "$wrapper"
+    chmod +x "$wrapper"
+    script -q -e -c "$wrapper" /dev/null
+    st=$?
+    rm -f "$wrapper"
+    return "$st"
+  fi
+  warn "No PTY helper — Nix install may fail without a real terminal"
+  "$@"
+}
+
+mmi_activate_nix_bin() {
+  local bin="$1" dir
+  NIX_BIN="$bin"
+  export NIX_BIN
+  dir="$(dirname "$bin")"
+  case ":${PATH}:" in
+    *":${dir}:"*) ;;
+    *) export PATH="${dir}:${PATH}" ;;
+  esac
+  hash -r || true
+}
+
+# Single-user Nix needs /nix owned by this user. Create it here, where sudo
+# can prompt, instead of inside the installer.
+mmi_ensure_user_nix_dir() {
+  local user
+  if mmi_is_nixos; then
+    return 0
+  fi
+  if [ -d /nix ] && [ -w /nix ] && [ -O /nix ]; then
+    return 0
+  fi
+  if [ -e /nix ]; then
+    return 0
+  fi
+  user="$(id -un 2>/dev/null || printf '%s' "${USER:-}")"
+  if [ "$(id -u)" -eq 0 ]; then
+    mkdir -m 0755 /nix || return 1
+    return 0
+  fi
+  if ! command -v sudo >/dev/null 2>&1; then
+    error "Single-user Nix needs /nix owned by ${user}."
+    error "As root run: mkdir -m 0755 /nix && chown ${user} /nix"
+    return 1
+  fi
+  info "Creating /nix owned by ${user}. This asks for your sudo password."
+  sudo sh -c "mkdir -m 0755 /nix && chown $(printf '%q' "$user") /nix"
 }
 
 mmi_download_nix_installer() {
-  local dest="${TMPDIR:-/tmp}/mmi-nix-install.$$.sh"
+  local dest
   if [ -n "${MMI_NIX_INSTALLER:-}" ]; then
     printf '%s\n' "${MMI_NIX_INSTALLER}"
     return 0
   fi
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL https://nixos.org/nix/install -o "$dest"
-  elif command -v wget >/dev/null 2>&1; then
-    wget -qO "$dest" https://nixos.org/nix/install
-  else
-    error "curl or wget is required to install Nix."
-    return 1
-  fi
+  mkdir -p "${MMI_BOOTSTRAP_DIR}/tmp"
+  dest="${MMI_BOOTSTRAP_DIR}/tmp/nix-installer.sh"
+  mmi_http_get "${MMI_NIX_INSTALL_URL}" "$dest" || return 1
+  chmod +x "$dest"
   printf '%s\n' "$dest"
 }
 
@@ -708,7 +1071,7 @@ mmi_remove_nix() {
   local u f
   if mmi_is_nixos; then
     error "This is NixOS. Refusing to delete /nix."
-    error "Upgrade Nix with the system: sudo nixos-rebuild switch"
+    error "Set nix.package = pkgs.nixVersions.nix_2_28 and run: sudo nixos-rebuild switch"
     return 1
   fi
   info "Removing the previous Nix installation."
@@ -749,63 +1112,133 @@ mmi_remove_nix() {
   if getent group nix-daemon >/dev/null 2>&1; then
     mmi_as_root groupdel nix-daemon >/dev/null 2>&1 || true
   fi
+  hash -r || true
+  unset NIX_BIN || true
 }
 
+# Install pinned Nix 2.28.5. A previous install is removed first when this
+# is a replacement, or when /nix is left behind without a working binary.
 mmi_install_nix() {
-  local sh
+  local installer flags mode tmp old_tmp had_tmp
   if mmi_is_nixos; then
     error "Nix is not available on this NixOS system."
     error "Boot a generation that includes nix, then run ./run.sh again."
     return 1
   fi
-  info "Installing Nix so CAD can run. This may ask for your sudo password."
-  if ! sh="$(mmi_download_nix_installer)"; then
+  if ! command -v curl >/dev/null 2>&1; then
+    mmi_ensure_static_curl || return 1
+  fi
+  mmi_ensure_xz || return 1
+  if [ "${MMI_NIX_REPLACE:-}" = "1" ]; then
+    mmi_remove_nix || return 1
+  elif ! mmi_find_nix >/dev/null 2>&1 && { [ -e /nix ] || [ -e "${HOME:-}/.nix-profile" ]; }; then
+    mmi_remove_nix || return 1
+  fi
+
+  export USER="${USER:-$(id -un 2>/dev/null || echo root)}"
+  tmp="${TMPDIR:-/tmp}"
+  case "$tmp" in
+    */) ;;
+    *) tmp="${tmp}/" ;;
+  esac
+  had_tmp=0
+  old_tmp=""
+  if [ "${TMPDIR+set}" = set ]; then
+    had_tmp=1
+    old_tmp="$TMPDIR"
+  fi
+  export TMPDIR="$tmp"
+  export NIX_INSTALLER_YES=1
+  export NIX_INSTALLER_NO_CHANNEL_ADD=1
+
+  if ! installer="$(mmi_download_nix_installer)"; then
     return 1
   fi
-  if ! mmi_run_nix_installer "$sh"; then
-    if [ "${MMI_NIX_REPLACE:-}" = "1" ] || { [ -d /nix ] && ! mmi_find_nix >/dev/null 2>&1; }; then
-      info "A previous Nix install is in the way. Removing it and installing again."
-      mmi_remove_nix || return 1
-      mmi_run_nix_installer "$sh" || return 1
-    else
-      error "Nix installer failed."
+  chmod +x "$installer" 2>/dev/null || true
+
+  mode="$(mmi_detect_nix_install_mode)"
+  case "$mode" in
+    daemon) flags="--daemon --yes --no-channel-add" ;;
+    *) flags="--no-daemon --yes --no-channel-add" ;;
+  esac
+  mmi_explain_nix_install_choice "$mode"
+  info "Nix installer flags: ${flags}"
+  if [ "$mode" != "daemon" ]; then
+    mmi_ensure_user_nix_dir || return 1
+  fi
+  # shellcheck disable=SC2086
+  if ! mmi_run_with_pty sh "$installer" $flags; then
+    if mmi_is_wsl; then
+      error "Nix installer failed. Not running it again on WSL."
+      error "If /nix was left behind and you own it: rm -rf /nix ~/.nix-profile"
       return 1
     fi
+    if [ "$mode" = "daemon" ]; then
+      warn "Daemon install failed — retrying single-user (--no-daemon)"
+      mmi_remove_nix || return 1
+      mmi_ensure_user_nix_dir || return 1
+      if ! mmi_run_with_pty sh "$installer" --no-daemon --yes --no-channel-add; then
+        error "Nix installer failed. If /nix was left behind, remove it and re-run."
+        return 1
+      fi
+    else
+      warn "Nix installer failed. Removing the previous tree and retrying once."
+      mmi_remove_nix || return 1
+      mmi_ensure_user_nix_dir || return 1
+      # shellcheck disable=SC2086
+      if ! mmi_run_with_pty sh "$installer" $flags; then
+        error "Nix installer failed. If /nix was left behind, remove it and re-run."
+        return 1
+      fi
+    fi
+  fi
+  if [ "$had_tmp" -eq 1 ]; then
+    export TMPDIR="$old_tmp"
+  else
+    unset TMPDIR
   fi
   if [ -z "${MMI_NIX_INSTALLER:-}" ]; then
-    rm -f "$sh"
+    rm -f "$installer"
   fi
   hash -r || true
-}
-
-mmi_try_upgrade_nix() {
-  info "Upgrading the installed Nix to 2.28 or newer."
-  if [ -S /nix/var/nix/daemon-socket/socket ]; then
-    mmi_as_root "$NIX_BIN" --extra-experimental-features "nix-command flakes" upgrade-nix
-    if command -v systemctl >/dev/null 2>&1; then
-      mmi_as_root systemctl restart nix-daemon.socket nix-daemon.service >/dev/null 2>&1 || true
-    fi
-  else
-    "$NIX_BIN" --extra-experimental-features "nix-command flakes" upgrade-nix
+  mmi_source_nix
+  if ! mmi_find_nix >/dev/null 2>&1 && ! mmi_select_nix_bin >/dev/null 2>&1; then
+    error "Nix installed but not on PATH. Open a new terminal and re-run."
+    return 1
   fi
+  mmi_reload_nix_bin || return 1
+  info "Nix installed: $("$NIX_BIN" --version 2>/dev/null || true)"
 }
 
 mmi_reload_nix_bin() {
+  local best
   hash -r || true
   mmi_source_nix
-  if ! NIX_BIN="$(mmi_find_nix)"; then
-    error "Nix install finished, but the nix command is still missing."
-    return 1
+  if mmi_prefer_pinned_bin; then
+    return 0
   fi
+  if ! best="$(mmi_select_nix_bin)"; then
+    if ! best="$(mmi_find_nix)"; then
+      error "Nix install finished, but the nix command is still missing."
+      return 1
+    fi
+  fi
+  mmi_activate_nix_bin "$best"
 }
 
 mmi_repair_nix_and_recheck() {
+  if mmi_is_nixos; then
+    error "This is NixOS. Refusing to delete /nix."
+    error "Set nix.package = pkgs.nixVersions.nix_2_28 and run: sudo nixos-rebuild switch"
+    return 1
+  fi
   if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
     error "Nix is still not usable after replacing the previous install."
     return 1
   fi
   export MMI_NIX_REPAIR=1
   export MMI_NIX_REPLACE=1
+  info "Replacing this Nix with pinned Nix ${MMI_NIX_PIN_VERSION}."
   mmi_install_nix || return 1
   mmi_reload_nix_bin || return 1
   mmi_check_existing_nix
@@ -856,11 +1289,12 @@ mmi_revive_nix_store() {
   return 1
 }
 
-# NixOS 25.05 ships Nix 2.28 (nixpkgs nixVersions.stable = nix_2_28).
-# flake.lock version 7 needs Nix >= 2.18; 25.05 itself is evaluated with 2.28.
-MMI_NIX_MIN_MAJOR=2
-MMI_NIX_MIN_MINOR=28
-MMI_NIX_MIN_PATCH=0
+# NixOS 25.05 ships Nix 2.28.5 (nixpkgs nixVersions.nix_2_28).
+mmi_nix_version_is_pinned() {
+  [ "$1" -eq "$MMI_NIX_PIN_MAJOR" ] \
+    && [ "$2" -eq "$MMI_NIX_PIN_MINOR" ] \
+    && [ "$3" -eq "$MMI_NIX_PIN_PATCH" ]
+}
 
 mmi_nix_parse_version() {
   local line
@@ -872,18 +1306,8 @@ mmi_nix_parse_version() {
   return 1
 }
 
-mmi_nix_ver_ge() {
-  local maj="$1" min="$2" pat="$3"
-  local need_maj="$4" need_min="$5" need_pat="$6"
-  if [ "$maj" -gt "$need_maj" ]; then return 0; fi
-  if [ "$maj" -lt "$need_maj" ]; then return 1; fi
-  if [ "$min" -gt "$need_min" ]; then return 0; fi
-  if [ "$min" -lt "$need_min" ]; then return 1; fi
-  [ "$pat" -ge "$need_pat" ]
-}
-
 # Newest Nix binary among PATH and the usual install locations.
-# Prints one path. Returns 1 when none of them run.
+# Prints one path. The caller keeps it only when it is Nix 2.28.5.
 mmi_select_nix_bin() {
   local cand resolved seen best best_key key maj min pat
   local -a cands
@@ -919,6 +1343,55 @@ mmi_select_nix_bin() {
   done
   [ -n "$best" ] || return 1
   printf '%s\n' "$best"
+}
+
+# Use an already-installed Nix 2.28.5 even when a newer binary is earlier on PATH.
+mmi_prefer_pinned_bin() {
+  local cand maj min pat
+  for cand in \
+    "${HOME:-}/.nix-profile/bin/nix" \
+    "/nix/var/nix/profiles/per-user/${USER:-}/profile/bin/nix" \
+    /nix/var/nix/profiles/default/bin/nix \
+    /run/current-system/sw/bin/nix
+  do
+    [ -n "$cand" ] && [ -x "$cand" ] || continue
+    if read -r maj min pat < <(mmi_nix_parse_version "$cand"); then
+      if mmi_nix_version_is_pinned "$maj" "$min" "$pat"; then
+        mmi_activate_nix_bin "$cand"
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
+mmi_nixpkgs_25_05_rev() {
+  local lock="${SCRIPT_DIR}/flake.lock" rev
+  [ -f "$lock" ] || return 1
+  rev="$(awk '
+    /"rev":/ { gsub(/[",]/, "", $2); rev = $2 }
+    /"ref": "nixos-25.05"/ { print rev; exit }
+  ' "$lock")"
+  [ -n "$rev" ] || return 1
+  printf '%s\n' "$rev"
+}
+
+# NixOS owns /nix. Put the pinned package manager in the user profile.
+mmi_install_pinned_on_nixos() {
+  local rev
+  rev="$(mmi_nixpkgs_25_05_rev)" || {
+    error "Could not read the nixos-25.05 revision from ${SCRIPT_DIR}/flake.lock."
+    return 1
+  }
+  info "This is NixOS. Installing Nix ${MMI_NIX_PIN_VERSION} into the user profile."
+  info "The system /nix store is left in place."
+  "$NIX_BIN" --extra-experimental-features "nix-command flakes" profile install \
+    --accept-flake-config \
+    "github:NixOS/nixpkgs/${rev}#nixVersions.nix_2_28" || return 1
+  if ! mmi_prefer_pinned_bin; then
+    error "Nix ${MMI_NIX_PIN_VERSION} installed, but it is not available in the user profile."
+    return 1
+  fi
 }
 
 # Description of a nixpkgs channel that is not nixos-25.05. Empty when
@@ -978,32 +1451,42 @@ mmi_nix_store_error() {
       ;;
     *database*|*schema*|*not\ compatible*)
       error "The Nix database was written by a different Nix version."
-      error "Upgrade or reinstall Nix so it matches that database: https://nixos.org/download.html"
+      error "Re-run ./run.sh to replace it with Nix ${MMI_NIX_PIN_VERSION}."
       ;;
     *)
-      error "Reinstall Nix from https://nixos.org/download.html if this install is broken."
+      error "Re-run ./run.sh to replace this Nix with ${MMI_NIX_PIN_VERSION}."
       ;;
   esac
 }
 
-# Previous Nix install: too old for NixOS 25.05, wrong channel, or a
-# broken daemon/store left behind by an earlier install.
+# Previous Nix: any version other than 2.28.5, a store left by that version,
+# or a daemon that no longer matches the client.
 mmi_check_existing_nix() {
-  local best maj min pat channel err json url sver
+  local first best maj min pat channel err json url sver
   local smaj smin sys feats store_msg
 
-  if ! best="$(mmi_select_nix_bin)"; then
+  mmi_source_nix
+  first="$(command -v nix 2>/dev/null || true)"
+  if mmi_prefer_pinned_bin; then
+    best="$NIX_BIN"
+  elif ! best="$(mmi_select_nix_bin)"; then
     if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
       error "Nix binaries still do not run after reinstall."
+      return 1
+    fi
+    if mmi_is_nixos; then
+      error "Nix is not available on this NixOS system."
+      error "Boot a generation that includes nix, then run ./run.sh again."
       return 1
     fi
     info "The Nix binary on this machine does not run. Replacing it."
     mmi_repair_nix_and_recheck || return 1
     return 0
-  fi
-  if [ "$best" != "$NIX_BIN" ]; then
-    info "Using ${best} (newer Nix than ${NIX_BIN})."
-    NIX_BIN="$best"
+  else
+    mmi_activate_nix_bin "$best"
+    if [ -n "$first" ] && [ "$first" != "$best" ]; then
+      info "Using ${best} (newer Nix than ${first})."
+    fi
   fi
 
   if ! read -r maj min pat < <(mmi_nix_parse_version "$NIX_BIN"); then
@@ -1018,25 +1501,26 @@ mmi_check_existing_nix() {
 
   channel="$(mmi_foreign_nixpkgs_channel || true)"
 
-  if ! mmi_nix_ver_ge "$maj" "$min" "$pat" \
-      "$MMI_NIX_MIN_MAJOR" "$MMI_NIX_MIN_MINOR" "$MMI_NIX_MIN_PATCH"; then
+  if ! mmi_nix_version_is_pinned "$maj" "$min" "$pat"; then
     if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
-      error "Nix ${maj}.${min}.${pat} is still older than Nix 2.28 after reinstall."
+      error "Nix ${maj}.${min}.${pat} is still not Nix ${MMI_NIX_PIN_VERSION} after reinstall."
       return 1
     fi
-    info "Nix ${maj}.${min}.${pat} is older than Nix 2.28 (NixOS 25.05)."
+    if mmi_is_nixos; then
+      if [ "${MMI_NIXOS_PIN_TRIED:-}" = "1" ]; then
+        error "This NixOS system still provides Nix ${maj}.${min}.${pat}, not Nix ${MMI_NIX_PIN_VERSION}."
+        error "Set nix.package = pkgs.nixVersions.nix_2_28 and run: sudo nixos-rebuild switch"
+        return 1
+      fi
+      export MMI_NIXOS_PIN_TRIED=1
+      mmi_install_pinned_on_nixos || return 1
+      mmi_check_existing_nix || return 1
+      return 0
+    fi
+    info "Nix ${maj}.${min}.${pat} is not pinned Nix ${MMI_NIX_PIN_VERSION} (NixOS 25.05). Replacing it."
     if [ -n "$channel" ]; then
       info "Existing nixpkgs channel: ${channel}"
     fi
-    if [ "${MMI_NIX_UPGRADED:-}" != "1" ]; then
-      export MMI_NIX_UPGRADED=1
-      if mmi_try_upgrade_nix; then
-        mmi_reload_nix_bin || return 1
-        mmi_check_existing_nix || return 1
-        return 0
-      fi
-    fi
-    info "Upgrade failed. Replacing this Nix install."
     mmi_repair_nix_and_recheck || return 1
     return 0
   fi
@@ -1063,7 +1547,7 @@ mmi_check_existing_nix() {
       fi
     fi
     if [ "${MMI_NIX_REPAIR:-}" != "1" ]; then
-      info "The existing Nix store is unusable. Installing a fresh Nix."
+      info "The existing Nix store is unusable. Installing Nix ${MMI_NIX_PIN_VERSION}."
       mmi_repair_nix_and_recheck || return 1
       return 0
     fi
@@ -1103,6 +1587,16 @@ mmi_check_existing_nix() {
     return 0
   fi
 
+  if ! "$NIX_BIN" flake --help >/dev/null 2>&1; then
+    if [ "${MMI_NIX_REPAIR:-}" = "1" ]; then
+      error "Nix ${maj}.${min}.${pat} still cannot run flakes."
+      return 1
+    fi
+    info "Nix ${maj}.${min}.${pat} cannot run flakes. Replacing it."
+    mmi_repair_nix_and_recheck || return 1
+    return 0
+  fi
+
   sys="$("$NIX_BIN" config show system 2>/dev/null || true)"
   if [ -n "$sys" ] && [ "$sys" != "x86_64-linux" ]; then
     error "Nix is configured for system ${sys}. CAD needs x86_64-linux."
@@ -1125,8 +1619,37 @@ mmi_check_existing_nix() {
     return 1
   fi
 
-  info "Nix ${maj}.${min}.${pat}"
+  info "Nix ${maj}.${min}.${pat} (pinned for NixOS 25.05)"
   return 0
+}
+
+mmi_ensure_nix() {
+  mmi_source_nix
+  if mmi_find_nix >/dev/null 2>&1 || mmi_select_nix_bin >/dev/null 2>&1; then
+    mmi_check_existing_nix || return 1
+    return 0
+  fi
+  info "Nix not found — installing Nix ${MMI_NIX_PIN_VERSION} (NixOS 25.05)."
+  mmi_install_nix || return 1
+  mmi_check_existing_nix || return 1
+}
+
+# Process-local safe.directory so Nix's git can read a WSL checkout whose
+# owner does not match this user. Does not write git config.
+mmi_export_git_safe_directory() {
+  local dir="$1" n
+  [ "${MMI_GIT_SAFE_DIR:-}" = "$dir" ] && return 0
+  command -v git >/dev/null 2>&1 || return 0
+  git -c safe.directory=/ --version >/dev/null 2>&1 || return 0
+  [ -n "$dir" ] || return 0
+  n="${GIT_CONFIG_COUNT:-0}"
+  case "$n" in
+    ""|*[!0-9]*) n=0 ;;
+  esac
+  export GIT_CONFIG_COUNT=$((n + 1))
+  export "GIT_CONFIG_KEY_${n}=safe.directory"
+  export "GIT_CONFIG_VALUE_${n}=${dir}"
+  export MMI_GIT_SAFE_DIR="$dir"
 }
 
 # Restore flake paths that are missing from the work tree. Do not `git add`:
@@ -1134,6 +1657,7 @@ mmi_check_existing_nix() {
 # vendor/mmi from disk (can OOM a small VM).
 mmi_ensure_flake_git_files() {
   local rel f
+  mmi_export_git_safe_directory "${SCRIPT_DIR}"
   if ! command -v git >/dev/null 2>&1; then
     return 0
   fi
@@ -1183,6 +1707,7 @@ mmi_ensure_flake_git_files() {
 }
 
 mmi_warn_if_git_dirty() {
+  mmi_export_git_safe_directory "${SCRIPT_DIR}"
   if ! command -v git >/dev/null 2>&1; then
     return 0
   fi

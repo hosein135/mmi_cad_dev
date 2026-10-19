@@ -37,8 +37,10 @@ Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
 Needs x86_64 Linux: bare metal, a VM with a GUI desktop, or WSL2
 (not WSL1, not Windows-native). Run as your desktop user. sudo is
 accepted and continues as that user. Missing git and curl are installed
-with that distro's package manager. Nix 2.28+ (NixOS 25.05) is
-installed or upgraded automatically when the current one cannot be used.
+with that distro's package manager. If curl still cannot be installed,
+a static binary is downloaded. Nix 2.28.5 (the NixOS 25.05 package
+manager) is required. Any other Nix is replaced. On NixOS, /nix is
+kept and 2.28.5 is installed into your user profile.
 First install keeps ~1 GiB in the Nix store and needs ~6 GiB free.
 
 On a graphical VM, windows open on your desktop. If CAD starts its own
@@ -62,24 +64,14 @@ done
 # Preflight before Nix, vendor checks, or any store writes.
 mmi_check_linux_host || exit 1
 mmi_check_free_space || exit 1
-mmi_ensure_git_and_curl || exit 1
+mmi_ensure_bootstrap_tools || exit 1
 
 if [ "${CLEAN}" = true ]; then
   info "Removing data/home (CAD overlay) ..."
   rm -rf "${SCRIPT_DIR}/data/home"/*
 fi
 
-mmi_source_nix
-NIX_BIN=""
-if ! NIX_BIN="$(mmi_find_nix)"; then
-  mmi_install_nix || exit 1
-  mmi_source_nix
-  if ! NIX_BIN="$(mmi_find_nix)"; then
-    error "Nix install finished, but the nix command is still missing."
-    exit 1
-  fi
-fi
-mmi_check_existing_nix || exit 1
+mmi_ensure_nix || exit 1
 
 if [ ! -d "${SCRIPT_DIR}/vendor/mmi/src/max4.3.16" ]; then
   error "vendor/mmi/src/max4.3.16 is missing. CAD sources must be in git."
