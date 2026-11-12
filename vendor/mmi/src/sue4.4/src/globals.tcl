@@ -847,7 +847,7 @@ set DEFAULT_VERILOG_HEADER {$SCHEM_DIR(verilog)/default_verilog_header.h}
 set SPICEHOSTS [exec uname -n]
 
 init_global SPICE_TYPES -flags "user netlist" -type LIST \
-    -default "spice adm powermill" -desc {
+    -default "ngspice spice adm powermill" -desc {
 
 List of types of spice-like simulators available at site.
 }
@@ -857,6 +857,7 @@ set SPICE_SUFFIX(spice) .tr0
 set SPICE_SUFFIX(adm) .xp
 set SPICE_SUFFIX(powermill) .
 set SPICE_SUFFIX(intel) .split
+set SPICE_SUFFIX(ngspice) .ng0
 
 init_global SPICE_SUFFIX -flags "user netlist" -type ARRAY -desc {
 

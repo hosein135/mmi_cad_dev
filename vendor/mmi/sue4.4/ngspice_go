@@ -1,0 +1,110 @@
+#!/bin/csh -f
+# The next line will be skipped in TCL because of the backslash \
+mmi_wish -f $0 $* ; exit
+
+# Run ngspice on a SUE spice netlist and write an NST ascii waveform.
+# SUE starts this with mmi_wish and passes -CALLBACK "send <sue> spice_callback".
+# spice_callback treats 1 as success and 0 as failure. The deck must
+# contain the analysis (.tran, .ac, or .dc). A .control block is left
+# to ngspice. Tcl 8.0.
+
+wm withdraw .
+
+set here [file dirname [info script]]
+source [file join $here ngspice_nst.tcl]
+
+proc ngspice_finish {code} {
+  global CALLBACK
+  if {$CALLBACK == ""} {
+    exit $code
+  }
+  set failed [catch "$CALLBACK $code" msg]
+  if {$failed} {
+    puts $msg
+  }
+  exit $code
+}
+
+set CALLBACK ""
+set in_file ""
+set i 0
+set narg [llength $argv]
+while {$i < $narg} {
+  set arg [lindex $argv $i]
+  if {$arg == "-CALLBACK"} {
+    incr i
+    set CALLBACK [lindex $argv $i]
+  } elseif {$in_file == ""} {
+    set in_file $arg
+  }
+  incr i
+}
+
+if {$in_file == "" || [string match "-h*" $in_file]} {
+  puts "Usage: ngspice_go <netlist.sp> -CALLBACK \"send <sue> spice_callback\""
+  exit 0
+}
+
+if {![file exists $in_file]} {
+  puts "ngspice: cannot find netlist $in_file"
+  ngspice_finish 0
+}
+
+if {[catch {exec which ngspice} ngspice_bin]} {
+  puts "ngspice: ngspice is not on PATH."
+  ngspice_finish 0
+}
+set ngspice_bin [string trim $ngspice_bin]
+
+set root [file rootname $in_file]
+set raw "$root.ngraw"
+set log "$root.nglog"
+set out "$root.ng0"
+
+set failed [catch {exec $ngspice_bin -b -a -r $raw $in_file < /dev/null >& $log} run_msg]
+if {![file exists $raw] || [file size $raw] == 0} {
+  puts "ngspice: no waveform was written."
+  if {$failed} {
+    puts $run_msg
+  }
+  if {[file exists $log]} {
+    set lf [open $log r]
+    set log_text [read $lf]
+    close $lf
+    set log_lines [split $log_text \n]
+    set start [expr {[llength $log_lines] - 40}]
+    if {$start < 0} {
+      set start 0
+    }
+    puts [join [lrange $log_lines $start end] \n]
+  }
+  puts "ngspice: the netlist needs a .tran, .ac, or .dc card."
+  ngspice_finish 0
+}
+
+set rf [open $raw r]
+set raw_text [read $rf]
+close $rf
+set nst_text [ngspice_raw_to_nst $raw_text]
+if {$nst_text == ""} {
+  puts "ngspice: could not read the waveform in $raw"
+  ngspice_finish 0
+}
+
+set of [open $out w]
+puts -nonewline $of $nst_text
+close $of
+
+set rows 0
+set body [split $nst_text \n]
+set rows [expr {[llength $body] - 3}]
+if {$rows < 0} {
+  set rows 0
+}
+catch {file delete $raw}
+puts "ngspice: wrote $rows points to $out"
+if {$rows <= 1} {
+  puts "ngspice: only the operating point is in the waveform. Add a .tran, .ac, or .dc card to see a sweep."
+}
+
+ngspice_finish 1

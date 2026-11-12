@@ -51,7 +51,7 @@ proc spice_it {} {
 
   # make sure we have a valid SPICE_TYPE
   # these are the only valid ones
-  set simulators "spice adm powermill intel"
+  set simulators "ngspice spice adm powermill intel"
   if {[lsearch $simulators $SPICE_TYPE] == -1} {
     warning "Aborting, Invalid simulator type \"$SPICE_TYPE\".  Valid supported simulators are \"$simulators\".  Change variable SPICE_TYPE in .suerc or \"Select Simulator\" in \"Sim\" menu."
     return
@@ -84,7 +84,9 @@ proc spice_it {} {
   # move the existing output data file if it exists to a backup
   # not used for powermill since nst doesn't read it
   switch $SPICE_TYPE {
-    spice - adm {
+    spice -
+    adm -
+    ngspice {
       move_file_or_copy ${cur_s}$SPICE_SUFFIX(current) \
 	  ${cur_s}$SPICE_SUFFIX(current)~
     }
@@ -133,6 +135,20 @@ proc spice_it {} {
 
       puts "Starting $dir/spice on file \"$netlist_filename\" ..."
       set error [catch "exec $dir/spice $netlist_filename -CALLBACK \"send $process_name spice_callback\" &" msg]
+    }
+
+    ngspice {
+      # mmi_wish reads the script. The file does not need to be executable.
+      if {[file exists $mmi_private/sue/ngspice_go]} {
+	set dir $mmi_private/sue
+      } elseif {[file exists $mmi_local/sue/ngspice_go]} {
+	set dir $mmi_local/sue
+      } else {
+	set dir $SUE_DIR
+      }
+
+      puts "Starting $dir/ngspice_go on file \"$netlist_filename\" ..."
+      set error [catch "exec mmi_wish $dir/ngspice_go $netlist_filename -CALLBACK \"send $process_name spice_callback\" &" msg]
     }
 
     powermill {
@@ -272,7 +288,9 @@ proc NST_init_probe {{options 0}} {
       [use_first SPICE_SUFFIX(current) SPICE_SUFFIX($SPICE_TYPE)]
 
   switch $SPICE_TYPE {
-    spice - adm {
+    spice -
+    adm -
+    ngspice {
       set PROBE_DATA_FILE $NETLIST(dir)$NETLIST(root)$SPICE_SUFFIX(current)
     }
     intel {
@@ -359,6 +377,12 @@ proc NST_init_probe {{options 0}} {
 
   # use format of last file, default to 9601
   set TR0_FORMAT [use_first TR0_FORMAT '9601]
+
+  if {$SPICE_TYPE == "ngspice"} {
+    # ngspice_go writes NST's ascii waveform. A leftover 9007 from an
+    # earlier HSPICE run would send these names through the .pa0 table.
+    set TR0_FORMAT ascii
+  }
 
   # now load in the tr0 file
   puts $PROBE_ID "nst_load $PROBE_DATA_FILE"
@@ -620,9 +644,8 @@ proc spice_net {{id ""}} {
 	    set net [translate_spice_net $net]
 	  }
 	}
-	intel {
-	  # don't translate
-	}
+	intel -
+	ngspice -
 	powermill {
 	  # don't translate
 	}
@@ -774,9 +797,8 @@ proc find_net_name {id {index ""}} {
 	set net [translate_spice_net $net]
       }
     }
-    intel {
-      # don't translate
-    }
+    intel -
+    ngspice -
     powermill {
       # don't translate
     }

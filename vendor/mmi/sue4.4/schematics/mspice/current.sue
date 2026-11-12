@@ -1,0 +1,14 @@
+# SUE version MMI_SUE4.4.0
+
+proc ICON_current args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {current 0A}}
+  icon_term -type inout -origin {0 40} -name i_minus
+  icon_term -type inout -origin {0 -40} -orient RY -name i_plus
+  icon_arc -20 -20 20 20 -start 0 -extent 359
+  icon_line 0 -40 0 40
+  icon_line -8 8 0 20 8 8
+  icon_property -origin {-130 90} -type user -name name
+  icon_property -origin {-220 220} -type fixed -name spice -text {[unique_name I $name] $i_plus $i_minus DC $current}
+  icon_property -origin {-130 110} -type user -name current -default 0A
+  icon_property -origin {22 -8} -label {$current}
+}

@@ -1,0 +1,19 @@
+# SUE version MMI_SUE4.4.0
+
+proc ICON_sine args {
+  icon_setup $args {{origin {0 0}} {orient R0} {name {}} {offset 0} {amplitude vddp} {frequency 100Meg} {delay 0}}
+  icon_term -type inout -origin {0 40} -name v_minus
+  icon_term -type inout -origin {0 -40} -orient RY -name v_plus
+  icon_arc -20 -20 20 20 -start 0 -extent 359
+  icon_line 0 -20 0 -40
+  icon_line 0 40 0 20
+  icon_line -14 0 -10 8 -6 0 -2 -8 2 0 6 8 10 0 14 0
+  icon_property -origin {-130 90} -type user -name name
+  icon_property -origin {-220 250} -type fixed -name spice -text {[unique_name V $name] $v_plus $v_minus SIN($offset $amplitude $frequency $delay)}
+  icon_property -origin {-130 110} -type user -name offset -default 0
+  icon_property -origin {-130 130} -type user -name amplitude -default vddp
+  icon_property -origin {-130 150} -type user -name frequency -default 100Meg
+  icon_property -origin {-130 170} -type user -name delay -default 0
+  icon_property -origin {22 0} -label {$amplitude}
+  icon_property -origin {22 -16} -label {$frequency}
+}

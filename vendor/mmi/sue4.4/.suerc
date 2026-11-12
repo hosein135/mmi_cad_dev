@@ -555,16 +555,18 @@ set DEFAULT_VERILOG_HEADER {$SCHEM_DIR(verilog)/default_verilog_header.h}
 # them if desired.
 set SPICEHOSTS [exec uname -n]
 
-# List of types of spice-like simulators available at site
-set SPICE_TYPES "spice adm powermill"
+# List of types of spice-like simulators available at site.
+# ngspice is first because this install ships ngspice, not HSPICE.
+# Select Simulator still offers spice, adm, and powermill.
+set SPICE_TYPES "ngspice spice adm powermill"
 # default simulator for spice netlist format
-set SPICE_TYPE spice
-#set SPICE_TYPE adm
+set SPICE_TYPE ngspice
 
 # default spice output suffixes for each spice type
 set SPICE_SUFFIX(spice) .tr0
 set SPICE_SUFFIX(adm) .xp
 set SPICE_SUFFIX(powermill) .
+set SPICE_SUFFIX(ngspice) .ng0
 
 # prints netlist warnings of unconnected nets if set to 1.  Ignores if set to 0.
 set NETLIST(warning) 1
@@ -816,4 +818,10 @@ set DPC_TIMING(out) see
 
 # gates transitions slower than this value will be displayed
 set DPC_TIMING(max_transition) 1n
+
+# Netlist all modes, net-name annotation, named-connection flylines,
+# property search, and schematic compare.
+if {[file readable $SUE_DIR/local/commands.tcl]} {
+  source $SUE_DIR/local/commands.tcl
+}
 

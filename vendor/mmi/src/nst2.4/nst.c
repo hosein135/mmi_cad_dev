@@ -803,13 +803,25 @@ read_ascii_file(infile)
   d1->cnam = (char **) malloc(d1->var_count * sizeof(char *) * 2);
   d1->ityp = (int *) malloc(d1->var_count * sizeof(int) * 2);
 
-  /* now read in the names and assign a bogus type */
-  d1->cnam[0] = (char *) malloc(sizeof(char) * 2 * 17);
-  strcpy(d1->cnam[0],strtok(buf," \t\n"));
+  /* now read in the names and assign a bogus type.
+     Names used to be copied into a 34-byte buffer. ngspice keeps the
+     full net name, so size the buffer from the token. */
+  token = strtok(buf," \t\n");
+  if (token == NULL) {
+    sprintf(error_msg,"ascii file has no column names");
+    return d1;
+  }
+  d1->cnam[0] = (char *) malloc(strlen(token) + 1);
+  strcpy(d1->cnam[0],token);
   d1->ityp[0] = HERTZ;
   for (i=1; i<d1->var_count; i++) {
-      d1->cnam[i] = (char *) malloc(sizeof(char) * 2 * 17);
-      strcpy(d1->cnam[i],strtok(NULL," \t\n"));
+      token = strtok(NULL," \t\n");
+      if (token == NULL) {
+        sprintf(error_msg,"ascii file is missing a column name");
+        return d1;
+      }
+      d1->cnam[i] = (char *) malloc(strlen(token) + 1);
+      strcpy(d1->cnam[i],token);
       d1->ityp[i] = VOLTAGE;
   }
 

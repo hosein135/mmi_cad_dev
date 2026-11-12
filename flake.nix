@@ -330,6 +330,7 @@
             xdg-utils
             strace
             magic-vlsi
+            ngspice
             imagemagick
             cairo
             xorg.xset
