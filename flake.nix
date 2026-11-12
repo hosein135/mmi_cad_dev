@@ -417,7 +417,7 @@
           export MMI_FONT_CACHE="''${MMI_FONT_CACHE:-''${MMI_CAD_ROOT}/data/fonts/max}"
           export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
-          export PATH=/mmi-bundle/importer:/mmi-magic/bin:$PATH
+          export PATH=/mmi-bundle/importer:$MMI_TOOLS/bin:/mmi-magic/bin:$PATH
           export MMI_XKB_ROOT=${xkbRoot}
           export QT_X11_NO_MITSHM=1
           export LC_ALL=C

@@ -227,7 +227,10 @@ export MN_BIN_DIR="${MN_BIN_DIR:-bin.linux}"
 if resolved="$(mmi_resolve_max_font_dir 2>/dev/null)"; then
   export MMI_MAX_FONTS_DIR="${resolved}"
 fi
-export PATH="/mmi-bundle/importer:/mmi-pdk-live/importer:/mmi-magic/bin:${MMI_TOOLS}/bin:${PATH}"
+# Micro Magic ext2sim, ext2spice, and gemini must come before Magic VLSI.
+# Magic ships ext2sim and ext2spice under the same names; MAX LVS calls
+# them by name and would otherwise run Magic 8.
+export PATH="/mmi-bundle/importer:/mmi-pdk-live/importer:${MMI_TOOLS}/bin:/mmi-magic/bin:${PATH}"
 export QT_X11_NO_MITSHM=1
 export LC_ALL=C
 export LANG=C

@@ -46,3 +46,19 @@ proc _mmi_pdk_source {name} {
 _mmi_pdk_source pdk_common.tcl
 _mmi_pdk_source mag_import.tcl
 _mmi_pdk_source image_layout.tcl
+
+# MAX LVS runs ext2sim, ext2spice, and gemini by name. Magic VLSI installs
+# ext2sim and ext2spice with those same names. Keep Micro Magic's copies first.
+if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) != ""} {
+  set _mmi_bin [file join $env(MMI_TOOLS) bin]
+} else {
+  set _mmi_bin /mmi-vendor/mmi/bin
+}
+if {[file executable [file join $_mmi_bin ext2sim]]} {
+  if {![info exists env(PATH)] || $env(PATH) == ""} {
+    set env(PATH) $_mmi_bin
+  } elseif {[string first $_mmi_bin: $env(PATH)] != 0 && $env(PATH) != $_mmi_bin} {
+    set env(PATH) $_mmi_bin:$env(PATH)
+  }
+}
+unset _mmi_bin
