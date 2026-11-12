@@ -173,6 +173,7 @@ proc _mmi_autolayout_run {} {
     set empty [_mmi_cell_empty $cell]
   }
   if {!$empty} {
+    _mmi_bind_cell_beside_sue
     cd $save
     set _mmi_autolayout_done 1
     return
@@ -184,8 +185,38 @@ proc _mmi_autolayout_run {} {
     return
   }
   catch {view_cell}
+  _mmi_bind_cell_beside_sue
   set _mmi_autolayout_done 1
   cd $save
+}
+
+# .ext, .sim, and .max for a schematic stay in the directory of its .sue file.
+proc _mmi_bind_cell_beside_sue {} {
+  global CELL LVS_SEARCH_DIRS
+  set req [_mmi_autolayout_request]
+  if {[llength $req] < 3} { return }
+  set dir [lindex $req 1]
+  set cell [lindex $req 2]
+  if {$dir == "" || ![file isdirectory $dir]} { return }
+  if {![cell_in_memory $cell]} { return }
+  set suffix .max
+  if {[info exists CELL(default_suffix)] && $CELL(default_suffix) != ""} {
+    set suffix $CELL(default_suffix)
+  }
+  set want $dir/$cell$suffix
+  set path ""
+  catch {set path [lindex [cell_info $cell] 1]}
+  set have ""
+  if {$path != ""} { set have [file dirname $path] }
+  if {$have != $dir} {
+    if {[catch {db_cell_rename $cell $cell $want} err]} {
+      msg "Could not put $cell next to its schematic ($want): $err\n"
+    } else {
+      msg "Cell file is $want\n"
+    }
+  }
+  set LVS_SEARCH_DIRS $dir
+  cd $dir
 }
 
 proc _mmi_autolayout_later {} {
@@ -222,11 +253,44 @@ proc _mmi_hook_lvs_it {} {
   rename lvs_it_max _mmi_lvs_it_max_real
   proc lvs_it_max {} {
     _mmi_autolayout_run
+    _mmi_bind_cell_beside_sue
     _mmi_lvs_it_max_real
   }
 }
 
+proc _mmi_hook_cross_probe_ext {} {
+  global auto_index _mmi_cross_probe_autoload
+  if {[info commands _mmi_cross_probe_real] != ""} { return }
+  if {[info commands _create_cross_probe_correspondence] == "" && \
+      [info exists auto_index(_create_cross_probe_correspondence)]} {
+    set _mmi_cross_probe_autoload $auto_index(_create_cross_probe_correspondence)
+    set auto_index(_create_cross_probe_correspondence) _mmi_autoload_cross_probe_ext
+    return
+  }
+  if {[info commands _create_cross_probe_correspondence] == ""} { return }
+  rename _create_cross_probe_correspondence _mmi_cross_probe_real
+  proc _create_cross_probe_correspondence {file} {
+    _mmi_bind_cell_beside_sue
+    _mmi_cross_probe_real $file
+  }
+}
+
+proc _mmi_autoload_cross_probe_ext {} {
+  global auto_index _mmi_cross_probe_autoload
+  if {[info exists auto_index(_create_cross_probe_correspondence)]} {
+    unset auto_index(_create_cross_probe_correspondence)
+  }
+  eval $_mmi_cross_probe_autoload
+  if {[info commands _create_cross_probe_correspondence] == ""} { return }
+  rename _create_cross_probe_correspondence _mmi_cross_probe_real
+  proc _create_cross_probe_correspondence {file} {
+    _mmi_bind_cell_beside_sue
+    _mmi_cross_probe_real $file
+  }
+}
+
 _mmi_hook_lvs_it
+_mmi_hook_cross_probe_ext
 set _mmi_autolayout_boot [_mmi_autolayout_request]
 if {[llength $_mmi_autolayout_boot] >= 3} {
   after 300 _mmi_autolayout_later
