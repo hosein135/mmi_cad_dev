@@ -31,8 +31,8 @@
 #   set VAR value         copied verbatim into TECH.tcl (LAYER_NAME, GRID)
 #   drc ... / preserve_ports / iname   accepted and ignored
 
-# Bump when the emitted files change; pdk_import.tcl re-converts older techs.
-set GEN_REV 6
+# Bump when the emitted files change. importer --repair rebuilds older techs.
+set GEN_REV 7
 
 if {[llength $argv] < 3} {
   puts stderr "usage: source_to_tech27.tcl SOURCE TECH OUTDIR"
@@ -647,7 +647,9 @@ puts $fh ""
 puts $fh "cifoutput"
 puts $fh "style $tech"
 puts $fh ""
-puts $fh "\tunits .001 .001 .001 .001"
+# 0.5 nm database unit. DB, CIF-plane, CIF, and GDS resolutions stay
+# equal, so CIFDBRes/CIFGDSRes remains 1. GDS is still written at 1 nm.
+puts $fh "\tunits .0005 .0005 .0005 .0005"
 puts $fh "\tcharset unrestricted"
 puts $fh ""
 if {$bbox_layer != "" && [info exists gds_of($bbox_layer)]} {

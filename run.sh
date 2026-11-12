@@ -31,6 +31,7 @@ Micro Magic CAD — run via Nix flake (pure eval, NixOS 25.05).
 
   ./run.sh              CAD shell (host X if DISPLAY is set, else Nix Xvnc)
   ./run.sh max          start MAX
+  ./run.sh importer     download a PDK and its SUE library
   ./run.sh --prep-only  build vendor + wrapper into the Nix store
   ./run.sh --clean      remove data/home (CAD overlay)
 

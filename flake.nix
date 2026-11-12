@@ -123,7 +123,7 @@
       '';
 
       # Scripts + Magic rc fallbacks + samples only. Foundry PDKs are not
-      # flake inputs; MAX File → Import PDK downloads them at user request.
+      # flake inputs; ./run.sh importer downloads them at user request.
       # Copy root is ./pdk (not ./.) so a Tcl-only change does not walk vendor/mmi.
       mmiPdk = pkgs.runCommand "mmi-pdk"
         {
@@ -140,8 +140,9 @@
         ''
           export LC_ALL=C
           mkdir -p $out/app-defaults $out/magic $out/samples
-          install -Dm644 "$src/pdk_import.tcl" $out/pdk_import.tcl
+          install -Dm644 "$src/pdk_common.tcl" $out/pdk_common.tcl
           install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
+          install -Dm644 "$src/mag_exact.tcl" $out/mag_exact.tcl
           install -Dm644 "$src/image_layout.tcl" $out/image_layout.tcl
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
           install -Dm755 "$src/open_mag.sh" $out/open_mag.sh
@@ -152,6 +153,19 @@
           install -Dm755 "$src/fetch_caravel_harness_mag.sh" $out/fetch_caravel_harness_mag.sh
           install -Dm644 "$src/source_to_tech27.tcl" $out/source_to_tech27.tcl
           install -Dm644 "$src/maxrc" $out/maxrc
+          mkdir -p $out/importer $out/sue
+          install -Dm755 "$src/importer/importer" $out/importer/importer
+          install -Dm644 "$src/importer/importer.tcl" $out/importer/importer.tcl
+          install -Dm644 "$src/importer/engine.tcl" $out/importer/engine.tcl
+          install -Dm644 "$src/importer/pdk_tables.tcl" $out/importer/pdk_tables.tcl
+          install -Dm644 "$src/importer/registry.json" $out/importer/registry.json
+          install -Dm644 "$src/sue/sue_lib.tcl" $out/sue/sue_lib.tcl
+          install -Dm755 "$src/sue/gen_sue_lib.tcl" $out/sue/gen_sue_lib.tcl
+          if [ -d "$src/tests" ]; then
+            mkdir -p $out/tests
+            cp -a "$src/tests/." $out/tests/
+            chmod a+x $out/tests/*.sh 2>/dev/null || true
+          fi
           if [ -d "$src/samples" ]; then
             cp -a "$src/samples/." $out/samples/
           fi
@@ -402,7 +416,7 @@
           export MMI_FONT_CACHE="''${MMI_FONT_CACHE:-''${MMI_CAD_ROOT}/data/fonts/max}"
           export PDK_ROOT="''${PDK_ROOT:-/mmi-pdks}"
           export PDK="''${PDK:-sky130A}"
-          export PATH=/mmi-magic/bin:$PATH
+          export PATH=/mmi-bundle/importer:/mmi-magic/bin:$PATH
           export MMI_XKB_ROOT=${xkbRoot}
           export QT_X11_NO_MITSHM=1
           export LC_ALL=C

@@ -1,0 +1,19 @@
+#!/bin/sh
+# importer — PDKs, MAX technologies, and SUE design libraries.
+# GUI with no arguments. Command line: --list --status --install --uninstall --repair.
+set -e
+HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+CMD=${1:-}
+RUN=wish
+case "$CMD" in
+  --*) RUN=tclsh ;;
+esac
+if ! command -v "$RUN" >/dev/null 2>&1; then
+  if [ "$RUN" = "wish" ] && command -v tclsh >/dev/null 2>&1; then
+    echo "importer: wish is not on PATH; the window needs Tk." >&2
+    exit 1
+  fi
+  echo "importer: $RUN is not on PATH" >&2
+  exit 1
+fi
+exec "$RUN" "$HERE/importer.tcl" "$@"

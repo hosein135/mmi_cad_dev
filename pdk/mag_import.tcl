@@ -23,12 +23,27 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 12
+set _MAG_IMPORT_REV 13
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
 set _MAG_IMPORT_SOURCED 1
 set _MAG_IMPORT_REV_LOADED $_MAG_IMPORT_REV
+
+set _mag_exact_tcl [file join [file dirname [info script]] mag_exact.tcl]
+if {![file readable $_mag_exact_tcl]} {
+  foreach _mag_exact_tcl {
+    /mmi-pdk-live/mag_exact.tcl
+    /mmi-bundle/mag_exact.tcl
+  } {
+    if {[file readable $_mag_exact_tcl]} break
+  }
+}
+if {[file readable $_mag_exact_tcl]} {
+  source $_mag_exact_tcl
+} else {
+  error "mag_exact.tcl not found (expected next to mag_import.tcl)"
+}
 
 if {[info commands _mmi_file_normalize] == ""} {
   proc _mmi_file_normalize {path} {
@@ -368,15 +383,17 @@ proc mag_pdk_dir {family} {
   return ""
 }
 
-# Nanometers per Magic lambda: "scalefactor N nanometers" of the PDK's
-# Magic cifoutput style when the PDK is installed, else the known defaults.
-proc mag_scalefactor_nm {family} {
+# Half-nanometres per Magic lambda. Defaults match open_pdks
+# (sky130 and IHP 10 nm, gf180mcu 50 nm). A "scalefactor" line in the
+# installed Magic tech replaces the default. The result is an integer;
+# a scalefactor that is not a whole number of half-nanometres is ignored.
+proc mag_lambda_hnm {family} {
   global MAG_IMPORT
-  if {[info exists MAG_IMPORT(scale,$family)]} { return $MAG_IMPORT(scale,$family) }
-  # open_pdks: sky130 "scalefactor 10 nanometers", gf180mcu "50 nanometers",
-  # IHP sg13g2 "10 nanometers" (the .mag magscale n/d then gives the grid).
-  set nm 10.0
-  if {$family == "gf180mcu"} { set nm 50.0 }
+  if {[info exists MAG_IMPORT(lambda_hnm,$family)]} {
+    return $MAG_IMPORT(lambda_hnm,$family)
+  }
+  set hnm 20
+  if {$family == "gf180mcu"} { set hnm 100 }
   set pdk [mag_pdk_dir $family]
   if {$pdk != ""} {
     set techs {}
@@ -392,26 +409,38 @@ proc mag_scalefactor_nm {family} {
         if {$c == "cifoutput"} { set in_out 1; continue }
         if {$in_out && ($c == "cifinput" || $c == "drc" || $c == "extract")} break
         if {$in_out && $c == "scalefactor" && [llength $toks] >= 2} {
-          set found [lindex $toks 1]
+          set raw [lindex $toks 1]
           set unit [string tolower [lindex $toks 2]]
-          # Magic's default scalefactor unit is centimicrons (10 nm).
-          if {$unit == "" || [string match centi* $unit]} {
-            set found [expr {double($found) * 10.0}]
+          if {[string match nano* $unit]} {
+            set found [mag_exact_nm_hnm $raw]
+          } elseif {$unit == "" || [string match centi* $unit]} {
+            # Centimicrons: 1 centimicron = 10 nm = 20 hnm.
+            set found [mag_exact_dec_hnm $raw 20]
           } elseif {[string match ang* $unit]} {
-            set found [expr {double($found) / 10.0}]
+            # 1 angstrom = 0.1 nm = 0.2 hnm. Only exact values are kept.
+            set found [mag_exact_dec_hnm $raw 1]
+            if {$found != "" && [expr {$found % 5}] != 0} { set found "" }
+            if {$found != ""} { set found [expr {$found / 5}] }
           }
           break
         }
       }
       close $fh
-      if {$found != "" && ![catch {expr {double($found) > 0}} ok] && $ok} {
-        set nm [expr {double($found)}]
+      if {$found != "" && $found > 0} {
+        set hnm $found
         break
       }
     }
   }
-  set MAG_IMPORT(scale,$family) $nm
-  return $nm
+  set MAG_IMPORT(lambda_hnm,$family) $hnm
+  set MAG_IMPORT(scale,$family) [expr {double($hnm) / 2.0}]
+  return $hnm
+}
+
+# Nanometers per Magic lambda. Kept for log lines; the converter itself
+# uses mag_lambda_hnm and integer arithmetic.
+proc mag_scalefactor_nm {family} {
+  return [expr {double([mag_lambda_hnm $family]) / 2.0}]
 }
 
 # Nanometers per .mag file unit: lambda * magscale n/d.
@@ -1043,6 +1072,19 @@ proc mag_sref_orient {a b d e} {
 }
 
 proc mag_scale_xy {x y scale} {
+  global MAG_IMPORT
+  set src 0
+  set dst 0
+  if {[info exists MAG_IMPORT(file_hnm)]} { set src $MAG_IMPORT(file_hnm) }
+  if {[info exists MAG_IMPORT(out_hnm)]} { set dst $MAG_IMPORT(out_hnm) }
+  if {$src > 0 && $dst > 0} {
+    set gx [mag_exact_coord $x $src $dst]
+    set gy [mag_exact_coord $y $src $dst]
+    if {$gx == "" || $gy == ""} {
+      error "coordinate $x $y is not a whole number of [mag_exact_hnm_text $dst] (file unit [mag_exact_hnm_text $src])"
+    }
+    return [list $gx $gy]
+  }
   set gx [expr {round(double($x) * $scale)}]
   set gy [expr {round(double($y) * $scale)}]
   return [list $gx $gy]
@@ -1384,14 +1426,24 @@ proc mag_tri_xy {x1 y1 x2 y2 dir scale} {
 }
 
 proc mag_write_cell {fh name family} {
-  global MAGDB
+  global MAGDB MAG_IMPORT
   mag_gds_bgnstr $fh $name
   set n 1
   set d 1
   if {[info exists MAGDB($name,n)]} { set n $MAGDB($name,n) }
   if {[info exists MAGDB($name,d)]} { set d $MAGDB($name,d) }
-  set scale [mag_nm_per_unit $family $n $d]
-  if {$scale <= 0} { set scale 1.0 }
+  set file_h 0
+  set out_h 0
+  if {[info exists MAG_IMPORT(lambda_hnm)]} {
+    set file_h [mag_exact_file_hnm $MAG_IMPORT(lambda_hnm) $n $d]
+  }
+  if {[info exists MAG_IMPORT(gds_hnm)]} { set out_h $MAG_IMPORT(gds_hnm) }
+  if {$file_h == "" || $file_h <= 0 || $out_h <= 0} {
+    error "no exact scale for cell $name (magscale $n $d)"
+  }
+  set MAG_IMPORT(file_hnm) $file_h
+  set MAG_IMPORT(out_hnm) $out_h
+  set scale 1.0
   set text_dt [mag_text_dt $family]
 
   if {[info exists MAGDB($name,layers)]} {
@@ -1404,7 +1456,15 @@ proc mag_write_cell {fh name family} {
           setl {lay dt grow_nm} $rec
           set g 0
           if {$grow_nm != "" && $grow_nm > 0} {
-            set g [expr {double($grow_nm) / $scale}]
+            set grow_h [mag_exact_nm_hnm $grow_nm]
+            if {$grow_h == ""} {
+              error "implant grow $grow_nm nm on $layer is not a whole number of half-nanometres"
+            }
+            set g [mag_exact_grow_file $grow_h $file_h]
+            set used [expr {$g * $file_h}]
+            if {$used != $grow_h} {
+              mag_log "grow $layer $grow_nm nm expanded to [mag_exact_hnm_text $used] so it stays on the file grid"
+            }
           }
           if {$kind == "rect"} {
             setl {x1 y1 x2 y2} [lrange $geom 1 4]
@@ -1439,8 +1499,9 @@ proc mag_write_cell {fh name family} {
         set dt [lindex [lindex $trec 0] 1]
         if {$lay >= 200} continue
       }
-      set mx [expr {($x1 + $x2) / 2.0}]
-      set my [expr {($y1 + $y2) / 2.0}]
+      set anchor [mag_exact_label_anchor $x1 $y1 $x2 $y2]
+      set mx [lindex $anchor 0]
+      set my [lindex $anchor 1]
       setl {gx gy} [mag_scale_xy $mx $my $scale]
       mag_gds_text $fh $lay $dt $gx $gy $text
     }
@@ -1495,6 +1556,177 @@ proc mag_write_cell {fh name family} {
   mag_gds_endstr $fh
 }
 
+proc mag_exact_header {path} {
+  set n 1
+  set d 1
+  if {[catch {set fh [open $path r]}]} { return [list 1 1] }
+  while {[gets $fh line] >= 0} {
+    set toks [mag_words $line]
+    if {[lindex $toks 0] == "magscale" && [llength $toks] >= 3 && \
+        [mag_all_int [lrange $toks 1 2]]} {
+      set n [lindex $toks 1]
+      set d [lindex $toks 2]
+      break
+    }
+    if {[string match "<<*" [string trim $line]]} break
+  }
+  close $fh
+  return [list $n $d]
+}
+
+proc mag_exact_dest_db_hnm {tech} {
+  set f ""
+  if {[info commands pdk_find_tech27] != ""} {
+    catch {set f [pdk_find_tech27 $tech]}
+  }
+  if {$f == ""} {
+    foreach dir [list \
+        [file join /mmi-pdks max tech $tech] \
+        [file join /mmi-home mmi_private max tech $tech] \
+        [file join /mmi-home cad mmi_local max tech $tech]] {
+      set c [file join $dir ${tech}.tech27]
+      if {[file readable $c]} { set f $c; break }
+    }
+  }
+  if {$f == ""} {
+    mag_log "No ${tech}.tech27 yet; exactness is checked against 1 nm database units"
+    return 2
+  }
+  set h [mag_exact_tech27_db_hnm $f]
+  if {$h == "" || $h <= 0} {
+    mag_log "Could not read the units line of $f; checking against 1 nm"
+    return 2
+  }
+  mag_log "Destination database unit [mag_exact_hnm_text $h] ($f)"
+  return $h
+}
+
+proc mag_exact_mask_hnm {family} {
+  if {$family == "gf180mcu"} { return 100 }
+  return 10
+}
+
+# Reject the conversion when a file-unit corner is not a whole number of
+# GDS units (1 nm) or of the destination database unit. Does not round.
+proc mag_exact_prepare {family dir top} {
+  global MAG_IMPORT
+  set lambda [mag_lambda_hnm $family]
+  set MAG_IMPORT(lambda_hnm) $lambda
+  set n 1
+  set d 1
+  if {$top != "" && $top != "auto"} {
+    set mag [file join $dir ${top}.mag]
+    if {[file readable $mag]} {
+      set hd [mag_exact_header $mag]
+      set n [lindex $hd 0]
+      set d [lindex $hd 1]
+    }
+  }
+  set file_h [mag_exact_file_hnm $lambda $n $d]
+  if {$file_h == ""} {
+    return "magscale $n $d does not divide lambda [mag_exact_hnm_text $lambda]. Refusing to round."
+  }
+  set MAG_IMPORT(file_hnm) $file_h
+  set MAG_IMPORT(gds_hnm) 2
+  set MAG_IMPORT(out_hnm) 2
+  set db_h [mag_exact_dest_db_hnm $MAG_IMPORT(tech)]
+  set MAG_IMPORT(db_hnm) $db_h
+  mag_log "Exact scale: file unit [mag_exact_hnm_text $file_h], GDS unit 1 nm, database unit [mag_exact_hnm_text $db_h]"
+  if {[expr {$file_h % 2}] != 0} {
+    return "File unit [mag_exact_hnm_text $file_h] is not a whole number of 1 nm GDS units. Refusing to round."
+  }
+  if {[expr {$file_h % $db_h}] != 0} {
+    return "File unit [mag_exact_hnm_text $file_h] is not a whole number of database units ([mag_exact_hnm_text $db_h]). Refusing to round."
+  }
+  return ""
+}
+
+proc mag_exact_scan_max {path mask_hnm} {
+  if {![file readable $path]} { return "" }
+  if {[catch {set fh [open $path r]}]} { return "" }
+  set db_h ""
+  set section ""
+  set bad ""
+  set lineno 0
+  while {[gets $fh line] >= 0} {
+    incr lineno
+    if {$lineno > 2000000} break
+    set t [string trim $line]
+    set toks [mag_words $t]
+    if {[lindex $toks 0] == "resolution" && [llength $toks] >= 2} {
+      set db_h [mag_exact_um_hnm [lindex $toks 1]]
+      continue
+    }
+    if {[lindex $toks 0] == "SECTION" && [llength $toks] >= 2} {
+      set section [lindex $toks 1]
+      continue
+    }
+    if {[string match "\}*" $t]} { set section ""; continue }
+    if {$db_h == "" || $db_h <= 0} continue
+    set coords {}
+    if {$section == "RECTS" || $section == "PAINT"} {
+      if {[llength $toks] >= 4 && [mag_all_int [lrange $toks 0 3]]} {
+        set coords [lrange $toks 0 3]
+      } elseif {[lindex $toks 0] == "rect" && [llength $toks] >= 5 && \
+          [mag_all_int [lrange $toks 1 4]]} {
+        set coords [lrange $toks 1 4]
+      }
+    } elseif {$section == "LABELS"} {
+      if {([lindex $toks 0] == "lab" || [lindex $toks 0] == "t") && \
+          [llength $toks] >= 6 && [mag_all_int [lrange $toks 2 5]]} {
+        set coords [lrange $toks 2 5]
+      }
+    }
+    foreach c $coords {
+      set num [expr {$c * $db_h}]
+      if {[string first . $num] >= 0 || [expr {$num % $mask_hnm}] != 0} {
+        set bad "off mask grid at line $lineno ($t)"
+        break
+      }
+    }
+    if {$bad != ""} break
+  }
+  close $fh
+  return $bad
+}
+
+proc mag_exact_scan_tree {dir family} {
+  set mask [mag_exact_mask_hnm $family]
+  set files {}
+  catch {set files [glob -nocomplain [file join $dir *.max]]}
+  set msgs {}
+  foreach f $files {
+    set err [mag_exact_scan_max $f $mask]
+    if {$err != ""} {
+      lappend msgs "[file tail $f]: $err"
+    }
+  }
+  return [join $msgs \n]
+}
+
+# Mark a Tcl-dump result so a later open can tell it from a Magic GDS import.
+proc mag_stamp_preview {path} {
+  if {![file readable $path]} { return }
+  if {[catch {set fh [open $path r]}]} { return }
+  set data [read $fh]
+  close $fh
+  if {[string first "mmi_convert" $data] >= 0} { return }
+  if {[regsub {SECTION PROPERTIES \{\n} $data "SECTION PROPERTIES \{\n\tmmi_convert preview\n" data]} {
+  } elseif {[regsub {SECTION } $data "SECTION PROPERTIES \{\n\tmmi_convert preview\n\} SECTION PROPERTIES\n\nSECTION " data]} {
+  } else {
+    return
+  }
+  if {[catch {set fh [open $path w]}]} { return }
+  puts -nonewline $fh $data
+  close $fh
+}
+
+proc mag_stamp_preview_tree {dir} {
+  set files {}
+  catch {set files [glob -nocomplain [file join $dir *.max]]}
+  foreach f $files { mag_stamp_preview $f }
+}
+
 proc mag_write_gds {gdsfile family} {
   global MAGDB
   if {[catch {set fh [open $gdsfile w]} err]} {
@@ -1518,9 +1750,6 @@ proc mag_import_dialog {} -desc {
   global MAG_IMPORT MN_TECH
 
   set sample [mag_sample_dir]
-  if {![mag_pdk_magicrc_ok]} {
-    set MAG_IMPORT(method) tcl
-  }
   set techs [mag_list_max_techs]
   if {![llength $techs]} {
     set techs {mmi18 mmi25}
@@ -1560,7 +1789,7 @@ proc mag_import_dialog {} -desc {
   }
 
   set prop_list ""
-  # No -reload: rebuilding the prop_menu jumps the window (same as Import PDK).
+  # No -reload: rebuilding the prop_menu jumps the window.
   lappend prop_list [list "Magic source:" MAG_IMPORT(source) \
       -radio $src_labels -values $src_values \
       -help {GDS download opens chipfoundry/caravel caravel.gds (pad ring, management core, empty user wrapper). Magic download converts efabless/caravel mag (harness) plus caravel_user_project user_proj_example (the counter) from .mag to GDS to MAX, and opens the original Magic layout. Both need sky130A. Local sample is example_por only.}]
@@ -1575,9 +1804,9 @@ proc mag_import_dialog {} -desc {
   lappend prop_list [list "GDS conversion method:" MAG_IMPORT(method) \
       -radio [list \
           "Magic mag2gds — tapeout-quality (needs Magic + shared PDK)" \
-          "Tcl paint dump — fast, no Magic (NOT tapeout-quality)"] \
+          "Tcl paint dump — preview only, not for DRC"] \
       -values {mag2gds tcl} \
-      -help {Magic mag2gds: real Magic VLSI writes GDS using the PDK cifoutput rules. Requires Import PDK (sky130A) first. Tcl dump: copies paint rectangles only.}]
+      -help {Magic mag2gds writes GDS with the PDK cifoutput rules. Import a PDK with ./run.sh importer first. The Tcl dump copies paint rectangles and is stamped mmi_convert preview. It is not checked against the foundry rules.}]
 
   lappend prop_list [list "Destination MAX PDK / technology:" MAG_IMPORT(tech) \
       -radio $labels -values $values \
@@ -1623,7 +1852,7 @@ proc mag_import_go {} {
       }
       catch {
         set w [tk_dialog .magwarn "PDK mismatch?" \
-            "$what\nDestination technology is '$MAG_IMPORT(tech)'.\n\nImport SKY130A first (File → Import PDK), then retry.\nContinue anyway with '$MAG_IMPORT(tech)'?" \
+            "$what\nDestination technology is '$MAG_IMPORT(tech)'.\n\nInstall sky130A first (./run.sh importer), then retry.\nContinue anyway with '$MAG_IMPORT(tech)'?" \
             {} 0 Continue Cancel]
       }
       if {$w != 0} { return }
@@ -1659,7 +1888,7 @@ proc mag_import_go {} {
   }
 
   if {$MAG_IMPORT(tech) == ""} {
-    mag_import_tell "Select a destination MAX technology (Import PDK if none are listed)." -copy
+    mag_import_tell "Select a destination MAX technology (./run.sh importer if none are listed)." -copy
     return
   }
 
@@ -1949,7 +2178,13 @@ proc mag_import_run {dir top tech {method mag2gds}} {
     return
   }
 
-  mag_progress_update 70 "Tcl paint dump → $gds (not tapeout-quality)"
+  mag_progress_update 70 "Tcl paint dump → $gds (preview, not for DRC)"
+  set perr [mag_exact_prepare $family $dir $topcell]
+  if {$perr != ""} {
+    mag_import_fail $perr
+    return
+  }
+  set MAG_IMPORT(preview) 1
   mag_log "Tcl dump scale: [mag_scalefactor_nm $family] nm per lambda"
   set err [mag_write_gds $gds $family]
   if {$err != ""} {
@@ -2024,9 +2259,16 @@ proc mag_max_show_converted {} {
   catch {view_cell}
 }
 
-proc mag_max_after_gds_script {path} {
+proc mag_import_drc_count {} {
+  if {[info commands msg_catch] == ""} { return "" }
+  if {[catch {msg_catch ":drc count" err msg}]} { return "" }
+  return [lindex $msg 3]
+}
+
+proc mag_max_after_gds_script {path {family sky130A} {outdir .}} {
   set fh [open $path w]
-  puts $fh "# Expand Mag→MAX import to match Magic's expanded layout view."
+  set report [file join $outdir mmi_convert_report.txt]
+  puts $fh "# Expand Mag to MAX, save, then record DRC and the mask-grid scan."
   puts $fh "after idle {"
   puts $fh "  catch {"
   puts $fh "    set bb \[db_bbox\]"
@@ -2041,6 +2283,29 @@ proc mag_max_after_gds_script {path} {
   puts $fh "  catch {:see no instancePorts}"
   puts $fh "  catch {view_cell}"
   puts $fh "  catch {cell_save_tree 0}"
+  puts $fh "  set _mmi_drc {}"
+  puts $fh "  if {\[info commands msg_catch\] != {}} {"
+  puts $fh "    catch {"
+  puts $fh "      msg_catch {:drc count} _mmi_err _mmi_msg"
+  puts $fh "      set _mmi_drc \[lindex \$_mmi_msg 3\]"
+  puts $fh "    }"
+  puts $fh "  }"
+  puts $fh "  set _mmi_scan {}"
+  puts $fh "  if {\[info commands mag_exact_scan_tree\] != {}} {"
+  puts $fh "    catch {set _mmi_scan \[mag_exact_scan_tree [list $outdir] [list $family]\]}"
+  puts $fh "  }"
+  puts $fh "  set _mmi_bb {}"
+  puts $fh "  catch {set _mmi_bb \[db_bbox\]}"
+  puts $fh "  if {\[catch {set _mmi_fh \[open [list $report] w\]}\] == 0} {"
+  puts $fh "    puts \$_mmi_fh \"drc_count \$_mmi_drc\""
+  puts $fh "    puts \$_mmi_fh \"bbox \$_mmi_bb\""
+  puts $fh "    puts \$_mmi_fh \"scan \$_mmi_scan\""
+  puts $fh "    close \$_mmi_fh"
+  puts $fh "  }"
+  puts $fh "  if {\$_mmi_scan != {}} {"
+  puts $fh "    puts stderr \"mmi convert: saved .max is off the mask grid: \$_mmi_scan\""
+  puts $fh "  }"
+  puts $fh "  puts stderr \"mmi convert: DRC errors \$_mmi_drc\""
   puts $fh "}"
   close $fh
 }
@@ -2249,11 +2514,17 @@ proc mag_import_run_magic {dir topcell gds family tech outdir} {
   if {[mag_pdk_dir $family] == ""} {
     set root /mmi-pdks
     if {[info commands pdk_root] != ""} { catch {set root [pdk_root]} }
-    mag_import_fail "No open_pdks tree for $family under $root\n(Magic needs <pdk>/libs.tech/magic/<pdk>.tech).\nRun File → Import PDK first, or use the Tcl paint-dump converter."
+    mag_import_fail "No open_pdks tree for $family under $root\n(Magic needs <pdk>/libs.tech/magic/<pdk>.tech).\nRun ./run.sh importer first, or use the Tcl paint-dump preview."
     return
   }
 
   mag_progress_update 40 "Running Magic mag2gds (PDK cifoutput)..."
+  set perr [mag_exact_prepare $family $dir $topcell]
+  if {$perr != ""} {
+    mag_import_fail $perr
+    return
+  }
+  set MAG_IMPORT(preview) 0
   mag_log "mag2gds: $sh $dir $topcell $gds $family"
   catch {file delete $gds}
   set logfile $MAG_IMPORT(log)
@@ -2306,7 +2577,7 @@ proc mag_import_poll_magic {} {
     set why "Magic mag2gds failed (no GDS was written)."
     set tail [mag_log_tail 40]
     if {[string match {*magicrc*} $tail] || [string match {*No Magic*} $tail]} {
-      set why "$why\nImport sky130A first (File → Import PDK) so this file exists:\n  /mmi-pdks/sky130A/libs.tech/magic/sky130A.magicrc"
+      set why "$why\nInstall sky130A first (./run.sh importer) so this file exists:\n  /mmi-pdks/sky130A/libs.tech/magic/sky130A.magicrc"
     }
     mag_import_fail "$why\nLog: $MAG_IMPORT(log)"
     return
@@ -2318,6 +2589,34 @@ proc mag_import_poll_magic {} {
   mag_log "Wrote $gds ([file size $gds] bytes) via Magic mag2gds"
   mag_progress_update 85 "Importing GDS into MAX as .max..."
   mag_import_open_max $gds $MAG_IMPORT(topcell) $MAG_IMPORT(tech) $MAG_IMPORT(outdir)
+}
+
+proc mag_gds_read_exact {gds} {
+  global GDS_READ_NO_DRC GDS_READ_SNAP_TO GDS_READ_REPORT_ROUNDING_ERRORS
+  global GDS_READ_PARTIAL
+  set prev_drc 1
+  set prev_snap 0
+  set prev_rep 1
+  set prev_part 0
+  if {[info exists GDS_READ_NO_DRC]} { set prev_drc $GDS_READ_NO_DRC }
+  if {[info exists GDS_READ_SNAP_TO]} { set prev_snap $GDS_READ_SNAP_TO }
+  if {[info exists GDS_READ_REPORT_ROUNDING_ERRORS]} {
+    set prev_rep $GDS_READ_REPORT_ROUNDING_ERRORS
+  }
+  if {[info exists GDS_READ_PARTIAL]} { set prev_part $GDS_READ_PARTIAL }
+  # Default GDS_READ_NO_DRC is 1, which hides every violation until the
+  # .max is opened again. This import checks DRC now, and does not snap.
+  set GDS_READ_NO_DRC 0
+  set GDS_READ_SNAP_TO 0
+  set GDS_READ_REPORT_ROUNDING_ERRORS 1
+  set GDS_READ_PARTIAL 0
+  set rc [catch {set top [gds_read $gds]} err]
+  set GDS_READ_NO_DRC $prev_drc
+  set GDS_READ_SNAP_TO $prev_snap
+  set GDS_READ_REPORT_ROUNDING_ERRORS $prev_rep
+  set GDS_READ_PARTIAL $prev_part
+  if {$rc} { error $err }
+  return $top
 }
 
 proc mag_import_open_max {gds top tech outdir} {
@@ -2347,7 +2646,7 @@ proc mag_import_open_max {gds top tech outdir} {
       set GDS_READ_PARTIAL 0
     }
     set topCell ""
-    if {[catch {set topCell [gds_read $gds]} err]} {
+    if {[catch {set topCell [mag_gds_read_exact $gds]} err]} {
       if {[info exists GDS_READ_PARTIAL]} { set GDS_READ_PARTIAL $oldp }
       catch {cd $here}
       mag_import_fail "gds_read failed:\n$err\nGDS is at:\n$gds"
@@ -2365,6 +2664,16 @@ proc mag_import_open_max {gds top tech outdir} {
     }
     mag_max_show_converted
     catch {cell_save_tree 0}
+    if {[info exists MAG_IMPORT(preview)] && $MAG_IMPORT(preview)} {
+      mag_stamp_preview_tree $outdir
+    }
+    set scan [mag_exact_scan_tree $outdir $family]
+    if {$scan != ""} {
+      catch {cd $here}
+      mag_import_fail "Saved .max is not on the mask grid:\n$scan"
+      return
+    }
+    set drc_n [mag_import_drc_count]
     catch {cd $here}
     mag_open_in_magic $magdir $topCell $family
     mag_progress_close
@@ -2375,6 +2684,9 @@ MAX technology: $tech\n\
 GDS method: $MAG_IMPORT(method)\n\
 Log: $MAG_IMPORT(log)\n\n\
 $store"
+    if {$drc_n != ""} {
+      set msg "$msg\n\nDRC errors in this session: $drc_n"
+    }
     if {[mag_want_gui]} {
       set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
     }
@@ -2397,12 +2709,12 @@ $store"
   if {[mag_import_is_chip]} {
     mag_max_after_chip_script $aftertcl $top
   } else {
-    mag_max_after_gds_script $aftertcl
+    mag_max_after_gds_script $aftertcl $family $outdir
   }
   set fh [open $script w]
   puts $fh "#!/bin/sh"
   puts $fh "cd \"$outdir\" || exit 1"
-  puts $fh "exec \"$maxbin\" -tech \"$tech\" -command \"source {$aftertcl}\" \"$gds\""
+  puts $fh "exec \"$maxbin\" -tech \"$tech\" -set GDS_READ_NO_DRC=0 -set GDS_READ_SNAP_TO=0 -set GDS_READ_REPORT_ROUNDING_ERRORS=1 -command \"source {$aftertcl}\" \"$gds\""
   close $fh
   catch {exec chmod +x $script}
   if {[catch {exec /bin/sh $script &} err]} {

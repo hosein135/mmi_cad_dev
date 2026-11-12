@@ -1,0 +1,61 @@
+{
+  "registry_url": "",
+  "pdks": [
+    {
+      "name": "sky130A",
+      "process": "SkyWater 130nm",
+      "dir": "sky130A",
+      "family": "sky130A",
+      "tag": "sky130-e8daeda73ca8f5814dbc0b11d1d05802251a3750",
+      "assets": ["common", "sky130_fd_pr", "sky130_fd_io", "sky130_fd_sc_hd", "sky130_fd_sc_hvl"],
+      "max_tech": "sky130A",
+      "sue_lib": "sky130A",
+      "license": "Apache-2.0",
+      "description": "open_pdks sky130A: Magic technology, primitives, IO, and the hd/hvl standard cells. MAX technology sky130A and SUE library sky130A are built locally after download."
+    },
+    {
+      "name": "gf180mcuD",
+      "process": "GlobalFoundries 180nm MCU",
+      "dir": "gf180mcuD",
+      "family": "gf180mcu",
+      "tag": "gf180mcu-0fe599b2afb6708d281543108caf8310912f54af",
+      "assets": ["common", "gf180mcu_fd_pr", "gf180mcu_fd_io", "gf180mcu_fd_sc_mcu7t5v0"],
+      "max_tech": "gf180mcu",
+      "sue_lib": "gf180mcu",
+      "license": "Apache-2.0",
+      "description": "open_pdks gf180mcuD. The MAX technology name is gf180mcu. The SUE library name is gf180mcu."
+    },
+    {
+      "name": "ihp-sg13g2",
+      "process": "IHP 130nm SiGe",
+      "dir": "ihp-sg13g2",
+      "family": "sg13g2",
+      "tag": "ihp-sg13g2-ddb601a4a4473163e1ed6df416b885df18b4ac03",
+      "assets": ["common", "sg13g2_pr", "sg13g2_io", "sg13g2_stdcell", "sg13g2_sram"],
+      "max_tech": "sg13g2",
+      "sue_lib": "sg13g2",
+      "license": "Apache-2.0",
+      "description": "IHP SG13G2 open PDK. The MAX technology name is sg13g2. The SUE library name is sg13g2."
+    }
+  ],
+  "libraries": [
+    {
+      "name": "sky130A",
+      "pdk": "sky130A",
+      "kind": "sue",
+      "description": "SUE icons for the sky130A primitives, generated when the PDK is installed."
+    },
+    {
+      "name": "gf180mcu",
+      "pdk": "gf180mcuD",
+      "kind": "sue",
+      "description": "SUE icons for the gf180mcu primitives, generated when the PDK is installed."
+    },
+    {
+      "name": "sg13g2",
+      "pdk": "ihp-sg13g2",
+      "kind": "sue",
+      "description": "SUE icons for the SG13G2 primitives, generated when the PDK is installed."
+    }
+  ]
+}

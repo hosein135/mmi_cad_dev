@@ -76,6 +76,7 @@ if ("$x" == "-help" || "$x" == "-h") then
 	echo "  -new <name>            Start SUE with a new schematic called <name>."
 	echo "  -log <1|0|filename>    Turns on/off the log.  Defaults to SUE_LOG shell"
 	echo "                         variable or off if not set."
+	echo "  -lib <name|dir>        Design library. A name loads \$PDK_ROOT/sue/lib/<name>."
 	echo "  -LIB <dir>             Adds <dir> to icon search path."
 	echo "  -AUTOLIB <dir>         Like LIB but loads all icons into icon lisbox."
 	echo "  -CMD <cmd>             Run SUE command on startup."

@@ -133,8 +133,9 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
   chmod -R u+w "${CAD}/mmi_local/max/pdk" 2>/dev/null || true
   for src in /mmi-bundle /mmi-pdk-live; do
     [ -d "${src}" ] || continue
-    cp -f "${src}/pdk_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/pdk_common.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/mag_import.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/mag_exact.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/image_layout.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/mag2gds.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/open_mag.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
@@ -175,6 +176,19 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
   fi
   chmod -R u+w "${CAD}/mmi_local" 2>/dev/null || true
 fi
+rm -f "${CAD}/mmi_local/max/pdk/pdk_import.tcl" 2>/dev/null || true
+mkdir -p "${CAD}/mmi_local/sue"
+SUE_SITE="${CAD}/mmi_local/sue/.suerc"
+if ! grep -q 'mmi-sue-lib' "${SUE_SITE}" 2>/dev/null; then
+  cat >> "${SUE_SITE}" << 'EOF'
+# mmi-sue-lib
+if {[file readable /mmi-pdk-live/sue/sue_lib.tcl]} {
+  source /mmi-pdk-live/sue/sue_lib.tcl
+} elseif {[file readable /mmi-bundle/sue/sue_lib.tcl]} {
+  source /mmi-bundle/sue/sue_lib.tcl
+}
+EOF
+fi
 if [ -f "${MMI_TOOLS}/app-defaults/Mmi" ]; then
   cp -f "${MMI_TOOLS}/app-defaults/Mmi" "${CAD}/mmi_pd/app-defaults/Mmi" 2>/dev/null || true
 fi
@@ -213,7 +227,7 @@ export MN_BIN_DIR="${MN_BIN_DIR:-bin.linux}"
 if resolved="$(mmi_resolve_max_font_dir 2>/dev/null)"; then
   export MMI_MAX_FONTS_DIR="${resolved}"
 fi
-export PATH="/mmi-magic/bin:${MMI_TOOLS}/bin:${PATH}"
+export PATH="/mmi-bundle/importer:/mmi-pdk-live/importer:/mmi-magic/bin:${MMI_TOOLS}/bin:${PATH}"
 export QT_X11_NO_MITSHM=1
 export LC_ALL=C
 export LANG=C
@@ -274,8 +288,28 @@ mmi_repair_tech27() {
   done
 }
 mmi_repair_tech27
+imp_repair=""
+for cand in /mmi-pdk-live/importer/importer /mmi-bundle/importer/importer; do
+  if [ -f "$cand" ]; then imp_repair="$cand"; break; fi
+done
+if [ -n "$imp_repair" ]; then
+  info "Checking installed PDKs (importer --repair)..."
+  bash "$imp_repair" --repair || true
+fi
 
 cmd="${1:-/bin/bash}"
+if [ "${cmd}" = "importer" ]; then
+  shift || true
+  imp=""
+  for cand in /mmi-pdk-live/importer/importer /mmi-bundle/importer/importer; do
+    if [ -f "$cand" ]; then imp="$cand"; break; fi
+  done
+  if [ -z "$imp" ]; then
+    error "importer is not installed in this environment"
+    exit 1
+  fi
+  exec bash "$imp" "$@"
+fi
 
 # Prefer the VM/desktop X server when DISPLAY already points at a local socket.
 # MMI_USE_XVNC=1 forces TigerVNC + browser. MMI_USE_HOST_X=1 requires host DISPLAY.
@@ -310,7 +344,7 @@ echo "=============================================="
 echo "  DISPLAY=${DISPLAY:-<unset>}   MMI_TOOLS=${MMI_TOOLS}"
 echo "  PDK_ROOT=${PDK_ROOT}   Magic: $(command -v magic 2>/dev/null || echo missing)"
 if [ ! -d "${PDK_ROOT}/sky130A/libs.ref" ] && [ ! -d "${PDK_ROOT}/gf180mcuD/libs.ref" ] && [ ! -d "${PDK_ROOT}/ihp-sg13g2/libs.ref" ]; then
-  echo "  PDKs: empty — start MAX, then File → Import PDK (not fetched by Nix)"
+  echo "  PDKs: empty — run:  importer    (or ./run.sh importer)"
 fi
 if [ -n "${MMI_NOVNC_URL:-}" ]; then
   echo "  GUI is in the browser, not this terminal:"

@@ -51,6 +51,8 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. `./run.sh` chec
 | `./run.sh` | CAD shell (Nix X + noVNC) |
 | `./run.sh max` | Start MAX |
 | `./run.sh sue` | Start SUE |
+| `./run.sh sue -lib sky130A` | Start SUE with that design library |
+| `./run.sh importer` | Download a PDK, its MAX technology, and its SUE library |
 | `./run.sh nst` | Start NST |
 | `./run.sh --prep-only` | Build into the Nix store |
 | `nix flake check` | Verify required binaries |
@@ -70,7 +72,7 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. `./run.sh` chec
 | `/mmi-vendor/mmi` | Rebuilt 64-bit CAD + scripts/tech |
 | `/mmi-bundle` | From `pdk/` |
 | `/mmi-magic` | nixpkgs **`magic-vlsi`** (not built from this repo) |
-| `/mmi-pdks` | Writable PDK overlay (`data/pdks`; empty until File → Import PDK in MAX) |
+| `/mmi-pdks` | Writable PDK overlay (`data/pdks`; empty until `./run.sh importer`) |
 | `/mmi-xfonts` | Bitmap fonts for Nix Xvnc |
 | `/mmi-home` | `data/home` |
 
@@ -83,7 +85,7 @@ On a graphical VM the MAX/SUE/NST windows appear on the desktop. `./run.sh` chec
 
 `nix build --rebuild --check .#mmi-vendor` on x86_64 Linux should reproduce the same output path.
 
-Foundry PDKs are **not** in the flake. After `./run.sh max`, use **File → Import PDK** to download a compiled open_pdks tree (SkyWater, GF180MCU, or IHP) into `data/pdks`.
+Foundry PDKs are **not** in the flake. Run `./run.sh importer` to download a compiled open_pdks tree (SkyWater, GF180MCU, or IHP) into `data/pdks`, build the MAX technology, and generate the matching SUE design library. Then `./run.sh max` with `-tech sky130A` (or `gf180mcu`, `sg13g2`) and `./run.sh sue -lib sky130A`.
 
 ## Magic VLSI (`magic-vlsi`)
 

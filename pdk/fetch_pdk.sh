@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Download a Magic-compiled open_pdks tree into PDK_ROOT.
 #
-# Called from MAX (File → Import PDK), never from Nix. GitHub archives of
+# Called by the importer application, never from Nix and never from a MAX menu.
 # skywater-pdk / gf180mcu-pdk omit git submodules (no stdcells). open_pdks
 # templates are not a compiled install. IHP is not a lone .magicrc.
 #
@@ -9,7 +9,7 @@
 #   https://github.com/fossi-foundation/ciel-releases
 #
 # Usage: fetch_pdk.sh <sky130A|gf180mcu|sg13g2> [status_file] [cancel_file]
-# Incomplete runs keep $PDK_ROOT/.fetch-<family>/ so the next Import PDK resumes.
+# Incomplete runs keep $PDK_ROOT/.fetch-<family>/ so the next importer install resumes.
 set -euo pipefail
 
 FAMILY="${1:-}"
@@ -184,8 +184,63 @@ case "$FAMILY" in
     ;;
 esac
 
+# registry.json is the pin. The case above is the fallback when it is absent.
+REG=""
+for cand in \
+    "${BUNDLE}/importer/registry.json" \
+    /mmi-pdk-live/importer/registry.json \
+    "$(dirname "$0")/importer/registry.json"
+do
+  if [ -f "$cand" ]; then
+    REG="$cand"
+    break
+  fi
+done
+# MMI_CIEL_TAG is an explicit pin from the importer Advanced dialog.
+# registry.json wins only when that override is empty.
+if [ -z "${MMI_CIEL_TAG:-}" ] && [ -n "$REG" ] && command -v python3 >/dev/null 2>&1; then
+  parsed="$(python3 -c '
+import json, sys
+data = json.load(open(sys.argv[1], encoding="utf-8"))
+want = sys.argv[2]
+for item in data.get("pdks", []):
+    names = {item.get("family"), item.get("name"), item.get("dir"), item.get("max_tech")}
+    if want in names:
+        print(item["tag"])
+        print(" ".join(item["assets"]))
+        break
+' "$REG" "$FAMILY" 2>/dev/null || true)"
+  reg_tag="$(printf '%s\n' "$parsed" | sed -n '1p')"
+  reg_assets="$(printf '%s\n' "$parsed" | sed -n '2p')"
+  if [ -n "$reg_tag" ] && [ -n "$reg_assets" ]; then
+    TAG="$reg_tag"
+    ASSETS="$reg_assets"
+    log "registry $REG tag=$TAG"
+  fi
+fi
+
 if [ -n "${MMI_PDK_LIBS:-}" ]; then
   ASSETS="$ASSETS $MMI_PDK_LIBS"
+fi
+
+# A compiled tree the user already has. Link it; uninstall removes the link.
+if [ -n "${MMI_PDK_LOCAL:-}" ]; then
+  mkdir -p "$PDK_ROOT" || die "PDK_ROOT $PDK_ROOT is not writable"
+  DEST="$PDK_ROOT/$VARIANT"
+  if ! tree_ready "$MMI_PDK_LOCAL"; then
+    die "MMI_PDK_LOCAL is not a compiled open_pdks tree: $MMI_PDK_LOCAL"
+  fi
+  if [ -L "$DEST" ] || [ ! -e "$DEST" ]; then
+    rm -f "$DEST"
+    ln -s "$MMI_PDK_LOCAL" "$DEST"
+    log "Linked local tree $MMI_PDK_LOCAL -> $DEST"
+  elif tree_ready "$DEST"; then
+    log "Already installed: $DEST"
+  else
+    die "$DEST exists and is not a finished tree. Remove it or pick another PDK_ROOT."
+  fi
+  write_status ok 100 "Local tree $DEST" "$DEST"
+  exit 0
 fi
 
 need_bin curl
@@ -220,7 +275,7 @@ on_exit() {
     kill "$CURL_PID" 2>/dev/null || true
     wait "$CURL_PID" 2>/dev/null || true
   fi
-  # Keep $STAGE on failure/cancel so the next Import PDK can resume.
+  # Keep $STAGE on failure/cancel so the next importer install can resume.
 }
 trap on_exit EXIT
 
@@ -315,7 +370,7 @@ fi
 tree_ready "$DEST" || die "Install incomplete: $DEST (need libs.tech/magic/*.magicrc and libs.ref/*)"
 
 {
-  echo "mmi-cad PDK (user Import PDK, not Nix)"
+  echo "mmi-cad PDK (importer, not Nix)"
   echo "  family  $FAMILY"
   echo "  variant $VARIANT"
   echo "  ciel    $TAG"
