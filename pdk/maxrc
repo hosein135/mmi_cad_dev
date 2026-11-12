@@ -96,6 +96,20 @@ proc _mmi_cell_empty {cell} {
   return 0
 }
 
+proc _mmi_sim_nfets {sim} {
+  if {![file readable $sim]} { return 0 }
+  set fh [open $sim r]
+  set n 0
+  while {[gets $fh line] >= 0} {
+    set c [string index [string trimleft $line] 0]
+    if {$c == "n" || $c == "N" || $c == "p" || $c == "P"} {
+      incr n
+    }
+  }
+  close $fh
+  return $n
+}
+
 proc _mmi_autolayout_run {} {
   global _mmi_autolayout_done
   if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} { return }
@@ -105,8 +119,17 @@ proc _mmi_autolayout_run {} {
   set dir [lindex $req 1]
   set cell [lindex $req 2]
   if {![file readable $sim]} { return }
+  if {[_mmi_sim_nfets $sim] < 1} { return }
   if {[info commands license_check] == ""} {
     proc license_check {args} { return 1 }
+  }
+  # stdcell_load_sim skips the setup dialog when verbose is 0, and that
+  # dialog is what normally fills LAYINFO. Fill the defaults first.
+  if {[info commands _stdcell_calculate_stuff] != ""} {
+    if {[catch {_stdcell_calculate_stuff ""} err]} {
+      msg "Layout generator setup failed: $err\n"
+      return
+    }
   }
   set save [pwd]
   if {$dir != "" && [file isdirectory $dir]} { cd $dir }
@@ -141,6 +164,17 @@ proc _mmi_autolayout_later {} {
   incr _mmi_autolayout_tries
   if {$_mmi_autolayout_tries < 30} {
     after 1000 _mmi_autolayout_later
+    return
+  }
+  set req [_mmi_autolayout_request]
+  if {[llength $req] < 3} { return }
+  set sim [lindex $req 0]
+  set cell [lindex $req 2]
+  if {[_mmi_sim_nfets $sim] < 1} {
+    msg "No transistors in $sim. Schematic \"$cell\" has nothing to draw.\n"
+    if {$cell == "no_name"} {
+      msg "no_name is the unsaved sheet. Save it, or bring the schematic that contains the transistors forward, then run Max Cross Probe Init again.\n"
+    }
   }
 }
 
