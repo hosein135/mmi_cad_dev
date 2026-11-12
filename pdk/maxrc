@@ -131,6 +131,38 @@ proc _mmi_autolayout_run {} {
       return
     }
   }
+  # Poly preroutes call ":paint poly". sg13g2 names that layer GatPoly.
+  # Translate canonical names before painting.
+  if {[info commands _mmi_stdcell_add_wire_orig] == "" && \
+      [info commands _stdcell_add_wire] != ""} {
+    rename _stdcell_add_wire _mmi_stdcell_add_wire_orig
+    proc _stdcell_add_wire {x1 y1 x2 y2 {layer ""}} {
+      if {$layer != ""} {
+        set mapped [techinfo2 layer $layer]
+        if {$mapped != ""} { set layer $mapped }
+      }
+      _mmi_stdcell_add_wire_orig $x1 $y1 $x2 $y2 $layer
+    }
+  }
+  global LAYINFO
+  # Well-tie paint uses the canonical names pwc/nwc/prb, which this tech
+  # does not define. Transistors and power rails still get drawn.
+  foreach _lay {pwc nwc prb_layer} {
+    if {[info exists LAYINFO(layers:$_lay)]} {
+      set LAYINFO(layers:$_lay) 0
+    }
+  }
+  if {[info commands techinfo2] != ""} {
+    foreach _lay {nplus pplus nwell} {
+      set _mapped ""
+      catch {set _mapped [techinfo2 layer $_lay]}
+      if {$_mapped == ""} {
+        set LAYINFO(layers:$_lay) 0
+      }
+    }
+  }
+  unset _lay
+  catch {unset _mapped}
   set save [pwd]
   if {$dir != "" && [file isdirectory $dir]} { cd $dir }
   set empty 1
