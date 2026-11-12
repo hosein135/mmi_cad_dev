@@ -62,3 +62,107 @@ if {[file executable [file join $_mmi_bin ext2sim]]} {
   }
 }
 unset _mmi_bin
+
+# Build a layout from the schematic netlist SUE recorded before it
+# started this MAX. Cross-probe alone leaves an empty cell.
+proc _mmi_autolayout_request {} {
+  global env
+  set home /mmi-home
+  if {[info exists env(HOME)] && $env(HOME) != ""} {
+    set home $env(HOME)
+  }
+  set f [file join $home .mmi-autolayout]
+  if {![file readable $f]} { return {} }
+  set fh [open $f r]
+  gets $fh sim
+  gets $fh dir
+  gets $fh cell
+  close $fh
+  return [list $sim $dir $cell]
+}
+
+proc _mmi_cell_empty {cell} {
+  if {![cell_in_memory $cell]} { return 1 }
+  if {[catch {lay_editcell} cur] || $cur != $cell} {
+    if {[catch {cell_load $cell}]} { return 1 }
+  }
+  if {[catch {lay_bbox} box] || [llength $box] < 4} { return 1 }
+  set x1 [lindex $box 0]
+  set y1 [lindex $box 1]
+  set x2 [lindex $box 2]
+  set y2 [lindex $box 3]
+  if {$x1 == "" || $x2 == ""} { return 1 }
+  if {[expr {$x2 - $x1}] == 0 && [expr {$y2 - $y1}] == 0} { return 1 }
+  return 0
+}
+
+proc _mmi_autolayout_run {} {
+  global _mmi_autolayout_done
+  if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} { return }
+  set req [_mmi_autolayout_request]
+  if {[llength $req] < 3} { return }
+  set sim [lindex $req 0]
+  set dir [lindex $req 1]
+  set cell [lindex $req 2]
+  if {![file readable $sim]} { return }
+  if {[info commands license_check] == ""} {
+    proc license_check {args} { return 1 }
+  }
+  set save [pwd]
+  if {$dir != "" && [file isdirectory $dir]} { cd $dir }
+  set empty 1
+  if {[cell_in_memory $cell]} {
+    set empty [_mmi_cell_empty $cell]
+  } elseif {[file readable [file join $dir $cell.max]]} {
+    catch {cell_load $cell $dir}
+    set empty [_mmi_cell_empty $cell]
+  }
+  if {!$empty} {
+    cd $save
+    set _mmi_autolayout_done 1
+    return
+  }
+  msg "Generating layout for $cell from $sim\n"
+  if {[catch {stdcell_load_sim $sim 0} err]} {
+    msg "Layout generator failed: $err\n"
+    cd $save
+    return
+  }
+  catch {view_cell}
+  set _mmi_autolayout_done 1
+  cd $save
+}
+
+proc _mmi_autolayout_later {} {
+  global _mmi_autolayout_done _mmi_autolayout_tries
+  _mmi_autolayout_run
+  if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} { return }
+  if {![info exists _mmi_autolayout_tries]} { set _mmi_autolayout_tries 0 }
+  incr _mmi_autolayout_tries
+  if {$_mmi_autolayout_tries < 30} {
+    after 1000 _mmi_autolayout_later
+  }
+}
+
+proc _mmi_hook_lvs_it {} {
+  global auto_index
+  if {[info commands _mmi_lvs_it_max_real] != ""} { return }
+  if {[info commands lvs_it_max] == "" && [info exists auto_index(lvs_it_max)]} {
+    set script $auto_index(lvs_it_max)
+    unset auto_index(lvs_it_max)
+    eval $script
+  }
+  if {[info commands lvs_it_max] == ""} { return }
+  rename lvs_it_max _mmi_lvs_it_max_real
+  proc lvs_it_max {} {
+    _mmi_autolayout_run
+    _mmi_lvs_it_max_real
+  }
+}
+
+_mmi_hook_lvs_it
+set _mmi_autolayout_boot [_mmi_autolayout_request]
+if {[llength $_mmi_autolayout_boot] >= 3} {
+  after 300 _mmi_autolayout_later
+}
+unset _mmi_autolayout_boot

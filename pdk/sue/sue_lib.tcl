@@ -103,3 +103,84 @@ proc sue_lib_apply {} {
 if {!$SUE_LIB_NO_APPLY} {
   sue_lib_apply
 }
+
+# Tell MAX which schematic netlist to turn into a layout. Written before
+# Max Cross Probe Init starts MAX. MAX reads this file from its own startup.
+proc _mmi_note_autolayout {} {
+  global cur_s env SUFFIX
+  if {![info exists cur_s] || $cur_s == ""} { return }
+  upvar #0 SUE_$cur_s data
+  if {![info exists data(dir)]} { return }
+  set dir [string trimright $data(dir) /]
+  set suf .sim
+  if {[info exists SUFFIX(sim)] && $SUFFIX(sim) != ""} {
+    set suf $SUFFIX(sim)
+  }
+  set home /mmi-home
+  if {[info exists env(HOME)] && $env(HOME) != ""} {
+    set home $env(HOME)
+  }
+  if {[catch {
+    set fh [open [file join $home .mmi-autolayout] w]
+    puts $fh $dir/$cur_s$suf
+    puts $fh $dir
+    puts $fh $cur_s
+    close $fh
+  } err]} {
+    puts "sue: could not record layout request: $err"
+  }
+}
+
+proc _mmi_autoload_cross_probe {} {
+  global auto_index _mmi_cross_probe_autoload
+  if {[info exists auto_index(max_cross_probe_init)]} {
+    unset auto_index(max_cross_probe_init)
+  }
+  eval $_mmi_cross_probe_autoload
+  if {[info commands max_cross_probe_init] == ""} { return }
+  rename max_cross_probe_init _mmi_max_cross_probe_init_real
+  proc max_cross_probe_init {args} {
+    _mmi_note_autolayout
+    eval _mmi_max_cross_probe_init_real $args
+  }
+}
+
+proc _mmi_install_autolayout_hook {} {
+  global auto_index _mmi_autolayout_hook_installed _mmi_autolayout_hook_tries
+  global _mmi_cross_probe_autoload
+  if {[info exists _mmi_autolayout_hook_installed]} { return }
+  if {![info exists _mmi_autolayout_hook_tries]} {
+    set _mmi_autolayout_hook_tries 0
+  }
+  incr _mmi_autolayout_hook_tries
+  if {$_mmi_autolayout_hook_tries > 40} {
+    puts "sue: layout hook was not installed"
+    return
+  }
+  if {[info commands use_first] == ""} {
+    after 500 _mmi_install_autolayout_hook
+    return
+  }
+  if {[info commands _mmi_max_cross_probe_init_real] != ""} {
+    set _mmi_autolayout_hook_installed 1
+    return
+  }
+  if {[info commands max_cross_probe_init] != ""} {
+    rename max_cross_probe_init _mmi_max_cross_probe_init_real
+    proc max_cross_probe_init {args} {
+      _mmi_note_autolayout
+      eval _mmi_max_cross_probe_init_real $args
+    }
+    set _mmi_autolayout_hook_installed 1
+    return
+  }
+  if {![info exists auto_index(max_cross_probe_init)]} {
+    after 500 _mmi_install_autolayout_hook
+    return
+  }
+  set _mmi_cross_probe_autoload $auto_index(max_cross_probe_init)
+  set auto_index(max_cross_probe_init) _mmi_autoload_cross_probe
+  set _mmi_autolayout_hook_installed 1
+}
+
+after 500 _mmi_install_autolayout_hook
