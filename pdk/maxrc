@@ -214,11 +214,221 @@ proc _mmi_flyline_count {} {
 }
 
 proc _mmi_reveal_flylines {} {
+  _mmi_flyline_style
   catch {:see flyLines}
   if {[info commands view_state_change] != ""} {
     catch {view_state_change flylines 1}
   }
   catch {view_cell}
+}
+
+# Flylines are not drawn at all unless some loaded font is at most
+# ts_maxHeight pixels. The flyline style is capped at 18px, while
+# ordinary labels use a much larger cap, so text can show and the
+# yellow lines never do.
+proc _mmi_flyline_style {} {
+  if {[info commands lay_text_style] == ""} return
+  catch {lay_text_style flyline 80 0 0 0 1}
+  set cur ""
+  catch {set cur [lay_text_style flyline]}
+  set h [lindex $cur 0]
+  if {$h == "" || [catch {expr {$h < 80}}] || $h < 80} {
+    catch {lay_text_style flyline 80 -1 0 0 1}
+  }
+  _mmi_flyline_color
+}
+
+proc _mmi_flyline_color {} {
+  global PAL_DATA GR_COLOR_MAPPED
+  if {[info exists PAL_DATA(color,flyline)]} return
+  if {[info exists GR_COLOR_MAPPED] && $GR_COLOR_MAPPED} return
+  if {[info commands gr_rgb_to_pixel] == ""} return
+  if {[info commands lay_style] == ""} return
+  if {[catch {set pix [gr_rgb_to_pixel 246 246 7]}]} return
+  catch {lay_style flyline 0177 $pix 0 solid 0}
+  catch {lay_style flyline_dim 0177 $pix 0 solid 0}
+}
+
+proc _mmi_hidden_label {box} {
+  global LABEL_COUNT
+  if {![info exists LABEL_COUNT]} { set LABEL_COUNT 1 }
+  set name mmifl$LABEL_COUNT
+  incr LABEL_COUNT
+  set x1 [lindex $box 0]
+  set y1 [lindex $box 1]
+  set x2 [lindex $box 2]
+  set y2 [lindex $box 3]
+  if {$x1 == ""} { return "" }
+  if {$x2 == ""} { set x2 $x1 }
+  if {$y1 == ""} { set y1 0 }
+  if {$y2 == ""} { set y2 $y1 }
+  if {![catch {db_label -kind hidden space $name $x1 $y1 $x2 $y2}]} {
+    return $name
+  }
+  set layer m1
+  if {[info commands techinfo2] != ""} {
+    set mapped ""
+    catch {set mapped [techinfo2 layer m1]}
+    if {$mapped != ""} { set layer $mapped }
+  }
+  if {[catch {db_label -kind hidden $layer $name $x1 $y1 $x2 $y2}]} {
+    return ""
+  }
+  return $name
+}
+
+# Gate flylines meet the poly edge that faces the wiring channel.
+# Source and drain keep the contact box the generator computed.
+proc _mmi_term_box {id gsd} {
+  global fet_info
+  set box $fet_info($id,${gsd}_pos)
+  if {$gsd != "g"} { return $box }
+  set x1 [lindex $box 0]
+  set y1 [lindex $box 1]
+  set x2 [lindex $box 2]
+  set y2 [lindex $box 3]
+  if {$x2 == ""} { return $box }
+  set type ""
+  catch {set type $fet_info($id,type)}
+  if {$type == "p"} {
+    return [list $x1 $y1 $x2 $y1]
+  }
+  if {$type == "n"} {
+    return [list $x1 $y2 $x2 $y2]
+  }
+  return $box
+}
+
+proc _mmi_signal_pairs {} {
+  global fet_info STDCELL
+  if {![array exists fet_info]} { return "" }
+  catch {unset bucket}
+  foreach key [array names fet_info] {
+    if {![regexp {^([^,]+),(g|s|d)$} $key dummy id gsd]} continue
+    if {![info exists fet_info($id,${gsd}_pos)]} continue
+    set net $fet_info($id,$gsd)
+    if {$net == ""} continue
+    regsub {_EQUIV.*} $net "" net
+    if {[info exists STDCELL(vdd)] && $net == $STDCELL(vdd)} continue
+    if {[info exists STDCELL(gnd)] && $net == $STDCELL(gnd)} continue
+    set x [lindex $fet_info($id,${gsd}_pos) 0]
+    set y [lindex $fet_info($id,${gsd}_pos) 1]
+    if {$x == ""} { set x 0 }
+    if {$y == ""} { set y 0 }
+    lappend bucket($net) [format "%012.4f %012.4f %s %s" $x $y $id $gsd]
+  }
+  if {![info exists bucket]} { return "" }
+  set cons ""
+  foreach net [array names bucket] {
+    set tagged [lsort $bucket($net)]
+    set prev ""
+    foreach item $tagged {
+      if {$prev != ""} {
+        lappend cons "[lindex $prev 2] [lindex $prev 3] [lindex $item 2] [lindex $item 3]"
+      }
+      set prev $item
+    }
+    if {[llength $tagged] == 1} {
+      set item [lindex $tagged 0]
+      lappend cons "[lindex $item 2] [lindex $item 3] [lindex $item 2] [lindex $item 3]"
+    }
+  }
+  return $cons
+}
+
+# The generator records flyline ends as gcell paths ("fet_0/gs").
+# DBLabelFindByPathName only splits that path on a space, so both ends
+# stay unresolved and the lines are never drawn. Labels created in this
+# cell are found, so rebuild the same nets on those.
+proc _mmi_place_flylines {} {
+  global fet_info fet_route fet_ports LAYINFO STDCELL
+  _mmi_flyline_style
+  catch {:see flyLines}
+  if {[info commands view_state_change] != ""} {
+    catch {view_state_change flylines 1}
+  }
+  if {![array exists fet_info]} {
+    catch {view_cell}
+    return
+  }
+  if {[info exists LAYINFO(option:flylines)] && \
+      $LAYINFO(option:flylines) == 0} {
+    catch {view_cell}
+    return
+  }
+
+  set cons ""
+  if {[info exists fet_route(flylines)] && $fet_route(flylines) != ""} {
+    set cons $fet_route(flylines)
+  } else {
+    set cons [_mmi_signal_pairs]
+  }
+  if {$cons == ""} {
+    catch {view_cell}
+    msg "Flylines: 0\n"
+    return
+  }
+
+  catch {unset nets}
+  catch {unset seen}
+  foreach con $cons {
+    foreach spec [list [list [lindex $con 0] [lindex $con 1]] \
+                       [list [lindex $con 2] [lindex $con 3]]] {
+      set id [lindex $spec 0]
+      set gsd [lindex $spec 1]
+      if {$id == "" || $gsd == ""} continue
+      if {![info exists fet_info($id,${gsd}_pos)]} continue
+      if {[info exists seen($id,$gsd)]} continue
+      set net $fet_info($id,$gsd)
+      if {$net == ""} continue
+      regsub {_EQUIV.*} $net "" net
+      if {[info exists STDCELL(vdd)] && $net == $STDCELL(vdd)} continue
+      if {[info exists STDCELL(gnd)] && $net == $STDCELL(gnd)} continue
+      set seen($id,$gsd) 1
+      lappend nets($net) [_mmi_term_box $id $gsd]
+    }
+  }
+  if {![info exists nets]} {
+    catch {view_cell}
+    msg "Flylines: 0\n"
+    return
+  }
+
+  set pads contact
+  if {[info exists LAYINFO(option:router_pads)]} {
+    set pads $LAYINFO(option:router_pads)
+  }
+
+  # Drop the generator flylines. Their gcell paths never resolve, so
+  # they occupy the list and still draw nothing.
+  catch {db_flyline -delete}
+  foreach net [array names nets] {
+    set boxes $nets($net)
+    set useport 0
+    if {$pads != "no" && [array exists fet_ports] && \
+        [info exists fet_ports($net)]} {
+      set useport 1
+    }
+    if {$useport} {
+      foreach box $boxes {
+        set lab [_mmi_hidden_label $box]
+        if {$lab == ""} continue
+        catch {db_flyline $lab $net}
+      }
+    } else {
+      set prev ""
+      foreach box $boxes {
+        set lab [_mmi_hidden_label $box]
+        if {$lab == ""} continue
+        if {$prev != ""} {
+          catch {db_flyline $prev $lab}
+        }
+        set prev $lab
+      }
+    }
+  }
+  catch {view_cell}
+  msg "Flylines: [_mmi_flyline_count]\n"
 }
 
 # A new cross-probe request can arrive after this MAX is already up.
@@ -689,11 +899,15 @@ proc _mmi_wrap_stdcell_labels {} {
     catch {_mmi_prepare_laygen}
     set ret [_mmi_stdcell_load_direct $filename]
     catch {_mmi_stdcell_power_labels}
+    if {[catch {_mmi_place_flylines} err]} {
+      msg "Flylines: $err\n"
+    }
     return $ret
   }
 }
 
 _mmi_wrap_stdcell_labels
+catch {_mmi_flyline_style}
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
 _mmi_autolayout_claim
