@@ -170,12 +170,12 @@ proc importer_busy {on} {
   set ::IMPORTER_BUSY $on
   if {$on} {
     foreach w {.act.install .act.remove .act.repair .act.refresh} {
-      if {[winfo exists $w]} { $w state disabled }
+      if {[winfo exists $w]} { $w configure -state disabled }
     }
     . configure -cursor watch
   } else {
     foreach w {.act.install .act.remove .act.repair .act.refresh} {
-      if {[winfo exists $w]} { $w state !disabled }
+      if {[winfo exists $w]} { $w configure -state normal }
     }
     . configure -cursor {}
   }
@@ -272,28 +272,45 @@ wm geometry . 980x720
 wm minsize . 860 640
 . configure -background #f4f6f8
 
-# Pin the actions and the download bar to the bottom so they stay visible.
-ttk::frame .act
-ttk::button .act.install -style Accent.TButton -text "Install" -command importer_do_install
-ttk::button .act.remove -text "Delete PDK" -command importer_do_uninstall
-ttk::button .act.repair -text "Repair" -command importer_do_repair
-ttk::button .act.refresh -text "Refresh" -command importer_refresh
-ttk::button .act.cancel -text "Cancel" -command importer_do_cancel
-ttk::button .act.open -text "Open folder" -command importer_open_dir
-ttk::button .act.quit -text "Close" -command exit
-pack .act.install -side left -padx 4
-pack .act.remove -side left -padx 4
-pack .act.repair -side left -padx 4
-pack .act.refresh -side left -padx 4
-pack .act.cancel -side left -padx 4
-pack .act.quit -side right -padx 4
-pack .act.open -side right -padx 4
-pack .act -side bottom -fill x -padx 20 -pady 12
+# Classic Tk buttons, packed first at the top. ttk styling was hiding
+# the label, and a bottom row was pushed off the window.
+frame .act -bg #e7ebf0 -bd 0
+button .act.install -text "Install" -command importer_do_install \
+    -font $::IMPORTER_UI -bg #1f6feb -fg #ffffff \
+    -activebackground #1a5fd0 -activeforeground #ffffff \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.remove -text "Delete PDK" -command importer_do_uninstall \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -activebackground #f3d6d6 -activeforeground #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.repair -text "Repair" -command importer_do_repair \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.refresh -text "Refresh" -command importer_refresh \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.cancel -text "Cancel" -command importer_do_cancel \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.open -text "Open folder" -command importer_open_dir \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.quit -text "Close" -command exit \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+pack .act.install -side left -padx 6 -pady 8
+pack .act.remove -side left -padx 6 -pady 8
+pack .act.repair -side left -padx 6 -pady 8
+pack .act.refresh -side left -padx 6 -pady 8
+pack .act.cancel -side left -padx 6 -pady 8
+pack .act.quit -side right -padx 6 -pady 8
+pack .act.open -side right -padx 6 -pady 8
+pack .act -side top -fill x
 
 ttk::label .pct -style Hint.TLabel -text "Download progress: ready" -anchor w
-pack .pct -side bottom -fill x -padx 20 -pady 4
 ttk::progressbar .bar -orient horizontal -mode determinate -maximum 100
-pack .bar -side bottom -fill x -padx 20
+pack .pct -side top -fill x -padx 16 -pady 4
+pack .bar -side top -fill x -padx 16 -pady 4
 
 ttk::frame .head
 ttk::label .head.title -style Title.TLabel -text "PDK installer"
@@ -301,7 +318,7 @@ ttk::label .head.hint -style Hint.TLabel \
     -text "Download a process kit and build its MAX technology."
 pack .head.title -anchor w
 pack .head.hint -anchor w -pady 2
-pack .head -side top -fill x -padx 20 -pady 12
+pack .head -side top -fill x -padx 16 -pady 8
 
 ttk::frame .path
 ttk::label .path.l -text "Install into"
@@ -310,16 +327,16 @@ ttk::button .path.b -text "Browse" -command importer_browse
 pack .path.l -side left -padx 8
 pack .path.b -side right
 pack .path.e -side left -fill x -expand 1
-pack .path -side top -fill x -padx 20 -pady 4
+pack .path -side top -fill x -padx 16 -pady 4
 
-text .desc -height 4 -wrap word -bd 0 -highlightthickness 0 \
-    -background #f4f6f8 -foreground #1a1d23 -font $::IMPORTER_UI -padx 2 -pady 6
+text .desc -height 3 -wrap word -bd 0 -highlightthickness 0 \
+    -background #f4f6f8 -foreground #1a1d23 -font $::IMPORTER_UI -padx 2 -pady 4
 .desc tag configure muted -foreground #5c6570 -font $::IMPORTER_UI
-pack .desc -side top -fill x -padx 20
+pack .desc -side top -fill x -padx 16
 
 ttk::frame .list
 ttk::treeview .tbl -columns {name process version state} -show headings \
-    -selectmode browse -height 5
+    -selectmode browse -height 6
 .tbl heading name -text "Name" -anchor w
 .tbl heading process -text "Process" -anchor w
 .tbl heading version -text "Version" -anchor w
@@ -332,12 +349,12 @@ ttk::treeview .tbl -columns {name process version state} -show headings \
 .tbl tag configure bad -foreground #8a9099
 .tbl tag configure mid -foreground #9a6700
 pack .tbl -in .list -fill both -expand 1
-pack .list -side top -fill both -expand 1 -padx 20 -pady 8
+pack .list -side top -fill both -expand 1 -padx 16 -pady 8
 
-text .log -height 4 -wrap word -bd 0 -highlightthickness 1 \
+text .log -height 5 -wrap word -bd 0 -highlightthickness 1 \
     -highlightbackground #e2e6ec -background #ffffff -foreground #1a1d23 \
     -font $::IMPORTER_UI -padx 8 -pady 6 -state disabled
-pack .log -side bottom -fill both -expand 1 -padx 20 -pady 8
+pack .log -side top -fill both -expand 1 -padx 16 -pady 8
 
 bind .tbl <<TreeviewSelect>> importer_show_desc
 bind .path.e <Return> {

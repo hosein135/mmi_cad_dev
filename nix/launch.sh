@@ -230,7 +230,7 @@ fi
 # Micro Magic ext2sim, ext2spice, and gemini must come before Magic VLSI.
 # Magic ships ext2sim and ext2spice under the same names; MAX LVS calls
 # them by name and would otherwise run Magic 8.
-export PATH="/mmi-bundle/importer:/mmi-pdk-live/importer:${MMI_TOOLS}/bin:/mmi-magic/bin:${PATH}"
+export PATH="/mmi-pdk-live/importer:/mmi-bundle/importer:${MMI_TOOLS}/bin:/mmi-magic/bin:${PATH}"
 export QT_X11_NO_MITSHM=1
 export LC_ALL=C
 export LANG=C
