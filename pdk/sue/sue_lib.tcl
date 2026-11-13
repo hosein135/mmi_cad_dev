@@ -235,12 +235,21 @@ proc _mmi_wrap_sue_title {} {
   }
   rename display_title _mmi_display_title_real
   proc display_title {args} {
+    global WIN
     eval _mmi_display_title_real $args
     set lib [_mmi_sue_lib_label]
     if {$lib == ""} { return }
-    set w .
-    if {[llength $args] > 0 && [lindex $args 0] != ""} {
+    # display_title with no argument updates $WIN (.win1), not ".".
+    set w ""
+    if {[llength $args] > 0} {
       set w [lindex $args 0]
+    }
+    if {$w == ""} {
+      if {[info exists WIN] && $WIN != ""} {
+        set w $WIN
+      } else {
+        set w .
+      }
     }
     if {![winfo exists $w]} { return }
     set t [wm title $w]
