@@ -677,6 +677,40 @@ proc mag_heal_spacing {layer gap} {
   return $bridged
 }
 
+# Paint hvi across a spacing error after DRC has marked it. The error box is
+# the gap itself (0.005 um and 0.12 um on example_por). Filling it joins the
+# two masks so the 0.7 um rule is satisfied. Labels are not moved here.
+proc mag_heal_hvi_drc {} {
+  catch {:drc check}
+  catch {:drc catchup}
+  set errs ""
+  if {[catch {set errs [db_search_l paint error]}]} { return 0 }
+  set n 0
+  foreach e $errs {
+    if {[catch {
+      struct max_paint p $e
+      set x1 ${p.x1}
+      set y1 ${p.y1}
+      set x2 ${p.x2}
+      set y2 ${p.y2}
+    }]} continue
+    layt_box exact $x1 $y1 $x2 $y2
+    set why ""
+    catch {msg_catch {:drc why} r why w}
+    if {[string first "hvi minimum spacing" $why] < 0} continue
+    if {$x1 > $x2} { set t $x1; set x1 $x2; set x2 $t }
+    if {$y1 > $y2} { set t $y1; set y1 $y2; set y2 $t }
+    lay_box $x1 $y1 $x2 $y2
+    :paint hvi
+    incr n
+  }
+  if {$n > 0} {
+    catch {:drc catchup}
+    mag_log "Closed $n hvi spacing gap(s)"
+  }
+  return $n
+}
+
 # Save the converted cell as outdir/top.max and make that the open cell.
 proc mag_save_open {outdir top} {
   if {$top == "" || $outdir == ""} { return }
@@ -688,6 +722,7 @@ proc mag_save_open {outdir top} {
     catch {db_cell_rename $top $top $dest}
   }
   catch {mag_heal_spacing hvi 0.7}
+  catch {mag_heal_hvi_drc}
   catch {cell_save_tree 0}
   catch {cell_save}
   catch {cell_load $top $outdir}
@@ -2478,6 +2513,7 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
     puts $fh "  catch {db_cell_rename [list $top] [list $top] [list [file join $outdir ${top}.max]]}"
   }
   puts $fh "  catch {mag_heal_spacing hvi 0.7}"
+  puts $fh "  catch {mag_heal_hvi_drc}"
   puts $fh "  catch {cell_save_tree 0}"
   if {$top != ""} {
     puts $fh "  catch {cell_load [list $top] [list $outdir]}"

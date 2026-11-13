@@ -99,7 +99,7 @@ fi
 
 export MMI_CAD_ROOT="${SCRIPT_DIR}"
 mkdir -p "${SCRIPT_DIR}/data/pdks" "${SCRIPT_DIR}/data/workspace" "${SCRIPT_DIR}/data/home"
-info "PDK_ROOT (host)  → ${SCRIPT_DIR}/data/pdks  (empty until you import a PDK in MAX)"
+info "PDK_ROOT (host)  → ${SCRIPT_DIR}/data/pdks  (empty until you import a PDK)"
 info "Workspace        → ${SCRIPT_DIR}/data/workspace"
 info "Starting CAD via nix run (Nix Xvnc) ..."
 "${NIX_BIN}" run --accept-flake-config "${SCRIPT_DIR}#mmi-cad" -- "${CMD_ARGS[@]}"
