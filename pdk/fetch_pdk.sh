@@ -95,6 +95,12 @@ apply_fallback_magicrc() {
   fi
 }
 
+remote_size() {
+  curl -fsIL --retry 2 --connect-timeout 15 \
+    -A "mmi-cad-pdk-fetch" "$1" 2>/dev/null \
+    | awk 'BEGIN{IGNORECASE=1} /^content-length:/ {gsub(/\r/,""); n=$2} END{print n+0}'
+}
+
 download_one() {
   local url="$1" dest="$2" label="$3" pct_lo="$4" pct_hi="$5"
   check_cancel
@@ -102,10 +108,15 @@ download_one() {
   log "GET $url"
   mkdir -p "$(dirname "$dest")"
   rm -f "$dest" "${dest}.part" "${dest}.ok"
+  local total
+  total="$(remote_size "$url" || true)"
+  case "$total" in
+    ''|*[!0-9]*) total=0 ;;
+  esac
   curl -fL --retry 3 --retry-delay 2 --connect-timeout 30 \
     -A "mmi-cad-pdk-fetch" -o "${dest}.part" "$url" &
   CURL_PID=$!
-  local got=0 pct="$pct_lo"
+  local got=0 pct="$pct_lo" span=$((pct_hi - pct_lo))
   while kill -0 "$CURL_PID" 2>/dev/null; do
     if [ -n "$CANCEL_FILE" ] && [ -f "$CANCEL_FILE" ]; then
       kill "$CURL_PID" 2>/dev/null || true
@@ -117,10 +128,18 @@ download_one() {
     if [ -f "${dest}.part" ]; then
       got="$(wc -c <"${dest}.part" 2>/dev/null | tr -d ' ' || echo 0)"
     fi
-    pct=$((pct_lo + (got / (8 * 1048576))))
+    if [ "$total" -gt 0 ] && [ "$span" -gt 0 ]; then
+      pct=$((pct_lo + got * span / total))
+    else
+      pct=$((pct_lo + got / 1048576))
+    fi
     if [ "$pct" -ge "$pct_hi" ]; then pct=$((pct_hi - 1)); fi
     if [ "$pct" -lt "$pct_lo" ]; then pct="$pct_lo"; fi
-    write_status running "$pct" "Downloading $label ($((got / 1048576)) MB)"
+    if [ "$total" -gt 0 ]; then
+      write_status running "$pct" "Downloading $label ($((got / 1048576)) / $((total / 1048576)) MB)"
+    else
+      write_status running "$pct" "Downloading $label ($((got / 1048576)) MB)"
+    fi
     sleep 0.4
   done
   set +e

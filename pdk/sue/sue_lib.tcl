@@ -184,3 +184,32 @@ proc _mmi_install_autolayout_hook {} {
 }
 
 after 500 _mmi_install_autolayout_hook
+
+# The MAX window SUE starts is an xterm titled "Max Terminal".
+# Give it a readable bitmap font, a dark ground, and a usable size.
+proc _mmi_style_max_terminal {} {
+  global env
+  set home /tmp
+  if {[info exists env(HOME)] && $env(HOME) != ""} {
+    set home $env(HOME)
+  }
+  set font "-misc-fixed-medium-r-normal--14-140-75-75-c-70-iso8859-1"
+  set big "-misc-fixed-medium-r-normal--18-120-100-100-c-90-iso8859-1"
+  if {![catch {exec xlsfonts -fn $big}]} {
+    set font $big
+  }
+  set path [file join $home .mmi-xterm.res]
+  if {[catch {set fh [open $path w]}]} { return }
+  puts $fh "XTerm*font: $font"
+  puts $fh "XTerm*boldFont: $font"
+  puts $fh "XTerm*background: #1b1e24"
+  puts $fh "XTerm*foreground: #e8eaed"
+  puts $fh "XTerm*cursorColor: #8ab4f8"
+  puts $fh "XTerm*scrollBar: true"
+  puts $fh "XTerm*rightScrollBar: true"
+  puts $fh "XTerm*saveLines: 2000"
+  puts $fh "XTerm*VT100.geometry: 110x36"
+  close $fh
+  catch {exec xrdb -merge $path}
+}
+_mmi_style_max_terminal
