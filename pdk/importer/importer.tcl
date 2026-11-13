@@ -50,21 +50,28 @@ proc importer_mono_font {pixels} {
 }
 
 set ::IMPORTER_UI [importer_ui_font 18]
-set ::IMPORTER_UI_B [importer_ui_font 18 bold]
-set ::IMPORTER_UI_SM [importer_ui_font 16]
-set ::IMPORTER_MONO [importer_mono_font 16]
-catch {font configure TkDefaultFont -family Helvetica -size -18}
-catch {font configure TkTextFont -family Helvetica -size -18}
-catch {font configure TkHeadingFont -family Helvetica -size -18 -weight bold}
-catch {font configure TkFixedFont -family Courier -size -16}
+set ::IMPORTER_FAM [font actual $::IMPORTER_UI -family]
+catch {font configure TkDefaultFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkTextFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkHeadingFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkCaptionFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkFixedFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkMenuFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkIconFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkSmallCaptionFont -family $::IMPORTER_FAM -size -18}
+catch {font configure TkTooltipFont -family $::IMPORTER_FAM -size -18}
+option add *Font $::IMPORTER_UI
+option add *font $::IMPORTER_UI
+option add *Dialog.msg.font $::IMPORTER_UI
+option add *Dialog.dtl.font $::IMPORTER_UI
 
 ttk::style theme use clam
 ttk::style configure TFrame -background #f4f6f8
 ttk::style configure TLabel -background #f4f6f8 -foreground #1a1d23 -font $::IMPORTER_UI
-ttk::style configure Title.TLabel -font $::IMPORTER_UI_B -foreground #1a1d23
-ttk::style configure Hint.TLabel -font $::IMPORTER_UI_SM -foreground #5c6570
+ttk::style configure Title.TLabel -font $::IMPORTER_UI -foreground #1a1d23
+ttk::style configure Hint.TLabel -font $::IMPORTER_UI -foreground #5c6570
 ttk::style configure TButton -font $::IMPORTER_UI -padding {14 8}
-ttk::style configure Accent.TButton -font $::IMPORTER_UI_B -padding {18 8} \
+ttk::style configure Accent.TButton -font $::IMPORTER_UI -padding {18 8} \
     -background #1f6feb -foreground #ffffff
 ttk::style map Accent.TButton \
     -background {disabled #b9c7dc active #1a5fd0 pressed #184eab} \
@@ -72,7 +79,7 @@ ttk::style map Accent.TButton \
 ttk::style configure TEntry -font $::IMPORTER_UI -padding 6
 ttk::style configure Treeview -font $::IMPORTER_UI -rowheight 40 \
     -background #ffffff -fieldbackground #ffffff -foreground #1a1d23
-ttk::style configure Treeview.Heading -font $::IMPORTER_UI_B -padding 6
+ttk::style configure Treeview.Heading -font $::IMPORTER_UI -padding 6
 ttk::style map Treeview -background {selected #dbe7ff} -foreground {selected #1a1d23}
 ttk::style configure TProgressbar -thickness 16 -background #1f6feb \
     -troughcolor #e2e6ec -bordercolor #e2e6ec
@@ -123,7 +130,7 @@ proc importer_show_desc {} {
     return
   }
   set tech [importer_field $item max_tech]
-  .desc insert end "[importer_field $item description]\n\n" title
+  .desc insert end "[importer_field $item description]\n\n"
   .desc insert end "Installs into  " muted
   .desc insert end "[file join $::IMPORTER_ROOT [importer_field $item dir]]\n"
   .desc insert end "Version  " muted
@@ -216,7 +223,7 @@ proc importer_do_uninstall {} {
   set ::env(PDK_ROOT) $::IMPORTER_ROOT
   set name [importer_field $item name]
   set go [tk_messageBox -icon warning -type yesno -title "PDK installer" \
-      -message "Remove $name from $::IMPORTER_ROOT?"]
+      -message "Remove PDK $name from $::IMPORTER_ROOT?"]
   if {$go != "yes"} { return }
   set err [importer_uninstall $name]
   if {$err != ""} { importer_fail $err; return }
@@ -301,8 +308,7 @@ pack .tbl -in .list -fill both -expand 1
 
 text .desc -height 7 -wrap word -bd 0 -highlightthickness 0 \
     -background #f4f6f8 -foreground #1a1d23 -font $::IMPORTER_UI -padx 2 -pady 6
-.desc tag configure title -font $::IMPORTER_UI_B
-.desc tag configure muted -foreground #5c6570
+.desc tag configure muted -foreground #5c6570 -font $::IMPORTER_UI
 pack .desc -fill x -padx 20
 
 ttk::progressbar .bar -orient horizontal -mode determinate -maximum 100
@@ -312,13 +318,13 @@ pack .pct -fill x -padx 20
 
 text .log -height 6 -wrap word -bd 0 -highlightthickness 1 \
     -highlightbackground #e2e6ec -background #ffffff -foreground #1a1d23 \
-    -font $::IMPORTER_MONO -padx 8 -pady 6 -state disabled
+    -font $::IMPORTER_UI -padx 8 -pady 6 -state disabled
 pack .log -fill both -expand 1 -padx 20 -pady 6
 
 ttk::frame .act
 pack .act -fill x -padx 20 -pady {4 16}
 ttk::button .act.install -style Accent.TButton -text "Install" -command importer_do_install
-ttk::button .act.remove -text "Uninstall" -command importer_do_uninstall
+ttk::button .act.remove -text "Remove PDK" -command importer_do_uninstall
 ttk::button .act.repair -text "Repair" -command importer_do_repair
 ttk::button .act.refresh -text "Refresh" -command importer_refresh
 ttk::button .act.cancel -text "Cancel" -command importer_do_cancel
