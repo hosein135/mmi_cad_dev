@@ -23,7 +23,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 13
+set _MAG_IMPORT_REV 14
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -680,12 +680,21 @@ proc mag_heal_spacing {layer gap} {
 # Paint hvi across a spacing error after DRC has marked it. The error box is
 # the gap itself (0.005 um and 0.12 um on example_por). Filling it joins the
 # two masks so the 0.7 um rule is satisfied. Labels are not moved here.
+# Call this only after the cell is loaded and :drc catchup has finished;
+# the error tiles are not in the database before that.
 proc mag_heal_hvi_drc {} {
-  catch {:drc check}
   catch {:drc catchup}
   set errs ""
-  if {[catch {set errs [db_search_l paint error]}]} { return 0 }
+  if {[catch {set errs [db_search_l paint error]}]} {
+    set errs ""
+  }
+  if {[llength $errs] == 0} {
+    catch {set errs [db_search_l paint error_s,error_p,error_ps]}
+  }
+  set cell ""
+  catch {set cell [lay_editcell]}
   set n 0
+  set seen 0
   foreach e $errs {
     if {[catch {
       struct max_paint p $e
@@ -694,19 +703,38 @@ proc mag_heal_hvi_drc {} {
       set x2 ${p.x2}
       set y2 ${p.y2}
     }]} continue
+    incr seen
     layt_box exact $x1 $y1 $x2 $y2
     set why ""
     catch {msg_catch {:drc why} r why w}
-    if {[string first "hvi minimum spacing" $why] < 0} continue
+    if {[string first "hvi" $why] < 0} continue
+    if {[string first "spacing" $why] < 0} continue
     if {$x1 > $x2} { set t $x1; set x1 $x2; set x2 $t }
     if {$y1 > $y2} { set t $y1; set y1 $y2; set y2 $t }
-    lay_box $x1 $y1 $x2 $y2
-    :paint hvi
+    if {$cell != "" && [info commands db_paint] != ""} {
+      db_paint -cell $cell hvi $x1 $y1 $x2 $y2
+    } else {
+      lay_box $x1 $y1 $x2 $y2
+      :paint hvi
+    }
     incr n
   }
   if {$n > 0} {
     catch {:drc catchup}
     mag_log "Closed $n hvi spacing gap(s)"
+  } else {
+    mag_log "hvi heal: $seen error tile(s), none painted"
+  }
+  return $n
+}
+
+# DRC, fill hvi spacing gaps, and write the edit cell back out.
+proc mag_close_hvi_gaps {} {
+  set n 0
+  catch {set n [mag_heal_hvi_drc]}
+  if {$n > 0} {
+    catch {cell_save}
+    catch {:drc catchup}
   }
   return $n
 }
@@ -722,7 +750,6 @@ proc mag_save_open {outdir top} {
     catch {db_cell_rename $top $top $dest}
   }
   catch {mag_heal_spacing hvi 0.7}
-  catch {mag_heal_hvi_drc}
   catch {cell_save_tree 0}
   catch {cell_save}
   catch {cell_load $top $outdir}
@@ -834,17 +861,19 @@ proc mag_write_where {outdir top} {
 }
 
 proc mag_open_storage_folder {{dir ""}} {
-  global MAG_IMPORT env
+  global MAG_IMPORT
   if {$dir == ""} {
     if {[info exists MAG_IMPORT(outdir)]} { set dir $MAG_IMPORT(outdir) }
   }
   if {$dir == "" || ![file isdirectory $dir]} { return }
   set dir [_mmi_file_normalize $dir]
-  if {[info exists env(MMI_BROWSER)] && $env(MMI_BROWSER) != ""} {
-    if {![catch {exec $env(MMI_BROWSER) $dir &}]} { return }
+  # A folder is not a document. xdg-open, with no file manager installed,
+  # walks every web browser and prints a page of "command not found".
+  if {[info commands auto_execok] == ""} { return }
+  foreach bin {nautilus thunar pcmanfm nemo caja explorer.exe} {
+    if {[auto_execok $bin] == ""} continue
+    if {![catch {exec $bin $dir &}]} { return }
   }
-  if {![catch {exec xdg-open $dir &}]} { return }
-  catch {exec gio open $dir &}
 }
 
 proc mag_finish_storage {outdir top} {
@@ -1921,6 +1950,24 @@ proc mag_exact_norm_rect {x1 y1 x2 y2} {
   return [list $x1 $y1 $x2 $y2]
 }
 
+proc mag_exact_rect_covered {rects x1 y1 x2 y2} {
+  foreach r $rects {
+    if {[lindex $r 0] <= $x1 && [lindex $r 2] >= $x2 && \
+        [lindex $r 1] <= $y1 && [lindex $r 3] >= $y2} {
+      return 1
+    }
+  }
+  return 0
+}
+
+proc mag_exact_note_bridge {extraVar rects x1 y1 x2 y2} {
+  upvar $extraVar extra
+  if {$x1 >= $x2 || $y1 >= $y2} { return }
+  if {[mag_exact_rect_covered $rects $x1 $y1 $x2 $y2]} { return }
+  if {[mag_exact_rect_covered $extra $x1 $y1 $x2 $y2]} { return }
+  lappend extra [list $x1 $y1 $x2 $y2]
+}
+
 # Add a rectangle that fills a gap smaller than the spacing rule.
 # limit is in the same integer file units as the rects.
 proc mag_exact_bridge_rects {rects limit} {
@@ -1946,12 +1993,12 @@ proc mag_exact_bridge_rects {rects limit} {
         if {$ax2 < $bx1} {
           set g [expr {$bx1 - $ax2}]
           if {$g > 0 && $g < $limit} {
-            lappend extra [list $ax2 $oy1 $bx1 $oy2]
+            mag_exact_note_bridge extra $rects $ax2 $oy1 $bx1 $oy2
           }
         } elseif {$bx2 < $ax1} {
           set g [expr {$ax1 - $bx2}]
           if {$g > 0 && $g < $limit} {
-            lappend extra [list $bx2 $oy1 $ax1 $oy2]
+            mag_exact_note_bridge extra $rects $bx2 $oy1 $ax1 $oy2
           }
         }
       }
@@ -1963,12 +2010,12 @@ proc mag_exact_bridge_rects {rects limit} {
         if {$ay2 < $by1} {
           set g [expr {$by1 - $ay2}]
           if {$g > 0 && $g < $limit} {
-            lappend extra [list $ox1 $ay2 $ox2 $by1]
+            mag_exact_note_bridge extra $rects $ox1 $ay2 $ox2 $by1
           }
         } elseif {$by2 < $ay1} {
           set g [expr {$ay1 - $by2}]
           if {$g > 0 && $g < $limit} {
-            lappend extra [list $ox1 $by2 $ox2 $ay1]
+            mag_exact_note_bridge extra $rects $ox1 $by2 $ox2 $ay1
           }
         }
       }
@@ -1977,6 +2024,37 @@ proc mag_exact_bridge_rects {rects limit} {
   return $extra
 }
 
+proc mag_exact_hvi_rect {toks} {
+  set key [lindex $toks 0]
+  if {$key == "rect" && [llength $toks] >= 5 && \
+      [mag_all_int [lrange $toks 1 4]]} {
+    return [mag_exact_norm_rect [lindex $toks 1] [lindex $toks 2] \
+        [lindex $toks 3] [lindex $toks 4]]
+  }
+  if {[llength $toks] >= 4 && [mag_all_int [lrange $toks 0 3]]} {
+    return [mag_exact_norm_rect [lindex $toks 0] [lindex $toks 1] \
+        [lindex $toks 2] [lindex $toks 3]]
+  }
+  return ""
+}
+
+proc mag_exact_flush_hvi {outVar hviVar changedVar limit} {
+  upvar $outVar out
+  upvar $hviVar hvi
+  upvar $changedVar changed
+  if {[llength $hvi] == 0} { return }
+  set extra [mag_exact_bridge_rects $hvi $limit]
+  if {[llength $extra] > 0} {
+    set changed 1
+    foreach r $extra {
+      lappend out "[lindex $r 0] [lindex $r 1] [lindex $r 2] [lindex $r 3]"
+    }
+  }
+  set hvi {}
+}
+
+# .max paint is "SECTION RECTS { layer hvi / x1 y1 x2 y2 }", not
+# "type hvi" and "rect". Bridges are appended; existing lines stay.
 proc mag_exact_merge_hvi {path} {
   if {![file readable $path]} { return 0 }
   if {[catch {set fh [open $path r]}]} { return 0 }
@@ -1998,45 +2076,54 @@ proc mag_exact_merge_hvi {path} {
   set limit [expr {$space_h / $db_h}]
 
   set out {}
-  set mode ""
+  set section ""
+  set layer ""
   set hvi {}
   set changed 0
   foreach line $lines {
     set t [string trim $line]
     set toks [mag_words $t]
     set key [lindex $toks 0]
-    if {$key == "type" && [llength $toks] >= 2} {
-      if {$mode == "hvi"} {
-        set extra [mag_exact_bridge_rects $hvi $limit]
-        if {[llength $extra] > 0} { set changed 1 }
-        foreach r [concat $hvi $extra] {
-          lappend out "\trect [lindex $r 0] [lindex $r 1] [lindex $r 2] [lindex $r 3]"
-        }
-        set hvi {}
+    if {$key == "SECTION" && [llength $toks] >= 2} {
+      if {$layer == "hvi"} {
+        mag_exact_flush_hvi out hvi changed $limit
       }
-      set mode [lindex $toks 1]
+      set section [lindex $toks 1]
+      set layer ""
       lappend out $line
       continue
     }
-    if {$mode == "hvi" && $key == "rect" && [llength $toks] >= 5 && \
-        [mag_all_int [lrange $toks 1 4]]} {
-      set r [mag_exact_norm_rect [lindex $toks 1] [lindex $toks 2] \
-          [lindex $toks 3] [lindex $toks 4]]
-      lappend hvi $r
+    if {[string match "\}*" $t]} {
+      if {$layer == "hvi"} {
+        mag_exact_flush_hvi out hvi changed $limit
+      }
+      set section ""
+      set layer ""
+      lappend out $line
       continue
     }
-    if {[string match "\}*" $t] || $key == "SECTION"} {
-      if {$mode == "hvi"} {
-        set extra [mag_exact_bridge_rects $hvi $limit]
-        if {[llength $extra] > 0} { set changed 1 }
-        foreach r [concat $hvi $extra] {
-          lappend out "\trect [lindex $r 0] [lindex $r 1] [lindex $r 2] [lindex $r 3]"
+    if {$section == "RECTS" || $section == "PAINT"} {
+      if {($key == "layer" || $key == "type") && [llength $toks] >= 2} {
+        if {$layer == "hvi"} {
+          mag_exact_flush_hvi out hvi changed $limit
         }
-        set hvi {}
-        set mode ""
+        set layer [string tolower [lindex $toks 1]]
+        lappend out $line
+        continue
+      }
+      if {$layer == "hvi"} {
+        set r [mag_exact_hvi_rect $toks]
+        if {$r != ""} {
+          lappend hvi $r
+          lappend out $line
+          continue
+        }
       }
     }
     lappend out $line
+  }
+  if {$layer == "hvi"} {
+    mag_exact_flush_hvi out hvi changed $limit
   }
   if {!$changed} { return 0 }
   if {[catch {set fh [open $path w]}]} { return 0 }
@@ -2657,7 +2744,6 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
     puts $fh "  catch {db_cell_rename [list $top] [list $top] [list [file join $outdir ${top}.max]]}"
   }
   puts $fh "  catch {mag_heal_spacing hvi 0.7}"
-  puts $fh "  catch {mag_heal_hvi_drc}"
   puts $fh "  catch {cell_save_tree 0}"
   if {$top != ""} {
     puts $fh "  catch {cell_load [list $top] [list $outdir]}"
@@ -2688,7 +2774,14 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
   if {$top != ""} {
     puts $fh "  catch {cell_load [list $top] [list $outdir]}"
     puts $fh "  catch {view_cell}"
+    puts $fh "  catch {mag_close_hvi_gaps}"
     puts $fh "  catch {:drc catchup}"
+    puts $fh "  if {\[info commands msg_catch\] != {}} {"
+    puts $fh "    catch {"
+    puts $fh "      msg_catch {:drc count} _mmi_err _mmi_msg"
+    puts $fh "      set _mmi_drc \[lindex \$_mmi_msg 3\]"
+    puts $fh "    }"
+    puts $fh "  }"
   }
   puts $fh "  puts stderr \"mmi convert: DRC errors \$_mmi_drc\""
   puts $fh "}"
@@ -3055,10 +3148,17 @@ proc mag_import_open_max {gds top tech outdir} {
     set scan [mag_exact_scan_tree $outdir $family]
     catch {cell_load $topCell $outdir}
     catch {view_cell}
-    catch {:drc catchup}
     if {$scan != ""} {
       catch {cd $here}
       mag_import_fail "Saved .max is not on the mask grid:\n$scan"
+      return
+    }
+    catch {mag_close_hvi_gaps}
+    set scan2 [mag_exact_scan_max [file join $outdir ${topCell}.max] \
+        [mag_exact_mask_hnm $family]]
+    if {$scan2 != ""} {
+      catch {cd $here}
+      mag_import_fail "Saved .max is not on the mask grid:\n$scan2"
       return
     }
     set drc_n [mag_import_drc_count]
