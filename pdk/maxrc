@@ -253,10 +253,16 @@ proc _mmi_autolayout_reread {} {
   catch {unset _mmi_autolayout_done}
 }
 
-proc _mmi_prepare_laygen {} {
+# This build has no license server. The generator still calls license_check.
+proc _mmi_ensure_license_check {} {
   if {[info commands license_check] == ""} {
     proc license_check {args} { return 1 }
   }
+}
+_mmi_ensure_license_check
+
+proc _mmi_prepare_laygen {} {
+  _mmi_ensure_license_check
   if {[info commands _stdcell_calculate_stuff] != ""} {
     if {[catch {_stdcell_calculate_stuff ""} err]} {
       msg "Layout generator setup failed: $err\n"
@@ -679,6 +685,8 @@ proc _mmi_wrap_stdcell_labels {} {
   if {[info commands stdcell_load_direct] == ""} return
   rename stdcell_load_direct _mmi_stdcell_load_direct
   proc stdcell_load_direct {filename} {
+    _mmi_ensure_license_check
+    catch {_mmi_prepare_laygen}
     set ret [_mmi_stdcell_load_direct $filename]
     catch {_mmi_stdcell_power_labels}
     return $ret
