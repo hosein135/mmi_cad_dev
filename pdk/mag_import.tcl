@@ -1915,7 +1915,151 @@ proc mag_exact_snap_labels_tree {dir family} {
   return $n
 }
 
+proc mag_exact_norm_rect {x1 y1 x2 y2} {
+  if {$x1 > $x2} { set t $x1; set x1 $x2; set x2 $t }
+  if {$y1 > $y2} { set t $y1; set y1 $y2; set y2 $t }
+  return [list $x1 $y1 $x2 $y2]
+}
+
+# Add a rectangle that fills a gap smaller than the spacing rule.
+# limit is in the same integer file units as the rects.
+proc mag_exact_bridge_rects {rects limit} {
+  set extra {}
+  set n [llength $rects]
+  for {set i 0} {$i < $n} {incr i} {
+    set a [lindex $rects $i]
+    set ax1 [lindex $a 0]
+    set ay1 [lindex $a 1]
+    set ax2 [lindex $a 2]
+    set ay2 [lindex $a 3]
+    for {set j [expr {$i + 1}]} {$j < $n} {incr j} {
+      set b [lindex $rects $j]
+      set bx1 [lindex $b 0]
+      set by1 [lindex $b 1]
+      set bx2 [lindex $b 2]
+      set by2 [lindex $b 3]
+      set oy1 $ay1
+      if {$by1 > $oy1} { set oy1 $by1 }
+      set oy2 $ay2
+      if {$by2 < $oy2} { set oy2 $by2 }
+      if {$oy2 > $oy1} {
+        if {$ax2 < $bx1} {
+          set g [expr {$bx1 - $ax2}]
+          if {$g > 0 && $g < $limit} {
+            lappend extra [list $ax2 $oy1 $bx1 $oy2]
+          }
+        } elseif {$bx2 < $ax1} {
+          set g [expr {$ax1 - $bx2}]
+          if {$g > 0 && $g < $limit} {
+            lappend extra [list $bx2 $oy1 $ax1 $oy2]
+          }
+        }
+      }
+      set ox1 $ax1
+      if {$bx1 > $ox1} { set ox1 $bx1 }
+      set ox2 $ax2
+      if {$bx2 < $ox2} { set ox2 $bx2 }
+      if {$ox2 > $ox1} {
+        if {$ay2 < $by1} {
+          set g [expr {$by1 - $ay2}]
+          if {$g > 0 && $g < $limit} {
+            lappend extra [list $ox1 $ay2 $ox2 $by1]
+          }
+        } elseif {$by2 < $ay1} {
+          set g [expr {$ay1 - $by2}]
+          if {$g > 0 && $g < $limit} {
+            lappend extra [list $ox1 $by2 $ox2 $ay1]
+          }
+        }
+      }
+    }
+  }
+  return $extra
+}
+
+proc mag_exact_merge_hvi {path} {
+  if {![file readable $path]} { return 0 }
+  if {[catch {set fh [open $path r]}]} { return 0 }
+  set data [read $fh]
+  close $fh
+  set lines [split $data \n]
+  set res ""
+  foreach line $lines {
+    set toks [mag_words [string trim $line]]
+    if {[lindex $toks 0] == "resolution" && [llength $toks] >= 2} {
+      set res [lindex $toks 1]
+      break
+    }
+  }
+  set db_h [mag_exact_um_hnm $res]
+  set space_h [mag_exact_um_hnm 0.7]
+  if {$db_h == "" || $db_h <= 0 || $space_h == "" || $space_h <= 0} { return 0 }
+  if {[expr {$space_h % $db_h}] != 0} { return 0 }
+  set limit [expr {$space_h / $db_h}]
+
+  set out {}
+  set mode ""
+  set hvi {}
+  set changed 0
+  foreach line $lines {
+    set t [string trim $line]
+    set toks [mag_words $t]
+    set key [lindex $toks 0]
+    if {$key == "type" && [llength $toks] >= 2} {
+      if {$mode == "hvi"} {
+        set extra [mag_exact_bridge_rects $hvi $limit]
+        if {[llength $extra] > 0} { set changed 1 }
+        foreach r [concat $hvi $extra] {
+          lappend out "\trect [lindex $r 0] [lindex $r 1] [lindex $r 2] [lindex $r 3]"
+        }
+        set hvi {}
+      }
+      set mode [lindex $toks 1]
+      lappend out $line
+      continue
+    }
+    if {$mode == "hvi" && $key == "rect" && [llength $toks] >= 5 && \
+        [mag_all_int [lrange $toks 1 4]]} {
+      set r [mag_exact_norm_rect [lindex $toks 1] [lindex $toks 2] \
+          [lindex $toks 3] [lindex $toks 4]]
+      lappend hvi $r
+      continue
+    }
+    if {[string match "\}*" $t] || $key == "SECTION"} {
+      if {$mode == "hvi"} {
+        set extra [mag_exact_bridge_rects $hvi $limit]
+        if {[llength $extra] > 0} { set changed 1 }
+        foreach r [concat $hvi $extra] {
+          lappend out "\trect [lindex $r 0] [lindex $r 1] [lindex $r 2] [lindex $r 3]"
+        }
+        set hvi {}
+        set mode ""
+      }
+    }
+    lappend out $line
+  }
+  if {!$changed} { return 0 }
+  if {[catch {set fh [open $path w]}]} { return 0 }
+  puts $fh [join $out \n]
+  close $fh
+  return 1
+}
+
+proc mag_exact_merge_hvi_tree {dir} {
+  set files {}
+  catch {set files [glob -nocomplain [file join $dir *.max]]}
+  set n 0
+  foreach f $files {
+    if {[mag_exact_merge_hvi $f]} { incr n }
+  }
+  if {$n > 0} {
+    mag_log "Joined hvi gaps under 0.7 um in $n .max file(s)"
+  }
+  return $n
+}
+
 proc mag_exact_scan_tree {dir family} {
+  mag_exact_merge_hvi_tree $dir
   mag_exact_snap_labels_tree $dir $family
   set mask [mag_exact_mask_hnm $family]
   set files {}
@@ -2541,6 +2685,11 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
   puts $fh "  if {\$_mmi_scan != {}} {"
   puts $fh "    puts stderr \"mmi convert: saved .max is off the mask grid: \$_mmi_scan\""
   puts $fh "  }"
+  if {$top != ""} {
+    puts $fh "  catch {cell_load [list $top] [list $outdir]}"
+    puts $fh "  catch {view_cell}"
+    puts $fh "  catch {:drc catchup}"
+  }
   puts $fh "  puts stderr \"mmi convert: DRC errors \$_mmi_drc\""
   puts $fh "}"
   close $fh
@@ -2904,6 +3053,9 @@ proc mag_import_open_max {gds top tech outdir} {
       mag_stamp_preview_tree $outdir
     }
     set scan [mag_exact_scan_tree $outdir $family]
+    catch {cell_load $topCell $outdir}
+    catch {view_cell}
+    catch {:drc catchup}
     if {$scan != ""} {
       catch {cd $here}
       mag_import_fail "Saved .max is not on the mask grid:\n$scan"
