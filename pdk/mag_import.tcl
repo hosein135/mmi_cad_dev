@@ -23,7 +23,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 15
+set _MAG_IMPORT_REV 16
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -677,64 +677,124 @@ proc mag_heal_spacing {layer gap} {
   return $bridged
 }
 
-# Paint hvi across a spacing error after DRC has marked it. The error box is
-# the gap itself (0.005 um and 0.12 um on example_por). Filling it joins the
-# two masks so the 0.7 um rule is satisfied. Labels are not moved here.
-# Call this only after the cell is loaded and :drc catchup has finished;
-# the error tiles are not in the database before that.
-proc mag_heal_hvi_drc {} {
-  catch {:drc catchup}
-  set errs ""
-  if {[catch {set errs [db_search_l paint error]}]} {
-    set errs ""
-  }
-  if {[llength $errs] == 0} {
-    catch {set errs [db_search_l paint error_s,error_p,error_ps]}
-  }
+# MAX paints a spacing error on the hvi that is too close, not in the
+# opening. example_por's 0.12 um and 0.005 um marks sit on the upper
+# implant; the opening is the space below them, between hvi in the
+# pfet cells and hvi in the nfet cells. Paint that opening in the
+# parent so the flattened check sees one shape.
+proc mag_heal_hvi_flat {{gap 0.7}} {
   set cell ""
   catch {set cell [lay_editcell]}
-  set n 0
-  set seen 0
-  foreach e $errs {
-    if {[catch {
-      struct max_paint p $e
-      set x1 ${p.x1}
-      set y1 ${p.y1}
-      set x2 ${p.x2}
-      set y2 ${p.y2}
-    }]} continue
-    incr seen
-    layt_box exact $x1 $y1 $x2 $y2
-    set why ""
-    catch {msg_catch {:drc why} r why w}
-    if {[string first "hvi" $why] < 0} continue
-    if {[string first "spacing" $why] < 0} continue
+  if {$cell == ""} { return 0 }
+  set boxes ""
+  if {[catch {set boxes [db_search_l paint -cell $cell -any_cell hvi]} err]} {
+    mag_log "hvi heal: flattened search failed: $err"
+    return 0
+  }
+  set rects {}
+  foreach e $boxes {
+    set x1 [lindex $e 1]
+    set y1 [lindex $e 2]
+    set x2 [lindex $e 3]
+    set y2 [lindex $e 4]
+    if {$x1 == "" || $y1 == "" || $x2 == "" || $y2 == ""} continue
     if {$x1 > $x2} { set t $x1; set x1 $x2; set x2 $t }
     if {$y1 > $y2} { set t $y1; set y1 $y2; set y2 $t }
-    if {$cell != "" && [info commands db_paint] != ""} {
-      db_paint -cell $cell hvi $x1 $y1 $x2 $y2
-    } else {
-      lay_box $x1 $y1 $x2 $y2
-      :paint hvi
+    lappend rects [list $x1 $y1 $x2 $y2]
+  }
+  set nrect [llength $rects]
+  if {$nrect > 6000} {
+    mag_log "hvi heal: $nrect flattened rectangles, skipped (too many to pair)"
+    return 0
+  }
+  set bridged 0
+  set pass 0
+  while {$pass < 4} {
+    incr pass
+    set extra {}
+    set n [llength $rects]
+    for {set i 0} {$i < $n} {incr i} {
+      set a [lindex $rects $i]
+      set ax1 [lindex $a 0]
+      set ay1 [lindex $a 1]
+      set ax2 [lindex $a 2]
+      set ay2 [lindex $a 3]
+      for {set j [expr {$i + 1}]} {$j < $n} {incr j} {
+        set b [lindex $rects $j]
+        set bx1 [lindex $b 0]
+        set by1 [lindex $b 1]
+        set bx2 [lindex $b 2]
+        set by2 [lindex $b 3]
+        if {[expr {$ax2 + $gap}] <= $bx1} continue
+        if {[expr {$bx2 + $gap}] <= $ax1} continue
+        if {[expr {$ay2 + $gap}] <= $by1} continue
+        if {[expr {$by2 + $gap}] <= $ay1} continue
+        set oy1 $ay1
+        if {$by1 > $oy1} { set oy1 $by1 }
+        set oy2 $ay2
+        if {$by2 < $oy2} { set oy2 $by2 }
+        if {$oy2 > $oy1} {
+          if {$ax2 < $bx1} {
+            set g [expr {$bx1 - $ax2}]
+            if {$g > 0.00025 && $g < $gap} {
+              mag_exact_note_bridge extra $rects $ax2 $oy1 $bx1 $oy2
+            }
+          } elseif {$bx2 < $ax1} {
+            set g [expr {$ax1 - $bx2}]
+            if {$g > 0.00025 && $g < $gap} {
+              mag_exact_note_bridge extra $rects $bx2 $oy1 $ax1 $oy2
+            }
+          }
+        }
+        set ox1 $ax1
+        if {$bx1 > $ox1} { set ox1 $bx1 }
+        set ox2 $ax2
+        if {$bx2 < $ox2} { set ox2 $bx2 }
+        if {$ox2 > $ox1} {
+          if {$ay2 < $by1} {
+            set g [expr {$by1 - $ay2}]
+            if {$g > 0.00025 && $g < $gap} {
+              mag_exact_note_bridge extra $rects $ox1 $ay2 $ox2 $by1
+            }
+          } elseif {$by2 < $ay1} {
+            set g [expr {$ay1 - $by2}]
+            if {$g > 0.00025 && $g < $gap} {
+              mag_exact_note_bridge extra $rects $ox1 $by2 $ox2 $ay1
+            }
+          }
+        }
+      }
     }
-    incr n
+    if {[llength $extra] == 0} break
+    foreach r $extra {
+      set x1 [lindex $r 0]
+      set y1 [lindex $r 1]
+      set x2 [lindex $r 2]
+      set y2 [lindex $r 3]
+      if {[info commands db_paint] != ""} {
+        db_paint -no_notify -cell $cell hvi $x1 $y1 $x2 $y2
+      } else {
+        lay_box $x1 $y1 $x2 $y2
+        :paint hvi
+      }
+      lappend rects $r
+      incr bridged
+    }
   }
-  if {$n > 0} {
-    catch {:drc catchup}
-    mag_log "Closed $n hvi spacing gap(s)"
-  } else {
-    mag_log "hvi heal: $seen error tile(s), none painted"
-  }
-  return $n
+  mag_log "hvi heal: $nrect flattened rectangles, joined $bridged gaps under $gap um"
+  return $bridged
 }
 
-# DRC, fill hvi spacing gaps, and write the edit cell back out.
+# Join hvi that is closer than 0.7 um across the hierarchy, then save.
 proc mag_close_hvi_gaps {} {
   set n 0
-  catch {set n [mag_heal_hvi_drc]}
+  if {[catch {set n [mag_heal_hvi_flat 0.7]} err]} {
+    mag_log "hvi heal failed: $err"
+    set n 0
+  }
   if {$n > 0} {
-    catch {cell_save}
     catch {:drc catchup}
+    catch {cell_save}
   }
   return $n
 }
