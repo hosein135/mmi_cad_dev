@@ -139,6 +139,7 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
     cp -f "${src}/image_layout.tcl" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/mag2gds.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/open_mag.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
+    cp -f "${src}/open_gds.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/fetch_pdk.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/compile_tech.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     cp -f "${src}/fetch_caravel_mag.sh" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
@@ -148,6 +149,7 @@ if [ -d /mmi-bundle ] || [ -d /mmi-pdk-live ]; then
     cp -f "${src}/maxrc" "${CAD}/mmi_local/max/pdk/" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/mag2gds.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/open_mag.sh" 2>/dev/null || true
+    chmod 755 "${CAD}/mmi_local/max/pdk/open_gds.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/fetch_pdk.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/compile_tech.sh" 2>/dev/null || true
     chmod 755 "${CAD}/mmi_local/max/pdk/fetch_caravel_mag.sh" 2>/dev/null || true

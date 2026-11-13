@@ -9,6 +9,9 @@
 # with the imported PDK technology and saves .max cells.
 # After a successful convert, open_mag.sh starts Magic GUI on the original
 # .mag (same X display as MAX) so the two layouts can be compared.
+# The dialog can also have MAX write that converted layout back to GDS
+# (<top>.max.gds) and open_gds.sh starts Magic on it with the PDK .magicrc,
+# so cifinput maps the layer numbers MAX just wrote.
 # MAX then expands all instances (Magic's expanded view) so resistor
 # subcells are paint, not empty bboxes with instance names.
 # Download options:
@@ -23,7 +26,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 16
+set _MAG_IMPORT_REV 17
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -96,6 +99,7 @@ set MAG_IMPORT(stat_dest) ""
 set MAG_IMPORT(fetch_dead) 0
 set MAG_IMPORT(magic_polls) 0
 if {![info exists MAG_IMPORT(open_magic)]} { set MAG_IMPORT(open_magic) 1 }
+if {![info exists MAG_IMPORT(open_max_gds)]} { set MAG_IMPORT(open_max_gds) 1 }
 if {![info exists MAG_IMPORT(view)]} { set MAG_IMPORT(view) cell }
 
 # ── Small Tcl 8.0-safe helpers ───────────────────────────────────────────────
@@ -887,8 +891,16 @@ proc mag_storage_report {outdir top} {
   lappend lines "Top cell .max:"
   lappend lines "  [file join $outdir ${top}.max]"
   if {[file exists [file join $outdir ${top}.gds]]} {
-    lappend lines "GDS:"
+    lappend lines "GDS Magic wrote on the way in:"
     lappend lines "  [file join $outdir ${top}.gds]"
+  }
+  set maxgds [file join $outdir ${top}.max.gds]
+  if {[file exists $maxgds]} {
+    lappend lines "GDS written back from MAX:"
+    lappend lines "  $maxgds"
+  } elseif {[mag_schedule_max_gds]} {
+    lappend lines "GDS written back from MAX (after the layout is saved):"
+    lappend lines "  $maxgds"
   }
   if {$n > 0} {
     lappend lines ""
@@ -924,6 +936,9 @@ proc mag_write_where {outdir top} {
   }
   puts $fh "Top cell:    ${top}.max"
   puts $fh "GDS:         ${top}.gds"
+  if {[mag_schedule_max_gds]} {
+    puts $fh "MAX GDS:     ${top}.max.gds"
+  }
   puts $fh ""
   set names [mag_list_max_files $outdir]
   if {[llength $names]} {
@@ -2348,6 +2363,10 @@ proc mag_import_dialog {} -desc {
       MAG_IMPORT(open_magic) -binary \
       -help {Starts nixpkgs magic-vlsi on the same top cell so you can compare the Mag layout with the converted MAX view.}]
 
+  lappend prop_list [list "Also export converted MAX as GDS and open it in Magic VLSI:" \
+      MAG_IMPORT(open_max_gds) -binary \
+      -help {After the .max is saved, MAX writes that cell to <top>.max.gds (cifoutput of the destination technology) and starts magic-vlsi on that file with the PDK .magicrc. That rc loads cifinput, which is what Magic needs to map the GDS layer numbers. This does not replace the GDS Magic wrote on the way in. Full Caravel die and harness imports skip it. mmi18/mmi25 have no Magic cifinput map.}]
+
   if {![prop_menu2 -title "Import Magic Design Folder" $prop_list]} {
     return
   }
@@ -2775,6 +2794,135 @@ proc mag_want_gui {} {
   return 1
 }
 
+proc mag_want_max_gds {} {
+  global MAG_IMPORT
+  if {![info exists MAG_IMPORT(open_max_gds)]} { return 1 }
+  set v $MAG_IMPORT(open_max_gds)
+  if {$v == "" || $v == "0" || $v == "no" || $v == "false"} { return 0 }
+  return 1
+}
+
+# sky130 / gf180 / IHP have a Magic .magicrc with cifinput. mmi18 and mmi25 do not.
+proc mag_tech_has_magic_pdk {tech} {
+  set t [string tolower $tech]
+  if {[string match *gf180* $t]} { return 1 }
+  if {[string match *sg13* $t] || [string match *ihp* $t]} { return 1 }
+  if {[string match *sky130* $t] || [string match *skywater* $t]} { return 1 }
+  return 0
+}
+
+# True when this convert should write <top>.max.gds and open it in Magic.
+# Chip imports stay hierarchical and are not written back. mmi18/mmi25 have
+# no Magic cifinput section, so a GDS from those techs cannot be read.
+proc mag_schedule_max_gds {{family ""}} {
+  global MAG_IMPORT
+  if {![mag_want_max_gds]} { return 0 }
+  if {[mag_import_is_chip]} { return 0 }
+  set tech ""
+  if {[info exists MAG_IMPORT(tech)]} { set tech $MAG_IMPORT(tech) }
+  if {$tech == "" && $family != ""} { set tech $family }
+  if {![mag_tech_has_magic_pdk $tech]} { return 0 }
+  return 1
+}
+
+proc mag_max_gds_path {outdir top} {
+  return [file join $outdir ${top}.max.gds]
+}
+
+# Sentence for the convert-done dialog. Empty when the option is off.
+proc mag_max_gds_note {} {
+  global MAG_IMPORT
+  if {![mag_want_max_gds]} { return "" }
+  if {[mag_import_is_chip]} { return "" }
+  set gds ""
+  if {[info exists MAG_IMPORT(max_gds)]} { set gds $MAG_IMPORT(max_gds) }
+  set pending 0
+  if {[info exists MAG_IMPORT(max_gds_pending)]} {
+    set pending $MAG_IMPORT(max_gds_pending)
+  }
+  set err ""
+  if {[info exists MAG_IMPORT(max_gds_err)]} { set err $MAG_IMPORT(max_gds_err) }
+  if {$pending && $gds != ""} {
+    return "\n\nWhen the new MAX finishes saving, it will write that layout to GDS and open it in Magic VLSI with the PDK cifinput map:\n$gds"
+  }
+  if {$gds != "" && [file exists $gds]} {
+    set note "\n\nMAX wrote this GDS from the converted layout:\n$gds"
+    if {$err == ""} {
+      append note "\n\nMagic VLSI is opening it with the PDK (cifinput) so the layers match."
+    } else {
+      append note "\n\nMagic did not start:\n$err"
+    }
+    return $note
+  }
+  if {$err != ""} {
+    return "\n\nMAX could not export GDS for Magic:\n$err"
+  }
+  return ""
+}
+
+proc mag_open_gds_in_magic {gds top family} {
+  global MAG_IMPORT
+  if {$gds == "" || $top == "" || ![file exists $gds]} { return 0 }
+  set sh [mag_pdk_script open_gds.sh]
+  if {$sh == ""} {
+    set MAG_IMPORT(max_gds_err) "open_gds.sh not found"
+    mag_log "open_gds.sh not found; skip Magic GDS compare"
+    return 0
+  }
+  if {[mag_find_bin] == ""} {
+    set MAG_IMPORT(max_gds_err) "magic-vlsi is not on PATH"
+    mag_log "magic-vlsi not on PATH; skip Magic GDS compare"
+    return 0
+  }
+  if {[mag_pdk_dir $family] == ""} {
+    set MAG_IMPORT(max_gds_err) "No PDK tree for $family. Magic needs its .magicrc (cifinput). Run ./run.sh importer."
+    mag_log $MAG_IMPORT(max_gds_err)
+    return 0
+  }
+  mag_log "Opening Magic VLSI on MAX GDS: $sh $gds $top $family"
+  puts stderr "mmi convert: opening $gds in Magic ($family)"
+  if {[catch {exec /bin/bash $sh $gds $top $family &} err]} {
+    set MAG_IMPORT(max_gds_err) $err
+    mag_log "Could not start Magic on GDS: $err"
+    puts stderr "mmi convert: could not start Magic on GDS: $err"
+    return 0
+  }
+  return 1
+}
+
+# Write the open MAX cell to <top>.max.gds and open that file in Magic.
+# Returns the GDS path, or "" if nothing was written.
+proc mag_export_and_open_max_gds {outdir top family} {
+  global MAG_IMPORT
+  set MAG_IMPORT(max_gds_err) ""
+  set MAG_IMPORT(max_gds_pending) 0
+  if {$outdir == "" || $top == ""} { return "" }
+  if {[mag_import_is_chip]} { return "" }
+  catch {cell_path_add $outdir}
+  catch {cell_load $top $outdir}
+  catch {view_cell}
+  set gds [mag_max_gds_path $outdir $top]
+  mag_log "Writing converted MAX layout to $gds"
+  puts stderr "mmi convert: writing MAX GDS $gds"
+  if {[catch {gds_write -overwrite $gds} err]} {
+    set MAG_IMPORT(max_gds_err) $err
+    mag_log "MAX GDS export failed: $err"
+    puts stderr "mmi convert: MAX GDS export failed: $err"
+    return ""
+  }
+  if {![file exists $gds] || [file size $gds] < 64} {
+    set MAG_IMPORT(max_gds_err) "MAX did not write $gds"
+    mag_log $MAG_IMPORT(max_gds_err)
+    puts stderr "mmi convert: $MAG_IMPORT(max_gds_err)"
+    return ""
+  }
+  mag_log "Wrote $gds ([file size $gds] bytes) from MAX"
+  puts stderr "mmi convert: wrote $gds ([file size $gds] bytes)"
+  set MAG_IMPORT(max_gds) $gds
+  mag_open_gds_in_magic $gds $top $family
+  return $gds
+}
+
 # Match Magic's expanded view: show subcell paint (the xhigh poly resistors,
 # HVL stdcells, ...) instead of empty instance bboxes + giant cell names.
 proc mag_max_show_converted {} {
@@ -2863,6 +3011,9 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
     puts $fh "  }"
   }
   puts $fh "  puts stderr \"mmi convert: DRC errors \$_mmi_drc\""
+  if {[mag_schedule_max_gds $family]} {
+    puts $fh "  catch {mag_export_and_open_max_gds [list $outdir] [list $top] [list $family]}"
+  }
   puts $fh "}"
   close $fh
 }
@@ -3248,6 +3399,17 @@ proc mag_import_open_max {gds top tech outdir} {
     catch {:drc catchup}
     set drc_n [mag_import_drc_count]
     catch {cd $here}
+    set MAG_IMPORT(max_gds) ""
+    set MAG_IMPORT(max_gds_err) ""
+    set MAG_IMPORT(max_gds_pending) 0
+    if {[mag_want_max_gds] && ![mag_schedule_max_gds $family] && \
+        ![mag_tech_has_magic_pdk $tech]} {
+      set MAG_IMPORT(max_gds_err) "Magic has no PDK cifinput for technology '$tech'. Use sky130A, gf180mcu, or ihp-sg13g2 to open the MAX GDS in Magic."
+    }
+    if {[mag_schedule_max_gds $family]} {
+      mag_progress_update 97 "Writing MAX GDS and opening it in Magic..."
+      mag_export_and_open_max_gds $outdir $topCell $family
+    }
     mag_open_in_magic $magdir $topCell $family
     mag_progress_close
     set store [mag_finish_storage $outdir $topCell]
@@ -3263,6 +3425,7 @@ $store"
     if {[mag_want_gui]} {
       set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
     }
+    append msg [mag_max_gds_note]
     set msg "$msg\n\nMAX instances are expanded (like Magic) so resistor and stdcell paint is visible."
     mag_import_tell $msg -copy
     return
@@ -3299,6 +3462,17 @@ $store"
     mag_import_finish_chip $top $tech $gds $outdir $magdir $family
     return
   }
+  set MAG_IMPORT(max_gds) ""
+  set MAG_IMPORT(max_gds_err) ""
+  set MAG_IMPORT(max_gds_pending) 0
+  if {[mag_want_max_gds]} {
+    if {[mag_schedule_max_gds $family]} {
+      set MAG_IMPORT(max_gds) [mag_max_gds_path $outdir $top]
+      set MAG_IMPORT(max_gds_pending) 1
+    } elseif {![mag_tech_has_magic_pdk $tech]} {
+      set MAG_IMPORT(max_gds_err) "Magic has no PDK cifinput for technology '$tech'. Use sky130A, gf180mcu, or ihp-sg13g2 to open the MAX GDS in Magic."
+    }
+  }
   mag_open_in_magic $magdir $top $family
   mag_progress_close
   set store [mag_finish_storage $outdir $top]
@@ -3312,6 +3486,7 @@ GDS→.max must use the destination technology."
   if {[mag_want_gui]} {
     set msg "$msg\n\nMagic VLSI is also opening the original .mag for comparison."
   }
+  append msg [mag_max_gds_note]
   set msg "$msg\n\nMAX instances are expanded (like Magic) so resistor and stdcell paint is visible."
   mag_import_tell $msg -copy
 }

@@ -8,7 +8,9 @@
 # Source: FOSSi ciel-releases (same artifacts as `ciel enable`):
 #   https://github.com/fossi-foundation/ciel-releases
 #
-# Usage: fetch_pdk.sh <sky130A|gf180mcu|sg13g2> [status_file] [cancel_file]
+# Usage: fetch_pdk.sh <sky130A|gf180mcu|sg13g2|name> [status_file] [cancel_file]
+# A name that is not one of the three built-in kits needs MMI_CIEL_TAG,
+# MMI_PDK_VARIANT and MMI_PDK_ASSETS, or a single MMI_PDK_ARCHIVE_URL.
 # Incomplete runs keep $PDK_ROOT/.fetch-<family>/ so the next importer install resumes.
 set -euo pipefail
 
@@ -62,7 +64,16 @@ check_cancel() {
 }
 
 usage() {
-  die "Usage: fetch_pdk.sh <sky130A|gf180mcu|sg13g2> [status_file] [cancel_file]"
+  die "Usage: fetch_pdk.sh <sky130A|gf180mcu|sg13g2|name> [status_file] [cancel_file]"
+}
+
+# Built-in assets are bare names (common → common.tar.zst). A URL import may
+# name the archive file itself (foo.tar.gz).
+asset_file() {
+  case "$1" in
+    *.tar.zst|*.tzst|*.tar.gz|*.tgz|*.tar.xz|*.tar) printf '%s\n' "$1" ;;
+    *) printf '%s.tar.zst\n' "$1" ;;
+  esac
 }
 
 need_bin() {
@@ -160,17 +171,68 @@ archive_ready() {
   local a="$1"
   [ -s "$a" ] || return 1
   [ -f "${a}.ok" ] || return 1
-  zstd -t "$a" >/dev/null 2>&1
+  case "$a" in
+    *.tar.zst|*.tzst) zstd -t "$a" >/dev/null 2>&1 ;;
+    *) return 0 ;;
+  esac
 }
 
-extract_zst() {
+extract_archive() {
   local archive="$1" dest="$2"
   check_cancel
   log "Unpack $archive → $dest"
   mkdir -p "$dest"
-  if ! zstd -d -c "$archive" | tar -xf - -C "$dest"; then
-    die "Unpack failed: $archive"
+  case "$archive" in
+    *.tar.zst|*.tzst)
+      zstd -d -c "$archive" | tar -xf - -C "$dest" || die "Unpack failed: $archive"
+      ;;
+    *.tar.gz|*.tgz)
+      tar -xzf "$archive" -C "$dest" || die "Unpack failed: $archive"
+      ;;
+    *.tar.xz)
+      tar -xJf "$archive" -C "$dest" || die "Unpack failed: $archive"
+      ;;
+    *.tar)
+      tar -xf "$archive" -C "$dest" || die "Unpack failed: $archive"
+      ;;
+    *)
+      die "Unknown archive type: $archive"
+      ;;
+  esac
+}
+
+# Ciel archives use their own top directory name. Put that tree at $variant
+# so the install lands on $PDK_ROOT/$variant.
+normalize_unpack_variant() {
+  local variant="$1" unpack="$2"
+  local cand base
+  [ -n "$variant" ] || return 1
+  [ -d "$unpack/$variant" ] && return 0
+  if [ -d "$unpack/libs.tech" ] || [ -d "$unpack/libs.ref" ]; then
+    mkdir -p "$unpack/.bundle"
+    for cand in "$unpack"/*; do
+      [ -e "$cand" ] || continue
+      base="$(basename "$cand")"
+      [ "$base" = ".bundle" ] && continue
+      mv "$cand" "$unpack/.bundle/"
+    done
+    mv "$unpack/.bundle" "$unpack/$variant"
+    log "Archive root installed as $variant"
+    return 0
   fi
+  for cand in "$unpack"/*; do
+    [ -d "$cand" ] || continue
+    base="$(basename "$cand")"
+    case "$base" in
+      dl|unpack|.*) continue ;;
+    esac
+    if [ -d "$cand/libs.tech" ] || [ -d "$cand/libs.ref" ]; then
+      log "Archive directory $base installed as $variant"
+      mv "$cand" "$unpack/$variant"
+      return 0
+    fi
+  done
+  return 1
 }
 
 # --- family ---
@@ -199,7 +261,19 @@ case "$FAMILY" in
     ASSETS="common sg13g2_pr sg13g2_io sg13g2_stdcell sg13g2_sram"
     ;;
   *)
-    usage
+    if [ -n "${MMI_PDK_ARCHIVE_URL:-}" ] && [ -n "${MMI_PDK_VARIANT:-}" ]; then
+      FAMILY="$(printf '%s' "$FAMILY" | tr -c 'A-Za-z0-9_.-' _)"
+      VARIANT="$MMI_PDK_VARIANT"
+      TAG="local-archive"
+      ASSETS="archive"
+    elif [ -n "${MMI_CIEL_TAG:-}" ] && [ -n "${MMI_PDK_VARIANT:-}" ] && [ -n "${MMI_PDK_ASSETS:-}" ]; then
+      FAMILY="$(printf '%s' "$FAMILY" | tr -c 'A-Za-z0-9_.-' _)"
+      VARIANT="$MMI_PDK_VARIANT"
+      TAG="$MMI_CIEL_TAG"
+      ASSETS="$MMI_PDK_ASSETS"
+    else
+      usage
+    fi
     ;;
 esac
 
@@ -240,6 +314,13 @@ fi
 
 if [ -n "${MMI_PDK_LIBS:-}" ]; then
   ASSETS="$ASSETS $MMI_PDK_LIBS"
+fi
+# Add URL passes the asset list (and sometimes a non-ciel download prefix).
+if [ -n "${MMI_PDK_ASSETS:-}" ]; then
+  ASSETS="$MMI_PDK_ASSETS"
+fi
+if [ -n "${MMI_PDK_BASE:-}" ]; then
+  CIEL_BASE="${MMI_PDK_BASE%/}"
 fi
 
 # A compiled tree the user already has. Link it; uninstall removes the link.
@@ -324,37 +405,68 @@ mkdir -p "$UNPACK"
 write_status running 1 "Fetching compiled open_pdks ($TAG)"
 log "PDK_ROOT=$PDK_ROOT tag=$TAG variant=$VARIANT stage=$STAGE"
 
-set -- $ASSETS
-N=$#
-i=0
-have=0
-for asset in $ASSETS; do
-  if archive_ready "$DL/${asset}.tar.zst"; then
-    have=$((have + 1))
-  fi
-done
-if [ "$have" -gt 0 ]; then
-  log "Resuming: $have/$N assets already downloaded"
-  write_status running 2 "Resuming download ($have/$N assets already fetched)"
+if [ -z "${MMI_PDK_ARCHIVE_URL:-}" ] && [ -z "$ASSETS" ]; then
+  die "No PDK libraries to download"
 fi
 
-for asset in $ASSETS; do
-  i=$((i + 1))
-  check_cancel
-  pct_lo=$((5 + (i - 1) * 70 / N))
-  pct_hi=$((5 + i * 70 / N))
-  archive="$DL/${asset}.tar.zst"
-  if archive_ready "$archive"; then
-    log "Resume: skip download $asset"
-    write_status running "$pct_hi" "Already downloaded $asset"
-  else
+if [ -n "${MMI_PDK_ARCHIVE_URL:-}" ]; then
+  arc_name="$(basename "${MMI_PDK_ARCHIVE_URL%%\?*}")"
+  case "$arc_name" in
+    *.tar.zst|*.tzst|*.tar.gz|*.tgz|*.tar.xz|*.tar) ;;
+    *) die "PDK archive URL must be a .tar.zst, .tar.gz, .tgz, .tar.xz, or .tar file" ;;
+  esac
+  archive="$DL/$arc_name"
+  if ! archive_ready "$archive"; then
     rm -f "$archive" "${archive}.part" "${archive}.ok"
-    download_one "${CIEL_BASE}/${TAG}/${asset}.tar.zst" "$archive" "$asset.tar.zst" "$pct_lo" "$pct_hi"
-    archive_ready "$archive" || die "Downloaded archive is not valid zstd: $asset"
+    download_one "$MMI_PDK_ARCHIVE_URL" "$archive" "$arc_name" 5 70
+    archive_ready "$archive" || die "Downloaded archive is not valid: $arc_name"
   fi
-  write_status running "$pct_hi" "Unpacking $asset"
-  extract_zst "$archive" "$UNPACK"
-done
+  write_status running 78 "Unpacking $arc_name"
+  extract_archive "$archive" "$UNPACK"
+else
+  set -- $ASSETS
+  N=$#
+  i=0
+  have=0
+  for asset in $ASSETS; do
+    fn="$(asset_file "$asset")"
+    if archive_ready "$DL/$fn"; then
+      have=$((have + 1))
+    fi
+  done
+  if [ "$have" -gt 0 ]; then
+    log "Resuming: $have/$N assets already downloaded"
+    write_status running 2 "Resuming download ($have/$N assets already fetched)"
+  fi
+
+  for asset in $ASSETS; do
+    i=$((i + 1))
+    check_cancel
+    pct_lo=$((5 + (i - 1) * 70 / N))
+    pct_hi=$((5 + i * 70 / N))
+    fn="$(asset_file "$asset")"
+    archive="$DL/$fn"
+    case "$asset" in
+      *.tar.zst|*.tzst|*.tar.gz|*.tgz|*.tar.xz|*.tar)
+        url="${CIEL_BASE}/${TAG}/${asset}" ;;
+      *)
+        url="${CIEL_BASE}/${TAG}/${asset}.tar.zst" ;;
+    esac
+    if archive_ready "$archive"; then
+      log "Resume: skip download $asset"
+      write_status running "$pct_hi" "Already downloaded $fn"
+    else
+      rm -f "$archive" "${archive}.part" "${archive}.ok"
+      download_one "$url" "$archive" "$fn" "$pct_lo" "$pct_hi"
+      archive_ready "$archive" || die "Downloaded archive is not valid: $fn"
+    fi
+    write_status running "$pct_hi" "Unpacking $fn"
+    extract_archive "$archive" "$UNPACK"
+  done
+fi
+
+normalize_unpack_variant "$VARIANT" "$UNPACK" || \
+  die "Archive had no open_pdks tree (expected libs.tech or libs.ref)"
 
 write_status running 88 "Installing into $PDK_ROOT"
 
@@ -394,7 +506,11 @@ tree_ready "$DEST" || die "Install incomplete: $DEST (need libs.tech/magic/*.mag
   echo "  variant $VARIANT"
   echo "  ciel    $TAG"
   echo "  assets  $ASSETS"
-  echo "  source  ${CIEL_BASE}/${TAG}/"
+  if [ -n "${MMI_PDK_ARCHIVE_URL:-}" ]; then
+    echo "  source  $MMI_PDK_ARCHIVE_URL"
+  else
+    echo "  source  ${CIEL_BASE}/${TAG}/"
+  fi
 } >"$DEST/MMI_PDK_SOURCE"
 
 rm -rf "$STAGE"

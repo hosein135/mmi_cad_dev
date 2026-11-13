@@ -88,26 +88,7 @@ proc importer_registry_text {} {
   return $text
 }
 
-proc importer_load {} {
-  global IMPORTER_CACHE
-  if {$IMPORTER_CACHE != ""} { return $IMPORTER_CACHE }
-  set text [importer_registry_text]
-  if {$text == ""} {
-    set IMPORTER_CACHE [list \
-        [list pdks [list name sky130A process "SkyWater 130nm" dir sky130A \
-            family sky130A max_tech sky130A sue_lib sky130A license Apache-2.0 \
-            tag sky130-e8daeda73ca8f5814dbc0b11d1d05802251a3750 \
-            description "open_pdks sky130A"]] \
-        [list pdks [list name gf180mcuD process "GlobalFoundries 180nm MCU" \
-            dir gf180mcuD family gf180mcu max_tech gf180mcu sue_lib gf180mcu \
-            license Apache-2.0 tag gf180mcu-0fe599b2afb6708d281543108caf8310912f54af \
-            description "open_pdks gf180mcuD"]] \
-        [list pdks [list name ihp-sg13g2 process "IHP 130nm SiGe" dir ihp-sg13g2 \
-            family sg13g2 max_tech sg13g2 sue_lib sg13g2 license Apache-2.0 \
-            tag ihp-sg13g2-ddb601a4a4473163e1ed6df416b885df18b4ac03 \
-            description "IHP SG13G2"]]]
-    return $IMPORTER_CACHE
-  }
+proc importer_parse_groups {text} {
   set cur ""
   set kind ""
   set item {}
@@ -125,8 +106,70 @@ proc importer_load {} {
     lappend item $key $val
   }
   if {$item != ""} { lappend items [list $kind $item] }
-  set IMPORTER_CACHE $items
   return $items
+}
+
+proc importer_builtin_items {} {
+  return [list \
+      [list pdks [list name sky130A process "SkyWater 130nm" dir sky130A \
+          family sky130A max_tech sky130A sue_lib sky130A license Apache-2.0 \
+          tag sky130-e8daeda73ca8f5814dbc0b11d1d05802251a3750 \
+          description "open_pdks sky130A"]] \
+      [list pdks [list name gf180mcuD process "GlobalFoundries 180nm MCU" \
+          dir gf180mcuD family gf180mcu max_tech gf180mcu sue_lib gf180mcu \
+          license Apache-2.0 tag gf180mcu-0fe599b2afb6708d281543108caf8310912f54af \
+          description "open_pdks gf180mcuD"]] \
+      [list pdks [list name ihp-sg13g2 process "IHP 130nm SiGe" dir ihp-sg13g2 \
+          family sg13g2 max_tech sg13g2 sue_lib sg13g2 license Apache-2.0 \
+          tag ihp-sg13g2-ddb601a4a4473163e1ed6df416b885df18b4ac03 \
+          description "IHP SG13G2"]]]
+}
+
+# Extra rows replace a built-in with the same name, then new names are appended.
+proc importer_merge_extra {items extra} {
+  set out {}
+  foreach pair $items {
+    set kind [lindex $pair 0]
+    set item [lindex $pair 1]
+    if {$kind != "pdks"} {
+      lappend out $pair
+      continue
+    }
+    set name [importer_field $item name]
+    set repl ""
+    foreach e $extra {
+      if {[importer_field $e name] == $name} { set repl $e }
+    }
+    if {$repl != ""} {
+      lappend out [list pdks $repl]
+    } else {
+      lappend out $pair
+    }
+  }
+  foreach e $extra {
+    set name [importer_field $e name]
+    set seen 0
+    foreach pair $out {
+      if {[lindex $pair 0] == "pdks" && [importer_field [lindex $pair 1] name] == $name} {
+        set seen 1
+      }
+    }
+    if {!$seen} { lappend out [list pdks $e] }
+  }
+  return $out
+}
+
+proc importer_load {} {
+  global IMPORTER_CACHE
+  if {$IMPORTER_CACHE != ""} { return $IMPORTER_CACHE }
+  set text [importer_registry_text]
+  if {$text == ""} {
+    set items [importer_builtin_items]
+  } else {
+    set items [importer_parse_groups $text]
+  }
+  set IMPORTER_CACHE [importer_merge_extra $items [importer_extra_items]]
+  return $IMPORTER_CACHE
 }
 
 proc importer_forget {} {
@@ -295,6 +338,17 @@ proc importer_flag {name default} {
   return [set ::$name]
 }
 
+proc importer_magic_tech_file {item} {
+  set dir [file join [importer_pdk_root] [importer_field $item dir] libs.tech magic]
+  set prefer [importer_field $item dir]
+  set best ""
+  foreach f [glob -nocomplain [file join $dir *.tech]] {
+    if {[string match *$prefer* [file tail $f]]} { return $f }
+    if {$best == ""} { set best $f }
+  }
+  return $best
+}
+
 proc importer_write_source {item} {
   set tech [importer_field $item max_tech]
   set fam [importer_field $item family]
@@ -304,7 +358,21 @@ proc importer_write_source {item} {
   if {[info commands pdk_write_source] == ""} {
     return "pdk_write_source is not loaded"
   }
-  pdk_write_source $fam $tech $source
+  set n [pdk_write_source $fam $tech $source]
+  if {$n == 0 || ![file readable $source]} {
+    set rows {}
+    set techfile [importer_magic_tech_file $item]
+    if {$techfile != "" && [info commands pdk_parse_magic_tech] != ""} {
+      set rows [pdk_parse_magic_tech $techfile]
+    }
+    if {![llength $rows]} {
+      return "No layer table for $fam, and the Magic tech has no cifoutput layers."
+    }
+    importer_log "MAX technology from [file tail $techfile] ([llength $rows] layers)"
+    if {![pdk_write_source $fam $tech $source $rows]} {
+      return "Could not write $source"
+    }
+  }
   return $source
 }
 
@@ -489,6 +557,19 @@ proc importer_install {name {progress ""}} {
   if {[info exists env(MMI_PDK_LOCAL)] && $env(MMI_PDK_LOCAL) == ""} {
     unset env(MMI_PDK_LOCAL)
   }
+  foreach key {MMI_CIEL_TAG MMI_PDK_ASSETS MMI_PDK_BASE MMI_PDK_ARCHIVE_URL MMI_PDK_VARIANT} {
+    catch {unset env($key)}
+  }
+  set tag [importer_field $item tag]
+  set assets [importer_field $item assets]
+  set base [importer_field $item base]
+  set archive [importer_field $item archive]
+  set variant [importer_field $item dir]
+  if {$tag != "" && $tag != "local-archive"} { set env(MMI_CIEL_TAG) $tag }
+  if {$assets != ""} { set env(MMI_PDK_ASSETS) $assets }
+  if {$base != ""} { set env(MMI_PDK_BASE) $base }
+  if {$archive != ""} { set env(MMI_PDK_ARCHIVE_URL) $archive }
+  if {$variant != ""} { set env(MMI_PDK_VARIANT) $variant }
   if {![importer_tree_ok $dir]} {
     set sh ""
     foreach c [list \
@@ -576,6 +657,302 @@ proc importer_repair {} {
   return $n
 }
 
+proc importer_extra_path {} {
+  return [file join [importer_pdk_root] registry extra.json]
+}
+
+proc importer_extra_items {} {
+  set path [importer_extra_path]
+  if {![file readable $path]} { return {} }
+  set text [importer_read_json $path]
+  if {$text == ""} { return {} }
+  set out {}
+  foreach pair [importer_parse_groups $text] {
+    if {[lindex $pair 0] == "pdks"} { lappend out [lindex $pair 1] }
+  }
+  return $out
+}
+
+proc importer_write_extra {items} {
+  set path [importer_extra_path]
+  if {[catch {file mkdir [file dirname $path]} err]} { return $err }
+  if {[catch {set fh [open $path w]} err]} { return $err }
+  puts $fh "\{"
+  puts $fh "  \"pdks\": \["
+  set n [llength $items]
+  set i 0
+  foreach item $items {
+    incr i
+    puts $fh "    \{"
+    set keys {name process dir family tag assets max_tech sue_lib license description base archive}
+    set ki 0
+    set kn [llength $keys]
+    foreach k $keys {
+      incr ki
+      set v [importer_field $item $k]
+      set comma ","
+      if {$ki == $kn} { set comma "" }
+      if {$k == "assets"} {
+        set arr {}
+        foreach a $v {
+          lappend arr "\"[importer_json_escape $a]\""
+        }
+        puts $fh "      \"assets\": \[[join $arr ,]\]$comma"
+      } else {
+        puts $fh "      \"$k\": \"[importer_json_escape $v]\"$comma"
+      }
+    }
+    set comma ","
+    if {$i == $n} { set comma "" }
+    puts $fh "    \}$comma"
+  }
+  puts $fh "  \]"
+  puts $fh "\}"
+  close $fh
+  return ""
+}
+
+proc importer_remember_pdk {item} {
+  set name [importer_field $item name]
+  if {$name == ""} { return "PDK entry has no name." }
+  set items [importer_extra_items]
+  set out {}
+  set replaced 0
+  foreach e $items {
+    if {[importer_field $e name] == $name} {
+      lappend out $item
+      set replaced 1
+    } else {
+      lappend out $e
+    }
+  }
+  if {!$replaced} { lappend out $item }
+  set err [importer_write_extra $out]
+  if {$err != ""} { return $err }
+  importer_forget
+  if {$replaced} { return "updated $name" }
+  return "added $name"
+}
+
+proc importer_is_url {url} {
+  if {[string length $url] < 12 || [string length $url] > 2000} { return 0 }
+  if {[string first " " $url] >= 0} { return 0 }
+  if {[string first \n $url] >= 0 || [string first \r $url] >= 0} { return 0 }
+  if {[string match https://* $url] || [string match http://* $url]} { return 1 }
+  return 0
+}
+
+proc importer_http_get {url dest} {
+  set curl [auto_execok curl]
+  if {$curl == ""} { return "curl is not on PATH" }
+  if {[catch {file mkdir [file dirname $dest]} err]} { return $err }
+  if {[catch {exec $curl -fsSL --max-time 90 -A mmi-cad-importer -o $dest $url} err]} {
+    return $err
+  }
+  if {![file readable $dest] || [file size $dest] < 2} {
+    return "Empty response from $url"
+  }
+  return ""
+}
+
+proc importer_release_from_url {url} {
+  set u [lindex [split $url ?] 0]
+  set u [string trimright $u /]
+  if {![regexp {^https?://github\.com/([^/]+)/([^/]+)/releases/(?:tag|download)/([^/]+)} $u -> owner repo tag]} {
+    return ""
+  }
+  if {$owner == "" || $repo == "" || $tag == ""} { return "" }
+  return [list $owner $repo $tag]
+}
+
+proc importer_release_assets {text} {
+  set names {}
+  foreach line [split $text \n] {
+    if {[regexp {^root\.assets\[[0-9]+\]\.name=(.+)$} $line -> name]} {
+      set name [string trim $name]
+      if {$name != ""} { lappend names $name }
+    }
+  }
+  return $names
+}
+
+proc importer_asset_id {filename} {
+  if {[string match *.tar.zst $filename]} {
+    return [string range $filename 0 end-8]
+  }
+  return $filename
+}
+
+proc importer_default_asset_ids {ids} {
+  set out {}
+  foreach n $ids {
+    if {$n == "common"} { lappend out $n }
+  }
+  foreach n $ids {
+    if {[string match *_pr $n] || [string match *_fd_pr $n] || \
+        [string match *primitives* $n]} {
+      if {[lsearch -exact $out $n] < 0} { lappend out $n }
+    }
+  }
+  foreach n $ids {
+    if {[string match *_io $n] || [string match *_fd_io $n]} {
+      if {[lsearch -exact $out $n] < 0} { lappend out $n }
+    }
+  }
+  set std ""
+  foreach n $ids {
+    if {[string match *_sc_hd $n] || [string match *stdcell* $n] || \
+        [string match *_sc_mcu* $n]} {
+      set std $n
+      break
+    }
+  }
+  if {$std == ""} {
+    foreach n $ids {
+      if {[string match *_sc_* $n]} { set std $n; break }
+    }
+  }
+  if {$std != "" && [lsearch -exact $out $std] < 0} { lappend out $std }
+  if {![llength $out]} { return $ids }
+  return $out
+}
+
+proc importer_identity_from_tag {tag} {
+  set stem $tag
+  regexp {^(.*)-([0-9a-fA-F]{7,})$} $tag -> stem
+  set low [string tolower $stem]
+  if {[string match sky130* $low]} {
+    return [list sky130A sky130A sky130A sky130A "SkyWater 130nm"]
+  }
+  if {[string match gf180* $low]} {
+    return [list gf180mcuD gf180mcu gf180mcuD gf180mcu "GlobalFoundries 180nm MCU"]
+  }
+  if {[string match *sg13g2* $low] || [string match ihp* $low]} {
+    return [list ihp-sg13g2 sg13g2 ihp-sg13g2 sg13g2 "IHP 130nm SiGe"]
+  }
+  set n $stem
+  if {[info commands pdk_sanitize] != ""} { set n [pdk_sanitize $stem] }
+  if {$n == ""} { set n pdk }
+  return [list $n $n $n $n "Added from URL"]
+}
+
+proc importer_item_from_release {url owner repo tag asset_ids} {
+  set id [importer_identity_from_tag $tag]
+  set name [lindex $id 0]
+  set family [lindex $id 1]
+  set dir [lindex $id 2]
+  set tech [lindex $id 3]
+  set process [lindex $id 4]
+  set base "https://github.com/$owner/$repo/releases/download"
+  set desc "Added from $url. Libraries: [join $asset_ids {, }]."
+  return [list name $name process $process dir $dir family $family \
+      tag $tag assets [join $asset_ids " "] max_tech $tech sue_lib $tech \
+      license "" description $desc base $base archive ""]
+}
+
+proc importer_item_from_archive {url} {
+  set pathpart [lindex [split $url ?] 0]
+  set bits [split $pathpart /]
+  set base [lindex $bits end]
+  foreach suf {.tar.zst .tar.gz .tgz .tar.xz .tar} {
+    set n [string length $suf]
+    set m [string length $base]
+    if {$m > $n && [string range [string tolower $base] [expr {$m - $n}] end] == $suf} {
+      set base [string range $base 0 [expr {$m - $n - 1}]]
+      break
+    }
+  }
+  if {[info commands pdk_sanitize] != ""} { set base [pdk_sanitize $base] }
+  if {$base == ""} { set base pdk }
+  set desc "Added from archive $url"
+  return [list name $base process "Added from URL" dir $base family $base \
+      tag local-archive assets "" max_tech $base sue_lib $base \
+      license "" description $desc base "" archive $url]
+}
+
+# Returns {error msg}, {release owner repo tag ids}, {archive url},
+# or {catalogue item item ...}. A release is not saved yet: the caller
+# chooses which libraries to download.
+proc importer_inspect_url {url} {
+  if {![importer_is_url $url]} {
+    return [list error "Enter an http or https URL."]
+  }
+  set rel [importer_release_from_url $url]
+  if {$rel != ""} {
+    set owner [lindex $rel 0]
+    set repo [lindex $rel 1]
+    set tag [lindex $rel 2]
+    set api "https://api.github.com/repos/$owner/$repo/releases/tags/$tag"
+    set tmp [file join [importer_pdk_root] registry url-inspect.json]
+    set err [importer_http_get $api $tmp]
+    if {$err != ""} {
+      return [list error "Could not read that GitHub release.\n$err"]
+    }
+    set files [importer_release_assets [importer_read_json $tmp]]
+    if {![llength $files]} {
+      return [list error "That release has no downloadable files."]
+    }
+    set ids {}
+    foreach f $files { lappend ids [importer_asset_id $f] }
+    return [list release $owner $repo $tag $ids]
+  }
+  set pathpart [string tolower [lindex [split $url ?] 0]]
+  if {[string match *.tar.zst $pathpart] || [string match *.tar.gz $pathpart] || \
+      [string match *.tgz $pathpart] || [string match *.tar.xz $pathpart] || \
+      [string match *.tar $pathpart]} {
+    return [list archive $url]
+  }
+  set tmp [file join [importer_pdk_root] registry url-inspect.json]
+  set err [importer_http_get $url $tmp]
+  if {$err != ""} {
+    return [list error "Could not download that URL.\n$err"]
+  }
+  set pdks {}
+  foreach pair [importer_parse_groups [importer_read_json $tmp]] {
+    if {[lindex $pair 0] == "pdks" && [importer_field [lindex $pair 1] name] != ""} {
+      lappend pdks [lindex $pair 1]
+    }
+  }
+  if {![llength $pdks]} {
+    return [list error "That URL is not a GitHub release, a PDK archive (.tar.zst, .tar.gz, .tgz, .tar.xz), or a catalogue JSON with a pdks list."]
+  }
+  set result [list catalogue]
+  foreach p $pdks { lappend result $p }
+  return $result
+}
+
+proc importer_add_url_cli {url} {
+  set got [importer_inspect_url $url]
+  set kind [lindex $got 0]
+  if {$kind == "error"} { return [lindex $got 1] }
+  if {$kind == "catalogue"} {
+    foreach item [lrange $got 1 end] {
+      set msg [importer_remember_pdk $item]
+      if {[string match "PDK*" $msg] || [string match "Could*" $msg]} { return $msg }
+      puts $msg
+    }
+    return ""
+  }
+  if {$kind == "archive"} {
+    set msg [importer_remember_pdk [importer_item_from_archive [lindex $got 1]]]
+    puts $msg
+    if {[string match added* $msg] || [string match updated* $msg]} { return "" }
+    return $msg
+  }
+  if {$kind == "release"} {
+    set ids [lindex $got 4]
+    set use [importer_default_asset_ids $ids]
+    set item [importer_item_from_release $url \
+        [lindex $got 1] [lindex $got 2] [lindex $got 3] $use]
+    set msg [importer_remember_pdk $item]
+    puts $msg
+    puts "libraries: [join $use {, }]"
+    if {[string match added* $msg] || [string match updated* $msg]} { return "" }
+    return $msg
+  }
+  return "Could not use that URL."
+}
+
 proc importer_cli {argv} {
   if {[llength $argv] == 0} { return 0 }
   set cmd [lindex $argv 0]
@@ -620,6 +997,15 @@ proc importer_cli {argv} {
     --repair {
       set n [importer_repair]
       puts "repair touched $n PDK(s)"
+      return 1
+    }
+    --add-url {
+      if {$arg == ""} {
+        puts "usage: importer --add-url <url>"
+        exit 2
+      }
+      set err [importer_add_url_cli $arg]
+      if {$err != ""} { puts "add-url failed: $err"; exit 1 }
       return 1
     }
     default { return 0 }

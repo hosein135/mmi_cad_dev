@@ -146,6 +146,7 @@
           install -Dm644 "$src/image_layout.tcl" $out/image_layout.tcl
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
           install -Dm755 "$src/open_mag.sh" $out/open_mag.sh
+          install -Dm755 "$src/open_gds.sh" $out/open_gds.sh
           install -Dm755 "$src/fetch_pdk.sh" $out/fetch_pdk.sh
           install -Dm755 "$src/compile_tech.sh" $out/compile_tech.sh
           install -Dm755 "$src/fetch_caravel_mag.sh" $out/fetch_caravel_mag.sh

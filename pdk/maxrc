@@ -25,10 +25,12 @@ if {[info commands _mmi_file_normalize] == ""} {
 proc _mmi_pdk_source {name} {
   global env
   set cands {}
+  # Live checkout first. The session start copies it into MMI_LOCAL, and that
+  # copy would hide a newer pdk/*.tcl until the next ./run.sh.
+  lappend cands /mmi-pdk-live/$name
   if {[info exists env(MMI_LOCAL)] && $env(MMI_LOCAL) != ""} {
     lappend cands [file join $env(MMI_LOCAL) max pdk $name]
   }
-  lappend cands /mmi-pdk-live/$name
   if {[info exists env(MMI_PDK_DIR)] && $env(MMI_PDK_DIR) != ""} {
     lappend cands [file join $env(MMI_PDK_DIR) $name]
   }

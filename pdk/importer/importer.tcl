@@ -1,6 +1,6 @@
 # importer — download a PDK and build the MAX technology and SUE library.
 #   importer                 window
-#   importer --list|--status|--install|--uninstall|--repair
+#   importer --list|--status|--install|--uninstall|--repair|--add-url <url>
 #
 # Tcl 8.6 / Tk. Not sourced by MAX.
 
@@ -112,11 +112,28 @@ proc importer_refresh {} {
         $st]
     incr i
   }
-  if {$keep != "" && [.tbl exists $keep]} {
-    .tbl selection set $keep
-    .tbl see $keep
-  } elseif {$i > 0} {
-    .tbl selection set p0
+  set picked 0
+  if {[info exists ::IMPORTER_SELECT_NAME] && $::IMPORTER_SELECT_NAME != ""} {
+    set want $::IMPORTER_SELECT_NAME
+    set ::IMPORTER_SELECT_NAME ""
+    set j 0
+    foreach item $::IMPORTER_ITEMS {
+      if {[importer_field $item name] == $want} {
+        .tbl selection set p$j
+        .tbl see p$j
+        set picked 1
+        break
+      }
+      incr j
+    }
+  }
+  if {!$picked} {
+    if {$keep != "" && [.tbl exists $keep]} {
+      .tbl selection set $keep
+      .tbl see $keep
+    } elseif {$i > 0} {
+      .tbl selection set p0
+    }
   }
   importer_show_desc
 }
@@ -169,12 +186,12 @@ proc importer_fail {msg} {
 proc importer_busy {on} {
   set ::IMPORTER_BUSY $on
   if {$on} {
-    foreach w {.act.install .act.remove .act.repair .act.refresh} {
+    foreach w {.act.install .act.url .act.remove .act.repair .act.refresh} {
       if {[winfo exists $w]} { $w configure -state disabled }
     }
     . configure -cursor watch
   } else {
-    foreach w {.act.install .act.remove .act.repair .act.refresh} {
+    foreach w {.act.install .act.url .act.remove .act.repair .act.refresh} {
       if {[winfo exists $w]} { $w configure -state normal }
     }
     . configure -cursor {}
@@ -186,6 +203,10 @@ proc importer_apply_env {} {
   catch {unset ::env(MMI_CIEL_TAG)}
   catch {unset ::env(MMI_PDK_LOCAL)}
   catch {unset ::env(MMI_PDK_LIBS)}
+  catch {unset ::env(MMI_PDK_ASSETS)}
+  catch {unset ::env(MMI_PDK_BASE)}
+  catch {unset ::env(MMI_PDK_ARCHIVE_URL)}
+  catch {unset ::env(MMI_PDK_VARIANT)}
 }
 
 proc importer_do_install {} {
@@ -258,6 +279,173 @@ proc importer_browse {} {
   importer_refresh
 }
 
+proc importer_pick_assets {ids pre} {
+  set w .assets
+  catch {destroy $w}
+  toplevel $w
+  wm title $w "PDK libraries"
+  wm transient $w .
+  wm minsize $w 420 360
+  set ::IMPORTER_ASSET_PICK ""
+  ttk::label $w.hint -wraplength 460 -justify left \
+      -text "Choose which libraries to download. common, primitives, IO, and one standard-cell library are already selected. Extra standard-cell and SRAM archives are often several gigabytes."
+  pack $w.hint -side top -fill x -padx 12 -pady 8
+  frame $w.box
+  listbox $w.box.lb -selectmode extended -height 12 -exportselection 0 \
+      -font $::IMPORTER_UI -activestyle dotbox
+  scrollbar $w.box.sb -command [list $w.box.lb yview]
+  $w.box.lb configure -yscrollcommand [list $w.box.sb set]
+  pack $w.box.sb -side right -fill y
+  pack $w.box.lb -side left -fill both -expand 1
+  pack $w.box -side top -fill both -expand 1 -padx 12
+  foreach n $ids { $w.box.lb insert end $n }
+  set i 0
+  foreach n $ids {
+    if {[lsearch -exact $pre $n] >= 0} { $w.box.lb selection set $i }
+    incr i
+  }
+  frame $w.act
+  button $w.act.all -text "Select all" -font $::IMPORTER_UI \
+      -command [list $w.box.lb selection set 0 end]
+  button $w.act.ok -text "Add these" -font $::IMPORTER_UI \
+      -bg #1f6feb -fg #ffffff -activebackground #1a5fd0 -activeforeground #ffffff \
+      -command [list importer_pick_assets_ok $w]
+  button $w.act.cancel -text "Cancel" -font $::IMPORTER_UI \
+      -command [list importer_pick_assets_cancel $w]
+  pack $w.act.cancel -side right -padx 6 -pady 8
+  pack $w.act.ok -side right -padx 6 -pady 8
+  pack $w.act.all -side left -padx 6 -pady 8
+  pack $w.act -side bottom -fill x
+  tkwait window $w
+  return $::IMPORTER_ASSET_PICK
+}
+
+proc importer_pick_assets_ok {w} {
+  set got {}
+  foreach i [$w.box.lb curselection] {
+    lappend got [$w.box.lb get $i]
+  }
+  if {![llength $got]} {
+    tk_messageBox -icon warning -title "PDK libraries" -parent $w \
+        -message "Select at least one library."
+    return
+  }
+  set ::IMPORTER_ASSET_PICK $got
+  destroy $w
+}
+
+proc importer_pick_assets_cancel {w} {
+  set ::IMPORTER_ASSET_PICK ""
+  destroy $w
+}
+
+proc importer_save_added {item} {
+  set name [importer_field $item name]
+  set had [expr {[importer_by_name $name] != ""}]
+  set msg [importer_remember_pdk $item]
+  if {![string match added* $msg] && ![string match updated* $msg]} {
+    return $msg
+  }
+  set ::IMPORTER_SELECT_NAME $name
+  importer_refresh
+  set what "Added $name to the list."
+  if {$had} {
+    set what "$name was already listed. Its download URL is now this one."
+  }
+  set go [tk_messageBox -icon info -type yesno -title "PDK installer" \
+      -message "$what\n\nInstall it now?"]
+  if {$go == "yes"} { importer_do_install }
+  return ""
+}
+
+proc importer_add_url_go {w} {
+  set url [string trim $::IMPORTER_ADD_URL]
+  if {$w != "" && [winfo exists $w]} { destroy $w }
+  set ::env(PDK_ROOT) $::IMPORTER_ROOT
+  importer_busy 1
+  importer_set_progress 2 "Reading $url"
+  update
+  set got [importer_inspect_url $url]
+  importer_busy 0
+  importer_set_progress 0 "Download progress: ready"
+  set kind [lindex $got 0]
+  if {$kind == "error"} {
+    importer_fail [lindex $got 1]
+    return
+  }
+  if {$kind == "catalogue"} {
+    set names {}
+    foreach item [lrange $got 1 end] {
+      set msg [importer_remember_pdk $item]
+      if {![string match added* $msg] && ![string match updated* $msg]} {
+        importer_fail $msg
+        importer_refresh
+        return
+      }
+      lappend names [importer_field $item name]
+    }
+    if {[llength $names]} { set ::IMPORTER_SELECT_NAME [lindex $names 0] }
+    importer_refresh
+    tk_messageBox -icon info -title "PDK installer" \
+        -message "Added [join $names {, }].\n\nSelect one and press Install."
+    return
+  }
+  if {$kind == "archive"} {
+    set err [importer_save_added [importer_item_from_archive [lindex $got 1]]]
+    if {$err != ""} { importer_fail $err }
+    return
+  }
+  if {$kind == "release"} {
+    set ids [lindex $got 4]
+    set pre [importer_default_asset_ids $ids]
+    set use $pre
+    if {[llength $ids] > 1} {
+      set use [importer_pick_assets $ids $pre]
+      if {![llength $use]} { return }
+    }
+    set item [importer_item_from_release $url \
+        [lindex $got 1] [lindex $got 2] [lindex $got 3] $use]
+    set err [importer_save_added $item]
+    if {$err != ""} { importer_fail $err }
+    return
+  }
+  importer_fail "Could not use that URL."
+}
+
+proc importer_add_url_dialog {} {
+  if {$::IMPORTER_BUSY} { return }
+  set w .addurl
+  catch {destroy $w}
+  toplevel $w
+  wm title $w "Add PDK URL"
+  wm transient $w .
+  wm resizable $w 1 0
+  set ::IMPORTER_ADD_URL ""
+  ttk::label $w.hint -wraplength 560 -justify left -text "Paste a URL for a PDK that is not in the list.
+
+A GitHub release (ciel or another open_pdks build):
+  https://github.com/fossi-foundation/ciel-releases/releases/tag/<tag>
+
+A catalogue JSON file with a \"pdks\" list.
+
+Or one compiled open_pdks archive:
+  https://example.com/my_pdk.tar.zst"
+  ttk::entry $w.url -textvariable ::IMPORTER_ADD_URL -width 72
+  frame $w.act -bg #f4f6f8
+  button $w.act.ok -text "Add" -font $::IMPORTER_UI \
+      -bg #1f6feb -fg #ffffff -activebackground #1a5fd0 -activeforeground #ffffff \
+      -command [list importer_add_url_go $w]
+  button $w.act.cancel -text "Cancel" -font $::IMPORTER_UI \
+      -command [list destroy $w]
+  pack $w.hint -side top -fill x -padx 12 -pady 10
+  pack $w.url -side top -fill x -padx 12 -pady 4
+  pack $w.act.cancel -side right -padx 6 -pady 10
+  pack $w.act.ok -side right -padx 6 -pady 10
+  pack $w.act -side top -fill x
+  bind $w.url <Return> [list importer_add_url_go $w]
+  focus $w.url
+}
+
 proc importer_open_dir {} {
   set item [importer_selected_item]
   if {$item == ""} { return }
@@ -286,6 +474,9 @@ button .act.remove -text "Delete PDK" -command importer_do_uninstall \
 button .act.repair -text "Repair" -command importer_do_repair \
     -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
     -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
+button .act.url -text "Add URL" -command importer_add_url_dialog \
+    -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
+    -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
 button .act.refresh -text "Refresh" -command importer_refresh \
     -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
     -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
@@ -299,6 +490,7 @@ button .act.quit -text "Close" -command exit \
     -font $::IMPORTER_UI -bg #ffffff -fg #1a1d23 \
     -padx 16 -pady 6 -relief raised -bd 2 -highlightthickness 0
 pack .act.install -side left -padx 6 -pady 8
+pack .act.url -side left -padx 6 -pady 8
 pack .act.remove -side left -padx 6 -pady 8
 pack .act.repair -side left -padx 6 -pady 8
 pack .act.refresh -side left -padx 6 -pady 8
