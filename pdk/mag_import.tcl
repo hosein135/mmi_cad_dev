@@ -23,7 +23,7 @@
 
 # Sourced from maxrc via a proc; arrays must be global or they vanish.
 global _MAG_IMPORT_SOURCED _MAG_IMPORT_REV_LOADED MAG_IMPORT
-set _MAG_IMPORT_REV 14
+set _MAG_IMPORT_REV 15
 if {[info exists _MAG_IMPORT_REV_LOADED]} {
   if {$_MAG_IMPORT_REV_LOADED >= $_MAG_IMPORT_REV} { return }
 }
@@ -737,6 +737,21 @@ proc mag_close_hvi_gaps {} {
     catch {:drc catchup}
   }
   return $n
+}
+
+# Reread every saved cell. cell_load leaves a cell that is already in
+# memory untouched, so a later cell_save would put the old labels back.
+proc mag_flush_tree {dir top} {
+  set files {}
+  catch {set files [glob -nocomplain [file join $dir *.max]]}
+  foreach f $files {
+    set name [file rootname [file tail $f]]
+    if {$name == $top} continue
+    catch {:flush $name}
+  }
+  if {$top != ""} {
+    catch {:flush $top}
+  }
 }
 
 # Save the converted cell as outdir/top.max and make that the open cell.
@@ -2545,7 +2560,8 @@ proc mag_import_run {dir top tech {method mag2gds}} {
   set MAG_IMPORT(log) [file join $work convert.log]
   set MAG_IMPORT(cancel) [file join $work CANCEL]
   catch {file delete $MAG_IMPORT(cancel)}
-  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev 11)"
+  global _MAG_IMPORT_REV
+  mag_log "Magic import dir=$dir tech=$tech top=$top method=$method (mag_import rev $_MAG_IMPORT_REV)"
   set MAG_IMPORT(magdir) $dir
 
   mag_progress_open $method
@@ -2775,6 +2791,9 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
     puts $fh "  catch {cell_load [list $top] [list $outdir]}"
     puts $fh "  catch {view_cell}"
     puts $fh "  catch {mag_close_hvi_gaps}"
+    puts $fh "  catch {mag_exact_snap_labels_tree [list $outdir] [list $family]}"
+    puts $fh "  catch {mag_flush_tree [list $outdir] [list $top]}"
+    puts $fh "  catch {view_cell}"
     puts $fh "  catch {:drc catchup}"
     puts $fh "  if {\[info commands msg_catch\] != {}} {"
     puts $fh "    catch {"
@@ -3146,14 +3165,17 @@ proc mag_import_open_max {gds top tech outdir} {
       mag_stamp_preview_tree $outdir
     }
     set scan [mag_exact_scan_tree $outdir $family]
-    catch {cell_load $topCell $outdir}
-    catch {view_cell}
     if {$scan != ""} {
       catch {cd $here}
       mag_import_fail "Saved .max is not on the mask grid:\n$scan"
       return
     }
+    catch {cell_load $topCell $outdir}
+    catch {view_cell}
     catch {mag_close_hvi_gaps}
+    # cell_load does not reread a cell already in memory, so cell_save
+    # wrote the original label anchors back over the snapped file.
+    mag_exact_snap_labels_tree $outdir $family
     set scan2 [mag_exact_scan_max [file join $outdir ${topCell}.max] \
         [mag_exact_mask_hnm $family]]
     if {$scan2 != ""} {
@@ -3161,6 +3183,9 @@ proc mag_import_open_max {gds top tech outdir} {
       mag_import_fail "Saved .max is not on the mask grid:\n$scan2"
       return
     }
+    mag_flush_tree $outdir $topCell
+    catch {view_cell}
+    catch {:drc catchup}
     set drc_n [mag_import_drc_count]
     catch {cd $here}
     mag_open_in_magic $magdir $topCell $family
