@@ -48,6 +48,29 @@ _mmi_pdk_source mag_import.tcl
 _mmi_pdk_source image_layout.tcl
 _mmi_pdk_source drc_errors.tcl
 
+proc _mmi_wrap_win_title {} {
+  global max_win
+  if {[info commands _mmi_win_title_real] != ""} { return }
+  if {[info commands win_title_update] == ""} {
+    after 500 _mmi_wrap_win_title
+    return
+  }
+  rename win_title_update _mmi_win_title_real
+  proc win_title_update {} {
+    global MN_TECH max_win
+    _mmi_win_title_real
+    if {![info exists MN_TECH] || $MN_TECH == ""} { return }
+    if {![info exists max_win] || $max_win == ""} { return }
+    set t [wm title $max_win]
+    if {[string first " pdk $MN_TECH" $t] >= 0} { return }
+    set t "$t  pdk $MN_TECH"
+    wm title $max_win $t
+    wm iconname $max_win $t
+  }
+  catch {win_title_update}
+}
+after 300 _mmi_wrap_win_title
+
 # MAX LVS runs ext2sim, ext2spice, and gemini by name. Magic VLSI installs
 # ext2sim and ext2spice with those same names. Keep Micro Magic's copies first.
 if {[info exists env(MMI_TOOLS)] && $env(MMI_TOOLS) != ""} {

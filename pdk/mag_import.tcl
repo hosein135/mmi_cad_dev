@@ -597,6 +597,86 @@ proc mag_output_dir {dir top} {
   return $d
 }
 
+# Two hvi rectangles that should be one mask often land a few database
+# units apart (the example_por errors are 0.005 um and 0.12 um). A gap
+# smaller than the spacing rule is painted shut so spacing is not flagged.
+proc mag_heal_spacing {layer gap} {
+  if {$gap <= 0} { return 0 }
+  if {[catch {set boxes [db_search_l paint $layer]}]} { return 0 }
+  set n [llength $boxes]
+  if {$n < 2} { return 0 }
+  set bridged 0
+  set i 0
+  foreach a $boxes {
+    incr i
+    if {[catch {
+      struct max_paint pa $a
+      set ax1 ${pa.x1}
+      set ay1 ${pa.y1}
+      set ax2 ${pa.x2}
+      set ay2 ${pa.y2}
+    }]} continue
+    set j 0
+    foreach b $boxes {
+      incr j
+      if {$j <= $i} continue
+      if {[catch {
+        struct max_paint pb $b
+        set bx1 ${pb.x1}
+        set by1 ${pb.y1}
+        set bx2 ${pb.x2}
+        set by2 ${pb.y2}
+      }]} continue
+      set oy1 $ay1
+      if {$by1 > $oy1} { set oy1 $by1 }
+      set oy2 $ay2
+      if {$by2 < $oy2} { set oy2 $by2 }
+      if {$oy2 > $oy1} {
+        if {$ax2 < $bx1} {
+          set g [expr {$bx1 - $ax2}]
+          if {$g > 0 && $g < $gap} {
+            lay_box $ax2 $oy1 $bx1 $oy2
+            :paint $layer
+            incr bridged
+          }
+        } elseif {$bx2 < $ax1} {
+          set g [expr {$ax1 - $bx2}]
+          if {$g > 0 && $g < $gap} {
+            lay_box $bx2 $oy1 $ax1 $oy2
+            :paint $layer
+            incr bridged
+          }
+        }
+      }
+      set ox1 $ax1
+      if {$bx1 > $ox1} { set ox1 $bx1 }
+      set ox2 $ax2
+      if {$bx2 < $ox2} { set ox2 $bx2 }
+      if {$ox2 > $ox1} {
+        if {$ay2 < $by1} {
+          set g [expr {$by1 - $ay2}]
+          if {$g > 0 && $g < $gap} {
+            lay_box $ox1 $ay2 $ox2 $by1
+            :paint $layer
+            incr bridged
+          }
+        } elseif {$by2 < $ay1} {
+          set g [expr {$ay1 - $by2}]
+          if {$g > 0 && $g < $gap} {
+            lay_box $ox1 $by2 $ox2 $ay1
+            :paint $layer
+            incr bridged
+          }
+        }
+      }
+    }
+  }
+  if {$bridged > 0} {
+    catch {:drc catchup}
+  }
+  return $bridged
+}
+
 # Save the converted cell as outdir/top.max and make that the open cell.
 proc mag_save_open {outdir top} {
   if {$top == "" || $outdir == ""} { return }
@@ -607,6 +687,7 @@ proc mag_save_open {outdir top} {
   if {[info commands cell_in_memory] != "" && [cell_in_memory $top]} {
     catch {db_cell_rename $top $top $dest}
   }
+  catch {mag_heal_spacing hvi 0.7}
   catch {cell_save_tree 0}
   catch {cell_save}
   catch {cell_load $top $outdir}
@@ -2312,6 +2393,7 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
   if {$top != ""} {
     puts $fh "  catch {db_cell_rename [list $top] [list $top] [list [file join $outdir ${top}.max]]}"
   }
+  puts $fh "  catch {mag_heal_spacing hvi 0.7}"
   puts $fh "  catch {cell_save_tree 0}"
   if {$top != ""} {
     puts $fh "  catch {cell_load [list $top] [list $outdir]}"

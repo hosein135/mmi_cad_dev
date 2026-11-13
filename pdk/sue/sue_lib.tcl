@@ -213,3 +213,42 @@ proc _mmi_style_max_terminal {} {
   catch {exec xrdb -merge $path}
 }
 _mmi_style_max_terminal
+
+proc _mmi_sue_lib_label {} {
+  global LIB
+  if {![info exists LIB] || $LIB == "" || $LIB == 0} { return "" }
+  set names ""
+  foreach d $LIB {
+    set tail [file tail $d]
+    if {$tail == ""} continue
+    if {$names != ""} { append names "," }
+    append names $tail
+  }
+  return $names
+}
+
+proc _mmi_wrap_sue_title {} {
+  if {[info commands _mmi_display_title_real] != ""} { return }
+  if {[info commands display_title] == ""} {
+    after 500 _mmi_wrap_sue_title
+    return
+  }
+  rename display_title _mmi_display_title_real
+  proc display_title {args} {
+    eval _mmi_display_title_real $args
+    set lib [_mmi_sue_lib_label]
+    if {$lib == ""} { return }
+    set w .
+    if {[llength $args] > 0 && [lindex $args 0] != ""} {
+      set w [lindex $args 0]
+    }
+    if {![winfo exists $w]} { return }
+    set t [wm title $w]
+    if {[string first " lib $lib" $t] >= 0} { return }
+    set t "$t  lib $lib"
+    wm title $w $t
+    wm iconname $w $t
+  }
+  catch {display_title}
+}
+after 800 _mmi_wrap_sue_title
