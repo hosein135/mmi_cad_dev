@@ -90,24 +90,29 @@ proc mmi_drc_window {} {
   frame .mmi_drc.top
   pack .mmi_drc.top -fill x -padx 8 -pady 8
   label .mmi_drc.top.l -text "DRC errors" -anchor w \
-      -font -adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1
+      -font {-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1}
   button .mmi_drc.top.copy -text "Copy all" -command mmi_drc_copy \
-      -font -adobe-helvetica-medium-r-normal--14-140-75-75-p-77-iso8859-1
+      -font {-adobe-helvetica-medium-r-normal--14-140-75-75-p-77-iso8859-1}
   button .mmi_drc.top.ref -text "Refresh" -command mmi_drc_fill \
-      -font -adobe-helvetica-medium-r-normal--14-140-75-75-p-77-iso8859-1
+      -font {-adobe-helvetica-medium-r-normal--14-140-75-75-p-77-iso8859-1}
   label .mmi_drc.top.note -text "" -anchor e \
-      -font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1
+      -font {-adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1}
   pack .mmi_drc.top.l -side left
-  pack .mmi_drc.top.ref .mmi_drc.top.copy -side right -padx 4
+  pack .mmi_drc.top.copy -side right -padx 4
+  pack .mmi_drc.top.ref -side right -padx 4
   pack .mmi_drc.top.note -side right -padx 8
   frame .mmi_drc.mid
-  pack .mmi_drc.mid -fill both -expand 1 -padx 8 -pady {0 8}
+  pack .mmi_drc.mid -fill both -expand 1 -padx 8 -pady 8
   text .mmi_drc.t -wrap word -yscrollcommand {.mmi_drc.sb set} \
       -font fixed -state disabled
   scrollbar .mmi_drc.sb -command {.mmi_drc.t yview}
   pack .mmi_drc.sb -in .mmi_drc.mid -side right -fill y
   pack .mmi_drc.t -in .mmi_drc.mid -side left -fill both -expand 1
-  mmi_drc_fill
+  if {[catch {mmi_drc_fill} err]} {
+    .mmi_drc.t configure -state normal
+    .mmi_drc.t insert end "Could not list DRC errors:\n$err"
+    .mmi_drc.t configure -state disabled
+  }
 }
 
 proc _mmi_drc_install_menu {} {

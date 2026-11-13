@@ -21,31 +21,42 @@ set ::IMPORTER_DO_LIB 1
 set ::IMPORTER_DO_EXTRA 0
 set ::IMPORTER_BUSY 0
 
-proc importer_ui_font {size {weight normal}} {
-  foreach fam {"DejaVu Sans" "Liberation Sans" "Nimbus Sans" "Ubuntu" "Sans"} {
-    if {[lsearch -exact [font families] $fam] >= 0} {
-      if {$weight == "bold"} {
-        return [list $fam $size bold]
-      }
-      return [list $fam $size]
-    }
+proc importer_named_family {candidates} {
+  set have [font families]
+  foreach fam $candidates {
+    if {[lsearch -exact $have $fam] >= 0} { return $fam }
   }
-  return TkDefaultFont
+  return ""
 }
 
-proc importer_mono_font {size} {
-  foreach fam {"DejaVu Sans Mono" "Liberation Mono" "Ubuntu Mono" "Nimbus Mono L"} {
-    if {[lsearch -exact [font families] $fam] >= 0} {
-      return [list $fam $size]
-    }
-  }
-  return TkFixedFont
+# Pixel sizes. Point sizes stay tiny when this session has Xft turned off.
+proc importer_ui_font {pixels {weight normal}} {
+  set fam [importer_named_family {
+    "DejaVu Sans" "Liberation Sans" "Ubuntu" "Nimbus Sans" "Helvetica" "helvetica"
+  }]
+  if {$fam == ""} { set fam Helvetica }
+  set w normal
+  if {$weight == "bold"} { set w bold }
+  return [font create -family $fam -size -$pixels -weight $w]
 }
 
-set ::IMPORTER_UI [importer_ui_font 12]
-set ::IMPORTER_UI_B [importer_ui_font 12 bold]
-set ::IMPORTER_UI_SM [importer_ui_font 10]
-set ::IMPORTER_MONO [importer_mono_font 11]
+proc importer_mono_font {pixels} {
+  set fam [importer_named_family {
+    "DejaVu Sans Mono" "Liberation Mono" "Ubuntu Mono" "Nimbus Mono L"
+    "Courier" "courier" "fixed"
+  }]
+  if {$fam == ""} { set fam Courier }
+  return [font create -family $fam -size -$pixels]
+}
+
+set ::IMPORTER_UI [importer_ui_font 18]
+set ::IMPORTER_UI_B [importer_ui_font 18 bold]
+set ::IMPORTER_UI_SM [importer_ui_font 16]
+set ::IMPORTER_MONO [importer_mono_font 16]
+catch {font configure TkDefaultFont -family Helvetica -size -18}
+catch {font configure TkTextFont -family Helvetica -size -18}
+catch {font configure TkHeadingFont -family Helvetica -size -18 -weight bold}
+catch {font configure TkFixedFont -family Courier -size -16}
 
 ttk::style theme use clam
 ttk::style configure TFrame -background #f4f6f8
@@ -59,7 +70,7 @@ ttk::style map Accent.TButton \
     -background {disabled #b9c7dc active #1a5fd0 pressed #184eab} \
     -foreground {disabled #f4f6f8}
 ttk::style configure TEntry -font $::IMPORTER_UI -padding 6
-ttk::style configure Treeview -font $::IMPORTER_UI -rowheight 32 \
+ttk::style configure Treeview -font $::IMPORTER_UI -rowheight 40 \
     -background #ffffff -fieldbackground #ffffff -foreground #1a1d23
 ttk::style configure Treeview.Heading -font $::IMPORTER_UI_B -padding 6
 ttk::style map Treeview -background {selected #dbe7ff} -foreground {selected #1a1d23}
@@ -112,16 +123,13 @@ proc importer_show_desc {} {
     return
   }
   set tech [importer_field $item max_tech]
-  set lib [importer_field $item sue_lib]
   .desc insert end "[importer_field $item description]\n\n" title
   .desc insert end "Installs into  " muted
   .desc insert end "[file join $::IMPORTER_ROOT [importer_field $item dir]]\n"
   .desc insert end "Version  " muted
   .desc insert end "[importer_short_tag $item]\n"
-  .desc insert end "MAX  " muted
-  .desc insert end "max -tech $tech\n"
-  .desc insert end "SUE  " muted
-  .desc insert end "sue -lib $lib\n"
+  .desc insert end "MAX technology  " muted
+  .desc insert end "$tech\n"
   .desc insert end "State  " muted
   .desc insert end "[importer_state $item]\n"
   .desc configure -state disabled
@@ -194,12 +202,10 @@ proc importer_do_install {} {
   importer_set_progress 100 "Installed $name"
   importer_refresh
   set tech [importer_field $item max_tech]
-  set lib [importer_field $item sue_lib]
   set go [tk_messageBox -icon info -type yesno -title "PDK installer" \
-      -message "Installed $name.\n\nStart MAX with -tech $tech and SUE with -lib $lib now?"]
+      -message "Installed $name.\n\nStart MAX with technology $tech now?"]
   if {$go == "yes"} {
     catch {exec max -tech $tech &}
-    catch {exec sue -lib $lib &}
   }
 }
 
@@ -263,7 +269,7 @@ ttk::frame .head
 pack .head -fill x -padx 20 -pady {16 8}
 ttk::label .head.title -style Title.TLabel -text "PDK installer"
 ttk::label .head.hint -style Hint.TLabel \
-    -text "Download a process kit, then build its MAX technology and SUE library."
+    -text "Download a process kit and build its MAX technology."
 pack .head.title -anchor w
 pack .head.hint -anchor w -pady {2 0}
 
@@ -272,7 +278,7 @@ pack .path -fill x -padx 20 -pady 4
 ttk::label .path.l -text "Install into"
 ttk::entry .path.e -textvariable ::IMPORTER_ROOT
 ttk::button .path.b -text "Browse" -command importer_browse
-pack .path.l -side left -padx {0 8}
+pack .path.l -side left -padx 8
 pack .path.b -side right
 pack .path.e -side left -fill x -expand 1
 
@@ -318,8 +324,13 @@ ttk::button .act.refresh -text "Refresh" -command importer_refresh
 ttk::button .act.cancel -text "Cancel" -command importer_do_cancel
 ttk::button .act.open -text "Open folder" -command importer_open_dir
 ttk::button .act.quit -text "Close" -command exit
-pack .act.install .act.remove .act.repair .act.refresh .act.cancel -side left -padx {0 8}
-pack .act.quit .act.open -side right -padx {8 0}
+pack .act.install -side left -padx 4
+pack .act.remove -side left -padx 4
+pack .act.repair -side left -padx 4
+pack .act.refresh -side left -padx 4
+pack .act.cancel -side left -padx 4
+pack .act.quit -side right -padx 4
+pack .act.open -side right -padx 4
 
 bind .tbl <<TreeviewSelect>> importer_show_desc
 bind .path.e <Return> {
