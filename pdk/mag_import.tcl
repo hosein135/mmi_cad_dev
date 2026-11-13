@@ -559,22 +559,30 @@ proc mag_import_is_chip {} {
   return 0
 }
 
-# Directory for GDS + .max output. Bundled samples live on read-only mounts
-# (/mmi-bundle, /mmi-pdk-live), so fall back to PDK_ROOT or /tmp.
+# A fresh directory for this conversion. Reusing one folder overwrote the
+# previous .max. Prefer a folder next to the Magic design, then writable
+# fallbacks. Bundled samples live on read-only mounts.
 proc mag_output_dir {dir top} {
-  set cands [list [file join $dir max_import]]
+  set leaf $top
+  if {$leaf == "" || $leaf == "auto"} { set leaf [file tail $dir] }
+  if {$leaf == ""} { set leaf design }
+  set stamp [clock seconds]
+  catch {set stamp [clock format [clock seconds] -format {%Y%m%d-%H%M%S}]}
+  set name "$leaf-$stamp"
+  set parents {}
+  lappend parents [file join $dir max_out]
   set base [file tail $dir]
   if {$base == ""} { set base design }
   if {[info commands pdk_root] != ""} {
-    lappend cands [file join [pdk_root] mag_import $base]
+    lappend parents [file join [pdk_root] mag_import $base]
   }
-  lappend cands [file join /mmi-pdks mag_import $base]
-  lappend cands [file join /mmi-home/cad/mmi_local/max/mag_import $base]
-  lappend cands [file join /tmp mag_import_out $base]
-  foreach d $cands {
+  lappend parents [file join /mmi-pdks mag_import $base]
+  lappend parents [file join /mmi-home/cad/mmi_local/max/mag_import $base]
+  lappend parents [file join /tmp mag_import_out $base]
+  foreach parent $parents {
+    set d [file join $parent $name]
     catch {file mkdir $d}
     if {![file isdirectory $d] || ![file writable $d]} continue
-    # mkdir can succeed on a bind mount that still refuses files: probe it.
     set probe [file join $d .mag_import_write_test]
     if {[catch {
       set fh [open $probe w]
@@ -584,7 +592,25 @@ proc mag_output_dir {dir top} {
     }]} continue
     return $d
   }
-  return [file join /tmp mag_import_out $base]
+  set d [file join /tmp mag_import_out $name]
+  catch {file mkdir $d}
+  return $d
+}
+
+# Save the converted cell as outdir/top.max and make that the open cell.
+proc mag_save_open {outdir top} {
+  if {$top == "" || $outdir == ""} { return }
+  catch {file mkdir $outdir}
+  catch {cell_path_add $outdir}
+  catch {cd $outdir}
+  set dest [file join $outdir ${top}.max]
+  if {[info commands cell_in_memory] != "" && [cell_in_memory $top]} {
+    catch {db_cell_rename $top $top $dest}
+  }
+  catch {cell_save_tree 0}
+  catch {cell_save}
+  catch {cell_load $top $outdir}
+  catch {view_cell}
 }
 
 # Map FHS bind paths to the host/VM folder (MMI_CAD_ROOT/data/...).
@@ -2265,7 +2291,7 @@ proc mag_import_drc_count {} {
   return [lindex $msg 3]
 }
 
-proc mag_max_after_gds_script {path {family sky130A} {outdir .}} {
+proc mag_max_after_gds_script {path {family sky130A} {outdir .} {top ""}} {
   set fh [open $path w]
   set report [file join $outdir mmi_convert_report.txt]
   puts $fh "# Expand Mag to MAX, save, then record DRC and the mask-grid scan."
@@ -2282,7 +2308,15 @@ proc mag_max_after_gds_script {path {family sky130A} {outdir .}} {
   puts $fh "  catch {:see no instanceNames}"
   puts $fh "  catch {:see no instancePorts}"
   puts $fh "  catch {view_cell}"
+  puts $fh "  catch {cell_path_add [list $outdir]}"
+  if {$top != ""} {
+    puts $fh "  catch {db_cell_rename [list $top] [list $top] [list [file join $outdir ${top}.max]]}"
+  }
   puts $fh "  catch {cell_save_tree 0}"
+  if {$top != ""} {
+    puts $fh "  catch {cell_load [list $top] [list $outdir]}"
+    puts $fh "  catch {view_cell}"
+  }
   puts $fh "  set _mmi_drc {}"
   puts $fh "  if {\[info commands msg_catch\] != {}} {"
   puts $fh "    catch {"
@@ -2663,7 +2697,7 @@ proc mag_import_open_max {gds top tech outdir} {
       return
     }
     mag_max_show_converted
-    catch {cell_save_tree 0}
+    mag_save_open $outdir $topCell
     if {[info exists MAG_IMPORT(preview)] && $MAG_IMPORT(preview)} {
       mag_stamp_preview_tree $outdir
     }
@@ -2709,7 +2743,7 @@ $store"
   if {[mag_import_is_chip]} {
     mag_max_after_chip_script $aftertcl $top
   } else {
-    mag_max_after_gds_script $aftertcl $family $outdir
+    mag_max_after_gds_script $aftertcl $family $outdir $top
   }
   set fh [open $script w]
   puts $fh "#!/bin/sh"
