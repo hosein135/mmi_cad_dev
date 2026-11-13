@@ -29,10 +29,19 @@
 #                         local global comment hidden); KIND labels are written
 #                         back to L:D (sky130 pins = datatype 16)
 #   set VAR value         copied verbatim into TECH.tcl (LAYER_NAME, GRID)
+#   enclose A B d         A must overlap B by d microns (layout generator)
+#   space A B d           minimum space between A and B (either order)
+#   extend A B d          A must extend past B by d microns
+#   area A d              minimum area of A, in square microns
 #   drc ... / preserve_ports / iname   accepted and ignored
+#
+# Sky130 layout generation does not depend on those lines being in the
+# .source. When the table is sky130 (li1/licon1/ndiff/pdiff), this script
+# adds the generator rules, the nwc/pwc tie layers, and the stdcell pitch
+# unless the .source already set that exact rule.
 
 # Bump when the emitted files change. importer --repair rebuilds older techs.
-set GEN_REV 7
+set GEN_REV 8
 
 if {[llength $argv] < 3} {
   puts stderr "usage: source_to_tech27.tcl SOURCE TECH OUTDIR"
@@ -194,6 +203,10 @@ set connects {}
 set devices {}
 set derives {}
 set setlines {}
+set enclose_rules {}   ;# {outer inner microns}
+set space_rules {}
+set extend_rules {}
+set area_rules {}      ;# {layer square-microns}
 set square_vias 0
 set port_rules {}      ;# {kind gdslayer datatypes} from "port" statements
 set text_layer ""
@@ -238,6 +251,17 @@ proc is_layer_row {toks} {
   return 0
 }
 
+# A paint type or a device name. Devices are recorded as the loop runs,
+# so this is valid for a statement that follows its "device" line.
+proc known_paint {name} {
+  global layers devices
+  if {[lsearch -exact $layers $name] >= 0} { return 1 }
+  foreach d $devices {
+    if {[lindex $d 0] == $name} { return 1 }
+  }
+  return 0
+}
+
 foreach t $lines {
   set toks [split_ws $t]
   set cmd [string tolower [lindex $toks 0]]
@@ -268,6 +292,29 @@ foreach t $lines {
         lappend derives [list [lindex $toks 1] [lrange $toks 3 end]]
       } else {
         warn "bad derive statement: $t"
+      }
+    }
+    enclose -
+    space -
+    extend {
+      if {[llength $toks] != 4 || ![is_pos_num [lindex $toks 3]]} {
+        warn "bad $cmd statement: $t"
+      } elseif {![known_paint [lindex $toks 1]] || ![known_paint [lindex $toks 2]]} {
+        warn "$cmd [lindex $toks 1] [lindex $toks 2]: unknown layer"
+      } else {
+        set bucket enclose_rules
+        if {$cmd == "space"} { set bucket space_rules }
+        if {$cmd == "extend"} { set bucket extend_rules }
+        lappend $bucket [list [lindex $toks 1] [lindex $toks 2] [lindex $toks 3]]
+      }
+    }
+    area {
+      if {[llength $toks] != 3 || ![is_pos_num [lindex $toks 2]]} {
+        warn "bad area statement: $t"
+      } elseif {![known_paint [lindex $toks 1]]} {
+        warn "area [lindex $toks 1]: unknown layer"
+      } else {
+        lappend area_rules [list [lindex $toks 1] [lindex $toks 2]]
       }
     }
     set {
@@ -427,6 +474,146 @@ proc valid_paint_csv {csv} {
   }
   return 1
 }
+
+# Layout-generator data for sky130. Applied to whatever .source is on
+# disk, including one written before these rules existed. A value already
+# present (from an enclose/space/extend/area/set line) is left alone.
+proc laygen_csv_add {csv name} {
+  set items [split $csv ,]
+  if {[lsearch -exact $items $name] >= 0} { return $csv }
+  lappend items $name
+  return [join $items ,]
+}
+
+proc laygen_add_pair {which a b d} {
+  upvar #0 $which rows
+  foreach r $rows {
+    if {[lindex $r 0] == $a && [lindex $r 1] == $b} { return }
+  }
+  lappend rows [list $a $b $d]
+}
+
+proc laygen_add_area {a d} {
+  global area_rules
+  foreach r $area_rules {
+    if {[lindex $r 0] == $a} { return }
+  }
+  lappend area_rules [list $a $d]
+}
+
+proc laygen_add_layer {name typ wid spc col} {
+  global layers order gds_of txt_of type_of width_of space_of color_of
+  if {[lsearch -exact $layers $name] >= 0} { return }
+  lappend layers $name
+  lappend order [list paint $name]
+  set gds_of($name) "-"
+  set txt_of($name) "-"
+  set type_of($name) $typ
+  set width_of($name) $wid
+  set space_of($name) $spc
+  set color_of($name) $col
+}
+
+proc laygen_set_missing {line} {
+  global setlines
+  set var [lindex [split_ws $line] 1]
+  foreach s $setlines {
+    if {[lindex [split_ws $s] 1] == $var} { return }
+  }
+  lappend setlines $line
+}
+
+proc laygen_connect_add {via name} {
+  global connects
+  set n [llength $connects]
+  for {set i 0} {$i < $n} {incr i} {
+    set c [lindex $connects $i]
+    if {[lindex $c 0] != $via} continue
+    set csv [laygen_csv_add [lindex $c 1] $name]
+    set connects [lreplace $connects $i $i [list $via $csv]]
+    return
+  }
+}
+
+proc laygen_derive_add {nm name} {
+  global derives
+  set n [llength $derives]
+  for {set i 0} {$i < $n} {incr i} {
+    set d [lindex $derives $i]
+    if {[lindex $d 0] != $nm} continue
+    set toks [lindex $d 1]
+    set csv [laygen_csv_add [lindex $toks 0] $name]
+    set toks [lreplace $toks 0 0 $csv]
+    set derives [lreplace $derives $i $i [list $nm $toks]]
+    return
+  }
+}
+
+proc laygen_sky130 {} {
+  global layers
+  foreach need {li1 licon1 poly ndiff pdiff} {
+    if {[lsearch -exact $layers $need] < 0} { return }
+  }
+  # The generator paints these names. nwc is the n+ tap on the vdd rail
+  # inside the nwell; pwc is the p+ substrate tap on the gnd rail.
+  # They are MAX-only. GDS still emits them as tap and as implant.
+  laygen_add_layer nwc act 0.15 0.27 80,140,200
+  laygen_add_layer pwc act 0.15 0.27 180,100,140
+  laygen_connect_add licon1 nwc
+  laygen_connect_add licon1 pwc
+  laygen_derive_add tap nwc
+  laygen_derive_add tap pwc
+  laygen_derive_add nsdm nwc
+  laygen_derive_add psdm pwc
+
+  # Microns, from sky130A.tech where one DRC unit is 1 nm.
+  # li.5, licon.5c, licon.8a, and 0.04 of tap beside a 0.17 cut.
+  laygen_add_pair enclose_rules li1 licon1 0.08
+  laygen_add_pair enclose_rules ndiff licon1 0.06
+  laygen_add_pair enclose_rules pdiff licon1 0.06
+  laygen_add_pair enclose_rules poly licon1 0.08
+  laygen_add_pair enclose_rules nwc licon1 0.04
+  laygen_add_pair enclose_rules pwc licon1 0.04
+  # The nsdm/psdm derive grows diffusion by 0.125.
+  laygen_add_pair enclose_rules nsdm ndiff 0.125
+  laygen_add_pair enclose_rules psdm pdiff 0.125
+  laygen_add_pair enclose_rules nsdm nwc 0.125
+  laygen_add_pair enclose_rules psdm pwc 0.125
+  # diff/tap.10 nwell over the n-tap, diff/tap.8 nwell over p-diffusion.
+  laygen_add_pair enclose_rules nwell nwc 0.18
+  laygen_add_pair enclose_rules nwell pdiff 0.18
+  # poly.8 extension past the gate, poly.7 diffusion past the gate.
+  laygen_add_pair extend_rules poly nfet 0.13
+  laygen_add_pair extend_rules poly pfet 0.13
+  laygen_add_pair extend_rules ndiff nfet 0.25
+  laygen_add_pair extend_rules pdiff pfet 0.25
+  # poly.4 is 0.075. poly-to-tap is 0.15 so diffusion, which begins
+  # one poly extension (0.13) past that gap, stays 0.28 from the tap.
+  # Diffusion spacing is 0.27.
+  laygen_add_pair space_rules poly ndiff 0.075
+  laygen_add_pair space_rules poly pdiff 0.075
+  laygen_add_pair space_rules poly nwc 0.15
+  laygen_add_pair space_rules poly pwc 0.15
+  # licon.11, contact to gate.
+  laygen_add_pair space_rules licon1 nfet 0.055
+  laygen_add_pair space_rules licon1 pfet 0.055
+  laygen_add_pair space_rules psdm nsdm 0.38
+  # li.6, square microns.
+  laygen_add_area li1 0.0561
+
+  # 0.46 is the sky130 HD track pitch. 22 tracks is 10.12, close to the
+  # generator default of 10, so a fet a couple of microns wide still fits.
+  # 0.40 covers a 0.17 licon by 0.115 on each side (the li rule is 0.08).
+  laygen_set_missing "set LAYINFO(stdcell:dpc_router_pitch) 0.46"
+  laygen_set_missing "set LAYINFO(stdcell:cell_width_pitch) 0.46"
+  laygen_set_missing "set LAYINFO(stdcell:well_v0_pitch) 0.46"
+  laygen_set_missing "set LAYINFO(stdcell:cell_router_pitch) 0.46"
+  laygen_set_missing "set LAYINFO(stdcell:dpc_router_offset_x,y) 0.23,0.23"
+  laygen_set_missing "set LAYINFO(stdcell:cell_height) 10.12"
+  laygen_set_missing "set LAYINFO(stdcell:power_strap_width) 0.40"
+}
+
+laygen_sky130
 
 set ok_connects {}
 foreach c $connects {
@@ -998,12 +1185,35 @@ foreach name $metal_layers {
   }
 }
 puts $fh "set MN_TYPICAL_WIRE_WIDTH $wire"
+# techinfo above/below treats an earlier entry as physically above a
+# later one, which is how the shipped mmi and g25 decks are written.
+# The .source lists metals and vias from the substrate upward, so the
+# stack is reversed. Vias stay in .source order: v0 is the diffusion
+# contact (licon1 on sky130), not the top via.
+set stack_bu {}
+foreach name $layers {
+  set typ $type_of($name)
+  if {$typ == "metal" || $typ == "via"} {
+    lappend stack_bu $name
+  }
+}
 set layer_order {}
-foreach name [concat $metal_layers $via_layers $poly_layers $act_layers $other_layers] {
+set si [llength $stack_bu]
+while {$si > 0} {
+  incr si -1
+  lappend layer_order [lindex $stack_bu $si]
+}
+foreach name $poly_layers {
   lappend layer_order $name
 }
 foreach d $devices {
   lappend layer_order [lindex $d 0]
+}
+foreach name $act_layers {
+  lappend layer_order $name
+}
+foreach name $other_layers {
+  lappend layer_order $name
 }
 puts $fh "set DRC_DATA(layer_order) {$layer_order}"
 if {[llength $via_layers]} {
@@ -1046,6 +1256,18 @@ foreach d $devices {
   if {[is_pos_num $space_of($a)]} {
     puts $fh "set DRC_DATA(spacing,$dn) $space_of($a)"
   }
+}
+foreach r $enclose_rules {
+  puts $fh "set DRC_DATA(enclose,[lindex $r 0],[lindex $r 1]) [lindex $r 2]"
+}
+foreach r $space_rules {
+  puts $fh "set DRC_DATA(space_to,[lindex $r 0],[lindex $r 1]) [lindex $r 2]"
+}
+foreach r $extend_rules {
+  puts $fh "set DRC_DATA(extend,[lindex $r 0],[lindex $r 1]) [lindex $r 2]"
+}
+foreach r $area_rules {
+  puts $fh "set DRC_DATA(area,[lindex $r 0]) [lindex $r 1]"
 }
 if {[llength $setlines]} {
   puts $fh ""

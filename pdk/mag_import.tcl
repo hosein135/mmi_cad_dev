@@ -945,7 +945,7 @@ proc mag_open_storage_folder {{dir ""}} {
   # A folder is not a document. xdg-open, with no file manager installed,
   # walks every web browser and prints a page of "command not found".
   if {[info commands auto_execok] == ""} { return }
-  foreach bin {nautilus thunar pcmanfm nemo caja explorer.exe} {
+  foreach bin {pcmanfm thunar nautilus nemo caja explorer.exe} {
     if {[auto_execok $bin] == ""} continue
     if {![catch {exec $bin $dir &}]} { return }
   }

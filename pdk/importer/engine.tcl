@@ -413,7 +413,7 @@ proc importer_record {item} {
   set root [importer_pdk_root]
   set name [importer_field $item name]
   set ver [importer_short_tag $item]
-  if {![info exists PDK_GEN_REQUIRED]} { set PDK_GEN_REQUIRED 7 }
+  if {![info exists PDK_GEN_REQUIRED]} { set PDK_GEN_REQUIRED 8 }
   set recs {}
   foreach rec [importer_load_records] {
     if {[importer_field $rec name] == $name} continue

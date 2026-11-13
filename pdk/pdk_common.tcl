@@ -2,7 +2,7 @@
 # Tcl 8.0 safe. The download dialog lives in the importer application.
 # Generator revision a usable .tech27 must carry (MMI_PDK_GEN).
 
-set PDK_GEN_REQUIRED 7
+set PDK_GEN_REQUIRED 8
 set PDK_SOURCE_REV 5
 
 proc pdk_source_rev {path} {

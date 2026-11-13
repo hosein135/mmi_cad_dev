@@ -268,6 +268,7 @@ proc _mmi_autolayout_run {} {
   if {!$empty} {
     _mmi_bind_cell_beside_sue
     cd $save
+    _mmi_show_layout_folder $dir
     set _mmi_autolayout_done 1
     return
   }
@@ -277,10 +278,77 @@ proc _mmi_autolayout_run {} {
     cd $save
     return
   }
-  catch {view_cell}
   _mmi_bind_cell_beside_sue
+  if {[_mmi_save_open_layout $dir $cell]} {
+    _mmi_show_layout_folder $dir
+  } else {
+    catch {view_cell}
+  }
   set _mmi_autolayout_done 1
   cd $save
+}
+
+# Write the generated cell to the schematic directory and load that file
+# back, the same sequence the Magic converter uses in mag_save_open.
+proc _mmi_save_open_layout {dir cell} {
+  if {$dir == "" || $cell == ""} { return 0 }
+  if {![file isdirectory $dir]} { return 0 }
+  if {[info commands cell_in_memory] == "" || ![cell_in_memory $cell]} {
+    msg "No layout in memory to save for $cell\n"
+    return 0
+  }
+  catch {cell_path_add $dir}
+  catch {cd $dir}
+  set dest $dir/$cell.max
+  catch {db_cell_rename $cell $cell $dest}
+  catch {cell_load $cell}
+  # cell_save asks about flylines. Clear them so the save does not stop
+  # on a dialog. The default answer in that dialog is to drop them.
+  catch {db_flyline -delete}
+  set rc 0
+  if {[catch {cell_save} rc] || $rc == 0} {
+    msg "Could not save $dest\n"
+    return 0
+  }
+  if {![file exists $dest]} {
+    msg "Save did not write $dest\n"
+    return 0
+  }
+  catch {:flush $cell}
+  if {[catch {cell_load $cell $dir} err]} {
+    msg "Saved $dest but could not open it: $err\n"
+    return 0
+  }
+  catch {view_cell}
+  msg "Saved and opened $dest\n"
+  return 1
+}
+
+proc _mmi_show_layout_folder {dir} {
+  if {$dir == "" || ![file isdirectory $dir]} { return }
+  if {[info commands _mmi_file_normalize] != ""} {
+    set dir [_mmi_file_normalize $dir]
+  }
+  if {[info commands auto_execok] == ""} { return }
+  if {[auto_execok pcmanfm] != ""} {
+    if {![catch {exec pcmanfm -n $dir &}]} {
+      msg "File manager: $dir\n"
+      return
+    }
+  }
+  if {[info commands mag_open_storage_folder] != ""} {
+    mag_open_storage_folder $dir
+    msg "File manager: $dir\n"
+    return
+  }
+  foreach bin {thunar nautilus nemo caja explorer.exe} {
+    if {[auto_execok $bin] == ""} continue
+    if {![catch {exec $bin $dir &}]} {
+      msg "File manager: $dir\n"
+      return
+    }
+  }
+  msg "No file manager on PATH. Layout folder: $dir\n"
 }
 
 # .ext, .sim, and .max for a schematic stay in the directory of its .sue file.
@@ -382,6 +450,62 @@ proc _mmi_autoload_cross_probe_ext {} {
   }
 }
 
+# The generator's vdd/gnd labels are a zero-size box. LVS only sees a
+# label that db_label put on the power metal, which is how the port
+# labels (a, b, y) already get there. Without these two names, Gemini
+# matches the rails and then MAX reports that match as a discrepancy.
+proc _mmi_has_global {name} {
+  if {[catch {
+    eval lay_box [lay_bbox]
+    sel_labels
+  }]} {
+    return 0
+  }
+  set found 0
+  foreach label [split [sel_what labels] \n] {
+    if {$label == ""} continue
+    if {[lindex $label 6] == $name && [lindex $label 9] == "global"} {
+      set found 1
+    }
+  }
+  catch {sel_clear}
+  return $found
+}
+
+proc _mmi_stdcell_power_labels {} {
+  global STDCELL LAYINFO
+  if {![info exists STDCELL(vdd)] || $STDCELL(vdd) == ""} return
+  if {![info exists STDCELL(gnd)] || $STDCELL(gnd) == ""} return
+  if {![info exists STDCELL(cell_width)] || $STDCELL(cell_width) == ""} return
+  if {$STDCELL(cell_width) <= 0} return
+  if {![info exists LAYINFO(stdcell:cell_height)]} return
+  if {[info exists LAYINFO(layers:power_strap)] && \
+      $LAYINFO(layers:power_strap) == 0} return
+  if {[info commands techinfo2] == ""} return
+  set m1 [techinfo2 layer m1]
+  if {$m1 == ""} return
+  set x [expr {$STDCELL(cell_width) / 4.0}]
+  set h $LAYINFO(stdcell:cell_height)
+  if {![_mmi_has_global $STDCELL(gnd)]} {
+    db_label -kind global -pos center $m1 $STDCELL(gnd) $x 0
+  }
+  if {![_mmi_has_global $STDCELL(vdd)]} {
+    db_label -kind global -pos center $m1 $STDCELL(vdd) $x $h
+  }
+}
+
+proc _mmi_wrap_stdcell_labels {} {
+  if {[info commands _mmi_stdcell_load_direct] != ""} return
+  if {[info commands stdcell_load_direct] == ""} return
+  rename stdcell_load_direct _mmi_stdcell_load_direct
+  proc stdcell_load_direct {filename} {
+    set ret [_mmi_stdcell_load_direct $filename]
+    catch {_mmi_stdcell_power_labels}
+    return $ret
+  }
+}
+
+_mmi_wrap_stdcell_labels
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
 _mmi_autolayout_claim

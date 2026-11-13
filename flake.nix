@@ -328,6 +328,13 @@
             tcsh
             xterm
             xdg-utils
+            # Folder window for a layout MAX just saved. pcmanfm is the
+            # name mag_open_storage_folder and the SUE layout hook launch.
+            pcmanfm
+            shared-mime-info
+            hicolor-icon-theme
+            adwaita-icon-theme
+            gsettings-desktop-schemas
             strace
             magic-vlsi
             ngspice
