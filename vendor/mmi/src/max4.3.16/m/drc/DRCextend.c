@@ -157,6 +157,20 @@ void drcCheckArea(Tile *starttile,
      static Stack		*DRCstack= NULL;
      
     arg->dCD_cptr = cptr;
+
+    /*
+     * A tile that already meets the minimum cannot fail this rule.
+     * Measure it before the pending-stack walk. PUSHTILE only pushes
+     * a tile whose client is still DRC_UNPROCESSED; otherwise the
+     * measured area stays 0 and the whole tile is reported.
+     */
+    {
+	double own = (RIGHT(starttile) - LEFT(starttile))
+	    * (double) (TOP(starttile) - BOTTOM(starttile));
+	if (own >= arealimit)
+	    return;
+    }
+
     if (DRCstack == (Stack *) NULL)
 	DRCstack = StackNew(64);
 

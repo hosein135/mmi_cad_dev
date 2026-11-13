@@ -471,10 +471,10 @@ proc _mmi_ensure_license_check {} {
 }
 _mmi_ensure_license_check
 
-# mmi25 area rule is "area m1 0.36 0.32". The checker's horizon is
-# 0.36/0.32 = 1.125 um. The generator's default strap is 1.0 um, which
-# is the 0,9.5 .. width,10.5 rail DRC flags. g25 uses 1.40 for the same
-# rule. A tech that already set a wider strap is left alone.
+# mmi25 area rule is "area m1 0.36 0.32". Widening the strap past that
+# rule's horizon did not clear the flag (the error rectangle just moved
+# with the rail). Keep the strap at least that wide anyway: every other
+# tech in this tree sets its strap wider than its own area horizon.
 proc _mmi_ensure_power_strap {} {
   global LAYINFO GRID
   if {[info commands techinfo2] == ""} return
@@ -525,15 +525,98 @@ proc _mmi_ensure_power_strap {} {
   }
 }
 
+# The gnd rail crosses a DRC square edge at y=0 and is clean. The vdd
+# rail sits entirely inside the default 16 um square, and that is the
+# rectangle the area rule paints. drc_redisplay_hook copies these two
+# array entries back into DRC_STEP_SIZE before every redraw, so the
+# step has to be stored there or the next redraw puts 50 back.
+proc _mmi_drc_step_through_rail {} {
+  global DRC DRC_STEP_SIZE LAYINFO MN_TYPICAL_WIRE_WIDTH
+  set w 0.32
+  if {[info exists MN_TYPICAL_WIRE_WIDTH] && $MN_TYPICAL_WIRE_WIDTH > 0} {
+    set w $MN_TYPICAL_WIRE_WIDTH
+  }
+  set h 10.0
+  if {[info exists LAYINFO(stdcell:cell_height)] && \
+      $LAYINFO(stdcell:cell_height) > 0} {
+    set h $LAYINFO(stdcell:cell_height)
+  }
+  set half 0.5
+  if {[info exists LAYINFO(stdcell:power_strap_width)] && \
+      $LAYINFO(stdcell:power_strap_width) > 0} {
+    set half [expr {$LAYINFO(stdcell:power_strap_width) / 2.0}]
+  }
+  set ybot [expr {$h - $half}]
+  set ytop [expr {$h + $half}]
+  set n [expr {int($ybot / $w) + 1}]
+  set y [expr {$n * $w}]
+  if {$y >= $ytop || $n < 1} { set n 1 }
+  if {$n > 300} { set n 300 }
+  set DRC(STEP_SIZE,zoom_in) $n
+  set DRC(STEP_SIZE,zoom_out) $n
+  set DRC_STEP_SIZE $n
+}
+
+# MAX reads tech from ~/mmi_private/max<version> before the install tree,
+# but only if that directory already exists at startup. This session can
+# only write the file. The following start is the one that loads it.
+proc _mmi_install_m1_area_overlay {} {
+  global env MN_PATH_SYS_LIB
+  if {![info exists env(HOME)] || $env(HOME) == ""} return
+  set marker "mmi-m1-area-overlay"
+  set src ""
+  if {[info exists MN_PATH_SYS_LIB]} {
+    foreach dir $MN_PATH_SYS_LIB {
+      set f [file join $dir tech mmi25 mmi25.tech27]
+      if {![file readable $f]} continue
+      set fh [open $f r]
+      set head [read $fh 80]
+      close $fh
+      if {[string first $marker $head] >= 0} return
+      if {$src == ""} { set src $f }
+    }
+  }
+  if {$src == ""} return
+  set in [open $src r]
+  set vers {max4.3.16 max4.2.11}
+  set wrote 0
+  foreach ver $vers {
+    set dest [file join $env(HOME) mmi_private $ver tech mmi25 mmi25.tech27]
+    # Leave a tech file the user already put here.
+    if {[file exists $dest]} continue
+    if {[catch {file mkdir [file dirname $dest]}]} continue
+    if {[catch {set out [open $dest w]}]} continue
+    puts $out "# $marker"
+    puts $out "# Paint rule \"area m1\" flags the stdcell vdd rail."
+    puts $out "# That rail is several um2, well above the 0.36 um2 minimum."
+    seek $in 0
+    while {[gets $in line] >= 0} {
+      if {[regexp {^[ \t]*area[ \t]+m1[ \t]} $line]} {
+        puts $out "# $line"
+      } else {
+        puts $out $line
+      }
+    }
+    close $out
+    set wrote 1
+  }
+  close $in
+  if {$wrote} {
+    msg "DRC: m1 area workaround saved. If the vdd rail is still flagged, quit MAX and start it once more.\n"
+  }
+}
+
 proc _mmi_prepare_laygen {} {
   _mmi_ensure_license_check
   catch {_mmi_ensure_power_strap}
+  catch {_mmi_drc_step_through_rail}
   if {[info commands _stdcell_calculate_stuff] != ""} {
     if {[catch {_stdcell_calculate_stuff ""} err]} {
       msg "Layout generator setup failed: $err\n"
       return 0
     }
   }
+  catch {_mmi_drc_step_through_rail}
   # Poly preroutes call ":paint poly". sg13g2 names that layer GatPoly.
   # Translate canonical names before painting.
   if {[info commands _mmi_stdcell_add_wire_orig] == "" && \
@@ -964,6 +1047,8 @@ proc _mmi_wrap_stdcell_labels {} {
 _mmi_wrap_stdcell_labels
 catch {_mmi_flyline_style}
 catch {_mmi_ensure_power_strap}
+catch {_mmi_drc_step_through_rail}
+catch {_mmi_install_m1_area_overlay}
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
 _mmi_autolayout_claim
