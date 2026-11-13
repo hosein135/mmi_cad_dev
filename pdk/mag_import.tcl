@@ -1797,7 +1797,91 @@ proc mag_exact_scan_max {path mask_hnm} {
   return $bad
 }
 
+# Nearest file-unit coordinate whose half-nanometre position is on the mask.
+proc mag_exact_snap_coord {c db_h mask_hnm} {
+  if {![mag_exact_is_int $c] || $db_h <= 0 || $mask_hnm <= 0} { return $c }
+  set hnm [expr {$c * $db_h}]
+  set neg 0
+  if {$hnm < 0} {
+    set neg 1
+    set hnm [expr {0 - $hnm}]
+  }
+  set q [expr {$hnm / $mask_hnm}]
+  set r [expr {$hnm % $mask_hnm}]
+  if {[expr {$r * 2}] >= $mask_hnm} { incr q }
+  set snapped [expr {$q * $mask_hnm}]
+  if {[expr {$snapped % $db_h}] != 0} { return $c }
+  set out [expr {$snapped / $db_h}]
+  if {$neg} { set out [expr {0 - $out}] }
+  return $out
+}
+
+# Label anchors from GDS text can sit off the 5 nm mask (VNB at y=116).
+# Rectangles are left alone. Snapping the point does not move paint.
+proc mag_exact_snap_labels {path family} {
+  if {![file readable $path]} { return 0 }
+  if {[catch {set fh [open $path r]}]} { return 0 }
+  set mask [mag_exact_mask_hnm $family]
+  set db_h ""
+  set section ""
+  set changed 0
+  set out {}
+  while {[gets $fh line] >= 0} {
+    set t [string trim $line]
+    set toks [mag_words $t]
+    if {[lindex $toks 0] == "resolution" && [llength $toks] >= 2} {
+      set db_h [mag_exact_um_hnm [lindex $toks 1]]
+    }
+    if {[lindex $toks 0] == "SECTION" && [llength $toks] >= 2} {
+      set section [lindex $toks 1]
+    }
+    if {[string match "\}*" $t]} { set section "" }
+    if {$section == "LABELS" && $db_h != "" && $db_h > 0 && \
+        ([lindex $toks 0] == "lab" || [lindex $toks 0] == "t") && \
+        [llength $toks] >= 6 && [mag_all_int [lrange $toks 2 5]]} {
+      set moved 0
+      set i 2
+      while {$i <= 5} {
+        set c [lindex $toks $i]
+        set s [mag_exact_snap_coord $c $db_h $mask]
+        if {$s != $c} {
+          set toks [lreplace $toks $i $i $s]
+          set moved 1
+        }
+        incr i
+      }
+      if {$moved} {
+        set indent ""
+        if {[string match "\t*" $line]} { set indent "\t" }
+        set line "$indent[join $toks " "]"
+        set changed 1
+      }
+    }
+    lappend out $line
+  }
+  close $fh
+  if {!$changed} { return 0 }
+  if {[catch {set fh [open $path w]}]} { return 0 }
+  puts $fh [join $out \n]
+  close $fh
+  return 1
+}
+
+proc mag_exact_snap_labels_tree {dir family} {
+  set files {}
+  catch {set files [glob -nocomplain [file join $dir *.max]]}
+  set n 0
+  foreach f $files {
+    if {[mag_exact_snap_labels $f $family]} { incr n }
+  }
+  if {$n > 0} {
+    mag_log "Snapped off-grid labels onto the mask in $n .max file(s)"
+  }
+  return $n
+}
+
 proc mag_exact_scan_tree {dir family} {
+  mag_exact_snap_labels_tree $dir $family
   set mask [mag_exact_mask_hnm $family]
   set files {}
   catch {set files [glob -nocomplain [file join $dir *.max]]}
