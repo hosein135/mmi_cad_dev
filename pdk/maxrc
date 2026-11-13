@@ -87,22 +87,91 @@ if {[file executable [file join $_mmi_bin ext2sim]]} {
 }
 unset _mmi_bin
 
-# Build a layout from the schematic netlist SUE recorded before it
-# started this MAX. Cross-probe alone leaves an empty cell.
-proc _mmi_autolayout_request {} {
+# SUE writes ~/.mmi-autolayout just before it starts MAX. A later MAX
+# with no file on the command line must stay empty, so the request is
+# kept only when this process is that launch.
+proc _mmi_autolayout_path {} {
   global env
   set home /mmi-home
   if {[info exists env(HOME)] && $env(HOME) != ""} {
     set home $env(HOME)
   }
-  set f [file join $home .mmi-autolayout]
-  if {![file readable $f]} { return {} }
-  set fh [open $f r]
-  gets $fh sim
-  gets $fh dir
-  gets $fh cell
-  close $fh
-  return [list $sim $dir $cell]
+  return [file join $home .mmi-autolayout]
+}
+
+proc _mmi_argv_has_layout {} {
+  global argv
+  if {![info exists argv]} { return 0 }
+  set skip 0
+  foreach a $argv {
+    if {$skip} {
+      set skip 0
+      continue
+    }
+    if {$a == "--"} continue
+    if {[string match -* $a]} {
+      switch -exact -- $a {
+        -tech -
+        -technology -
+        -project -
+        -set -
+        -command -
+        -iconify -
+        -batch -
+        -display -
+        -geometry -
+        -name -
+        -colormap -
+        -visual -
+        -use { set skip 1 }
+      }
+      continue
+    }
+    if {$a != ""} { return 1 }
+  }
+  return 0
+}
+
+proc _mmi_autolayout_claim {} {
+  global _mmi_auto_sim _mmi_auto_dir _mmi_auto_cell _mmi_auto_claimed
+  if {[info exists _mmi_auto_claimed]} { return }
+  set _mmi_auto_claimed 1
+  set _mmi_auto_sim ""
+  set _mmi_auto_dir ""
+  set _mmi_auto_cell ""
+  set f [_mmi_autolayout_path]
+  if {![file readable $f]} { return }
+  set age 999999
+  if {![catch {file mtime $f} mtime]} {
+    set age [expr {[clock seconds] - $mtime}]
+    if {$age < 0} { set age 0 }
+  }
+  set sim ""
+  set dir ""
+  set cell ""
+  if {[catch {
+    set fh [open $f r]
+    gets $fh sim
+    gets $fh dir
+    gets $fh cell
+    close $fh
+  }]} {
+    return
+  }
+  # One launch consumes the request. The next MAX does not reopen it.
+  catch {file delete $f}
+  if {[_mmi_argv_has_layout]} { return }
+  if {$age > 120} { return }
+  if {$sim == "" || $cell == ""} { return }
+  set _mmi_auto_sim $sim
+  set _mmi_auto_dir $dir
+  set _mmi_auto_cell $cell
+}
+
+proc _mmi_autolayout_request {} {
+  global _mmi_auto_sim _mmi_auto_dir _mmi_auto_cell
+  if {![info exists _mmi_auto_sim] || $_mmi_auto_sim == ""} { return {} }
+  return [list $_mmi_auto_sim $_mmi_auto_dir $_mmi_auto_cell]
 }
 
 proc _mmi_cell_empty {cell} {
@@ -315,8 +384,7 @@ proc _mmi_autoload_cross_probe_ext {} {
 
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
-set _mmi_autolayout_boot [_mmi_autolayout_request]
-if {[llength $_mmi_autolayout_boot] >= 3} {
+_mmi_autolayout_claim
+if {[llength [_mmi_autolayout_request]] >= 3} {
   after 300 _mmi_autolayout_later
 }
-unset _mmi_autolayout_boot
