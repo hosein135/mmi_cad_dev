@@ -471,8 +471,63 @@ proc _mmi_ensure_license_check {} {
 }
 _mmi_ensure_license_check
 
+# mmi25 area rule is "area m1 0.36 0.32". The checker's horizon is
+# 0.36/0.32 = 1.125 um. The generator's default strap is 1.0 um, which
+# is the 0,9.5 .. width,10.5 rail DRC flags. g25 uses 1.40 for the same
+# rule. A tech that already set a wider strap is left alone.
+proc _mmi_ensure_power_strap {} {
+  global LAYINFO GRID
+  if {[info commands techinfo2] == ""} return
+  set area ""
+  set minw ""
+  catch {set area [techinfo2 area m1]}
+  catch {set minw [techinfo2 min_width m1]}
+  if {$area == "" || $minw == ""} return
+  if {[catch {expr $area > 0 && $minw > 0}]} return
+  if {$area <= 0 || $minw <= 0} return
+  set grid 0.01
+  if {[info commands res] != ""} {
+    catch {
+      set g [res -mask]
+      if {$g > 0} { set grid $g }
+    }
+  }
+  if {$grid <= 0 && [info exists GRID(mask)] && $GRID(mask) > 0} {
+    set grid $GRID(mask)
+  }
+  if {$grid <= 0 && [info exists GRID(resolution)] && $GRID(resolution) > 0} {
+    set grid $GRID(resolution)
+  }
+  if {$grid <= 0} { set grid 0.01 }
+  # Thousandths of a micron, so the half-width stays on the mask grid.
+  set horizon_m [expr int(($area / $minw) * 1000.0 + 0.999)]
+  set grid_m [expr int($grid * 1000.0 + 0.5)]
+  if {$grid_m < 1} { set grid_m 1 }
+  set step_m [expr $grid_m * 2]
+  # One extra grid step past the horizon, then round up to an even step
+  # so half the strap still lands on the mask grid.
+  set need_m [expr $horizon_m + $grid_m + $step_m]
+  set n [expr int(($need_m + $step_m - 1) / $step_m)]
+  if {$n < 1} { set n 1 }
+  set w_m [expr $n * $step_m]
+  if {$w_m > 3000} { set w_m 3000 }
+  set w [expr $w_m / 1000.0]
+  set cur ""
+  if {[info exists LAYINFO(stdcell:power_strap_width)]} {
+    set cur $LAYINFO(stdcell:power_strap_width)
+  }
+  if {$cur == "" || [catch {expr $cur + 0}]} {
+    set LAYINFO(stdcell:power_strap_width) $w
+    return
+  }
+  if {$cur + 0 < $w} {
+    set LAYINFO(stdcell:power_strap_width) $w
+  }
+}
+
 proc _mmi_prepare_laygen {} {
   _mmi_ensure_license_check
+  catch {_mmi_ensure_power_strap}
   if {[info commands _stdcell_calculate_stuff] != ""} {
     if {[catch {_stdcell_calculate_stuff ""} err]} {
       msg "Layout generator setup failed: $err\n"
@@ -908,6 +963,7 @@ proc _mmi_wrap_stdcell_labels {} {
 
 _mmi_wrap_stdcell_labels
 catch {_mmi_flyline_style}
+catch {_mmi_ensure_power_strap}
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
 _mmi_autolayout_claim
