@@ -203,25 +203,64 @@ proc _mmi_sim_nfets {sim} {
   return $n
 }
 
-proc _mmi_autolayout_run {} {
-  global _mmi_autolayout_done
-  if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} { return }
-  set req [_mmi_autolayout_request]
-  if {[llength $req] < 3} { return }
-  set sim [lindex $req 0]
-  set dir [lindex $req 1]
-  set cell [lindex $req 2]
-  if {![file readable $sim]} { return }
-  if {[_mmi_sim_nfets $sim] < 1} { return }
+proc _mmi_flyline_count {} {
+  if {[info commands db_flyline] == ""} { return 0 }
+  if {[catch {set fl [db_flyline]}]} { return 0 }
+  set n 0
+  foreach line [split [string trim $fl] \n] {
+    if {$line != ""} { incr n }
+  }
+  return $n
+}
+
+proc _mmi_reveal_flylines {} {
+  catch {:see flyLines}
+  if {[info commands view_state_change] != ""} {
+    catch {view_state_change flylines 1}
+  }
+  catch {view_cell}
+}
+
+# A new cross-probe request can arrive after this MAX is already up.
+# Claimed requests stay in memory; a newer file replaces them.
+proc _mmi_autolayout_reread {} {
+  global _mmi_auto_sim _mmi_auto_dir _mmi_auto_cell _mmi_autolayout_done
+  set f [_mmi_autolayout_path]
+  if {![file readable $f]} { return }
+  set age 999999
+  if {![catch {file mtime $f} mtime]} {
+    set age [expr {[clock seconds] - $mtime}]
+    if {$age < 0} { set age 0 }
+  }
+  if {$age > 120} { return }
+  set sim ""
+  set dir ""
+  set cell ""
+  if {[catch {
+    set fh [open $f r]
+    gets $fh sim
+    gets $fh dir
+    gets $fh cell
+    close $fh
+  }]} {
+    return
+  }
+  catch {file delete $f}
+  if {$sim == "" || $cell == ""} { return }
+  set _mmi_auto_sim $sim
+  set _mmi_auto_dir $dir
+  set _mmi_auto_cell $cell
+  catch {unset _mmi_autolayout_done}
+}
+
+proc _mmi_prepare_laygen {} {
   if {[info commands license_check] == ""} {
     proc license_check {args} { return 1 }
   }
-  # stdcell_load_sim skips the setup dialog when verbose is 0, and that
-  # dialog is what normally fills LAYINFO. Fill the defaults first.
   if {[info commands _stdcell_calculate_stuff] != ""} {
     if {[catch {_stdcell_calculate_stuff ""} err]} {
       msg "Layout generator setup failed: $err\n"
-      return
+      return 0
     }
   }
   # Poly preroutes call ":paint poly". sg13g2 names that layer GatPoly.
@@ -237,9 +276,16 @@ proc _mmi_autolayout_run {} {
       _mmi_stdcell_add_wire_orig $x1 $y1 $x2 $y2 $layer
     }
   }
-  global LAYINFO
+  global LAYINFO STDCELL
+  if {![info exists STDCELL(stdcell_layers)]} {
+    set STDCELL(stdcell_layers) 1
+  }
+  if {![info exists LAYINFO(option:flylines)]} {
+    set LAYINFO(option:flylines) 1
+  }
   # Well-tie paint uses the canonical names pwc/nwc/prb, which this tech
-  # does not define. Transistors and power rails still get drawn.
+  # does not define. Leave those boxes off in the Layers window.
+  # Transistors and power rails still get drawn.
   foreach _lay {pwc nwc prb_layer} {
     if {[info exists LAYINFO(layers:$_lay)]} {
       set LAYINFO(layers:$_lay) 0
@@ -254,8 +300,68 @@ proc _mmi_autolayout_run {} {
       }
     }
   }
-  unset _lay
-  catch {unset _mapped}
+  return 1
+}
+
+# Layout Generator window: input .sim, output cell, and the buttons for
+# Per-Cell Options, Stdcell Options, and Layers. Done draws the cell.
+proc _mmi_laygen_dialog {sim dir cell} {
+  global STDCELL
+  if {[info commands stdcell_setup] == ""} {
+    msg "Layout generator is not loaded.\n"
+    return -1
+  }
+  set STDCELL(input_filename) $sim
+  if {$dir != ""} {
+    set STDCELL(output_filename) $dir/$cell
+  } else {
+    set STDCELL(output_filename) $cell
+  }
+  set STDCELL(debug) 0
+  if {![stdcell_setup]} {
+    return 0
+  }
+  regsub {\.max$} $STDCELL(output_filename) "" STDCELL(output_filename)
+  if {[catch {
+    _stdcell_goto_cell $STDCELL(output_filename)
+    update
+    cursor_busy 1
+    set rc [stdcell_load_direct $STDCELL(input_filename)]
+    cursor_busy 0
+  } err]} {
+    catch {cursor_busy 0}
+    msg "Layout generator failed: $err\n"
+    return -1
+  }
+  if {$rc == 0} {
+    msg "Layout generator did not draw $cell\n"
+    return -1
+  }
+  return 1
+}
+
+proc _mmi_autolayout_run {} {
+  global _mmi_autolayout_done STDCELL
+  _mmi_autolayout_reread
+  if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} { return }
+  set req [_mmi_autolayout_request]
+  if {[llength $req] < 3} { return }
+  set sim [lindex $req 0]
+  set dir [lindex $req 1]
+  set cell [lindex $req 2]
+  if {![file readable $sim]} {
+    msg "No netlist $sim. Save the schematic and run Max Cross Probe Init again.\n"
+    set _mmi_autolayout_done 1
+    return
+  }
+  if {[_mmi_sim_nfets $sim] < 1} {
+    msg "No transistors in $sim. Schematic \"$cell\" has nothing to draw.\n"
+    if {$cell == "no_name"} {
+      msg "no_name is the unsaved sheet. Save it, or bring the schematic that contains the transistors forward, then run Max Cross Probe Init again.\n"
+    }
+    set _mmi_autolayout_done 1
+    return
+  }
   set save [pwd]
   if {$dir != "" && [file isdirectory $dir]} { cd $dir }
   set empty 1
@@ -265,25 +371,51 @@ proc _mmi_autolayout_run {} {
     catch {cell_load $cell $dir}
     set empty [_mmi_cell_empty $cell]
   }
-  if {!$empty} {
+  if {!$empty && [_mmi_flyline_count] > 0} {
     _mmi_bind_cell_beside_sue
+    _mmi_reveal_flylines
     cd $save
     _mmi_show_layout_folder $dir
     set _mmi_autolayout_done 1
     return
   }
-  msg "Generating layout for $cell from $sim\n"
-  if {[catch {stdcell_load_sim $sim 0} err]} {
-    msg "Layout generator failed: $err\n"
+  if {$empty} {
+    msg "Generating layout for $cell from $sim\n"
+  } else {
+    msg "Cell $cell has no flylines. Layout Generator can rebuild it so unfinished nets show as yellow lines. Cancel keeps the current layout.\n"
+  }
+  if {![_mmi_prepare_laygen]} {
     cd $save
     return
   }
-  _mmi_bind_cell_beside_sue
-  if {[_mmi_save_open_layout $dir $cell]} {
-    _mmi_show_layout_folder $dir
-  } else {
-    catch {view_cell}
+  set drew [_mmi_laygen_dialog $sim $dir $cell]
+  if {$drew == 0} {
+    msg "Layout generator cancelled\n"
+    cd $save
+    set _mmi_autolayout_done 1
+    return
   }
+  if {$drew != 1} {
+    cd $save
+    set _mmi_autolayout_done 1
+    return
+  }
+  set edit $cell
+  catch {set edit [lay_editcell]}
+  set outdir $dir
+  if {[info exists STDCELL(output_filename)] && $STDCELL(output_filename) != ""} {
+    set got [file dirname $STDCELL(output_filename)]
+    if {$got != "" && $got != "." && [file isdirectory $got]} {
+      set outdir $got
+    }
+  }
+  _mmi_bind_cell_beside_sue
+  if {[_mmi_save_open_layout $outdir $edit]} {
+    _mmi_show_layout_folder $outdir
+  } else {
+    _mmi_reveal_flylines
+  }
+  msg "Flylines in [lay_editcell]: [_mmi_flyline_count]\n"
   set _mmi_autolayout_done 1
   cd $save
 }
@@ -302,11 +434,10 @@ proc _mmi_save_open_layout {dir cell} {
   set dest $dir/$cell.max
   catch {db_cell_rename $cell $cell $dest}
   catch {cell_load $cell}
-  # cell_save asks about flylines. Clear them so the save does not stop
-  # on a dialog. The default answer in that dialog is to drop them.
-  catch {db_flyline -delete}
+  # cell_save asks whether to keep flylines, and the default button drops
+  # them. Answer yes so the yellow lines stay in the file and on screen.
   set rc 0
-  if {[catch {cell_save} rc] || $rc == 0} {
+  if {[catch {set rc [_mmi_cell_save_keep_flylines]} err] || $rc == 0} {
     msg "Could not save $dest\n"
     return 0
   }
@@ -319,9 +450,36 @@ proc _mmi_save_open_layout {dir cell} {
     msg "Saved $dest but could not open it: $err\n"
     return 0
   }
-  catch {view_cell}
+  _mmi_reveal_flylines
   msg "Saved and opened $dest\n"
   return 1
+}
+
+# Yes on "save the flylines?" is button 0. That keeps the lines.
+proc _mmi_cell_save_keep_flylines {} {
+  set wrapped 0
+  if {[info commands tk_dialog] != "" && \
+      [info commands _mmi_tk_dialog_real] == ""} {
+    rename tk_dialog _mmi_tk_dialog_real
+    proc tk_dialog {w title text bitmap default args} {
+      if {[string match *flyline* $text]} {
+        return 0
+      }
+      return [eval _mmi_tk_dialog_real \
+          [list $w $title $text $bitmap $default] $args]
+    }
+    set wrapped 1
+  }
+  set rc 0
+  set failed [catch {set rc [cell_save]} err]
+  if {$wrapped} {
+    rename tk_dialog ""
+    rename _mmi_tk_dialog_real tk_dialog
+  }
+  if {$failed} {
+    return -code error $err
+  }
+  return $rc
 }
 
 proc _mmi_show_layout_folder {dir} {
@@ -402,20 +560,42 @@ proc _mmi_autolayout_later {} {
   }
 }
 
-proc _mmi_hook_lvs_it {} {
-  global auto_index
+proc _mmi_wrap_lvs_it {} {
   if {[info commands _mmi_lvs_it_max_real] != ""} { return }
-  if {[info commands lvs_it_max] == "" && [info exists auto_index(lvs_it_max)]} {
-    set script $auto_index(lvs_it_max)
-    unset auto_index(lvs_it_max)
-    eval $script
-  }
   if {[info commands lvs_it_max] == ""} { return }
   rename lvs_it_max _mmi_lvs_it_max_real
   proc lvs_it_max {} {
     _mmi_autolayout_run
     _mmi_bind_cell_beside_sue
     _mmi_lvs_it_max_real
+  }
+}
+
+proc _mmi_autoload_lvs_it {} {
+  global auto_index _mmi_lvs_autoload
+  if {[info exists auto_index(lvs_it_max)]} {
+    unset auto_index(lvs_it_max)
+  }
+  eval $_mmi_lvs_autoload
+  _mmi_wrap_lvs_it
+}
+
+proc _mmi_hook_lvs_it {} {
+  global auto_index _mmi_lvs_autoload _mmi_lvs_hook_tries
+  if {[info commands _mmi_lvs_it_max_real] != ""} { return }
+  if {[info commands lvs_it_max] == "" && [info exists auto_index(lvs_it_max)]} {
+    set _mmi_lvs_autoload $auto_index(lvs_it_max)
+    set auto_index(lvs_it_max) _mmi_autoload_lvs_it
+    return
+  }
+  if {[info commands lvs_it_max] != ""} {
+    _mmi_wrap_lvs_it
+    return
+  }
+  if {![info exists _mmi_lvs_hook_tries]} { set _mmi_lvs_hook_tries 0 }
+  incr _mmi_lvs_hook_tries
+  if {$_mmi_lvs_hook_tries < 40} {
+    after 500 _mmi_hook_lvs_it
   }
 }
 
@@ -509,6 +689,5 @@ _mmi_wrap_stdcell_labels
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
 _mmi_autolayout_claim
-if {[llength [_mmi_autolayout_request]] >= 3} {
-  after 300 _mmi_autolayout_later
-}
+# Do not draw at startup. SUE still has to show the "can't find cell"
+# window. The Layout Generator opens from lvs_it_max, after that choice.
