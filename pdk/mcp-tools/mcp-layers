@@ -1,0 +1,8 @@
+#!/bin/sh
+# Nix tool: list technology layers in the open MAX.
+set -eu
+dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+if [ -x "$dir/mcp-io" ]; then
+  exec "$dir/mcp-io" layers
+fi
+exec sh "$dir/mcp-io" layers

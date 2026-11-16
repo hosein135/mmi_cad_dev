@@ -1,4 +1,4 @@
-# Site-wide MAX startup: PDK import, Magic design import, image-to-layout
+# Site-wide MAX startup: PDK import, Magic design import, image-to-layout, mcp
 # Tcl 8.0 has no [file normalize] (that is 8.4+).
 if {[info commands _mmi_file_normalize] == ""} {
   proc _mmi_file_normalize {path} {
@@ -48,6 +48,7 @@ proc _mmi_pdk_source {name} {
 _mmi_pdk_source pdk_common.tcl
 _mmi_pdk_source mag_import.tcl
 _mmi_pdk_source image_layout.tcl
+_mmi_pdk_source mcp.tcl
 _mmi_pdk_source drc_errors.tcl
 
 proc _mmi_wrap_win_title {} {

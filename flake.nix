@@ -144,6 +144,12 @@
           install -Dm644 "$src/mag_import.tcl" $out/mag_import.tcl
           install -Dm644 "$src/mag_exact.tcl" $out/mag_exact.tcl
           install -Dm644 "$src/image_layout.tcl" $out/image_layout.tcl
+          install -Dm644 "$src/mcp.tcl" $out/mcp.tcl
+          install -Dm755 "$src/mcp_ask.py" $out/mcp_ask.py
+          mkdir -p $out/mcp-tools
+          for t in mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-zoom mcp-nix; do
+            install -Dm755 "$src/mcp-tools/$t" "$out/mcp-tools/$t"
+          done
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
           install -Dm755 "$src/open_mag.sh" $out/open_mag.sh
           install -Dm755 "$src/open_gds.sh" $out/open_gds.sh
@@ -277,6 +283,22 @@
       # Official nixpkgs Magic VLSI (not a local build). FHS bind: /mmi-magic.
       mmiMagic = pkgs.magic-vlsi;
 
+      # Layout tools the mcp menu gives to an agent. Each name is a nix package.
+      mmiMcpTools = pkgs.runCommand "mmi-mcp-tools"
+        {
+          SOURCE_DATE_EPOCH = sourceDateEpoch;
+        }
+        ''
+          mkdir -p $out/bin
+          install -Dm755 ${./pdk/mcp-tools/mcp-io} $out/bin/mcp-io
+          install -Dm755 ${./pdk/mcp-tools/mcp-layers} $out/bin/mcp-layers
+          install -Dm755 ${./pdk/mcp-tools/mcp-cell} $out/bin/mcp-cell
+          install -Dm755 ${./pdk/mcp-tools/mcp-paint} $out/bin/mcp-paint
+          install -Dm755 ${./pdk/mcp-tools/mcp-label} $out/bin/mcp-label
+          install -Dm755 ${./pdk/mcp-tools/mcp-zoom} $out/bin/mcp-zoom
+          install -Dm755 ${./pdk/mcp-tools/mcp-nix} $out/bin/mcp-nix
+        '';
+
       mmiCad = pkgs.buildFHSEnv {
         pname = "mmi-cad";
         version = "1.0.0";
@@ -294,6 +316,7 @@
           p:
           [
             cshCompat
+            mmiMcpTools
           ]
           ++ (with p; [
             bashInteractive
@@ -324,6 +347,7 @@
             diffutils
             patch
             perl
+            python3
             tcl
             tk
             tcsh
@@ -478,6 +502,7 @@
         mmi-xfonts = mmiFonts;
         mmi-pdk = mmiPdk;
         magic-vlsi = mmiMagic;
+        mmi-mcp-tools = mmiMcpTools;
       };
 
       apps.${system}.default = {

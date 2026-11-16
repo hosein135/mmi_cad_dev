@@ -1,0 +1,33 @@
+#!/bin/sh
+# Nix tool: zoom the MAX window to a box.
+set -eu
+x1=
+y1=
+x2=
+y2=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --x1) x1=${2-} ;;
+    --y1) y1=${2-} ;;
+    --x2) x2=${2-} ;;
+    --y2) y2=${2-} ;;
+    *)
+      echo "error: unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  if [ $# -lt 2 ]; then
+    echo "error: missing value after $1" >&2
+    exit 2
+  fi
+  shift 2
+done
+if [ -z "$x1" ] || [ -z "$y1" ] || [ -z "$x2" ] || [ -z "$y2" ]; then
+  echo "error: usage: mcp-zoom --x1 N --y1 N --x2 N --y2 N" >&2
+  exit 2
+fi
+dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+if [ -x "$dir/mcp-io" ]; then
+  exec "$dir/mcp-io" zoom "$x1" "$y1" "$x2" "$y2"
+fi
+exec sh "$dir/mcp-io" zoom "$x1" "$y1" "$x2" "$y2"

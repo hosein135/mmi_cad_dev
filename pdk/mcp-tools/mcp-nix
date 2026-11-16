@@ -1,0 +1,30 @@
+#!/bin/sh
+# Nix tool: run one allowlisted package from the CAD environment.
+# magic, ngspice, gawk, and ImageMagick (convert, magick, identify).
+set -eu
+if [ $# -lt 1 ]; then
+  echo "error: usage: mcp-nix package [args...]" >&2
+  exit 2
+fi
+pkg=$1
+shift
+case $pkg in
+  magic|ngspice|gawk|convert|magick|identify) ;;
+  *)
+    echo "error: $pkg is not one of the nix tools (magic ngspice gawk convert magick identify)" >&2
+    exit 2
+    ;;
+esac
+for arg in "$@"; do
+  case $arg in
+    *max-mcp*|*CURSOR_API_KEY*|*API_KEY*)
+      echo "error: refusing that argument" >&2
+      exit 2
+      ;;
+  esac
+done
+if ! command -v "$pkg" >/dev/null 2>&1; then
+  echo "error: $pkg is not installed in this nix environment" >&2
+  exit 1
+fi
+exec "$pkg" "$@"

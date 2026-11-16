@@ -1,0 +1,29 @@
+#!/bin/sh
+# Nix tool: create a cell and edit it in MAX.
+set -eu
+name=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --name)
+      if [ $# -lt 2 ]; then
+        echo "error: missing name" >&2
+        exit 2
+      fi
+      name=$2
+      shift 2
+      ;;
+    *)
+      echo "error: unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+done
+if [ -z "$name" ]; then
+  echo "error: usage: mcp-cell --name CELL" >&2
+  exit 2
+fi
+dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+if [ -x "$dir/mcp-io" ]; then
+  exec "$dir/mcp-io" cell "$name"
+fi
+exec sh "$dir/mcp-io" cell "$name"

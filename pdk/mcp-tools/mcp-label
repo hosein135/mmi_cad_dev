@@ -1,0 +1,33 @@
+#!/bin/sh
+# Nix tool: place one label in MAX.
+set -eu
+layer=
+text=
+x=
+y=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --layer) layer=${2-} ;;
+    --text) text=${2-} ;;
+    --x) x=${2-} ;;
+    --y) y=${2-} ;;
+    *)
+      echo "error: unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  if [ $# -lt 2 ]; then
+    echo "error: missing value after $1" >&2
+    exit 2
+  fi
+  shift 2
+done
+if [ -z "$layer" ] || [ -z "$text" ] || [ -z "$x" ] || [ -z "$y" ]; then
+  echo "error: usage: mcp-label --layer L --text TEXT --x N --y N" >&2
+  exit 2
+fi
+dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+if [ -x "$dir/mcp-io" ]; then
+  exec "$dir/mcp-io" label "$layer" "$text" "$x" "$y"
+fi
+exec sh "$dir/mcp-io" label "$layer" "$text" "$x" "$y"

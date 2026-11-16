@@ -1,0 +1,45 @@
+#!/bin/sh
+# Ask the open MAX to run one mcp step, then print MAX's reply.
+# MAX watches MAX_MCP_DIR and redraws before it answers.
+set -eu
+dir=${MAX_MCP_DIR:-}
+if [ -z "$dir" ] || [ ! -d "$dir" ]; then
+  echo "error: MAX is not listening (MAX_MCP_DIR is unset)" >&2
+  exit 1
+fi
+if [ $# -lt 1 ]; then
+  echo "error: mcp-io needs an operation" >&2
+  exit 2
+fi
+
+id="$$-$(date +%s)"
+op=$1
+shift
+line=$op
+for a in "$@"; do
+  a=$(printf '%s' "$a" | tr '\t\n\r' ' ')
+  line=$(printf '%s\t%s' "$line" "$a")
+done
+
+req="$dir/pending.$id"
+rep="$dir/reply.$id"
+tmp="$dir/tmp.$id"
+printf '%s\n' "$line" > "$tmp"
+mv "$tmp" "$req"
+
+n=0
+while [ ! -f "$rep" ]; do
+  if [ -f "$dir/cancel" ]; then
+    rm -f "$req"
+    echo "error: cancelled"
+    exit 1
+  fi
+  n=$((n + 1))
+  if [ "$n" -gt 900 ]; then
+    echo "error: MAX did not answer" >&2
+    exit 1
+  fi
+  sleep 0.2
+done
+cat "$rep"
+rm -f "$req" "$rep"
