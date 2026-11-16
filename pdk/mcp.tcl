@@ -1,5 +1,5 @@
 # mcp menu for MAX. Tcl 8.0: no dict, no string map, no eq.
-# One window: API keys for many agents, and a question.
+# Two windows: API keys, and the question.
 # Cursor is Grok 4.7, extra high, fast off.
 # Drawing steps are nix packages. MAX paints each one before the next.
 
@@ -173,8 +173,8 @@ proc mcp_log {text} {
 }
 
 proc mcp_key_status {text} {
-  if {[info commands winfo] != "" && [winfo exists .mcp.keystatus]} {
-    .mcp.keystatus configure -text $text
+  if {[info commands winfo] != "" && [winfo exists .mcpkeys.status]} {
+    .mcpkeys.status configure -text $text
   }
 }
 
@@ -194,7 +194,7 @@ proc mcp_collect {} {
   set r 0
   foreach spec [mcp_agent_table] {
     set id [lindex $spec 0]
-    set key [string trim [.mcp.keys.r$r.key get]]
+    set key [string trim [.mcpkeys.r$r.key get]]
     if {[string first "\t" $key] >= 0 || [string first "\n" $key] >= 0} {
       error "The $id key cannot contain a tab or a newline."
     }
@@ -203,9 +203,9 @@ proc mcp_collect {} {
       set effort xhigh
       set fast 0
     } else {
-      set model [string trim [.mcp.keys.r$r.model get]]
-      set effort [string trim [.mcp.keys.r$r.effort get]]
-      set fast [string trim [.mcp.keys.r$r.fast get]]
+      set model [string trim [.mcpkeys.r$r.model get]]
+      set effort [string trim [.mcpkeys.r$r.effort get]]
+      set fast [string trim [.mcpkeys.r$r.fast get]]
       if {$fast != "0" && $fast != "1"} { set fast 0 }
     }
     lappend rows [list $id [lindex $spec 1] $key $model $effort $fast]
@@ -231,16 +231,16 @@ proc mcp_save_keys {} {
 
 proc mcp_selected {} {
   global MCP
-  if {[info commands winfo] == "" || ![winfo exists .mcp.agents]} {
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.agents]} {
     return cursor
   }
-  set sel [.mcp.agents curselection]
+  set sel [.mcpask.agents curselection]
   if {$sel == ""} { return cursor }
   return [lindex $MCP(agent_ids) [lindex $sel 0]]
 }
 
 proc mcp_show_agent {} {
-  if {[info commands winfo] == "" || ![winfo exists .mcp.settings]} { return }
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.settings]} { return }
   set id [mcp_selected]
   set note ""
   foreach row [mcp_rows] {
@@ -248,7 +248,7 @@ proc mcp_show_agent {} {
     if {$id == "cursor"} {
       set note "Cursor uses Grok 4.7, extra high, fast off."
       if {[lindex $row 2] == ""} {
-        append note " Paste the Cursor API key in the box above."
+        append note " Paste the Cursor API key in the API Keys window."
       } else {
         append note " A key is saved."
       }
@@ -260,119 +260,131 @@ proc mcp_show_agent {} {
       } else {
         append note "  fast off"
       }
-      if {[lindex $row 2] == ""} { append note ". No key saved." }
+      if {[lindex $row 2] == ""} {
+        append note ". No key saved. Open API Keys to paste one."
+      }
     }
   }
-  .mcp.settings configure -text $note
+  .mcpask.settings configure -text $note
 }
 
-proc mcp_build {} {
+proc mcp_build_keys {} {
   global MCP
-  toplevel .mcp
-  wm title .mcp mcp
-  label .mcp.intro -wraplength 720 -justify left -anchor w -text \
-      "API keys stay in your home directory. Cursor is Grok 4.7, extra high, and not fast. The other agents use the model you type. Fast is 0 or 1 for agents that have a fast mode."
-  pack .mcp.intro -fill x -padx 8 -pady 4
+  toplevel .mcpkeys
+  wm title .mcpkeys "mcp API keys"
+  label .mcpkeys.intro -wraplength 720 -justify left -anchor w -text \
+      "Paste each API key here. Keys stay in your home directory, not in the project. Cursor is Grok 4.7, extra high, and not fast. The other agents use the model you type. Fast is 0 or 1 for agents that have a fast mode."
+  pack .mcpkeys.intro -fill x -padx 8 -pady 4
 
-  frame .mcp.keys
-  pack .mcp.keys -fill x -padx 6
+  set show "*"
+  if {$MCP(show_keys)} { set show "" }
   set MCP(key_entries) {}
   set r 0
   foreach row [mcp_rows] {
     set id [lindex $row 0]
-    frame .mcp.keys.r$r
-    pack .mcp.keys.r$r -fill x -pady 1
-    label .mcp.keys.r$r.name -text [lindex $row 1] -width 12 -anchor w
-    entry .mcp.keys.r$r.key -width 34 -show "*"
-    .mcp.keys.r$r.key insert 0 [lindex $row 2]
-    lappend MCP(key_entries) .mcp.keys.r$r.key
+    frame .mcpkeys.r$r
+    pack .mcpkeys.r$r -fill x -padx 6 -pady 1
+    label .mcpkeys.r$r.name -text [lindex $row 1] -width 12 -anchor w
+    entry .mcpkeys.r$r.key -width 34 -show $show
+    .mcpkeys.r$r.key insert 0 [lindex $row 2]
+    lappend MCP(key_entries) .mcpkeys.r$r.key
     if {$id == "cursor"} {
-      label .mcp.keys.r$r.model -text "grok-4.7   extra high   fast off" -anchor w
-      pack .mcp.keys.r$r.name .mcp.keys.r$r.key .mcp.keys.r$r.model -side left -padx 2
+      label .mcpkeys.r$r.model -text "grok-4.7   extra high   fast off" -anchor w
+      pack .mcpkeys.r$r.name .mcpkeys.r$r.key .mcpkeys.r$r.model -side left -padx 2
     } else {
-      entry .mcp.keys.r$r.model -width 42
-      .mcp.keys.r$r.model insert 0 [lindex $row 3]
-      entry .mcp.keys.r$r.effort -width 8
-      .mcp.keys.r$r.effort insert 0 [lindex $row 4]
-      entry .mcp.keys.r$r.fast -width 3
-      .mcp.keys.r$r.fast insert 0 [lindex $row 5]
-      pack .mcp.keys.r$r.name .mcp.keys.r$r.key .mcp.keys.r$r.model \
-          .mcp.keys.r$r.effort .mcp.keys.r$r.fast -side left -padx 2
+      entry .mcpkeys.r$r.model -width 42
+      .mcpkeys.r$r.model insert 0 [lindex $row 3]
+      entry .mcpkeys.r$r.effort -width 8
+      .mcpkeys.r$r.effort insert 0 [lindex $row 4]
+      entry .mcpkeys.r$r.fast -width 3
+      .mcpkeys.r$r.fast insert 0 [lindex $row 5]
+      pack .mcpkeys.r$r.name .mcpkeys.r$r.key .mcpkeys.r$r.model \
+          .mcpkeys.r$r.effort .mcpkeys.r$r.fast -side left -padx 2
     }
     incr r
   }
-  frame .mcp.keybtns
-  pack .mcp.keybtns -fill x -padx 6 -pady 2
-  button .mcp.keybtns.save -text "Save keys" -command mcp_save_keys
-  checkbutton .mcp.keybtns.show -text "Show keys" -variable MCP(show_keys) \
+  frame .mcpkeys.btns
+  pack .mcpkeys.btns -fill x -padx 6 -pady 2
+  button .mcpkeys.btns.save -text "Save keys" -command mcp_save_keys
+  checkbutton .mcpkeys.btns.show -text "Show keys" -variable MCP(show_keys) \
       -command mcp_keys_toggle
-  label .mcp.keystatus -anchor w -text ""
-  pack .mcp.keybtns.save .mcp.keybtns.show -side left -padx 4
-  pack .mcp.keystatus -fill x -padx 8
+  label .mcpkeys.status -anchor w -text ""
+  pack .mcpkeys.btns.save .mcpkeys.btns.show -side left -padx 4
+  pack .mcpkeys.status -fill x -padx 8 -pady 4
+}
 
-  frame .mcp.sep -height 2 -bd 1 -relief sunken
-  pack .mcp.sep -fill x -padx 8 -pady 6
+proc mcp_build_ask {} {
+  global MCP
+  toplevel .mcpask
+  wm title .mcpask "mcp Ask"
+  label .mcpask.intro -wraplength 720 -justify left -anchor w -text \
+      "Pick an agent and ask a question. API keys are entered in the API Keys window."
+  pack .mcpask.intro -fill x -padx 8 -pady 4
 
-  label .mcp.asklabel -text "Ask" -anchor w
-  pack .mcp.asklabel -fill x -padx 8
-  frame .mcp.pick
-  pack .mcp.pick -fill x -padx 8
-  listbox .mcp.agents -height 5 -width 18 -exportselection 0 \
-      -yscrollcommand {.mcp.pick.scroll set}
-  scrollbar .mcp.pick.scroll -command {.mcp.agents yview}
-  pack .mcp.pick.scroll -side right -fill y
-  pack .mcp.agents -side left -fill y
+  frame .mcpask.pick
+  pack .mcpask.pick -fill x -padx 8
+  listbox .mcpask.agents -height 6 -width 18 -exportselection 0 \
+      -yscrollcommand {.mcpask.pick.scroll set}
+  scrollbar .mcpask.pick.scroll -command {.mcpask.agents yview}
+  pack .mcpask.pick.scroll -side right -fill y
+  pack .mcpask.agents -side left -fill y
   set MCP(agent_ids) {}
   set cursor_i 0
   set i 0
   foreach row [mcp_rows] {
     lappend MCP(agent_ids) [lindex $row 0]
-    .mcp.agents insert end [lindex $row 1]
+    .mcpask.agents insert end [lindex $row 1]
     if {[lindex $row 0] == "cursor"} { set cursor_i $i }
     incr i
   }
-  .mcp.agents selection set $cursor_i
-  .mcp.agents see $cursor_i
-  bind .mcp.agents <<ListboxSelect>> mcp_show_agent
+  .mcpask.agents selection set $cursor_i
+  .mcpask.agents see $cursor_i
+  bind .mcpask.agents <<ListboxSelect>> mcp_show_agent
 
-  label .mcp.settings -anchor w -wraplength 720 -justify left
-  pack .mcp.settings -fill x -padx 8 -pady 2
-  text .mcp.q -height 4 -width 88 -wrap word
-  pack .mcp.q -fill x -padx 8
-  frame .mcp.askbtns
-  pack .mcp.askbtns -fill x -padx 6 -pady 4
-  button .mcp.askbtns.ask -text "Ask" -command mcp_ask_start
-  button .mcp.askbtns.draw -text "Draw a simple inverter" -command mcp_draw_inverter
-  button .mcp.askbtns.stop -text "Stop" -command mcp_ask_stop
-  pack .mcp.askbtns.ask .mcp.askbtns.draw .mcp.askbtns.stop -side left -padx 4
-  label .mcp.hint -anchor w -wraplength 720 -justify left -text \
+  label .mcpask.settings -anchor w -wraplength 720 -justify left
+  pack .mcpask.settings -fill x -padx 8 -pady 2
+  text .mcpask.q -height 5 -width 88 -wrap word
+  pack .mcpask.q -fill x -padx 8
+  frame .mcpask.btns
+  pack .mcpask.btns -fill x -padx 6 -pady 4
+  button .mcpask.btns.ask -text "Ask" -command mcp_ask_start
+  button .mcpask.btns.draw -text "Draw a simple inverter" -command mcp_draw_inverter
+  button .mcpask.btns.stop -text "Stop" -command mcp_ask_stop
+  pack .mcpask.btns.ask .mcpask.btns.draw .mcpask.btns.stop -side left -padx 4
+  label .mcpask.hint -anchor w -wraplength 720 -justify left -text \
       "Draw a simple inverter asks for a CMOS inverter, one rectangle at a time. Each step is a nix package (mcp-paint, mcp-cell, mcp-label, mcp-zoom, mcp-layers, or mcp-nix). The layout window updates before the next step."
-  pack .mcp.hint -fill x -padx 8
-  frame .mcp.logf
-  pack .mcp.logf -fill both -expand 1 -padx 8 -pady 4
-  text .mcp.log -height 12 -width 88 -wrap word -state disabled \
-      -yscrollcommand {.mcp.logf.scroll set}
-  scrollbar .mcp.logf.scroll -command {.mcp.log yview}
-  pack .mcp.logf.scroll -side right -fill y
-  pack .mcp.log -side left -fill both -expand 1
-  set MCP(log) .mcp.log
-  bind .mcp <Destroy> {
-    if {"%W" == ".mcp"} { mcp_ask_stop }
+  pack .mcpask.hint -fill x -padx 8
+  frame .mcpask.logf
+  pack .mcpask.logf -fill both -expand 1 -padx 8 -pady 4
+  text .mcpask.log -height 14 -width 88 -wrap word -state disabled \
+      -yscrollcommand {.mcpask.logf.scroll set}
+  scrollbar .mcpask.logf.scroll -command {.mcpask.log yview}
+  pack .mcpask.logf.scroll -side right -fill y
+  pack .mcpask.log -side left -fill both -expand 1
+  set MCP(log) .mcpask.log
+  bind .mcpask <Destroy> {
+    if {"%W" == ".mcpask"} { mcp_ask_stop }
   }
   mcp_show_agent
 }
 
 proc mcp_open {which} {
   if {[info commands winfo] == ""} { return }
-  if {![winfo exists .mcp]} {
-    mcp_build
+  if {$which == "keys"} {
+    if {![winfo exists .mcpkeys]} {
+      mcp_build_keys
+    }
+    raise .mcpkeys
+    if {[winfo exists .mcpkeys.r0.key]} {
+      focus .mcpkeys.r0.key
+    }
+    return
   }
-  raise .mcp
-  if {$which == "ask"} {
-    focus .mcp.q
-  } elseif {[winfo exists .mcp.keys.r0.key]} {
-    focus .mcp.keys.r0.key
+  if {![winfo exists .mcpask]} {
+    mcp_build_ask
   }
+  raise .mcpask
+  focus .mcpask.q
 }
 
 proc mcp_layer_names {} {
@@ -408,8 +420,10 @@ proc mcp_reset_spool {} {
 }
 
 proc mcp_write_job {question} {
-  if {![mcp_save_keys]} {
-    error "The keys were not saved."
+  if {[info commands winfo] != "" && [winfo exists .mcpkeys]} {
+    if {![mcp_save_keys]} {
+      error "The keys were not saved."
+    }
   }
   mcp_reset_spool
   set dir [mcp_jobdir]
@@ -456,8 +470,8 @@ proc mcp_ask_start {} {
     mcp_log "An answer is already running."
     return
   }
-  if {![winfo exists .mcp.q]} { return }
-  set q [string trim [.mcp.q get 1.0 end]]
+  if {![winfo exists .mcpask.q]} { return }
+  set q [string trim [.mcpask.q get 1.0 end]]
   if {$q == ""} {
     mcp_log "Type a question first."
     return
@@ -502,9 +516,9 @@ proc mcp_ask_start {} {
 }
 
 proc mcp_draw_inverter {} {
-  if {[info commands winfo] == "" || ![winfo exists .mcp.q]} { return }
-  .mcp.q delete 1.0 end
-  .mcp.q insert 1.0 "Draw the layout of a very simple CMOS inverter, one rectangle at a time, so I can watch each step. Label the input, the output, and the supplies."
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.q]} { return }
+  .mcpask.q delete 1.0 end
+  .mcpask.q insert 1.0 "Draw the layout of a very simple CMOS inverter, one rectangle at a time, so I can watch each step. Label the input, the output, and the supplies."
   mcp_ask_start
 }
 
