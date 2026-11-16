@@ -39,7 +39,7 @@ proc mcp_agent_table {} {
     [list cursor Cursor grok-4.7 xhigh 0] \
     [list openai OpenAI gpt-4.1 "" 0] \
     [list anthropic Anthropic claude-sonnet-4-5 "" 0] \
-    [list google Google gemini-2.5-pro "" 0] \
+    [list google Google gemini-3.1-pro-preview "" 0] \
     [list xai xAI grok-4.7 xhigh 0] \
     [list groq Groq llama-3.3-70b-versatile "" 0] \
     [list mistral Mistral mistral-large-latest "" 0] \
@@ -106,6 +106,16 @@ proc mcp_find_saved {id lines} {
   return {}
 }
 
+proc mcp_google_model {model} {
+  if {[string match "models/*" $model]} {
+    set model [string range $model 7 end]
+  }
+  if {$model == "gemini-2.5-pro"} {
+    set model gemini-3.1-pro-preview
+  }
+  return $model
+}
+
 proc mcp_rows {} {
   set lines [mcp_saved_lines]
   set rows {}
@@ -128,6 +138,9 @@ proc mcp_rows {} {
       set model grok-4.7
       set effort xhigh
       set fast 0
+    }
+    if {$id == "google"} {
+      set model [mcp_google_model $model]
     }
     lappend rows [list $id [lindex $spec 1] $key $model $effort $fast]
   }
@@ -997,6 +1010,12 @@ proc mcp_selftest {} {
   }
   if {![mcp_keep_error "Type a question first." 1]} {
     puts "FAIL keep forced"
+    incr failed
+  }
+  if {[mcp_google_model gemini-2.5-pro] != "gemini-3.1-pro-preview" \
+      || [mcp_google_model models/gemini-2.5-pro] != "gemini-3.1-pro-preview" \
+      || [mcp_google_model gemini-3.1-pro-preview] != "gemini-3.1-pro-preview"} {
+    puts "FAIL google model"
     incr failed
   }
   global MCP

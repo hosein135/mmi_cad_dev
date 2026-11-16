@@ -979,7 +979,22 @@ def anthropic_loop(key, model, user, job):
     fail("Too many tool steps.")
 
 
+def google_model(model):
+    name = (model or "").strip()
+    if name.startswith("models/"):
+        name = name[len("models/") :]
+    if name == "gemini-2.5-pro":
+        name = "gemini-3.1-pro-preview"
+    return name
+
+
 def google_text(key, model, user):
+    raw = (model or "").strip()
+    if raw.startswith("models/"):
+        raw = raw[len("models/") :]
+    if raw == "gemini-2.5-pro":
+        log("Google retired gemini-2.5-pro. Using gemini-3.1-pro-preview.")
+    model = google_model(model)
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         + urllib.parse.quote(model, safe="")
@@ -1170,6 +1185,9 @@ def selftest():
         check("paint tool", tool == "mcp-paint" and "--layer" in argv and "poly" in argv)
     check("draw question", wants_layout("Draw the layout of a very simple CMOS inverter"))
     check("plain question", not wants_layout("What is a via?"))
+    check("google retired", google_model("gemini-2.5-pro") == "gemini-3.1-pro-preview")
+    check("google prefix", google_model("models/gemini-2.5-pro") == "gemini-3.1-pro-preview")
+    check("google current", google_model("gemini-3.1-pro-preview") == "gemini-3.1-pro-preview")
 
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp-tools")
     nix = open(os.path.join(root, "mcp-nix"), "r", encoding="utf-8").read()
