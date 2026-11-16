@@ -131,6 +131,18 @@ proc _mmi_note_autolayout {} {
   }
 }
 
+# Write the sim before MAX is asked to load the cell. A successful
+# generation can then finish inside that load, and SUE never opens
+# the "load myself" window.
+proc _mmi_prepare_cross_probe {} {
+  global cur_s
+  _mmi_note_autolayout
+  if {![info exists cur_s] || $cur_s == ""} { return }
+  if {[info commands is_icon] != "" && [is_icon $cur_s]} { return }
+  if {[info commands cross_probe_setup] == ""} { return }
+  catch {cross_probe_setup}
+}
+
 proc _mmi_autoload_cross_probe {} {
   global auto_index _mmi_cross_probe_autoload
   if {[info exists auto_index(max_cross_probe_init)]} {
@@ -140,7 +152,7 @@ proc _mmi_autoload_cross_probe {} {
   if {[info commands max_cross_probe_init] == ""} { return }
   rename max_cross_probe_init _mmi_max_cross_probe_init_real
   proc max_cross_probe_init {args} {
-    _mmi_note_autolayout
+    _mmi_prepare_cross_probe
     eval _mmi_max_cross_probe_init_real $args
   }
 }
@@ -168,7 +180,7 @@ proc _mmi_install_autolayout_hook {} {
   if {[info commands max_cross_probe_init] != ""} {
     rename max_cross_probe_init _mmi_max_cross_probe_init_real
     proc max_cross_probe_init {args} {
-      _mmi_note_autolayout
+      _mmi_prepare_cross_probe
       eval _mmi_max_cross_probe_init_real $args
     }
     set _mmi_autolayout_hook_installed 1

@@ -659,14 +659,27 @@ proc _mmi_prepare_laygen {} {
   return 1
 }
 
-# Layout Generator window: input .sim, output cell, and the buttons for
-# Per-Cell Options, Stdcell Options, and Layers. Done draws the cell.
-proc _mmi_laygen_dialog {sim dir cell} {
-  global STDCELL
-  if {[info commands stdcell_setup] == ""} {
-    msg "Layout generator is not loaded.\n"
-    return -1
+# The Layout Generator is the same window used to load a sim by hand.
+# Close it once a SUE generation has actually drawn the cell. Flylines
+# are not part of that window and are left in the cell.
+proc _mmi_close_laygen_windows {} {
+  if {[info commands winfo] == ""} { return }
+  foreach w [winfo children .] {
+    if {![string match .prop_menu* $w]} continue
+    set title ""
+    catch {set title [wm title $w]}
+    if {$title == "Layout Generator"} {
+      catch {destroy $w}
+    }
   }
+}
+
+# Draw the cell from a sim. Does not open a window.
+# 1 = drawn, 0 = cancelled or not run, -1 = failed.
+proc _mmi_autolayout_draw {sim dir cell} {
+  global STDCELL
+  if {[info commands _stdcell_goto_cell] == ""} { return -1 }
+  if {[info commands stdcell_load_direct] == ""} { return -1 }
   set STDCELL(input_filename) $sim
   if {$dir != ""} {
     set STDCELL(output_filename) $dir/$cell
@@ -674,8 +687,8 @@ proc _mmi_laygen_dialog {sim dir cell} {
     set STDCELL(output_filename) $cell
   }
   set STDCELL(debug) 0
-  if {![stdcell_setup]} {
-    return 0
+  if {![info exists STDCELL(stdcell_layers)]} {
+    set STDCELL(stdcell_layers) 1
   }
   regsub {\.max$} $STDCELL(output_filename) "" STDCELL(output_filename)
   if {[catch {
@@ -693,10 +706,50 @@ proc _mmi_laygen_dialog {sim dir cell} {
     msg "Layout generator did not draw $cell\n"
     return -1
   }
+  catch {_mmi_stdcell_power_labels}
+  if {[catch {_mmi_place_flylines} err]} {
+    msg "Flylines: $err\n"
+  }
   return 1
 }
 
+# Layout Generator window: input .sim, output cell, and the buttons for
+# Per-Cell Options, Stdcell Options, and Layers. Done draws the cell.
+# This is the window the user gets from "load myself".
+proc _mmi_laygen_dialog {sim dir cell} {
+  global STDCELL
+  if {[info commands stdcell_setup] == ""} {
+    msg "Layout generator is not loaded.\n"
+    return -1
+  }
+  set STDCELL(input_filename) $sim
+  if {$dir != ""} {
+    set STDCELL(output_filename) $dir/$cell
+  } else {
+    set STDCELL(output_filename) $cell
+  }
+  set STDCELL(debug) 0
+  if {![stdcell_setup]} {
+    return 0
+  }
+  return [_mmi_autolayout_draw $sim $dir $cell]
+}
+
 proc _mmi_autolayout_run {} {
+  global _mmi_generating
+  if {[info exists _mmi_generating] && $_mmi_generating} { return }
+  set _mmi_generating 1
+  set save [pwd]
+  # catch also sees a normal return (code 2). Only a real error is 1.
+  set code [catch {_mmi_autolayout_run_body} err]
+  set _mmi_generating 0
+  catch {cd $save}
+  if {$code == 1} {
+    msg "Layout generator failed: $err\n"
+  }
+}
+
+proc _mmi_autolayout_run_body {} {
   global _mmi_autolayout_done STDCELL
   _mmi_autolayout_reread
   if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} { return }
@@ -728,6 +781,7 @@ proc _mmi_autolayout_run {} {
     set empty [_mmi_cell_empty $cell]
   }
   if {!$empty && [_mmi_flyline_count] > 0} {
+    _mmi_close_laygen_windows
     _mmi_bind_cell_beside_sue
     _mmi_reveal_flylines
     cd $save
@@ -735,24 +789,33 @@ proc _mmi_autolayout_run {} {
     set _mmi_autolayout_done 1
     return
   }
+  if {![_mmi_prepare_laygen]} {
+    cd $save
+    return
+  }
   if {$empty} {
     msg "Generating layout for $cell from $sim\n"
   } else {
     msg "Cell $cell has no flylines. Layout Generator can rebuild it so unfinished nets show as yellow lines. Cancel keeps the current layout.\n"
   }
-  if {![_mmi_prepare_laygen]} {
-    cd $save
-    return
-  }
+  # Same window as "load myself": sim path, output cell, per-cell
+  # options, and layers. It is closed again after a successful draw.
   set drew [_mmi_laygen_dialog $sim $dir $cell]
   if {$drew == 0} {
     msg "Layout generator cancelled\n"
     cd $save
-    set _mmi_autolayout_done 1
+    # No cell yet: SUE still has to offer "load myself", and the
+    # generator can open again after that choice. A cell that is
+    # already in memory was an explicit cancel, so do not ask again.
+    if {[cell_in_memory $cell]} {
+      set _mmi_autolayout_done 1
+    }
+    _mmi_close_laygen_windows
     return
   }
   if {$drew != 1} {
     cd $save
+    _mmi_close_laygen_windows
     set _mmi_autolayout_done 1
     return
   }
@@ -771,7 +834,13 @@ proc _mmi_autolayout_run {} {
   } else {
     _mmi_reveal_flylines
   }
-  msg "Flylines in [lay_editcell]: [_mmi_flyline_count]\n"
+  # Generation succeeded. Take down the load-myself Layout Generator.
+  # The flylines just placed stay in the cell.
+  _mmi_close_laygen_windows
+  _mmi_reveal_flylines
+  set shown $cell
+  catch {set shown [lay_editcell]}
+  msg "Flylines in $shown: [_mmi_flyline_count]\n"
   set _mmi_autolayout_done 1
   cd $save
 }
@@ -1046,6 +1115,90 @@ proc _mmi_wrap_stdcell_labels {} {
   }
 }
 
+# SUE asks MAX to load the schematic cell before it opens "load myself".
+# If that file is not here yet, open the Layout Generator first. A
+# successful Done writes the cell, so SUE does not open that window.
+proc _mmi_cell_load_is_sue_missing {arglist} {
+  global _mmi_autolayout_done CELL
+  _mmi_autolayout_reread
+  if {[info exists _mmi_autolayout_done] && $_mmi_autolayout_done} {
+    return 0
+  }
+  set req [_mmi_autolayout_request]
+  if {[llength $req] < 3} { return 0 }
+  set search 0
+  set cell ""
+  set dir ""
+  foreach a $arglist {
+    if {$a == "-search"} {
+      set search 1
+      continue
+    }
+    if {$cell == ""} {
+      set cell $a
+    } else {
+      set dir $a
+    }
+  }
+  if {$search || $cell == "" || $dir == ""} { return 0 }
+  if {$cell != [lindex $req 2]} { return 0 }
+  set want [string trimright [lindex $req 1] /]
+  set got [string trimright $dir /]
+  if {$want != "" && $got != $want} { return 0 }
+  set suffix .max
+  if {[info exists CELL(default_suffix)] && $CELL(default_suffix) != ""} {
+    set suffix $CELL(default_suffix)
+  }
+  if {[file readable $got/$cell$suffix]} { return 0 }
+  if {[info commands cell_in_memory] != "" && [cell_in_memory $cell] && \
+      ![_mmi_cell_empty $cell]} {
+    return 0
+  }
+  return 1
+}
+
+proc _mmi_hook_cell_load {} {
+  global _mmi_cell_load_hook_tries
+  if {[info commands _mmi_cell_load_real] != ""} { return }
+  if {[info commands cell_load] == ""} {
+    if {![info exists _mmi_cell_load_hook_tries]} {
+      set _mmi_cell_load_hook_tries 0
+    }
+    incr _mmi_cell_load_hook_tries
+    if {$_mmi_cell_load_hook_tries < 40} {
+      after 500 _mmi_hook_cell_load
+    }
+    return
+  }
+  rename cell_load _mmi_cell_load_real
+  proc cell_load {args} {
+    global _mmi_generating
+    if {(![info exists _mmi_generating] || !$_mmi_generating) && \
+        [_mmi_cell_load_is_sue_missing $args]} {
+      _mmi_autolayout_run
+      _mmi_close_laygen_windows
+    }
+    set code [catch {eval [linsert $args 0 _mmi_cell_load_real]} err]
+    if {$code == 1} {
+      return -code error $err
+    }
+    if {$code == 0} {
+      set req [_mmi_autolayout_request]
+      set cur ""
+      catch {set cur [lay_editcell]}
+      if {[llength $req] >= 3 && $cur == [lindex $req 2] && \
+          [_mmi_flyline_count] > 0} {
+        _mmi_reveal_flylines
+      }
+    }
+    # A plain return inside cell_load (code 2) ends this load only.
+    if {$code == 0 || $code == 2} {
+      return $err
+    }
+    return -code $code $err
+  }
+}
+
 _mmi_wrap_stdcell_labels
 catch {_mmi_flyline_style}
 catch {_mmi_ensure_power_strap}
@@ -1053,6 +1206,8 @@ catch {_mmi_drc_step_through_rail}
 catch {_mmi_install_m1_area_overlay}
 _mmi_hook_lvs_it
 _mmi_hook_cross_probe_ext
+_mmi_hook_cell_load
 _mmi_autolayout_claim
-# Do not draw at startup. SUE still has to show the "can't find cell"
-# window. The Layout Generator opens from lvs_it_max, after that choice.
+# Do not draw at startup. The Layout Generator opens when SUE asks for
+# the missing cell. If that draw succeeds, the window is closed and
+# SUE does not show "load myself". Flylines stay on the cell.
