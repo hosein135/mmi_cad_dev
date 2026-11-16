@@ -572,12 +572,15 @@ proc mcp_ask_start {} {
     set env(PATH) "$tools:$MCP(path)"
   }
   set MCP(running) 1
-  set args [list python3 -u $script [mcp_jobdir]]
-  lappend args 2>@1
+  # Tcl 8.0 reads 2>@1 as a channel named "1", which does not exist.
+  # |& joins python's stderr onto the pipe this window reads.
+  set args [list python3 -u $script [mcp_jobdir] |& cat -u]
   if {[catch {set MCP(chan) [open |$args r]} err]} {
     set MCP(running) 0
     mcp_log_err "Could not start python3: $err"
-    mcp_log_err "python3 is a nix package in the CAD environment."
+    if {[string match "*couldn't execute*" $err] && [string match *python3* $err]} {
+      mcp_log_err "python3 is a nix package in the CAD environment."
+    }
     return
   }
   fconfigure $MCP(chan) -blocking 0 -buffering line
