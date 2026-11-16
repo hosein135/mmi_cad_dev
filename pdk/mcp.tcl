@@ -11,6 +11,9 @@ set MCP(poll) ""
 set MCP(step_after) ""
 set MCP(menus_done) 0
 set MCP(log) ""
+set MCP(errors) {}
+set MCP(log_err) 0
+set MCP(copy_text) ""
 set MCP(show_keys) 0
 set MCP(menu_tries) 0
 
@@ -155,8 +158,32 @@ proc mcp_write_keys {rows} {
   catch {exec chmod 600 $path}
 }
 
+proc mcp_keep_error {text forced} {
+  if {$forced} { return 1 }
+  if {[string match "error:*" $text]} { return 1 }
+  if {[string match "Error:*" $text]} { return 1 }
+  return 0
+}
+
+proc mcp_error_blob {} {
+  global MCP
+  if {![info exists MCP(errors)]} { return "" }
+  set text ""
+  foreach line $MCP(errors) {
+    if {$text != ""} { append text "\n" }
+    append text $line
+  }
+  return $text
+}
+
 proc mcp_log {text} {
   global MCP
+  if {![info exists MCP(errors)]} { set MCP(errors) {} }
+  set forced 0
+  if {[info exists MCP(log_err)] && $MCP(log_err)} { set forced 1 }
+  if {[mcp_keep_error $text $forced]} {
+    lappend MCP(errors) $text
+  }
   if {[info commands winfo] == "" || ![info exists MCP(log)] || $MCP(log) == ""} {
     puts $text
     return
@@ -170,6 +197,40 @@ proc mcp_log {text} {
   $MCP(log) see end
   $MCP(log) configure -state disabled
   update idletasks
+}
+
+proc mcp_log_err {text} {
+  global MCP
+  set MCP(log_err) 1
+  mcp_log $text
+  set MCP(log_err) 0
+}
+
+proc mcp_sel_handle {offset maxBytes} {
+  global MCP
+  if {![info exists MCP(copy_text)]} { return "" }
+  return [string range $MCP(copy_text) $offset [expr {$offset + $maxBytes - 1}]]
+}
+
+proc mcp_copy_errors {} {
+  global MCP
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.logtop.copy]} { return }
+  set text [mcp_error_blob]
+  if {$text == ""} {
+    .mcpask.logtop.note configure -text "No errors to copy"
+    return
+  }
+  set MCP(copy_text) $text
+  # Tk 8.0 drops a clipboard set owned by a disabled text widget.
+  selection handle -selection CLIPBOARD .mcpask.logtop.copy mcp_sel_handle
+  selection own -selection CLIPBOARD -command {} .mcpask.logtop.copy
+  selection handle -selection PRIMARY .mcpask.logtop.copy mcp_sel_handle
+  catch {selection own -selection PRIMARY -command {} .mcpask.logtop.copy}
+  catch {
+    clipboard clear -displayof .mcpask.logtop.copy
+    clipboard append -displayof .mcpask.logtop.copy $text
+  }
+  .mcpask.logtop.note configure -text "Copied"
 }
 
 proc mcp_key_status {text} {
@@ -217,7 +278,7 @@ proc mcp_collect {} {
 proc mcp_save_keys {} {
   if {[catch {set rows [mcp_collect]} err]} {
     mcp_key_status $err
-    mcp_log $err
+    mcp_log_err $err
     return 0
   }
   if {[catch {mcp_write_keys $rows} err]} {
@@ -317,6 +378,8 @@ proc mcp_build_ask {} {
   global MCP
   toplevel .mcpask
   wm title .mcpask "mcp Ask"
+  set MCP(errors) {}
+  set MCP(copy_text) ""
   label .mcpask.intro -wraplength 720 -justify left -anchor w -text \
       "Pick an agent and ask a question. API keys are entered in the API Keys window."
   pack .mcpask.intro -fill x -padx 8 -pady 4
@@ -354,6 +417,14 @@ proc mcp_build_ask {} {
   label .mcpask.hint -anchor w -wraplength 720 -justify left -text \
       "Draw a simple inverter asks for a CMOS inverter, one rectangle at a time. Each step is a nix package (mcp-paint, mcp-cell, mcp-label, mcp-zoom, mcp-layers, or mcp-nix). The layout window updates before the next step."
   pack .mcpask.hint -fill x -padx 8
+  frame .mcpask.logtop
+  pack .mcpask.logtop -fill x -padx 8 -pady 2
+  label .mcpask.logtop.l -text "Result" -anchor w
+  button .mcpask.logtop.copy -text "Copy errors" -command mcp_copy_errors
+  label .mcpask.logtop.note -text "" -anchor e
+  pack .mcpask.logtop.l -side left
+  pack .mcpask.logtop.copy -side right -padx 4
+  pack .mcpask.logtop.note -side right -padx 8
   frame .mcpask.logf
   pack .mcpask.logf -fill both -expand 1 -padx 8 -pady 4
   text .mcpask.log -height 14 -width 88 -wrap word -state disabled \
@@ -477,7 +548,7 @@ proc mcp_ask_start {} {
     return
   }
   if {[catch {mcp_write_job $q} err]} {
-    mcp_log $err
+    mcp_log_err $err
     return
   }
   set script [file join $MCP(root) mcp_ask.py]
@@ -485,7 +556,7 @@ proc mcp_ask_start {} {
     set script /mmi-bundle/mcp_ask.py
   }
   if {![file readable $script]} {
-    mcp_log "mcp_ask.py was not found."
+    mcp_log_err "mcp_ask.py was not found."
     return
   }
   set tools [mcp_tools_dir]
@@ -505,8 +576,8 @@ proc mcp_ask_start {} {
   lappend args 2>@1
   if {[catch {set MCP(chan) [open |$args r]} err]} {
     set MCP(running) 0
-    mcp_log "Could not start python3: $err"
-    mcp_log "python3 is a nix package in the CAD environment."
+    mcp_log_err "Could not start python3: $err"
+    mcp_log_err "python3 is a nix package in the CAD environment."
     return
   }
   fconfigure $MCP(chan) -blocking 0 -buffering line
@@ -528,7 +599,7 @@ proc mcp_on_line {line} {
     return
   }
   if {[string match "ERR *" $line]} {
-    mcp_log [string range $line 4 end]
+    mcp_log_err [string range $line 4 end]
     return
   }
   if {$line == "DONE"} {
@@ -546,7 +617,7 @@ proc mcp_ask_readable {} {
     set MCP(chan) ""
     catch {fileevent $chan readable {}}
     if {[catch {close $chan} err] && $err != ""} {
-      mcp_log $err
+      mcp_log_err $err
     }
     set MCP(running) 0
     return
@@ -917,7 +988,22 @@ proc mcp_selftest {} {
     puts "FAIL name"
     incr failed
   }
+  if {![mcp_keep_error "error: layer poly" 0] || [mcp_keep_error "paint poly" 0]} {
+    puts "FAIL keep error"
+    incr failed
+  }
+  if {![mcp_keep_error "Type a question first." 1]} {
+    puts "FAIL keep forced"
+    incr failed
+  }
   global MCP
+  set MCP(errors) {}
+  lappend MCP(errors) "Could not start python3: missing"
+  lappend MCP(errors) "error: layer poly is not in this technology"
+  if {[mcp_error_blob] != "Could not start python3: missing\nerror: layer poly is not in this technology"} {
+    puts "FAIL error blob"
+    incr failed
+  }
   foreach t {mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-zoom mcp-nix} {
     if {![file exists [file join $MCP(root) mcp-tools $t]]} {
       puts "FAIL missing $t"
