@@ -1,6 +1,6 @@
 # mcp menu for MAX. Tcl 8.0: no dict, no string map, no eq.
 # Two windows: API keys, and the question.
-# Cursor is Grok 4.7, extra high, fast off.
+# Cursor is Grok 4.7, extra high. Fast and the context window are set in API Keys.
 # Drawing steps are nix packages. MAX paints each one before the next.
 
 set MCP(root) [file dirname [info script]]
@@ -12,6 +12,9 @@ set MCP(step_after) ""
 set MCP(menus_done) 0
 set MCP(log) ""
 set MCP(errors) {}
+set MCP(turns) {}
+set MCP(saying) 0
+set MCP(say_buf) ""
 set MCP(log_err) 0
 set MCP(copy_text) ""
 set MCP(show_keys) 0
@@ -106,6 +109,14 @@ proc mcp_find_saved {id lines} {
   return {}
 }
 
+proc mcp_context {s} {
+  if {$s == ""} { return 32000 }
+  set n [mcp_int $s]
+  if {$n == "" || $n < 2000} { return 32000 }
+  if {$n > 1000000} { return 1000000 }
+  return $n
+}
+
 proc mcp_google_model {model} {
   if {[string match "models/*" $model]} {
     set model [string range $model 7 end]
@@ -126,23 +137,30 @@ proc mcp_rows {} {
     set model [lindex $spec 2]
     set effort [lindex $spec 3]
     set fast [lindex $spec 4]
+    set context ""
     if {$saved != ""} {
       set key [lindex $saved 1]
       if {$id != "cursor"} {
         if {[lindex $saved 2] != ""} { set model [lindex $saved 2] }
         set effort [lindex $saved 3]
         if {[lindex $saved 4] != ""} { set fast [lindex $saved 4] }
+      } else {
+        if {[lindex $saved 4] == "0" || [lindex $saved 4] == "1"} {
+          set fast [lindex $saved 4]
+        }
+        set context [lindex $saved 5]
       }
     }
     if {$id == "cursor"} {
       set model grok-4.7
       set effort xhigh
-      set fast 0
+      if {$fast != "1"} { set fast 0 }
+      set context [mcp_context $context]
     }
     if {$id == "google"} {
       set model [mcp_google_model $model]
     }
-    lappend rows [list $id [lindex $spec 1] $key $model $effort $fast]
+    lappend rows [list $id [lindex $spec 1] $key $model $effort $fast $context]
   }
   return $rows
 }
@@ -152,19 +170,21 @@ proc mcp_write_keys {rows} {
   file mkdir $dir
   set path [mcp_keys_path]
   set fh [open $path w]
-  puts $fh "# mcp keys: id, key, model, effort, fast. Cursor stays grok-4.7, xhigh, fast 0."
+  puts $fh "# mcp keys: id, key, model, effort, fast, context. Cursor stays grok-4.7 and xhigh."
   foreach row $rows {
     set id [lindex $row 0]
     set key [lindex $row 2]
     set model [lindex $row 3]
     set effort [lindex $row 4]
     set fast [lindex $row 5]
+    set context [lindex $row 6]
     if {$id == "cursor"} {
       set model grok-4.7
       set effort xhigh
-      set fast 0
+      if {$fast != "1"} { set fast 0 }
+      set context [mcp_context $context]
     }
-    puts $fh "$id\t$key\t$model\t$effort\t$fast"
+    puts $fh "$id\t$key\t$model\t$effort\t$fast\t$context"
   }
   close $fh
   catch {exec chmod 700 $dir}
@@ -205,10 +225,8 @@ proc mcp_log {text} {
     puts $text
     return
   }
-  $MCP(log) configure -state normal
   $MCP(log) insert end "$text\n"
   $MCP(log) see end
-  $MCP(log) configure -state disabled
   update idletasks
 }
 
@@ -225,25 +243,55 @@ proc mcp_sel_handle {offset maxBytes} {
   return [string range $MCP(copy_text) $offset [expr {$offset + $maxBytes - 1}]]
 }
 
-proc mcp_copy_errors {} {
+proc mcp_clipboard {text note} {
   global MCP
-  if {[info commands winfo] == "" || ![winfo exists .mcpask.logtop.copy]} { return }
-  set text [mcp_error_blob]
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.tools.copy]} { return }
   if {$text == ""} {
-    .mcpask.logtop.note configure -text "No errors to copy"
+    .mcpask.tools.note configure -text $note
     return
   }
   set MCP(copy_text) $text
-  # Tk 8.0 drops a clipboard set owned by a disabled text widget.
-  selection handle -selection CLIPBOARD .mcpask.logtop.copy mcp_sel_handle
-  selection own -selection CLIPBOARD -command {} .mcpask.logtop.copy
-  selection handle -selection PRIMARY .mcpask.logtop.copy mcp_sel_handle
-  catch {selection own -selection PRIMARY -command {} .mcpask.logtop.copy}
+  selection handle -selection CLIPBOARD .mcpask.tools.copy mcp_sel_handle
+  selection own -selection CLIPBOARD -command {} .mcpask.tools.copy
+  selection handle -selection PRIMARY .mcpask.tools.copy mcp_sel_handle
+  catch {selection own -selection PRIMARY -command {} .mcpask.tools.copy}
   catch {
-    clipboard clear -displayof .mcpask.logtop.copy
-    clipboard append -displayof .mcpask.logtop.copy $text
+    clipboard clear -displayof .mcpask.tools.copy
+    clipboard append -displayof .mcpask.tools.copy $text
   }
-  .mcpask.logtop.note configure -text "Copied"
+  .mcpask.tools.note configure -text "Copied"
+}
+
+proc mcp_copy_errors {} {
+  set text [mcp_error_blob]
+  if {$text == ""} {
+    mcp_clipboard "" "No errors to copy"
+    return
+  }
+  mcp_clipboard $text "Copied"
+}
+
+proc mcp_copy_chat {} {
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.chat]} { return }
+  set text ""
+  if {[catch {set text [.mcpask.chat get sel.first sel.last]}]} {
+    set text [.mcpask.chat get 1.0 end-1c]
+  }
+  if {$text == ""} {
+    mcp_clipboard "" "Nothing to copy"
+    return
+  }
+  mcp_clipboard $text "Copied"
+}
+
+proc mcp_paste_question {} {
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.q]} { return }
+  set text ""
+  if {[catch {set text [selection get -selection CLIPBOARD]}]} {
+    return
+  }
+  .mcpask.q insert insert $text
+  focus .mcpask.q
 }
 
 proc mcp_key_status {text} {
@@ -264,6 +312,7 @@ proc mcp_keys_toggle {} {
 }
 
 proc mcp_collect {} {
+  global MCP
   set rows {}
   set r 0
   foreach spec [mcp_agent_table] {
@@ -276,13 +325,16 @@ proc mcp_collect {} {
       set model grok-4.7
       set effort xhigh
       set fast 0
+      if {[info exists MCP(cursor_fast)] && $MCP(cursor_fast)} { set fast 1 }
+      set context [mcp_context [string trim [.mcpkeys.r$r.context get]]]
     } else {
       set model [string trim [.mcpkeys.r$r.model get]]
       set effort [string trim [.mcpkeys.r$r.effort get]]
       set fast [string trim [.mcpkeys.r$r.fast get]]
       if {$fast != "0" && $fast != "1"} { set fast 0 }
+      set context ""
     }
-    lappend rows [list $id [lindex $spec 1] $key $model $effort $fast]
+    lappend rows [list $id [lindex $spec 1] $key $model $effort $fast $context]
     incr r
   }
   return $rows
@@ -320,7 +372,13 @@ proc mcp_show_agent {} {
   foreach row [mcp_rows] {
     if {[lindex $row 0] != $id} continue
     if {$id == "cursor"} {
-      set note "Cursor uses Grok 4.7, extra high, fast off."
+      set note "Cursor uses Grok 4.7, extra high."
+      if {[lindex $row 5] == "1"} {
+        append note " Fast is on."
+      } else {
+        append note " Fast is off."
+      }
+      append note " Context window [lindex $row 6] tokens."
       if {[lindex $row 2] == ""} {
         append note " Paste the Cursor API key in the API Keys window."
       } else {
@@ -347,7 +405,7 @@ proc mcp_build_keys {} {
   toplevel .mcpkeys
   wm title .mcpkeys "mcp API keys"
   label .mcpkeys.intro -wraplength 720 -justify left -anchor w -text \
-      "Paste each API key here. Keys stay in your home directory, not in the project. Cursor is Grok 4.7, extra high, and not fast. The other agents use the model you type. Fast is 0 or 1 for agents that have a fast mode."
+      "Paste each API key here. Keys stay in your home directory, not in the project. Cursor is Grok 4.7 and extra high. Fast is on or off, and Context is how many tokens of this chat and the Magic notes are sent. The other agents use the model you type. Fast is 0 or 1 for agents that have a fast mode."
   pack .mcpkeys.intro -fill x -padx 8 -pady 4
 
   set show "*"
@@ -363,8 +421,17 @@ proc mcp_build_keys {} {
     .mcpkeys.r$r.key insert 0 [lindex $row 2]
     lappend MCP(key_entries) .mcpkeys.r$r.key
     if {$id == "cursor"} {
-      label .mcpkeys.r$r.model -text "grok-4.7   extra high   fast off" -anchor w
-      pack .mcpkeys.r$r.name .mcpkeys.r$r.key .mcpkeys.r$r.model -side left -padx 2
+      set MCP(cursor_fast) 0
+      if {[lindex $row 5] == "1"} { set MCP(cursor_fast) 1 }
+      label .mcpkeys.r$r.model -text "grok-4.7   extra high" -anchor w
+      checkbutton .mcpkeys.r$r.fast -text Fast -variable MCP(cursor_fast) \
+          -onvalue 1 -offvalue 0
+      label .mcpkeys.r$r.contextl -text Context -anchor w
+      entry .mcpkeys.r$r.context -width 8
+      .mcpkeys.r$r.context insert 0 [lindex $row 6]
+      pack .mcpkeys.r$r.name .mcpkeys.r$r.key .mcpkeys.r$r.model \
+          .mcpkeys.r$r.fast .mcpkeys.r$r.contextl .mcpkeys.r$r.context \
+          -side left -padx 2
     } else {
       entry .mcpkeys.r$r.model -width 42
       .mcpkeys.r$r.model insert 0 [lindex $row 3]
@@ -394,12 +461,12 @@ proc mcp_build_ask {} {
   set MCP(errors) {}
   set MCP(copy_text) ""
   label .mcpask.intro -wraplength 720 -justify left -anchor w -text \
-      "Pick an agent and ask a question. API keys are entered in the API Keys window."
+      "Ask any question. This chat remembers earlier messages. API keys are entered in the API Keys window."
   pack .mcpask.intro -fill x -padx 8 -pady 4
 
   frame .mcpask.pick
   pack .mcpask.pick -fill x -padx 8
-  listbox .mcpask.agents -height 6 -width 18 -exportselection 0 \
+  listbox .mcpask.agents -height 5 -width 18 -exportselection 0 \
       -yscrollcommand {.mcpask.pick.scroll set}
   scrollbar .mcpask.pick.scroll -command {.mcpask.agents yview}
   pack .mcpask.pick.scroll -side right -fill y
@@ -419,7 +486,42 @@ proc mcp_build_ask {} {
 
   label .mcpask.settings -anchor w -wraplength 720 -justify left
   pack .mcpask.settings -fill x -padx 8 -pady 2
-  text .mcpask.q -height 5 -width 88 -wrap word
+  frame .mcpask.tools
+  pack .mcpask.tools -fill x -padx 8 -pady 2
+  label .mcpask.tools.l -text "Chat" -anchor w
+  button .mcpask.tools.copy -text "Copy" -command mcp_copy_chat
+  button .mcpask.tools.paste -text "Paste" -command mcp_paste_question
+  button .mcpask.tools.errors -text "Copy errors" -command mcp_copy_errors
+  label .mcpask.tools.note -text "" -anchor e
+  pack .mcpask.tools.l -side left
+  pack .mcpask.tools.errors -side right -padx 4
+  pack .mcpask.tools.copy -side right -padx 4
+  pack .mcpask.tools.paste -side right -padx 4
+  pack .mcpask.tools.note -side right -padx 8
+  frame .mcpask.logf
+  pack .mcpask.logf -fill both -expand 1 -padx 8 -pady 4
+  text .mcpask.chat -height 16 -width 88 -wrap word \
+      -yscrollcommand {.mcpask.logf.scroll set}
+  scrollbar .mcpask.logf.scroll -command {.mcpask.chat yview}
+  pack .mcpask.logf.scroll -side right -fill y
+  pack .mcpask.chat -side left -fill both -expand 1
+  set MCP(log) .mcpask.chat
+  bind .mcpask.chat <Key> {
+    if {"%K" == "c" && (%s & 4)} {
+      mcp_copy_chat
+      break
+    }
+    if {"%K" == "v" && (%s & 4)} {
+      mcp_paste_question
+      break
+    }
+    if {"%K" == "Left" || "%K" == "Right" || "%K" == "Up" || "%K" == "Down" \
+        || "%K" == "Prior" || "%K" == "Next" || "%K" == "Home" || "%K" == "End"} {
+      continue
+    }
+    break
+  }
+  text .mcpask.q -height 3 -width 88 -wrap word
   pack .mcpask.q -fill x -padx 8
   frame .mcpask.btns
   pack .mcpask.btns -fill x -padx 6 -pady 4
@@ -428,27 +530,12 @@ proc mcp_build_ask {} {
   button .mcpask.btns.stop -text "Stop" -command mcp_ask_stop
   pack .mcpask.btns.ask .mcpask.btns.draw .mcpask.btns.stop -side left -padx 4
   label .mcpask.hint -anchor w -wraplength 720 -justify left -text \
-      "Draw a simple inverter asks for a CMOS inverter, one rectangle at a time. Each step is a nix package (mcp-paint, mcp-cell, mcp-label, mcp-zoom, mcp-layers, or mcp-nix). The layout window updates before the next step."
+      "Type any question. Copy selects text in the chat, or the whole chat. Paste puts the clipboard into the question box. Earlier messages are sent with the next question."
   pack .mcpask.hint -fill x -padx 8
-  frame .mcpask.logtop
-  pack .mcpask.logtop -fill x -padx 8 -pady 2
-  label .mcpask.logtop.l -text "Result" -anchor w
-  button .mcpask.logtop.copy -text "Copy errors" -command mcp_copy_errors
-  label .mcpask.logtop.note -text "" -anchor e
-  pack .mcpask.logtop.l -side left
-  pack .mcpask.logtop.copy -side right -padx 4
-  pack .mcpask.logtop.note -side right -padx 8
-  frame .mcpask.logf
-  pack .mcpask.logf -fill both -expand 1 -padx 8 -pady 4
-  text .mcpask.log -height 14 -width 88 -wrap word -state disabled \
-      -yscrollcommand {.mcpask.logf.scroll set}
-  scrollbar .mcpask.logf.scroll -command {.mcpask.log yview}
-  pack .mcpask.logf.scroll -side right -fill y
-  pack .mcpask.log -side left -fill both -expand 1
-  set MCP(log) .mcpask.log
   bind .mcpask <Destroy> {
     if {"%W" == ".mcpask"} { mcp_ask_stop }
   }
+  mcp_history_load
   mcp_show_agent
 }
 
@@ -503,6 +590,91 @@ proc mcp_reset_spool {} {
   catch {file delete [file join $dir cancel]}
 }
 
+proc mcp_chat_path {} {
+  return [file join [mcp_confdir] chat]
+}
+
+proc mcp_chat_show {role text} {
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.chat]} { return }
+  if {$role == "u"} {
+    .mcpask.chat insert end "You\n$text\n\n"
+  } else {
+    .mcpask.chat insert end "Agent\n$text\n\n"
+  }
+  .mcpask.chat see end
+}
+
+proc mcp_history_write {} {
+  global MCP
+  set dir [mcp_confdir]
+  file mkdir $dir
+  set fh [open [mcp_chat_path] w]
+  foreach turn $MCP(turns) {
+    puts $fh "---[lindex $turn 0]"
+    foreach line [split [lindex $turn 1] \n] {
+      puts $fh " $line"
+    }
+  }
+  close $fh
+}
+
+proc mcp_history_add {role text} {
+  global MCP
+  lappend MCP(turns) [list $role $text]
+  set n [llength $MCP(turns)]
+  if {$n > 40} {
+    set MCP(turns) [lrange $MCP(turns) [expr {$n - 40}] end]
+  }
+  mcp_history_write
+}
+
+proc mcp_history_load {} {
+  global MCP
+  set MCP(turns) {}
+  set path [mcp_chat_path]
+  if {![file readable $path]} { return }
+  set fh [open $path r]
+  set role ""
+  set buf ""
+  while {[gets $fh line] >= 0} {
+    if {$line == "---u" || $line == "---a"} {
+      if {$role != ""} {
+        set who u
+        if {$role == "---a"} { set who a }
+        lappend MCP(turns) [list $who $buf]
+        mcp_chat_show $who $buf
+      }
+      set role $line
+      set buf ""
+    } else {
+      if {$buf != ""} { append buf "\n" }
+      if {[string index $line 0] == " "} {
+        append buf [string range $line 1 end]
+      } else {
+        append buf $line
+      }
+    }
+  }
+  if {$role != ""} {
+    set who u
+    if {$role == "---a"} { set who a }
+    lappend MCP(turns) [list $who $buf]
+    mcp_chat_show $who $buf
+  }
+  close $fh
+}
+
+proc mcp_write_history_job {dest} {
+  global MCP
+  set fh [open $dest w]
+  foreach turn $MCP(turns) {
+    puts $fh "---[lindex $turn 0]"
+    foreach line [split [lindex $turn 1] \n] {
+      puts $fh " $line"
+    }
+  }
+  close $fh
+}
 proc mcp_write_job {question} {
   if {[info commands winfo] != "" && [winfo exists .mcpkeys]} {
     if {![mcp_save_keys]} {
@@ -518,18 +690,22 @@ proc mcp_write_job {question} {
   set model ""
   set effort ""
   set fast 0
+  set context 32000
   foreach row [mcp_rows] {
     if {[lindex $row 0] == $id} {
       set model [lindex $row 3]
       set effort [lindex $row 4]
       set fast [lindex $row 5]
+      set context [lindex $row 6]
     }
   }
+  if {$context == ""} { set context 32000 }
   set fh [open [file join $dir meta] w]
   puts $fh "agent $id"
   puts $fh "model $model"
   puts $fh "effort $effort"
   puts $fh "fast $fast"
+  puts $fh "context $context"
   set tech [mcp_tech_name]
   if {$tech != ""} { puts $fh "tech $tech" }
   close $fh
@@ -538,6 +714,7 @@ proc mcp_write_job {question} {
     puts $fh $L
   }
   close $fh
+  mcp_write_history_job [file join $dir history.txt]
 }
 
 proc mcp_tools_dir {} {
@@ -564,6 +741,9 @@ proc mcp_ask_start {} {
     mcp_log_err $err
     return
   }
+  mcp_history_add u $q
+  mcp_chat_show u $q
+  .mcpask.q delete 1.0 end
   set script [file join $MCP(root) mcp_ask.py]
   if {![file readable $script]} {
     set script /mmi-bundle/mcp_ask.py
@@ -598,7 +778,7 @@ proc mcp_ask_start {} {
   }
   fconfigure $MCP(chan) -blocking 0 -buffering line
   fileevent $MCP(chan) readable mcp_ask_readable
-  mcp_log "Asking [mcp_selected]. Layout steps will show up in this window and in the layout."
+  mcp_log "Asking [mcp_selected]. The reply shows up in this chat."
   set MCP(poll) [after 80 mcp_spool_poll]
 }
 
@@ -610,6 +790,23 @@ proc mcp_draw_inverter {} {
 }
 
 proc mcp_on_line {line} {
+  global MCP
+  if {$line == "SAY_BEGIN"} {
+    set MCP(saying) 1
+    set MCP(say_buf) ""
+    return
+  }
+  if {$line == "SAY_END"} {
+    set MCP(saying) 0
+    mcp_history_add a $MCP(say_buf)
+    mcp_chat_show a $MCP(say_buf)
+    return
+  }
+  if {$MCP(saying) && [string match "SAY *" $line]} {
+    if {$MCP(say_buf) != ""} { append MCP(say_buf) "\n" }
+    append MCP(say_buf) [string range $line 4 end]
+    return
+  }
   if {[string match "LOG *" $line]} {
     mcp_log [string range $line 4 end]
     return
@@ -1016,6 +1213,10 @@ proc mcp_selftest {} {
       || [mcp_google_model models/gemini-2.5-pro] != "gemini-3.1-pro-preview" \
       || [mcp_google_model gemini-3.1-pro-preview] != "gemini-3.1-pro-preview"} {
     puts "FAIL google model"
+    incr failed
+  }
+  if {[mcp_context ""] != 32000 || [mcp_context 16000] != 16000 || [mcp_context 12] != 32000} {
+    puts "FAIL context"
     incr failed
   }
   global MCP

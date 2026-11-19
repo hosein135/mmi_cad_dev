@@ -1,0 +1,69 @@
+## Overview
+
+MAX is the Micro Magic layout editor. Its database source calls itself magic. A cell holds paint, labels, subcells, and flylines. Coordinates are integer database units. Paint is the geometry that can become a mask. A flyline is not paint and is not a mask layer. magic-vlsi is a different program, used here to read .mag files. It does not store MAX flylines.
+
+Answer questions about this editor from these notes. Draw geometry only when the user asks you to draw or paint. A cell is stored as a .max file whose tech line must match the technology already open in MAX. Paint only layer names from that technology. Do not write a .max file by hand.
+
+## Cells
+
+The edit cell is the cell on screen. A new cell is created empty and then loaded for editing. A read-only cell cannot be painted. A subcell is an instance of another cell. Flattening replaces that instance with the shapes inside it. Saving a cell writes a .max file. If the cell has flylines, MAX asks whether to keep them in that file. Answering no deletes the flylines for the save. Undo can bring them back if the delete was recorded.
+
+## Paint and layers
+
+Paint is an axis-aligned rectangle on one technology layer. The mask layers come from the technology. These names are display-only and are not circuit paint: annotation, background, bbox, box, drc, feedback, flyline, grid, label, selection, subcell. Do not paint a fake wire on the flyline layer. A design-rule check can explain a violation on the error layer. The window can zoom to a box. Each painted rectangle is one edit, so a person can watch the layout appear one shape at a time.
+
+## Labels
+
+A label has text, a layer, and a box. The point a flyline uses is the center of that box. The text is the net name. The same text on two labels means those points are the same net when a tool looks up connectivity. A hierarchical name can point at a label inside a subcell, as a path plus the label text. If a label cannot be found, a flyline that names it has no position for that end.
+
+## Flylines
+
+A flyline joins two labels by name. It is a straight line from the center of one label to the center of the other. It records that those two labels belong on one net and that the connection is not a piece of paint. It is redrawn when a label moves. Only the old and new line areas are refreshed. The area is grown by one database unit so the box is never empty. If either label is missing, that end is invalid and the line is not shown.
+
+Flyline mode uses the mouse. Button 1 on the first label starts the line. Button 1 on the second label finishes it. Button 2 leaves the mode. Button 3 or the Delete key removes the highlighted flyline. The editor also accepts db_flyline name1 name2 to add one. db_flyline -delete name1 name2 removes that pair. db_flyline -delete name1 removes every flyline that touches that label. db_flyline -delete with no names removes every flyline in the cell. db_flyline with no arguments lists them. A flyline can store a pixel width and a short text. The width is used when many wires are drawn as one thick line.
+
+The first flyline turns on flyline updates. Until then the editor does not keep moving lines around. Adding a flyline can be undone when flylines are being saved. If saving is turned off, flylines are annotations only and are not written into the .max file. Floorplan flylines use that annotation mode on purpose.
+
+Moving a wire can reattach flylines. When that option is on, the flylines that touched the old net are pointed at the label that is moving, so the lines follow the wire instead of staying on a label that was left behind.
+
+## Floorplan flylines
+
+The floorplanner draws flylines from the netlist, not from a mouse drag. A verilog connection between two pins becomes a line. The line can run from pin to pin, or many pins on one side of a cell can share one line to the center or to that side. A thicker line means more wires in the bundle, and the count can be written on the line. Nets on the ignore list are skipped. Pins that are not placed are skipped. If a module has no cell yet, that line is skipped and a warning is printed. These lines are not saved in the layout file.
+
+The standard-cell placer can build the same kind of line from schematic connectivity. It can flip transistors so those lines cross less often. Flylines inside a subcell are not the same as flylines in the parent. A parent line uses a hierarchical label name when the pin is inside a child.
+
+## Magic VLSI
+
+magic-vlsi is the separate nixpkgs layout tool at /mmi-magic. A .mag file is Magic's own tile paint, not a MAX flyline list. Import runs Magic to write GDS from the .mag, then reads that GDS into a MAX cell. Opening the .mag in Magic is only for comparison. It does not create MAX flylines. Questions about .mag tiles, Magic extraction, or cifoutput are about magic-vlsi. Questions about an on-screen line between two labels in MAX are about MAX flylines.
+
+## Max files
+
+A .max file is the text file for one MAX cell. The usual suffix is .max. Lines that start with # are comments, and blank lines are skipped. Current MAX writes format version 4. The reader accepts versions 0 through 4. Version 2 added the resolution line. Version 3 stores generated cells and replaced the old PAINT section with RECTS. Version 4 adds the user bounding box.
+
+The header is three lines: `max 4`, then `tech NAME`, then `resolution NUMBER`. NAME is the technology that was running when the file was written. NUMBER is the database resolution, in microns per database unit. On read, MAX scales the file coordinates by the file resolution divided by the resolution of the technology that is open now. A rounding error can be reported in microns. A file older than version 2 has no resolution line.
+
+MAX refuses the file when NAME is not the technology that is open. The message is that the cell has the wrong technology. Do not edit the tech line to force a file into a different PDK. Open MAX with that technology first, then load the cell.
+
+After the header come DEF blocks. `DEF` with no name is the main cell. `DEF name "showName" "showInst"` is a dependent cell stored in the same file, such as a generated via or transistor. Inside a DEF, sections look like `SECTION NAME { ... } SECTION NAME`. The sections are VERSIONS, PROPERTIES, RECTS or the older PAINT, POLYGONS, WIREPATHS, LABELS, GROUPS, INSTANCES, and FLYLINES. Empty sections may be omitted. INSTANCES are the subcells. FLYLINES is written only when flylines exist and flyline saving is on.
+
+Inside RECTS or PAINT, a `type layername` line selects the paint, and each following `rect x1 y1 x2 y2` is one rectangle in integer file coordinates. An unknown type is an error. A label line starts with `lab`, then the layer, the box, a few small integers, and the label text. A saved flyline is `fly name1 name2`. The width and the text of a flyline are not stored.
+
+The file itself warns that the format keeps changing and that programs should not parse or write it. Use the MAX commands, such as db_paint and db_search. The drawing tools do that. A new cell from this chat is created in the work directory, as the cell name plus .max, and then loaded. A read-only cell is not written. Do not compose a .max file as text, and do not rename layers inside one.
+
+## PDK technology
+
+The open technology is the PDK MAX was started with. Its name is given with the question as Technology. Its mask layer names are given as Layers. If that list is missing, call mcp-layers before painting. Paint and labels may use only those names. A name from another PDK is rejected: the tool says the layer is not in this technology, and a .max file with that name fails to read as an unknown type.
+
+Do not switch technologies while drawing. If the user asks for a different PDK than the one that is open, say which technology is open and that MAX has to be started with the other technology before its layers exist. Do not invent sky130 names in an mmi18 session, or mmi18 names in a sky130 session. sky130 drawn layers include li1, licon1, ndiff, and pdiff. mmi18 uses names such as poly, m1, ct, nw, nplus, and pplus. Other imported technologies, including gf180mcu and sg13g2, have their own names.
+
+Display-only names are not mask paint: annotation, background, bbox, box, drc, feedback, flyline, grid, label, selection, and subcell. Do not paint those to imitate a mask layer or a flyline.
+
+The technology MAX loads is a .tech27 file, named after the technology, plus a .palette and a .tcl next to it. Those files are searched under the private tech directory, under MMI_LOCAL max/tech, and under the PDK tree max/tech. A usable .tech27 has a drc section, and cifstyle is inside that drc section rather than at the top of the file. It also rejects `labels *`, a width or spacing written as `-`, and a calma datatype of `*`. The companion .tcl must set MMI_PDK_GEN to at least 8. You do not write or repair these files from the chat. If the technology will not load, say what is missing.
+
+A .tech27 is built from a .source table. Each drawn layer has a name, a GDS layer and datatype, a text datatype, a type such as act, poly, via, or metal, and a minimum width and spacing in microns. `connect` says which paints touch electrically. `derive` builds a paint from GDS booleans on the way in, or writes GDS from paint on the way out. Planes group paints, and device paints sit on the active plane. Coordinates in the editor are integer database units, not microns. The resolution line is how many microns one database unit is. Stay in database units unless the question gives the resolution. Do not treat a micron rule from the .source table as a database-unit coordinate.
+
+Import from Magic or GDS uses this same technology map. The resulting .max file belongs to the technology that was open during the import.
+
+## What the drawing tools can do
+
+The nix tools can list layers, create a cell, paint one rectangle, place one label, zoom, and run magic, ngspice, gawk, or ImageMagick for a check. They cannot create a flyline. To talk about connectivity, explain the flyline. To show geometry, paint a mask layer from the technology list. Keep a requested drawing simple, one rectangle at a time, with integer coordinates.

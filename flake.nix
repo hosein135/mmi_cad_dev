@@ -146,6 +146,7 @@
           install -Dm644 "$src/image_layout.tcl" $out/image_layout.tcl
           install -Dm644 "$src/mcp.tcl" $out/mcp.tcl
           install -Dm755 "$src/mcp_ask.py" $out/mcp_ask.py
+          install -Dm644 "$src/mcp-knowledge/magic.txt" $out/mcp-knowledge/magic.txt
           mkdir -p $out/mcp-tools
           for t in mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-zoom mcp-nix; do
             install -Dm755 "$src/mcp-tools/$t" "$out/mcp-tools/$t"

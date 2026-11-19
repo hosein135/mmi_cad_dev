@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Ask one configured agent a question and run nix-package layout tools.
-# Cursor is Grok 4.7, extra high, fast off. Tcl drives the MAX window.
+# Cursor is Grok 4.7, extra high. Fast and the context window come from the user.
+# Tcl drives the MAX window.
 
 import json
 import os
@@ -40,20 +41,20 @@ CURSOR = "https://api.cursor.com"
 EFFORT_IDS = ("effort", "reasoning", "reasoning_effort")
 EFFORT_WANTS = ("xhigh", "extra-high", "extra_high", "high")
 
-SYSTEM = """You are the layout assistant inside MAX, a VLSI layout editor.
-The user can see the edit cell. Draw by calling tools, one shape at a time, so each step appears on screen before the next.
+SYSTEM = """You are the assistant inside MAX, the Micro Magic layout editor.
+Answer any question in ordinary sentences. Use the reference notes when the question is about MAX, Magic, layout, or flylines.
+Draw only when the user asks you to draw, paint, or create geometry. Then use the tools, one shape at a time, so each step appears before the next.
 
-Tools (these are nix packages):
+Tools, which are nix packages:
 - mcp-layers: no arguments. Returns the technology layer names.
 - mcp-cell: cell name. Creates that cell and edits it.
 - mcp-paint: layer, x1, y1, x2, y2, and a short note. Paints one rectangle in integer database units.
 - mcp-label: layer, text, x, y. Places one label.
 - mcp-zoom: x1, y1, x2, y2. Zooms the window to that box.
-- mcp-nix: package and args. package is one of magic, ngspice, gawk, convert, magick, identify. Use it for a version or a geometry check. Do not use it to paint. Painting must be mcp-paint so the user can watch.
+- mcp-nix: package and args. package is one of magic, ngspice, gawk, convert, magick, identify. Use it for a version or a geometry check. Do not use it to paint.
 
-Use only layer names from the list you were given. Keep a very simple circuit inside 0..96 by 0..128. Make every rectangle at least 2 units on its short side. For a CMOS inverter, paint the well, the two diffusion regions, the poly gate, contacts, and metal, then labels for the input, output, and supplies, then zoom.
-
-If the user is not asking you to draw, answer in plain sentences and do not emit a tool list.
+Use only layer names from the technology list you were given. Do not invent names from another PDK. Do not paint on the flyline layer. A flyline is not mask geometry. Do not write a .max file as text.
+If the user did not ask you to draw, do not emit a tool list.
 If you cannot call tools yourself and the user asked you to draw, reply with only a JSON array. Each item has "tool" and its arguments, for example {"tool":"mcp-paint","layer":"poly","x1":0,"y1":20,"x2":8,"y2":60,"note":"gate"}. No markdown.
 """
 
@@ -67,6 +68,13 @@ class HttpError(Exception):
 
 def log(msg):
     print("LOG " + str(msg).replace("\n", " / "), flush=True)
+
+
+def say(msg):
+    print("SAY_BEGIN", flush=True)
+    for line in str(msg).split("\n"):
+        print("SAY " + line, flush=True)
+    print("SAY_END", flush=True)
 
 
 def fail(msg):
@@ -141,9 +149,9 @@ def read_meta(path):
 
 
 def wants_layout(question):
-    text = question.lower()
-    for word in ("draw", "layout", "inverter", "transistor", "cmos", "nand gate", "simple ic"):
-        if word in text:
+    text = " " + (question or "").lower() + " "
+    for phrase in (" draw ", " paint ", " place a ", " create a cell", " create the cell", " layout of"):
+        if phrase in text:
             return True
     return False
 
@@ -201,6 +209,7 @@ def fallback_selection():
             {"id": "effort", "value": "xhigh"},
         ],
         "from_catalog": False,
+        "parameters": [],
         "note": "",
     }
 
@@ -261,6 +270,7 @@ def pick_cursor_grok(items):
             return {
                 "id": str(chosen["id"]),
                 "params": copied,
+                "parameters": chosen.get("parameters") or [],
                 "from_catalog": True,
                 "note": "",
             }
@@ -294,6 +304,7 @@ def pick_cursor_grok(items):
     return {
         "id": str(chosen["id"]),
         "params": params,
+        "parameters": chosen.get("parameters") or [],
         "from_catalog": True,
         "note": note,
     }
@@ -329,16 +340,75 @@ def cursor_attempts(selection):
     if changed:
         sets.append(swapped)
     if not selection.get("from_catalog"):
-        sets.append([p for p in params if p["id"] != "fast"])
+        sets.append([p for p in params if p["id"] != "fast" and "context" not in p["id"].lower()])
         sets.append([])
+    without_context = [p for p in params if "context" not in p["id"].lower()]
+    if without_context != params:
+        sets.append(without_context)
     return unique_params(sets)
 
 
-def params_safe(params):
+def params_safe(params, fast="0"):
     for param in params:
         if param.get("id") == "fast" and str(param.get("value")).lower() in ("true", "1", "yes"):
-            return False
+            if str(fast) != "1":
+                return False
     return True
+
+
+def cursor_options(selection, fast, context):
+    want = "true" if str(fast) == "1" else "false"
+    params = []
+    seen_fast = False
+    seen_effort = False
+    for param in selection.get("params") or []:
+        pid = param.get("id")
+        if pid == "fast":
+            params.append({"id": "fast", "value": want})
+            seen_fast = True
+        elif pid in EFFORT_IDS:
+            params.append(dict(param))
+            seen_effort = True
+        elif "context" in str(pid).lower():
+            continue
+        else:
+            params.append(dict(param))
+    if not seen_fast:
+        params.insert(0, {"id": "fast", "value": want})
+    if not seen_effort:
+        params.append({"id": "effort", "value": "xhigh"})
+    extra = context_setting(selection.get("parameters"), context)
+    if extra:
+        params.append(extra)
+    out = dict(selection)
+    out["params"] = params
+    return out
+
+
+def context_setting(parameters, context):
+    text = str(normalize_context(context))
+    for param in parameters or []:
+        if not isinstance(param, dict):
+            continue
+        pid = str(param.get("id") or "")
+        low = pid.lower()
+        if low not in ("context", "context_window", "max_context", "num_ctx") and "context" not in low:
+            continue
+        values = value_list(param)
+        if not values or text in values:
+            return {"id": pid, "value": text}
+        nums = []
+        for value in values:
+            if value.isdigit():
+                nums.append(int(value))
+        if nums:
+            target = int(text)
+            best = nums[0]
+            for number in nums:
+                if abs(number - target) < abs(best - target):
+                    best = number
+            return {"id": pid, "value": str(best)}
+    return None
 
 
 def user_prompt(question, tech, layers):
@@ -351,13 +421,182 @@ def user_prompt(question, tech, layers):
     return "\n".join(lines)
 
 
-def cursor_prompt(user):
+def knowledge_path():
+    root = os.path.dirname(os.path.abspath(__file__))
+    for path in (
+        os.path.join(root, "mcp-knowledge", "magic.txt"),
+        "/mmi-pdk-live/mcp-knowledge/magic.txt",
+        "/mmi-bundle/mcp-knowledge/magic.txt",
+    ):
+        if os.path.isfile(path):
+            return path
+    return ""
+
+
+def knowledge_sections():
+    path = knowledge_path()
+    if not path:
+        return []
+    sections = []
+    title = ""
+    body = []
+    for line in read_text(path).splitlines():
+        if line.startswith("## "):
+            if title and "".join(body).strip():
+                sections.append((title, "\n".join(body).strip()))
+            title = line[3:].strip()
+            body = []
+        else:
+            body.append(line)
+    if title and "".join(body).strip():
+        sections.append((title, "\n".join(body).strip()))
+    return sections
+
+
+def retrieve_notes(question, budget):
+    sections = knowledge_sections()
+    if not sections:
+        return ""
+    try:
+        budget = int(budget)
+    except (TypeError, ValueError):
+        budget = 4000
+    if budget < 500:
+        budget = 500
+    words = re.findall(r"[a-z0-9]+", (question or "").lower())
+    scored = []
+    for index, (title, body) in enumerate(sections):
+        hay_title = title.lower()
+        hay = hay_title + " " + body.lower()
+        score = 1 if index == 0 else 0
+        for word in words:
+            if len(word) < 4 and word not in ("max", "pdk", "gds", "drc"):
+                continue
+            if word in hay_title:
+                score += 3
+            elif word in hay:
+                score += 1
+        question_text = (question or "").lower()
+        if (".max" in question_text or "max file" in question_text) and "max file" in hay_title:
+            score += 6
+        if ("pdk" in question_text or "tech27" in question_text) and (
+            "pdk" in hay_title or "tech27" in hay
+        ):
+            score += 6
+        scored.append((score, index, title, body))
+    scored.sort(key=lambda item: (-item[0], item[1]))
+    chosen = []
+    used = 0
+    for score, index, title, body in scored:
+        if score <= 0 and chosen:
+            continue
+        piece = len(title) + len(body) + 2
+        if chosen and used + piece > budget:
+            continue
+        chosen.append(index)
+        used += piece
+        if used >= budget:
+            break
+    if 0 not in chosen:
+        chosen.append(0)
+    parts = []
+    for index, (title, body) in enumerate(sections):
+        if index in chosen:
+            parts.append(title + "\n" + body)
+    text = "\n\n".join(parts)
+    if len(text) > budget:
+        text = text[:budget]
+    return text
+
+
+def normalize_context(value):
+    try:
+        number = int(str(value).strip())
+    except (TypeError, ValueError):
+        number = 32000
+    if number < 2000:
+        number = 32000
+    if number > 1000000:
+        number = 1000000
+    return number
+
+
+def context_budgets(context):
+    tokens = normalize_context(context)
+    chars = tokens * 3
+    notes = chars // 3
+    if notes > 8000:
+        notes = 8000
+    history = chars - notes
+    if history < 1000:
+        history = 1000
+    return notes, history
+
+
+def read_history(path):
+    turns = []
+    role = ""
+    buf = []
+    for line in read_text(path).splitlines():
+        if line == "---u" or line == "---a":
+            if role:
+                turns.append((role, "\n".join(buf)))
+            role = "u" if line == "---u" else "a"
+            buf = []
+        elif role:
+            buf.append(line[1:] if line.startswith(" ") else line)
+    if role:
+        turns.append((role, "\n".join(buf)))
+    return turns
+
+
+def fit_history(turns, budget):
+    try:
+        budget = int(budget)
+    except (TypeError, ValueError):
+        budget = 8000
+    kept = []
+    used = 0
+    for role, text in reversed(turns):
+        size = len(text) + 8
+        if kept and used + size > budget:
+            break
+        kept.append((role, text))
+        used += size
+    kept.reverse()
+    return kept
+
+
+def pack_turns(history, user):
+    items = []
+    for role, text in history:
+        who = "user" if role == "u" else "assistant"
+        if items and items[-1][0] == who:
+            items[-1] = (who, items[-1][1] + "\n\n" + text)
+        else:
+            items.append((who, text))
+    if items and items[-1][0] == "user":
+        items[-1] = ("user", items[-1][1] + "\n\n" + user)
+    else:
+        items.append(("user", user))
+    return items
+
+
+def cursor_prompt(user, history, system):
     extra = (
         "You are answering through the Cursor agent API and cannot call these tools yourself. "
-        "When the user wants a layout, reply with only the JSON array so MAX can run the nix tools. "
+        "Answer the user's question. Remember the earlier chat. "
+        "When the user wants a layout drawn, reply with only the JSON array so MAX can run the nix tools. "
+        "When the user does not want a drawing, answer in plain sentences and do not emit a tool list. "
         "Do not create files and do not run shell commands.\n\n"
     )
-    return SYSTEM + "\n" + extra + user
+    prior = []
+    for role, text in history:
+        who = "User" if role == "u" else "Assistant"
+        prior.append(who + ":\n" + text)
+    if prior:
+        return system + "\n" + extra + "Earlier chat:\n" + "\n\n".join(prior) + "\n\nCurrent question:\n" + user
+    return system + "\n" + extra + user
 
 
 def model_items(payload):
@@ -383,15 +622,15 @@ def fetch_models(key):
     return items
 
 
-def create_cursor(key, prompt, selection):
+def create_cursor(key, prompt, selection, fast):
     last = None
     for params in cursor_attempts(selection):
         if params == [] and selection.get("from_catalog"):
             continue
-        if not params_safe(params):
+        if not params_safe(params, fast):
             continue
         if params == []:
-            log("Cursor did not accept extra high and fast off. This last try uses the account default.")
+            log("Cursor did not accept that fast and context setting. This last try uses the account default.")
         shown = " ".join(p["id"] + "=" + p["value"] for p in params) or "account default"
         log("Cursor model " + selection["id"] + " " + shown)
         body = {
@@ -474,7 +713,7 @@ def stream_run(key, agent_id, run_id, job):
             if cancelled(job):
                 fail("Stopped.")
             if event == "thinking" and not thinking:
-                log("Grok 4.7 is thinking (extra high, not fast).")
+                log("Grok 4.7 is thinking.")
                 thinking = True
             elif event == "assistant":
                 try:
@@ -515,17 +754,23 @@ def stream_run(key, agent_id, run_id, job):
     return text
 
 
-def cursor_ask(key, question, tech, layers, job):
+def cursor_ask(key, question, tech, layers, job, history, system, fast, context):
     try:
         selection = pick_cursor_grok(fetch_models(key))
     except HttpError as e:
         if e.code in (401, 403):
             fail("Cursor rejected the API key.")
-        log("Could not list Cursor models. Using grok-4.7, extra high, fast off.")
+        log("Could not list Cursor models. Using grok-4.7, extra high.")
         selection = fallback_selection()
+    selection = cursor_options(selection, fast, context)
     if selection.get("note"):
         log(selection["note"])
-    created = create_cursor(key, cursor_prompt(user_prompt(question, tech, layers)), selection)
+    if str(fast) == "1":
+        log("Cursor fast mode is on. Context window " + str(normalize_context(context)) + " tokens.")
+    else:
+        log("Cursor fast mode is off. Context window " + str(normalize_context(context)) + " tokens.")
+    prompt = cursor_prompt(user_prompt(question, tech, layers), history, system)
+    created = create_cursor(key, prompt, selection, fast)
     agent = created.get("agent") or {}
     run = created.get("run") or {}
     agent_id = agent.get("id") or ""
@@ -765,18 +1010,15 @@ def run_plan(steps, job):
 
 def deliver(text, question, job, drew):
     plan = extract_plan(text or "")
-    if plan and not drew:
+    prose = (text or "").strip()
+    if wants_layout(question) and plan and not drew:
         run_plan(plan, job)
+        say("Drew the requested layout, one shape at a time.")
         return
-    shown = (text or "").strip()
-    if shown and plan is None:
-        log(shown)
-    elif shown and drew and not shown.startswith("[") and not shown.startswith("```"):
-        log(shown)
-    elif not drew:
-        log("(empty reply)")
-    if wants_layout(question) and plan is None and not drew:
-        log("No draw steps were in the reply, so nothing was painted.")
+    if prose:
+        say(prose)
+    else:
+        say("(no reply)")
 
 
 def openai_tools():
@@ -853,11 +1095,10 @@ def post_openai(agent, key, body):
         raise
 
 
-def openai_loop(agent, key, model, effort, user, job):
-    messages = [
-        {"role": "system", "content": SYSTEM},
-        {"role": "user", "content": user},
-    ]
+def openai_loop(agent, key, model, effort, user, job, history, system):
+    messages = [{"role": "system", "content": system}]
+    for role, text in pack_turns(history, user):
+        messages.append({"role": role, "content": text})
     drew = False
     tools = openai_tools()
     for _ in range(24):
@@ -946,8 +1187,8 @@ def anthropic_tools():
     ]
 
 
-def anthropic_loop(key, model, user, job):
-    messages = [{"role": "user", "content": user}]
+def anthropic_loop(key, model, user, job, history, system):
+    messages = [{"role": role, "content": text} for role, text in pack_turns(history, user)]
     drew = False
     for _ in range(24):
         if cancelled(job):
@@ -958,7 +1199,7 @@ def anthropic_loop(key, model, user, job):
             {
                 "model": model,
                 "max_tokens": 4096,
-                "system": SYSTEM,
+                "system": system,
                 "tools": anthropic_tools(),
                 "messages": messages,
             },
@@ -988,7 +1229,7 @@ def google_model(model):
     return name
 
 
-def google_text(key, model, user):
+def google_text(key, model, user, history, system):
     raw = (model or "").strip()
     if raw.startswith("models/"):
         raw = raw[len("models/") :]
@@ -1000,27 +1241,32 @@ def google_text(key, model, user):
         + urllib.parse.quote(model, safe="")
         + ":generateContent"
     )
+    contents = []
+    first = True
+    for role, text in pack_turns(history, user):
+        grole = "user" if role == "user" else "model"
+        if first and grole == "user":
+            text = system + "\n\n" + text
+            first = False
+        contents.append({"role": grole, "parts": [{"text": text}]})
     data = request_json(
         url,
         key,
-        {"contents": [{"role": "user", "parts": [{"text": SYSTEM + "\n\n" + user}]}]},
+        {"contents": contents},
         auth="google",
     )
     parts = (((data.get("candidates") or [{}])[0].get("content") or {}).get("parts")) or []
     return "".join(p.get("text") or "" for p in parts if isinstance(p, dict))
 
 
-def cohere_text(key, model, user):
+def cohere_text(key, model, user, history, system):
+    messages = [{"role": "system", "content": system}]
+    for role, text in pack_turns(history, user):
+        messages.append({"role": role, "content": text})
     data = request_json(
         "https://api.cohere.com/v2/chat",
         key,
-        {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": SYSTEM},
-                {"role": "user", "content": user},
-            ],
-        },
+        {"model": model, "messages": messages},
         auth="bearer",
     )
     content = (data.get("message") or {}).get("content") or ""
@@ -1034,28 +1280,37 @@ def load_key(agent, home):
     model = ""
     effort = ""
     fast = "0"
+    context = ""
     path = os.path.join(home, "keys")
     if os.path.isfile(path):
         for line in read_text(path).splitlines():
             if not line.strip() or line.startswith("#"):
                 continue
             parts = line.split("\t")
-            while len(parts) < 5:
+            while len(parts) < 6:
                 parts.append("")
             if parts[0] == agent:
-                found, model, effort, fast = parts[1], parts[2], parts[3], parts[4]
+                found, model, effort, fast, context = parts[1], parts[2], parts[3], parts[4], parts[5]
                 break
     if agent == "cursor":
-        model, effort, fast = "grok-4.7", "xhigh", "0"
+        model, effort = "grok-4.7", "xhigh"
+        if fast != "1":
+            fast = "0"
+        context = str(normalize_context(context))
     if not found:
         fail("No API key for " + agent + ". Open the mcp menu and paste the key in the box.")
-    return found, model, effort, fast
+    return found, model, effort, fast, context
 
 
 def settings_for(agent, meta, home):
-    key, model, effort, fast = load_key(agent, home)
+    key, model, effort, fast, context = load_key(agent, home)
     if agent == "cursor":
-        return key, "grok-4.7", "xhigh", "0"
+        model, effort = "grok-4.7", "xhigh"
+        if meta.get("fast") in ("0", "1"):
+            fast = meta["fast"]
+        if meta.get("context"):
+            context = str(normalize_context(meta.get("context")))
+        return key, model, effort, fast, context
     if meta.get("model"):
         model = meta["model"]
     if "effort" in meta:
@@ -1064,7 +1319,7 @@ def settings_for(agent, meta, home):
         fast = meta["fast"]
     if not model:
         fail("No model is set for " + agent + ".")
-    return key, model, effort, fast
+    return key, model, effort, fast, "32000"
 
 
 def run_job(job):
@@ -1074,21 +1329,32 @@ def run_job(job):
     question = read_text(os.path.join(job, "question.txt"))
     layers = [ln.strip() for ln in read_text(os.path.join(job, "layers.txt")).splitlines() if ln.strip()]
     tech = meta.get("tech") or ""
-    key, model, effort, fast = settings_for(agent, meta, home)
+    key, model, effort, fast, context = settings_for(agent, meta, home)
+    note_budget, history_budget = context_budgets(context)
+    notes = retrieve_notes(question, note_budget)
+    system = SYSTEM
+    if notes:
+        system = (
+            SYSTEM
+            + "\n\nReference notes from the Magic guide. Use them for the editor, .max files, and the open PDK technology. "
+            + "They are not a request to draw.\n\n"
+            + notes
+        )
+    history = fit_history(read_history(os.path.join(job, "history.txt")), history_budget)
     user = user_prompt(question, tech, layers)
     drew = False
     if agent == "cursor":
-        text = cursor_ask(key, question, tech, layers, job)
+        text = cursor_ask(key, question, tech, layers, job, history, system, fast, context)
     elif agent == "anthropic":
-        text, drew = anthropic_loop(key, model, user, job)
+        text, drew = anthropic_loop(key, model, user, job, history, system)
     elif agent == "google":
-        text = google_text(key, model, user)
+        text = google_text(key, model, user, history, system)
     elif agent == "cohere":
-        text = cohere_text(key, model, user)
+        text = cohere_text(key, model, user, history, system)
     elif agent in OPENAI_URLS:
         if fast == "1":
             log(agent + " fast is on. Model " + model)
-        text, drew = openai_loop(agent, key, model, effort, user, job)
+        text, drew = openai_loop(agent, key, model, effort, user, job, history, system)
     else:
         fail("Unknown agent " + agent)
     deliver(text, question, job, drew)
@@ -1185,6 +1451,35 @@ def selftest():
         check("paint tool", tool == "mcp-paint" and "--layer" in argv and "poly" in argv)
     check("draw question", wants_layout("Draw the layout of a very simple CMOS inverter"))
     check("plain question", not wants_layout("What is a via?"))
+    check("flyline question", not wants_layout("How does a flyline work?"))
+    check("editor question", not wants_layout("How does the layout editor work?"))
+    notes = retrieve_notes("what is a flyline", 5000)
+    check("notes flyline", "label" in notes.lower() and "flyline" in notes.lower())
+    max_notes = retrieve_notes("how does a .max file work", 8000).lower()
+    check("notes max", "resolution" in max_notes and "tech name" in max_notes)
+    pdk_notes = retrieve_notes("how should I handle pdk tech", 8000).lower()
+    check("notes pdk", "tech27" in pdk_notes and "not in this technology" in pdk_notes)
+    fast_on = cursor_options(picked, "1", "16000")
+    check("fast on", {"id": "fast", "value": "true"} in fast_on["params"])
+    check("fast allowed", params_safe(fast_on["params"], "1"))
+    check("fast keeps effort", {"id": "effort", "value": "xhigh"} in fast_on["params"])
+    setting = context_setting(
+        [{"id": "context_window", "values": [{"value": "8000"}, {"value": "32000"}]}],
+        "16000",
+    )
+    check("context nearest", setting == {"id": "context_window", "value": "8000"})
+    check("context absent", context_setting([{"id": "fast", "values": [{"value": "true"}]}], "32000") is None)
+    kept = fit_history([("u", "old"), ("a", "older answer"), ("u", "new")], 20)
+    check("history newest", kept[-1] == ("u", "new"))
+    import tempfile
+    handle = tempfile.NamedTemporaryFile(mode="w", delete=False, encoding="utf-8")
+    handle.write("---u\n what is a flyline?\n---a\n It joins two labels.\n")
+    handle.close()
+    turns = read_history(handle.name)
+    os.remove(handle.name)
+    check("history read", turns == [("u", "what is a flyline?"), ("a", "It joins two labels.")])
+    packed = pack_turns([("u", "Earlier"), ("a", "A flyline joins labels.")], "And now?")
+    check("packed memory", packed[0] == ("user", "Earlier") and packed[1][0] == "assistant" and packed[2][0] == "user")
     check("google retired", google_model("gemini-2.5-pro") == "gemini-3.1-pro-preview")
     check("google prefix", google_model("models/gemini-2.5-pro") == "gemini-3.1-pro-preview")
     check("google current", google_model("gemini-3.1-pro-preview") == "gemini-3.1-pro-preview")
