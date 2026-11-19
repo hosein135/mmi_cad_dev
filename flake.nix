@@ -148,7 +148,7 @@
           install -Dm755 "$src/mcp_ask.py" $out/mcp_ask.py
           install -Dm644 "$src/mcp-knowledge/magic.txt" $out/mcp-knowledge/magic.txt
           mkdir -p $out/mcp-tools
-          for t in mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-zoom mcp-nix; do
+          for t in mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-flyline mcp-zoom mcp-nix; do
             install -Dm755 "$src/mcp-tools/$t" "$out/mcp-tools/$t"
           done
           install -Dm755 "$src/mag2gds.sh" $out/mag2gds.sh
@@ -296,6 +296,7 @@
           install -Dm755 ${./pdk/mcp-tools/mcp-cell} $out/bin/mcp-cell
           install -Dm755 ${./pdk/mcp-tools/mcp-paint} $out/bin/mcp-paint
           install -Dm755 ${./pdk/mcp-tools/mcp-label} $out/bin/mcp-label
+          install -Dm755 ${./pdk/mcp-tools/mcp-flyline} $out/bin/mcp-flyline
           install -Dm755 ${./pdk/mcp-tools/mcp-zoom} $out/bin/mcp-zoom
           install -Dm755 ${./pdk/mcp-tools/mcp-nix} $out/bin/mcp-nix
         '';

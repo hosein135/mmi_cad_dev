@@ -19,6 +19,7 @@ TOOLS = (
     "mcp-cell",
     "mcp-paint",
     "mcp-label",
+    "mcp-flyline",
     "mcp-zoom",
     "mcp-nix",
 )
@@ -50,6 +51,7 @@ Tools, which are nix packages:
 - mcp-cell: cell name. Creates that cell and edits it.
 - mcp-paint: layer, x1, y1, x2, y2, and a short note. Paints one rectangle in integer database units.
 - mcp-label: layer, text, x, y. Places one label.
+- mcp-flyline: two label names. Draws one flyline between those labels. Place both labels first. Do not paint the flyline layer.
 - mcp-zoom: x1, y1, x2, y2. Zooms the window to that box.
 - mcp-nix: package and args. package is one of magic, ngspice, gawk, convert, magick, identify. Use it for a version or a geometry check. Do not use it to paint.
 
@@ -754,6 +756,13 @@ def stream_run(key, agent_id, run_id, job):
     return text
 
 
+def context_label(context):
+    n = normalize_context(context)
+    if n % 1000 == 0:
+        return str(n // 1000) + "k"
+    return str(n)
+
+
 def cursor_ask(key, question, tech, layers, job, history, system, fast, context):
     try:
         selection = pick_cursor_grok(fetch_models(key))
@@ -766,9 +775,9 @@ def cursor_ask(key, question, tech, layers, job, history, system, fast, context)
     if selection.get("note"):
         log(selection["note"])
     if str(fast) == "1":
-        log("Cursor fast mode is on. Context window " + str(normalize_context(context)) + " tokens.")
+        log("Cursor fast mode is on. Context window " + context_label(context) + ".")
     else:
-        log("Cursor fast mode is off. Context window " + str(normalize_context(context)) + " tokens.")
+        log("Cursor fast mode is off. Context window " + context_label(context) + ".")
     prompt = cursor_prompt(user_prompt(question, tech, layers), history, system)
     created = create_cursor(key, prompt, selection, fast)
     agent = created.get("agent") or {}
@@ -826,6 +835,16 @@ def num(step, key):
             raise ValueError(key + " is not an integer")
         return str(int(value))
     return str(int(value))
+
+
+def fly_name(step, key, alt):
+    value = step.get(key)
+    if value is None or value == "":
+        value = step.get(alt)
+    value = str(value or "").strip()
+    if not re.fullmatch(r"[A-Za-z0-9_./{}*+-]+", value) or len(value) > 80:
+        raise ValueError("flyline name must be a label name")
+    return value
 
 
 def normalize(step):
@@ -896,6 +915,13 @@ def normalize(step):
         if len(args) >= 4:
             return name, ["--layer", str(args[0]), "--text", str(args[1]), "--x", str(int(args[2])), "--y", str(int(args[3]))]
         raise ValueError("mcp-label needs a layer, text, and a point")
+    if name == "mcp-flyline":
+        if "name1" in step or "a" in step:
+            return name, ["--name1", fly_name(step, "name1", "a"), "--name2", fly_name(step, "name2", "b")]
+        args = step.get("args") or []
+        if len(args) >= 2:
+            return name, ["--name1", str(args[0]), "--name2", str(args[1])]
+        raise ValueError("mcp-flyline needs two label names")
     if name == "mcp-zoom":
         if "x1" in step:
             return name, ["--x1", num(step, "x1"), "--y1", num(step, "y1"), "--x2", num(step, "x2"), "--y2", num(step, "y2")]
@@ -1057,6 +1083,12 @@ def openai_tools():
             {"layer": {"type": "string"}, "text": {"type": "string"}, "x": {"type": "integer"}, "y": {"type": "integer"}},
             ["layer", "text", "x", "y"],
         ),
+        fn(
+            "mcp-flyline",
+            "Draw one flyline between two labels that are already placed.",
+            {"name1": {"type": "string"}, "name2": {"type": "string"}},
+            ["name1", "name2"],
+        ),
         fn("mcp-zoom", "Zoom the window to a box.", box, ["x1", "y1", "x2", "y2"]),
         fn(
             "mcp-nix",
@@ -1176,6 +1208,12 @@ def anthropic_tools():
             "Place one label.",
             {"layer": {"type": "string"}, "text": {"type": "string"}, "x": {"type": "integer"}, "y": {"type": "integer"}},
             ["layer", "text", "x", "y"],
+        ),
+        spec(
+            "mcp-flyline",
+            "Draw one flyline between two labels that are already placed.",
+            {"name1": {"type": "string"}, "name2": {"type": "string"}},
+            ["name1", "name2"],
         ),
         spec("mcp-zoom", "Zoom the window to a box.", box, ["x1", "y1", "x2", "y2"]),
         spec(
@@ -1449,6 +1487,8 @@ def selftest():
         check("cell tool", tool == "mcp-cell" and argv == ["--name", "inv"])
         tool, argv = normalize(plan[1])
         check("paint tool", tool == "mcp-paint" and "--layer" in argv and "poly" in argv)
+        tool, argv = normalize({"tool": "mcp-flyline", "name1": "in", "name2": "out"})
+        check("flyline tool", tool == "mcp-flyline" and argv == ["--name1", "in", "--name2", "out"])
     check("draw question", wants_layout("Draw the layout of a very simple CMOS inverter"))
     check("plain question", not wants_layout("What is a via?"))
     check("flyline question", not wants_layout("How does a flyline work?"))
@@ -1488,7 +1528,7 @@ def selftest():
     nix = open(os.path.join(root, "mcp-nix"), "r", encoding="utf-8").read()
     for pkg in NIX_PACKAGES:
         check("nix " + pkg, pkg in nix)
-    for name in ("mcp-io", "mcp-layers", "mcp-cell", "mcp-paint", "mcp-label", "mcp-zoom", "mcp-nix"):
+    for name in ("mcp-io", "mcp-layers", "mcp-cell", "mcp-paint", "mcp-label", "mcp-flyline", "mcp-zoom", "mcp-nix"):
         check("tool " + name, os.path.isfile(os.path.join(root, name)))
     check("paint uses io", "mcp-io" in open(os.path.join(root, "mcp-paint"), "r", encoding="utf-8").read())
 

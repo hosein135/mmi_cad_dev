@@ -1,0 +1,29 @@
+#!/bin/sh
+# Nix tool: draw one flyline between two labels already in the edit cell.
+set -eu
+name1=
+name2=
+while [ $# -gt 0 ]; do
+  case $1 in
+    --name1) name1=${2-} ;;
+    --name2) name2=${2-} ;;
+    *)
+      echo "error: unknown argument: $1" >&2
+      exit 2
+      ;;
+  esac
+  if [ $# -lt 2 ]; then
+    echo "error: missing value after $1" >&2
+    exit 2
+  fi
+  shift 2
+done
+if [ -z "$name1" ] || [ -z "$name2" ]; then
+  echo "error: usage: mcp-flyline --name1 LABEL --name2 LABEL" >&2
+  exit 2
+fi
+dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+if [ -x "$dir/mcp-io" ]; then
+  exec "$dir/mcp-io" flyline "$name1" "$name2"
+fi
+exec sh "$dir/mcp-io" flyline "$name1" "$name2"

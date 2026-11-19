@@ -110,12 +110,19 @@ proc mcp_find_saved {id lines} {
   return {}
 }
 
-proc mcp_context {s} {
-  if {$s == ""} { return 32000 }
+proc mcp_context_k {s} {
+  if {$s == ""} { return 32 }
   set n [mcp_int $s]
-  if {$n == "" || $n < 2000} { return 32000 }
-  if {$n > 1000000} { return 1000000 }
+  if {$n == ""} { return 32 }
+  if {$n >= 1000} {
+    set n [expr {$n / 1000}]
+  }
+  if {$n < 2 || $n > 1000} { return 32 }
   return $n
+}
+
+proc mcp_context {s} {
+  return [expr {[mcp_context_k $s] * 1000}]
 }
 
 proc mcp_google_model {model} {
@@ -226,7 +233,9 @@ proc mcp_log {text} {
     puts $text
     return
   }
-  $MCP(log) insert end "$text\n"
+  set tag note
+  if {[info exists MCP(log_err)] && $MCP(log_err)} { set tag err }
+  $MCP(log) insert end "$text\n" $tag
   $MCP(log) see end
   update idletasks
 }
@@ -300,10 +309,10 @@ proc mcp_copy_errors {} {
 }
 
 proc mcp_copy_chat {} {
-  if {[info commands winfo] == "" || ![winfo exists .mcpask.chat]} { return }
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.logf.chat]} { return }
   set text ""
-  if {[catch {set text [.mcpask.chat get sel.first sel.last]}]} {
-    set text [.mcpask.chat get 1.0 end-1c]
+  if {[catch {set text [.mcpask.logf.chat get sel.first sel.last]}]} {
+    set text [.mcpask.logf.chat get 1.0 end-1c]
   }
   if {$text == ""} {
     mcp_clipboard "" "Nothing to copy"
@@ -406,7 +415,7 @@ proc mcp_show_agent {} {
       } else {
         append note " Fast is off."
       }
-      append note " Context window [lindex $row 6] tokens."
+      append note " Context window [mcp_context_k [lindex $row 6]]k."
       if {[lindex $row 2] == ""} {
         append note " Paste the Cursor API key in the API Keys window."
       } else {
@@ -436,7 +445,7 @@ proc mcp_build_keys {} {
   toplevel .mcpkeys
   wm title .mcpkeys "mcp API keys"
   label .mcpkeys.intro -wraplength 720 -justify left -anchor w -text \
-      "Paste each API key here. Keys stay in your home directory, not in the project. Cursor is Grok 4.7 and extra high. Fast is on or off, and Context is how many tokens of this chat and the Magic notes are sent. The other agents use the model you type. Fast is 0 or 1 for agents that have a fast mode."
+      "Paste each API key here. Keys stay in your home directory, not in the project. Cursor is Grok 4.7 and extra high. Fast is on or off. Context is thousands of tokens: type 32 for 32k, not 32000. The other agents use the model you type. Fast is 0 or 1 for agents that have a fast mode."
   pack .mcpkeys.intro -fill x -padx 8 -pady 4
 
   set show "*"
@@ -458,11 +467,12 @@ proc mcp_build_keys {} {
       checkbutton .mcpkeys.r$r.fast -text Fast -variable MCP(cursor_fast) \
           -onvalue 1 -offvalue 0
       label .mcpkeys.r$r.contextl -text Context -anchor w
-      entry .mcpkeys.r$r.context -width 8
-      .mcpkeys.r$r.context insert 0 [lindex $row 6]
+      entry .mcpkeys.r$r.context -width 4
+      .mcpkeys.r$r.context insert 0 [mcp_context_k [lindex $row 6]]
+      label .mcpkeys.r$r.unit -text k -anchor w
       pack .mcpkeys.r$r.name .mcpkeys.r$r.key .mcpkeys.r$r.model \
           .mcpkeys.r$r.fast .mcpkeys.r$r.contextl .mcpkeys.r$r.context \
-          -side left -padx 2
+          .mcpkeys.r$r.unit -side left -padx 2
     } else {
       entry .mcpkeys.r$r.model -width 42
       .mcpkeys.r$r.model insert 0 [lindex $row 3]
@@ -522,22 +532,36 @@ proc mcp_build_ask {} {
   label .mcpask.tools.l -text "Chat" -anchor w
   button .mcpask.tools.copy -text "Copy" -command mcp_copy_chat
   button .mcpask.tools.paste -text "Paste" -command mcp_paste_question
+  button .mcpask.tools.clean -text "Clean chat" -command mcp_chat_clean
   button .mcpask.tools.errors -text "Copy errors" -command mcp_copy_errors
   label .mcpask.tools.note -text "" -anchor e
   pack .mcpask.tools.l -side left
   pack .mcpask.tools.errors -side right -padx 4
+  pack .mcpask.tools.clean -side right -padx 4
   pack .mcpask.tools.copy -side right -padx 4
   pack .mcpask.tools.paste -side right -padx 4
   pack .mcpask.tools.note -side right -padx 8
   frame .mcpask.logf
   pack .mcpask.logf -fill both -expand 1 -padx 8 -pady 4
-  text .mcpask.chat -height 16 -width 88 -wrap word \
-      -yscrollcommand {.mcpask.logf.scroll set}
-  scrollbar .mcpask.logf.scroll -command {.mcpask.chat yview}
+  text .mcpask.logf.chat -height 16 -width 80 -wrap word -background white \
+      -padx 6 -pady 4 -yscrollcommand {.mcpask.logf.scroll set}
+  scrollbar .mcpask.logf.scroll -width 18 -command {.mcpask.logf.chat yview}
   pack .mcpask.logf.scroll -side right -fill y
-  pack .mcpask.chat -side left -fill both -expand 1
-  set MCP(log) .mcpask.chat
-  bind .mcpask.chat <Key> {
+  pack .mcpask.logf.chat -side left -fill both -expand 1
+  .mcpask.logf.chat tag configure you -foreground #003399
+  .mcpask.logf.chat tag configure agent -foreground #0b6b2a
+  .mcpask.logf.chat tag configure note -foreground #666666
+  .mcpask.logf.chat tag configure err -foreground #a32020
+  set MCP(log) .mcpask.logf.chat
+  bind .mcpask.logf.chat <Button-4> {
+    .mcpask.logf.chat yview scroll -3 units
+    break
+  }
+  bind .mcpask.logf.chat <Button-5> {
+    .mcpask.logf.chat yview scroll 3 units
+    break
+  }
+  bind .mcpask.logf.chat <Key> {
     if {"%K" == "c" && (%s & 4)} {
       mcp_copy_chat
       break
@@ -626,13 +650,35 @@ proc mcp_chat_path {} {
 }
 
 proc mcp_chat_show {role text} {
-  if {[info commands winfo] == "" || ![winfo exists .mcpask.chat]} { return }
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.logf.chat]} { return }
   if {$role == "u"} {
-    .mcpask.chat insert end "You\n$text\n\n"
+    .mcpask.logf.chat insert end "You\n$text\n\n" you
   } else {
-    .mcpask.chat insert end "Agent\n$text\n\n"
+    .mcpask.logf.chat insert end "Agent\n$text\n\n" agent
   }
-  .mcpask.chat see end
+  .mcpask.logf.chat see end
+}
+
+proc mcp_chat_clean {} {
+  global MCP
+  if {$MCP(running)} {
+    mcp_log "Stop the answer before cleaning the chat."
+    return
+  }
+  set MCP(turns) {}
+  set MCP(errors) {}
+  set MCP(say_buf) ""
+  set MCP(saying) 0
+  if {[info commands winfo] != "" && [winfo exists .mcpask.logf.chat]} {
+    .mcpask.logf.chat delete 1.0 end
+  }
+  set path [mcp_chat_path]
+  if {[file exists $path]} {
+    catch {file delete $path}
+  }
+  if {[info commands winfo] != "" && [winfo exists .mcpask.tools.note]} {
+    .mcpask.tools.note configure -text "Cleaned"
+  }
 }
 
 proc mcp_history_write {} {
@@ -1095,6 +1141,31 @@ proc mcp_do_label {layer text x y} {
   return "labeled $layer $text"
 }
 
+proc mcp_fly_name_ok {name} {
+  if {$name == "" || [string length $name] > 80} { return 0 }
+  return [regexp {^[A-Za-z0-9_./{}*+-]+$} $name]
+}
+
+proc mcp_do_flyline {name1 name2} {
+  if {![mcp_fly_name_ok $name1] || ![mcp_fly_name_ok $name2]} {
+    return "error: flyline names must be label names"
+  }
+  if {$name1 == $name2} {
+    return "error: a flyline needs two different labels"
+  }
+  set why [mcp_need_edit]
+  if {$why != ""} { return $why }
+  if {[info commands db_flyline] == ""} {
+    return "error: db_flyline is not available"
+  }
+  if {[catch {db_flyline $name1 $name2} err]} {
+    return "error: $err"
+  }
+  mcp_log "flyline $name1 $name2"
+  update
+  return "flyline $name1 $name2"
+}
+
 proc mcp_do_zoom {x1 y1 x2 y2} {
   if {![mcp_order_box x1 y1 x2 y2]} {
     return "error: coordinates must be integers"
@@ -1116,6 +1187,9 @@ proc mcp_apply {line} {
   }
   if {$op == "label"} {
     return [mcp_do_label [lindex $p 1] [lindex $p 2] [lindex $p 3] [lindex $p 4]]
+  }
+  if {$op == "flyline"} {
+    return [mcp_do_flyline [lindex $p 1] [lindex $p 2]]
   }
   if {$op == "zoom"} {
     return [mcp_do_zoom [lindex $p 1] [lindex $p 2] [lindex $p 3] [lindex $p 4]]
@@ -1162,7 +1236,7 @@ proc mcp_take_pending {path} {
   }
   set wait 120
   set op [lindex [mcp_split_line $line] 0]
-  if {$op == "paint" || $op == "label"} {
+  if {$op == "paint" || $op == "label" || $op == "flyline"} {
     set wait 450
   }
   set MCP(step_after) [after $wait [list mcp_step_done $id $reply]]
@@ -1263,7 +1337,8 @@ proc mcp_selftest {} {
     puts "FAIL agent label"
     incr failed
   }
-  if {[mcp_context ""] != 32000 || [mcp_context 16000] != 16000 || [mcp_context 12] != 32000} {
+  if {[mcp_context ""] != 32000 || [mcp_context 32] != 32000 || [mcp_context 16] != 16000 \
+      || [mcp_context 16000] != 16000 || [mcp_context 1] != 32000 || [mcp_context_k 32000] != 32} {
     puts "FAIL context"
     incr failed
   }
@@ -1275,7 +1350,7 @@ proc mcp_selftest {} {
     puts "FAIL error blob"
     incr failed
   }
-  foreach t {mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-zoom mcp-nix} {
+  foreach t {mcp-io mcp-layers mcp-cell mcp-paint mcp-label mcp-flyline mcp-zoom mcp-nix} {
     if {![file exists [file join $MCP(root) mcp-tools $t]]} {
       puts "FAIL missing $t"
       incr failed

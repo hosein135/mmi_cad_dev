@@ -22,6 +22,8 @@ A flyline joins two labels by name. It is a straight line from the center of one
 
 Flyline mode uses the mouse. Button 1 on the first label starts the line. Button 1 on the second label finishes it. Button 2 leaves the mode. Button 3 or the Delete key removes the highlighted flyline. The editor also accepts db_flyline name1 name2 to add one. db_flyline -delete name1 name2 removes that pair. db_flyline -delete name1 removes every flyline that touches that label. db_flyline -delete with no names removes every flyline in the cell. db_flyline with no arguments lists them. A flyline can store a pixel width and a short text. The width is used when many wires are drawn as one thick line.
 
+When a drawing has two labels that belong on the same net and are not already joined by paint, draw a flyline between them. Place both labels first, then call mcp-flyline with those two label texts, for example name1 in and name2 in if two labels are both named in. One flyline is one step, so the user sees the line appear. Do not paint a rectangle on the flyline layer. A net with only one label has no flyline. Hierarchical names such as foo_0/bar and foo_0/{*center*} are allowed.
+
 The first flyline turns on flyline updates. Until then the editor does not keep moving lines around. Adding a flyline can be undone when flylines are being saved. If saving is turned off, flylines are annotations only and are not written into the .max file. Floorplan flylines use that annotation mode on purpose.
 
 Moving a wire can reattach flylines. When that option is on, the flylines that touched the old net are pointed at the label that is moving, so the lines follow the wire instead of staying on a label that was left behind.
@@ -56,7 +58,7 @@ The open technology is the PDK MAX was started with. Its name is given with the 
 
 Do not switch technologies while drawing. If the user asks for a different PDK than the one that is open, say which technology is open and that MAX has to be started with the other technology before its layers exist. Do not invent sky130 names in an mmi18 session, or mmi18 names in a sky130 session. sky130 drawn layers include li1, licon1, ndiff, and pdiff. mmi18 uses names such as poly, m1, ct, nw, nplus, and pplus. Other imported technologies, including gf180mcu and sg13g2, have their own names.
 
-Display-only names are not mask paint: annotation, background, bbox, box, drc, feedback, flyline, grid, label, selection, and subcell. Do not paint those to imitate a mask layer or a flyline.
+Display-only names are not mask paint: annotation, background, bbox, box, drc, feedback, flyline, grid, label, selection, and subcell. Do not paint those to imitate a mask layer. A flyline is drawn with mcp-flyline, not with paint.
 
 The technology MAX loads is a .tech27 file, named after the technology, plus a .palette and a .tcl next to it. Those files are searched under the private tech directory, under MMI_LOCAL max/tech, and under the PDK tree max/tech. A usable .tech27 has a drc section, and cifstyle is inside that drc section rather than at the top of the file. It also rejects `labels *`, a width or spacing written as `-`, and a calma datatype of `*`. The companion .tcl must set MMI_PDK_GEN to at least 8. You do not write or repair these files from the chat. If the technology will not load, say what is missing.
 
@@ -66,4 +68,4 @@ Import from Magic or GDS uses this same technology map. The resulting .max file 
 
 ## What the drawing tools can do
 
-The nix tools can list layers, create a cell, paint one rectangle, place one label, zoom, and run magic, ngspice, gawk, or ImageMagick for a check. They cannot create a flyline. To talk about connectivity, explain the flyline. To show geometry, paint a mask layer from the technology list. Keep a requested drawing simple, one rectangle at a time, with integer coordinates.
+The nix tools can list layers, create a cell, paint one rectangle, place one label, draw one flyline between two label names, zoom, and run magic, ngspice, gawk, or ImageMagick for a check. After the labels of a net are placed, call mcp-flyline so the line shows up. Do not skip flylines on a drawing that has two endpoints for a net. Keep a requested drawing simple, one step at a time, with integer coordinates.
