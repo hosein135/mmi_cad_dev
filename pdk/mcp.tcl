@@ -15,6 +15,7 @@ set MCP(errors) {}
 set MCP(turns) {}
 set MCP(saying) 0
 set MCP(say_buf) ""
+set MCP(saw_err) 0
 set MCP(log_err) 0
 set MCP(copy_text) ""
 set MCP(show_keys) 0
@@ -233,8 +234,35 @@ proc mcp_log {text} {
 proc mcp_log_err {text} {
   global MCP
   set MCP(log_err) 1
+  set MCP(saw_err) 1
   mcp_log $text
   set MCP(log_err) 0
+}
+
+proc mcp_agent_label {id} {
+  foreach spec [mcp_agent_table] {
+    if {[lindex $spec 0] == $id} { return [lindex $spec 1] }
+  }
+  return $id
+}
+
+proc mcp_saved_key {id} {
+  foreach row [mcp_rows] {
+    if {[lindex $row 0] == $id} {
+      return [string trim [lindex $row 2]]
+    }
+  }
+  return ""
+}
+
+proc mcp_keyed_names {} {
+  set names {}
+  foreach row [mcp_rows] {
+    if {[string trim [lindex $row 2]] != ""} {
+      lappend names [lindex $row 1]
+    }
+  }
+  return $names
 }
 
 proc mcp_sel_handle {offset maxBytes} {
@@ -357,10 +385,10 @@ proc mcp_save_keys {} {
 
 proc mcp_selected {} {
   global MCP
-  if {[info commands winfo] == "" || ![winfo exists .mcpask.agents]} {
+  if {[info commands winfo] == "" || ![winfo exists .mcpask.pick.agents]} {
     return cursor
   }
-  set sel [.mcpask.agents curselection]
+  set sel [.mcpask.pick.agents curselection]
   if {$sel == ""} { return cursor }
   return [lindex $MCP(agent_ids) [lindex $sel 0]]
 }
@@ -398,6 +426,9 @@ proc mcp_show_agent {} {
     }
   }
   .mcpask.settings configure -text $note
+  if {[info commands winfo] != "" && [winfo exists .mcpask.btns.ask]} {
+    .mcpask.btns.ask configure -text "Ask [mcp_agent_label $id]"
+  }
 }
 
 proc mcp_build_keys {} {
@@ -466,23 +497,23 @@ proc mcp_build_ask {} {
 
   frame .mcpask.pick
   pack .mcpask.pick -fill x -padx 8
-  listbox .mcpask.agents -height 5 -width 18 -exportselection 0 \
-      -yscrollcommand {.mcpask.pick.scroll set}
-  scrollbar .mcpask.pick.scroll -command {.mcpask.agents yview}
+  listbox .mcpask.pick.agents -height 8 -width 22 -exportselection 0 \
+      -selectmode browse -yscrollcommand {.mcpask.pick.scroll set}
+  scrollbar .mcpask.pick.scroll -command {.mcpask.pick.agents yview}
   pack .mcpask.pick.scroll -side right -fill y
-  pack .mcpask.agents -side left -fill y
+  pack .mcpask.pick.agents -side left -fill both -expand 1
   set MCP(agent_ids) {}
   set cursor_i 0
   set i 0
   foreach row [mcp_rows] {
     lappend MCP(agent_ids) [lindex $row 0]
-    .mcpask.agents insert end [lindex $row 1]
+    .mcpask.pick.agents insert end [lindex $row 1]
     if {[lindex $row 0] == "cursor"} { set cursor_i $i }
     incr i
   }
-  .mcpask.agents selection set $cursor_i
-  .mcpask.agents see $cursor_i
-  bind .mcpask.agents <<ListboxSelect>> mcp_show_agent
+  .mcpask.pick.agents selection set $cursor_i
+  .mcpask.pick.agents see $cursor_i
+  bind .mcpask.pick.agents <<ListboxSelect>> mcp_show_agent
 
   label .mcpask.settings -anchor w -wraplength 720 -justify left
   pack .mcpask.settings -fill x -padx 8 -pady 2
@@ -741,6 +772,17 @@ proc mcp_ask_start {} {
     mcp_log_err $err
     return
   }
+  set id [mcp_selected]
+  if {[mcp_saved_key $id] == ""} {
+    set label [mcp_agent_label $id]
+    set msg "$label has no API key. Open API Keys and paste a key in the $label box, or select a different agent."
+    set have [mcp_keyed_names]
+    if {$have != ""} {
+      append msg " A key is saved for [join $have {, }]."
+    }
+    mcp_log_err $msg
+    return
+  }
   mcp_history_add u $q
   mcp_chat_show u $q
   .mcpask.q delete 1.0 end
@@ -765,6 +807,7 @@ proc mcp_ask_start {} {
     set env(PATH) "$tools:$MCP(path)"
   }
   set MCP(running) 1
+  set MCP(saw_err) 0
   # Tcl 8.0 reads 2>@1 as a channel named "1", which does not exist.
   # |& joins python's stderr onto the pipe this window reads.
   set args [list python3 -u $script [mcp_jobdir] |& cat -u]
@@ -825,18 +868,19 @@ proc mcp_on_line {line} {
 proc mcp_ask_readable {} {
   global MCP
   if {$MCP(chan) == ""} { return }
-  if {[eof $MCP(chan)]} {
-    set chan $MCP(chan)
-    set MCP(chan) ""
-    catch {fileevent $chan readable {}}
-    if {[catch {close $chan} err] && $err != ""} {
+  if {[gets $MCP(chan) line] >= 0} {
+    mcp_on_line $line
+  }
+  if {$MCP(chan) == "" || ![eof $MCP(chan)]} { return }
+  set chan $MCP(chan)
+  set MCP(chan) ""
+  catch {fileevent $chan readable {}}
+  if {[catch {close $chan} err] && $err != ""} {
+    if {$err != "child process exited abnormally" || !$MCP(saw_err)} {
       mcp_log_err $err
     }
-    set MCP(running) 0
-    return
   }
-  if {[gets $MCP(chan) line] < 0} { return }
-  mcp_on_line $line
+  set MCP(running) 0
 }
 
 proc mcp_ask_stop {} {
@@ -1213,6 +1257,10 @@ proc mcp_selftest {} {
       || [mcp_google_model models/gemini-2.5-pro] != "gemini-3.1-pro-preview" \
       || [mcp_google_model gemini-3.1-pro-preview] != "gemini-3.1-pro-preview"} {
     puts "FAIL google model"
+    incr failed
+  }
+  if {[mcp_agent_label fireworks] != "Fireworks" || [mcp_agent_label cursor] != "Cursor"} {
+    puts "FAIL agent label"
     incr failed
   }
   if {[mcp_context ""] != 32000 || [mcp_context 16000] != 16000 || [mcp_context 12] != 32000} {
