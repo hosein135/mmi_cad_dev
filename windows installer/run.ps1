@@ -8,7 +8,8 @@ $ErrorActionPreference = 'Stop'
 # Command lookup follows ../document/run.ps1: find winget/vfox when they are
 # missing from PATH, and fall back to the user PATH if Machine PATH is locked.
 # run.cmd calls powershell.exe by full path and does not ask for administrator
-# rights. Extra arguments are passed to
+# rights. Vagrant's MSI is unpacked for the current user the same way.
+# Extra arguments are passed to
 # ./run.sh, for example:  run.cmd max
 
 Set-Location -LiteralPath $PSScriptRoot
@@ -25,6 +26,8 @@ $vfoxVersion = "0.6.2"
 $vfoxPackageId = "version-fox.vfox"
 $vagrantVersion = "2.4.9"
 $vagrantPluginZip = "https://github.com/johnxu16/vfox-vagrant/archive/1d8a1c7198f26439a796ac4e7169047a2dcd6c48.zip"
+$vagrantMsiUrl = "https://releases.hashicorp.com/vagrant/2.4.9/vagrant_2.4.9_windows_amd64.msi"
+$vagrantMsiSha256 = "3bdd967927705872a70c7c98e0576afd5acd9dd73b527695f4d9dd75dd26cbe3"
 $virtualBoxVersion = "7.1.18"
 $virtualBoxPackageId = "Oracle.VirtualBox"
 $boxVersion = "202510.26.0"
@@ -346,49 +349,175 @@ function Find-VagrantExe {
     return $null
 }
 
-function Install-VagrantMsiFallback {
-    $msi = $null
-    foreach ($root in @("$HOME\.version-fox", "$HOME\.vfox")) {
+function Get-VagrantHelperDir {
+    $temp = Join-Path $env:TEMP "mmi-cad-vagrant"
+    if ($temp -notmatch "\s") {
+        New-Item -ItemType Directory -Force -Path $temp | Out-Null
+        return $temp
+    }
+    $publicDir = "C:\Users\Public\mmi-cad-vagrant"
+    New-Item -ItemType Directory -Force -Path $publicDir | Out-Null
+    return $publicDir
+}
+
+function Update-VagrantPostInstallText {
+    param(
+        [string]$Text,
+        [string]$LauncherPath
+    )
+    $newline = "`n"
+    if ($Text.Contains("`r`n")) { $newline = "`r`n" }
+    $norm = $Text.Replace("`r`n", "`n")
+    $start = $norm.IndexOf('local install_cmd = "sudo msiexec.exe /i "')
+    $singleLine = $false
+    if ($start -lt 0) {
+        $start = $norm.IndexOf('local install_cmd = [[set MMI_VAGRANT_MSI=]]')
+        if ($start -lt 0) { return $null }
+        $singleLine = $true
+    }
+    $lineStart = $norm.LastIndexOf("`n", $start)
+    $indent = ""
+    if ($lineStart -ge 0) {
+        $indent = $norm.Substring($lineStart + 1, $start - $lineStart - 1)
+    } else {
+        $lineStart = -1
+    }
+    if ($singleLine) {
+        $end = $norm.IndexOf("`n", $start)
+        if ($end -lt 0) { $end = $norm.Length }
+    } else {
+        $installPathAt = $norm.IndexOf("installPath", $start)
+        if ($installPathAt -lt 0) { return $null }
+        $end = $norm.IndexOf("`n", $installPathAt)
+        if ($end -lt 0) { $end = $norm.Length }
+    }
+    $newLine = $indent + 'local install_cmd = [[set MMI_VAGRANT_MSI=]] .. installer .. [[&& set MMI_VAGRANT_DEST=]] .. installPath .. [[&& ' + $LauncherPath + ']]'
+    $updated = $norm.Substring(0, $lineStart + 1) + $newLine + $norm.Substring($end)
+    if ($newline -eq "`r`n") { $updated = $updated.Replace("`n", "`r`n") }
+    return $updated
+}
+
+function Repair-VagrantPluginPostInstall {
+    $source = Join-Path $PSScriptRoot "install-vagrant-user.ps1"
+    if (-not (Test-Path -LiteralPath $source)) {
+        Write-Host "install-vagrant-user.ps1 is missing. Vagrant will be extracted directly." -ForegroundColor Yellow
+        return
+    }
+    $dir = Get-VagrantHelperDir
+    if ($dir -match "\s") {
+        Write-Host "No space-free folder was available for the Vagrant helper." -ForegroundColor Yellow
+        return
+    }
+    Copy-Item -LiteralPath $source -Destination (Join-Path $dir "install-vagrant-user.ps1") -Force
+    $launcher = Join-Path $dir "install-vagrant.cmd"
+    $psExe = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+    $cmdLines = @(
+        "@echo off",
+        "setlocal",
+        "`"$psExe`" -NoProfile -ExecutionPolicy Bypass -File `"%~dp0install-vagrant-user.ps1`" -ExpectedSha256 $vagrantMsiSha256 -ExpectedVersion $vagrantVersion",
+        "exit /b %ERRORLEVEL%"
+    )
+    $cmdText = ($cmdLines -join "`r`n") + "`r`n"
+    $ascii = New-Object System.Text.ASCIIEncoding
+    [System.IO.File]::WriteAllText($launcher, $cmdText, $ascii)
+
+    $utf8 = New-Object System.Text.UTF8Encoding $false
+    $patched = 0
+    foreach ($base in @((Join-Path $HOME ".version-fox\plugin"), (Join-Path $HOME ".vfox\plugin"))) {
+        if (-not (Test-Path -LiteralPath $base)) { continue }
+        $hooks = Get-ChildItem -Path $base -Recurse -Filter "post_install.lua" -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match '\\vagrant\\hooks\\post_install\.lua$' }
+        foreach ($hook in $hooks) {
+            $text = [System.IO.File]::ReadAllText($hook.FullName)
+            $updated = Update-VagrantPostInstallText -Text $text -LauncherPath $launcher
+            if (-not $updated) {
+                Write-Host "Could not adjust $($hook.FullName). It does not match the known Vagrant plugin." -ForegroundColor Yellow
+                continue
+            }
+            if ($updated -ne $text) {
+                [System.IO.File]::WriteAllText($hook.FullName, $updated, $utf8)
+            }
+            $patched++
+        }
+    }
+    if ($patched -eq 0) {
+        Write-Host "The vfox Vagrant plugin hook was not found yet." -ForegroundColor Yellow
+        return
+    }
+    Write-Host "The vfox Vagrant plugin will extract the MSI without administrator rights." -ForegroundColor Green
+}
+
+function Find-VagrantMsi {
+    $name = "vagrant_${vagrantVersion}_windows_amd64.msi"
+    $candidates = @(
+        (Join-Path $HOME ".version-fox\cache\vagrant\v-$vagrantVersion\vagrant-$vagrantVersion\$name"),
+        (Join-Path $HOME ".vfox\cache\vagrant\v-$vagrantVersion\vagrant-$vagrantVersion\$name"),
+        (Join-Path $env:TEMP "mmi-cad-vagrant\$name"),
+        (Join-Path $env:TEMP $name)
+    )
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate) { return $candidate }
+    }
+    foreach ($root in @((Join-Path $HOME ".version-fox"), (Join-Path $HOME ".vfox"))) {
         if (-not (Test-Path -LiteralPath $root)) { continue }
-        $msi = Get-ChildItem -Path $root -Recurse -Filter "vagrant_${vagrantVersion}_windows_amd64.msi" -ErrorAction SilentlyContinue |
-            Select-Object -First 1
-        if ($msi) { break }
+        $found = Get-ChildItem -Path $root -Recurse -Filter $name -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($found) { return $found.FullName }
     }
-    if (-not $msi) { return $false }
-    $dest = Join-Path $msi.DirectoryName "release"
-    $log = Join-Path $msi.DirectoryName "install.log"
-    if (Test-Path -LiteralPath (Join-Path $dest "bin\vagrant.exe")) {
-        Write-Host "  Vagrant MSI is already installed in $($msi.DirectoryName)" -ForegroundColor Green
-        return $true
+    return $null
+}
+
+function Install-VagrantUnelevated {
+    $helper = Join-Path $PSScriptRoot "install-vagrant-user.ps1"
+    if (-not (Test-Path -LiteralPath $helper)) {
+        Write-Host "  Missing $helper" -ForegroundColor Yellow
+        return $false
     }
-    Write-Host "  vfox left the Vagrant MSI on disk. Installing it with msiexec..." -ForegroundColor Yellow
-    $msiArgs = "/i `"$($msi.FullName)`" /qn /norestart /L*V `"$log`" LicenseAccepted=1 CostingComplete=1 INSTALLDIR=`"$dest`""
-    $proc = Start-Process -FilePath "$env:SystemRoot\System32\msiexec.exe" -ArgumentList $msiArgs -Wait -PassThru
-    if ($proc.ExitCode -ne 0 -and $proc.ExitCode -ne 3010) {
-        Write-Host "  msiexec exit $($proc.ExitCode). See $log" -ForegroundColor Yellow
+    $destRoot = Join-Path $HOME ".version-fox\cache\vagrant\v-$vagrantVersion\vagrant-$vagrantVersion"
+    $msi = Find-VagrantMsi
+    $dest = Join-Path $destRoot "release"
+    if ($msi) {
+        $parentName = Split-Path -Leaf (Split-Path -Parent $msi)
+        if ($parentName -like "vagrant-*") {
+            $dest = Join-Path (Split-Path -Parent $msi) "release"
+        }
+    }
+    $existing = Join-Path $dest "bin\vagrant.exe"
+    if (Test-Path -LiteralPath $existing) {
+        $env:VAGRANT_CHECKPOINT_DISABLE = "1"
+        $prev = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        $versionText = & $existing --version 2>&1 | Out-String
+        $ErrorActionPreference = $prev
+        if ($versionText -match [regex]::Escape($vagrantVersion)) {
+            Write-Host "  Vagrant $vagrantVersion is already extracted." -ForegroundColor Green
+            return $true
+        }
+    }
+    if (-not $msi) {
+        $downloadDir = Join-Path $env:TEMP "mmi-cad-vagrant"
+        New-Item -ItemType Directory -Force -Path $downloadDir | Out-Null
+        $msi = Join-Path $downloadDir ("vagrant_${vagrantVersion}_windows_amd64.msi")
+        $downloaded = Download-File -Url $vagrantMsiUrl -Destination $msi -Label "Downloading Vagrant $vagrantVersion"
+        if (-not $downloaded) { return $false }
+        $dest = Join-Path $destRoot "release"
+    }
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dest) | Out-Null
+    Write-Host "  Extracting Vagrant $vagrantVersion without administrator rights..." -ForegroundColor Yellow
+    $ps = Join-Path $env:SystemRoot "System32\WindowsPowerShell\v1.0\powershell.exe"
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    & $ps -NoProfile -ExecutionPolicy Bypass -File $helper -Msi $msi -Dest $dest -ExpectedSha256 $vagrantMsiSha256 -ExpectedVersion $vagrantVersion
+    $code = $LASTEXITCODE
+    $ErrorActionPreference = $prev
+    if ($code -ne 0) {
+        Write-Host "  Vagrant extract failed (exit $code)." -ForegroundColor Yellow
+        $downloadMsi = Join-Path (Join-Path $env:TEMP "mmi-cad-vagrant") ("vagrant_${vagrantVersion}_windows_amd64.msi")
+        if ($msi -eq $downloadMsi) {
+            Remove-Item -LiteralPath $msi -Force -ErrorAction SilentlyContinue
+        }
         return $false
     }
     return (Test-Path -LiteralPath (Join-Path $dest "bin\vagrant.exe"))
-}
-
-function Ensure-SudoForVfoxPlugin {
-    if (Get-Command sudo -ErrorAction SilentlyContinue) {
-        Write-Host "sudo is available. The vfox Vagrant plugin will use it." -ForegroundColor Green
-        return
-    }
-    # The plugin runs "sudo msiexec" and does not quote paths. This process is
-    # already elevated, so sudo only needs to forward the command.
-    $shim = Join-Path $env:TEMP "mmi-cad-sudo"
-    New-Item -ItemType Directory -Force -Path $shim | Out-Null
-    $cmdPath = Join-Path $shim "sudo.cmd"
-    @(
-        '@echo off',
-        'REM Forward sudo to the elevated installer. vfox-vagrant prefixes msiexec with sudo.',
-        '%*',
-        'exit /b %ERRORLEVEL%'
-    ) | Set-Content -LiteralPath $cmdPath -Encoding ASCII
-    $env:Path = "$shim;$env:Path"
-    Write-Host "Sudo for Windows is not installed. Using an elevated sudo shim for the Vagrant MSI." -ForegroundColor Yellow
 }
 
 function Find-VBoxManage {
@@ -755,17 +884,18 @@ try {
     Write-Host "vfox successfully located. Activating session environment..." -ForegroundColor Green
     Enable-VfoxSession
 
-    Ensure-SudoForVfoxPlugin
     Write-Host "Adding the Vagrant plugin to vfox..." -ForegroundColor Yellow
     $addCode = Invoke-Vfox add --source $vagrantPluginZip vagrant
     if ($addCode -ne 0) {
         Write-Host "Plugin add returned $addCode. Continuing if vagrant is already added." -ForegroundColor Yellow
         Invoke-Vfox add vagrant | Out-Null
     }
+    Repair-VagrantPluginPostInstall
 
     $installed = Install-VfoxSdk -Plugin "vagrant" -Version $vagrantVersion
     if (-not $installed) {
-        if (-not (Install-VagrantMsiFallback)) {
+        Write-Host "vfox did not finish installing Vagrant. Extracting the official MSI without administrator rights..." -ForegroundColor Yellow
+        if (-not (Install-VagrantUnelevated)) {
             Fail "Failed to install vagrant@$vagrantVersion via vfox."
         }
     }
@@ -777,7 +907,7 @@ try {
 
     $script:VagrantExe = Find-VagrantExe
     if (-not $script:VagrantExe) {
-        if (Install-VagrantMsiFallback) {
+        if (Install-VagrantUnelevated) {
             Refresh-SessionPath -WingetPackagesRoot $wingetPackagesRoot
             $script:VagrantExe = Find-VagrantExe
         }
