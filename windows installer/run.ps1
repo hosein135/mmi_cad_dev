@@ -28,7 +28,7 @@ $vagrantVersion = "2.4.9"
 $vagrantPluginZip = "https://github.com/johnxu16/vfox-vagrant/archive/1d8a1c7198f26439a796ac4e7169047a2dcd6c48.zip"
 $vagrantMsiUrl = "https://releases.hashicorp.com/vagrant/2.4.9/vagrant_2.4.9_windows_amd64.msi"
 $vagrantMsiSha256 = "3bdd967927705872a70c7c98e0576afd5acd9dd73b527695f4d9dd75dd26cbe3"
-$virtualBoxVersion = "7.1.18"
+$virtualBoxVersion = "7.2.22"
 $virtualBoxPackageId = "Oracle.VirtualBox"
 $boxVersion = "202510.26.0"
 $minFreeBytes = 24GB
@@ -557,6 +557,18 @@ function Ensure-VirtualBox {
         Write-Host "VirtualBox $ver is installed. WinGet will install the pinned $virtualBoxVersion." -ForegroundColor Yellow
     }
 
+    Write-Host "Refreshing the WinGet catalog..." -ForegroundColor Yellow
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    & $WingetExe source update --disable-interactivity
+    $showText = & $WingetExe show --id $virtualBoxPackageId --version $virtualBoxVersion --exact --accept-source-agreements --disable-interactivity 2>&1 | Out-String
+    $showCode = $LASTEXITCODE
+    $ErrorActionPreference = $prev
+    if ($showCode -ne 0) {
+        Write-Host $showText.Trim()
+        Fail "WinGet has no $virtualBoxPackageId package for $virtualBoxVersion."
+    }
+
     Write-Host "Installing VirtualBox $virtualBoxVersion via winget ($virtualBoxPackageId)..." -ForegroundColor Yellow
     $prev = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
@@ -580,7 +592,7 @@ function Ensure-VirtualBox {
     if ($wingetCode -eq 3010) {
         Fail "WinGet installed VirtualBox $virtualBoxVersion and requested a reboot. Reboot Windows, then run this installer again."
     }
-    Fail "WinGet did not install VirtualBox $virtualBoxVersion (exit $wingetCode). Remove any other VirtualBox version, then run this installer again."
+    Fail "WinGet did not install VirtualBox $virtualBoxVersion (exit $wingetCode). If another VirtualBox version is installed, remove it and run this installer again."
 }
 
 function Get-FreeBytes([string]$LiteralPath) {
@@ -622,7 +634,7 @@ function Assert-HostCanRunVm {
         $problems += "Windows build $build is older than Windows 10 version 1809. VirtualBox $virtualBoxVersion needs Windows 10 or newer."
     }
     if ([int]$os.ProductType -ne 1) {
-        Write-Host "This is Windows Server. VirtualBox $virtualBoxVersion is documented for Windows 10 and Windows Server 2022. The installer will still try." -ForegroundColor Yellow
+        Write-Host "This is Windows Server. VirtualBox $virtualBoxVersion is documented for Windows 10, Windows Server 2022, and Windows Server 2025. The installer will still try." -ForegroundColor Yellow
     }
 
     $cpus = @(Get-CimInstance Win32_Processor)
