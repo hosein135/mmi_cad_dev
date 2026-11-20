@@ -7,20 +7,18 @@ $ErrorActionPreference = 'Stop'
 # and starts ./run.sh so the CAD applications can be opened again.
 # Command lookup follows ../document/run.ps1: find winget/vfox when they are
 # missing from PATH, and fall back to the user PATH if Machine PATH is locked.
-# run.cmd calls powershell.exe by full path and requests administrator rights
-# (VirtualBox and the Vagrant MSI need them). Extra arguments are passed to
+# run.cmd calls powershell.exe by full path and does not ask for administrator
+# rights. Extra arguments are passed to
 # ./run.sh, for example:  run.cmd max
 
 Set-Location -LiteralPath $PSScriptRoot
 Write-Host "Working directory set to: $PSScriptRoot" -ForegroundColor Cyan
 
-$script:ElevatedHere = $false
 $script:VagrantExe = $null
 $script:BrowserJob = $null
 $RunArgs = @()
 foreach ($a in $args) {
-    if ($a -eq '-ElevatedChild') { $script:ElevatedHere = $true }
-    else { $RunArgs += $a }
+    $RunArgs += $a
 }
 
 $vfoxVersion = "0.6.2"
@@ -46,18 +44,7 @@ function Write-Section([string]$Title) {
 function Fail([string]$Message) {
     Write-Host ""
     Write-Host $Message -ForegroundColor Red
-    if ($script:ElevatedHere) {
-        Write-Host ""
-        Write-Host "Press Enter to close this window."
-        try { [void](Read-Host) } catch {}
-    }
     exit 1
-}
-
-function Test-IsAdmin {
-    $id = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = New-Object Security.Principal.WindowsPrincipal($id)
-    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
 function Refresh-SessionPath {
@@ -646,24 +633,6 @@ function Get-SavedNovncHostPort {
     return $null
 }
 
-function Enter-Admin {
-    if (Test-IsAdmin) { return }
-    Write-Host ""
-    Write-Host "Administrator rights are required to install VirtualBox and Vagrant." -ForegroundColor Yellow
-    $ps = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-    $argList = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -ElevatedChild"
-    foreach ($a in $RunArgs) {
-        if ($a -match '[\s"]') {
-            $argList += " `"$($a.Replace('"', '\"'))`""
-        } else {
-            $argList += " $a"
-        }
-    }
-    $proc = Start-Process -FilePath $ps -ArgumentList $argList -Verb RunAs -Wait -PassThru
-    if (-not $proc) { Fail "Administrator approval was cancelled." }
-    exit $proc.ExitCode
-}
-
 function New-GuestRunCommand {
     param([int]$HostPort)
     # One remote command. vagrant.exe passes it through unchanged; bash on the
@@ -720,11 +689,8 @@ try {
         Write-Section "Setup already complete"
         Write-Host "Vagrant, VirtualBox, and the Ubuntu VM are already installed." -ForegroundColor Green
         Write-Host "Starting the virtual machine and ./run.sh." -ForegroundColor Green
-    } else {
-        if (-not $toolsReady -and $HOME -match '\s') {
-            Fail "The vfox Vagrant plugin passes the install path to msiexec without quotes. This profile path contains a space: $HOME. Run the installer from an account whose profile path has no spaces."
-        }
-        Enter-Admin
+    } elseif (-not $toolsReady -and $HOME -match '\s') {
+        Fail "The vfox Vagrant plugin passes the install path to msiexec without quotes. This profile path contains a space: $HOME. Run the installer from an account whose profile path has no spaces."
     }
 
     $hostPort = $null

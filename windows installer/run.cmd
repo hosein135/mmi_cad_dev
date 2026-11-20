@@ -3,7 +3,7 @@ REM Launcher for run.ps1. Double-click this file, or run:  run.cmd
 REM The first run installs vfox, Vagrant, and VirtualBox, then starts Ubuntu.
 REM A later run sees that setup and only starts the VM and ./run.sh.
 REM Extra words are passed to run.sh, for example:  run.cmd max
-REM Administrator rights are required for VirtualBox and the Vagrant MSI.
+REM Runs in this window. It does not ask for administrator rights up front.
 
 setlocal
 
@@ -28,23 +28,6 @@ if not exist "%PS_EXE%" (
     echo   %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe
     pause
     exit /b 1
-)
-
-net session >nul 2>&1
-if errorlevel 1 (
-    echo [run.cmd] Administrator rights are required to install VirtualBox and Vagrant.
-    echo [run.cmd] Approve the Windows prompt. The installer continues in that window.
-    if "%~1"=="" (
-        "%PS_EXE%" -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
-    ) else (
-        "%PS_EXE%" -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList '%*'"
-    )
-    if errorlevel 1 (
-        echo [run.cmd] Administrator approval was cancelled.
-        pause
-        exit /b 1
-    )
-    exit /b 0
 )
 
 cd /d "%SCRIPT_DIR%"
