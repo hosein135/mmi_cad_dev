@@ -1,0 +1,41 @@
+# Micro Magic CAD — x86_64 Ubuntu VM. run.ps1 starts this and runs ./run.sh inside.
+
+ENV["VAGRANT_EXPERIMENTAL"] ||= "disks"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.box_version = "202510.26.0"
+  config.vm.box_architecture = "amd64"
+  config.vm.box_check_update = false
+  config.vm.hostname = "mmi-cad"
+  config.vm.boot_timeout = 1200
+  config.ssh.keep_alive = true
+
+  # Nix plus the CAD tree need several GiB. Grow; do not shrink a larger box.
+  config.vm.disk :disk, primary: true, size: "64GB"
+
+  config.vm.network "forwarded_port",
+    guest: 6080,
+    host: (ENV["MMI_NOVNC_HOST_PORT"] || "6080").to_i,
+    host_ip: "127.0.0.1",
+    id: "mmi-novnc",
+    auto_correct: false
+
+  # The CAD tree is the parent of this folder. Nix cannot build on a
+  # shared folder, so the guest copies /mmi-src onto its own disk.
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder "..", "/mmi-src", type: "virtualbox", id: "mmi-src"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+    vb.name = "mmi-cad"
+    vb.memory = (ENV["MMI_VM_MEMORY"] || "6144").to_i
+    vb.cpus = (ENV["MMI_VM_CPUS"] || "2").to_i
+    # Avoid a boot hang seen with this Ubuntu box on VirtualBox.
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    vb.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+    vb.customize ["modifyvm", :id, "--uartmode1", "file", File::NULL]
+  end
+
+  config.vm.provision "shell", path: "guest-prepare.sh", privileged: true
+end
